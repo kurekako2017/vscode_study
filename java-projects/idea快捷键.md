@@ -109,5 +109,37 @@
 
 ---
 
-## 十、Eclipse → IDEA 必记快捷键 TOP 6
+## 十、常用场景快速参考
+
+### 📌 从接口跳转到实现类
+
+**快捷键：** `Ctrl + Alt + B`
+
+**菜单路径：** Navigate → Implementation(s)
+
+**使用场景：** 光标放在接口名或接口方法上，按 `Ctrl + Alt + B` 即可跳转到实现类。如果有多个实现，会弹出列表供选择。
+
+**对比 Eclipse：** Eclipse 使用 `Ctrl + T`
+
+---
+
+### 🐛 Debug 调试快捷键
+
+**启动 Debug：** `Shift + F9`
+
+**常用 Debug 操作：**
+
+| 操作 | 快捷键 | Eclipse 对比 | 说明 |
+|---|---|---|---|
+| Step Over（单步跳过） | F8 | F6 | 执行当前行，不进入方法 |
+| Step Into（单步进入） | F7 | F5 | 进入方法内部 |
+| Step Out（单步返回） | Shift + F8 | F7 | 跳出当前方法 |
+| Resume Program（继续执行） | F9 | F8 | 执行到下一个断点 |
+| Toggle Breakpoint（切换断点） | Ctrl + F8 | Ctrl + Shift + B | 添加/删除断点 |
+| View Breakpoints（查看所有断点） | Ctrl + Shift + F8 | - | 管理所有断点 |
+| Evaluate Expression（计算表达式） | Alt + F8 | Ctrl + Shift + I | 调试时计算表达式 |
+
+---
+
+## 十一、Eclipse → IDEA 必记快捷键 TOP 6
 
