@@ -53,10 +53,10 @@ public class AdminController {
 	private ProductService productService;
 	
 	// 管理员登录状态标志：0=未登录，1=已登录（静态变量，用于跨请求保持状态）
-	int adminlogcheck = 0;
+	static int adminlogcheck = 0;
 
 	// 当前登录管理员的用户名（静态变量，用于跨请求保持状态）
-	String usernameforclass = "";
+	static String usernameforclass = "";
 
 	/**
 	 * 管理员退出登录或返回首页

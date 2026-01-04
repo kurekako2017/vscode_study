@@ -96,9 +96,7 @@ public class AdminControllerTest {
         userService.addUser(normalUser);
         
         // 创建测试商品分类
-        testCategory = new Category();
-        testCategory.setName("Test Category");
-        categoryService.addCategory(testCategory);
+        testCategory = categoryService.addCategory("Test Category");
     }
     
     // ==================== 登录功能测试 ====================
@@ -342,10 +340,7 @@ public class AdminControllerTest {
     void testDeleteCategory() throws Exception {
         AdminController.adminlogcheck = 1;
         
-        Category category = new Category();
-        category.setName("Category to Delete");
-        categoryService.addCategory(category);
-        
+        Category category = categoryService.addCategory("Category to Delete");
         int categoryId = category.getId();
         
         mockMvc.perform(get("/admin/categories/delete")

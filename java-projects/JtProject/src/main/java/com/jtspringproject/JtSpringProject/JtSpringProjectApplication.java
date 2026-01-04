@@ -35,6 +35,14 @@ public class JtSpringProjectApplication {
 	/**
 	 * 应用程序主入口方法
 	 *
+	 * 调用流程：
+	 * 1. main方法启动
+	 * 2. SpringApplication.run() 初始化Spring容器
+	 * 3. 扫描@Controller、@Service等组件
+	 * 4. 配置DispatcherServlet（Spring MVC核心）
+	 * 5. 启动内嵌Tomcat服务器（默认8080端口）
+	 * 6. 应用就绪，等待HTTP请求
+	 *
 	 * @param args 命令行参数
 	 */
 	public static void main(String[] args) {
@@ -42,16 +50,15 @@ public class JtSpringProjectApplication {
 		logger.info("JT电商系统启动中...");
 		logger.info("========================================");
 
-		try {
-			SpringApplication.run(JtSpringProjectApplication.class, args);
-			logger.info("========================================");
-			logger.info("JT电商系统启动成功！");
-			logger.info("访问地址: http://localhost:8080");
-			logger.info("========================================");
-		} catch (Exception e) {
-			logger.error("应用启动失败: {}", e.getMessage(), e);
-			System.exit(1);
-		}
+		// 直接运行Spring Boot应用
+		// 注意：不要捕获异常，让Spring Boot自己处理
+		// DevTools的SilentExitException是正常的重启机制
+		SpringApplication.run(JtSpringProjectApplication.class, args);
+
+		logger.info("========================================");
+		logger.info("JT电商系统启动成功！");
+		logger.info("访问地址: http://localhost:8080");
+		logger.info("========================================");
 	}
 
 }

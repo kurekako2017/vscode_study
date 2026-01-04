@@ -1,0 +1,8 @@
+写代码/连接 VS Code 测速：http://vhcala4hci:8000/sap/bc/adt/discovery
+进系统敲 T-Code（传统界面）：http://vhcala4hci:8000/sap/bc/gui/sap/its/webgui?sap-client=100
+看现代 Fiori 磁贴：http://vhcala4hci:8000/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100
+
+
+写代码/连接 VS Code 测速：http://localhost:8000/sap/bc/adt/discovery
+进系统敲 T-Code（传统界面）：http://localhost:8000/sap/bc/gui/sap/its/webgui?sap-client=100
+看现代 Fiori 磁贴：http://localhost:8000/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100

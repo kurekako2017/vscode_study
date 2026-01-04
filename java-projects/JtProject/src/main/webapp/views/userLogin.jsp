@@ -34,12 +34,39 @@
 
             <!--
                 用户登录表单
-                - action: userloginvalidate - 表单提交的后端接口
-                - method: post - 使用POST方法提交（安全性考虑）
+
+                📝 表单提交流程：
+                1. 用户填写用户名和密码
+                2. 点击 Login 按钮（type="submit"）
+                3. 浏览器发送 POST 请求到 action 指定的 URL
+                4. 请求路径: POST /userloginvalidate
+                5. 请求参数: username=xxx&password=xxx
+                6. Spring MVC 的 DispatcherServlet 接收请求
+                7. 根据 @RequestMapping 路由到 UserController.userlogin() 方法
+                8. 执行登录验证逻辑
+                9. 返回结果页面（成功→index.jsp，失败→userLogin.jsp）
+
+                - action: userloginvalidate - 表单提交的后端接口（必须与Controller中的路由匹配）
+                - method: post - 使用POST方法提交（安全性考虑，密码不会显示在URL中）
             -->
             <form action="userloginvalidate" method="post">
 
-                <!-- 用户名输入框 -->
+                <!--
+                    用户名输入框
+
+                    📝 重要属性说明：
+                    - name="username" : 最关键的属性！提交表单时的参数名
+                      → 后端通过 @RequestParam("username") 接收此参数
+                      → 参数名必须与Controller中的注解值完全一致
+
+                    - id="username" : 用于JavaScript操作和label的for属性关联
+
+                    - required : HTML5验证，确保用户必须填写此字段
+
+                    - placeholder : 输入框的提示文字
+
+                    - class="form-control..." : Bootstrap样式类
+                -->
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text"
@@ -50,7 +77,18 @@
                            class="form-control form-control-lg">
                 </div>
 					
-                <!-- 密码输入框 -->
+                <!--
+                    密码输入框
+
+                    📝 重要属性说明：
+                    - type="password" : 密码类型，输入内容会显示为 ●●● （安全性）
+
+                    - name="password" : 提交表单时的参数名
+                      → 后端通过 @RequestParam("password") 接收此参数
+                      → 与Controller的参数名对应
+
+                    - required : 必填字段验证
+                -->
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password"
@@ -61,13 +99,38 @@
                            id="password">
                 </div>
 
-                <!-- 注册链接提示 -->
+                <!--
+                    注册链接提示
+
+                    📝 跳转流程：
+                    1. 用户点击 "Register here" 链接
+                    2. 浏览器发送 GET /register 请求
+                    3. 路由到 UserController.registerUser() 方法
+                    4. 返回 register.jsp 注册页面
+                -->
                 <span>Don't have an account <a class="linkControl" href="/register">Register here</a></span> <br><br>
 
-                <!-- 登录提交按钮 -->
+                <!--
+                    登录提交按钮
+
+                    📝 提交流程：
+                    - type="submit" : 提交按钮，点击后触发表单提交
+                    - 浏览器收集表单数据：username=xxx&password=xxx
+                    - 发送POST请求到 action 指定的URL（userloginvalidate）
+                    - 等待服务器响应
+                -->
                 <input type="submit" value="Login" class="btn btn-primary btn-block">
 
-                <!-- 错误消息显示区域（使用EL表达式从后端获取） -->
+                <!--
+                    错误消息显示区域
+
+                    📝 EL表达式说明：
+                    - ${msg} : Expression Language（表达式语言）
+                    - 从后端 ModelAndView 中获取 "msg" 属性的值
+                    - 如果登录失败，Controller会设置：
+                      mView.addObject("msg", "Please enter correct email and password");
+                    - 该消息会在这里显示为红色文字
+                -->
                 <br><h3 style="color:red;">${msg}</h3>
                 <br>
             </form>

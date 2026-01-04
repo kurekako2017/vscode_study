@@ -51,7 +51,10 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers(){
         logger.info("服务层：获取所有用户");
         try {
+            // 调用DAO层获取所有用户
+            // 数据流向: Service → UserDao.getAllUser() → 数据库查询 → 返回List<User>
             List<User> users = this.userDao.getAllUser();
+
             logger.info("服务层：成功获取 {} 个用户", users.size());
             return users;
         } catch (Exception e) {
@@ -70,7 +73,11 @@ public class UserServiceImpl implements UserService {
     public User addUser(User user) {
         logger.info("服务层：添加/更新用户，用户名: {}", user.getUsername());
         try {
+            // 调用DAO层保存用户到数据库
+            // 数据流向: Service → UserDao.saveUser() → Hibernate SessionFactory → 数据库INSERT/UPDATE
+            // 如果user.id为空，执行INSERT；如果user.id存在，执行UPDATE
             User savedUser = this.userDao.saveUser(user);
+
             logger.info("服务层：用户保存成功，ID: {}, 用户名: {}, 角色: {}",
                     savedUser.getId(), savedUser.getUsername(), savedUser.getRole());
             return savedUser;
@@ -86,6 +93,16 @@ public class UserServiceImpl implements UserService {
      *
      * <p>验证用户名和密码是否匹配。</p>
      *
+     * 📝 完整调用链路：
+     * 1. Controller 接收用户输入（username, password）
+     * 2. Controller 调用 Service.checkLogin()
+     * 3. Service 调用 Dao.getUser()  ← 当前位置
+     * 4. Dao 执行数据库查询（SELECT * FROM users WHERE username=? AND password=?）
+     * 5. 数据库返回查询结果
+     * 6. Dao 将结果封装为 User 对象
+     * 7. Service 返回 User 对象给 Controller
+     * 8. Controller 判断登录是否成功
+     *
      * @param username 用户名
      * @param password 密码
      * @return 验证成功返回用户对象，失败返回空User对象
@@ -94,7 +111,22 @@ public class UserServiceImpl implements UserService {
     public User checkLogin(String username, String password) {
         logger.info("服务层：用户登录验证，用户名: {}", username);
         try {
+            // 调用DAO层根据用户名和密码查询用户
+            // 📝 数据流向详解：
+            // Step 1: Service层调用 → userDao.getUser(username, password)
+            // Step 2: DAO层执行 → Hibernate查询: "FROM User WHERE username=? AND password=?"
+            // Step 3: 数据库执行 → SELECT * FROM users WHERE username='xxx' AND password='xxx'
+            // Step 4: 数据库返回 → 查询结果集（0条或1条记录）
+            // Step 5: Hibernate映射 → 将结果集转换为User对象
+            // Step 6: DAO层返回 → User对象（如果查不到，返回空User对象，id=0）
+            // Step 7: Service层接收 → user变量
+            //
+            // 注意：如果查询不到匹配的用户，返回的是一个空User对象（id=0），而不是null
             User user = this.userDao.getUser(username, password);
+
+            // 判断用户是否存在（通过id是否大于0来判断）
+            // id > 0 表示数据库中存在该用户，登录验证成功
+            // id = 0 表示数据库中不存在匹配的用户，登录验证失败
             if (user.getId() > 0) {
                 logger.info("服务层：用户登录验证成功，用户名: {}, 角色: {}",
                         username, user.getRole());
@@ -121,7 +153,13 @@ public class UserServiceImpl implements UserService {
     public boolean checkUserExists(String username) {
         logger.info("服务层：检查用户名是否存在，用户名: {}", username);
         try {
+            // 调用DAO层检查用户名是否存在
+            // 数据流向: Service → UserDao.userExists() → 数据库查询 → 返回boolean
+            // SQL查询: SELECT COUNT(*) FROM users WHERE username = ?
+            // 如果COUNT > 0，返回true（用户名已存在）
+            // 如果COUNT = 0，返回false（用户名可用）
             boolean exists = this.userDao.userExists(username);
+
             logger.info("服务层：用户名 {} 存在性: {}", username, exists);
             return exists;
         } catch (Exception e) {
