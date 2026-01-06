@@ -1254,19 +1254,19 @@ SMTP_PASS=your-app-password  # 使用应用专用密码
 # 3. 生成应用专用密码
 ```
 
-#### 阿里云邮件推送
+#### SendGrid (国際推奨)
 ```env
-SMTP_HOST=smtpdm.aliyun.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=your-account@your-domain.com
-SMTP_PASS=your-smtp-password
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
 
 # 配置步骤：
-# 1. 登录阿里云控制台
-# 2. 开通邮件推送服务
-# 3. 配置发信域名
-# 4. 创建发信地址
+# 1. 访问 https://sendgrid.com
+# 2. 注册账号
+# 3. 创建 API Key
+# 4. 配置发信域名验证
 ```
 
 #### 腾讯企业邮箱
@@ -1514,7 +1514,7 @@ module.exports = {
 | 项目 | 方案 | 月费用 |
 |------|------|--------|
 | 邮件服务 | Gmail/企业邮箱 | ¥0-200 |
-| 服务器 | 阿里云 ECS 2核4G | ¥100-300 |
+| 服务器 | Sakura VPS / AWS EC2 2核4G | ¥1,000-3,000 |
 | 数据库 | MySQL (自建) | 包含在服务器 |
 | 域名 | .com | ¥60/年 |
 | SSL证书 | Let's Encrypt | 免费 |

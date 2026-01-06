@@ -302,7 +302,7 @@
 - 🎁 企业邮箱配置（5个邮箱）
 - 🎁 基础SEO设置（meta标签、sitemap）
 - 🎁 网站备份设置（首年）
-- 🎁 Google Analytics / 百度统计配置
+- 🎁 Google Analytics 配置
 
 ---
 
@@ -404,9 +404,9 @@ A: 采用HTTPS加密传输、数据库加密存储、定期备份、访问权限
 - **数据库**: PostgreSQL / MySQL / MongoDB
 
 ### 部署方案
-- **服务器**: 阿里云 / 腾讯云 / AWS
+- **服务器**: AWS / Google Cloud / Azure / Sakura VPS
 - **Web服务器**: Nginx / Apache
-- **CDN**: Cloudflare / 七牛云 / 又拍云
+- **CDN**: Cloudflare / AWS CloudFront
 
 ---
 

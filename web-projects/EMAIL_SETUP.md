@@ -19,7 +19,7 @@
 | 注册商 | .com 价格 | 优点 | 缺点 |
 |--------|-----------|------|------|
 | **Cloudflare Registrar** | ¥60/年 | 成本价，无隐藏费用 | 需要先添加到 Cloudflare |
-| **阿里云（万网）** | ¥65/年 | 国内访问快，支持支付宝 | 需要实名认证 |
+| **お名前.com** | ¥1,408/年 | 日本最大域名注册商 | 支持日文界面 |
 | **Namecheap** | $9/年 | 隐私保护免费 | 国际支付 |
 | **GoDaddy** | $20/年 | 知名度高 | 续费贵 |
 
@@ -44,7 +44,7 @@
    brad.ns.cloudflare.com
    ```
 6. 到域名注册商处修改 DNS 服务器：
-   - **阿里云**：域名管理 → DNS 修改 → 修改 DNS 服务器
+   - **お名前.com**：ドメイン設定 → ネームサーバー設定
    - **Namecheap**：Domain List → Manage → Nameservers → Custom DNS
    - **GoDaddy**：My Domains → Domain Settings → Nameservers
 7. 等待生效（通常 10-30 分钟，最长 24 小时）
