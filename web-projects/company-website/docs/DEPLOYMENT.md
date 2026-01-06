@@ -20,13 +20,14 @@ Brevo (邮件服务)
 
 #### 1.1 购买域名
 
-**推荐注册商**：
-- 阿里云（万网）
-- Cloudflare Registrar（最便宜）
-- GoDaddy
-- Namecheap
+**推荐注册商（日本项目）**：
+- お名前.com（日本最大域名注册商）
+- Value Domain
+- ムームードメイン (Muumuu Domain)
+- Cloudflare Registrar（国际通用，最便宜）
+- GoDaddy（国际通用）
 
-**成本**：¥60-100/年（.com 域名）
+**成本**：¥1,000-1,500/年（.com 域名）或 ¥3,000-4,000/年（.jp 域名）
 
 #### 1.2 添加到 Cloudflare
 
