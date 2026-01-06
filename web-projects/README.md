@@ -21,15 +21,29 @@
    - 简化版实现
    - 常见问题解决
 
+4. **[SEO_OPTIMIZATION_GUIDE.md](SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
+   - 已上线网站SEO工具
+   - 本地环境SEO检查
+   - 关键词研究优化
+   - WordPress SEO优化
+
 ### 💼 业务文档
 
-4. **[company-website/docs/WEB_QUOTATION_STANDARD.md](company-website/docs/WEB_QUOTATION_STANDARD.md)** - 报价标准
+5. **[WEB_QUOTATION_STANDARD.md](WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
    - 页面制作费用
    - 服务器维护费用
    - 企业邮箱年费
    - 完整案例计算
 
-5. **[company-website/docs/EMAIL_SETUP.md](company-website/docs/EMAIL_SETUP.md)** - 邮件配置文档
+6. **[ECOMMERCE_QUOTATION_TEMPLATE.md](ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
+   - 购物网站功能模块
+   - 电商平台报价
+   - 支付集成费用
+
+7. **[EMAIL_SETUP.md](EMAIL_SETUP.md)** - 邮箱服务器配置
+   - 域名和邮箱配置
+   - SMTP设置
+   - 企业邮箱方案
 
 ---
 
