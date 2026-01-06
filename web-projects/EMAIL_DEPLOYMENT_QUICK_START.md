@@ -284,31 +284,31 @@ app.get('/test-email', async (req, res) => {
 
 ## 🌟 其他邮件服务配置
 
-### 阿里云邮件推送
+### SendGrid (国际推荐)
 ```env
-SMTP_HOST=smtpdm.aliyun.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=your-account@your-domain.com
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
+```
+
+### AWS SES (日本区域)
+```env
+SMTP_HOST=email-smtp.ap-northeast-1.amazonaws.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-username
 SMTP_PASS=your-smtp-password
 ```
 
-### 腾讯企业邮箱
+### Mailgun (国际服务)
 ```env
-SMTP_HOST=smtp.exmail.qq.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=your-email@company.com
-SMTP_PASS=your-password
-```
-
-### QQ 邮箱
-```env
-SMTP_HOST=smtp.qq.com
+SMTP_HOST=smtp.mailgun.org
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=your-qq@qq.com
-SMTP_PASS=your-auth-code  # QQ邮箱授权码
+SMTP_USER=postmaster@your-domain.mailgun.org
+SMTP_PASS=your-smtp-password
 ```
 
 ---
