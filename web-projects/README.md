@@ -4,24 +4,24 @@
 
 ### 🎓 教程文档
 
-1. **[WEB_DEVELOPMENT_GUIDE.md](WEB_DEVELOPMENT_GUIDE.md)** - 网站开发完整教程
+1. **[WEB_DEVELOPMENT_GUIDE.md](docs/WEB_DEVELOPMENT_GUIDE.md)** - 网站开发完整教程
    - VS Code 网页制作基础
    - WordPress 开发方案
    - Bootstrap Studio 集成
    - 现代开发工具和模板
 
-2. **[EMAIL_NEWS_IMPLEMENTATION_GUIDE.md](EMAIL_NEWS_IMPLEMENTATION_GUIDE.md)** - 邮件和新闻功能实现
+2. **[EMAIL_NEWS_IMPLEMENTATION_GUIDE.md](docs/EMAIL_NEWS_IMPLEMENTATION_GUIDE.md)** - 邮件和新闻功能实现
    - 邮件服务器部署
    - 邮件发送功能
    - 新闻提交管理
    - 生产环境部署
 
-3. **[EMAIL_DEPLOYMENT_QUICK_START.md](EMAIL_DEPLOYMENT_QUICK_START.md)** - 5分钟快速上手
+3. **[EMAIL_DEPLOYMENT_QUICK_START.md](docs/EMAIL_DEPLOYMENT_QUICK_START.md)** - 5分钟快速上手
    - 快速部署邮件服务
    - 简化版实现
    - 常见问题解决
 
-4. **[SEO_OPTIMIZATION_GUIDE.md](SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
+4. **[SEO_OPTIMIZATION_GUIDE.md](docs/SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
    - 已上线网站SEO工具
    - 本地环境SEO检查
    - 关键词研究优化
@@ -29,18 +29,18 @@
 
 ### 💼 业务文档
 
-5. **[WEB_QUOTATION_STANDARD.md](WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
+5. **[WEB_QUOTATION_STANDARD.md](docs/WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
    - 页面制作费用
    - 服务器维护费用
    - 企业邮箱年费
    - 完整案例计算
 
-6. **[ECOMMERCE_QUOTATION_TEMPLATE.md](ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
+6. **[ECOMMERCE_QUOTATION_TEMPLATE.md](docs/ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
    - 购物网站功能模块
    - 电商平台报价
    - 支付集成费用
 
-7. **[EMAIL_SETUP.md](EMAIL_SETUP.md)** - 邮箱服务器配置
+7. **[EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - 邮箱服务器配置
    - 域名和邮箱配置
    - SMTP设置
    - 企业邮箱方案
