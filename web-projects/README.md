@@ -2,26 +2,54 @@
 
 ## 📚 文档导航
 
-### 🎓 教程文档
+### 🇯🇵 日本企業サイト制作完全ガイド【推奨】
 
-1. **[WEB_DEVELOPMENT_GUIDE.md](docs/WEB_DEVELOPMENT_GUIDE.md)** - 网站开发完整教程
+1. **[WORDPRESS_COCOON_COMPLETE_GUIDE.md](docs/WORDPRESS_COCOON_COMPLETE_GUIDE.md)** - Cocoon主题完全开发指南【最推荐】
+   - Cocoon主题介绍与优势
+   - 30分钟快速安装配置
+   - 企业网站页面模板（可直接复制使用）
+   - 功能模块配置（短代码/按钮/标签页）
+   - 自定义设计与性能优化
+   - IT咨询/制造业实战案例
+
+2. **[JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md](docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md)** - 完全開発ガイド
+   - 4つの開発方案比較 (WordPress単体/Bootstrap Studio/VSCode/Elementor Pro)
+   - 無料メール・ニュース機能実装
+   - デプロイ設定 (onamae.com RSプラン)
+   - 段階的アップグレード戦略
+
+3. **[QUICK_START_WORDPRESS.md](docs/QUICK_START_WORDPRESS.md)** - 30分クイックスタート
+   - 問い合わせフォーム設定
+   - メール送信設定 (WP Mail SMTP)
+   - 基本ページ作成
+   - セキュリティ設定
+
+4. **[COST_COMPARISON_REAL_EXAMPLES.md](docs/COST_COMPARISON_REAL_EXAMPLES.md)** - コスト比較・実例
+   - 詳細コスト比較表
+   - 実際の制作例3件
+   - 規模別・業種別推奨方案
+   - ROI計算・年間総コスト
+
+### 🎓 通用开发教程
+
+5. **[WEB_DEVELOPMENT_GUIDE.md](docs/WEB_DEVELOPMENT_GUIDE.md)** - 网站开发完整教程
    - VS Code 网页制作基础
    - WordPress 开发方案
    - Bootstrap Studio 集成
    - 现代开发工具和模板
 
-2. **[EMAIL_NEWS_IMPLEMENTATION_GUIDE.md](docs/EMAIL_NEWS_IMPLEMENTATION_GUIDE.md)** - 邮件和新闻功能实现
+6. **[EMAIL_NEWS_IMPLEMENTATION_GUIDE.md](docs/EMAIL_NEWS_IMPLEMENTATION_GUIDE.md)** - 邮件和新闻功能实现
    - 邮件服务器部署
    - 邮件发送功能
    - 新闻提交管理
    - 生产环境部署
 
-3. **[EMAIL_DEPLOYMENT_QUICK_START.md](docs/EMAIL_DEPLOYMENT_QUICK_START.md)** - 5分钟快速上手
+7. **[EMAIL_DEPLOYMENT_QUICK_START.md](docs/EMAIL_DEPLOYMENT_QUICK_START.md)** - 5分钟快速上手
    - 快速部署邮件服务
    - 简化版实现
    - 常见问题解决
 
-4. **[SEO_OPTIMIZATION_GUIDE.md](docs/SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
+8. **[SEO_OPTIMIZATION_GUIDE.md](docs/SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
    - 已上线网站SEO工具
    - 本地环境SEO检查
    - 关键词研究优化
@@ -29,25 +57,82 @@
 
 ### 💼 业务文档
 
-5. **[WEB_QUOTATION_STANDARD.md](docs/WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
+9. **[WEB_QUOTATION_STANDARD.md](docs/WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
    - 页面制作费用
    - 服务器维护费用
    - 企业邮箱年费
    - 完整案例计算
 
-6. **[ECOMMERCE_QUOTATION_TEMPLATE.md](docs/ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
-   - 购物网站功能模块
-   - 电商平台报价
-   - 支付集成费用
+10. **[ECOMMERCE_QUOTATION_TEMPLATE.md](docs/ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
+    - 购物网站功能模块
+    - 电商平台报价
+    - 支付集成费用
 
-7. **[EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - 邮箱服务器配置
-   - 域名和邮箱配置
-   - SMTP设置
-   - 企业邮箱方案
+11. **[EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - 邮箱服务器配置
+    - 域名和邮箱配置
+    - SMTP设置
+    - 企业邮箱方案
 
 ---
 
 ## 🚀 快速开始
+
+### 🏆 最推荐：使用Cocoon主题制作企业网站
+
+```bash
+# 🎯 超快速路径：1-2天完成专业企业网站
+1. 阅读 docs/WORDPRESS_COCOON_COMPLETE_GUIDE.md
+2. 安装WordPress + Cocoon主题（免费）
+3. 直接复制使用页面模板代码
+4. 自定义公司信息和图片
+5. 🎉 完成专业企业网站！
+
+✅ 成本：¥0（完全免费）
+✅ 时间：1-2天
+✅ 特点：日本制作、SEO优化、高速、响应式
+✅ 无需编程知识
+```
+
+### 日本企業サイトを作りたい方
+
+```bash
+# 其他方案选择
+1. docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md - 4种方案对比
+2. docs/QUICK_START_WORDPRESS.md - Lightning主题30分钟快速启动
+3. docs/COST_COMPARISON_REAL_EXAMPLES.md - 查看实际案例和成本
+
+コスト: ¥0-¥9,000/年
+時間: 1-7日
+```
+
+### どの方案を選ぶか迷っている方
+
+```bash
+# 方案比較チャート
+docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md を確認
+
+推奨:
+- 初めて → WordPress単体 (¥0)
+- デザイン重視 → Elementor Pro (¥9,000/年)
+- 完全カスタム → VSCode開発 (¥0、時間投資大)
+```
+
+### 実例・コストを知りたい方
+
+```bash
+# 実際の制作例を確認
+docs/COST_COMPARISON_REAL_EXAMPLES.md
+
+含まれる内容:
+✅ 中小企業の実例3件
+✅ 規模別・業種別推奨方案
+✅ ROI計算
+✅ 年間総コスト比較
+```
+
+---
+
+## 🚀 その他の開発ガイド
 
 ### 方案一：纯静态网站（最简单）
 
@@ -230,43 +315,4 @@ docker-compose up -d
 ## 🔗 有用的资源
 
 ### 官方文档
-- [MDN Web Docs](https://developer.mozilla.org/)
-- [Node.js Docs](https://nodejs.org/docs/)
-- [WordPress Developer](https://developer.wordpress.org/)
-- [React Docs](https://react.dev/)
-
-### 学习平台
-- [freeCodeCamp](https://www.freecodecamp.org/)
-- [MDN](https://developer.mozilla.org/)
-- [W3Schools](https://www.w3schools.com/)
-
-### 工具和资源
-- [GitHub](https://github.com/)
-- [VS Code](https://code.visualstudio.com/)
-- [Bootstrap](https://getbootstrap.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-
----
-
-## 📞 获取帮助
-
-如有问题，请查看：
-1. 文档中的"常见问题"章节
-2. GitHub Issues
-3. Stack Overflow
-4. 项目内的具体文档
-
----
-
-## 📝 更新日志
-
-- **2026-01-06**: 创建项目文档结构
-  - 添加完整开发教程
-  - 添加邮件功能实现指南
-  - 添加快速部署文档
-  - 添加报价标准文档
-
----
-
-**最后更新**：2026年1月6日
-**文档版本**：v1.0
+- [MDN Web Docs](https://developer.mozi
