@@ -2,7 +2,7 @@
 
 ## 📚 文档导航
 
-### 🇯🇵 日本企業サイト制作完全ガイド【推奨】
+### 🇯🇵 日本企业网站开发完全指南【推荐】
 
 1. **[WORDPRESS_COCOON_COMPLETE_GUIDE.md](docs/WORDPRESS_COCOON_COMPLETE_GUIDE.md)** - Cocoon主题完全开发指南【最推荐】
    - Cocoon主题介绍与优势
@@ -12,11 +12,11 @@
    - 自定义设计与性能优化
    - IT咨询/制造业实战案例
 
-2. **[JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md](docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md)** - 完全開発ガイド
-   - 4つの開発方案比較 (WordPress単体/Bootstrap Studio/VSCode/Elementor Pro)
-   - 無料メール・ニュース機能実装
-   - デプロイ設定 (onamae.com RSプラン)
-   - 段階的アップグレード戦略
+2. **[JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md](docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md)** - 日本企业网站完整开发指南（中文）
+   - 4种开发方案对比 (WordPress单体/Bootstrap Studio/VSCode/Elementor Pro)
+   - 免费邮件/新闻功能实现
+   - 部署设置 (onamae.com RSプラン)
+   - 分阶段升级策略
 
 3. **[QUICK_START_WORDPRESS.md](docs/QUICK_START_WORDPRESS.md)** - 30分クイックスタート
    - 問い合わせフォーム設定
@@ -97,7 +97,7 @@
 
 ```bash
 # 其他方案选择
-1. docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md - 4种方案对比
+1. docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md - 4种方案对比
 2. docs/QUICK_START_WORDPRESS.md - Lightning主题30分钟快速启动
 3. docs/COST_COMPARISON_REAL_EXAMPLES.md - 查看实际案例和成本
 
@@ -109,7 +109,7 @@
 
 ```bash
 # 方案比較チャート
-docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS.md を確認
+docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md を確認
 
 推奨:
 - 初めて → WordPress単体 (¥0)
