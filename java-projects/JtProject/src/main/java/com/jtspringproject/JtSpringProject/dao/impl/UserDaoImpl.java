@@ -77,7 +77,7 @@ public class UserDaoImpl implements UserDao {
             // 对应SQL：SELECT * FROM users
             // CUSTOMER是User实体类的@Entity注解名称（不是表名）
             // Hibernate会自动将CUSTOMER映射到users表
-            List<User> userList = session.createQuery("from CUSTOMER").list();
+            List<User> userList = session.createQuery("from CUSTOMER", User.class).list();
 
             logger.info("DAO层：成功获取 {} 个用户", userList.size());
             return userList;
@@ -162,8 +162,8 @@ public class UserDaoImpl implements UserDao {
             // - from CUSTOMER: 从User实体查询（CUSTOMER是@Entity名称）
             // - where username = :username: WHERE条件，:username是命名参数
             // 对应SQL: SELECT * FROM users WHERE username = ?
-            Query query = sessionFactory.getCurrentSession()
-                    .createQuery("from CUSTOMER where username = :username");
+            Query<User> query = sessionFactory.getCurrentSession()
+                    .createQuery("from CUSTOMER where username = :username", User.class);
 
             // 绑定命名参数的值
             // 📝 setParameter方法：
@@ -178,7 +178,7 @@ public class UserDaoImpl implements UserDao {
             // - 如果没有结果，抛出NoResultException
             // - 如果有多条结果，抛出NonUniqueResultException
             // 数据库返回的记录会被Hibernate自动映射为User对象
-            User user = (User) query.getSingleResult();
+            User user = query.getSingleResult();
             logger.debug("DAO层：找到用户: {}", username);
 
             // 判断密码是否匹配
@@ -195,10 +195,14 @@ public class UserDaoImpl implements UserDao {
                 logger.warn("DAO层：用户密码错误: {}", username);
                 return new User();
             }
+        } catch (NoResultException nre) {
+            // 用户不存在，返回空 User 对象（id 默认 0）
+            logger.warn("DAO层：用户不存在: {}", username);
+            return new User();
         } catch(Exception e){
-            // ❌ 查询异常（用户不存在或其他错误）
-            // 返回空User对象，而不是null，避免NullPointerException
-            logger.warn("DAO层：用户不存在或登录失败: {}, 错误: {}", username, e.getMessage());
+            // 其他异常（例如数据库连接/查询错误）记录完整堆栈，方便排查
+            logger.error("DAO层：查询用户时发生异常: {}, 错误: {}", username, e.getMessage(), e);
+            // 为了与现有代码契约一致，返回空 User 对象而不是抛出异常
             return new User();
         }
     }
@@ -223,30 +227,13 @@ public class UserDaoImpl implements UserDao {
     public boolean userExists(String username) {
         logger.info("DAO层：检查用户名是否存在: {}", username);
         try {
-            // 创建COUNT查询
-            // 📝 HQL COUNT查询语法：
-            // - SELECT COUNT(u): 统计数量
-            // - FROM CUSTOMER u: 从User实体查询，u是别名
-            // - WHERE u.username = :username: 根据用户名筛选
-            // 对应SQL: SELECT COUNT(*) FROM users WHERE username = ?
-            Query query = sessionFactory.getCurrentSession()
-                .createQuery("SELECT COUNT(u) FROM CUSTOMER u WHERE u.username = :username");
+            Query<Long> query = sessionFactory.getCurrentSession()
+                .createQuery("SELECT COUNT(u) FROM CUSTOMER u WHERE u.username = :username", Long.class);
 
-            // 绑定命名参数
-            // 防止SQL注入攻击
             query.setParameter("username", username);
 
-            // 执行查询并获取唯一结果
-            // 📝 uniqueResult()：
-            // - 期望查询结果只有一个值（COUNT总是返回单个数字）
-            // - 返回类型是Long（表示数量）
-            // - 如果username存在，count > 0
-            // - 如果username不存在，count = 0
-            Long count = (Long) query.uniqueResult();
+            Long count = query.uniqueResult();
 
-            // 判断是否存在
-            // count != null 确保查询有返回值
-            // count > 0 表示找到至少一个匹配的用户名
             boolean exists = count != null && count > 0;
 
             logger.info("DAO层：用户名 {} 存在性: {}", username, exists);

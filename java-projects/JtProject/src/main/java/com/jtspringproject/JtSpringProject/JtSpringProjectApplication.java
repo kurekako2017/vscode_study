@@ -33,8 +33,7 @@ public class JtSpringProjectApplication {
 	private static final Logger logger = LoggerFactory.getLogger(JtSpringProjectApplication.class);
 
 	/**
-	 * 应用程序主入口方法
-	 *
+	 * 应用程序主入口
 	 * 调用流程：
 	 * 1. main方法启动
 	 * 2. SpringApplication.run() 初始化Spring容器
