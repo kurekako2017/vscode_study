@@ -1,369 +1,676 @@
-# Aider 本地 AI 编程助手使用手册 (UM890 Pro 专用版)
-
-## 目录
-1. [简介](#简介)
-2. [系统要求](#系统要求)
-3. [安装配置](#安装配置)
-4. [基础使用](#基础使用)
-5. [高级功能](#高级功能)
-6. [最佳实践](#最佳实践)
-7. [故障排查](#故障排查)
-8. [性能优化](#性能优化)
+# Aider 本地安装使用指南
+## UM890 Pro (Win11 Pro + 32GB 内存) 专用版
 
 ---
 
-## 简介
-
-Aider 是一个基于 AI 的命令行编程助手,可以帮助您直接在终端中编辑代码文件。本手册专为在 UM890 Pro 上使用本地 AI 模型(如 Ollama)的用户编写。
-
-### 主要特性
-- 直接修改现有代码文件
-- 支持多文件编辑
-- Git 集成,自动提交更改
-- 支持本地和云端 AI 模型
-- 智能代码补全和重构
-
----
-
-## 系统要求
-
-### 硬件要求 (UM890 Pro)
-- **CPU**: AMD Ryzen 9 8945HS (已满足)
-- **内存**: 建议 32GB 以上(运行较大模型)
-- **存储**: 至少 20GB 可用空间(用于模型存储)
-- **GPU**: 集成显卡可用,独立显卡更佳
-
-### 软件要求
-- **操作系统**: Linux, macOS, 或 Windows
-- **Python**: 3.8 或更高版本
-- **Git**: 用于版本控制
-- **Ollama**: 用于运行本地 LLM 模型
+## 📋 目录
+1. [系统配置概览](#系统配置概览)
+2. [安装前准备](#安装前准备)
+3. [安装 Ollama](#安装-ollama)
+4. [下载和配置模型](#下载和配置模型)
+5. [安装 Aider](#安装-aider)
+6. [实战使用教程](#实战使用教程)
+7. [性能优化建议](#性能优化建议)
+8. [常用命令速查](#常用命令速查)
+9. [故障排查](#故障排查)
 
 ---
 
-## 安装配置
+## 系统配置概览
 
-### 1. 安装 Python 依赖
+### 您的硬件配置
+```
+主机: UM890 Pro
+CPU: AMD Ryzen 9 8945HS (8核16线程)
+内存: 32GB
+系统: Windows 11 Pro
+```
 
-```bash
-# 使用 pip 安装
+### 推荐模型配置
+| 模型 | 量化版本 | 内存占用 | 推理速度 | 适用场景 |
+|------|---------|---------|---------|---------|
+| DeepSeek-Coder V2 Lite 16B | Q4_K_M | ~10GB | 中等 | 复杂代码生成、重构 |
+| DeepSeek-Coder V2 Lite 16B | Q5_K_M | ~12GB | 较慢 | 高质量代码生成 |
+| Qwen2.5-Coder 14B | Q4_K_M | ~9GB | 快速 | 日常编码、快速迭代 |
+| Qwen2.5-Coder 14B | Q5_K_M | ~11GB | 中等 | 平衡性能和质量 |
+
+**32GB 内存推荐**: 使用 Q4_K_M 版本以获得最佳性能，或在需要高质量时使用 Q5_K_M。
+
+---
+
+## 安装前准备
+
+### 1. 安装 Python
+
+访问 [Python 官网](https://www.python.org/downloads/) 下载 Python 3.10 或更高版本
+
+```powershell
+# 验证 Python 安装
+python --version
+# 应该显示: Python 3.10.x 或更高
+
+# 验证 pip
+pip --version
+```
+
+### 2. 安装 Git
+
+访问 [Git 官网](https://git-scm.com/download/win) 下载并安装
+
+```powershell
+# 验证 Git 安装
+git --version
+```
+
+### 3. 配置 PowerShell 执行策略（如需要）
+
+```powershell
+# 以管理员身份运行 PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+---
+
+## 安装 Ollama
+
+### 1. 下载并安装 Ollama
+
+访问 [Ollama 官网](https://ollama.com/download/windows) 下载 Windows 安装程序
+
+或使用命令行下载：
+```powershell
+# 下载 Ollama 安装程序
+Invoke-WebRequest -Uri https://ollama.com/download/OllamaSetup.exe -OutFile OllamaSetup.exe
+
+# 运行安装程序
+.\OllamaSetup.exe
+```
+
+### 2. 验证 Ollama 安装
+
+```powershell
+# 打开新的 PowerShell 窗口
+ollama --version
+
+# 应该显示版本号，如: ollama version is 0.x.x
+```
+
+### 3. 启动 Ollama 服务
+
+Ollama 在 Windows 上会自动作为后台服务运行，但您可以手动启动：
+
+```powershell
+# Ollama 会在系统托盘中显示图标
+# 确保服务正在运行
+ollama list
+```
+
+---
+
+## 下载和配置模型
+
+### 1. 下载 DeepSeek-Coder V2 Lite 16B
+
+```powershell
+# Q4 量化版本（推荐，速度快，内存占用约 10GB）
+ollama pull deepseek-coder-v2:16b-lite-instruct-q4_K_M
+
+# Q5 量化版本（质量更高，内存占用约 12GB）
+ollama pull deepseek-coder-v2:16b-lite-instruct-q5_K_M
+
+# 查看已下载的模型
+ollama list
+```
+
+### 2. 下载 Qwen2.5-Coder 14B
+
+```powershell
+# Q4 量化版本（推荐，速度最快，内存占用约 9GB）
+ollama pull qwen2.5-coder:14b-instruct-q4_K_M
+
+# Q5 量化版本（平衡性能，内存占用约 11GB）
+ollama pull qwen2.5-coder:14b-instruct-q5_K_M
+
+# 查看所有模型
+ollama list
+```
+
+### 3. 测试模型
+
+```powershell
+# 测试 DeepSeek-Coder（Q4 版本）
+ollama run deepseek-coder-v2:16b-lite-instruct-q4_K_M "写一个 Python 快速排序函数"
+
+# 测试 Qwen2.5-Coder（Q4 版本）
+ollama run qwen2.5-coder:14b-instruct-q4_K_M "解释什么是闭包"
+
+# 退出测试
+/bye
+```
+
+---
+
+## 安装 Aider
+
+### 1. 使用 pip 安装
+
+```powershell
+# 安装 aider-chat
 pip install aider-chat
 
-# 或使用 pipx (推荐,隔离环境)
+# 验证安装
+aider --version
+```
+
+### 2. 使用 pipx 安装（推荐，隔离环境）
+
+```powershell
+# 先安装 pipx
+pip install pipx
+pipx ensurepath
+
+# 重启 PowerShell 后安装 aider
 pipx install aider-chat
+
+# 验证安装
+aider --version
 ```
 
-### 2. 安装 Ollama
+### 3. 配置 Aider
 
-```bash
-# Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# macOS
-brew install ollama
-
-# Windows
-# 从 https://ollama.com/download 下载安装程序
-```
-
-### 3. 下载推荐模型
-
-UM890 Pro 推荐使用以下模型:
-
-```bash
-# 轻量级模型 (8GB 内存)
-ollama pull codellama:7b
-
-# 中等模型 (16GB 内存)
-ollama pull deepseek-coder:6.7b
-
-# 高性能模型 (32GB+ 内存)
-ollama pull qwen2.5-coder:14b
-```
-
-### 4. 配置环境变量
-
-```bash
-# 在 ~/.bashrc 或 ~/.zshrc 中添加
-export OLLAMA_HOST=http://localhost:11434
-```
-
----
-
-## 基础使用
-
-### 启动 Aider
-
-```bash
-# 使用默认模型
-aider
-
-# 指定 Ollama 模型
-aider --model ollama/deepseek-coder:6.7b
-
-# 添加文件到聊天
-aider main.py utils.py
-
-# 只读模式添加文件
-aider --read README.md --file main.py
-```
-
-### 基本命令
-
-在 Aider 会话中:
-
-```
-/add <file>        # 添加文件到编辑
-/drop <file>       # 从编辑中移除文件
-/ls                # 列出所有文件
-/undo              # 撤销最后一次更改
-/commit            # 提交更改到 git
-/diff              # 查看未提交的更改
-/help              # 显示帮助
-/exit              # 退出 Aider
-```
-
-### 示例工作流
-
-```bash
-# 1. 启动 Aider 并添加文件
-$ aider main.py
-
-# 2. 请求修改代码
-> 添加一个函数来计算列表的平均值
-
-# 3. Aider 会自动修改文件并显示 diff
-
-# 4. 确认更改
-> /commit
-
-# 5. 继续工作或退出
-> /exit
-```
-
----
-
-## 高级功能
-
-### 1. 多模型配置
-
-创建配置文件 `~/.aider.conf.yml`:
+创建配置文件 `%USERPROFILE%\.aider.conf.yml`：
 
 ```yaml
-model: ollama/deepseek-coder:6.7b
+# Aider 配置文件
+model: ollama/qwen2.5-coder:14b-instruct-q4_K_M
 edit-format: diff
-auto-commits: true
+auto-commits: false
 dark-mode: true
+pretty: true
+stream: true
 ```
 
-### 2. 自定义提示词
+在 PowerShell 中创建：
+```powershell
+# 创建配置文件
+$configContent = @"
+model: ollama/qwen2.5-coder:14b-instruct-q4_K_M
+edit-format: diff
+auto-commits: false
+dark-mode: true
+pretty: true
+stream: true
+"@
 
-```bash
-# 使用自定义系统提示
-aider --message "你是一个 Python 专家,专注于编写高性能代码"
-```
-
-### 3. 架构师模式
-
-```bash
-# 用于规划和设计(不直接修改代码)
-aider --architect
-```
-
-### 4. 与 Git 集成
-
-```bash
-# 自动提交每次更改
-aider --auto-commits
-
-# 自定义提交消息前缀
-aider --commit-prompt "feat: "
-```
-
-### 5. 使用 API 模式
-
-如果您想使用云端模型作为备份:
-
-```bash
-# 使用 OpenAI
-export OPENAI_API_KEY=your-key
-aider --model gpt-4
-
-# 使用 Anthropic Claude
-export ANTHROPIC_API_KEY=your-key
-aider --model claude-sonnet-4-5-20250929
+$configContent | Out-File -FilePath "$env:USERPROFILE\.aider.conf.yml" -Encoding UTF8
 ```
 
 ---
 
-## 最佳实践
+## 实战使用教程
 
-### 1. 模型选择策略
+### 场景 1: 创建新 Python 项目
 
-| 任务类型 | 推荐模型 | 内存需求 |
-|---------|---------|---------|
-| 简单修改 | codellama:7b | 8GB |
-| 中等复杂度 | deepseek-coder:6.7b | 16GB |
-| 复杂重构 | qwen2.5-coder:14b | 32GB |
+```powershell
+# 1. 创建项目目录
+mkdir my_project
+cd my_project
 
-### 2. 提示词技巧
+# 2. 初始化 Git
+git init
 
-**好的提示**:
-```
-在 main.py 中添加错误处理,捕获 ValueError 和 TypeError,
-并记录错误信息到日志文件
-```
+# 3. 启动 Aider（使用 Qwen2.5-Coder Q4，速度快）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
 
-**不好的提示**:
-```
-修复代码
-```
+# 4. 在 Aider 中请求创建代码
+# > 创建一个 FastAPI 应用，包含用户注册和登录接口，使用 SQLite 数据库
 
-### 3. 文件管理
+# 5. Aider 会自动生成文件，查看生成的文件
+# > /ls
 
-```bash
-# 添加相关文件以提供上下文
-aider --read requirements.txt --read README.md main.py
+# 6. 提交更改
+# > /commit
 
-# 对于大型项目,只添加需要修改的文件
-aider src/module.py
+# 7. 退出
+# > /exit
 ```
 
-### 4. 增量开发
+### 场景 2: 修改现有代码
 
-1. 从小改动开始
-2. 每次只修改一个功能
-3. 频繁提交
-4. 使用 `/undo` 回退错误更改
+```powershell
+# 1. 进入项目目录
+cd existing_project
+
+# 2. 使用 DeepSeek-Coder V2（Q4 版本，适合复杂重构）
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M main.py utils.py
+
+# 3. 在 Aider 中请求修改
+# > 重构 main.py 中的数据库连接代码，使用连接池，添加错误重试机制
+
+# 4. 查看更改
+# > /diff
+
+# 5. 如果满意，提交
+# > /commit
+
+# 6. 继续其他修改或退出
+# > /exit
+```
+
+### 场景 3: 代码审查和优化
+
+```powershell
+# 启动 Aider 并添加只读文件以提供上下文
+aider --read README.md --read requirements.txt --file src/main.py
+
+# 在 Aider 中请求优化
+# > 分析 main.py 的性能瓶颈，优化数据库查询，添加缓存机制
+
+# 查看建议的更改
+# > /diff
+
+# 应用更改
+# > /commit
+```
+
+### 场景 4: 快速切换模型
+
+```powershell
+# 方法 1: 命令行指定模型
+# 使用 Qwen2.5（日常快速开发）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# 使用 DeepSeek-Coder V2（复杂任务）
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M
+
+# 方法 2: 在 Aider 会话中切换模型
+# > /model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M
+```
+
+### 场景 5: 批量处理多个文件
+
+```powershell
+# 添加多个文件
+aider src/main.py src/utils.py src/models.py
+
+# 在 Aider 中请求全局修改
+# > 在所有文件中添加类型注解，使用 typing 模块
+
+# 查看所有更改
+# > /diff
+
+# 提交
+# > /commit
+```
+
+---
+
+## 性能优化建议
+
+### 1. 模型选择策略（基于 32GB 内存）
+
+```powershell
+# 日常开发、快速迭代 -> Qwen2.5-Coder Q4
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# 复杂重构、架构设计 -> DeepSeek-Coder V2 Q4
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M
+
+# 需要最高质量输出 -> 任意模型的 Q5 版本
+aider --model ollama/qwen2.5-coder:14b-instruct-q5_K_M
+```
+
+### 2. Ollama 性能优化
+
+创建或编辑环境变量：
+
+```powershell
+# 设置用户环境变量（永久生效）
+[System.Environment]::SetEnvironmentVariable('OLLAMA_NUM_PARALLEL', '2', 'User')
+[System.Environment]::SetEnvironmentVariable('OLLAMA_MAX_LOADED_MODELS', '2', 'User')
+[System.Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', '1', 'User')
+
+# 重启 PowerShell 使环境变量生效
+```
+
+或手动设置：
+1. 右键"此电脑" → "属性" → "高级系统设置"
+2. "环境变量" → "用户变量" → "新建"
+3. 添加以下变量：
+   - `OLLAMA_NUM_PARALLEL` = `2`
+   - `OLLAMA_MAX_LOADED_MODELS` = `2`
+   - `OLLAMA_FLASH_ATTENTION` = `1`
+
+### 3. Aider 优化参数
+
+```powershell
+# 使用优化参数启动
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M \
+      --model-temperature 0.2 \
+      --stream \
+      --no-auto-commits
+
+# 或在配置文件中设置（推荐）
+# 编辑 ~/.aider.conf.yml
+```
+
+### 4. Windows 性能优化
+
+```powershell
+# 设置 Windows 电源计划为高性能
+powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
+# 确保虚拟内存足够（推荐 16-32GB）
+# 控制面板 → 系统 → 高级系统设置 → 性能设置 → 高级 → 虚拟内存
+```
+
+---
+
+## 常用命令速查
+
+### Aider 启动命令
+
+```powershell
+# 基础启动（使用默认配置）
+aider
+
+# 指定模型启动（Qwen2.5-Coder Q4）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# 指定模型启动（DeepSeek-Coder V2 Q4）
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M
+
+# 添加文件启动
+aider main.py utils.py
+
+# 添加只读文件（作为上下文）
+aider --read README.md --file main.py
+
+# 架构师模式（只规划不修改）
+aider --architect
+
+# 自动提交模式
+aider --auto-commits
+
+# 禁用流式输出（适合慢速终端）
+aider --no-stream
+```
+
+### Aider 会话内命令
+
+```
+/add <file>              添加文件到编辑列表
+/drop <file>             从编辑列表移除文件
+/read <file>             添加只读文件（仅作为上下文）
+/ls                      列出所有文件
+/diff                    显示未提交的更改
+/undo                    撤销最后一次更改
+/commit [message]        提交更改到 Git
+/clear                   清除聊天历史
+/tokens                  显示 token 使用情况
+/model <model_name>      切换模型
+/help                    显示帮助
+/exit 或 /quit           退出 Aider
+```
+
+### Ollama 常用命令
+
+```powershell
+# 列出已安装的模型
+ollama list
+
+# 运行模型（交互模式）
+ollama run qwen2.5-coder:14b-instruct-q4_K_M
+
+# 删除模型
+ollama rm deepseek-coder-v2:16b-lite-instruct-q5_K_M
+
+# 查看模型信息
+ollama show qwen2.5-coder:14b-instruct-q4_K_M
+
+# 查看正在运行的模型
+ollama ps
+
+# 停止所有模型
+ollama stop -a
+```
 
 ---
 
 ## 故障排查
 
-### 常见问题
+### 问题 1: Ollama 服务未启动
 
-**1. Ollama 连接失败**
-```bash
-# 检查 Ollama 是否运行
+**症状**: `Error: could not connect to ollama`
+
+**解决方法**:
+```powershell
+# 检查 Ollama 服务状态
+Get-Process ollama -ErrorAction SilentlyContinue
+
+# 如果没有运行，从开始菜单启动 Ollama
+# 或重新启动计算机
+```
+
+### 问题 2: 模型加载失败或内存不足
+
+**症状**: `Error: model failed to load` 或系统变慢
+
+**解决方法**:
+```powershell
+# 1. 检查可用内存
+Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory
+
+# 2. 关闭其他应用程序释放内存
+
+# 3. 使用更小的量化版本（Q4 而非 Q5）
+ollama pull qwen2.5-coder:14b-instruct-q4_K_M
+
+# 4. 卸载不需要的模型
+ollama rm <model_name>
+```
+
+### 问题 3: Aider 找不到 Ollama 模型
+
+**症状**: `Model not found`
+
+**解决方法**:
+```powershell
+# 1. 确认模型已下载
 ollama list
 
-# 启动 Ollama 服务
-ollama serve
+# 2. 使用正确的模型名称
+# 正确: ollama/qwen2.5-coder:14b-instruct-q4_K_M
+# 错误: qwen2.5-coder (缺少 ollama/ 前缀和版本标签)
+
+# 3. 测试模型是否可用
+ollama run qwen2.5-coder:14b-instruct-q4_K_M "hello"
 ```
 
-**2. 模型响应慢**
-```bash
-# 切换到更小的模型
-aider --model ollama/codellama:7b
+### 问题 4: Git 相关错误
 
-# 或调整温度参数
-aider --model-temperature 0.2
+**症状**: `fatal: not a git repository`
+
+**解决方法**:
+```powershell
+# 在项目目录中初始化 Git
+git init
+
+# 配置 Git 用户信息（如果是首次使用）
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
 ```
 
-**3. 内存不足**
-```bash
-# 监控内存使用
-htop
+### 问题 5: 模型响应太慢
 
-# 使用更小的模型或增加交换空间
-sudo fallocate -l 8G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
+**解决方法**:
+```powershell
+# 1. 切换到 Q4 量化版本
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# 2. 降低温度参数（更确定性，更快）
+aider --model-temperature 0.1
+
+# 3. 预加载模型到内存
+ollama run qwen2.5-coder:14b-instruct-q4_K_M ""
+
+# 4. 检查系统资源
+# 打开任务管理器 (Ctrl+Shift+Esc) 查看 CPU/内存使用
 ```
 
-**4. Git 冲突**
-```bash
-# Aider 会自动处理大多数 Git 操作
-# 如果出现问题,可以手动解决
-git status
+### 问题 6: PowerShell 中文显示乱码
+
+**解决方法**:
+```powershell
+# 设置 PowerShell 编码为 UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+chcp 65001
+
+# 或在 PowerShell 配置文件中永久设置
+# 编辑: notepad $PROFILE
+# 添加: [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+```
+
+---
+
+## 实用技巧
+
+### 1. 创建快捷启动脚本
+
+创建 `start-aider-qwen.ps1`:
+```powershell
+# Qwen2.5-Coder Q4（日常使用）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M --stream --pretty
+```
+
+创建 `start-aider-deepseek.ps1`:
+```powershell
+# DeepSeek-Coder V2 Q4（复杂任务）
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M --stream --pretty
+```
+
+使用：
+```powershell
+.\start-aider-qwen.ps1
+```
+
+### 2. 批处理脚本（.bat 格式）
+
+创建 `aider-qwen.bat`:
+```batch
+@echo off
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M --stream --pretty
+```
+
+双击运行即可。
+
+### 3. 设置 Windows Terminal 配置
+
+如果使用 Windows Terminal，可以添加专用配置：
+
+```json
+{
+    "name": "Aider (Qwen)",
+    "commandline": "powershell.exe -NoExit -Command \"aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M\"",
+    "startingDirectory": "%USERPROFILE%\\Projects"
+}
+```
+
+---
+
+## 推荐工作流程
+
+### 工作流 1: 新项目开发
+
+```powershell
+# 1. 创建项目
+mkdir my_new_project
+cd my_new_project
+git init
+
+# 2. 启动 Aider（使用 Qwen，速度快）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# 3. 描述项目需求
+> 创建一个 Flask Web 应用，包含用户认证系统（注册、登录、登出），
+  使用 SQLAlchemy ORM，JWT 令牌认证，包含单元测试
+
+# 4. 审查生成的代码
+> /ls
+> /diff
+
+# 5. 测试运行
+> /exit
+python main.py
+
+# 6. 如果需要修改
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M main.py
+> 添加密码强度验证和邮箱格式检查
+```
+
+### 工作流 2: 代码重构
+
+```powershell
+# 1. 进入项目
+cd existing_project
+
+# 2. 使用 DeepSeek（适合复杂重构）
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M \
+      --read README.md \
+      --file src/legacy_code.py
+
+# 3. 请求重构
+> 重构这个文件：
+  1. 将单个大函数拆分成多个小函数
+  2. 添加类型注解
+  3. 改进错误处理
+  4. 添加文档字符串
+  5. 遵循 PEP 8 规范
+
+# 4. 审查并提交
+> /diff
+> /commit
+```
+
+### 工作流 3: Bug 修复
+
+```powershell
+# 1. 启动 Aider，添加相关文件
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M \
+      buggy_file.py \
+      --read test_file.py
+
+# 2. 描述 Bug
+> 修复以下 Bug：当输入为空列表时程序崩溃，
+  应该返回默认值而不是抛出异常
+
+# 3. 运行测试验证
+> /exit
+pytest test_file.py
+
+# 4. 如果测试通过，提交
 git add .
-git commit -m "manual fix"
+git commit -m "fix: handle empty list input"
 ```
 
 ---
 
-## 性能优化
+## 总结
 
-### 1. UM890 Pro 特定优化
+### 您的最佳配置
 
-```bash
-# 启用 CPU 性能模式
-echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+**硬件**: UM890 Pro + 32GB 内存 + Win11 Pro  
+**推荐模型**: 
+- **日常开发**: Qwen2.5-Coder 14B Q4_K_M（快速）
+- **复杂任务**: DeepSeek-Coder V2 Lite 16B Q4_K_M（强大）
 
-# 为 Ollama 分配更多资源
-export OLLAMA_NUM_PARALLEL=2
-export OLLAMA_MAX_LOADED_MODELS=1
-```
+### 快速开始
 
-### 2. 模型量化
+```powershell
+# 1. 安装 Ollama（官网下载安装）
+# 2. 下载模型
+ollama pull qwen2.5-coder:14b-instruct-q4_K_M
+ollama pull deepseek-coder-v2:16b-lite-instruct-q4_K_M
 
-使用量化模型以减少内存占用:
-
-```bash
-# 下载 Q4 量化版本(更快,内存更少)
-ollama pull deepseek-coder:6.7b-q4_0
-```
-
-### 3. 缓存优化
-
-```bash
-# 保持模型在内存中
-ollama run deepseek-coder:6.7b ""  # 预加载模型
-```
-
-### 4. 监控性能
-
-```bash
-# 实时监控
-watch -n 1 'ollama ps'
-
-# 检查模型性能
-ollama show deepseek-coder:6.7b
-```
-
----
-
-## 快速参考
-
-### 常用命令速查
-
-```bash
-# 启动
-aider --model ollama/deepseek-coder:6.7b main.py
-
-# 会话中
-/add file.py           # 添加文件
-/drop file.py          # 移除文件
-/undo                  # 撤销
-/commit               # 提交
-/diff                 # 查看差异
-/tokens               # 查看 token 使用量
-/exit                 # 退出
-```
-
-### 推荐工作流
-
-1. **初始化项目**: `git init && aider`
-2. **描述需求**: 用自然语言描述要实现的功能
-3. **审查更改**: 检查 Aider 的修改
-4. **测试代码**: 运行测试确保正确性
-5. **提交更改**: `/commit` 或 `git commit`
-6. **迭代改进**: 继续下一个功能
-
----
-
-## 资源链接
-
-- **Aider 官方文档**: https://aider.chat/docs/
-- **Ollama 模型库**: https://ollama.com/library
-- **GitHub 仓库**: https://github.com/paul-gauthier/aider
-- **社区论坛**: https://discord.gg/Tv2uQnR5
-
----
-
-## 许可证与支持
-
-本手册基于 Aider 官方文档编写,专为 UM890 Pro 用户优化。如有问题,请访问官方 GitHub 仓库提交 issue。
-
-**最后更新**: 2025年1月
+# 3. 安装 Aider
+pip install 
