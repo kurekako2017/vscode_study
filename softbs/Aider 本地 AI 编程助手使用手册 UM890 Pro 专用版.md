@@ -1,3 +1,220 @@
+Aider 本地安装使用指南
+
+UM890 Pro (Windows 11 Pro + 32GB 内存) 专用版
+
+概述
+=====
+本指南面向 UM890 Pro（Ryzen 9 8945HS、32GB 内存）用户，介绍如何在本机使用 Ollama + Aider 进行本地代码生成、重构与审查。包含环境准备、模型下载、Aider 安装与配置、使用示例、性能优化与故障排查。
+
+目录
+----
+1. 系统与硬件建议
+2. 安装前准备
+3. 安装与验证 Ollama
+4. 下载与测试模型
+5. 安装与配置 Aider
+6. 实战示例
+7. 性能优化与建议
+8. 常用命令速查
+9. 故障排查
+
+1. 系统与硬件建议
+-----------------
+推荐机器规格（UM890 Pro 已满足）：
+
+```
+主机: UM890 Pro（Ryzen 9 8945HS）
+内存: 32 GB
+系统: Windows 11 Pro
+```
+
+内存对模型加载影响最大。32GB 建议使用 Q4 量化版本（Q4_K_M），以便在加载 14B/16B 模型时保持系统响应。
+
+2. 安装前准备
+----------------
+- 安装 Python 3.10+：
+
+```powershell
+python --version
+pip --version
+```
+
+- 安装 Git：
+
+```powershell
+git --version
+```
+
+- 如需运行脚本，设置 PowerShell 执行策略（管理员）：
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+3. 安装与验证 Ollama
+---------------------
+1) 下载并安装：
+
+```powershell
+# 官网下载安装包: https://ollama.com/download/windows
+Invoke-WebRequest -Uri https://ollama.com/download/OllamaSetup.exe -OutFile OllamaSetup.exe
+.\OllamaSetup.exe
+```
+
+2) 验证安装：
+
+```powershell
+ollama --version
+ollama list
+```
+
+3) 确认服务运行：使用 `ollama list` 或 `ollama ps`。
+
+4. 下载与测试模型
+------------------
+建议优先拉取 Q4 量化版本（对 32GB 更友好）：
+
+```powershell
+# Qwen2.5-Coder 14B Q4（约 9GB）
+ollama pull qwen2.5-coder:14b-instruct-q4_K_M
+
+# DeepSeek-Coder V2 Lite 16B Q4（约 10GB）
+ollama pull deepseek-coder-v2:16b-lite-instruct-q4_K_M
+
+ollama list
+```
+
+测试模型输出：
+
+```powershell
+ollama run qwen2.5-coder:14b-instruct-q4_K_M "解释什么是闭包"
+ollama run deepseek-coder-v2:16b-lite-instruct-q4_K_M "写一个 Python 快速排序函数"
+```
+
+5. 安装与配置 Aider
+--------------------
+推荐使用 `pipx` 隔离安装：
+
+```powershell
+pip install --user pipx
+python -m pipx ensurepath
+# 重新打开 PowerShell 后
+pipx install aider-chat
+
+# 验证
+aider --version
+```
+
+直接使用 `pip`：
+
+```powershell
+pip install aider-chat
+```
+
+配置（示例配置文件）：
+
+```powershell
+$config = @"
+model: ollama/qwen2.5-coder:14b-instruct-q4_K_M
+edit-format: diff
+auto-commits: false
+dark-mode: true
+pretty: true
+stream: true
+"@
+
+$config | Out-File -FilePath "$env:USERPROFILE\.aider.conf.yml" -Encoding UTF8
+```
+
+6. 实战示例（快速上手）
+---------------------
+示例 A：创建新项目
+
+```powershell
+mkdir my_project
+cd my_project
+git init
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+# 在会话里：创建一个 FastAPI 应用（注册/登录），查看 /ls、/diff、/commit
+```
+
+示例 B：重构（使用 DeepSeek）
+
+```powershell
+cd existing_project
+aider --model ollama/deepseek-coder-v2:16b-lite-instruct-q4_K_M main.py utils.py
+# 会话里描述重构目标，查看 /diff，提交 /commit
+```
+
+示例 C：审查与优化
+
+```powershell
+aider --read README.md --read requirements.txt --file src/main.py
+# 请求性能审查、查看 /diff、提交 /commit
+```
+
+7. 性能优化建议（UM890 Pro）
+-------------------------
+- 模型选择：优先 Q4 量化版本（Q4_K_M）。
+- 推荐环境变量：
+
+```powershell
+[System.Environment]::SetEnvironmentVariable('OLLAMA_NUM_PARALLEL','2','User')
+[System.Environment]::SetEnvironmentVariable('OLLAMA_MAX_LOADED_MODELS','2','User')
+[System.Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION','1','User')
+```
+
+- Aider 启动优化：
+
+```powershell
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M --model-temperature 0.2 --stream --no-auto-commits
+```
+
+- Windows 优化：启用高性能电源计划并调整虚拟内存。
+
+8. 常用命令速查
+----------------
+
+```powershell
+# Ollama 列表
+ollama list
+
+# 运行模型
+ollama run qwen2.5-coder:14b-instruct-q4_K_M
+
+# 启动 Aider（指定模型）
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M
+
+# Aider 会话命令：/add /read /ls /diff /commit /model /exit
+```
+
+9. 常见故障与排查
+------------------
+- Ollama 连接失败：确认 `ollama` 进程在运行，或重启。
+- 模型加载失败：检查剩余内存，切换至 Q4，或卸载其他模型。
+- Aider 找不到模型：确认模型名带 `ollama/` 前缀并带版本标签。
+
+诊断命令示例：
+
+```powershell
+Get-Process ollama -ErrorAction SilentlyContinue
+ollama list
+Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory
+```
+
+附录：快速脚本示例
+------------------
+`start-aider-qwen.ps1`：
+
+```powershell
+# Qwen2.5 快速启动脚本
+aider --model ollama/qwen2.5-coder:14b-instruct-q4_K_M --stream --pretty
+```
+
+结语
+----
+文档已为 UM890 Pro 优化。如需英文版、截图或精简速查卡，请回复我将继续完善。
+
 # Aider 本地安装使用指南
 ## UM890 Pro (Win11 Pro + 32GB 内存) 专用版
 
