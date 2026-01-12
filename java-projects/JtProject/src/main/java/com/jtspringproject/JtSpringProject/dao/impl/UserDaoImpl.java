@@ -2,14 +2,14 @@ package com.jtspringproject.JtSpringProject.dao.impl;
 
 import java.util.List;
 
-import javax.persistence.NoResultException;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,12 +44,10 @@ public class UserDaoImpl implements UserDao {
     private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
 
     @Autowired
+    @Qualifier("secondarySessionFactory")
+    @Lazy
     private SessionFactory sessionFactory;
-    
-    public void setSessionFactory(SessionFactory sf) {
-        this.sessionFactory = sf;
-    }
-   
+
     /**
      * 获取所有用户
      *
@@ -77,7 +75,7 @@ public class UserDaoImpl implements UserDao {
             // 对应SQL：SELECT * FROM users
             // CUSTOMER是User实体类的@Entity注解名称（不是表名）
             // Hibernate会自动将CUSTOMER映射到users表
-            List<User> userList = session.createQuery("from CUSTOMER", User.class).list();
+            List<User> userList = session.createQuery("from User", User.class).list();
 
             logger.info("DAO层：成功获取 {} 个用户", userList.size());
             return userList;
@@ -142,7 +140,7 @@ public class UserDaoImpl implements UserDao {
      * 2. 绑定参数：username值
      * 3. Hibernate转换为SQL：SELECT * FROM users WHERE username = ?
      * 4. 数据库执行查询
-     * 5. 返回单个结果（getSingleResult）
+     * 5. 返回结果（可能是0、1或多条）
      * 6. 在Java代码中比对密码
      * 7. 密码正确返回User对象，错误返回空User对象
      *
@@ -158,51 +156,30 @@ public class UserDaoImpl implements UserDao {
         logger.info("DAO层：用户登录验证: {}", username);
         try {
             // 创建Hibernate Query对象
-            // 📝 HQL查询语法：
-            // - from CUSTOMER: 从User实体查询（CUSTOMER是@Entity名称）
-            // - where username = :username: WHERE条件，:username是命名参数
-            // 对应SQL: SELECT * FROM users WHERE username = ?
             Query<User> query = sessionFactory.getCurrentSession()
-                    .createQuery("from CUSTOMER where username = :username", User.class);
-
-            // 绑定命名参数的值
-            // 📝 setParameter方法：
-            // - 第一个参数：命名参数名称（HQL中的:username）
-            // - 第二个参数：实际的值（传入的username变量）
-            // 这样可以防止SQL注入攻击
+                    .createQuery("from User where username = :username", User.class);
             query.setParameter("username", username);
-
-            // 执行查询并获取单个结果
-            // 📝 getSingleResult()：
-            // - 期望查询结果只有一条记录
-            // - 如果没有结果，抛出NoResultException
-            // - 如果有多条结果，抛出NonUniqueResultException
-            // 数据库返回的记录会被Hibernate自动映射为User对象
-            User user = query.getSingleResult();
-            logger.debug("DAO层：找到用户: {}", username);
-
-            // 判断密码是否匹配
-            // ⚠️ 注意：这里使用明文比对密码，不安全！
-            // 生产环境应该使用：
-            // - 存储：BCrypt.hashpw(password, BCrypt.gensalt())
-            // - 验证：BCrypt.checkpw(password, user.getPassword())
-            if(password.equals(user.getPassword())) {
-                // ✅ 密码正确，登录成功
+            logger.debug("DAO层：执行HQL: {}，参数: username={}", query.getQueryString(), username);
+            List<User> results = query.getResultList();
+            if (results == null || results.isEmpty()) {
+                logger.warn("DAO层：用户不存在: {}", username);
+                return new User();
+            }
+            if (results.size() > 1) {
+                logger.warn("DAO层：查询到多条相同用户名的记录: {}，将使用第一条进行验证", username);
+            }
+            User user = results.get(0);
+            logger.debug("DAO层：找到用户: {} (id={})", username, user.getId());
+            String stored = user.getPassword();
+            if (stored != null && stored.equals(password)) {
                 logger.info("DAO层：用户登录成功: {}, 角色: {}", username, user.getRole());
                 return user;
             } else {
-                // ❌ 密码错误，返回空User对象（id=0）
                 logger.warn("DAO层：用户密码错误: {}", username);
                 return new User();
             }
-        } catch (NoResultException nre) {
-            // 用户不存在，返回空 User 对象（id 默认 0）
-            logger.warn("DAO层：用户不存在: {}", username);
-            return new User();
-        } catch(Exception e){
-            // 其他异常（例如数据库连接/查询错误）记录完整堆栈，方便排查
-            logger.error("DAO层：查询用户时发生异常: {}, 错误: {}", username, e.getMessage(), e);
-            // 为了与现有代码契约一致，返回空 User 对象而不是抛出异常
+        } catch (Exception e) {
+            logger.error("DAO层：getUser() 总异常捕获: {} - {}", e.getClass().getName(), e.getMessage(), e);
             return new User();
         }
     }
@@ -228,7 +205,7 @@ public class UserDaoImpl implements UserDao {
         logger.info("DAO层：检查用户名是否存在: {}", username);
         try {
             Query<Long> query = sessionFactory.getCurrentSession()
-                .createQuery("SELECT COUNT(u) FROM CUSTOMER u WHERE u.username = :username", Long.class);
+                .createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class);
 
             query.setParameter("username", username);
 

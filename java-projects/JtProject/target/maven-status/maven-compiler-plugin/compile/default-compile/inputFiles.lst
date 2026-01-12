@@ -12,6 +12,8 @@ D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspri
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\models\Cart.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\dao\CartDao.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\models\User.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\AnotherComponent.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\LazyTestComponent.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\dao\ProductDao.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\dao\UserDao.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\services\ProductService.java
@@ -22,6 +24,9 @@ D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspri
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\models\CartProduct.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\dao\impl\UserDaoImpl.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\services\CategoryService.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\TransactionConfig.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\models\Category.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\services\impl\ProductServiceImpl.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\WebMvcConfig.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\HibernateSessionFactoryConfig.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\services\impl\CategoryServiceImpl.java

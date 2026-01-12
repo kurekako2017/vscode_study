@@ -1,10 +1,12 @@
 com\jtspringproject\JtSpringProject\dao\UserDao.class
 com\jtspringproject\JtSpringProject\models\CartProduct.class
+com\jtspringproject\JtSpringProject\WebMvcConfig.class
 com\jtspringproject\JtSpringProject\models\Category.class
 com\jtspringproject\JtSpringProject\services\CategoryService.class
 com\jtspringproject\JtSpringProject\models\Product.class
 com\jtspringproject\JtSpringProject\services\ProductService.class
 com\jtspringproject\JtSpringProject\dao\impl\ProductDaoImpl.class
+com\jtspringproject\JtSpringProject\LazyTestComponent.class
 com\jtspringproject\JtSpringProject\dao\impl\UserDaoImpl.class
 com\jtspringproject\JtSpringProject\dao\CartDao.class
 com\jtspringproject\JtSpringProject\services\impl\CartServiceImpl.class
@@ -12,8 +14,11 @@ com\jtspringproject\JtSpringProject\dao\CategoryDao.class
 com\jtspringproject\JtSpringProject\services\impl\UserServiceImpl.class
 com\jtspringproject\JtSpringProject\dao\impl\CartDaoImpl.class
 com\jtspringproject\JtSpringProject\models\User.class
+com\jtspringproject\JtSpringProject\AnotherComponent.class
 com\jtspringproject\JtSpringProject\dao\ProductDao.class
 com\jtspringproject\JtSpringProject\HibernateConfiguration.class
+com\jtspringproject\JtSpringProject\HibernateSessionFactoryConfig.class
+com\jtspringproject\JtSpringProject\TransactionConfig.class
 com\jtspringproject\JtSpringProject\services\impl\CategoryServiceImpl.class
 com\jtspringproject\JtSpringProject\dao\impl\CategoryDaoImpl.class
 com\jtspringproject\JtSpringProject\dao\impl\CartProductDaoImpl.class

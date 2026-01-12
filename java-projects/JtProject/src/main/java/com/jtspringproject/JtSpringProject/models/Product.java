@@ -3,12 +3,16 @@ package com.jtspringproject.JtSpringProject.models;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 /**
  * 商品实体类
@@ -47,9 +51,10 @@ public class Product {
 	/** 商品图片路径 */
 	private String image;
 	
-	/** 商品所属分类，一对一关系，级联所有操作 */
-	@OneToOne(cascade = CascadeType.ALL)
+	/** 商品所属分类，一对一关系，级联所有操作（改为可选且延迟加载，缺失时忽略） */
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "category_id",referencedColumnName = "category_id")
+	@NotFound(action = NotFoundAction.IGNORE)
 	private Category category;
 	
 	/** 商品库存数量 */

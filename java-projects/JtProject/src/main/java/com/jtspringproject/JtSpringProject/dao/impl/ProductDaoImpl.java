@@ -7,6 +7,8 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,12 +41,10 @@ public class ProductDaoImpl implements ProductDao {
     private static final Logger logger = LoggerFactory.getLogger(ProductDaoImpl.class);
 
     @Autowired
+    @Qualifier("secondarySessionFactory")
+    @Lazy
     private SessionFactory sessionFactory;
-    
-    public void setSessionFactory(SessionFactory sf) {
-        this.sessionFactory = sf;
-    }
-    
+
     /**
      * 获取所有商品
      *
@@ -56,7 +56,7 @@ public class ProductDaoImpl implements ProductDao {
         logger.info("获取所有商品");
         try {
             List<Product> products = this.sessionFactory.getCurrentSession()
-                    .createQuery("from PRODUCT").list();
+                    .createQuery("from PRODUCT", Product.class).list();
             logger.info("成功获取 {} 个商品", products.size());
             return products;
         } catch (Exception e) {

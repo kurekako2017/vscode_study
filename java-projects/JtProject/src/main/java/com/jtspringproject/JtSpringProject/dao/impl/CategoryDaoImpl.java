@@ -2,11 +2,11 @@ package com.jtspringproject.JtSpringProject.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +16,12 @@ import com.jtspringproject.JtSpringProject.models.Category;
 /**
  * 分类数据访问实现类
  *
- * <p>实现CategoryDao接口，使用Hibernate SessionFactory直接操作数据库。
+ * <p>实现CategoryDao接口，使用Hibernate EntityManager直接操作数据库。
  * 所有方法都使用@Transactional注解确保事务管理。</p>
  *
  * <h3>技术特点：</h3>
  * <ul>
- *   <li>使用Hibernate Session进行数据库操作</li>
+ *   <li>使用Hibernate EntityManager进行数据库操作</li>
  *   <li>使用HQL查询语言</li>
  *   <li>方法级别的声明式事务管理</li>
  * </ul>
@@ -36,12 +36,8 @@ public class CategoryDaoImpl implements CategoryDao {
     
     private static final Logger logger = LoggerFactory.getLogger(CategoryDaoImpl.class);
 
-    @Autowired
-    private SessionFactory sessionFactory;
-
-    public void setSessionFactory(SessionFactory sf) {
-        this.sessionFactory = sf;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     /**
      * 添加分类
@@ -56,7 +52,7 @@ public class CategoryDaoImpl implements CategoryDao {
         try {
             Category category = new Category();
             category.setName(name);
-            this.sessionFactory.getCurrentSession().saveOrUpdate(category);
+            entityManager.persist(category);
             logger.info("分类添加成功，ID: {}", category.getId());
             return category;
         } catch (Exception e) {
@@ -75,8 +71,7 @@ public class CategoryDaoImpl implements CategoryDao {
     public List<Category> getCategories() {
         logger.info("获取所有分类");
         try {
-            List<Category> categories = this.sessionFactory.getCurrentSession()
-                    .createQuery("from CATEGORY").list();
+            List<Category> categories = entityManager.createQuery("from CATEGORY", Category.class).getResultList();
             logger.info("成功获取 {} 个分类", categories.size());
             return categories;
         } catch (Exception e) {
@@ -96,11 +91,9 @@ public class CategoryDaoImpl implements CategoryDao {
     public Boolean deletCategory(int id) {
         logger.info("删除分类，ID: {}", id);
         try {
-            Session session = this.sessionFactory.getCurrentSession();
-            Object persistanceInstance = session.load(Category.class, id);
-
-            if (persistanceInstance != null) {
-                session.delete(persistanceInstance);
+            Category category = entityManager.find(Category.class, id);
+            if (category != null) {
+                entityManager.remove(category);
                 logger.info("分类删除成功，ID: {}", id);
                 return true;
             }
@@ -124,13 +117,13 @@ public class CategoryDaoImpl implements CategoryDao {
     public Category updateCategory(int id, String name) {
         logger.info("更新分类，ID: {}, 新名称: {}", id, name);
         try {
-            Category category = this.sessionFactory.getCurrentSession().get(Category.class, id);
+            Category category = entityManager.find(Category.class, id);
             if (category == null) {
                 logger.error("分类不存在，无法更新，ID: {}", id);
                 throw new RuntimeException("分类不存在: " + id);
             }
             category.setName(name);
-            this.sessionFactory.getCurrentSession().update(category);
+            entityManager.merge(category);
             logger.info("分类更新成功，ID: {}", id);
             return category;
         } catch (Exception e) {
@@ -150,7 +143,7 @@ public class CategoryDaoImpl implements CategoryDao {
     public Category getCategory(int id) {
         logger.info("获取分类详情，ID: {}", id);
         try {
-            Category category = this.sessionFactory.getCurrentSession().get(Category.class, id);
+            Category category = entityManager.find(Category.class, id);
             if (category != null) {
                 logger.info("成功获取分类，ID: {}, 名称: {}", id, category.getName());
             } else {

@@ -1,13 +1,10 @@
 package com.jtspringproject.JtSpringProject.models;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -32,8 +29,8 @@ import javax.persistence.Table;
  * @version 1.0
  * @see Cart
  */
-@Entity(name="CUSTOMER")
-@Table
+@Entity
+@Table(name="CUSTOMER")
 public class User {
 
 	/** 用户ID，主键，自动生成 */

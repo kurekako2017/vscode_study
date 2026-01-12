@@ -4,7 +4,14 @@
 
 ### 🇯🇵 日本企业网站开发完全指南【推荐】
 
-1. **[WORDPRESS_COCOON_COMPLETE_GUIDE.md](docs/WORDPRESS_COCOON_COMPLETE_GUIDE.md)** - Cocoon主题完全开发指南【最推荐】
+1. **[WordPress 公司网站制作完全指南.md](docs/WordPress%20公司网站制作完全指南.md)** - WordPress公司网站制作完全指南【主题对比推荐】
+   - Kadence、Elementor、Cocoon、Lightning主题对比
+   - 推荐组合方案（免费/付费）
+   - 各主题详细安装配置指南
+   - 30分钟快速上手指南
+   - SEO优化、性能优化、安全设置
+
+2. **[WordPress Cocoon主题完全开发指南.md](docs/WordPress%20Cocoon主题完全开发指南.md)** - Cocoon主题完全开发指南【最推荐】
    - Cocoon主题介绍与优势
    - 30分钟快速安装配置
    - 企业网站页面模板（可直接复制使用）
@@ -12,19 +19,19 @@
    - 自定义设计与性能优化
    - IT咨询/制造业实战案例
 
-2. **[JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md](docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md)** - 日本企业网站完整开发指南（中文）
+3. **[日本企业网站解决方案.md](docs/日本企业网站解决方案.md)** - 日本企业网站完整开发指南（中文）
    - 4种开发方案对比 (WordPress单体/Bootstrap Studio/VSCode/Elementor Pro)
    - 免费邮件/新闻功能实现
    - 部署设置 (onamae.com RSプラン)
    - 分阶段升级策略
 
-3. **[QUICK_START_WORDPRESS.md](docs/QUICK_START_WORDPRESS.md)** - 30分クイックスタート
+4. **[WordPress快速入门.md](docs/WordPress快速入门.md)** - 30分クイックスタート
    - 問い合わせフォーム設定
    - メール送信設定 (WP Mail SMTP)
    - 基本ページ作成
    - セキュリティ設定
 
-4. **[COST_COMPARISON_REAL_EXAMPLES.md](docs/COST_COMPARISON_REAL_EXAMPLES.md)** - コスト比較・実例
+5. **[成本比较与实际案例.md](docs/成本比较与实际案例.md)** - コスト比較・実例
    - 詳細コスト比較表
    - 実際の制作例3件
    - 規模別・業種別推奨方案
@@ -32,24 +39,24 @@
 
 ### 🎓 通用开发教程
 
-5. **[WEB_DEVELOPMENT_GUIDE.md](docs/WEB_DEVELOPMENT_GUIDE.md)** - 网站开发完整教程
+6. **[网站开发指南.md](docs/网站开发指南.md)** - 网站开发完整教程
    - VS Code 网页制作基础
    - WordPress 开发方案
    - Bootstrap Studio 集成
    - 现代开发工具和模板
 
-6. **[EMAIL_NEWS_IMPLEMENTATION_GUIDE.md](docs/EMAIL_NEWS_IMPLEMENTATION_GUIDE.md)** - 邮件和新闻功能实现
+7. **[邮件和新闻功能实现指南.md](docs/邮件和新闻功能实现指南.md)** - 邮件和新闻功能实现
    - 邮件服务器部署
    - 邮件发送功能
    - 新闻提交管理
    - 生产环境部署
 
-7. **[EMAIL_DEPLOYMENT_QUICK_START.md](docs/EMAIL_DEPLOYMENT_QUICK_START.md)** - 5分钟快速上手
+8. **[邮件部署快速上手.md](docs/邮件部署快速上手.md)** - 5分钟快速上手
    - 快速部署邮件服务
    - 简化版实现
    - 常见问题解决
 
-8. **[SEO_OPTIMIZATION_GUIDE.md](docs/SEO_OPTIMIZATION_GUIDE.md)** - SEO 优化指南
+9. **[SEO优化指南.md](docs/SEO优化指南.md)** - SEO 优化指南
    - 已上线网站SEO工具
    - 本地环境SEO检查
    - 关键词研究优化
@@ -57,18 +64,18 @@
 
 ### 💼 业务文档
 
-9. **[WEB_QUOTATION_STANDARD.md](docs/WEB_QUOTATION_STANDARD.md)** - 网页制作报价标准
+10. **[网页制作报价标准.md](docs/网页制作报价标准.md)** - 网页制作报价标准
    - 页面制作费用
    - 服务器维护费用
    - 企业邮箱年费
    - 完整案例计算
 
-10. **[ECOMMERCE_QUOTATION_TEMPLATE.md](docs/ECOMMERCE_QUOTATION_TEMPLATE.md)** - 电商网站报价方案
+11. **[电商网站报价方案.md](docs/电商网站报价方案.md)** - 电商网站报价方案
     - 购物网站功能模块
     - 电商平台报价
     - 支付集成费用
 
-11. **[EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - 邮箱服务器配置
+12. **[邮箱服务器配置.md](docs/邮箱服务器配置.md)** - 邮箱服务器配置
     - 域名和邮箱配置
     - SMTP设置
     - 企业邮箱方案
@@ -81,7 +88,7 @@
 
 ```bash
 # 🎯 超快速路径：1-2天完成专业企业网站
-1. 阅读 docs/WORDPRESS_COCOON_COMPLETE_GUIDE.md
+1. 阅读 docs/WordPress Cocoon主题完全开发指南.md
 2. 安装WordPress + Cocoon主题（免费）
 3. 直接复制使用页面模板代码
 4. 自定义公司信息和图片
@@ -97,9 +104,9 @@
 
 ```bash
 # 其他方案选择
-1. docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md - 4种方案对比
-2. docs/QUICK_START_WORDPRESS.md - Lightning主题30分钟快速启动
-3. docs/COST_COMPARISON_REAL_EXAMPLES.md - 查看实际案例和成本
+1. docs/日本企业网站解决方案.md - 4种方案对比
+2. docs/WordPress快速入门.md - Lightning主题30分钟快速启动
+3. docs/成本比较与实际案例.md - 查看实际案例和成本
 
 コスト: ¥0-¥9,000/年
 時間: 1-7日
@@ -109,7 +116,7 @@
 
 ```bash
 # 方案比較チャート
-docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md を確認
+docs/日本企业网站解决方案.md を確認
 
 推奨:
 - 初めて → WordPress単体 (¥0)
@@ -121,7 +128,7 @@ docs/JAPAN_CORPORATE_WEBSITE_SOLUTIONS_CN.md を確認
 
 ```bash
 # 実際の制作例を確認
-docs/COST_COMPARISON_REAL_EXAMPLES.md
+docs/成本比较与实际案例.md
 
 含まれる内容:
 ✅ 中小企業の実例3件
@@ -156,7 +163,7 @@ npm init -y
 npm install express nodemailer dotenv body-parser cors
 
 # 创建文件
-# 参考 EMAIL_DEPLOYMENT_QUICK_START.md
+# 参考 邮件部署快速上手.md
 
 # 启动
 node server.js
@@ -187,13 +194,13 @@ npm run dev
 ```
 web-projects/
 ├── README.md                              # 本文件
-├── WEB_DEVELOPMENT_GUIDE.md              # 开发教程
-├── EMAIL_NEWS_IMPLEMENTATION_GUIDE.md    # 邮件新闻实现
-├── EMAIL_DEPLOYMENT_QUICK_START.md       # 快速部署
+├── 网站开发指南.md                       # 开发教程
+├── 邮件和新闻功能实现指南.md             # 邮件新闻实现
+├── 邮件部署快速上手.md                   # 快速部署
 └── company-website/                       # 公司网站项目
     ├── docs/
-    │   ├── WEB_QUOTATION_STANDARD.md     # 报价标准
-    │   └── EMAIL_SETUP.md                # 邮件配置
+    │   ├── 网页制作报价标准.md            # 报价标准
+    │   └── 邮箱服务器配置.md              # 邮件配置
     └── [项目文件...]
 ```
 
@@ -308,7 +315,7 @@ docker-compose up -d
 - **年维护费**：¥50,000-150,000
 - **服务器**：¥5,000-15,000/年
 
-详细报价见：[WEB_QUOTATION_STANDARD.md](company-website/docs/WEB_QUOTATION_STANDARD.md)
+详细报价见：[网页制作报价标准.md](company-website/docs/网页制作报价标准.md)
 
 ---
 

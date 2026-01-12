@@ -70,4 +70,4 @@ npx tailwindcss init
 
 ---
 
-示例项目页面：`index.html`。更多细节请查看项目根目录的 `README.md`。
+示例项目位于 `static-site-example` 目录，包含演示用的 `index.html`、`css/styles.css`、`js/script.js`，以及 `.vscode` 设置与 `README.md`。

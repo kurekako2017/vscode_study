@@ -40,11 +40,11 @@ public class CartProductDaoImpl implements CartProductDao {
     
     private static final Logger logger = LoggerFactory.getLogger(CartProductDaoImpl.class);
 
-    @Autowired
     private SessionFactory sessionFactory;
 
-    public void setSessionFactory(SessionFactory sf) {
-        this.sessionFactory = sf;
+    @Autowired
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     /**

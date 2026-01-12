@@ -4,10 +4,8 @@ import java.sql.*;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +17,6 @@ import com.jtspringproject.JtSpringProject.models.User;
 import com.jtspringproject.JtSpringProject.services.CategoryService;
 import com.jtspringproject.JtSpringProject.services.ProductService;
 import com.jtspringproject.JtSpringProject.services.UserService;
-import com.mysql.cj.protocol.Resultset;
-
-import net.bytebuddy.asm.Advice.This;
-import net.bytebuddy.asm.Advice.OffsetMapping.ForOrigin.Renderer.ForReturnTypeName;
 
 /**
  * 管理员控制器
@@ -41,14 +35,17 @@ import net.bytebuddy.asm.Advice.OffsetMapping.ForOrigin.Renderer.ForReturnTypeNa
 public class AdminController {
 	
 	// 依赖注入：用户服务，用于处理用户相关业务逻辑
+	@Lazy
 	@Autowired
 	private UserService userService;
 
 	// 依赖注入：分类服务，用于处理商品分类相关业务逻辑
+	@Lazy
 	@Autowired
 	private CategoryService categoryService;
 	
 	// 依赖注入：商品服务，用于处理商品相关业务逻辑
+	@Lazy
 	@Autowired
 	private ProductService productService;
 	
@@ -270,7 +267,7 @@ public class AdminController {
 	@GetMapping("categories/update")
 	public String updateCategory(@RequestParam("categoryid") int id, @RequestParam("categoryname") String categoryname)
 	{
-		Category category = this.categoryService.updateCategory(id, categoryname);
+		this.categoryService.updateCategory(id, categoryname);
 		return "redirect:/admin/categories";
 	}
 
