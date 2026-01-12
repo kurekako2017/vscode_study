@@ -68,4 +68,12 @@ https://forum.cleora.ai/#/threads/11436 修改和反馈。
 
  重新初始化任务: 本地运行会经常出现初始化失败的情况，请使用/audio 重新开始尝试。
  重新生成: 请尝试重新生成这个 UM190 Frame Buffer 相关的文本内容了，稍等片刻。
+
+六、推荐模型
+
+| 使用场景 | 模型 | 启动命令 |
+| --- | --- | --- |
+| 日常快速写代码、补全 | Qwen2.5-Coder:7b (你现有的) | `ollama run qwen2.5-coder:7b` |
+| 需要更强的逻辑、复杂任务 | Qwen3:8b | `ollama run qwen3:8b` |
+| 深度 Debug、疑难杂症 | DeepSeek-R1:8b | `ollama run deepseek-r1:8b` |
 ```

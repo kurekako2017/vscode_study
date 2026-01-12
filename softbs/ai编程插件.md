@@ -1,3 +1,50 @@
+## VS Code 最佳免费 AI 编程插件推荐（2026）
+
+### 1. 免费云端 AI 编程插件
+
+- **Codeium**
+   - 功能：自动补全、代码生成、注释解释，体验接近 Copilot。
+   - 优点：完全免费，支持多语言，响应速度快。
+   - 安装：VS Code 插件市场搜索“Codeium”。
+
+- **TabNine**（基础免费）
+   - 功能：AI 代码补全，支持多语言。
+   - 优点：本地和云端混合，免费版有基本补全。
+   - 安装：VS Code 插件市场搜索“TabNine”。
+
+### 2. 本地大模型 AI 编程插件
+
+- **Continue**
+   - 功能：支持本地 LLM（如 Ollama、LM Studio、OpenAI API），可自定义模型，支持代码补全、对话、代码解释。
+   - 优点：隐私安全，支持多种本地模型（如 Llama 2/3、Qwen、Deepseek 等），界面友好。
+   - 安装：VS Code 插件市场搜索“Continue”。
+   - 配置：配合 Ollama（推荐 Windows/Mac 本地部署）、LM Studio 或自建 API。
+
+- **Aider**（配合 VS Code Terminal 使用）
+   - 功能：本地 LLM 代码助手，支持多轮对话、代码修改、自动补全。
+   - 优点：支持 Ollama、LM Studio，适合本地私有化开发。
+   - 用法：在终端运行 aider，结合 VS Code 编辑器。
+
+### 3. 其他本地模型插件
+
+- **ChatGPT - Genie AI**
+   - 功能：支持自定义 API、本地模型，代码补全、对话。
+   - 安装：VS Code 插件市场搜索“Genie AI”。
+
+---
+
+#### 推荐组合
+- 云端免费体验：**Codeium**
+- 本地模型体验：**Continue + Ollama/LM Studio**
+- 进阶本地工作流：**Aider + Ollama**（需命令行操作）
+
+#### 参考配置
+1. 安装 Continue 插件，配置 Ollama（如 Llama 3、Qwen、Deepseek 等模型）。
+2. VS Code 插件市场安装 Codeium 体验云端补全。
+3. 需要更强本地控制可用 Aider（详见 softbs/01_Aider + Ollama Windows 标准启动方案.md）。
+
+---
+**注意：** 本地大模型需较大内存（16GB+），推荐 GPU 环境体验更佳。
 # VS Code 替代方案推荐
 ## 前言
 本文将介绍几款优秀的 VS Code 替代方案，特别适合追求 AI 深度集成的开发者。这些方案不仅能提供更好的智能编程体验，还能为你的开发工作带来更多便利。
