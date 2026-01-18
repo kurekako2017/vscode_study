@@ -71,7 +71,7 @@ public class CategoryDaoImpl implements CategoryDao {
     public List<Category> getCategories() {
         logger.info("获取所有分类");
         try {
-            List<Category> categories = entityManager.createQuery("from CATEGORY", Category.class).getResultList();
+            List<Category> categories = entityManager.createQuery("from Category", Category.class).getResultList();
             logger.info("成功获取 {} 个分类", categories.size());
             return categories;
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package com.jtspringproject.JtSpringProject.models;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -36,7 +37,8 @@ import org.hibernate.annotations.NotFoundAction;
  * @see Category
  * @see User
  */
-@Entity(name="PRODUCT")
+@Entity
+@Table(name = "PRODUCT")
 public class Product {
 
 	/** 商品ID，主键，自动生成 */

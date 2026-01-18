@@ -53,7 +53,7 @@
                     - action: userloginvalidate - 表单提交的后端接口（必须与Controller中的路由匹配）
                     - method: post - 使用POST方法提交（安全性考虑，密码不会显示在URL中）
                 -->
-                <form action="userloginvalidate" method="post">
+                <form action="userloginvalidate1" method="post">
 
                     <!--
                         用户名输入框

@@ -19,6 +19,12 @@
 </head>
 <body class="bg-light">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+		<c:if test="${not empty cartMsg}">
+			<div class="alert alert-success" role="alert" style="margin: 20px;">
+				${cartMsg}
+			</div>
+		</c:if>
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#"> <img
 				th:src="@{/images/logo.png}" src="../static/images/logo.png"
@@ -98,7 +104,7 @@
 					<td>
 
 
-				    <form action="products/addtocart" method="get">
+                    <form action="/products/addtocart" method="get">
 							<input type="hidden" name="id" value="${product.id}">
 							<input type="submit" value="Add To Cart" class="btn btn-warning">
 					</form>

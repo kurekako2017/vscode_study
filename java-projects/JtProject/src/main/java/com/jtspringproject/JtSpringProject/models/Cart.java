@@ -1,6 +1,7 @@
 package com.jtspringproject.JtSpringProject.models;
 
 import javax.persistence.*;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,8 @@ import java.util.List;
  * @see User
  * @see CartProduct
  */
-@Entity(name="CART")
+@Entity
+@Table(name = "CART")
 public class Cart {
 
 	/** 购物车ID，主键，自动生成 */

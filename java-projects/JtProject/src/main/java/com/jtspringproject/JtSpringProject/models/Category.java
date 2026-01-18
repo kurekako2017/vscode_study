@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * 商品分类实体类
@@ -21,7 +22,8 @@ import javax.persistence.Id;
  * @version 1.0
  * @see Product
  */
-@Entity(name="CATEGORY")
+@Entity
+@Table(name = "CATEGORY")
 public class Category {
 
 	/** 分类ID，主键，自动生成 */

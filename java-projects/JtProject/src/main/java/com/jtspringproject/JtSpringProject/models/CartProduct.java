@@ -1,8 +1,6 @@
 package com.jtspringproject.JtSpringProject.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 购物车商品关联实体类
@@ -28,7 +26,8 @@ import java.util.List;
  * @see Cart
  * @see Product
  */
-@Entity(name="CART_PRODUCT")
+@Entity
+@Table(name = "CART_PRODUCT")
 public class CartProduct {
 
 	/** 购物车商品关联ID，主键，自动生成 */
@@ -38,12 +37,12 @@ public class CartProduct {
 
     /** 所属购物车，多对一关系 */
     @ManyToOne
-    @JoinColumn(name="cart_id")
+    @JoinColumn(name="cart_id", nullable = false)
     private Cart cart;
 
     /** 关联的商品，多对一关系 */
     @ManyToOne
-    @JoinTable(name="product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
 	/**

@@ -35,7 +35,7 @@
         </button>
 		
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <h4>Welcome ${ username } </h4>
+        <h4>Welcome1 ${ username } </h4>
             <ul class="navbar-nav mr-auto"></ul>
             <ul class="navbar-nav">
                 <li class="nav-item active">
@@ -95,7 +95,10 @@
               <h5 class="card-text">Category: ${product.category.name}</h5>
               <h5 class="card-text">Price: ${product.price}</h5>
               <p class="card-text">Description: ${product.description}</p>
-              <a href="#" class="btn btn-primary">Add to Cart</a>
+              <form action="/products/addtocart" method="get" style="display:inline-block;">
+                <input type="hidden" name="id" value="${product.id}">
+                <input type="submit" value="Add To Cart" class="btn btn-primary">
+              </form>
             </div>
           </div>
         </div> </c:forEach>

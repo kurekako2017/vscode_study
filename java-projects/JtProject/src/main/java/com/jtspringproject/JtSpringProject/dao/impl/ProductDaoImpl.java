@@ -55,8 +55,8 @@ public class ProductDaoImpl implements ProductDao {
     public List<Product> getProducts(){
         logger.info("获取所有商品");
         try {
-            List<Product> products = this.sessionFactory.getCurrentSession()
-                    .createQuery("from PRODUCT", Product.class).list();
+                List<Product> products = this.sessionFactory.getCurrentSession()
+                    .createQuery("from Product", Product.class).list();
             logger.info("成功获取 {} 个商品", products.size());
             return products;
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class ProductDaoImpl implements ProductDao {
     public Product updateProduct(Product product){
         logger.info("更新商品，ID: {}, 名称: {}", product.getId(), product.getName());
         try {
-            this.sessionFactory.getCurrentSession().update(String.valueOf(Product.class), product);
+            this.sessionFactory.getCurrentSession().update(product);
             logger.info("商品更新成功，ID: {}", product.getId());
             return product;
         } catch (Exception e) {

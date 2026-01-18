@@ -73,8 +73,9 @@ public class CartDaoImpl implements CartDao {
     public List<Cart> getCarts() {
         logger.info("获取所有购物车");
         try {
-            List<Cart> carts = this.sessionFactory.getCurrentSession()
-                    .createQuery("from CART").list();
+                List<Cart> carts = this.sessionFactory.getCurrentSession()
+                    .createQuery("from Cart", Cart.class)
+                    .list();
             logger.info("成功获取 {} 个购物车", carts.size());
             return carts;
         } catch (Exception e) {

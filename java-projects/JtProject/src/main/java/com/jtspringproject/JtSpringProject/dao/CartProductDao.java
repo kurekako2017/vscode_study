@@ -41,4 +41,11 @@ public interface CartProductDao {
      * @param cartProduct 要删除的购物车商品
      */
     void deleteCartProduct(CartProduct cartProduct);
+
+    /**
+     * 根据商品ID获取购物车商品
+     * @param productId 商品ID
+     * @return 购物车商品列表
+     */
+    List<CartProduct> getCartProductsByProductId(int productId);
 }

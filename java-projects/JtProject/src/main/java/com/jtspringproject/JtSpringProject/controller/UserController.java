@@ -1,30 +1,30 @@
 package com.jtspringproject.JtSpringProject.controller;
 
-import com.jtspringproject.JtSpringProject.models.Cart;
-import com.jtspringproject.JtSpringProject.models.Product;
-import com.jtspringproject.JtSpringProject.models.User;
-
-import java.io.Console;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import com.jtspringproject.JtSpringProject.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
 
-import com.jtspringproject.JtSpringProject.services.UserService;
+import com.jtspringproject.JtSpringProject.models.Product;
+import com.jtspringproject.JtSpringProject.models.User;
+import com.jtspringproject.JtSpringProject.models.Cart;
+import com.jtspringproject.JtSpringProject.models.CartProduct;
 import com.jtspringproject.JtSpringProject.services.ProductService;
+import com.jtspringproject.JtSpringProject.services.UserService;
+import com.jtspringproject.JtSpringProject.services.CartService;
+import com.jtspringproject.JtSpringProject.dao.CartProductDao;
 
 
 /**
@@ -49,6 +49,12 @@ public class UserController{
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private CartProductDao cartProductDao;
+
     /**
      * 用户注册页面
      * 路由：GET /register
@@ -67,9 +73,30 @@ public class UserController{
 
 
     @GetMapping("/")
-    public String userlogin(Model model) {
-
-        return "userLogin";
+    public ModelAndView userloginPage(HttpServletRequest request) {
+        ModelAndView mView = new ModelAndView("userLogin");
+        // 如果已登录，自动注入商品列表
+        String username = null;
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie c : request.getCookies()) {
+                if ("username".equals(c.getName())) {
+                    username = c.getValue();
+                    break;
+                }
+            }
+        }
+        try {
+            List<Product> products = this.productService.getProducts();
+            if (products != null && !products.isEmpty()) {
+                mView.addObject("products", products);
+            }
+        } catch (Exception e) {
+            mView.addObject("msg", "Error loading products: " + e.getMessage());
+        }
+        if (username != null) {
+            mView.addObject("username", username);
+        }
+        return mView;
     }
 
     /**
@@ -78,7 +105,7 @@ public class UserController{
      *
      * 说明：此方法已增强空值检查和异常处理，避免常见的 NullPointerException
      */
-    @RequestMapping(value = "userloginvalidate", method = RequestMethod.POST)
+    @RequestMapping(value = "userloginvalidate1", method = RequestMethod.POST)
     public ModelAndView userlogin(
             @RequestParam("username") String username,
             @RequestParam("password") String pass,
@@ -169,6 +196,19 @@ public class UserController{
         }
     }
 
+    /**
+     * 兼容旧的表单 action: POST /userloginvalidate
+     * 直接委托到 userlogin(...) 处理，避免前端 action 名称差异导致登录失败。
+     */
+    @RequestMapping(value = "userloginvalidate", method = RequestMethod.POST)
+    public ModelAndView userloginAlias(
+            @RequestParam("username") String username,
+            @RequestParam("password") String pass,
+            Model model,
+            HttpServletResponse res) {
+        return userlogin(username, pass, model, res);
+    }
+
 
     @GetMapping("/user/products")
     public ModelAndView getproduct() {
@@ -183,6 +223,38 @@ public class UserController{
             mView.addObject("products",products);
         }
 
+        return mView;
+    }
+
+    /**
+     * 首页（可通过 GET /index 访问）
+     * 如果用户已登录（通过 cookie username 判断），将 username 和 products 注入视图
+     */
+    @GetMapping({"/index"})
+    public ModelAndView indexPage(HttpServletRequest request) {
+        ModelAndView mView = new ModelAndView("index");
+        String username = null;
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie c : request.getCookies()) {
+                if ("username".equals(c.getName())) {
+                    username = c.getValue();
+                    break;
+                }
+            }
+        }
+        if (username != null) {
+            mView.addObject("username", username);
+        }
+        try {
+            List<Product> products = this.productService.getProducts();
+            if (products == null || products.isEmpty()) {
+                mView.addObject("msg", "No products are available");
+            } else {
+                mView.addObject("products", products);
+            }
+        } catch (Exception e) {
+            mView.addObject("msg", "Error loading products: " + e.getMessage());
+        }
         return mView;
     }
 
@@ -244,6 +316,124 @@ public class UserController{
         return mv;
 
 
+    }
+
+    @RequestMapping(value = "products/addtocart", method = {RequestMethod.GET, RequestMethod.POST})
+    public String addToCart(@RequestParam("id") int id, HttpServletRequest request) {
+        try {
+            // 1. 获取当前登录用户名（从 cookie 或 session）
+            String username = null;
+            if (request.getCookies() != null) {
+                for (javax.servlet.http.Cookie c : request.getCookies()) {
+                    if ("username".equals(c.getName())) {
+                        username = c.getValue();
+                        break;
+                    }
+                }
+            }
+            if (username == null) {
+                request.getSession().setAttribute("cartMsg", "Please login first");
+                return "redirect:/user/products";
+            }
+            // 2. 查找用户对象
+            java.util.List<User> allUsers = this.userService.getUsers();
+            User user = null;
+            for (User u : allUsers) {
+                if (username.equals(u.getUsername())) {
+                    user = u;
+                    break;
+                }
+            }
+            if (user == null) {
+                request.getSession().setAttribute("cartMsg", "User not found, please login again");
+                return "redirect:/user/products";
+            }
+            // 如果是管理员，不允许作为普通用户加入购物车，重定向到管理员商品管理页面
+            if ("ROLE_ADMIN".equals(user.getRole())) {
+                request.getSession().setAttribute("cartMsg", "管理员请使用后台管理商品。");
+                return "redirect:/admin/products";
+            }
+            // 3. 查找该用户的购物车（如无则新建）
+            java.util.List<Cart> allCarts = this.cartService.getCarts();
+            Cart cart = null;
+            for (Cart c : allCarts) {
+                if (c.getCustomer() != null && c.getCustomer().getId() == user.getId()) {
+                    cart = c;
+                    break;
+                }
+            }
+            if (cart == null) {
+                cart = new Cart();
+                cart.setCustomer(user);
+                cart = this.cartService.addCart(cart);
+            }
+            // 4. 添加商品到购物车
+            Product product = this.productService.getProduct(id);
+            CartProduct cp = new CartProduct(cart, product);
+            this.cartProductDao.addCartProduct(cp);
+            request.getSession().setAttribute("cartMsg", "Add Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("cartMsg", "Add failed: " + e.getMessage());
+        }
+        // 添加后直接跳转到购物车页面
+        return "redirect:/user/cart";
+    }
+
+    @GetMapping("/user/cart")
+    public ModelAndView showCart(HttpServletRequest request) {
+        ModelAndView mView = new ModelAndView("cart");
+        String username = null;
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie c : request.getCookies()) {
+                if ("username".equals(c.getName())) {
+                    username = c.getValue();
+                    break;
+                }
+            }
+        }
+        if (username == null) {
+            mView.addObject("msg", "Please login first");
+            return mView;
+        }
+        java.util.List<User> allUsers = this.userService.getUsers();
+        User user = null;
+        for (User u : allUsers) {
+            if (username.equals(u.getUsername())) {
+                user = u;
+                break;
+            }
+        }
+        if (user == null) {
+            mView.addObject("msg", "User not found");
+            return mView;
+        }
+        // 管理员不使用购物车，重定向到管理员商品管理页
+        if ("ROLE_ADMIN".equals(user.getRole())) {
+            ModelAndView redirect = new ModelAndView("redirect:/admin/products");
+            redirect.addObject("msg", "管理员请使用后台管理商品。");
+            return redirect;
+        }
+        java.util.List<Cart> allCarts = this.cartService.getCarts();
+        Cart cart = null;
+        for (Cart c : allCarts) {
+            if (c.getCustomer() != null && c.getCustomer().getId() == user.getId()) {
+                cart = c;
+                break;
+            }
+        }
+        java.util.List<Product> cartProducts = new java.util.ArrayList<>();
+        if (cart != null) {
+            // 获取购物车内所有商品
+            cartProducts = this.cartProductDao.getProductByCartID(cart.getId());
+        }
+        mView.addObject("products", cartProducts);
+        Object cartMsg = request.getSession().getAttribute("cartMsg");
+        if (cartMsg != null) {
+            mView.addObject("cartMsg", cartMsg.toString());
+            request.getSession().removeAttribute("cartMsg");
+        }
+        return mView;
     }
 
 }

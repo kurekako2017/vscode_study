@@ -80,7 +80,8 @@ public class CartProductDaoImpl implements CartProductDao {
         logger.info("获取所有购物车商品");
         try {
             List<CartProduct> cartProducts = this.sessionFactory.getCurrentSession()
-                    .createQuery("from CART_PRODUCT ").list();
+                .createQuery("from CartProduct", CartProduct.class)
+                .list();
             logger.info("成功获取 {} 个购物车商品关联", cartProducts.size());
             return cartProducts;
         } catch (Exception e) {
@@ -106,32 +107,26 @@ public class CartProductDaoImpl implements CartProductDao {
     public List<Product> getProductByCartID(Integer cart_id) {
         logger.info("根据购物车ID获取商品列表，购物车ID: {}", cart_id);
         try {
-            // 第一步：查询商品ID列表
-            String sql = "SELECT product_id FROM cart_product WHERE cart_id = :cart_id";
-            List<Integer> productIds = this.sessionFactory.getCurrentSession()
-                    .createNativeQuery(sql)
+            // 先查询 CartProduct 实体，再在 Java 层提取 Product，避免 join/返回类型问题
+            String hqlCp = "from CartProduct cp where cp.cart.id = :cart_id";
+            List<CartProduct> cps = this.sessionFactory.getCurrentSession()
+                    .createQuery(hqlCp, CartProduct.class)
                     .setParameter("cart_id", cart_id)
                     .list();
 
-            logger.debug("购物车 {} 包含 {} 个商品", cart_id, productIds.size());
-
-            if (productIds.isEmpty()) {
-                logger.info("购物车 {} 为空", cart_id);
-                return List.of();
+            List<Product> products = new java.util.ArrayList<>();
+            if (cps != null) {
+                for (CartProduct cp : cps) {
+                    if (cp != null && cp.getProduct() != null) {
+                        products.add(cp.getProduct());
+                    }
+                }
             }
-
-            // 第二步：根据商品ID列表查询商品详情
-            sql = "SELECT * FROM product WHERE id IN (:product_ids)";
-            List<Product> products = this.sessionFactory.getCurrentSession()
-                    .createNativeQuery(sql, Product.class)
-                    .setParameterList("product_ids", productIds)
-                    .list();
-
             logger.info("成功获取购物车 {} 的 {} 个商品", cart_id, products.size());
             return products;
         } catch (Exception e) {
-            logger.error("根据购物车ID获取商品失败，购物车ID: {}, 错误: {}",
-                    cart_id, e.getMessage(), e);
+            logger.error("根据购物车ID获取商品失败，购物车ID: {}，异常: {}，原因: {}",
+                    cart_id, e.getClass().getName(), e.getMessage(), e);
             throw e;
         }
     }
@@ -170,6 +165,29 @@ public class CartProductDaoImpl implements CartProductDao {
         } catch (Exception e) {
             logger.error("删除购物车商品失败，ID: {}, 错误: {}",
                     cartProduct.getId(), e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    /**
+     * 根据商品ID获取购物车商品
+     *
+     * @param productId 商品ID
+     * @return 购物车商品列表
+     */
+    @Override
+    @Transactional
+    public List<CartProduct> getCartProductsByProductId(int productId) {
+        logger.info("根据商品ID获取购物车商品，商品ID: {}", productId);
+        try {
+            // 修正HQL，CartProduct中应为product.id
+            String hql = "FROM CartProduct cp WHERE cp.product.id = :productId";
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery(hql, CartProduct.class)
+                    .setParameter("productId", productId)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("获取购物车商品失败，商品ID: {}, 错误: {}", productId, e.getMessage(), e);
             throw e;
         }
     }
