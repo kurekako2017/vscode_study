@@ -184,6 +184,37 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    @Override
+    @Transactional
+    public User getUserByUsername(String username) {
+        logger.info("DAO层：根据用户名获取用户: {}", username);
+        try {
+            Query<User> query = sessionFactory.getCurrentSession()
+                    .createQuery("from User where username = :username", User.class);
+            query.setParameter("username", username);
+            List<User> results = query.getResultList();
+            if (results == null || results.isEmpty()) {
+                return null;
+            }
+            return results.get(0);
+        } catch (Exception e) {
+            logger.error("DAO层：根据用户名获取用户失败: {}, 错误: {}", username, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public User getUserById(int id) {
+        logger.info("DAO层：根据ID获取用户: {}", id);
+        try {
+            return sessionFactory.getCurrentSession().get(User.class, id);
+        } catch (Exception e) {
+            logger.error("DAO层：根据ID获取用户失败: {}, 错误: {}", id, e.getMessage(), e);
+            throw e;
+        }
+    }
+
     /**
      * 检查用户名是否存在
      *

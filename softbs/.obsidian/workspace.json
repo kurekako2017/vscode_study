@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "task.md",
+                "file": "aider/aider_quickstart.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "task"
+              "title": "aider_quickstart"
             }
           }
         ]
@@ -174,33 +174,42 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:新建数据库": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
-      "command-palette:打开命令面板": false,
-      "bases:创建新数据库": false
+      "command-palette:打开命令面板": false
     }
   },
-  "active": "fb365d9f81ca56b7",
+  "active": "d776dbca67bd7051",
   "lastOpenFiles": [
-    "未命名.base",
-    "test.md",
-    "task.md",
-    "grok.md",
-    "image.png",
-    "Codespaces学习要点.md",
-    "ai编程插件.md",
-    "aider/aider本地模型.md",
-    "aider/aider_local_usage.md",
-    "aider/07_Aider_让 Aider 像“初级同事”一样工作的 Prompt 模板.md",
-    "aider/02_Aider 参数调优（UM890 Pro  32GB 内存专用）.md",
+    "aider/Aider_UM890_Pro_本地模型实战手册.md",
     "aider/01_Aider + Ollama Windows 标准启动方案.md",
-    "chat.md",
-    "run_aider.bat.md",
+    "ai编程插件.md",
     "vscode_github_tutorial.md",
     "VSCode操作指南.md",
-    "UM890_Aider_Local_LLM_Install.md"
+    "UM890_Aider_Local_LLM_Install.md",
+    "task.md",
+    "image.png",
+    "aider/Qwen2.5-Coder-7B加速最佳实践.md",
+    "aider/Qwen2.5-Coder-7B加速最佳实践-完整版.md",
+    "aider/Roo Code Agent启动与配置实战指南.md",
+    "aider/aider本地模型.md",
+    "aider/aider_quickstart.md",
+    "aider/gemini_aider_fixed.md",
+    "aider/aider_um890_tips.md",
+    "aider/06_Aider_真实项目 · Aider 使用方式（工程手册级）k.md",
+    "chat.md",
+    "Codespaces学习要点.md",
+    "aider/aider_local_usage.md",
+    "aider/07_Aider_让 Aider 像“初级同事”一样工作的 Prompt 模板.md",
+    "aider/05_Aider_脚本使用说明.md",
+    "未命名.base",
+    "test.md",
+    "grok.md",
+    "aider/02_Aider 参数调优（UM890 Pro  32GB 内存专用）.md",
+    "run_aider.bat.md"
   ]
 }

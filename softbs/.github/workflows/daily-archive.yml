@@ -1,0 +1,54 @@
+name: "Daily Log Archiver"
+
+on:
+  schedule:
+    # 每天在 UTC 时间 15:00 (对应北京时间 23:00) 运行
+    - cron: '0 15 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          # We need to fetch all history to properly handle commits
+          fetch-depth: 0
+
+      - name: "Get current date"
+        id: date
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: "Fetch comments from Daily Log issue"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # IMPORTANT: Replace '1' with your actual Daily Log issue number
+          ISSUE_NUMBER: '1'
+        run: |
+          gh issue view $ISSUE_NUMBER --comments --json comments --jq '.comments[].body' > today_comments.txt
+
+      - name: "Archive comments to a new markdown file"
+        run: |
+          # Only proceed if the comments file is not empty
+          if [ -s today_comments.txt ]; then
+            # Create a directory for logs if it doesn't exist
+            mkdir -p logs
+            
+            # Create the daily log file with a header
+            echo "# Daily Log - ${{ env.DATE }}" > logs/${{ env.DATE }}.md
+            echo "" >> logs/${{ env.DATE }}.md
+            cat today_comments.txt >> logs/${{ env.DATE }}.md
+            
+            # Configure git
+            git config user.name "GitHub Actions Bot"
+            git config user.email "actions@github.com"
+            
+            # Add, commit, and push the new file
+            git add logs/${{ env.DATE }}.md
+            git commit -m "docs(log): Archive daily log for ${{ env.DATE }}" || echo "No new content to commit"
+            git push
+          else
+            echo "No comments to archive today."
+          fi

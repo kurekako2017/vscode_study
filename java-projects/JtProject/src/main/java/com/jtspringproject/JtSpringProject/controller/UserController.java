@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,6 +56,25 @@ public class UserController{
     @Autowired
     private CartProductDao cartProductDao;
 
+    private String resolveLoggedInUsername(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Object username = session.getAttribute("username");
+            if (username != null && !username.toString().trim().isEmpty()) {
+                return username.toString();
+            }
+        }
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie c : request.getCookies()) {
+                if ("username".equals(c.getName()) && c.getValue() != null && !c.getValue().trim().isEmpty()) {
+                    request.getSession().setAttribute("username", c.getValue());
+                    return c.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * 用户注册页面
      * 路由：GET /register
@@ -76,15 +96,7 @@ public class UserController{
     public ModelAndView userloginPage(HttpServletRequest request) {
         ModelAndView mView = new ModelAndView("userLogin");
         // 如果已登录，自动注入商品列表
-        String username = null;
-        if (request.getCookies() != null) {
-            for (javax.servlet.http.Cookie c : request.getCookies()) {
-                if ("username".equals(c.getName())) {
-                    username = c.getValue();
-                    break;
-                }
-            }
-        }
+        String username = resolveLoggedInUsername(request);
         try {
             List<Product> products = this.productService.getProducts();
             if (products != null && !products.isEmpty()) {
@@ -99,6 +111,19 @@ public class UserController{
         return mView;
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        Cookie cookie = new Cookie("username", "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
+    }
+
     /**
      * 用户登录验证
      * 路由：POST /userloginvalidate
@@ -110,7 +135,8 @@ public class UserController{
             @RequestParam("username") String username,
             @RequestParam("password") String pass,
             Model model,
-            HttpServletResponse res) {
+            HttpServletResponse res,
+            HttpServletRequest request) {
 
         // 打印接收到的参数（用于调试）
         System.out.println("收到登录请求 - 用户名: " + username);
@@ -146,7 +172,12 @@ public class UserController{
                 // ✅ 登录成功的处理逻辑
 
                 // 1. 创建Cookie保存用户名（用于客户端会话管理）
-                res.addCookie(new Cookie("username", u.getUsername()));
+                Cookie cookie = new Cookie("username", u.getUsername());
+                cookie.setPath("/");
+                cookie.setMaxAge(7 * 24 * 60 * 60);
+                res.addCookie(cookie);
+                request.getSession().setAttribute("username", u.getUsername());
+                request.getSession().setAttribute("userRole", u.getRole());
 
                 // 2. 创建 ModelAndView，指定返回首页视图
                 ModelAndView mView  = new ModelAndView("index");
@@ -205,8 +236,9 @@ public class UserController{
             @RequestParam("username") String username,
             @RequestParam("password") String pass,
             Model model,
-            HttpServletResponse res) {
-        return userlogin(username, pass, model, res);
+            HttpServletResponse res,
+            HttpServletRequest request) {
+        return userlogin(username, pass, model, res, request);
     }
 
 
@@ -233,15 +265,7 @@ public class UserController{
     @GetMapping({"/index"})
     public ModelAndView indexPage(HttpServletRequest request) {
         ModelAndView mView = new ModelAndView("index");
-        String username = null;
-        if (request.getCookies() != null) {
-            for (javax.servlet.http.Cookie c : request.getCookies()) {
-                if ("username".equals(c.getName())) {
-                    username = c.getValue();
-                    break;
-                }
-            }
-        }
+        String username = resolveLoggedInUsername(request);
         if (username != null) {
             mView.addObject("username", username);
         }
@@ -322,28 +346,13 @@ public class UserController{
     public String addToCart(@RequestParam("id") int id, HttpServletRequest request) {
         try {
             // 1. 获取当前登录用户名（从 cookie 或 session）
-            String username = null;
-            if (request.getCookies() != null) {
-                for (javax.servlet.http.Cookie c : request.getCookies()) {
-                    if ("username".equals(c.getName())) {
-                        username = c.getValue();
-                        break;
-                    }
-                }
-            }
+            String username = resolveLoggedInUsername(request);
             if (username == null) {
                 request.getSession().setAttribute("cartMsg", "Please login first");
                 return "redirect:/user/products";
             }
             // 2. 查找用户对象
-            java.util.List<User> allUsers = this.userService.getUsers();
-            User user = null;
-            for (User u : allUsers) {
-                if (username.equals(u.getUsername())) {
-                    user = u;
-                    break;
-                }
-            }
+            User user = this.userService.getUserByUsername(username);
             if (user == null) {
                 request.getSession().setAttribute("cartMsg", "User not found, please login again");
                 return "redirect:/user/products";
@@ -369,6 +378,10 @@ public class UserController{
             }
             // 4. 添加商品到购物车
             Product product = this.productService.getProduct(id);
+            if (product == null) {
+                request.getSession().setAttribute("cartMsg", "Product not found");
+                return "redirect:/user/products";
+            }
             CartProduct cp = new CartProduct(cart, product);
             this.cartProductDao.addCartProduct(cp);
             request.getSession().setAttribute("cartMsg", "Add Success");
@@ -383,27 +396,12 @@ public class UserController{
     @GetMapping("/user/cart")
     public ModelAndView showCart(HttpServletRequest request) {
         ModelAndView mView = new ModelAndView("cart");
-        String username = null;
-        if (request.getCookies() != null) {
-            for (javax.servlet.http.Cookie c : request.getCookies()) {
-                if ("username".equals(c.getName())) {
-                    username = c.getValue();
-                    break;
-                }
-            }
-        }
+        String username = resolveLoggedInUsername(request);
         if (username == null) {
             mView.addObject("msg", "Please login first");
             return mView;
         }
-        java.util.List<User> allUsers = this.userService.getUsers();
-        User user = null;
-        for (User u : allUsers) {
-            if (username.equals(u.getUsername())) {
-                user = u;
-                break;
-            }
-        }
+        User user = this.userService.getUserByUsername(username);
         if (user == null) {
             mView.addObject("msg", "User not found");
             return mView;
@@ -434,6 +432,50 @@ public class UserController{
             request.getSession().removeAttribute("cartMsg");
         }
         return mView;
+    }
+
+    @GetMapping("/user/cart/delete")
+    public String deleteFromCart(@RequestParam("id") int productId, HttpServletRequest request) {
+        try {
+            String username = resolveLoggedInUsername(request);
+
+            if (username == null) {
+                request.getSession().setAttribute("cartMsg", "Please login first");
+                return "redirect:/";
+            }
+
+            User user = this.userService.getUserByUsername(username);
+            if (user == null) {
+                request.getSession().setAttribute("cartMsg", "User not found");
+                return "redirect:/";
+            }
+
+            java.util.List<Cart> allCarts = this.cartService.getCarts();
+            Cart cart = null;
+            for (Cart c : allCarts) {
+                if (c.getCustomer() != null && c.getCustomer().getId() == user.getId()) {
+                    cart = c;
+                    break;
+                }
+            }
+            if (cart == null) {
+                request.getSession().setAttribute("cartMsg", "Cart not found");
+                return "redirect:/user/cart";
+            }
+
+            java.util.List<CartProduct> cartProducts = this.cartProductDao.getCartProductsByCartAndProductId(cart.getId(), productId);
+            if (cartProducts == null || cartProducts.isEmpty()) {
+                request.getSession().setAttribute("cartMsg", "Product not found in cart");
+                return "redirect:/user/cart";
+            }
+
+            this.cartProductDao.deleteCartProduct(cartProducts.get(0));
+            request.getSession().setAttribute("cartMsg", "Delete Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("cartMsg", "Delete failed: " + e.getMessage());
+        }
+        return "redirect:/user/cart";
     }
 
 }

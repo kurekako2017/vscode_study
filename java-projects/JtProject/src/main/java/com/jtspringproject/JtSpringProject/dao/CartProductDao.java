@@ -48,4 +48,12 @@ public interface CartProductDao {
      * @return 购物车商品列表
      */
     List<CartProduct> getCartProductsByProductId(int productId);
+
+    /**
+     * 根据购物车ID和商品ID获取购物车商品关联
+     * @param cartId 购物车ID
+     * @param productId 商品ID
+     * @return 购物车商品关联列表
+     */
+    List<CartProduct> getCartProductsByCartAndProductId(int cartId, int productId);
 }

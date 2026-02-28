@@ -56,7 +56,7 @@
 ┌─────────────────────────────────────────────────────────────┐
 │ 步骤3：浏览器发送HTTP请求                                    │
 │                                                             │
-│ POST http://localhost:8080/userloginvalidate HTTP/1.1      │
+│ POST http://localhost:8082/userloginvalidate HTTP/1.1      │
 │ Content-Type: application/x-www-form-urlencoded            │
 │ Cookie: JSESSIONID=...                                      │
 │                                                             │
@@ -187,7 +187,7 @@
     <!--
         action="userloginvalidate" 说明:
         - 相对路径，基于当前域名
-        - 完整URL: http://localhost:8080/userloginvalidate
+        - 完整URL: http://localhost:8082/userloginvalidate
         - 当用户点击提交按钮时，浏览器会发送POST请求到这个路径
     -->
     
@@ -362,7 +362,7 @@ public String registerUser() {
 
 ### 2. **直接访问URL**
 
-用户在浏览器输入：`http://localhost:8080/`
+用户在浏览器输入：`http://localhost:8082/`
 
 **对应的Controller方法**：
 ```java
@@ -468,4 +468,5 @@ Java:   @RequestMapping(value="userloginvalidate", method=POST)
 ```
 
 **现在你完全理解了 userLogin.jsp 如何跳转到 UserController 了吗？** 🎉
+
 

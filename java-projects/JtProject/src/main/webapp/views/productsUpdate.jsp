@@ -36,18 +36,17 @@
 				<ul class="navbar-nav mr-auto"></ul>
 				<ul class="navbar-nav">
 					<li class="nav-item active"><a class="nav-link"
-						href="/dashboard" >Home Page</a></li>
+						href="/admin/index" >Home Page</a></li>
 					<li class="nav-item active"><a class="nav-link"
-						href="/logout" >Logout</a></li>
+						href="/admin/logout" >Logout</a></li>
 				</ul>
 
 			</div>
 		</div>
 	</nav><br>
-	<c:forEach var="product" items="products">
 	<div class="jumbotron container border border-info">
 		<h3>Update Existing Product</h3>
-		<form action="/products/update/${product.id}" method="post">
+		<form action="/admin/products/update/${product.id}" method="post">
 			<div class="row">
 				<div class="col-sm-5">
 					
@@ -65,10 +64,10 @@
 					<div class="form-group">
 					
 						<label for="category">Select Category</label> 
-						<select class="form-control border border-success" name="categoryid" readonly>
+						<select class="form-control border border-success" name="categoryid">
 							<option selected>Select a Category</option>
                             							<c:forEach var="category" items="${categories}">
-                            								<option value="${category.id}">${category.name}</option>
+								<option value="${category.id}" ${category.id == product.category.id ? 'selected' : ''}>${category.name}</option>
                             							</c:forEach>
 						</select>
 					</div>
@@ -91,18 +90,11 @@
 				<div class="col-sm-5">
 				<div class="form-group">
 						<label for="description">Product Description</label>
-						<textarea class="form-control border border-success" rows="4" name="product.description" placeholder="Product Details" value= "${ pdescription }"></textarea>
+						<textarea class="form-control border border-success" rows="4" name="description" placeholder="Product Details">${product.description}</textarea>
 					</div>
 					<p>Product Image</p>
-					<div class="custom-file">
-						<input type="file" class="custom-file-input" name="productImage" value="${ product.image }" accept="image/jpeg, image/png" id="productImage"  onchange="loadfile(event)"/>
-						<label class="custom-file-label border border-success" for="productImage">Choose file</label>
-						<script type="text/javascript">
-						var loadFile = function(event) {
-							var image = document.getElementById('imgPreview');
-							image.src = URL.createObjectURL(event.target.files[0]);
-						};
-						</script>
+					<div class="form-group">
+						<input type="text" class="form-control border border-success" name="productImage" value="${ product.image }" placeholder="Enter Short Image Link">
 					</div>
 					<div class="form-group">
 						<img src="#" id="imgPreview" height="100px" width="100px"
@@ -114,7 +106,6 @@
 			</div>
 		</form>
 	</div>
-	</c:forEach>
 
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
 		integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"

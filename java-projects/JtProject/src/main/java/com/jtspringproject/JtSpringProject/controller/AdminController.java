@@ -1,8 +1,7 @@
 package com.jtspringproject.JtSpringProject.controller;
 
-import java.sql.*;
-import java.sql.PreparedStatement;
 import java.util.List;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -27,7 +26,7 @@ import com.jtspringproject.JtSpringProject.services.UserService;
  * - 客户信息查看
  * - 管理员个人信息管理
  *
- * 注意：使用静态变量（adminlogcheck, usernameforclass）进行会话管理
+ * 注意：管理员登录态使用HttpSession进行会话管理
  * 所有路由都以 /admin 为前缀
  */
 @Controller
@@ -49,11 +48,15 @@ public class AdminController {
 	@Autowired
 	private ProductService productService;
 	
-	// 管理员登录状态标志：0=未登录，1=已登录（静态变量，用于跨请求保持状态）
-	static int adminlogcheck = 0;
+	private boolean isAdminLoggedIn(HttpSession session) {
+		Object value = session.getAttribute("adminLoggedIn");
+		return Boolean.TRUE.equals(value);
+	}
 
-	// 当前登录管理员的用户名（静态变量，用于跨请求保持状态）
-	static String usernameforclass = "";
+	private String getAdminUsername(HttpSession session) {
+		Object value = session.getAttribute("adminUsername");
+		return value == null ? "" : value.toString();
+	}
 
 	/**
 	 * 管理员退出登录或返回首页
@@ -67,9 +70,8 @@ public class AdminController {
 	 * @return 返回用户登录页面视图名称
 	 */
 	@RequestMapping(value = {"/","/logout"})
-	public String returnIndex() {
-		adminlogcheck =0;
-		usernameforclass = "";
+	public String returnIndex(HttpSession session) {
+		session.invalidate();
 		return "userLogin";
 	}
 	
@@ -88,11 +90,12 @@ public class AdminController {
 	 * @return 返回index视图或userLogin视图
 	 */
 	@GetMapping("/index")
-	public String index(Model model) {
-		if("".equalsIgnoreCase(usernameforclass))
+	public String index(Model model, HttpSession session) {
+		String username = getAdminUsername(session);
+		if (username.isEmpty())
 			return "userLogin";
 		else {
-			model.addAttribute("username", usernameforclass);
+			model.addAttribute("username", username);
 			return "index";
 		}
 			
@@ -118,16 +121,16 @@ public class AdminController {
 	 * 路由：GET /admin/Dashboard
 	 *
 	 * 功能：
-	 * 1. 检查管理员登录状态（adminlogcheck）
-	 * 2. 已登录（adminlogcheck==1）：返回管理员主页
+	 * 1. 检查管理员登录状态（Session）
+	 * 2. 已登录：返回管理员主页
 	 * 3. 未登录：重定向到管理员登录页面
 	 *
 	 * @param model Spring MVC模型对象
 	 * @return 返回adminHome视图或重定向到登录页面
 	 */
 	@GetMapping("Dashboard")
-	public String adminHome(Model model) {
-		if(adminlogcheck==1)
+	public String adminHome(Model model, HttpSession session) {
+		if (isAdminLoggedIn(session))
 			return "adminHome";
 		else
 			return "redirect:/admin/login";
@@ -164,13 +167,14 @@ public class AdminController {
 	 * @return ModelAndView对象，包含视图名称和数据
 	 */
 	@RequestMapping(value = "loginvalidate", method = RequestMethod.POST)
-	public ModelAndView adminlogin( @RequestParam("username") String username, @RequestParam("password") String pass) {
+	public ModelAndView adminlogin(@RequestParam("username") String username, @RequestParam("password") String pass, HttpSession session) {
 		
 		User user=this.userService.checkLogin(username, pass);
 		
-		if("ROLE_ADMIN".equals(user.getRole())) {
+		if(user != null && "ROLE_ADMIN".equals(user.getRole())) {
 			ModelAndView mv = new ModelAndView("adminHome");
-			adminlogcheck=1;
+			session.setAttribute("adminLoggedIn", true);
+			session.setAttribute("adminUsername", user.getUsername());
 			mv.addObject("admin", user);
 			return mv;
 		}
@@ -187,14 +191,14 @@ public class AdminController {
 	 *
 	 * 功能：
 	 * 1. 检查管理员登录状态
-	 * 2. 未登录（adminlogcheck==0）：返回管理员登录页面
+	 * 2. 未登录：返回管理员登录页面
 	 * 3. 已登录：查询所有分类并返回分类列表页面
 	 *
 	 * @return ModelAndView对象，包含分类列表数据和视图名称
 	 */
 	@GetMapping("categories")
-	public ModelAndView getcategory() {
-		if(adminlogcheck==0){
+	public ModelAndView getcategory(HttpSession session) {
+		if (!isAdminLoggedIn(session)) {
 			ModelAndView mView = new ModelAndView("adminlogin");
 			return mView;
 		}
@@ -280,15 +284,15 @@ public class AdminController {
 	 *
 	 * 功能：
 	 * 1. 检查管理员登录状态
-	 * 2. 未登录（adminlogcheck==0）：返回管理员登录页面
+	 * 2. 未登录：返回管理员登录页面
 	 * 3. 已登录：查询所有商品并返回商品列表页面
 	 * 4. 如果商品列表为空，显示"无商品可用"的消息
 	 *
 	 * @return ModelAndView对象，包含商品列表数据和视图名称
 	 */
 	@GetMapping("products")
-	public ModelAndView getproduct() {
-		if(adminlogcheck==0){
+	public ModelAndView getproduct(HttpSession session) {
+		if (!isAdminLoggedIn(session)) {
 			ModelAndView mView = new ModelAndView("adminlogin");
 			return mView;
 		}
@@ -351,7 +355,6 @@ public class AdminController {
 		System.out.println(categoryId);
 		Category category = this.categoryService.getCategory(categoryId);
 		Product product = new Product();
-		product.setId(categoryId);
 		product.setName(name);
 		product.setCategory(category);
 		product.setDescription(description);
@@ -394,10 +397,8 @@ public class AdminController {
 	 *
 	 * 功能：
 	 * 1. 接收商品ID和所有要更新的属性参数
-	 * 2. 调用productService.updateProduct()更新商品信息（当前未实现）
+	 * 2. 组装商品对象并调用productService.updateProduct()更新商品信息
 	 * 3. 重定向到商品列表页面
-	 *
-	 * 注意：此方法的业务逻辑尚未完全实现
 	 *
 	 * @param id 商品ID（路径变量）
 	 * @param name 商品名称
@@ -410,10 +411,26 @@ public class AdminController {
 	 * @return 重定向到商品列表页面
 	 */
 	@RequestMapping(value = "products/update/{id}",method=RequestMethod.POST)
-	public String updateProduct(@PathVariable("id") int id ,@RequestParam("name") String name,@RequestParam("categoryid") int categoryId ,@RequestParam("price") int price,@RequestParam("weight") int weight, @RequestParam("quantity")int quantity,@RequestParam("description") String description,@RequestParam("productImage") String productImage)
+	public String updateProduct(@PathVariable("id") int id ,@RequestParam("name") String name,@RequestParam("categoryid") int categoryId ,@RequestParam("price") int price,@RequestParam("weight") int weight, @RequestParam("quantity")int quantity,@RequestParam(value = "description", required = false, defaultValue = "") String description,@RequestParam(value = "productImage", required = false, defaultValue = "") String productImage)
 	{
+		Category category = this.categoryService.getCategory(categoryId);
+		Product existingProduct = this.productService.getProduct(id);
 
-//		this.productService.updateProduct();
+		Product product = new Product();
+		product.setName(name);
+		product.setCategory(category);
+		product.setDescription(description);
+		product.setPrice(price);
+		product.setWeight(weight);
+		product.setQuantity(quantity);
+
+		if (productImage != null && !productImage.trim().isEmpty()) {
+			product.setImage(productImage);
+		} else if (existingProduct != null) {
+			product.setImage(existingProduct.getImage());
+		}
+
+		this.productService.updateProduct(id, product);
 		return "redirect:/admin/products";
 	}
 	
@@ -440,14 +457,14 @@ public class AdminController {
 	 * 处理商品相关的POST请求
 	 * 路由：POST /admin/products
 	 *
-	 * 功能：重定向到分类列表页面
-	 * 注意：此方法的用途不明确，可能是遗留代码
+	 * 功能：统一重定向到商品列表页面
+	 * 说明：用于兼容历史表单提交，避免错误跳转到分类页
 	 *
-	 * @return 重定向到分类列表页面
+	 * @return 重定向到商品列表页面
 	 */
 	@PostMapping("products")
 	public String postproduct() {
-		return "redirect:/admin/categories";
+		return "redirect:/admin/products";
 	}
 	
 	/**
@@ -456,14 +473,14 @@ public class AdminController {
 	 *
 	 * 功能：
 	 * 1. 检查管理员登录状态
-	 * 2. 未登录（adminlogcheck==0）：返回管理员登录页面
+	 * 2. 未登录：返回管理员登录页面
 	 * 3. 已登录：查询所有用户并返回客户列表页面
 	 *
 	 * @return ModelAndView对象，包含客户列表数据和视图名称
 	 */
 	@GetMapping("customers")
-	public ModelAndView getCustomerDetail() {
-		if(adminlogcheck==0){
+	public ModelAndView getCustomerDetail(HttpSession session) {
+		if (!isAdminLoggedIn(session)) {
 			ModelAndView mView = new ModelAndView("adminlogin");
 			return mView;
 		}
@@ -492,35 +509,18 @@ public class AdminController {
 	 * @return 返回更新个人资料页面视图
 	 */
 	@GetMapping("profileDisplay")
-	public String profileDisplay(Model model) {
-		String displayusername,displaypassword,displayemail,displayaddress;
-		try
-		{
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommjava","root","");
-			PreparedStatement stmt = con.prepareStatement("select * from users where username = ?"+";");
-			stmt.setString(1, usernameforclass);
-			ResultSet rst = stmt.executeQuery();
-			
-			if(rst.next())
-			{
-			int userid = rst.getInt(1);
-			displayusername = rst.getString(2);
-			displayemail = rst.getString(3);
-			displaypassword = rst.getString(4);
-			displayaddress = rst.getString(5);
-			model.addAttribute("userid",userid);
-			model.addAttribute("username",displayusername);
-			model.addAttribute("email",displayemail);
-			model.addAttribute("password",displaypassword);
-			model.addAttribute("address",displayaddress);
-			}
+	public String profileDisplay(Model model, HttpSession session) {
+		if (!isAdminLoggedIn(session)) {
+			return "adminlogin";
 		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		User user = this.userService.getUserByUsername(getAdminUsername(session));
+		if (user != null) {
+			model.addAttribute("userid", user.getId());
+			model.addAttribute("username", user.getUsername());
+			model.addAttribute("email", user.getEmail());
+			model.addAttribute("password", user.getPassword());
+			model.addAttribute("address", user.getAddress());
 		}
-		System.out.println("Hello");
 		return "updateProfile";
 	}
 	
@@ -531,7 +531,7 @@ public class AdminController {
 	 * 功能：
 	 * 1. 接收用户ID和要更新的所有个人信息（用户名、邮箱、密码、地址）
 	 * 2. 使用JDBC直接执行UPDATE SQL语句更新数据库
-	 * 3. 更新成功后，将新的用户名赋值给usernameforclass静态变量
+	 * 3. 更新成功后，将新的用户名写回Session
 	 * 4. 重定向到首页
 	 *
 	 * 注意：此方法直接使用JDBC而非通过Service层，且数据库连接信息硬编码
@@ -544,27 +544,22 @@ public class AdminController {
 	 * @return 重定向到首页
 	 */
 	@RequestMapping(value = "updateuser",method=RequestMethod.POST)
-	public String updateUserProfile(@RequestParam("userid") int userid,@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("address") String address) 
+	public String updateUserProfile(@RequestParam("userid") int userid,@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("address") String address, HttpSession session) 
 	
 	{
-		try
-		{
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommjava","root","");
-			
-			PreparedStatement pst = con.prepareStatement("update users set username= ?,email = ?,password= ?, address= ? where uid = ?;");
-			pst.setString(1, username);
-			pst.setString(2, email);
-			pst.setString(3, password);
-			pst.setString(4, address);
-			pst.setInt(5, userid);
-			int i = pst.executeUpdate();	
-			usernameforclass = username;
+		if (!isAdminLoggedIn(session)) {
+			return "adminlogin";
 		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		User existingUser = this.userService.getUserById(userid);
+		if (existingUser == null) {
+			return "redirect:/admin/profileDisplay";
 		}
+		existingUser.setUsername(username);
+		existingUser.setEmail(email);
+		existingUser.setPassword(password);
+		existingUser.setAddress(address);
+		this.userService.addUser(existingUser);
+		session.setAttribute("adminUsername", username);
 		return "redirect:/index";
 	}
 

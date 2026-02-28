@@ -36,6 +36,20 @@ public interface UserService {
     User checkLogin(String username, String password);
 
     /**
+     * 根据用户名获取用户
+     * @param username 用户名
+     * @return 用户对象，不存在返回null
+     */
+    User getUserByUsername(String username);
+
+    /**
+     * 根据ID获取用户
+     * @param id 用户ID
+     * @return 用户对象，不存在返回null
+     */
+    User getUserById(int id);
+
+    /**
      * 检查用户是否存在
      * @param username 用户名
      * @return 用户是否存在

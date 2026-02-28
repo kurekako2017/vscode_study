@@ -6,7 +6,7 @@
 **在VS Code或任意IDE中：**
 1. 打开文件: `src/main/java/com/jtspringproject/JtSpringProject/JtSpringProjectApplication.java`
 2. 点击主类上方的 `▶ Run` 按钮，或右键选择 `Run Java`
-3. 应用启动成功后访问 http://localhost:8080
+3. 应用启动成功后访问 http://localhost:8082
 
 **切换环境配置：**
 - 方法1: 编辑 `application.properties` 修改默认配置
@@ -212,11 +212,11 @@ mvn spring-boot:run -Dspring-boot.run.profiles=mysql
 ## 访问应用
 
 ### Web界面
-- **首页/登录**: http://localhost:8080/
-- **用户注册**: http://localhost:8080/register
-- **测试页面**: http://localhost:8080/test
-- **管理员登录**: http://localhost:8080/admin/login
-- **H2数据库控制台**: http://localhost:8080/h2-console
+- **首页/登录**: http://localhost:8082/
+- **用户注册**: http://localhost:8082/register
+- **测试页面**: http://localhost:8082/test
+- **管理员登录**: http://localhost:8082/admin/login
+- **H2数据库控制台**: http://localhost:8082/h2-console
 
 ### 默认账户（已自动初始化）
 - **管理员**: `admin` / `123`
@@ -315,3 +315,4 @@ mvn spring-boot:run
 - `GET /test` - 测试页面
 - `GET /test2` - 测试页面2
 - `GET /admin/login` - 管理员登录页面
+

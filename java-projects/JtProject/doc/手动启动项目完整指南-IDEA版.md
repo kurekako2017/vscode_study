@@ -1,6 +1,12 @@
 # 🚀 手动启动项目完整指南 - IntelliJ IDEA
 
 > **针对IDEA新手的详细启动教程，每一步都有截图说明位置**
+>
+> 📌 文档入口说明：
+> - 总入口：`../README.md`
+> - 导航：`文档导航.md`
+> - 命令行版本：`手动启动项目完整指南.md`
+> - 默认端口：`8082`（备用：`8083`）
 
 ---
 
@@ -116,7 +122,7 @@
 Started JtSpringProjectApplication in 5.234 seconds
 ========================================
 JT电商系统启动成功！
-访问地址: http://localhost:8080
+访问地址: http://localhost:8082
 ========================================
 ```
 
@@ -227,7 +233,7 @@ JT电商系统启动成功！
 ```
 ========================================
 JT电商系统启动成功！
-访问地址: http://localhost:8080
+访问地址: http://localhost:8082
 ========================================
 ```
 
@@ -237,17 +243,17 @@ JT电商系统启动成功！
 1. 按快捷键：`Alt + F12`（打开终端）
 2. 输入命令：
    ```powershell
-   netstat -ano | findstr :8080
+   netstat -ano | findstr :8082
    ```
 3. 如果看到类似这样的输出，说明端口正在监听：
    ```
-   TCP    0.0.0.0:8080    0.0.0.0:0    LISTENING    12345
+   TCP    0.0.0.0:8082    0.0.0.0:0    LISTENING    12345
    ```
 
 ### 3. 访问应用
 
 1. 打开浏览器（Chrome、Edge、Firefox等）
-2. 在地址栏输入：`http://localhost:8080`
+2. 在地址栏输入：`http://localhost:8082`
 3. 按回车键
 4. **应该能看到登录页面** ✅
 
@@ -268,18 +274,18 @@ Error: Could not find or load main class com.jtspringproject.JtSpringProject.JtS
 3. 等待刷新完成
 4. 重新运行
 
-### ❌ 问题2：端口8080被占用
+### ❌ 问题2：端口8082被占用
 
 **错误信息**：
 ```
-Web server failed to start. Port 8080 was already in use.
+Web server failed to start. Port 8082 was already in use.
 ```
 
 **解决方法A：停止占用端口的进程**
 1. 按 `Alt + F12` 打开终端
 2. 查找占用端口的进程：
    ```powershell
-   netstat -ano | findstr :8080
+   netstat -ano | findstr :8082
    ```
 3. 记下最后一列的进程ID（PID），例如：12345
 4. 停止进程：
@@ -292,10 +298,10 @@ Web server failed to start. Port 8080 was already in use.
 1. 打开 `application.properties` 文件
 2. 添加一行：
    ```properties
-   server.port=8081
+   server.port=8083
    ```
 3. 保存文件
-4. 重新启动，访问：`http://localhost:8081`
+4. 重新启动，访问：`http://localhost:8083`
 
 ### ❌ 问题3：Maven依赖下载失败
 
@@ -392,7 +398,7 @@ Unsupported class file major version
 - [ ] IDEA已打开JtProject项目
 - [ ] 右下角没有进度条（Maven依赖已下载完成）
 - [ ] JDK已正确配置（JDK 11+）
-- [ ] 8080端口没有被占用
+- [ ] 8082端口没有被占用
 - [ ] `target` 目录下有编译好的 `.jar` 文件
 - [ ] `application.properties` 配置正确
 - [ ] 网络连接正常（首次启动需要下载依赖）
@@ -443,4 +449,5 @@ Unsupported class file major version
 - `Run` 面板中的错误信息
 - 右下角的 `Event Log`（事件日志）
 - 或参考 [IDEA操作完整指南-新手版.md](./IDEA操作完整指南-新手版.md)
+
 

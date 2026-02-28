@@ -26,8 +26,19 @@ username VARCHAR(255) UNIQUE
 );
 
 -- insert default customers
-INSERT INTO CUSTOMER(address, email, password, role, username) VALUES ('123, Albany Street', 'admin@nyan.cat', '123', 'ROLE_ADMIN', 'admin');
-INSERT INTO CUSTOMER(address, email, password, role, username) VALUES ('765, 5th Avenue', 'lisa@gmail.com', '765', 'ROLE_NORMAL', 'lisa');
+-- Check if 'admin' user exists before inserting
+INSERT INTO CUSTOMER(address, email, password, role, username)
+SELECT '123, Albany Street', 'admin@nyan.cat', '123', 'ROLE_ADMIN', 'admin'
+WHERE NOT EXISTS (
+    SELECT 1 FROM CUSTOMER WHERE username = 'admin'
+);
+
+-- Check if 'lisa' user exists before inserting
+INSERT INTO CUSTOMER(address, email, password, role, username)
+SELECT '765, 5th Avenue', 'lisa@gmail.com', '765', 'ROLE_NORMAL', 'lisa'
+WHERE NOT EXISTS (
+    SELECT 1 FROM CUSTOMER WHERE username = 'lisa'
+);
 
 -- create the product table
 CREATE TABLE IF NOT EXISTS PRODUCT(
@@ -47,5 +58,32 @@ INSERT INTO PRODUCT(description, image, name, price, quantity, weight, category_
 INSERT INTO PRODUCT(description, image, name, price, quantity, weight, category_id) VALUES ('Woops! There goes the eggs...', 'https://www.nicepng.com/png/full/813-8132637_poiata-bunicii-cracked-egg.png', 'Cracked Eggs', 1, 90, 43, 9);
 
 -- create indexes
-CREATE INDEX FK7u438kvwr308xcwr4wbx36uiw ON PRODUCT (category_id);
-CREATE INDEX FKt23apo8r9s2hse1dkt95ig0w5 ON PRODUCT (customer_id);
+-- Drop existing indexes if they exist
+SET @index_exists := (SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = 'ecommjava' AND table_name = 'PRODUCT' AND index_name = 'IDX_PRODUCT_CATEGORY');
+IF @index_exists > 0 THEN
+    ALTER TABLE PRODUCT DROP INDEX IDX_PRODUCT_CATEGORY;
+END IF;
+CREATE INDEX IDX_PRODUCT_CATEGORY ON PRODUCT (category_id);
+
+SET @index_exists := (SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = 'ecommjava' AND table_name = 'PRODUCT' AND index_name = 'IDX_PRODUCT_CUSTOMER');
+IF @index_exists > 0 THEN
+    ALTER TABLE PRODUCT DROP INDEX IDX_PRODUCT_CUSTOMER;
+END IF;
+CREATE INDEX IDX_PRODUCT_CUSTOMER ON PRODUCT (customer_id);
+
+-- create cart table
+CREATE TABLE IF NOT EXISTS CART(
+id INT PRIMARY KEY AUTO_INCREMENT,
+customer_id INT,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (customer_id) REFERENCES CUSTOMER(id)
+);
+
+-- create cart_product table
+CREATE TABLE IF NOT EXISTS CART_PRODUCT (
+id INT PRIMARY KEY AUTO_INCREMENT,
+cart_id INT NOT NULL,
+product_id INT NOT NULL,
+FOREIGN KEY (cart_id) REFERENCES CART(id),
+FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
+);

@@ -191,4 +191,22 @@ public class CartProductDaoImpl implements CartProductDao {
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public List<CartProduct> getCartProductsByCartAndProductId(int cartId, int productId) {
+        logger.info("根据购物车ID和商品ID获取购物车商品，购物车ID: {}, 商品ID: {}", cartId, productId);
+        try {
+            String hql = "FROM CartProduct cp WHERE cp.cart.id = :cartId AND cp.product.id = :productId";
+            return this.sessionFactory.getCurrentSession()
+                    .createQuery(hql, CartProduct.class)
+                    .setParameter("cartId", cartId)
+                    .setParameter("productId", productId)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("根据购物车ID和商品ID获取购物车商品失败，购物车ID: {}, 商品ID: {}, 错误: {}",
+                    cartId, productId, e.getMessage(), e);
+            throw e;
+        }
+    }
 }

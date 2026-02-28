@@ -4,8 +4,8 @@
 
 ### 当前状态
 - **状态**: ✅ 运行中
-- **访问地址**: http://localhost:8080
-- **端口**: 8080
+- **访问地址**: http://localhost:8082
+- **端口**: 8082
 - **Java版本**: OpenJDK 11.0.28
 - **数据库**: H2 (文件模式，持久化存储)
 - **数据文件位置**: `./data/ecommjava.mv.db`
@@ -15,7 +15,7 @@
 #### 1. 浏览器访问
 打开浏览器，访问：
 ```
-http://localhost:8080
+http://localhost:8082
 ```
 
 #### 2. 默认账户
@@ -23,7 +23,7 @@ http://localhost:8080
 **管理员账户**:
 - 用户名: `admin`
 - 密码: `123`
-- 管理后台: http://localhost:8080/admin
+- 管理后台: http://localhost:8082/admin
 
 **普通用户账户**:
 - 用户名: `lisa`
@@ -61,8 +61,8 @@ java -jar target\JtSpringProject-0.0.1-SNAPSHOT.jar
 
 #### 方法2: 查找并终止进程
 ```powershell
-# 查找占用8080端口的进程
-netstat -ano | findstr :8080
+# 查找占用8082端口的进程
+netstat -ano | findstr :8082
 
 # 终止进程（替换PID为实际进程ID）
 Stop-Process -Id <PID> -Force
@@ -73,13 +73,13 @@ Stop-Process -Id <PID> -Force
 #### 问题1: 启动失败 - 端口被占用
 **症状**: 
 ```
-Port 8080 was already in use
+Port 8082 was already in use
 ```
 
 **解决方案**:
 ```powershell
 # 查找占用端口的进程
-netstat -ano | findstr :8080
+netstat -ano | findstr :8082
 
 # 终止进程
 Stop-Process -Id <PID> -Force
@@ -127,10 +127,10 @@ hibernate.dialect= org.hibernate.dialect.MySQL5Dialect
 ```
 ✅ 启动成功标志：
 JT电商系统启动成功！
-访问地址: http://localhost:8080
+访问地址: http://localhost:8082
 
 ✅ Tomcat启动：
-Tomcat started on port(s): 8080 (http)
+Tomcat started on port(s): 8082 (http)
 
 ✅ Hibernate初始化：
 Hibernate SessionFactory配置完成
@@ -228,11 +228,11 @@ JtProject/
 
 ### 下一步操作
 
-1. **访问首页**: http://localhost:8080
+1. **访问首页**: http://localhost:8082
 2. **测试用户登录**: 使用 `lisa` / `765`
 3. **测试管理员功能**: 使用 `admin` / `123`
-4. **查看产品列表**: http://localhost:8080/products
-5. **访问管理后台**: http://localhost:8080/admin
+4. **查看产品列表**: http://localhost:8082/products
+5. **访问管理后台**: http://localhost:8082/admin
 
 ### 相关文档
 
@@ -247,4 +247,5 @@ JtProject/
 **最后更新**: 2026-01-01  
 **应用版本**: 0.0.1-SNAPSHOT  
 **状态**: ✅ 运行正常
+
 

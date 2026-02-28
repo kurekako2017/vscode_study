@@ -39,7 +39,7 @@ public class JtSpringProjectApplication {
 	 * 2. SpringApplication.run() 初始化Spring容器
 	 * 3. 扫描@Controller、@Service等组件
 	 * 4. 配置DispatcherServlet（Spring MVC核心）
-	 * 5. 启动内嵌Tomcat服务器（默认8080端口）
+	 * 5. 启动内嵌Tomcat服务器（默认8082端口）
 	 * 6. 应用就绪，等待HTTP请求
 	 *
 	 * @param args 命令行参数
@@ -56,7 +56,7 @@ public class JtSpringProjectApplication {
 
 		logger.info("========================================");
 		logger.info("JT电商系统启动成功！");
-		logger.info("访问地址: http://localhost:8080");
+		logger.info("访问地址: http://localhost:8082");
 		logger.info("========================================");
 	}
 

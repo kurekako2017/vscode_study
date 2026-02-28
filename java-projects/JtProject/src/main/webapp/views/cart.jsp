@@ -22,6 +22,7 @@
             <th>Category</th>
             <th>Price</th>
             <th>Description</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -31,6 +32,12 @@
                 <td>${product.category.name}</td>
                 <td>${product.price}</td>
                 <td>${product.description}</td>
+                <td>
+                    <form action="/user/cart/delete" method="get" style="display:inline-block;">
+                        <input type="hidden" name="id" value="${product.id}">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
             </tr>
         </c:forEach>
         </tbody>

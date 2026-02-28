@@ -141,6 +141,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User getUserByUsername(String username) {
+        logger.info("服务层：根据用户名获取用户，用户名: {}", username);
+        try {
+            return this.userDao.getUserByUsername(username);
+        } catch (Exception e) {
+            logger.error("服务层：根据用户名获取用户失败，用户名: {}, 错误: {}", username, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public User getUserById(int id) {
+        logger.info("服务层：根据ID获取用户，ID: {}", id);
+        try {
+            return this.userDao.getUserById(id);
+        } catch (Exception e) {
+            logger.error("服务层：根据ID获取用户失败，ID: {}, 错误: {}", id, e.getMessage(), e);
+            throw e;
+        }
+    }
+
     /**
      * 检查用户名是否已存在
      *

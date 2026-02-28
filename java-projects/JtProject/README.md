@@ -1,52 +1,75 @@
-# JtSpringProject 快速启动指南
+# JtSpringProject 学习与启动入口
 
-## 🚀 最简单的启动方式（推荐）
+这个项目文档较多，建议只从本文件开始。先跑起来，再按学习路线看细节文档。
 
-### 方法1: 点击运行主类 ⭐
-1. 打开文件: `src/main/java/com/jtspringproject/JtSpringProject/JtSpringProjectApplication.java`
-2. 点击主类上方的 `▶ Run Java` 按钮
-3. 等待应用启动（约3-5秒）
-4. 访问 http://localhost:8080
+## 1) 快速启动（Windows / PowerShell）
 
-### 方法2: Maven命令
-```bash
-cd /workspaces/study/java-projects/JtProject
-mvn spring-boot:run
+```powershell
+cd d:\dev\source_code\vscode_study\java-projects\JtProject
+.\mvnw.cmd spring-boot:run
 ```
 
-### 方法3: 启动脚本
+如果你在 Linux / macOS：
+
 ```bash
-cd /workspaces/study/java-projects/JtProject
-./start.sh
+./mvnw spring-boot:run
 ```
 
-## 📱 访问应用
+启动成功后访问：
 
-- **首页**: http://localhost:8080
-- **管理员账户**: `admin` / `123`
-- **普通用户**: `lisa` / `765`
+- 首页：[http://localhost:8082/](http://localhost:8082/)
+- 管理员登录：[http://localhost:8082/admin/login](http://localhost:8082/admin/login)
 
-## 🔄 切换数据库环境
+默认端口是 `8082`（见 `src/main/resources/application.properties`）。
 
-### 默认（H2文件存储 - 数据持久化）
-```bash
-mvn spring-boot:run
+## 2) 账号与验证
+
+- 管理员：`admin / 123`
+- 普通用户：`lisa / 765`
+
+验证建议：
+
+1. 用户登录
+2. 管理员登录
+3. 打开商品管理页，测试新增/更新/删除
+
+## 3) 学习路线（按顺序）
+
+1. `doc/🚀快速启动指南.md`（先确认你能稳定启动）
+2. `doc/启动到登录页面的完整流程.md`（理解请求入口和页面跳转）
+3. `CONTROLLER_注释说明.md`（看 Controller 层职责）
+4. `REFACTORING_GUIDE.md`（了解当前重构方向）
+5. `TESTING_GUIDE.md`（后续补测试再看）
+
+> 说明：`doc` 目录里有很多“启动成功/问题修复总结”类文档，历史价值大于学习价值。优先按以上 5 个文档阅读即可。
+
+## 4) 文档索引（按用途）
+
+| 用途 | 推荐文档 | 说明 |
+| --- | --- | --- |
+| 首次启动（命令行） | `doc/手动启动项目完整指南.md` | 最完整、当前版本维护中 |
+| 首次启动（IDEA） | `doc/手动启动项目完整指南-IDEA版.md` | 面向IDEA新手 |
+| 启动后排障 | `doc/启动失败解决方案.md` | 历史问题集合，按关键词查阅 |
+| 请求链路学习 | `doc/启动到登录页面的完整流程.md` | 理解Controller与页面跳转 |
+| 架构重构学习 | `REFACTORING_GUIDE.md` | 接口分层与重构说明 |
+| 测试入门 | `TESTING_GUIDE.md` | 测试命令和实践建议 |
+
+## 5) 环境切换（可选）
+
+默认命令使用当前配置（`application.properties`）。如需切 profile：
+
+```powershell
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=remote
 ```
 
-### 远程MySQL (192.168.10.2)
+Linux / macOS 对应命令：
+
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=remote
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql
+./mvnw spring-boot:run -Dspring-boot.run.profiles=remote
 ```
 
-### 本地MySQL
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=mysql
-```
-
-## 📚 完整文档
-
-详细配置说明请查看：[ENV_CONFIG.md](ENV_CONFIG.md)
-
----
-
-**快速开始**: 直接点击 `JtSpringProjectApplication.java` 的运行按钮即可！
+数据库配置详见：`ENV_CONFIG.md`

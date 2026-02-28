@@ -39,13 +39,13 @@
             <ul class="navbar-nav mr-auto"></ul>
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" th:href="@{/}" href="#">CART</a>
+                  <a class="nav-link" href="/user/cart">CART</a>
                 </li>
                  <li class="nav-item active">
-                    <a class="nav-link" href="profileDisplay" >Profile</a>
+                  <a class="nav-link" href="/user/products" >Products</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" sec:authorize="isAuthenticated()" href="logout">Logout</a>
+                  <a class="nav-link" href="/logout">Logout</a>
                 </li>
                
             </ul>
