@@ -1,0 +1,24 @@
+# /etc/sudoers.d/jtproject-deploy
+# 使用方式：
+# 1) 把 deployuser 替换为你的部署账户（与 GitHub Action 中 DEPLOY_USER 一致）
+# 2) 使用 visudo 校验并安装：
+#    sudo visudo -cf /tmp/jtproject-sudoers
+#    sudo install -m 440 /tmp/jtproject-sudoers /etc/sudoers.d/jtproject-deploy
+#
+# 注意：请根据你的实际路径与命令版本微调。
+
+Defaults:deployuser !requiretty
+
+deployuser ALL=(root) NOPASSWD: \
+  /bin/mkdir -p /opt/apps/jtproject, \
+  /bin/mkdir -p /opt/apps/jtproject/releases/*, \
+  /bin/mkdir -p /opt/apps/jtproject/backups, \
+  /bin/cp /tmp/app.jar /opt/apps/jtproject/releases/*/app.jar, \
+  /bin/cp /opt/apps/jtproject/releases/*/app.jar /opt/apps/jtproject/app.jar, \
+  /bin/cp /opt/apps/jtproject/app.jar /opt/apps/jtproject/backups/app-*.jar, \
+  /bin/mv /opt/apps/jtproject/java-projects/JtProject/target/app.jar /opt/apps/jtproject/app.jar, \
+  /bin/rm -rf /opt/apps/jtproject/java-projects, \
+  /bin/chown -R www-data:www-data /opt/apps/jtproject, \
+  /bin/systemctl daemon-reload, \
+  /bin/systemctl restart jtproject, \
+  /bin/systemctl status jtproject --no-pager

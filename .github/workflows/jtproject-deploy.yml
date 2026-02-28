@@ -1,0 +1,70 @@
+name: JtProject Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: "Deployment environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_env }}
+    defaults:
+      run:
+        working-directory: java-projects/JtProject
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
+      - name: Build package
+        run: ./mvnw -B -DskipTests clean package
+
+      - name: Rename artifact
+        run: |
+          JAR_PATH=$(ls target/*.jar | head -n 1)
+          cp "$JAR_PATH" target/app.jar
+
+      - name: Copy app.jar to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "java-projects/JtProject/target/app.jar"
+          target: "/opt/apps/jtproject"
+
+      - name: Restart service on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/apps/jtproject
+            sudo mv /opt/apps/jtproject/java-projects/JtProject/target/app.jar /opt/apps/jtproject/app.jar
+            sudo rm -rf /opt/apps/jtproject/java-projects
+            sudo chown -R www-data:www-data /opt/apps/jtproject
+            sudo systemctl daemon-reload
+            sudo systemctl restart jtproject
+            sudo systemctl status jtproject --no-pager

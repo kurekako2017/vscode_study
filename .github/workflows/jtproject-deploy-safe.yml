@@ -1,0 +1,129 @@
+name: JtProject Deploy Safe
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: "Deployment environment (manual only)"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jtproject-deploy-${{ github.event_name == 'push' && 'production' || github.event.inputs.deploy_env }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'push' && 'production' || github.event.inputs.deploy_env }}
+    defaults:
+      run:
+        working-directory: java-projects/JtProject
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
+      - name: Build package
+        run: ./mvnw -B -DskipTests clean package
+
+      - name: Prepare artifact
+        run: |
+          JAR_PATH=$(ls target/*.jar | head -n 1)
+          cp "$JAR_PATH" target/app.jar
+
+      - name: Copy app.jar to server temp
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "java-projects/JtProject/target/app.jar"
+          target: "/tmp/"
+
+      - name: Deploy with health check and rollback
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          APP_DIR: /opt/apps/jtproject
+          RELEASE_ID: ${{ github.sha }}
+          HEALTHCHECK_URL: ${{ secrets.DEPLOY_HEALTHCHECK_URL }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: APP_DIR,RELEASE_ID,HEALTHCHECK_URL
+          script: |
+            set -euo pipefail
+
+            CURRENT_JAR="$APP_DIR/app.jar"
+            RELEASE_DIR="$APP_DIR/releases/$RELEASE_ID"
+            BACKUP_DIR="$APP_DIR/backups"
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            TMP_JAR="/tmp/app.jar"
+
+            if [ -z "${HEALTHCHECK_URL:-}" ]; then
+              HEALTHCHECK_URL="http://127.0.0.1:8080"
+            fi
+
+            sudo mkdir -p "$RELEASE_DIR" "$BACKUP_DIR"
+
+            if [ -f "$CURRENT_JAR" ]; then
+              sudo cp "$CURRENT_JAR" "$BACKUP_DIR/app-$TIMESTAMP.jar"
+            fi
+
+            if [ ! -f "$TMP_JAR" ]; then
+              echo "Missing uploaded artifact: $TMP_JAR"
+              exit 1
+            fi
+
+            sudo cp "$TMP_JAR" "$RELEASE_DIR/app.jar"
+            sudo cp "$RELEASE_DIR/app.jar" "$CURRENT_JAR"
+            sudo chown -R www-data:www-data "$APP_DIR"
+
+            sudo systemctl daemon-reload
+            sudo systemctl restart jtproject
+
+            echo "Health check URL: $HEALTHCHECK_URL"
+            OK=0
+            for i in $(seq 1 10); do
+              if curl -fsS --max-time 5 "$HEALTHCHECK_URL" >/dev/null 2>&1; then
+                OK=1
+                break
+              fi
+              sleep 3
+            done
+
+            if [ "$OK" -ne 1 ]; then
+              echo "Health check failed, start rollback..."
+              LAST_BACKUP=$(ls -1t "$BACKUP_DIR"/app-*.jar 2>/dev/null | head -n 1 || true)
+              if [ -n "$LAST_BACKUP" ]; then
+                sudo cp "$LAST_BACKUP" "$CURRENT_JAR"
+                sudo systemctl restart jtproject
+                echo "Rollback applied: $LAST_BACKUP"
+              else
+                echo "No backup found, rollback skipped."
+              fi
+              exit 1
+            fi
+
+            rm -f "$TMP_JAR" || true
+            sudo systemctl status jtproject --no-pager

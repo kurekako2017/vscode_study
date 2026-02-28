@@ -1,0 +1,35 @@
+name: JtProject CI
+
+on:
+  push:
+    paths:
+      - "java-projects/JtProject/**"
+      - ".github/workflows/jtproject-ci.yml"
+  pull_request:
+    paths:
+      - "java-projects/JtProject/**"
+      - ".github/workflows/jtproject-ci.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java-projects/JtProject
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
+      - name: Build and test
+        run: ./mvnw -B clean test
