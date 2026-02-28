@@ -61,7 +61,7 @@ jobs:
           target: "/tmp/"
 
       - name: Deploy with health check and rollback
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         env:
           APP_DIR: /opt/apps/jtproject
           RELEASE_ID: ${{ github.sha }}
