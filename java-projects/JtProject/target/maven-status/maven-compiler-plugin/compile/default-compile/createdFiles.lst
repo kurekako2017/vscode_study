@@ -1,9 +1,12 @@
 com\jtspringproject\JtSpringProject\dao\UserDao.class
+com\jtspringproject\JtSpringProject\common\constants\RoleConstants.class
 com\jtspringproject\JtSpringProject\models\CartProduct.class
 com\jtspringproject\JtSpringProject\WebMvcConfig.class
 com\jtspringproject\JtSpringProject\models\Category.class
 com\jtspringproject\JtSpringProject\services\CategoryService.class
 com\jtspringproject\JtSpringProject\models\Product.class
+com\jtspringproject\JtSpringProject\batch\ProductInventoryCheckBatchApplication.class
+com\jtspringproject\JtSpringProject\common\util\InputCheckUtil.class
 com\jtspringproject\JtSpringProject\services\ProductService.class
 com\jtspringproject\JtSpringProject\dao\impl\ProductDaoImpl.class
 com\jtspringproject\JtSpringProject\LazyTestComponent.class
@@ -14,6 +17,8 @@ com\jtspringproject\JtSpringProject\dao\CategoryDao.class
 com\jtspringproject\JtSpringProject\services\impl\UserServiceImpl.class
 com\jtspringproject\JtSpringProject\dao\impl\CartDaoImpl.class
 com\jtspringproject\JtSpringProject\models\User.class
+com\jtspringproject\JtSpringProject\batch\ProductInventoryCheckBatchService.class
+com\jtspringproject\JtSpringProject\common\util\TypeConversionUtil.class
 com\jtspringproject\JtSpringProject\AnotherComponent.class
 com\jtspringproject\JtSpringProject\dao\ProductDao.class
 com\jtspringproject\JtSpringProject\HibernateConfiguration.class
@@ -29,4 +34,5 @@ com\jtspringproject\JtSpringProject\dao\CartProductDao.class
 com\jtspringproject\JtSpringProject\controller\AdminController.class
 com\jtspringproject\JtSpringProject\models\Cart.class
 com\jtspringproject\JtSpringProject\services\impl\ProductServiceImpl.class
+com\jtspringproject\JtSpringProject\common\constants\SessionConstants.class
 com\jtspringproject\JtSpringProject\JtSpringProjectApplication.class

@@ -10,6 +10,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jtspringproject.JtSpringProject.common.constants.RoleConstants;
+import com.jtspringproject.JtSpringProject.common.constants.SessionConstants;
+import com.jtspringproject.JtSpringProject.common.util.InputCheckUtil;
+import com.jtspringproject.JtSpringProject.common.util.TypeConversionUtil;
 import com.jtspringproject.JtSpringProject.models.Category;
 import com.jtspringproject.JtSpringProject.models.Product;
 import com.jtspringproject.JtSpringProject.models.User;
@@ -49,13 +53,13 @@ public class AdminController {
 	private ProductService productService;
 	
 	private boolean isAdminLoggedIn(HttpSession session) {
-		Object value = session.getAttribute("adminLoggedIn");
+		Object value = session.getAttribute(SessionConstants.ADMIN_LOGGED_IN);
 		return Boolean.TRUE.equals(value);
 	}
 
 	private String getAdminUsername(HttpSession session) {
-		Object value = session.getAttribute("adminUsername");
-		return value == null ? "" : value.toString();
+		String value = TypeConversionUtil.toTrimmedString(session.getAttribute(SessionConstants.ADMIN_USERNAME));
+		return value == null ? "" : value;
 	}
 
 	/**
@@ -92,7 +96,7 @@ public class AdminController {
 	@GetMapping("/index")
 	public String index(Model model, HttpSession session) {
 		String username = getAdminUsername(session);
-		if (username.isEmpty())
+		if (InputCheckUtil.isBlank(username))
 			return "userLogin";
 		else {
 			model.addAttribute("username", username);
@@ -171,10 +175,10 @@ public class AdminController {
 		
 		User user=this.userService.checkLogin(username, pass);
 		
-		if(user != null && "ROLE_ADMIN".equals(user.getRole())) {
+		if(user != null && RoleConstants.isAdmin(user.getRole())) {
 			ModelAndView mv = new ModelAndView("adminHome");
-			session.setAttribute("adminLoggedIn", true);
-			session.setAttribute("adminUsername", user.getUsername());
+			session.setAttribute(SessionConstants.ADMIN_LOGGED_IN, true);
+			session.setAttribute(SessionConstants.ADMIN_USERNAME, user.getUsername());
 			mv.addObject("admin", user);
 			return mv;
 		}
@@ -225,6 +229,10 @@ public class AdminController {
 	@RequestMapping(value = "categories",method = RequestMethod.POST)
 	public String addCategory(@RequestParam("categoryname") String category_name)
 	{
+		category_name = InputCheckUtil.trimToEmpty(category_name);
+		if (!InputCheckUtil.hasText(category_name)) {
+			return "redirect:/admin/categories";
+		}
 		System.out.println(category_name);
 		
 		Category category =  this.categoryService.addCategory(category_name);
@@ -271,6 +279,10 @@ public class AdminController {
 	@GetMapping("categories/update")
 	public String updateCategory(@RequestParam("categoryid") int id, @RequestParam("categoryname") String categoryname)
 	{
+		categoryname = InputCheckUtil.trimToEmpty(categoryname);
+		if (!InputCheckUtil.hasText(categoryname)) {
+			return "redirect:/admin/categories";
+		}
 		this.categoryService.updateCategory(id, categoryname);
 		return "redirect:/admin/categories";
 	}
@@ -301,7 +313,7 @@ public class AdminController {
 
 			List<Product> products = this.productService.getProducts();
 
-			if (products.isEmpty()) {
+			if (!InputCheckUtil.hasItems(products)) {
 				mView.addObject("msg", "No products are available");
 			} else {
 				mView.addObject("products", products);
@@ -352,6 +364,12 @@ public class AdminController {
 	 */
 	@RequestMapping(value = "products/add",method=RequestMethod.POST)
 	public String addProduct(@RequestParam("name") String name,@RequestParam("categoryid") int categoryId ,@RequestParam("price") int price,@RequestParam("weight") int weight, @RequestParam("quantity")int quantity,@RequestParam("description") String description,@RequestParam("productImage") String productImage) {
+		name = InputCheckUtil.trimToEmpty(name);
+		description = InputCheckUtil.trimToEmpty(description);
+		productImage = InputCheckUtil.trimToEmpty(productImage);
+		if (!InputCheckUtil.hasText(name)) {
+			return "redirect:/admin/products/add";
+		}
 		System.out.println(categoryId);
 		Category category = this.categoryService.getCategory(categoryId);
 		Product product = new Product();
@@ -413,6 +431,12 @@ public class AdminController {
 	@RequestMapping(value = "products/update/{id}",method=RequestMethod.POST)
 	public String updateProduct(@PathVariable("id") int id ,@RequestParam("name") String name,@RequestParam("categoryid") int categoryId ,@RequestParam("price") int price,@RequestParam("weight") int weight, @RequestParam("quantity")int quantity,@RequestParam(value = "description", required = false, defaultValue = "") String description,@RequestParam(value = "productImage", required = false, defaultValue = "") String productImage)
 	{
+		name = InputCheckUtil.trimToEmpty(name);
+		description = InputCheckUtil.trimToEmpty(description);
+		productImage = InputCheckUtil.trimToEmpty(productImage);
+		if (!InputCheckUtil.hasText(name)) {
+			return "redirect:/admin/products/update/" + id;
+		}
 		Category category = this.categoryService.getCategory(categoryId);
 		Product existingProduct = this.productService.getProduct(id);
 
@@ -424,7 +448,7 @@ public class AdminController {
 		product.setWeight(weight);
 		product.setQuantity(quantity);
 
-		if (productImage != null && !productImage.trim().isEmpty()) {
+		if (InputCheckUtil.hasText(productImage)) {
 			product.setImage(productImage);
 		} else if (existingProduct != null) {
 			product.setImage(existingProduct.getImage());
@@ -550,6 +574,13 @@ public class AdminController {
 		if (!isAdminLoggedIn(session)) {
 			return "adminlogin";
 		}
+		username = InputCheckUtil.trimToEmpty(username);
+		email = InputCheckUtil.trimToEmpty(email);
+		password = InputCheckUtil.trimToEmpty(password);
+		address = InputCheckUtil.trimToEmpty(address);
+		if (!InputCheckUtil.hasText(username) || !InputCheckUtil.hasText(email) || !InputCheckUtil.hasText(password)) {
+			return "redirect:/admin/profileDisplay";
+		}
 		User existingUser = this.userService.getUserById(userid);
 		if (existingUser == null) {
 			return "redirect:/admin/profileDisplay";
@@ -559,7 +590,7 @@ public class AdminController {
 		existingUser.setPassword(password);
 		existingUser.setAddress(address);
 		this.userService.addUser(existingUser);
-		session.setAttribute("adminUsername", username);
+		session.setAttribute(SessionConstants.ADMIN_USERNAME, username);
 		return "redirect:/index";
 	}
 

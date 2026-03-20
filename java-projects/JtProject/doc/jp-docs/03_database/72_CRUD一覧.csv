@@ -1,0 +1,21 @@
+No,功能分类,機能名,画面名/JSP,Controller,Service,主テーブル,URL,C,R,U,D,備考
+1,用户,一般ユーザー登録,register.jsp,UserController.newUseRegister(),UserService.addUser(),CUSTOMER,POST /newuserregister,1,0,0,0,新規顧客作成
+2,用户,ユーザーログイン認証,userLogin.jsp,UserController.userloginAlias(),UserService.checkLogin(),CUSTOMER,POST /userloginvalidate,0,1,0,0,ユーザー照合
+3,管理员,管理者ログイン認証,adminlogin.jsp,AdminController.adminlogin(),UserService.checkLogin(),CUSTOMER,POST /admin/loginvalidate,0,1,0,0,管理者ロール判定込み
+4,管理员,顧客一覧表示,displayCustomers.jsp,AdminController.getCustomerDetail(),UserService.getUsers(),CUSTOMER,GET /admin/customers,0,1,0,0,全顧客参照
+5,管理员,管理者プロフィール表示,updateProfile.jsp,AdminController.profileDisplay(),UserService.getUserByUsername(),CUSTOMER,GET /admin/profileDisplay,0,1,0,0,ログイン中管理者参照
+6,管理员,管理者プロフィール更新,updateProfile.jsp,AdminController.updateUserProfile(),"UserService.getUserById() / addUser()",CUSTOMER,POST /admin/updateuser,0,1,1,0,既存顧客更新
+7,分类,カテゴリ一覧表示,categories.jsp,AdminController.getcategory(),CategoryService.getCategories(),CATEGORY,GET /admin/categories,0,1,0,0,一覧参照
+8,分类,カテゴリ追加,categories.jsp,AdminController.addCategory(),CategoryService.addCategory(),CATEGORY,POST /admin/categories,1,0,0,0,新規カテゴリ作成
+9,分类,カテゴリ更新,categories.jsp,AdminController.updateCategory(),CategoryService.updateCategory(),CATEGORY,GET /admin/categories/update,0,1,1,0,更新前提で対象カテゴリ参照あり
+10,分类,カテゴリ削除,categories.jsp,AdminController.removeCategoryDb(),CategoryService.deleteCategory(),CATEGORY,GET /admin/categories/delete,0,1,0,1,削除前に対象カテゴリ取得
+11,商品,商品トップ表示,index.jsp,"UserController.userloginPage() / indexPage()",ProductService.getProducts(),PRODUCT,"GET /, GET /index",0,1,0,0,利用者向け商品参照
+12,商品,利用者商品一覧表示,uproduct.jsp,UserController.getproduct(),ProductService.getProducts(),PRODUCT,GET /user/products,0,1,0,0,一覧参照
+13,商品,管理者商品一覧表示,products.jsp,AdminController.getproduct(),ProductService.getProducts(),PRODUCT,GET /admin/products,0,1,0,0,一覧参照
+14,商品,商品追加,productsAdd.jsp,AdminController.addProduct(),"CategoryService.getCategory() / ProductService.addProduct()",PRODUCT,POST /admin/products/add,1,1,0,0,カテゴリ参照後に商品作成
+15,商品,商品更新画面表示,productsUpdate.jsp,AdminController.updateproduct(),"ProductService.getProduct() / CategoryService.getCategories()",PRODUCT,GET /admin/products/update/{id},0,1,0,0,更新前の単票参照
+16,商品,商品更新,productsUpdate.jsp,AdminController.updateProduct(),"CategoryService.getCategory() / ProductService.getProduct() / updateProduct()",PRODUCT,POST /admin/products/update/{id},0,1,1,0,既存商品参照後に更新
+17,商品,商品削除,products.jsp,AdminController.removeProduct(),ProductService.deleteProduct(),PRODUCT,GET /admin/products/delete,0,1,0,1,削除対象商品を扱う
+18,购物车,"カート生成付き商品追加","index.jsp / uproduct.jsp",UserController.addToCart(),"UserService.getUserByUsername() / CartService.getCarts() / addCart() / ProductService.getProduct()","CART, CART_PRODUCT, PRODUCT, CUSTOMER",GET/POST /products/addtocart,1,1,0,0,必要時はCART作成 商品参照 明細作成
+19,购物车,カート表示,cart.jsp,UserController.showCart(),"UserService.getUserByUsername() / CartService.getCarts()","CART, CART_PRODUCT, PRODUCT, CUSTOMER",GET /user/cart,0,1,0,0,カート 商品 利用者参照
+20,购物车,カート内商品削除,cart.jsp,UserController.deleteFromCart(),"UserService.getUserByUsername() / CartService.getCarts()","CART_PRODUCT, CART, CUSTOMER",GET /user/cart/delete,0,1,0,1,明細存在確認後に削除

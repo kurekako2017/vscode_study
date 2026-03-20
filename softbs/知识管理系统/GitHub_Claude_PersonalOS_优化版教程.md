@@ -22,7 +22,7 @@
 ```text
 .github/
   ISSUE_TEMPLATE/
-    task.md
+    ../notes/task.md
     goal.md
     habit.md
     insight.md
@@ -57,7 +57,7 @@ docs/
 
 ### 阶段 A（第 2 周）
 
-- `task.md`
+- `../notes/task.md`
 - `goal.md`
 - `habit.md`
 - `insight.md`

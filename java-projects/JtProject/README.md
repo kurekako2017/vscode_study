@@ -1,6 +1,12 @@
 # JtSpringProject 学习与启动入口
 
-这个项目文档较多，建议只从本文件开始。先跑起来，再按学习路线看细节文档。
+这个项目的 Markdown 文档已经按用途整理到 `doc/` 下。
+
+建议阅读顺序：
+
+1. 本文件
+2. [doc/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/README.md)
+3. 再按启动、参考、测试或日式项目文档继续深入
 
 ## 1) 快速启动（Windows / PowerShell）
 
@@ -35,24 +41,35 @@ cd d:\dev\source_code\vscode_study\java-projects\JtProject
 
 ## 3) 学习路线（按顺序）
 
-1. `doc/🚀快速启动指南.md`（先确认你能稳定启动）
-2. `doc/启动到登录页面的完整流程.md`（理解请求入口和页面跳转）
-3. `CONTROLLER_注释说明.md`（看 Controller 层职责）
-4. `REFACTORING_GUIDE.md`（了解当前重构方向）
-5. `TESTING_GUIDE.md`（后续补测试再看）
+1. [手动启动项目完整指南.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/手动启动项目完整指南.md)
+2. [启动到登录页面的完整流程.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/启动到登录页面的完整流程.md)
+3. [CONTROLLER_注释说明.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/CONTROLLER_注释说明.md)
+4. [REFACTORING_GUIDE.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/REFACTORING_GUIDE.md)
+5. [TESTING_GUIDE.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/TESTING_GUIDE.md)
 
-> 说明：`doc` 目录里有很多“启动成功/问题修复总结”类文档，历史价值大于学习价值。优先按以上 5 个文档阅读即可。
+历史性的启动成功、问题修复、临时记录文档已统一归档到 `doc/history/`。
+
+## 3.1) 脚本入口
+
+- PowerShell: `.\scripts\start\run.ps1`
+- CMD: `scripts\start\run.cmd`
+- Linux / macOS: `./scripts/start/start.sh`
+- 脚本导航: [scripts/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/scripts/README.md)
 
 ## 4) 文档索引（按用途）
 
 | 用途 | 推荐文档 | 说明 |
 | --- | --- | --- |
-| 首次启动（命令行） | `doc/手动启动项目完整指南.md` | 最完整、当前版本维护中 |
-| 首次启动（IDEA） | `doc/手动启动项目完整指南-IDEA版.md` | 面向IDEA新手 |
-| 启动后排障 | `doc/启动失败解决方案.md` | 历史问题集合，按关键词查阅 |
-| 请求链路学习 | `doc/启动到登录页面的完整流程.md` | 理解Controller与页面跳转 |
-| 架构重构学习 | `REFACTORING_GUIDE.md` | 接口分层与重构说明 |
-| 测试入门 | `TESTING_GUIDE.md` | 测试命令和实践建议 |
+| 总导航 | `doc/README.md` | 所有文档分类入口 |
+| 首次启动（命令行） | `doc/guides/手动启动项目完整指南.md` | 最完整、当前版本维护中 |
+| 首次启动（IDEA） | `doc/guides/手动启动项目完整指南-IDEA版.md` | 面向 IDEA 新手 |
+| 启动后排障 | `doc/guides/启动失败解决方案.md` | 常见启动异常排查 |
+| 请求链路学习 | `doc/reference/启动到登录页面的完整流程.md` | 理解 Controller 与页面跳转 |
+| 架构与实现参考 | `doc/reference/项目框架与调用流程完整总结.md` | 理解整体结构 |
+| 架构重构学习 | `doc/guides/REFACTORING_GUIDE.md` | 接口分层与重构说明 |
+| 测试入门 | `doc/guides/TESTING_GUIDE.md` | 测试命令和实践建议 |
+| 日式项目文档 | `doc/jp-docs/README.md` | 設計書、テスト仕様書、障害票等 |
+| 历史归档 | `doc/history/` | 旧启动记录、修复记录、临时笔记 |
 
 ## 5) 环境切换（可选）
 
@@ -72,4 +89,4 @@ Linux / macOS 对应命令：
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=remote
 ```
 
-数据库配置详见：`ENV_CONFIG.md`
+数据库配置详见：[ENV_CONFIG.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/ENV_CONFIG.md)

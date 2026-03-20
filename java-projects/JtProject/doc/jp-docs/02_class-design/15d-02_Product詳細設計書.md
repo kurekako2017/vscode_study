@@ -1,0 +1,68 @@
+# Product 詳細設計書
+
+## 1. 文書情報
+
+| 項目 | 内容 |
+|---|---|
+| 文書名 | Product 詳細設計書 |
+| 対象クラス | `Product` |
+| パッケージ | `models` |
+| 作成日 | 2026-03-15 |
+| 作成者 | Codex |
+
+## 2. クラス概要
+
+| 項目 | 内容 |
+|---|---|
+| 役割 | 商品情報を表す Entity |
+| 対応テーブル | `PRODUCT` |
+| 主キー | `product_id` |
+| 主な利用箇所 | 商品一覧、商品登録、商品更新、カート追加 |
+
+## 3. 属性一覧
+
+| No | 属性名 | 型 | DB カラム | 内容 |
+|---|---|---|---|---|
+| 1 | `id` | `int` | `product_id` | 商品 ID、主キー、自動採番 |
+| 2 | `name` | `String` | `name` | 商品名 |
+| 3 | `image` | `String` | `image` | 商品画像パス |
+| 4 | `category` | `Category` | `category_id` | 所属カテゴリ |
+| 5 | `quantity` | `int` | `quantity` | 在庫数 |
+| 6 | `price` | `int` | `price` | 価格 |
+| 7 | `weight` | `int` | `weight` | 重量 |
+| 8 | `description` | `String` | `description` | 商品説明 |
+| 9 | `customer` | `User` | `customer_id` | 関連ユーザー |
+
+## 4. 業務上の意味
+
+- 一般ユーザー画面の商品表示主体
+- 管理者画面の商品管理対象
+- カート投入対象商品
+- 商品カテゴリとの関連を持つ業務エンティティ
+
+## 5. 業務ルール
+
+- 商品登録時はカテゴリが設定されている前提で扱う。
+- 商品更新時は画像未入力の場合に既存画像を引き継ぐ運用となる。
+- 在庫、価格、重量は数値項目として扱う。
+
+## 6. 関連
+
+| 関連先 | 関係 | 内容 |
+|---|---|---|
+| `Category` | 1 : 1 定義 / 設計上は N : 1 相当 | 商品所属カテゴリ |
+| `User` | N : 1 | 商品関連ユーザー |
+| `CartProduct` | 1 : N 相当 | カート明細に紐づく |
+
+## 7. 設計上の注意
+
+- 実装上は `Category` と `@OneToOne` だが、業務設計上はカテゴリ 1 : 商品 N として扱う。
+- `customer_id` の業務上の意味は継続確認事項である。
+- Entity と DTO の分離は行っていない。
+
+## 8. 関連資料
+
+- [15d_Model詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15d_Model%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [11_ER図.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/11_ER%E5%9B%B3.md)
+- [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md)
+

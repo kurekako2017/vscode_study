@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
+import com.jtspringproject.JtSpringProject.common.constants.RoleConstants;
+import com.jtspringproject.JtSpringProject.common.constants.SessionConstants;
+import com.jtspringproject.JtSpringProject.common.util.InputCheckUtil;
+import com.jtspringproject.JtSpringProject.common.util.TypeConversionUtil;
 import com.jtspringproject.JtSpringProject.models.Product;
 import com.jtspringproject.JtSpringProject.models.User;
 import com.jtspringproject.JtSpringProject.models.Cart;
@@ -59,16 +63,17 @@ public class UserController{
     private String resolveLoggedInUsername(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
-            Object username = session.getAttribute("username");
-            if (username != null && !username.toString().trim().isEmpty()) {
-                return username.toString();
+            String username = TypeConversionUtil.toTrimmedString(session.getAttribute(SessionConstants.USERNAME));
+            if (InputCheckUtil.hasText(username)) {
+                return username;
             }
         }
         if (request.getCookies() != null) {
             for (javax.servlet.http.Cookie c : request.getCookies()) {
-                if ("username".equals(c.getName()) && c.getValue() != null && !c.getValue().trim().isEmpty()) {
-                    request.getSession().setAttribute("username", c.getValue());
-                    return c.getValue();
+                String cookieValue = TypeConversionUtil.toTrimmedString(c.getValue());
+                if (SessionConstants.USERNAME.equals(c.getName()) && InputCheckUtil.hasText(cookieValue)) {
+                    request.getSession().setAttribute(SessionConstants.USERNAME, cookieValue);
+                    return cookieValue;
                 }
             }
         }
@@ -99,7 +104,7 @@ public class UserController{
         String username = resolveLoggedInUsername(request);
         try {
             List<Product> products = this.productService.getProducts();
-            if (products != null && !products.isEmpty()) {
+            if (InputCheckUtil.hasItems(products)) {
                 mView.addObject("products", products);
             }
         } catch (Exception e) {
@@ -117,7 +122,7 @@ public class UserController{
         if (session != null) {
             session.invalidate();
         }
-        Cookie cookie = new Cookie("username", "");
+        Cookie cookie = new Cookie(SessionConstants.USERNAME, "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
@@ -172,12 +177,12 @@ public class UserController{
                 // ✅ 登录成功的处理逻辑
 
                 // 1. 创建Cookie保存用户名（用于客户端会话管理）
-                Cookie cookie = new Cookie("username", u.getUsername());
+                Cookie cookie = new Cookie(SessionConstants.USERNAME, u.getUsername());
                 cookie.setPath("/");
                 cookie.setMaxAge(7 * 24 * 60 * 60);
                 res.addCookie(cookie);
-                request.getSession().setAttribute("username", u.getUsername());
-                request.getSession().setAttribute("userRole", u.getRole());
+                request.getSession().setAttribute(SessionConstants.USERNAME, u.getUsername());
+                request.getSession().setAttribute(SessionConstants.USER_ROLE, u.getRole());
 
                 // 2. 创建 ModelAndView，指定返回首页视图
                 ModelAndView mView  = new ModelAndView("index");
@@ -195,7 +200,7 @@ public class UserController{
                 }
 
                 // 5. 判断商品列表是否为空（注意：products 可能为 null）
-                if (products == null || products.isEmpty()) {
+                if (!InputCheckUtil.hasItems(products)) {
                     // 商品列表为空或未获取到，添加提示信息
                     mView.addObject("msg", "No products are available");
                 } else {
@@ -249,7 +254,7 @@ public class UserController{
 
         List<Product> products = this.productService.getProducts();
 
-        if(products.isEmpty()) {
+        if(!InputCheckUtil.hasItems(products)) {
             mView.addObject("msg","No products are available");
         }else {
             mView.addObject("products",products);
@@ -271,7 +276,7 @@ public class UserController{
         }
         try {
             List<Product> products = this.productService.getProducts();
-            if (products == null || products.isEmpty()) {
+            if (!InputCheckUtil.hasItems(products)) {
                 mView.addObject("msg", "No products are available");
             } else {
                 mView.addObject("products", products);
@@ -285,12 +290,27 @@ public class UserController{
     @RequestMapping(value = "newuserregister", method = RequestMethod.POST)
     public ModelAndView newUseRegister(@ModelAttribute User user)
     {
+        String username = InputCheckUtil.trimToNull(user.getUsername());
+        String email = InputCheckUtil.trimToNull(user.getEmail());
+        String password = InputCheckUtil.trimToNull(user.getPassword());
+
+        if (!InputCheckUtil.hasText(username) || !InputCheckUtil.hasText(email) || !InputCheckUtil.hasText(password)) {
+            ModelAndView mView = new ModelAndView("register");
+            mView.addObject("msg", "Username, email and password are required.");
+            return mView;
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setAddress(InputCheckUtil.trimToEmpty(user.getAddress()));
+
         // Check if username already exists in database
         boolean exists = this.userService.checkUserExists(user.getUsername());
 
         if(!exists) {
             System.out.println(user.getEmail());
-            user.setRole("ROLE_NORMAL");
+            user.setRole(RoleConstants.ROLE_NORMAL);
             this.userService.addUser(user);
 
             System.out.println("New user created: " + user.getUsername());
@@ -348,18 +368,18 @@ public class UserController{
             // 1. 获取当前登录用户名（从 cookie 或 session）
             String username = resolveLoggedInUsername(request);
             if (username == null) {
-                request.getSession().setAttribute("cartMsg", "Please login first");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Please login first");
                 return "redirect:/user/products";
             }
             // 2. 查找用户对象
             User user = this.userService.getUserByUsername(username);
             if (user == null) {
-                request.getSession().setAttribute("cartMsg", "User not found, please login again");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "User not found, please login again");
                 return "redirect:/user/products";
             }
             // 如果是管理员，不允许作为普通用户加入购物车，重定向到管理员商品管理页面
-            if ("ROLE_ADMIN".equals(user.getRole())) {
-                request.getSession().setAttribute("cartMsg", "管理员请使用后台管理商品。");
+            if (RoleConstants.isAdmin(user.getRole())) {
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "管理员请使用后台管理商品。");
                 return "redirect:/admin/products";
             }
             // 3. 查找该用户的购物车（如无则新建）
@@ -379,15 +399,15 @@ public class UserController{
             // 4. 添加商品到购物车
             Product product = this.productService.getProduct(id);
             if (product == null) {
-                request.getSession().setAttribute("cartMsg", "Product not found");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Product not found");
                 return "redirect:/user/products";
             }
             CartProduct cp = new CartProduct(cart, product);
             this.cartProductDao.addCartProduct(cp);
-            request.getSession().setAttribute("cartMsg", "Add Success");
+            request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Add Success");
         } catch (Exception e) {
             e.printStackTrace();
-            request.getSession().setAttribute("cartMsg", "Add failed: " + e.getMessage());
+            request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Add failed: " + e.getMessage());
         }
         // 添加后直接跳转到购物车页面
         return "redirect:/user/cart";
@@ -407,7 +427,7 @@ public class UserController{
             return mView;
         }
         // 管理员不使用购物车，重定向到管理员商品管理页
-        if ("ROLE_ADMIN".equals(user.getRole())) {
+        if (RoleConstants.isAdmin(user.getRole())) {
             ModelAndView redirect = new ModelAndView("redirect:/admin/products");
             redirect.addObject("msg", "管理员请使用后台管理商品。");
             return redirect;
@@ -426,10 +446,10 @@ public class UserController{
             cartProducts = this.cartProductDao.getProductByCartID(cart.getId());
         }
         mView.addObject("products", cartProducts);
-        Object cartMsg = request.getSession().getAttribute("cartMsg");
+        Object cartMsg = request.getSession().getAttribute(SessionConstants.CART_MESSAGE);
         if (cartMsg != null) {
             mView.addObject("cartMsg", cartMsg.toString());
-            request.getSession().removeAttribute("cartMsg");
+            request.getSession().removeAttribute(SessionConstants.CART_MESSAGE);
         }
         return mView;
     }
@@ -440,13 +460,13 @@ public class UserController{
             String username = resolveLoggedInUsername(request);
 
             if (username == null) {
-                request.getSession().setAttribute("cartMsg", "Please login first");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Please login first");
                 return "redirect:/";
             }
 
             User user = this.userService.getUserByUsername(username);
             if (user == null) {
-                request.getSession().setAttribute("cartMsg", "User not found");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "User not found");
                 return "redirect:/";
             }
 
@@ -459,21 +479,21 @@ public class UserController{
                 }
             }
             if (cart == null) {
-                request.getSession().setAttribute("cartMsg", "Cart not found");
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Cart not found");
                 return "redirect:/user/cart";
             }
 
             java.util.List<CartProduct> cartProducts = this.cartProductDao.getCartProductsByCartAndProductId(cart.getId(), productId);
-            if (cartProducts == null || cartProducts.isEmpty()) {
-                request.getSession().setAttribute("cartMsg", "Product not found in cart");
+            if (!InputCheckUtil.hasItems(cartProducts)) {
+                request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Product not found in cart");
                 return "redirect:/user/cart";
             }
 
             this.cartProductDao.deleteCartProduct(cartProducts.get(0));
-            request.getSession().setAttribute("cartMsg", "Delete Success");
+            request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Delete Success");
         } catch (Exception e) {
             e.printStackTrace();
-            request.getSession().setAttribute("cartMsg", "Delete failed: " + e.getMessage());
+            request.getSession().setAttribute(SessionConstants.CART_MESSAGE, "Delete failed: " + e.getMessage());
         }
         return "redirect:/user/cart";
     }

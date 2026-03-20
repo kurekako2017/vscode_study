@@ -1,11 +1,35 @@
-# AI Agents Windows 示例（软体学习仓库）
+# Softbs
 
-本仓库包含在 Windows + VS Code 环境下，如何用命令行 / 脚本 调用常见 AI 服务（OpenAI / Claude / Gemini）的示例。
+`softbs/` 已整理为按主题分类的学习资料库，而不是把所有 Markdown 散放在根目录。
 
-目录（新增文件）
-- `tools/ai-run.ps1`：PowerShell 示例脚本，支持 `-Provider`、`-Prompt`、`-DryRun`。默认 DryRun 模式仅打印请求体，避免意外使用密钥。
-- `tools/openai.http`：REST Client（VS Code 扩展）示例请求文件，使用 `{{OPENAI_API_KEY}}` 等变量。
-- `.vscode/tasks.json`：可选的任务配置，用于在 VS Code 中一键运行脚本。
+## 目录导航
+
+- `tools/`: 脚本与调用示例
+- `aider/`: Aider、本地模型、AI 编程辅助相关资料
+- `openclaw/`: OpenClaw 安装、使用、微信命令、历史说明
+- `github/`: GitHub、Codespaces、Pages、学生版 DevOps 相关资料
+- `vscode/`: VS Code 操作指南
+- `notes/`: 临时笔记与零散记录
+- `history/`: 历史环境说明
+
+## 推荐阅读
+
+- [UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md](D:/dev/source_code/vscode_study/softbs/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md)
+- [OpenClaw_实用使用教程.md](D:/dev/source_code/vscode_study/softbs/openclaw/OpenClaw_实用使用教程.md)
+- [GitHub学生版学习与DevOps实践教程.md](D:/dev/source_code/vscode_study/softbs/github/GitHub学生版学习与DevOps实践教程.md)
+- [VSCode操作指南.md](D:/dev/source_code/vscode_study/softbs/vscode/VSCode操作指南.md)
+
+## 原有脚本说明
+
+- `tools/ai-run.ps1`：PowerShell 示例脚本，支持 `-Provider`、`-Prompt`、`-DryRun`
+- `tools/openai.http`：REST Client 示例请求文件
+- `.vscode/tasks.json`：VS Code 任务配置
+
+## 说明
+
+- 根目录尽量只保留总入口和少量核心教程
+- 其余文档按主题归类到子目录
+- 历史或重复说明优先放到 `history/` 或对应主题目录下的归档位置
 
 快速开始（在 VS Code 终端运行）：
 

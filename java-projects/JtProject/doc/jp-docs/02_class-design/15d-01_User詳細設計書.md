@@ -1,0 +1,65 @@
+# User 詳細設計書
+
+## 1. 文書情報
+
+| 項目 | 内容 |
+|---|---|
+| 文書名 | User 詳細設計書 |
+| 対象クラス | `User` |
+| パッケージ | `models` |
+| 作成日 | 2026-03-15 |
+| 作成者 | Codex |
+
+## 2. クラス概要
+
+| 項目 | 内容 |
+|---|---|
+| 役割 | 顧客および管理者の基本情報を表す Entity |
+| 対応テーブル | `CUSTOMER` |
+| 主キー | `id` |
+| 一意制約 | `username` |
+| 主な利用箇所 | ログイン、登録、顧客一覧、プロフィール更新、権限判定 |
+
+## 3. 属性一覧
+
+| No | 属性名 | 型 | DB カラム | 内容 |
+|---|---|---|---|---|
+| 1 | `id` | `int` | `id` | 顧客 ID、主キー、自動採番 |
+| 2 | `username` | `String` | `username` | ログインユーザー名、一意制約 |
+| 3 | `email` | `String` | `email` | メールアドレス |
+| 4 | `password` | `String` | `password` | パスワード |
+| 5 | `role` | `String` | `role` | `ROLE_ADMIN` または `ROLE_NORMAL` |
+| 6 | `address` | `String` | `address` | 住所 |
+
+## 4. 業務上の意味
+
+- 一般ユーザー認証対象
+- 管理者認証対象
+- 顧客一覧表示対象
+- カート所有者の親エンティティ
+- 権限判定の基準データ
+
+## 5. 業務ルール
+
+- 登録時の一般ユーザーは `ROLE_NORMAL` を付与する。
+- 管理者ログイン許可条件は `role = ROLE_ADMIN` である。
+- `username` は重複不可である。
+- 現行実装ではパスワードは平文保持である。
+
+## 6. 関連
+
+| 関連先 | 関係 | 内容 |
+|---|---|---|
+| `Cart` | 1 : N 相当 | 顧客ごとのカート所有 |
+| `Product` | 1 : N 相当 | 商品との関連カラムを保持 |
+
+## 7. 設計上の注意
+
+- Entity と画面入出力モデルが分離されていない。
+- 本番向けには監査項目、論理削除、パスワードハッシュ化が必要。
+
+## 8. 関連資料
+
+- [15d_Model詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15d_Model%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md)
+

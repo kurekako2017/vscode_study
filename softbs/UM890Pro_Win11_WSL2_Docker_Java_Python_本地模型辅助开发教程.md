@@ -313,7 +313,7 @@ docker run --rm -it -v "$PWD":/app -w /app python:3.11 python --version
 
 ## 11. 本地模型辅助开发（Ollama + Aider）
 
-> 你仓库里已有参考文档：`softbs/UM890_Aider_Local_LLM_Install.md`。本节给出与 WSL 开发流结合的最短路径。
+> 你仓库里已有参考文档：`softbs/aider/UM890_Aider_Local_LLM_Install.md`。本节给出与 WSL 开发流结合的最短路径。
 
 ### 11.1 在 Windows 安装 Ollama
 
@@ -353,7 +353,7 @@ no-stream: true
 
 ### 11.4 配置 CoPaw（OpenClaw）方案（可选）
 
-> 说明：若你说的 `CoPaw` 指的是你仓库中的 `OpenClaw`，可按以下方式接入本地模型。参考文档：`softbs/Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md`。
+> 说明：若你说的 `CoPaw` 指的是你仓库中的 `OpenClaw`，可按以下方式接入本地模型。参考文档：`softbs/openclaw/Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md`。
 
 推荐职责分离：
 
