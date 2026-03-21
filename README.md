@@ -51,6 +51,19 @@
 - 项目结构
 - 日式文档与测试资料
 
+### 4. DevOps / SRE 补充主线
+
+如果你想基于当前工作区已有内容补：
+
+- `Docker`
+- `CI/CD`
+- 自动化运维
+- `Kubernetes` 入门
+
+建议看：
+
+- [devops-lab/README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
+
 ## 推荐查看顺序
 
 如果你现在主要想学生成 AI 并贴日本现场：
@@ -63,6 +76,10 @@
 
 1. [java-lab/README.md](D:/dev/source_code/vscode_study/java-lab/README.md)
 
+如果你现在主要想补 `DevOps / SRE`：
+
+1. [devops-lab/README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
+
 ## 当前目录概览
 
 ```text
@@ -70,6 +87,7 @@ vscode_study/
 |-- llm-lab/          # LLM 应用开发主线
 |-- agent-lab/        # Agent 进阶专题
 |-- java-lab/         # 对日 Java 开发主线
+|-- devops-lab/       # DevOps / SRE 补充主线
 |-- java-projects/    # Java 项目实战
 |-- python-projects/  # Python 项目
 |-- web-projects/     # Web 项目

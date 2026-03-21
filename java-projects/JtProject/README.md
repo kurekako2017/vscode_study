@@ -90,3 +90,27 @@ Linux / macOS 对应命令：
 ```
 
 数据库配置详见：[ENV_CONFIG.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/ENV_CONFIG.md)
+
+## 6) Batch 运行目录说明
+
+项目里现在已经补了一套学习用模擬 batch，因此运行后会出现几类 batch 相关目录：
+
+| 目录 | 作用 | 说明 |
+| --- | --- | --- |
+| `batch-work/` | batch 专用本地数据库目录 | `batch` profile 使用的 H2 文件 DB 会落在这里 |
+| `batch-output/` | batch 结果输出目录 | 例如库存整合检查 CSV 会输出到这里 |
+| `logs/batch/` | batch 日志目录 | batch 运行日志会输出到这里 |
+
+当前 `batch` profile 的数据库配置在 [application-batch.properties](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/resources/application-batch.properties)，其中：
+
+- `spring.datasource.url=jdbc:h2:file:./batch-work/jtproject-batch...`
+- `logging.file.name=logs/batch/product-inventory-check.log`
+- `batch.output.dir=batch-output`
+
+也就是说：
+
+- `batch-work` 负责存放 batch 运行时的本地 H2 数据文件
+- `batch-output` 负责存放 batch 业务输出结果
+- `logs/batch` 负责存放 batch 运行日志
+
+如果你看到 [batch-work](D:/dev/source_code/vscode_study/java-projects/JtProject/batch-work) 目录里的 `.mv.db`、`.trace.db` 文件，它们不是源码，而是 batch 执行时生成的本地数据库文件。

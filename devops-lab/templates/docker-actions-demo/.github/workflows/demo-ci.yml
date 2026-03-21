@@ -1,0 +1,15 @@
+name: Demo CI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  docker-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t devops-demo:ci .
