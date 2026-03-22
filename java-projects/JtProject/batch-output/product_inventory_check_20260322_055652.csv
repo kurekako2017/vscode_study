@@ -1,0 +1,3 @@
+check_timestamp,product_id,product_name,category_id,category_name,quantity,price,status,check_messages
+"2026-03-22 05:56:52","1","Apple","1","Fruits","40","3","OK",""
+"2026-03-22 05:56:52","2","Cracked Eggs","9","Other","90","1","OK",""
