@@ -5,6 +5,7 @@ data/
 *.trace.db
 
 # Maven
+.m2/
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -24,6 +25,8 @@ dependency-reduced-pom.xml
 # Logs
 *.log
 app.log
+batch-output/
+batch-work/
 
 # OS
 .DS_Store

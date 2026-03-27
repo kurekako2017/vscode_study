@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('后台首页')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('后台首页', '这里把后台常用页面集中到一个入口，也方便你观察 Thymeleaf 片段导航的复用。', 'Dashboard')"></section>
+    <nav th:replace="fragments/layout :: adminNav('dashboard')"></nav>
+
+    <section class="grid two">
+      <article class="card">
+        <h3>分类管理</h3>
+        <p class="muted">学习 `th:each`、`th:action` 和列表渲染。</p>
+        <a class="button" th:href="@{/admin/categories}">进入分类管理</a>
+      </article>
+      <article class="card">
+        <h3>商品管理</h3>
+        <p class="muted">学习表格、编辑页和 URL 参数绑定。</p>
+        <a class="button" th:href="@{/admin/products}">进入商品管理</a>
+      </article>
+      <article class="card">
+        <h3>客户列表</h3>
+        <p class="muted">学习将 `List<User>` 渲染到表格中。</p>
+        <a class="button" th:href="@{/admin/customers}">查看客户</a>
+      </article>
+      <article class="card">
+        <h3>资料维护</h3>
+        <p class="muted">学习表单回填和页面更新。</p>
+        <a class="button" th:href="@{/admin/profileDisplay}">编辑资料</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

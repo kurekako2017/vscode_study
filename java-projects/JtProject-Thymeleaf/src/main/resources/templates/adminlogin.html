@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('管理员登录')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('管理员登录', '用户端和管理端共用同一套后端服务，但 Thymeleaf 可以分别渲染不同模板。', 'Admin Portal')"></section>
+    <nav th:replace="fragments/layout :: userNav('admin-login')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+
+    <section class="grid two">
+      <article class="panel stack">
+        <h2>后台入口</h2>
+        <form th:action="@{/admin/loginvalidate}" method="post" class="stack">
+          <div class="field">
+            <label for="username">管理员用户名</label>
+            <input id="username" name="username" type="text" required>
+          </div>
+          <div class="field">
+            <label for="password">密码</label>
+            <input id="password" name="password" type="password" required>
+          </div>
+          <button type="submit">进入后台</button>
+        </form>
+      </article>
+
+      <article class="panel">
+        <h2>学习点</h2>
+        <p class="muted">这个页面很适合拿来和 JSP 登录页对比，区别主要在模板属性和片段复用。</p>
+        <div class="notice success">默认管理员：`admin / 123`</div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

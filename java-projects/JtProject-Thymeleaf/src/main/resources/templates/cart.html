@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('购物车')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('购物车', '这个页面能帮助你看懂 Controller 如何把列表数据放进模板，并用 Thymeleaf 渲染表格。', 'List Rendering')"></section>
+    <nav th:replace="fragments/layout :: userNav('cart')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+    <div th:replace="fragments/layout :: message(${cartMsg}, 'success')"></div>
+
+    <section class="panel table-wrap">
+      <h2>购物车商品</h2>
+      <p class="muted" th:if="${products == null or #lists.isEmpty(products)}">当前购物车为空。</p>
+      <table th:if="${products != null and !#lists.isEmpty(products)}">
+        <thead>
+          <tr>
+            <th>商品</th>
+            <th>价格</th>
+            <th>分类</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="product : ${products}">
+            <td>
+              <strong th:text="${product.name}">商品</strong>
+              <div class="muted" th:text="${product.description}">描述</div>
+            </td>
+            <td th:text="'¥ ' + ${product.price}">¥ 0</td>
+            <td th:text="${product.category != null ? product.category.name : '未分类'}">分类</td>
+            <td>
+              <a class="button secondary" th:href="@{/user/cart/delete(id=${product.id})}">删除</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

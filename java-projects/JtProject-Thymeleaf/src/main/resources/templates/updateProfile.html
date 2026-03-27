@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('资料维护')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('资料维护', '这个页面展示了最基础的表单回填方式。', 'Profile Form')"></section>
+    <nav th:replace="fragments/layout :: adminNav('profile')"></nav>
+
+    <section class="panel">
+      <form th:action="@{/admin/updateuser}" method="post" class="grid two">
+        <input type="hidden" name="userid" th:value="${userid}">
+        <div class="field">
+          <label for="username">用户名</label>
+          <input id="username" name="username" type="text" th:value="${username}" required>
+        </div>
+        <div class="field">
+          <label for="email">邮箱</label>
+          <input id="email" name="email" type="email" th:value="${email}" required>
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="text" th:value="${password}" required>
+        </div>
+        <div class="field">
+          <label for="address">地址</label>
+          <input id="address" name="address" type="text" th:value="${address}">
+        </div>
+        <div class="actions">
+          <button type="submit">保存资料</button>
+          <a class="button secondary" th:href="@{/admin/Dashboard}">返回后台</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

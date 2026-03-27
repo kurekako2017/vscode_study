@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('学习首页')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('学习首页', '登录成功后会跳到这里。这个页面把 Controller 放进 Model 的数据直接渲染出来。', 'Model Rendering')"></section>
+    <nav th:replace="fragments/layout :: userNav('index')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+
+    <section class="grid two">
+      <article class="panel">
+        <h2>当前登录用户</h2>
+        <p class="muted" th:if="${user == null and username == null}">当前还没有用户对象，说明你可能是直接访问了首页。</p>
+        <div class="card" th:if="${user != null or username != null}">
+          <h3 th:text="${user != null ? user.username : username}">username</h3>
+          <p class="muted">这里使用 `th:text` 输出 Controller 放进模型的数据。</p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>页面入口</h2>
+        <div class="actions">
+          <a class="button" th:href="@{/user/products}">去看商品列表</a>
+          <a class="button secondary" th:href="@{/user/cart}">去看购物车</a>
+          <a class="button secondary" th:href="@{/logout}">退出登录</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel cards">
+      <h2>推荐对照学习</h2>
+      <div class="grid three">
+        <article class="card">
+          <h3>先看 HTML</h3>
+          <p class="muted">先看页面用了哪些 `th:*` 属性。</p>
+        </article>
+        <article class="card">
+          <h3>再看 Controller</h3>
+          <p class="muted">再去看方法里到底往 `ModelAndView` 放了什么。</p>
+        </article>
+        <article class="card">
+          <h3>最后看 Service/DAO</h3>
+          <p class="muted">这样最容易建立 Thymeleaf 和后端调用链的关系。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

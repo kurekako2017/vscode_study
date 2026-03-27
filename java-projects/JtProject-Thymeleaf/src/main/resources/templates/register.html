@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('用户注册')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('用户注册', '这个页面适合学习 Thymeleaf 在表单页面中的基础用法。', 'Form Binding')"></section>
+    <nav th:replace="fragments/layout :: userNav('register')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+
+    <section class="panel">
+      <form th:action="@{/newuserregister}" method="post" class="grid two">
+        <div class="field">
+          <label for="username">用户名</label>
+          <input id="username" name="username" type="text" required>
+        </div>
+        <div class="field">
+          <label for="email">邮箱</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="password" required>
+        </div>
+        <div class="field">
+          <label for="address">地址</label>
+          <input id="address" name="address" type="text">
+        </div>
+        <div class="actions">
+          <button type="submit">提交注册</button>
+          <a class="button secondary" th:href="@{/}">返回登录</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

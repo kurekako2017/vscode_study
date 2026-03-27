@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title} + ' | JtProject-Thymeleaf'">JtProject-Thymeleaf</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+  <div th:fragment="hero(title, subtitle, badge)">
+    <section class="hero">
+      <div>
+        <div class="badge" th:text="${badge}">Spring Boot + Thymeleaf</div>
+        <h1 th:text="${title}">JtProject-Thymeleaf</h1>
+        <p th:text="${subtitle}">服务端模板学习项目</p>
+      </div>
+      <div class="panel">
+        <strong>学习提示</strong>
+        <p class="muted">先看页面里的 `th:text`、`th:if`、`th:each`，再回到 Controller 对照数据来源。</p>
+      </div>
+    </section>
+  </div>
+
+  <nav th:fragment="userNav(active)" class="topnav">
+    <a th:href="@{/}" th:classappend="${active == 'login'} ? ' active'">用户登录</a>
+    <a th:href="@{/register}" th:classappend="${active == 'register'} ? ' active'">用户注册</a>
+    <a th:href="@{/index}" th:classappend="${active == 'index'} ? ' active'">首页</a>
+    <a th:href="@{/user/products}" th:classappend="${active == 'products'} ? ' active'">商品列表</a>
+    <a th:href="@{/user/cart}" th:classappend="${active == 'cart'} ? ' active'">购物车</a>
+    <a th:href="@{/admin/login}" th:classappend="${active == 'admin-login'} ? ' active'">管理员登录</a>
+  </nav>
+
+  <nav th:fragment="adminNav(active)" class="topnav">
+    <a th:href="@{/admin/Dashboard}" th:classappend="${active == 'dashboard'} ? ' active'">后台首页</a>
+    <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? ' active'">商品管理</a>
+    <a th:href="@{/admin/categories}" th:classappend="${active == 'categories'} ? ' active'">分类管理</a>
+    <a th:href="@{/admin/customers}" th:classappend="${active == 'customers'} ? ' active'">客户列表</a>
+    <a th:href="@{/admin/profileDisplay}" th:classappend="${active == 'profile'} ? ' active'">资料维护</a>
+    <a th:href="@{/admin/logout}">退出</a>
+  </nav>
+
+  <div th:fragment="message(text, kind)" th:if="${text != null and !#strings.isEmpty(text)}"
+       class="notice" th:classappend="${kind == 'error'} ? ' error' : ' success'">
+    <span th:text="${text}">消息</span>
+  </div>
+</body>
+</html>

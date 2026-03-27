@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('商品列表')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('商品列表', '这个页面最适合学习 `th:each`。页面里的 products 来自 ProductService -> ProductDao -> Hibernate。', 'th:each')"></section>
+    <nav th:replace="fragments/layout :: userNav('products')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+    <div th:replace="fragments/layout :: message(${session.cartMsg}, 'success')"></div>
+
+    <section class="grid three">
+      <article class="card" th:each="product : ${products}">
+        <h3 th:text="${product.name}">商品名称</h3>
+        <p class="price" th:text="'¥ ' + ${product.price}">¥ 0</p>
+        <div class="meta">
+          <span th:text="'库存 ' + ${product.quantity}">库存</span>
+          <span th:text="'重量 ' + ${product.weight} + ' g'">重量</span>
+          <span th:text="${product.category != null ? product.category.name : '未分类'}">分类</span>
+        </div>
+        <p class="muted" th:text="${product.description}">商品描述</p>
+        <form th:action="@{/products/addtocart}" method="post">
+          <input type="hidden" name="id" th:value="${product.id}">
+          <button type="submit">加入购物车</button>
+        </form>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

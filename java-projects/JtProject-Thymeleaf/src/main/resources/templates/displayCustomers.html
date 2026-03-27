@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('客户列表')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('客户列表', '这个页面只有一个重点：看懂 `th:each` 怎么把 List<User> 变成表格。', 'Table Rendering')"></section>
+    <nav th:replace="fragments/layout :: adminNav('customers')"></nav>
+
+    <section class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>邮箱</th>
+            <th>角色</th>
+            <th>地址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="customer : ${customers}">
+            <td th:text="${customer.id}">1</td>
+            <td th:text="${customer.username}">用户名</td>
+            <td th:text="${customer.email}">邮箱</td>
+            <td th:text="${customer.role}">角色</td>
+            <td th:text="${customer.address}">地址</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

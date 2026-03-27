@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('商品管理')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('商品管理', '这里保留了最小可学习的商品 CRUD 页面。', 'Admin Products')"></section>
+    <nav th:replace="fragments/layout :: adminNav('products')"></nav>
+    <div th:replace="fragments/layout :: message(${msg}, 'error')"></div>
+
+    <section class="panel">
+      <div class="actions">
+        <a class="button" th:href="@{/admin/products/add}">新增商品</a>
+      </div>
+    </section>
+
+    <section class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>分类</th>
+            <th>价格</th>
+            <th>库存</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="product : ${products}">
+            <td th:text="${product.id}">1</td>
+            <td th:text="${product.name}">商品</td>
+            <td th:text="${product.category != null ? product.category.name : '未分类'}">分类</td>
+            <td th:text="${product.price}">0</td>
+            <td th:text="${product.quantity}">0</td>
+            <td class="actions">
+              <a class="button secondary" th:href="@{/admin/products/update/{id}(id=${product.id})}">编辑</a>
+              <a class="button secondary" th:href="@{/admin/products/delete(id=${product.id})}">删除</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

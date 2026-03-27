@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('新增商品')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('新增商品', '这个页面适合学习下拉框、表单提交和 `th:each` 生成选项。', 'Form + Select')"></section>
+    <nav th:replace="fragments/layout :: adminNav('products')"></nav>
+
+    <section class="panel">
+      <form th:action="@{/admin/products/add}" method="post" class="grid two">
+        <div class="field">
+          <label for="name">商品名称</label>
+          <input id="name" name="name" type="text" required>
+        </div>
+        <div class="field">
+          <label for="categoryid">所属分类</label>
+          <select id="categoryid" name="categoryid" required>
+            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">分类</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="price">价格</label>
+          <input id="price" name="price" type="number" min="0" required>
+        </div>
+        <div class="field">
+          <label for="weight">重量</label>
+          <input id="weight" name="weight" type="number" min="0" required>
+        </div>
+        <div class="field">
+          <label for="quantity">库存</label>
+          <input id="quantity" name="quantity" type="number" min="0" required>
+        </div>
+        <div class="field">
+          <label for="productImage">图片地址</label>
+          <input id="productImage" name="productImage" type="text" placeholder="可为空">
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="description">描述</label>
+          <textarea id="description" name="description"></textarea>
+        </div>
+        <div class="actions">
+          <button type="submit">保存商品</button>
+          <a class="button secondary" th:href="@{/admin/products}">返回列表</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('分类管理')"></head>
+<body>
+  <main class="shell">
+    <section th:replace="fragments/layout :: hero('分类管理', '这个页面用来学习最基础的后台 CRUD 模板写法。', 'CRUD Demo')"></section>
+    <nav th:replace="fragments/layout :: adminNav('categories')"></nav>
+
+    <section class="panel stack">
+      <h2>新增分类</h2>
+      <form th:action="@{/admin/categories}" method="post" class="inline-form">
+        <input name="categoryname" type="text" placeholder="输入新分类名称" required>
+        <button type="submit">添加</button>
+      </form>
+    </section>
+
+    <section class="panel table-wrap">
+      <h2>分类列表</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>分类名</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="category : ${categories}">
+            <td th:text="${category.id}">1</td>
+            <td th:text="${category.name}">分类名</td>
+            <td class="actions">
+              <a class="button secondary" th:href="@{/admin/categories/delete(id=${category.id})}">删除</a>
+              <a class="button secondary"
+                 th:href="@{/admin/categories/update(categoryid=${category.id}, categoryname=${category.name + '-Updated'})}">
+                 快速更新
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
