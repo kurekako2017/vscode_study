@@ -38,19 +38,19 @@ Browser
 
 | 功能 | JSP 页面 | Thymeleaf 页面 | 学习重点 |
 |---|---|---|---|
-| 用户登录 | [userLogin.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/userLogin.jsp) | [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html) | 表单提交、消息显示、链接 |
-| 用户注册 | [register.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/register.jsp) | [register.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/register.html) | 表单字段、提交流程 |
-| 首页 | [index.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/index.jsp) | [index.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/index.html) | 模型数据显示 |
-| 商品列表 | [uproduct.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/uproduct.jsp) | [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html) | 列表循环、按钮操作 |
-| 购物车 | [cart.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/cart.jsp) | [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html) | 表格渲染、条件提示 |
-| 管理员登录 | [adminlogin.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/adminlogin.jsp) | [adminlogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/adminlogin.html) | 后台登录表单 |
-| 后台首页 | [adminHome.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/adminHome.jsp) | [adminHome.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/adminHome.html) | 导航和后台入口 |
-| 分类管理 | [categories.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/categories.jsp) | [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html) | CRUD 页面表达 |
-| 商品管理 | [products.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/products.jsp) | [products.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/products.html) | 表格、操作链接 |
-| 商品新增 | [productsAdd.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/productsAdd.jsp) | [productsAdd.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsAdd.html) | 表单、下拉框 |
-| 商品编辑 | [productsUpdate.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/productsUpdate.jsp) | [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html) | 回填值、选中状态 |
-| 客户列表 | [displayCustomers.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/displayCustomers.jsp) | [displayCustomers.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/displayCustomers.html) | 表格循环 |
-| 资料维护 | [updateProfile.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/updateProfile.jsp) | [updateProfile.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/updateProfile.html) | 表单回填 |
+| 用户登录 | [userLogin.jsp](../../../JtProject/src/main/webapp/views/userLogin.jsp) | [userLogin.html](../../src/main/resources/templates/userLogin.html) | 表单提交、消息显示、链接 |
+| 用户注册 | [register.jsp](../../../JtProject/src/main/webapp/views/register.jsp) | [register.html](../../src/main/resources/templates/register.html) | 表单字段、提交流程 |
+| 首页 | [index.jsp](../../../JtProject/src/main/webapp/views/index.jsp) | [index.html](../../src/main/resources/templates/index.html) | 模型数据显示 |
+| 商品列表 | [uproduct.jsp](../../../JtProject/src/main/webapp/views/uproduct.jsp) | [uproduct.html](../../src/main/resources/templates/uproduct.html) | 列表循环、按钮操作 |
+| 购物车 | [cart.jsp](../../../JtProject/src/main/webapp/views/cart.jsp) | [cart.html](../../src/main/resources/templates/cart.html) | 表格渲染、条件提示 |
+| 管理员登录 | [adminlogin.jsp](../../../JtProject/src/main/webapp/views/adminlogin.jsp) | [adminlogin.html](../../src/main/resources/templates/adminlogin.html) | 后台登录表单 |
+| 后台首页 | [adminHome.jsp](../../../JtProject/src/main/webapp/views/adminHome.jsp) | [adminHome.html](../../src/main/resources/templates/adminHome.html) | 导航和后台入口 |
+| 分类管理 | [categories.jsp](../../../JtProject/src/main/webapp/views/categories.jsp) | [categories.html](../../src/main/resources/templates/categories.html) | CRUD 页面表达 |
+| 商品管理 | [products.jsp](../../../JtProject/src/main/webapp/views/products.jsp) | [products.html](../../src/main/resources/templates/products.html) | 表格、操作链接 |
+| 商品新增 | [productsAdd.jsp](../../../JtProject/src/main/webapp/views/productsAdd.jsp) | [productsAdd.html](../../src/main/resources/templates/productsAdd.html) | 表单、下拉框 |
+| 商品编辑 | [productsUpdate.jsp](../../../JtProject/src/main/webapp/views/productsUpdate.jsp) | [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html) | 回填值、选中状态 |
+| 客户列表 | [displayCustomers.jsp](../../../JtProject/src/main/webapp/views/displayCustomers.jsp) | [displayCustomers.html](../../src/main/resources/templates/displayCustomers.html) | 表格循环 |
+| 资料维护 | [updateProfile.jsp](../../../JtProject/src/main/webapp/views/updateProfile.jsp) | [updateProfile.html](../../src/main/resources/templates/updateProfile.html) | 表单回填 |
 
 ---
 
@@ -58,11 +58,11 @@ Browser
 
 ### JSP
 
-- [userLogin.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/userLogin.jsp)
+- [userLogin.jsp](../../../JtProject/src/main/webapp/views/userLogin.jsp)
 
 ### Thymeleaf
 
-- [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
+- [userLogin.html](../../src/main/resources/templates/userLogin.html)
 
 ### 共同点
 
@@ -72,7 +72,7 @@ Browser
 
 对应控制器：
 
-- [UserController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
+- [UserController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
 
 ### 主要差别
 
@@ -97,11 +97,11 @@ Browser
 
 ### JSP
 
-- [uproduct.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/uproduct.jsp)
+- [uproduct.jsp](../../../JtProject/src/main/webapp/views/uproduct.jsp)
 
 ### Thymeleaf
 
-- [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
+- [uproduct.html](../../src/main/resources/templates/uproduct.html)
 
 ### 共同点
 
@@ -111,9 +111,9 @@ Browser
 
 对应后端：
 
-- [UserController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
-- [ProductServiceImpl.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/services/impl/ProductServiceImpl.java)
-- [ProductDaoImpl.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/dao/impl/ProductDaoImpl.java)
+- [UserController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
+- [ProductServiceImpl.java](../../src/main/java/com/jtspringproject/JtSpringProject/services/impl/ProductServiceImpl.java)
+- [ProductDaoImpl.java](../../src/main/java/com/jtspringproject/JtSpringProject/dao/impl/ProductDaoImpl.java)
 
 ### 主要差别
 
@@ -156,11 +156,11 @@ Thymeleaf:
 
 ### JSP
 
-- [cart.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/cart.jsp)
+- [cart.jsp](../../../JtProject/src/main/webapp/views/cart.jsp)
 
 ### Thymeleaf
 
-- [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html)
+- [cart.html](../../src/main/resources/templates/cart.html)
 
 ### 共同点
 
@@ -190,11 +190,11 @@ Thymeleaf:
 
 ### JSP
 
-- [adminHome.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/adminHome.jsp)
+- [adminHome.jsp](../../../JtProject/src/main/webapp/views/adminHome.jsp)
 
 ### Thymeleaf
 
-- [adminHome.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/adminHome.html)
+- [adminHome.html](../../src/main/resources/templates/adminHome.html)
 
 ### 共同点
 
@@ -223,11 +223,11 @@ Thymeleaf:
 
 ### JSP
 
-- [categories.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/categories.jsp)
+- [categories.jsp](../../../JtProject/src/main/webapp/views/categories.jsp)
 
 ### Thymeleaf
 
-- [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)
+- [categories.html](../../src/main/resources/templates/categories.html)
 
 ### 共同点
 
@@ -237,7 +237,7 @@ Thymeleaf:
 
 对应控制器：
 
-- [AdminController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
+- [AdminController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
 
 ### 主要差别
 
@@ -263,24 +263,24 @@ Thymeleaf:
 如果只想用最短时间看出区别，按这个顺序：
 
 1. 登录页  
-   [userLogin.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/userLogin.jsp)  
-   [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
+   [userLogin.jsp](../../../JtProject/src/main/webapp/views/userLogin.jsp)  
+   [userLogin.html](../../src/main/resources/templates/userLogin.html)
 
 2. 商品列表页  
-   [uproduct.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/uproduct.jsp)  
-   [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
+   [uproduct.jsp](../../../JtProject/src/main/webapp/views/uproduct.jsp)  
+   [uproduct.html](../../src/main/resources/templates/uproduct.html)
 
 3. 购物车页  
-   [cart.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/cart.jsp)  
-   [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html)
+   [cart.jsp](../../../JtProject/src/main/webapp/views/cart.jsp)  
+   [cart.html](../../src/main/resources/templates/cart.html)
 
 4. 分类管理页  
-   [categories.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/categories.jsp)  
-   [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)
+   [categories.jsp](../../../JtProject/src/main/webapp/views/categories.jsp)  
+   [categories.html](../../src/main/resources/templates/categories.html)
 
 5. 后台首页  
-   [adminHome.jsp](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/webapp/views/adminHome.jsp)  
-   [adminHome.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/adminHome.html)
+   [adminHome.jsp](../../../JtProject/src/main/webapp/views/adminHome.jsp)  
+   [adminHome.html](../../src/main/resources/templates/adminHome.html)
 
 ---
 

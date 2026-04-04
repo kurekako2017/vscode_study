@@ -18,7 +18,7 @@ Vue 前端现在已经拆成这几层：
 
 当前文件：
 
-- [AppLayout.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/layouts/AppLayout.vue)
+- [AppLayout.vue](../frontend/src/layouts/AppLayout.vue)
 
 ### `views`
 
@@ -26,11 +26,11 @@ Vue 前端现在已经拆成这几层：
 
 当前文件：
 
-- [UserLoginView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/UserLoginView.vue)
-- [ProductsView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/ProductsView.vue)
-- [CartView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/CartView.vue)
-- [AdminLoginView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/AdminLoginView.vue)
-- [AdminDashboardView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/AdminDashboardView.vue)
+- [UserLoginView.vue](../frontend/src/views/UserLoginView.vue)
+- [ProductsView.vue](../frontend/src/views/ProductsView.vue)
+- [CartView.vue](../frontend/src/views/CartView.vue)
+- [AdminLoginView.vue](../frontend/src/views/AdminLoginView.vue)
+- [AdminDashboardView.vue](../frontend/src/views/AdminDashboardView.vue)
 
 这一层负责：
 
@@ -58,7 +58,7 @@ Vue 前端现在已经拆成这几层：
 
 当前文件：
 
-- [useAppStore.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/composables/useAppStore.ts)
+- [useAppStore.ts](../frontend/src/composables/useAppStore.ts)
 
 它负责：
 
@@ -72,7 +72,7 @@ Vue 前端现在已经拆成这几层：
 
 当前文件：
 
-- [appService.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/services/appService.ts)
+- [appService.ts](../frontend/src/services/appService.ts)
 
 它负责：
 

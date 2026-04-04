@@ -161,7 +161,7 @@ flowchart LR
 
 ### 5.3 Excel での確認方法
 
-- CSV 版は [72_CRUD一覧.csv](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/72_CRUD%E4%B8%80%E8%A6%A7.csv) を参照
+- CSV 版は [72_CRUD一覧.csv](../../../../JtProject/doc/jp-docs/03_database/72_CRUD一覧.csv) を参照
 - Excel で開いて `功能分类`、`Controller`、`Service`、`画面名/JSP`、`C`、`R`、`U`、`D` 列をフィルタすれば、`Update = 1 の機能のみ`、`商品関連のみ` のように絞り込み可能
 
 ## 6. 実装フロー例
@@ -211,7 +211,7 @@ flowchart LR
 
 ## 8. 関連資料
 
-- [12_データベース一覧表.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/12_%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E4%B8%80%E8%A6%A7%E8%A1%A8.md)
-- [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md)
-- [17_URL一覧.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/17_URL%E4%B8%80%E8%A6%A7.md)
-- [53_インターフェース一覧.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/53_%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E4%B8%80%E8%A6%A7.md)
+- [12_データベース一覧表.md](../../../../JtProject/doc/jp-docs/03_database/12_データベース一覧表.md)
+- [16_テーブル定義書.md](../../../../JtProject/doc/jp-docs/03_database/16_テーブル定義書.md)
+- [17_URL一覧.md](../../../../JtProject/doc/jp-docs/03_database/17_URL一覧.md)
+- [53_インターフェース一覧.md](../../../../JtProject/doc/jp-docs/03_database/53_インターフェース一覧.md)

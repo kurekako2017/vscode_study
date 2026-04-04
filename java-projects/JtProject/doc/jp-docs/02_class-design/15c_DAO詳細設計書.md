@@ -17,28 +17,28 @@
 
 ## 2.1 クラス別文書
 
-- [15c-01_UserDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-01_UserDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c-02_ProductDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-02_ProductDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c-03_CategoryDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-03_CategoryDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c-04_CartDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-04_CartDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c-05_CartProductDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-05_CartProductDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [15c-01_UserDao詳細設計書.md](15c-01_UserDao詳細設計書.md)
+- [15c-02_ProductDao詳細設計書.md](15c-02_ProductDao詳細設計書.md)
+- [15c-03_CategoryDao詳細設計書.md](15c-03_CategoryDao詳細設計書.md)
+- [15c-04_CartDao詳細設計書.md](15c-04_CartDao詳細設計書.md)
+- [15c-05_CartProductDao詳細設計書.md](15c-05_CartProductDao詳細設計書.md)
 
 ## 2.2 クラス単位文書の読書順
 
 推奨順:
 
-1. [15c-01_UserDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-01_UserDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-2. [15c-02_ProductDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-02_ProductDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-3. [15c-03_CategoryDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-03_CategoryDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-4. [15c-04_CartDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-04_CartDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-5. [15c-05_CartProductDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-05_CartProductDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+1. [15c-01_UserDao詳細設計書.md](15c-01_UserDao詳細設計書.md)
+2. [15c-02_ProductDao詳細設計書.md](15c-02_ProductDao詳細設計書.md)
+3. [15c-03_CategoryDao詳細設計書.md](15c-03_CategoryDao詳細設計書.md)
+4. [15c-04_CartDao詳細設計書.md](15c-04_CartDao詳細設計書.md)
+5. [15c-05_CartProductDao詳細設計書.md](15c-05_CartProductDao詳細設計書.md)
 
 読書観点:
 
 - `UserDao` で基本的な Hibernate アクセスと認証系取得方針を把握する。
 - 次に商品、カテゴリの CRUD を読み、マスタ系 DB アクセスを理解する。
 - 最後に `Cart`、`CartProduct` を読み、購買系の親子構造と明細取得ロジックを追う。
-- DAO 層を読んだ後は [15d_Model詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15d_Model%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md) と [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md) を参照する。
+- DAO 層を読んだ後は [15d_Model詳細設計書.md](15d_Model詳細設計書.md) と [16_テーブル定義書.md](../03_database/16_テーブル定義書.md) を参照する。
 
 ## 3. UserDao / UserDaoImpl
 
@@ -168,5 +168,5 @@
 - 例外処理方式と戻り値ポリシーにばらつきがある。
 - `UserDao.getUser()` のように `null` ではなく空オブジェクトを返す実装が存在する。
 - HQL / SessionFactory / EntityManager が混在しているため、統一余地がある。
-- 詳細なテーブル構造は [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md) と [27_DDL一覧.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/27_DDL%E4%B8%80%E8%A6%A7.md) を参照する。
+- 詳細なテーブル構造は [16_テーブル定義書.md](../03_database/16_テーブル定義書.md) と [27_DDL一覧.md](../03_database/27_DDL一覧.md) を参照する。
 

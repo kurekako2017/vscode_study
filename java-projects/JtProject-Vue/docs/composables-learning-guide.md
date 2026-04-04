@@ -10,9 +10,9 @@
 
 推荐对照文件：
 
-- [App.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/App.vue)
-- [useAppStore.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/composables/useAppStore.ts)
-- [appService.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/services/appService.ts)
+- [App.vue](../frontend/src/App.vue)
+- [useAppStore.ts](../frontend/src/composables/useAppStore.ts)
+- [appService.ts](../frontend/src/services/appService.ts)
 
 ## 1. `ref`
 
@@ -32,7 +32,7 @@ const message = ref('Loading...')
 
 当前项目为了更像一个页面级 store，把多个状态统一组织到了：
 
-- [useAppStore.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/composables/useAppStore.ts)
+- [useAppStore.ts](../frontend/src/composables/useAppStore.ts)
 
 这里的 `store` 就是一个响应式对象。
 
@@ -71,7 +71,7 @@ composable 本质上就是：
 ### 请求层
 
 看：
-[appService.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/services/appService.ts)
+[appService.ts](../frontend/src/services/appService.ts)
 
 这里负责：
 
@@ -83,7 +83,7 @@ composable 本质上就是：
 ### 组合逻辑层
 
 看：
-[useAppStore.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/composables/useAppStore.ts)
+[useAppStore.ts](../frontend/src/composables/useAppStore.ts)
 
 这里负责：
 
@@ -97,8 +97,8 @@ composable 本质上就是：
 
 看：
 
-- [ProductsView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/ProductsView.vue)
-- [CartView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/CartView.vue)
+- [ProductsView.vue](../frontend/src/views/ProductsView.vue)
+- [CartView.vue](../frontend/src/views/CartView.vue)
 
 页面会更干净，因为逻辑已经抽到 composable。
 
@@ -106,13 +106,13 @@ composable 本质上就是：
 
 这次我额外做了一次组件拆分：
 
-- 新增了 [PageHeader.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/components/PageHeader.vue)
+- 新增了 [PageHeader.vue](../frontend/src/components/PageHeader.vue)
 
 它被这些页面复用：
 
-- [ProductsView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/ProductsView.vue)
-- [CartView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/CartView.vue)
-- [AdminDashboardView.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/views/AdminDashboardView.vue)
+- [ProductsView.vue](../frontend/src/views/ProductsView.vue)
+- [CartView.vue](../frontend/src/views/CartView.vue)
+- [AdminDashboardView.vue](../frontend/src/views/AdminDashboardView.vue)
 
 这就是 Vue 学习里非常重要的一步：
 

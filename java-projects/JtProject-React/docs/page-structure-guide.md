@@ -18,7 +18,7 @@ React 前端现在已经拆成这几层：
 
 当前文件：
 
-- [AppLayout.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/layouts/AppLayout.tsx)
+- [AppLayout.tsx](../frontend/src/layouts/AppLayout.tsx)
 
 你可以理解成：
 
@@ -32,11 +32,11 @@ React 前端现在已经拆成这几层：
 
 当前文件：
 
-- [UserLoginView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/UserLoginView.tsx)
-- [ProductsView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/ProductsView.tsx)
-- [CartView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/CartView.tsx)
-- [AdminLoginView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/AdminLoginView.tsx)
-- [AdminDashboardView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/AdminDashboardView.tsx)
+- [UserLoginView.tsx](../frontend/src/views/UserLoginView.tsx)
+- [ProductsView.tsx](../frontend/src/views/ProductsView.tsx)
+- [CartView.tsx](../frontend/src/views/CartView.tsx)
+- [AdminLoginView.tsx](../frontend/src/views/AdminLoginView.tsx)
+- [AdminDashboardView.tsx](../frontend/src/views/AdminDashboardView.tsx)
 
 这一层负责：
 
@@ -66,7 +66,7 @@ React 前端现在已经拆成这几层：
 
 当前文件：
 
-- [useAppState.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/hooks/useAppState.ts)
+- [useAppState.ts](../frontend/src/hooks/useAppState.ts)
 
 它负责：
 
@@ -81,7 +81,7 @@ React 前端现在已经拆成这几层：
 
 当前文件：
 
-- [appService.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/services/appService.ts)
+- [appService.ts](../frontend/src/services/appService.ts)
 
 它负责：
 

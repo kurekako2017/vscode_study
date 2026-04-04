@@ -17,7 +17,7 @@
 ### 第一步：看入口
 
 先看：
-[main.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/main.ts)
+[main.ts](../frontend/src/main.ts)
 
 你要理解：
 
@@ -26,7 +26,7 @@
 ### 第二步：看主组件
 
 再看：
-[App.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/App.vue)
+[App.vue](../frontend/src/App.vue)
 
 重点按顺序看：
 

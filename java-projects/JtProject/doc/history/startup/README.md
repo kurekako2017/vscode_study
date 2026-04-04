@@ -5,7 +5,7 @@
 使用建议：
 
 - 不要把这里的文档当作当前主入口
-- 当前应优先查看 [01_启动历史总结.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/01_%E5%90%AF%E5%8A%A8%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%93.md)
+- 当前应优先查看 [01_启动历史总结.md](../01_启动历史总结.md)
 - 只有在需要回溯历史上下文时，再查看这里的单篇文档
 
 本目录当前仅保留少量代表性记录：

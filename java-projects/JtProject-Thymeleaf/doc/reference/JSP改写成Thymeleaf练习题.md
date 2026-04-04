@@ -250,7 +250,7 @@ JSP 里常常会通过脚本或复杂条件让某一项选中。
 ### 说明
 
 - 这个练习很适合对照
-  [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html)
+  [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html)
 
 ---
 
@@ -323,7 +323,7 @@ JSP 里常常会通过脚本或复杂条件让某一项选中。
 - JSP 常用 include
 - Thymeleaf 常用 `th:replace`
 - 对照文件：
-  [layout.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/fragments/layout.html)
+  [layout.html](../../src/main/resources/templates/fragments/layout.html)
 
 ---
 
@@ -394,15 +394,15 @@ JSP 里常常会通过脚本或复杂条件让某一项选中。
 做完这些练习后，建议你直接去项目里找真实代码：
 
 - 登录页：
-  [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
+  [userLogin.html](../../src/main/resources/templates/userLogin.html)
 - 商品列表：
-  [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
+  [uproduct.html](../../src/main/resources/templates/uproduct.html)
 - 购物车：
-  [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html)
+  [cart.html](../../src/main/resources/templates/cart.html)
 - 分类管理：
-  [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)
+  [categories.html](../../src/main/resources/templates/categories.html)
 - 商品编辑：
-  [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html)
+  [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html)
 
 ---
 

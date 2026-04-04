@@ -124,7 +124,7 @@ flowchart TD
 
 ## 6. 関連資料
 
-- [15a_Controller詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a_Controller%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [17_URL一覧.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/17_URL%E4%B8%80%E8%A6%A7.md)
-- [19_画面遷移図.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/01_design/19_%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3.md)
+- [15a_Controller詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15a_Controller詳細設計書.md)
+- [17_URL一覧.md](../../../../JtProject/doc/jp-docs/03_database/17_URL一覧.md)
+- [19_画面遷移図.md](../../../../JtProject/doc/jp-docs/01_design/19_画面遷移図.md)
 

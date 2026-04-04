@@ -10,9 +10,9 @@
 
 推荐对照文件：
 
-- [App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
-- [useAppState.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/hooks/useAppState.ts)
-- [appService.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/services/appService.ts)
+- [App.tsx](../frontend/src/App.tsx)
+- [useAppState.ts](../frontend/src/hooks/useAppState.ts)
+- [appService.ts](../frontend/src/services/appService.ts)
 
 ## 1. `useState`
 
@@ -45,7 +45,7 @@ const [message, setMessage] = useState('Loading...')
 - 依赖变化后做额外处理
 
 在当前项目里：
-[useAppState.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/hooks/useAppState.ts)
+[useAppState.ts](../frontend/src/hooks/useAppState.ts)
 
 里面最关键的是初始化：
 
@@ -71,7 +71,7 @@ useEffect(() => {
 
 当前项目里我们做的就是：
 
-- [useAppState.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/hooks/useAppState.ts)
+- [useAppState.ts](../frontend/src/hooks/useAppState.ts)
 
 ### 它解决了什么问题
 
@@ -106,15 +106,15 @@ useEffect(() => {
 
 这次我额外做了一次组件拆分：
 
-- 新增了 [PageHeader.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/components/PageHeader.tsx)
+- 新增了 [PageHeader.tsx](../frontend/src/components/PageHeader.tsx)
 
 它把多个页面里重复的页面头部抽成了公共组件。
 
 你可以看到它已经被这些页面复用：
 
-- [ProductsView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/ProductsView.tsx)
-- [CartView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/CartView.tsx)
-- [AdminDashboardView.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/views/AdminDashboardView.tsx)
+- [ProductsView.tsx](../frontend/src/views/ProductsView.tsx)
+- [CartView.tsx](../frontend/src/views/CartView.tsx)
+- [AdminDashboardView.tsx](../frontend/src/views/AdminDashboardView.tsx)
 
 这就是很典型的 React 学习路径：
 

@@ -14,21 +14,21 @@
 
 ## 2.1 クラス別文書
 
-- [15a-01_UserController詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a-01_UserController%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15a-02_AdminController詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a-02_AdminController%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [15a-01_UserController詳細設計書.md](15a-01_UserController詳細設計書.md)
+- [15a-02_AdminController詳細設計書.md](15a-02_AdminController詳細設計書.md)
 
 ## 2.2 クラス単位文書の読書順
 
 推奨順:
 
-1. [15a-01_UserController詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a-01_UserController%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-2. [15a-02_AdminController詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a-02_AdminController%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+1. [15a-01_UserController詳細設計書.md](15a-01_UserController詳細設計書.md)
+2. [15a-02_AdminController詳細設計書.md](15a-02_AdminController詳細設計書.md)
 
 読書観点:
 
 - 先に一般ユーザー導線を確認し、画面遷移とリクエスト処理の基本形を把握する。
 - 次に管理者導線を確認し、商品管理、カテゴリ管理、顧客管理の差分を追う。
-- Controller 層を読んだ後は [15b_Service詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b_Service%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md) へ進む。
+- Controller 層を読んだ後は [15b_Service詳細設計書.md](15b_Service詳細設計書.md) へ進む。
 
 ## 3. UserController
 
@@ -160,5 +160,5 @@
 - 入力値妥当性は現状 Controller と Service に分散している。
 - 画面メッセージは `msg`、`cartMsg` を利用する実装が多い。
 - 権限制御は Session 判定ベースである。
-- 詳細な呼出順序は [20_シーケンス図.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/01_design/20_%E3%82%B7%E3%83%BC%E3%82%B1%E3%83%B3%E3%82%B9%E5%9B%B3.md) を参照する。
+- 詳細な呼出順序は [20_シーケンス図.md](../01_design/20_シーケンス図.md) を参照する。
 

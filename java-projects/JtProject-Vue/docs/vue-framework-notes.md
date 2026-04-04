@@ -19,7 +19,7 @@ Vue 是一个渐进式前端框架。
 Vue 页面也是由组件组成的。
 
 当前项目暂时把主要逻辑集中在：
-[App.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/App.vue)
+[App.vue](../frontend/src/App.vue)
 
 ### 2. Reactive Data
 
@@ -65,10 +65,10 @@ Vue 使用模板描述页面：
 
 ## 这个项目里的学习重点文件
 
-- Vue 入口：[main.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/main.ts)
-- 主组件：[App.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/App.vue)
-- 样式文件：[style.css](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/style.css)
-- API 控制器：[ApiController.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
+- Vue 入口：[main.ts](../frontend/src/main.ts)
+- 主组件：[App.vue](../frontend/src/App.vue)
+- 样式文件：[style.css](../frontend/src/style.css)
+- API 控制器：[ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
 
 ## 下一步推荐重构
 

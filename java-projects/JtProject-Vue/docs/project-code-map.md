@@ -4,15 +4,15 @@
 
 ### 后端
 
-- [ApiController.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
-- [application.properties](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/src/main/resources/application.properties)
-- [WebMvcConfig.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/src/main/java/com/jtspringproject/JtSpringProject/WebMvcConfig.java)
+- [ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
+- [application.properties](../src/main/resources/application.properties)
+- [WebMvcConfig.java](../src/main/java/com/jtspringproject/JtSpringProject/WebMvcConfig.java)
 
 ### 前端
 
-- [main.ts](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/main.ts)
-- [App.vue](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/App.vue)
-- [style.css](/d:/dev/source_code/vscode_study/java-projects/JtProject-Vue/frontend/src/style.css)
+- [main.ts](../frontend/src/main.ts)
+- [App.vue](../frontend/src/App.vue)
+- [style.css](../frontend/src/style.css)
 
 ## 你可以怎么对照学习
 

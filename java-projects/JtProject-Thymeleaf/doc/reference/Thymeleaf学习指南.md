@@ -12,18 +12,18 @@
 
 建议按下面顺序学：
 
-1. 先看 [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)  
+1. 先看 [userLogin.html](../../src/main/resources/templates/userLogin.html)  
    学 `th:action`、`th:href`、`th:if`
-2. 再看 [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)  
+2. 再看 [uproduct.html](../../src/main/resources/templates/uproduct.html)  
    学 `th:each`、`th:text`
-3. 再看 [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html)  
+3. 再看 [cart.html](../../src/main/resources/templates/cart.html)  
    学列表渲染和条件渲染
-4. 再看 [fragments/layout.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/fragments/layout.html)  
+4. 再看 [fragments/layout.html](../../src/main/resources/templates/fragments/layout.html)  
    学 `th:replace`
 5. 最后看后台页面  
-   [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)  
-   [products.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/products.html)  
-   [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html)
+   [categories.html](../../src/main/resources/templates/categories.html)  
+   [products.html](../../src/main/resources/templates/products.html)  
+   [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html)
 
 ---
 
@@ -70,8 +70,8 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [index.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/index.html)
-- [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
+- [index.html](../../src/main/resources/templates/index.html)
+- [uproduct.html](../../src/main/resources/templates/uproduct.html)
 
 例子：
 
@@ -92,8 +92,8 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
-- [cart.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/cart.html)
+- [userLogin.html](../../src/main/resources/templates/userLogin.html)
+- [cart.html](../../src/main/resources/templates/cart.html)
 
 例子：
 
@@ -109,9 +109,9 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
-- [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)
-- [displayCustomers.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/displayCustomers.html)
+- [uproduct.html](../../src/main/resources/templates/uproduct.html)
+- [categories.html](../../src/main/resources/templates/categories.html)
+- [displayCustomers.html](../../src/main/resources/templates/displayCustomers.html)
 
 例子：
 
@@ -133,7 +133,7 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [fragments/layout.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/fragments/layout.html)
+- [fragments/layout.html](../../src/main/resources/templates/fragments/layout.html)
 
 例子：
 
@@ -149,8 +149,8 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
-- [register.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/register.html)
+- [userLogin.html](../../src/main/resources/templates/userLogin.html)
+- [register.html](../../src/main/resources/templates/register.html)
 
 例子：
 
@@ -166,8 +166,8 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html)
-- [updateProfile.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/updateProfile.html)
+- [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html)
+- [updateProfile.html](../../src/main/resources/templates/updateProfile.html)
 
 ---
 
@@ -177,7 +177,7 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [productsUpdate.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/productsUpdate.html)
+- [productsUpdate.html](../../src/main/resources/templates/productsUpdate.html)
 
 ---
 
@@ -187,7 +187,7 @@ Thymeleaf 不是前后端分离框架。
 
 示例位置：
 
-- [fragments/layout.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/fragments/layout.html)
+- [fragments/layout.html](../../src/main/resources/templates/fragments/layout.html)
 
 页面调用例子：
 
@@ -205,11 +205,11 @@ Thymeleaf 不是前后端分离框架。
 
 页面：
 
-- [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html)
+- [userLogin.html](../../src/main/resources/templates/userLogin.html)
 
 控制器：
 
-- [UserController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
+- [UserController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
 
 关键链路：
 
@@ -227,11 +227,11 @@ userLogin.html
 
 页面：
 
-- [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html)
+- [uproduct.html](../../src/main/resources/templates/uproduct.html)
 
 控制器：
 
-- [UserController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
+- [UserController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
 
 关键链路：
 
@@ -249,11 +249,11 @@ GET /user/products
 
 页面：
 
-- [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html)
+- [categories.html](../../src/main/resources/templates/categories.html)
 
 控制器：
 
-- [AdminController.java](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
+- [AdminController.java](../../src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
 
 关键链路：
 
@@ -287,10 +287,10 @@ GET /admin/categories
 
 ## 7. 当前这版最适合你练手的改造任务
 
-1. 把 [categories.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/categories.html) 的“快速更新”改成真正的编辑表单
-2. 给 [uproduct.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/uproduct.html) 增加商品详情页链接
-3. 把 [userLogin.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/userLogin.html) 再拆成登录卡片和学习说明卡片两个片段
-4. 给 [adminHome.html](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/src/main/resources/templates/adminHome.html) 再补一个统计模块
+1. 把 [categories.html](../../src/main/resources/templates/categories.html) 的“快速更新”改成真正的编辑表单
+2. 给 [uproduct.html](../../src/main/resources/templates/uproduct.html) 增加商品详情页链接
+3. 把 [userLogin.html](../../src/main/resources/templates/userLogin.html) 再拆成登录卡片和学习说明卡片两个片段
+4. 给 [adminHome.html](../../src/main/resources/templates/adminHome.html) 再补一个统计模块
 
 ---
 

@@ -30,7 +30,7 @@
 .\scripts\start\run.ps1
 ```
 
-詳細は [33_運用手順書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/06_operations/33_%E9%81%8B%E7%94%A8%E6%89%8B%E9%A0%86%E6%9B%B8.md) を参照。
+詳細は [33_運用手順書.md](../../../../JtProject/doc/jp-docs/06_operations/33_運用手順書.md) を参照。
 
 ### Q2. ログインできない場合は何を確認する？
 
@@ -79,7 +79,7 @@
 
 **A.**
 
-- 全体入口は [README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/README.md)
+- 全体入口は [README.md](../../../../JtProject/doc/jp-docs/README.md)
 - 機能は `13_機能設計書.md`
 - 画面は `14_画面一覧.md`
 - クラスは `15_クラス詳細設計書.md` と `15a` から `15d`
@@ -91,14 +91,14 @@
 
 - 単体、結合、総合の試験仕様書は整備済み
 - 実施結果はまだ未入力
-- 結果まとめは [34_試験結果報告書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/04_testing/34_%E8%A9%A6%E9%A8%93%E7%B5%90%E6%9E%9C%E5%A0%B1%E5%91%8A%E6%9B%B8.md) を参照
+- 結果まとめは [34_試験結果報告書.md](../../../../JtProject/doc/jp-docs/04_testing/34_試験結果報告書.md) を参照
 
 ### Q9. 既知課題やリスクはどこにある？
 
 **A.**
 
-- 課題は [31_課題管理表.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/05_management/31_%E8%AA%B2%E9%A1%8C%E7%AE%A1%E7%90%86%E8%A1%A8.md)
-- リスクは [32_リスク一覧.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/05_management/32_%E3%83%AA%E3%82%B9%E3%82%AF%E4%B8%80%E8%A6%A7.md)
+- 課題は [31_課題管理表.md](../../../../JtProject/doc/jp-docs/05_management/31_課題管理表.md)
+- リスクは [32_リスク一覧.md](../../../../JtProject/doc/jp-docs/05_management/32_リスク一覧.md)
 
 ### Q10. リリース時に最低限見るべき文書は？
 

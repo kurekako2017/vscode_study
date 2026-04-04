@@ -4,7 +4,7 @@
 
 使用建议：
 
-- 当前问题排查优先查看 [02_问题修复历史总结.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/02_%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%93.md)
+- 当前问题排查优先查看 [02_问题修复历史总结.md](../../../../JtProject/doc/history/02_问题修复历史总结.md)
 - 只有在需要追踪某次修复细节时，再打开这里的原始文档
 
 本目录当前仅保留少量代表性记录：

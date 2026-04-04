@@ -4,9 +4,9 @@
 
 建议优先阅读以下 3 份主文档：
 
-- [01_启动历史总结.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/01_%E5%90%AF%E5%8A%A8%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%93.md)
-- [02_问题修复历史总结.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/02_%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%93.md)
-- [03_历史归档索引.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/03_%E5%8E%86%E5%8F%B2%E5%BD%92%E6%A1%A3%E7%B4%A2%E5%BC%95.md)
+- [01_启动历史总结.md](../../../JtProject/doc/history/01_启动历史总结.md)
+- [02_问题修复历史总结.md](../../../JtProject/doc/history/02_问题修复历史总结.md)
+- [03_历史归档索引.md](../../../JtProject/doc/history/03_历史归档索引.md)
 
 目录说明：
 

@@ -16,26 +16,26 @@
 
 ## 2.1 クラス別文書
 
-- [15b-01_UserService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-01_UserService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15b-02_ProductService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-02_ProductService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15b-03_CategoryService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-03_CategoryService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15b-04_CartService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-04_CartService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [15b-01_UserService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-01_UserService詳細設計書.md)
+- [15b-02_ProductService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-02_ProductService詳細設計書.md)
+- [15b-03_CategoryService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-03_CategoryService詳細設計書.md)
+- [15b-04_CartService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-04_CartService詳細設計書.md)
 
 ## 2.2 クラス単位文書の読書順
 
 推奨順:
 
-1. [15b-01_UserService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-01_UserService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-2. [15b-02_ProductService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-02_ProductService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-3. [15b-03_CategoryService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-03_CategoryService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-4. [15b-04_CartService詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b-04_CartService%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+1. [15b-01_UserService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-01_UserService詳細設計書.md)
+2. [15b-02_ProductService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-02_ProductService詳細設計書.md)
+3. [15b-03_CategoryService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-03_CategoryService詳細設計書.md)
+4. [15b-04_CartService詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15b-04_CartService詳細設計書.md)
 
 読書観点:
 
 - 先に認証と利用者判定を持つ `UserService` を読む。
 - 次に商品、カテゴリの主業務を読み、一覧取得と更新系の流れを把握する。
 - 最後にカート系を読み、購買導線における周辺処理を理解する。
-- Service 層を読んだ後は [15c_DAO詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c_DAO%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md) へ進む。
+- Service 層を読んだ後は [15c_DAO詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15c_DAO詳細設計書.md) へ進む。
 
 ## 3. UserService / UserServiceImpl
 
@@ -143,6 +143,6 @@
 
 関連資料:
 
-- [13_機能設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/01_design/13_%E6%A9%9F%E8%83%BD%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c_DAO詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c_DAO%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [13_機能設計書.md](../../../../JtProject/doc/jp-docs/01_design/13_機能設計書.md)
+- [15c_DAO詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15c_DAO詳細設計書.md)
 

@@ -1,14 +1,20 @@
-# JtSpringProject 学习与启动入口
+# JtProject 学习与启动入口
+
+相关入口：
+
+- 项目总导航：[Java项目总启动导航.md](../Java项目总启动导航.md)
+- Java 项目根入口：[README.md](../README.md)
+- 项目文档总索引：[doc/README.md](./doc/README.md)
 
 这个项目的 Markdown 文档已经按用途整理到 `doc/` 下。
 
-建议阅读顺序：
+建议先看：
 
 1. 本文件
-2. [doc/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/README.md)
+2. [doc/README.md](./doc/README.md)
 3. 再按启动、参考、测试或日式项目文档继续深入
 
-## 1) 快速启动（Windows / PowerShell）
+## 快速启动（Windows / PowerShell）
 
 ```powershell
 cd d:\dev\source_code\vscode_study\java-projects\JtProject
@@ -28,7 +34,7 @@ cd d:\dev\source_code\vscode_study\java-projects\JtProject
 
 默认端口是 `8082`（见 `src/main/resources/application.properties`）。
 
-## 2) 账号与验证
+## 账号与验证
 
 - 管理员：`admin / 123`
 - 普通用户：`lisa / 765`
@@ -39,24 +45,24 @@ cd d:\dev\source_code\vscode_study\java-projects\JtProject
 2. 管理员登录
 3. 打开商品管理页，测试新增/更新/删除
 
-## 3) 学习路线（按顺序）
+## 学习文档
 
-1. [手动启动项目完整指南.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/手动启动项目完整指南.md)
-2. [启动到登录页面的完整流程.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/启动到登录页面的完整流程.md)
-3. [CONTROLLER_注释说明.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/CONTROLLER_注释说明.md)
-4. [REFACTORING_GUIDE.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/REFACTORING_GUIDE.md)
-5. [TESTING_GUIDE.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/guides/TESTING_GUIDE.md)
+1. [手动启动项目完整指南.md](./doc/guides/手动启动项目完整指南.md)
+2. [启动到登录页面的完整流程.md](./doc/reference/启动到登录页面的完整流程.md)
+3. [CONTROLLER_注释说明.md](./doc/reference/CONTROLLER_注释说明.md)
+4. [REFACTORING_GUIDE.md](./doc/guides/REFACTORING_GUIDE.md)
+5. [TESTING_GUIDE.md](./doc/guides/TESTING_GUIDE.md)
 
 历史性的启动成功、问题修复、临时记录文档已统一归档到 `doc/history/`。
 
-## 3.1) 脚本入口
+## 脚本入口
 
 - PowerShell: `.\scripts\start\run.ps1`
 - CMD: `scripts\start\run.cmd`
 - Linux / macOS: `./scripts/start/start.sh`
-- 脚本导航: [scripts/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/scripts/README.md)
+- 脚本导航: [scripts/README.md](./scripts/README.md)
 
-## 4) 文档索引（按用途）
+## 文档索引
 
 | 用途 | 推荐文档 | 说明 |
 | --- | --- | --- |
@@ -71,7 +77,7 @@ cd d:\dev\source_code\vscode_study\java-projects\JtProject
 | 日式项目文档 | `doc/jp-docs/README.md` | 設計書、テスト仕様書、障害票等 |
 | 历史归档 | `doc/history/` | 旧启动记录、修复记录、临时笔记 |
 
-## 5) 环境切换（可选）
+## 环境切换
 
 默认命令使用当前配置（`application.properties`）。如需切 profile：
 
@@ -89,9 +95,9 @@ Linux / macOS 对应命令：
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=remote
 ```
 
-数据库配置详见：[ENV_CONFIG.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/reference/ENV_CONFIG.md)
+数据库配置详见：[ENV_CONFIG.md](./doc/reference/ENV_CONFIG.md)
 
-## 6) Batch 运行目录说明
+## Batch 运行目录说明
 
 项目里现在已经补了一套学习用模擬 batch，因此运行后会出现几类 batch 相关目录：
 
@@ -101,7 +107,7 @@ Linux / macOS 对应命令：
 | `batch-output/` | batch 结果输出目录 | 例如库存整合检查 CSV 会输出到这里 |
 | `logs/batch/` | batch 日志目录 | batch 运行日志会输出到这里 |
 
-当前 `batch` profile 的数据库配置在 [application-batch.properties](D:/dev/source_code/vscode_study/java-projects/JtProject/src/main/resources/application-batch.properties)，其中：
+当前 `batch` profile 的数据库配置在 [application-batch.properties](./src/main/resources/application-batch.properties)，其中：
 
 - `spring.datasource.url=jdbc:h2:file:./batch-work/jtproject-batch...`
 - `logging.file.name=logs/batch/product-inventory-check.log`
@@ -113,4 +119,11 @@ Linux / macOS 对应命令：
 - `batch-output` 负责存放 batch 业务输出结果
 - `logs/batch` 负责存放 batch 运行日志
 
-如果你看到 [batch-work](D:/dev/source_code/vscode_study/java-projects/JtProject/batch-work) 目录里的 `.mv.db`、`.trace.db` 文件，它们不是源码，而是 batch 执行时生成的本地数据库文件。
+如果你看到 [batch-work](./batch-work) 目录里的 `.mv.db`、`.trace.db` 文件，它们不是源码，而是 batch 执行时生成的本地数据库文件。
+
+## 使用建议
+
+- 想先把项目跑起来：先看 [手动启动项目完整指南.md](./doc/guides/手动启动项目完整指南.md)
+- 想理解 JSP 页面怎么进入 Controller：先看 [启动到登录页面的完整流程.md](./doc/reference/启动到登录页面的完整流程.md)
+- 想理解整体结构：先看 [项目框架与调用流程完整总结.md](./doc/reference/项目框架与调用流程完整总结.md)
+- 想查设计书和测试资料：进入 [doc/jp-docs/README.md](./doc/jp-docs/README.md)

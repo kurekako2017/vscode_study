@@ -20,7 +20,7 @@ React 是一个组件驱动的前端库。
 React 的页面由组件组成。
 
 当前项目暂时把逻辑都放在：
-[App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
+[App.tsx](../frontend/src/App.tsx)
 
 后面你可以继续拆分。
 
@@ -69,10 +69,10 @@ JSX 是“在 JavaScript 里写 UI”。
 
 ## 这个项目里的学习重点文件
 
-- React 入口：[main.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/main.tsx)
-- 页面逻辑：[App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
-- 样式文件：[styles.css](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/styles.css)
-- API 控制器：[ApiController.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
+- React 入口：[main.tsx](../frontend/src/main.tsx)
+- 页面逻辑：[App.tsx](../frontend/src/App.tsx)
+- 样式文件：[styles.css](../frontend/src/styles.css)
+- API 控制器：[ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
 
 ## 下一步推荐重构
 

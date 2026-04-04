@@ -1,4 +1,12 @@
-# JtProject-Thymeleaf
+# JtProject-Thymeleaf 学习与启动入口
+
+相关入口：
+
+- 项目总导航：[Java项目总启动导航.md](../Java项目总启动导航.md)
+- Java 项目根入口：[README.md](../README.md)
+- 项目文档总入口：[doc/README.md](./doc/README.md)
+
+## 项目说明
 
 这个目录是从原始 `JtProject` 复制出来的独立学习项目，改造成了：
 
@@ -13,7 +21,9 @@
 - Thymeleaf 怎么写
 - React / Vue 又怎么写
 
-## 启动后端
+## 快速启动（Windows / PowerShell）
+
+启动后端：
 
 ```powershell
 cd d:\dev\source_code\vscode_study\java-projects\JtProject-Thymeleaf
@@ -32,7 +42,20 @@ H2 控制台：
 http://localhost:8085/h2-console
 ```
 
-## 当前可学习页面
+## 账号与验证
+
+默认账号：
+
+- 普通用户：`lisa / 765`
+- 管理员：`admin / 123`
+
+验证建议：
+
+1. 先访问 `/`
+2. 测试用户登录和管理员登录
+3. 再进入商品、分类、购物车等页面观察模板渲染
+
+## 页面入口
 
 - 用户登录：`/`
 - 用户注册：`/register`
@@ -46,12 +69,7 @@ http://localhost:8085/h2-console
 - 客户列表：`/admin/customers`
 - 资料维护：`/admin/profileDisplay`
 
-## 默认账号
-
-- 普通用户：`lisa / 765`
-- 管理员：`admin / 123`
-
-## 这版项目重点学习什么
+## 学习重点
 
 - `th:text`
 - `th:if`
@@ -64,13 +82,13 @@ http://localhost:8085/h2-console
 
 ## 学习文档
 
-- 文档总入口：[doc/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/doc/README.md)
-- Thymeleaf 学习指南：[doc/reference/Thymeleaf学习指南.md](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/doc/reference/Thymeleaf学习指南.md)
-- 数据访问层与调用链：[doc/reference/数据访问层与调用链学习文档.md](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/doc/reference/数据访问层与调用链学习文档.md)
-- JSP/Thymeleaf 对照文档：[doc/reference/JSP页面 vs Thymeleaf页面逐页对照.md](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/doc/reference/JSP%E9%A1%B5%E9%9D%A2%20vs%20Thymeleaf%E9%A1%B5%E9%9D%A2%E9%80%90%E9%A1%B5%E5%AF%B9%E7%85%A7.md)
-- 改写练习题：[doc/reference/JSP改写成Thymeleaf练习题.md](D:/dev/source_code/vscode_study/java-projects/JtProject-Thymeleaf/doc/reference/JSP%E6%94%B9%E5%86%99%E6%88%90Thymeleaf%E7%BB%83%E4%B9%A0%E9%A2%98.md)
+- 文档总入口：[doc/README.md](./doc/README.md)
+- Thymeleaf 学习指南：[doc/reference/Thymeleaf学习指南.md](./doc/reference/Thymeleaf学习指南.md)
+- 数据访问层与调用链：[doc/reference/数据访问层与调用链学习文档.md](./doc/reference/数据访问层与调用链学习文档.md)
+- JSP/Thymeleaf 对照文档：[doc/reference/JSP页面 vs Thymeleaf页面逐页对照.md](./doc/reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)
+- 改写练习题：[doc/reference/JSP改写成Thymeleaf练习题.md](./doc/reference/JSP改写成Thymeleaf练习题.md)
 
-## 推荐学习顺序
+## 使用建议
 
 1. 先运行页面，看模板效果
 2. 再看 `src/main/resources/templates/` 下的 HTML

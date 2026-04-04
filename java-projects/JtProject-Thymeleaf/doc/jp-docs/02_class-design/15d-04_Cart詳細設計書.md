@@ -53,7 +53,7 @@
 
 ## 8. 関連資料
 
-- [15d_Model詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15d_Model%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [11_ER図.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/11_ER%E5%9B%B3.md)
-- [16_テーブル定義書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/03_database/16_%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8.md)
+- [15d_Model詳細設計書.md](../../../../JtProject/doc/jp-docs/02_class-design/15d_Model詳細設計書.md)
+- [11_ER図.md](../../../../JtProject/doc/jp-docs/03_database/11_ER図.md)
+- [16_テーブル定義書.md](../../../../JtProject/doc/jp-docs/03_database/16_テーブル定義書.md)
 

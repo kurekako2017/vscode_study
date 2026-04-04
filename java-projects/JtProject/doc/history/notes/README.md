@@ -6,5 +6,5 @@
 
 当前应优先查看：
 
-- [doc/history/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/README.md)
-- [03_历史归档索引.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/history/03_%E5%8E%86%E5%8F%B2%E5%BD%92%E6%A1%A3%E7%B4%A2%E5%BC%95.md)
+- [doc/history/README.md](../README.md)
+- [03_历史归档索引.md](../03_历史归档索引.md)

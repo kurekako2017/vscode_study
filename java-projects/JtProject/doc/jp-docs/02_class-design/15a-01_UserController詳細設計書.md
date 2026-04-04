@@ -151,7 +151,7 @@ flowchart TD
 
 ## 6. 関連資料
 
-- [15a_Controller詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15a_Controller%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [13_機能設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/01_design/13_%E6%A9%9F%E8%83%BD%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [20_シーケンス図.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/01_design/20_%E3%82%B7%E3%83%BC%E3%82%B1%E3%83%B3%E3%82%B9%E5%9B%B3.md)
+- [15a_Controller詳細設計書.md](15a_Controller詳細設計書.md)
+- [13_機能設計書.md](../01_design/13_機能設計書.md)
+- [20_シーケンス図.md](../01_design/20_シーケンス図.md)
 

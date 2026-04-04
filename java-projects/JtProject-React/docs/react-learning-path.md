@@ -17,7 +17,7 @@
 ### 第一步：先看入口
 
 看这个文件：
-[main.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/main.tsx)
+[main.tsx](../frontend/src/main.tsx)
 
 你要理解的是：
 
@@ -27,7 +27,7 @@
 ### 第二步：看主组件
 
 看这个文件：
-[App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
+[App.tsx](../frontend/src/App.tsx)
 
 重点按顺序看：
 
@@ -60,7 +60,7 @@ React 的思路可以记成一句话：
 
 例如：
 
-- [App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
+- [App.tsx](../frontend/src/App.tsx)
 
 它本质是：
 

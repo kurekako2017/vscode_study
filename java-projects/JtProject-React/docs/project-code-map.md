@@ -4,15 +4,15 @@
 
 ### 后端
 
-- [ApiController.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
-- [application.properties](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/src/main/resources/application.properties)
-- [WebMvcConfig.java](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/WebMvcConfig.java)
+- [ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
+- [application.properties](../src/main/resources/application.properties)
+- [WebMvcConfig.java](../src/main/java/com/jtspringproject/JtSpringProject/WebMvcConfig.java)
 
 ### 前端
 
-- [main.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/main.tsx)
-- [App.tsx](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/App.tsx)
-- [styles.css](/d:/dev/source_code/vscode_study/java-projects/JtProject-React/frontend/src/styles.css)
+- [main.tsx](../frontend/src/main.tsx)
+- [App.tsx](../frontend/src/App.tsx)
+- [styles.css](../frontend/src/styles.css)
 
 ## 你可以怎么对照学习
 

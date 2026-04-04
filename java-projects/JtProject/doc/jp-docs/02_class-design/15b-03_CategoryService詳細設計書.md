@@ -127,6 +127,6 @@ flowchart TD
 
 ## 6. 関連資料
 
-- [15b_Service詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15b_Service%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
-- [15c-03_CategoryDao詳細設計書.md](D:/dev/source_code/vscode_study/java-projects/JtProject/doc/jp-docs/02_class-design/15c-03_CategoryDao%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%E6%9B%B8.md)
+- [15b_Service詳細設計書.md](15b_Service詳細設計書.md)
+- [15c-03_CategoryDao詳細設計書.md](15c-03_CategoryDao詳細設計書.md)
 
