@@ -25,6 +25,7 @@ dependency-reduced-pom.xml
 # Logs
 *.log
 app.log
+logs/
 
 # OS
 .DS_Store

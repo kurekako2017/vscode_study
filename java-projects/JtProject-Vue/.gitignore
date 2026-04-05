@@ -25,6 +25,7 @@ dependency-reduced-pom.xml
 # Logs
 *.log
 app.log
+logs/
 
 # Frontend
 frontend/node_modules/
