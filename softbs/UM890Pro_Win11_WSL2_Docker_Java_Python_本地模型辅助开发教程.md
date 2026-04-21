@@ -645,14 +645,14 @@ sudo journalctl -u jtproject -n 100 --no-pager
 
 仓库已提供模板文件：
 
-- `softbs/deploy/jtproject-sudoers.example`
+- `scripts/deploy/jtproject-sudoers.example`
 
 #### 启用步骤
 
 1. 在服务器把模板复制到临时文件并编辑用户名：
 
 ```bash
-cp /path/to/repo/softbs/deploy/jtproject-sudoers.example /tmp/jtproject-sudoers
+cp /path/to/repo/scripts/deploy/jtproject-sudoers.example /tmp/jtproject-sudoers
 sed -i 's/deployuser/your-deploy-user/g' /tmp/jtproject-sudoers
 ```
 
@@ -684,7 +684,7 @@ sudo -l -U your-deploy-user
 
 仓库已提供脚本：
 
-- `softbs/deploy/init-jtproject-server.sh`
+- `scripts/deploy/init-jtproject-server.sh`
 
 该脚本会自动完成：
 
@@ -699,8 +699,8 @@ sudo -l -U your-deploy-user
 1. 把脚本传到服务器并执行：
 
 ```bash
-chmod +x softbs/deploy/init-jtproject-server.sh
-sudo bash softbs/deploy/init-jtproject-server.sh \
+chmod +x scripts/deploy/init-jtproject-server.sh
+sudo bash scripts/deploy/init-jtproject-server.sh \
     --deploy-user your-deploy-user \
     --domain your-domain.com \
     --app-run-user www-data \
