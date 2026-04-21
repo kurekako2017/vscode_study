@@ -2,6 +2,8 @@
 
 这个目录是当前学习工作区的总入口。
 
+🚀 **新用户？从这里开始**: [QUICK_START_NAVIGATION.md](QUICK_START_NAVIGATION.md) — 30 秒进入开发状态 + 完整项目地图
+
 它的作用是：
 
 - 说明这个工作区里有哪些主学习线

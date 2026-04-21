@@ -226,12 +226,12 @@ docker run -d `
 
 ### PowerShell 脚本
 ```powershell
-D:\dev\study\scripts\verify-localstack.ps1
+D:\dev\study\scripts\localstack\verify-localstack.ps1
 ```
 
 ### 批处理脚本
 ```cmd
-D:\dev\study\scripts\check-localstack.bat
+D:\dev\study\scripts\localstack\check-localstack.bat
 ```
 
 这些脚本会自动:

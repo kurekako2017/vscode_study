@@ -29,7 +29,7 @@
 
 ### Docker
 
-- [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/DOCKER_INSTALL_GUIDE.md)
+- [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/docker/DOCKER_INSTALL_GUIDE.md)
 - [TROUBLESHOOTING.md](D:/dev/source_code/vscode_study/localstack-lab/TROUBLESHOOTING.md)
 - [如何查看LocalStack日志.md](D:/dev/source_code/vscode_study/localstack-lab/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLocalStack%E6%97%A5%E5%BF%97.md)
 
@@ -48,8 +48,8 @@
 ### 监控与可观测性
 
 - [11-监控与可观测性入口.md](D:/dev/source_code/vscode_study/devops-lab/11-%E7%9B%91%E6%8E%A7%E4%B8%8E%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E5%85%A5%E5%8F%A3.md)
-- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/monitor-status.ps1)
-- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/diagnostic.ps1)
+- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/localstack/monitor-status.ps1)
+- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/localstack/diagnostic.ps1)
 - [如何查看LocalStack日志.md](D:/dev/source_code/vscode_study/localstack-lab/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLocalStack%E6%97%A5%E5%BF%97.md)
 
 ### 最小监控栈

@@ -37,8 +37,8 @@
 ### 自动化运维脚本
 
 - [scripts/README.md](D:/dev/source_code/vscode_study/java-projects/JtProject/scripts/README.md)
-- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/monitor-status.ps1)
-- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/diagnostic.ps1)
+- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/localstack/monitor-status.ps1)
+- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/localstack/diagnostic.ps1)
 
 ## 5. 最小教程
 

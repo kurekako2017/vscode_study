@@ -4,32 +4,35 @@
 
 ## 目录导航
 
-- `tools/`: 脚本与调用示例
 - `aider/`: Aider、本地模型、AI 编程辅助相关资料
 - `openclaw/`: OpenClaw 安装、使用、微信命令、历史说明
 - `github/`: GitHub、Codespaces、Pages、学生版 DevOps 相关资料
 - `vscode/`: VS Code 操作指南
-- `notes/`: 临时笔记与零散记录
-- `history/`: 历史环境说明
+- `support/`: 归档、临时笔记、工具示例
 
 ## 推荐阅读
 
+- [Windows_Git_Bash_开发实战教程_Java_Python_LLM.md](D:/dev/source_code/vscode_study/softbs/github/Windows_Git_Bash_%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8B_Java_Python_LLM.md)
 - [UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md](D:/dev/source_code/vscode_study/softbs/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md)
+- [Win11_WSL_VSCode_Java_Python_快速开发指南.md](D:/dev/source_code/vscode_study/softbs/vscode/Win11_WSL_VSCode_Java_Python_%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.md)
+- [Win11_WSL_当前仓库实战教程_vscode_study.md](D:/dev/source_code/vscode_study/softbs/vscode/Win11_WSL_%E5%BD%93%E5%89%8D%E4%BB%93%E5%BA%93%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8B_vscode_study.md)
 - [OpenClaw_实用使用教程.md](D:/dev/source_code/vscode_study/softbs/openclaw/OpenClaw_实用使用教程.md)
 - [GitHub学生版学习与DevOps实践教程.md](D:/dev/source_code/vscode_study/softbs/github/GitHub学生版学习与DevOps实践教程.md)
 - [VSCode操作指南.md](D:/dev/source_code/vscode_study/softbs/vscode/VSCode操作指南.md)
 
 ## 原有脚本说明
 
-- `tools/ai-run.ps1`：PowerShell 示例脚本，支持 `-Provider`、`-Prompt`、`-DryRun`
-- `tools/openai.http`：REST Client 示例请求文件
+- `support/tools/ai-run.ps1`：PowerShell 示例脚本，支持 `-Provider`、`-Prompt`、`-DryRun`
+- `support/tools/openai.http`：REST Client 示例请求文件
+- `../scripts/wsl/dev-check-gitbash.sh`：Git Bash 开发环境一键检查（Git / Java / Python / LLM）
+- `../scripts/wsl/gitbash_aliases.sh`：Git Bash 常用别名与函数（`gs`、`gp`、`venvon`、`devcheck`）
 - `.vscode/tasks.json`：VS Code 任务配置
 
 ## 说明
 
 - 根目录尽量只保留总入口和少量核心教程
 - 其余文档按主题归类到子目录
-- 历史或重复说明优先放到 `history/` 或对应主题目录下的归档位置
+- 历史或重复说明优先放到 `support/history/` 或对应主题目录下的归档位置
 
 快速开始（在 VS Code 终端运行）：
 

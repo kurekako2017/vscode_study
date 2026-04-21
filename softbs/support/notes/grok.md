@@ -28,5 +28,3 @@ chatModels:
     provider: google-generative-ai
     model: gemini-1.5-flash
     apiKey: ${AIzaSyDkSS59wKRnCsq9iprKwHlivUDJeXgLnCM}
-
- 

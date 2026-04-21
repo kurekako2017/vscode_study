@@ -33,7 +33,7 @@
 
 ## 4. 当前工作区里的教程
 
-- [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/DOCKER_INSTALL_GUIDE.md)
+- [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/docker/DOCKER_INSTALL_GUIDE.md)
 - [TROUBLESHOOTING.md](D:/dev/source_code/vscode_study/localstack-lab/TROUBLESHOOTING.md)
 - [如何查看LocalStack日志.md](D:/dev/source_code/vscode_study/localstack-lab/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLocalStack%E6%97%A5%E5%BF%97.md)
 - [UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md](D:/dev/source_code/vscode_study/softbs/UM890Pro_Win11_WSL2_Docker_Java_Python_%E6%9C%AC%E5%9C%B0%E6%A8%A1%E5%9E%8B%E8%BE%85%E5%8A%A9%E5%BC%80%E5%8F%91%E6%95%99%E7%A8%8B.md)
@@ -41,10 +41,10 @@
 ## 5. 当前工作区里的现成示例
 
 - [check-docker-status.ps1](D:/dev/source_code/vscode_study/scripts/check-docker-status.ps1)
-- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/diagnostic.ps1)
-- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/monitor-status.ps1)
-- [verify-localstack.ps1](D:/dev/source_code/vscode_study/scripts/verify-localstack.ps1)
-- [wait-for-docker-and-run.ps1](D:/dev/source_code/vscode_study/scripts/wait-for-docker-and-run.ps1)
+- [diagnostic.ps1](D:/dev/source_code/vscode_study/scripts/localstack/diagnostic.ps1)
+- [monitor-status.ps1](D:/dev/source_code/vscode_study/scripts/localstack/monitor-status.ps1)
+- [verify-localstack.ps1](D:/dev/source_code/vscode_study/scripts/localstack/verify-localstack.ps1)
+- [wait-for-docker-and-run.ps1](D:/dev/source_code/vscode_study/scripts/localstack/wait-for-docker-and-run.ps1)
 
 ## 6. 最小示例
 
@@ -59,7 +59,7 @@ powershell -ExecutionPolicy Bypass -File scripts\check-docker-status.ps1
 再例如：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\monitor-status.ps1
+powershell -ExecutionPolicy Bypass -File scripts\localstack\monitor-status.ps1
 ```
 
 ## 7. 练习题

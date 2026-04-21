@@ -131,7 +131,7 @@ jobs:
 你这个工作区里已经有现成参考材料：
 
 - `Docker`
-  - [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/DOCKER_INSTALL_GUIDE.md)
+  - [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/docker/DOCKER_INSTALL_GUIDE.md)
 - `GitHub Actions`
   - [jtproject-ci.yml](D:/dev/source_code/vscode_study/.github/workflows/jtproject-ci.yml)
   - [deploy-softbs-pages.yml](D:/dev/source_code/vscode_study/.github/workflows/deploy-softbs-pages.yml)
