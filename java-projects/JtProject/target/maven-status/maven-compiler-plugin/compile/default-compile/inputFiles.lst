@@ -40,3 +40,5 @@ D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspri
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\WebMvcConfig.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\HibernateSessionFactoryConfig.java
 D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\services\impl\CategoryServiceImpl.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\batch\ProductCategoryCheckBatchService.java
+D:\dev\source_code\vscode_study\java-projects\JtProject\src\main\java\com\jtspringproject\JtSpringProject\batch\ProductCategoryCheckBatchApplication.java

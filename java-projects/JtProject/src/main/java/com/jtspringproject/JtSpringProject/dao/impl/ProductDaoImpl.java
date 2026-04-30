@@ -154,4 +154,35 @@ public class ProductDaoImpl implements ProductDao {
             throw e;
         }
     }
+
+    /**
+     * 获取所有商品（包含分类信息），用于整合チェックバッチ処理
+     *
+     * <p>LEFT OUTER JOIN で CATEGORY テーブルと結合し、
+     * カテゴリが存在しない商品も検出できるようにする。
+     * エラーチェック用のクエリであり、分類情報を含めて取得する。</p>
+     *
+     * @return 商品リスト（分類情報付き）
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getProductsWithCategories() {
+        logger.info("整合チェック用の商品一覧を取得します（分類情報付き）");
+        try {
+            // LEFT OUTER JOIN で両方のテーブル情報を取得
+            // 商品が存在しないカテゴリを参照していても検出可能
+            List<Product> products = this.sessionFactory.getCurrentSession()
+                .createQuery(
+                    "FROM Product p "
+                    + "LEFT OUTER JOIN FETCH p.category "
+                    + "ORDER BY p.id ASC",
+                    Product.class)
+                .list();
+            logger.info("整合チェック用の商品一覧を取得しました。件数: {}", products.size());
+            return products;
+        } catch (Exception e) {
+            logger.error("整合チェック用の商品一覧取得に失敗しました: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
 }

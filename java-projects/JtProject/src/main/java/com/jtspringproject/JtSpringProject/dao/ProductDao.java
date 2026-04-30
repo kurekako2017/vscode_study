@@ -47,5 +47,15 @@ public interface ProductDao {
      * @return 是否删除成功
      */
     Boolean deletProduct(int id);
+
+    /**
+     * 获取所有商品（包含分类信息），用于整合チェックバッチ処理
+     * 
+     * <p>LEFT OUTER JOIN で CATEGORY テーブルと結合し、
+     * カテゴリが存在しない商品も検出できるようにする。</p>
+     * 
+     * @return 商品リスト（分類情報付き）
+     */
+    List<Product> getProductsWithCategories();
 }
 
