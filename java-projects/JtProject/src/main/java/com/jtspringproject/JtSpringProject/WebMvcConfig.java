@@ -7,6 +7,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+/**
+ * Web MVC 配置。
+ *
+ * <p>仅在非 batch 模式下启用，用于 JSP 视图解析和 Spring MVC 的基础配置。</p>
+ */
 @Configuration
 @Profile("!batch")
 @EnableWebMvc

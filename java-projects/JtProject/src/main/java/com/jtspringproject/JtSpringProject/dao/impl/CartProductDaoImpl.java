@@ -192,6 +192,15 @@ public class CartProductDaoImpl implements CartProductDao {
         }
     }
 
+    /**
+     * 根据购物车ID和商品ID获取购物车商品关联
+     *
+     * <p>用于检查某个商品是否已经存在于指定购物车中，常见于加购、去重和数量合并逻辑。</p>
+     *
+     * @param cartId 购物车ID
+     * @param productId 商品ID
+     * @return 购物车商品关联列表
+     */
     @Override
     @Transactional
     public List<CartProduct> getCartProductsByCartAndProductId(int cartId, int productId) {

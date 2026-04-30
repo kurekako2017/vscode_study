@@ -11,6 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * Hibernate SessionFactory 配置。
+ *
+ * <p>该配置用于手动创建 Hibernate SessionFactory，并继续沿用项目现有的 DAO + SessionFactory
+ * 访问方式，而不是切换到 Spring Data JPA。</p>
+ */
 @Configuration
 public class HibernateSessionFactoryConfig {
 

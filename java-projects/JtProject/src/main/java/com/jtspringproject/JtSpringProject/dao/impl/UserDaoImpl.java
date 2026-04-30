@@ -184,6 +184,14 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * 根据用户名获取用户
+     *
+     * <p>用于登录后查询、用户资料页校验和批处理去重检查。</p>
+     *
+     * @param username 用户名
+     * @return 用户对象，不存在返回null
+     */
     @Override
     @Transactional
     public User getUserByUsername(String username) {
@@ -203,6 +211,14 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * 根据ID获取用户
+     *
+     * <p>用于后台管理、用户详情页和批处理校验等场景。</p>
+     *
+     * @param id 用户ID
+     * @return 用户对象，不存在则返回null
+     */
     @Override
     @Transactional
     public User getUserById(int id) {
