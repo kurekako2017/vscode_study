@@ -1,4 +1,4 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

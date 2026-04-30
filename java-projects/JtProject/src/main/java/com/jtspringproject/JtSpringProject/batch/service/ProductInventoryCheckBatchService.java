@@ -1,4 +1,4 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.service;
 
 import com.jtspringproject.JtSpringProject.dao.ProductDao;
 import com.jtspringproject.JtSpringProject.models.Category;

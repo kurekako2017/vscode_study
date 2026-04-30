@@ -1,7 +1,7 @@
 package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
-import com.jtspringproject.JtSpringProject.batch.DatabaseBackupBatchService;
+import com.jtspringproject.JtSpringProject.batch.service.DatabaseBackupBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

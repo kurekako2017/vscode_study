@@ -1,4 +1,4 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.service;
 
 import com.jtspringproject.JtSpringProject.dao.ProductDao;
 import com.jtspringproject.JtSpringProject.models.Category;
@@ -73,11 +73,9 @@ public class ProductCategoryCheckBatchService {
         List<String> csvLines = new ArrayList<>();
         int ngCount = 0;
 
-        // CSV ヘッダ
         csvLines.add(
             "check_timestamp,product_id,product_name,category_id,category_name,quantity,price,check_status,error_messages");
 
-        // フェーズ 1: カテゴリ参照整合チェック
         logger.info("フェーズ 1: カテゴリ参照整合チェックを実行します。対象件数: {}", products.size());
         Map<Integer, Category> categoryCache = buildCategoryCache(products);
         int phase1NgCount = 0;
@@ -85,13 +83,8 @@ public class ProductCategoryCheckBatchService {
         for (Product product : products) {
             List<String> errors = new ArrayList<>();
 
-            // フェーズ 1: カテゴリ参照整合
             errors.addAll(validateCategoryReference(product, categoryCache));
-
-            // フェーズ 2: 商品データ有効性
             errors.addAll(validateProductData(product));
-
-            // フェーズ 3: マスタ連動整合性
             errors.addAll(validateMasterIntegrity(product, categoryCache));
 
             if (!errors.isEmpty()) {
@@ -101,7 +94,6 @@ public class ProductCategoryCheckBatchService {
                 }
             }
 
-            // CSV 行を構築
             String status = errors.isEmpty() ? "OK" : "NG";
             Category category = product.getCategory();
             csvLines.add(String.join(",",
@@ -118,7 +110,6 @@ public class ProductCategoryCheckBatchService {
 
         logger.info("フェーズ 1: カテゴリ参照整合チェック完了。NG件数: {}", phase1NgCount);
 
-        // CSV を出力
         Path outputFile = buildOutputFile(now);
         try {
             writeLines(outputFile, csvLines);
@@ -126,24 +117,12 @@ public class ProductCategoryCheckBatchService {
                 products.size(), ngCount, outputFile.toAbsolutePath());
         } catch (IOException e) {
             logger.error("CSV ファイル出力に失敗しました: {}", e.getMessage(), e);
-            return 1;  // システム異常
+            return 1;
         }
 
         return ngCount > 0 ? 2 : 0;
     }
 
-    /**
-     * フェーズ 1: カテゴリ参照整合チェック
-     *
-     * <p>以下をチェック：
-     * - CATEGORY_ID が NULL でないか
-     * - CATEGORY テーブルに存在するか
-     * </p>
-     *
-     * @param product 商品オブジェクト
-     * @param categoryCache カテゴリキャッシュ
-     * @return エラーコードのリスト（エラーなければ空のリスト）
-     */
     private List<String> validateCategoryReference(Product product, Map<Integer, Category> categoryCache) {
         List<String> errors = new ArrayList<>();
 
@@ -164,23 +143,9 @@ public class ProductCategoryCheckBatchService {
         return errors;
     }
 
-    /**
-     * フェーズ 2: 商品データ有効性チェック
-     *
-     * <p>以下をチェック：
-     * - 商品名が空でないか
-     * - 商品名が最大長を超えていないか
-     * - 価格が 0 より大きいか、最大値を超えていないか
-     * - 在庫数が 0 以上か、最大値を超えていないか
-     * </p>
-     *
-     * @param product 商品オブジェクト
-     * @return エラーコードのリスト
-     */
     private List<String> validateProductData(Product product) {
         List<String> errors = new ArrayList<>();
 
-        // 商品名チェック
         if (!InputCheckUtil.hasText(product.getName())) {
             errors.add("ERR_PROD_NAME_EMPTY");
             logger.warn("[商品ID={}] ERR_PROD_NAME_EMPTY: 商品名が空です", product.getId());
@@ -190,14 +155,12 @@ public class ProductCategoryCheckBatchService {
                 product.getId(), product.getName().length());
         }
 
-        // 価格チェック
         if (product.getPrice() <= 0 || product.getPrice() > 999999) {
             errors.add("ERR_PRICE_INVALID");
             logger.warn("[商品ID={}] ERR_PRICE_INVALID: 価格が無効です ({})",
                 product.getId(), product.getPrice());
         }
 
-        // 在庫数チェック
         if (product.getQuantity() < 0 || product.getQuantity() > 999999) {
             errors.add("ERR_QUANTITY_INVALID");
             logger.warn("[商品ID={}] ERR_QUANTITY_INVALID: 在庫数が無効です ({})",
@@ -207,24 +170,11 @@ public class ProductCategoryCheckBatchService {
         return errors;
     }
 
-    /**
-     * フェーズ 3: マスタ連動整合性チェック
-     *
-     * <p>以下をチェック：
-     * - カテゴリの利用可否（削除フラグ確認）
-     * - 商品の販売可能状態（在庫・価格確認）
-     * </p>
-     *
-     * @param product 商品オブジェクト
-     * @param categoryCache カテゴリキャッシュ
-     * @return エラーコードのリスト
-     */
     private List<String> validateMasterIntegrity(Product product, Map<Integer, Category> categoryCache) {
         List<String> errors = new ArrayList<>();
 
         Category category = product.getCategory();
         if (category != null) {
-            // 在庫が 0 の場合は警告ログのみ（NG ではない）
             if (product.getQuantity() == 0) {
                 logger.info("[商品ID={}] 在庫が 0 です。販売可能状態を確認してください", product.getId());
             }
@@ -233,14 +183,6 @@ public class ProductCategoryCheckBatchService {
         return errors;
     }
 
-    /**
-     * カテゴリキャッシュを構築する
-     *
-     * <p>後続の処理で複数回参照するため、メモリ内キャッシュを事前構築する。</p>
-     *
-     * @param products 商品リスト
-     * @return カテゴリ ID → Category のマップ
-     */
     private Map<Integer, Category> buildCategoryCache(List<Product> products) {
         Map<Integer, Category> cache = new HashMap<>();
         for (Product product : products) {
@@ -252,14 +194,6 @@ public class ProductCategoryCheckBatchService {
         return cache;
     }
 
-    /**
-     * CSV 値をエスケープする
-     *
-     * <p>ダブルクォートとカンマを含む値を CSV 形式でエスケープする。</p>
-     *
-     * @param value CSV フィールド値
-     * @return エスケープされた値
-     */
     private String csvValue(String value) {
         if (value == null) {
             return "";
@@ -270,24 +204,11 @@ public class ProductCategoryCheckBatchService {
         return value;
     }
 
-    /**
-     * 出力ファイルパスを構築する
-     *
-     * @param now 実行時刻
-     * @return 出力ファイルパス
-     */
     private Path buildOutputFile(LocalDateTime now) {
         String filename = "product_category_check_" + FILE_TIMESTAMP_FORMAT.format(now) + ".csv";
         return Paths.get(batchOutputDir, filename);
     }
 
-    /**
-     * CSV 行をファイルに書き込む
-     *
-     * @param outputFile 出力ファイルパス
-     * @param lines CSV 行のリスト
-     * @throws IOException ファイル出力エラー
-     */
     private void writeLines(Path outputFile, List<String> lines) throws IOException {
         Files.createDirectories(outputFile.getParent());
         Files.write(outputFile, lines, StandardCharsets.UTF_8);

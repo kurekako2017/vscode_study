@@ -1,6 +1,6 @@
 package com.jtspringproject.JtSpringProject.batch.quartz;
 
-import com.jtspringproject.JtSpringProject.batch.ProductInventoryCheckBatchService;
+import com.jtspringproject.JtSpringProject.batch.service.ProductInventoryCheckBatchService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;

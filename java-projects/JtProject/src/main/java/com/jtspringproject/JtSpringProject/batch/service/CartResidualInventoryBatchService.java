@@ -1,4 +1,4 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
