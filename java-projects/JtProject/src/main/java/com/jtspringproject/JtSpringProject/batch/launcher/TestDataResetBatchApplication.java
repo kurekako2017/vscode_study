@@ -1,7 +1,7 @@
 package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
-import com.jtspringproject.JtSpringProject.batch.service.CartResidualInventoryBatchService;
+import com.jtspringproject.JtSpringProject.batch.service.TestDataResetBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,21 +10,18 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * BAT-006 カート残留データ棚卸バッチ起動クラス。
- */
-/**
- * BAT-006 カート残留データ棚卸バッチ起動クラス。
+ * BAT-003 テストデータリセットバッチ起動クラス。
  *
- * <p>用途: `CART` / `CART_PRODUCT` の残留・孤立データを検出するバッチの起動エントリ。
- * 実行により CSV を出力し、必要に応じて削除モードで不要データを削除する。
+ * <p>用途: 開発・テスト用に DB を初期状態へ戻すためのバッチ起動エントリ。テスト実行前に
+ * 手動で起動して DB を初期化することを想定している。
  *
- * <p>関連設計書: doc/jp-docs/03_database/89_カート残留データ棚卸詳細設計書.md
+ * <p>関連設計書: doc/jp-docs/03_database/87_テストデータリセット詳細設計書.md
  */
-public final class CartResidualInventoryBatchApplication {
+public final class TestDataResetBatchApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(CartResidualInventoryBatchApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestDataResetBatchApplication.class);
 
-    private CartResidualInventoryBatchApplication() {
+    private TestDataResetBatchApplication() {
     }
 
     /**
@@ -42,11 +39,10 @@ public final class CartResidualInventoryBatchApplication {
 
         int exitCode = 1;
         try {
-            CartResidualInventoryBatchService batchService =
-                context.getBean(CartResidualInventoryBatchService.class);
+            TestDataResetBatchService batchService = context.getBean(TestDataResetBatchService.class);
             exitCode = batchService.runBatch();
         } catch (Exception exception) {
-            logger.error("BAT-006 カート残留データ棚卸の実行に失敗しました。", exception);
+            logger.error("BAT-003 テストデータリセットの実行に失敗しました。", exception);
         } finally {
             final int finalExitCode = exitCode;
             int springExitCode = SpringApplication.exit(context, () -> finalExitCode);

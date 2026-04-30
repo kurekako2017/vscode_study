@@ -1,7 +1,7 @@
 package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
-import com.jtspringproject.JtSpringProject.batch.service.ProductInventoryCheckBatchService;
+import com.jtspringproject.JtSpringProject.batch.service.ProductCategoryCheckBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,25 +10,17 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * 商品在庫整合チェック用の模擬バッチ起動クラス（BAT-LAB-001）。
+ * BAT-005 商品・分類マスタ整合チェックバッチ起動クラス。
  *
- * <p>Spring Boot を非 Web モードで起動し、
- * バッチ処理用の専用コンテキストを構築する。</p>
+ * <p>用途: 商品マスタと分類マスタの整合性をチェックし、CSV に結果を出力するバッチの起動エントリ。
  *
- * <h3>実行方法：</h3>
- * <pre>
- * java -cp "..." \
- *   com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication
- * </pre>
- *
- * @author JT Spring Project Team
- * @version 1.0
+ * <p>関連設計書: doc/jp-docs/03_database/83_模擬バッチ設計書.md
  */
-public final class ProductInventoryCheckBatchApplication {
+public final class ProductCategoryCheckBatchApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductInventoryCheckBatchApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductCategoryCheckBatchApplication.class);
 
-    private ProductInventoryCheckBatchApplication() {
+    private ProductCategoryCheckBatchApplication() {
     }
 
     /**
@@ -46,11 +38,11 @@ public final class ProductInventoryCheckBatchApplication {
 
         int exitCode = 1;
         try {
-            ProductInventoryCheckBatchService batchService =
-                context.getBean(ProductInventoryCheckBatchService.class);
+            ProductCategoryCheckBatchService batchService =
+                context.getBean(ProductCategoryCheckBatchService.class);
             exitCode = batchService.runBatch();
         } catch (Exception exception) {
-            logger.error("商品在庫整合チェックバッチの実行に失敗しました。", exception);
+            logger.error("商品・分類マスタ整合チェックバッチの実行に失敗しました。", exception);
         } finally {
             final int finalExitCode = exitCode;
             int springExitCode = SpringApplication.exit(context, () -> finalExitCode);
