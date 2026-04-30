@@ -21,7 +21,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 商品在庫整合チェックの模擬バッチ本体。
+ * 商品在庫整合チェックの模擬バッチ本体（BAT-LAB-001）。
+ *
+ * <p>学習用の最小構成バッチとして、商品データの整合性をチェックし、
+ * 結果を CSV ファイルに出力する。</p>
+ *
+ * <h3>処理フロー：</h3>
+ * <ol>
+ *   <li>商品一覧を取得</li>
+ *   <li>商品ごとに整合チェック実施</li>
+ *   <li>結果を CSV に出力</li>
+ *   <li>ログへ件数を出力</li>
+ *   <li>終了コードを返却</li>
+ * </ol>
+ *
+ * @author JT Spring Project Team
+ * @version 1.0
  */
 @Service
 @Profile("batch")

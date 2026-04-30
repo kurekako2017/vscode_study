@@ -9,7 +9,19 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * 商品在庫整合チェック用の模擬バッチ起動クラス。
+ * 商品在庫整合チェック用の模擬バッチ起動クラス（BAT-LAB-001）。
+ *
+ * <p>Spring Boot を非 Web モードで起動し、
+ * バッチ処理用の専用コンテキストを構築する。</p>
+ *
+ * <h3>実行方法：</h3>
+ * <pre>
+ * java -cp "..." \
+ *   com.jtspringproject.JtSpringProject.batch.ProductInventoryCheckBatchApplication
+ * </pre>
+ *
+ * @author JT Spring Project Team
+ * @version 1.0
  */
 public final class ProductInventoryCheckBatchApplication {
 
