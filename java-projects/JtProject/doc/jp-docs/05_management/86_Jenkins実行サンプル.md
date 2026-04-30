@@ -18,7 +18,7 @@
 | 項目 | 内容 |
 |---|---|
 | パイプライン定義 | `Jenkinsfile` |
-| 実行対象 | `ProductInventoryCheckBatchApplication` |
+| 実行対象 | `com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication` |
 | 成果物 | `batch-output/*.csv`, `logs/batch/*.log` |
 | Maven 実行方式 | `mvnw` / `mvnw.cmd` を優先し、失敗時は `mvn` にフォールバック |
 

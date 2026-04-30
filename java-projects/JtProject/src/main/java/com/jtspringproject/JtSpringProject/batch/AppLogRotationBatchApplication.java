@@ -1,6 +1,7 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
+import com.jtspringproject.JtSpringProject.batch.AppLogRotationBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

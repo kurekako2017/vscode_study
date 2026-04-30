@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        BATCH_MAIN_CLASS = 'com.jtspringproject.JtSpringProject.batch.ProductInventoryCheckBatchApplication'
+        BATCH_MAIN_CLASS = 'com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication'
         BATCH_ARGS = '--batch.jobName=productInventoryCheck'
     }
 

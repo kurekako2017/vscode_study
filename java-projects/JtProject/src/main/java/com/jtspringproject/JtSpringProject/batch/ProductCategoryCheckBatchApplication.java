@@ -1,6 +1,7 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
+import com.jtspringproject.JtSpringProject.batch.ProductCategoryCheckBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * <h3>実行方法：</h3>
  * <pre>
  * java -cp "..." \
- *   com.jtspringproject.JtSpringProject.batch.ProductCategoryCheckBatchApplication
+ *   com.jtspringproject.JtSpringProject.batch.launcher.ProductCategoryCheckBatchApplication
  * </pre>
  *
  * または：

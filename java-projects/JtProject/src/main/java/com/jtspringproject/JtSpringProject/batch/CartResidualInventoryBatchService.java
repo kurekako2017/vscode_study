@@ -20,6 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * BAT-006 カート残留データ棚卸バッチ本体。
+ *
+ * <p>概要: カートに紐づく `CART_PRODUCT` が存在しないカート（未使用カート）や、
+ * `CART_PRODUCT` 側で参照先が存在しない孤立レコード（オーファン）を収集し、CSV 出力する。
+ * オプションで検出した不要リンクや空カートを削除する機能を持つ（`batch.cart-residual.delete`）。
+ *
+ * <p>出力項目: 実行タイムスタンプ、レコード種別、cart_id、customer_id、cart_product_id、product_id、ステータス、メッセージ
+ *
+ * <p>関連設計書: doc/jp-docs/03_database/89_カート残留データ棚卸詳細設計書.md
  */
 @Service
 @Profile("batch")

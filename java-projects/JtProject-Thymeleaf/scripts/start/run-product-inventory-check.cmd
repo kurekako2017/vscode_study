@@ -13,9 +13,9 @@ echo Output   : batch-output
 echo.
 
 if exist mvnw.cmd (
-  call mvnw.cmd -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.ProductInventoryCheckBatchApplication -Dexec.args=--batch.jobName=productInventoryCheck
+  call mvnw.cmd -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication -Dexec.args=--batch.jobName=productInventoryCheck
 ) else (
-  call mvn -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.ProductInventoryCheckBatchApplication -Dexec.args=--batch.jobName=productInventoryCheck
+  call mvn -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication -Dexec.args=--batch.jobName=productInventoryCheck
 )
 
 exit /b %ERRORLEVEL%

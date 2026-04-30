@@ -15,6 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * BAT-003 テストデータリセットバッチ本体。
+ *
+ * <p>概要: 開発環境向けにテストデータを初期化するバッチ処理。主に以下の処理を行う:
+ * <ol>
+ *   <li>主要テーブルのデータ削除（`CART_PRODUCT`、`CART`、`PRODUCT`、`CATEGORY`、`CUSTOMER`）</li>
+ *   <li>`data.sql` による初期データの再投入</li>
+ * </ol>
+ *
+ * <p>注意: 本処理は開発専用であり、本番環境での実行は禁止すること。
+ *
+ * <p>関連設計書: doc/jp-docs/03_database/87_テストデータリセット詳細設計書.md
  */
 @Service
 @Profile("batch")

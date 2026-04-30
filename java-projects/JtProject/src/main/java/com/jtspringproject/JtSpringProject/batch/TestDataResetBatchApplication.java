@@ -1,6 +1,7 @@
-package com.jtspringproject.JtSpringProject.batch;
+package com.jtspringproject.JtSpringProject.batch.launcher;
 
 import com.jtspringproject.JtSpringProject.JtSpringProjectApplication;
+import com.jtspringproject.JtSpringProject.batch.TestDataResetBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,6 +11,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * BAT-003 テストデータリセットバッチ起動クラス。
+ */
+/**
+ * BAT-003 テストデータリセットバッチ起動クラス。
+ *
+ * <p>用途: 開発・テスト用に DB を初期状態へ戻すためのバッチ起動エントリ。テスト実行前に
+ * 手動で起動して DB を初期化することを想定している。
+ *
+ * <p>関連設計書: doc/jp-docs/03_database/87_テストデータリセット詳細設計書.md
  */
 public final class TestDataResetBatchApplication {
 

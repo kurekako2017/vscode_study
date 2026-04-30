@@ -12,9 +12,9 @@ echo Job Name : testDataReset
 echo.
 
 if exist mvnw.cmd (
-  call mvnw.cmd -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.TestDataResetBatchApplication
+  call mvnw.cmd -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.launcher.TestDataResetBatchApplication
 ) else (
-  call mvn -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.TestDataResetBatchApplication
+  call mvn -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.jtspringproject.JtSpringProject.batch.launcher.TestDataResetBatchApplication
 )
 
 exit /b %ERRORLEVEL%
