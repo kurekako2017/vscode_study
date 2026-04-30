@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author JT Spring Project Team
  * @version 1.0
+ * @see doc/jp-docs/03_database/（学習用バッチについての設計書）
  */
 @Service
 @Profile("batch")
@@ -60,7 +61,10 @@ public class ProductInventoryCheckBatchService {
     /**
      * バッチを実行し、結果 CSV を出力する。
      *
-     * @return 終了コード
+     * <p>この学習用バッチは簡易チェックを行い、処理対象数・NG 件数・出力ファイルパスをログに出力する。
+     * 実運用向けの詳細チェックは `ProductCategoryCheckBatchService` のような多段フェーズ実装を参照する。
+     *
+     * @return 終了コード: 0=正常（NG 件無し）、2=業務 NG（NG 件あり）
      */
     @Transactional(readOnly = true)
     public int runBatch() {

@@ -10,6 +10,18 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * BAT-004 アプリケーションログローテーションバッチ起動クラス。
+ *
+ * <p>用途: アプリケーションのログファイルをローテーション（ZIP 圧縮して元ファイルを切り詰める）するバッチの起動エントリ。
+ * このクラスは Spring Boot を非 Web モードで起動し、`AppLogRotationBatchService` の `runBatch()` を実行して終了コードを返却する。
+ *
+ * <p>実行手順:
+ * <ol>
+ *   <li>`JtSpringProjectApplication` を Spring Application として起動（プロファイル: `batch`）</li>
+ *   <li>`AppLogRotationBatchService` を取得して `runBatch()` を実行</li>
+ *   <li>実行結果の終了コードで Spring を終了し、`System.exit()` を呼び出す</li>
+ * </ol>
+ *
+ * <p>関連設計書: doc/jp-docs/03_database/88_アプリケーションログローテーション詳細設計書.md
  */
 public final class AppLogRotationBatchApplication {
 
