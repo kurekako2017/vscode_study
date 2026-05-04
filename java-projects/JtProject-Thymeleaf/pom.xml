@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jtspringproject</groupId>
-	<artifactId>JtSpringProject</artifactId>
+	<artifactId>JtSpringProject-Thymeleaf</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>JtSpringProject</name>
-	<description>Spring project for Java Technology</description>
+	<name>JtSpringProject-Thymeleaf</name>
+	<description>Spring project (Thymeleaf variant) for Java Technology</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
