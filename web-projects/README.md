@@ -80,6 +80,12 @@
     - SMTP设置
     - 企业邮箱方案
 
+13. **[gk-fuji 域名跳转教程](docs/domain/gk-fuji-%E5%9F%9F%E5%90%8D%E8%B7%B3%E8%BD%AC%E6%95%99%E7%A8%8B.md)** - gk-fuji.co.jp 到 gk-fuji.jp 跳转方案
+   - onamae.com 域名转发思路
+   - 服务器层 301 跳转配置
+   - WordPress 跳转注意事项
+   - 未来 gk-fuji.jp 废止迁移方案
+
 ---
 
 ## 🚀 快速开始
