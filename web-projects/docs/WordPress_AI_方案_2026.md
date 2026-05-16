@@ -244,3 +244,56 @@ wp maintenance-mode deactivate
 
 该脚本为通用示例，请根据你的服务器路径、用户和域名修改变量后在 staging 先做 `--dry-run` 验证。
 
+部署到 onamae RS 的可选方案（针对不支持 Node 的环境）
+
+下面汇总三种可行方案（A/B/C），并给出优缺点和可执行步骤，便于你选择并记录到项目文档中。
+
+方案 A：静态导出并上传到 onamae（适合 SSG）
+
+- 适用场景：前端主要为静态内容或可接受离线构建（不需要 SSR/ISR/API Routes）。
+- 优点：兼容性最高，不依赖服务器 Node；部署简单，适合共享主机或仅支持 PHP 的环境。
+- 缺点：无法使用 SSR/ISR、Serverless API；需要在构建时包含外部数据。
+- 步骤：
+  1. 在本地或 CI 构建并导出静态文件：
+     ```bash
+     npm run build
+     npm run export    # 生成 out/ 目录
+     ```
+  2. 将 `out/` 上传到 onamae 的站点根目录（FTP/rsync/scp）：
+     ```bash
+     rsync -avz out/ user@onamae:/path/to/wwwroot/
+     ```
+  3. 如需调用 `ai-codex-agent`，前端直接请求 WordPress 的 REST endpoint（注意 CORS 与认证）。
+
+方案 B：前端部署到 Vercel/Netlify 等（推荐 SSR/ISR）
+
+- 适用场景：需要 SSR/ISR、API Routes、自动部署与快速预览。
+- 优点：支持完整 Next.js 功能（SSR/ISR/API），自动化部署与 webhook 集成，性能高。
+- 缺点：额外托管成本；需要将域名或部分流量指向平台。
+- 步骤：
+  1. 在 Vercel/Netlify 建项目并连接 Git 仓库，设置环境变量 `WP_API_URL`。
+  2. 在 WordPress 的 staging 发布钩子配置 webhook，触发平台重新构建（Vercel/Netlify 提供 URL）。
+  3. 如需保留主站域名，可使用反向代理或 CNAME 配置。
+
+方案 C：在 onamae 使用 PHP 作为 BFF（代理）
+
+- 适用场景：onamae 不支持 Node，希望前端仍托管在 onamae 或需要隐藏密钥与做速率控制。
+- 优点：不依赖 Node，能隐藏 API Key、做认证和速率限制；易与现有 PHP 环境整合。
+- 缺点：无法原生使用 Next.js 的 SSR 特性；需要额外实现代理逻辑。
+- 步骤（示例）：
+  1. 在 onamae 的站点目录放置 `api/proxy-generate.php`，接收 POST 的 prompt。
+  2. PHP 端用 `wp_remote_post()` 或 curl 调用 `ai-codex-agent` 或 OpenAI API（在服务器环境变量中保存密钥）。
+  3. 前端调用该 PHP 接口，接口再转发并返回结果，避免跨域与密钥泄露。
+
+综合建议
+
+- 仅需静态内容：用方案 A（静态导出）最快最稳。 
+- 需要 SSR/ISR 或方便自动化重建：用方案 B（Vercel/Netlify）并把 WordPress 放在 onamae。
+- onamae 不支持 Node 且希望前端继续托管在主机：用方案 C（PHP 代理）以保护密钥并进行速率控制。
+
+我可以把上述内容格式化成文档节并推送到仓库（已完成），并按需生成：
+- 自动化上传脚本（`npm run export` -> rsync 到 onamae）
+- Vercel 部署说明与 webhook 配置示例
+- PHP 代理示例文件 `web-projects/examples/php-proxy/proxy-generate.php`
+
+
