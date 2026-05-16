@@ -198,6 +198,50 @@ llm-lab/
 |-- 05-FastAPI与企业集成.md
 |-- 06-评估与运维.md
 |-- 07-日本现场应用与案件关键词.md
+
+## 示例代码位置与快速运行
+
+- 说明：本仓库的可运行 demo 全部放在 `agent-lab/projects/`，`llm-lab` 只保留主线文档和评估资料以减少重复维护。
+
+- 主要 demo 路径（工作区相对路径）：
+  - [agent-lab/projects/chat_cli/README.md](agent-lab/projects/chat_cli/README.md)
+  - [agent-lab/projects/structured_output_demo/README.md](agent-lab/projects/structured_output_demo/README.md)
+  - [agent-lab/projects/doc_qa_agent/README.md](agent-lab/projects/doc_qa_agent/README.md)
+  - [agent-lab/projects/rag_api_demo/README.md](agent-lab/projects/rag_api_demo/README.md)
+
+- 快速运行（示例以 `chat_cli` 为例）：
+
+PowerShell:
+```
+cd d:\dev\source_code\vscode_study\agent-lab\projects\chat_cli
+pip install -r requirements.txt
+$env:OPENAI_API_KEY="your_api_key"
+python main.py "用一句话解释什么是 agent"
+```
+
+macOS / Linux:
+```
+cd llm-lab/projects/chat_cli  # 或到 agent-lab/projects/chat_cli
+pip install -r requirements.txt
+export OPENAI_API_KEY="your_api_key"
+python main.py "用一句话解释什么是 agent"
+```
+
+- 如果你希望把某个 demo 的副本放到 `llm-lab/projects`（便于修改或离线修改），可以复制整个目录：
+
+PowerShell:
+```
+mkdir llm-lab\projects\chat_cli
+Copy-Item -Path agent-lab\projects\chat_cli\* -Destination llm-lab\projects\chat_cli -Recurse
+```
+
+macOS / Linux:
+```
+mkdir -p llm-lab/projects/chat_cli
+cp -r agent-lab/projects/chat_cli/* llm-lab/projects/chat_cli/
+```
+
+（复制后请在 `llm-lab/projects/chat_cli` 下按 README 运行示例）
 |-- 08-云平台与企业环境.md
 |-- 09-岗位与技能要求对照.md
 |-- 10-作品集与面试准备.md

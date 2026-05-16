@@ -1,3 +1,13 @@
+"""workflow_agent: 分阶段工作流生成示例（分析→计划→总结），带注释。
+
+此示例展示如何把复杂任务分解为多个模型阶段：
+1. `analyze` 阶段提取目标与限制
+2. `plan` 阶段生成结构化执行步骤（并用 Pydantic 验证）
+3. `finalize` 阶段基于前两步生成最终建议
+
+使用分阶段方法能让模型在每一步聚焦单一子任务，提高可控性与可验证性。
+"""
+
 import argparse
 import json
 import os
@@ -23,6 +33,7 @@ FINALIZE_INSTRUCTIONS = (
 
 
 class WorkflowPlan(BaseModel):
+    """Pydantic 定义的计划 schema，用于在计划阶段验证模型输出结构。"""
     # This schema keeps the planning step stable enough for the next workflow stage.
     goal: str = Field(description="The main goal of the task.")
     priority: Literal["low", "medium", "high"] = Field(
@@ -34,6 +45,7 @@ class WorkflowPlan(BaseModel):
 
 
 def parse_args() -> argparse.Namespace:
+    """解析命令行参数：用户任务与可选模型名。"""
     parser = argparse.ArgumentParser(
         description="Minimal workflow agent demo with staged OpenAI Responses API calls."
     )
@@ -47,6 +59,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client() -> OpenAI:
+    """创建 OpenAI 客户端，需通过环境变量提供 API Key。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -55,6 +68,7 @@ def build_client() -> OpenAI:
 
 
 def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
+    """分析阶段：把用户请求转换为简洁的分析文本，供下一步计划使用。"""
     response = client.responses.create(
         model=model,
         instructions=ANALYZE_INSTRUCTIONS,
@@ -64,6 +78,7 @@ def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
 
 
 def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
+    """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。"""
     response = client.responses.parse(
         model=model,
         instructions=PLAN_INSTRUCTIONS,
@@ -74,6 +89,7 @@ def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
 
 
 def finalize_task(client: OpenAI, model: str, analysis: str, plan: WorkflowPlan) -> str:
+    """总结阶段：基于分析与计划生成最终简短建议。"""
     # The final step consumes prior workflow state instead of re-reading the original task alone.
     final_input = (
         "Analysis:\n"
@@ -94,6 +110,7 @@ def main() -> None:
     client = build_client()
 
     try:
+        # 分阶段执行：先分析，再计划，最后总结
         analysis = analyze_task(client, args.model, args.prompt)
         plan = plan_task(client, args.model, analysis)
         final_summary = finalize_task(client, args.model, analysis, plan)
@@ -101,6 +118,7 @@ def main() -> None:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)
 
+    # 打印每个阶段的结果，便于学习和调试
     print("=== Step 1: Analysis ===")
     print(analysis)
     print("\n=== Step 2: Plan ===")

@@ -1,3 +1,14 @@
+"""doc_qa_agent: 本地 RAG 文档问答最小示例。
+
+功能概览：
+- 扫描指定目录下的 Markdown / 文本文件
+- 将文档切分为重叠的 chunk（用于保证局部上下文）
+- 使用简单的关键词重合度做检索（PoC 用法，非向量检索）
+- 将检索到的 top-k chunk 拼接为上下文并调用模型回答
+
+本示例适合教学与 PoC，生产环境请替换为 embeddings + 向量检索并添加缓存、限流与认证。
+"""
+
 import argparse
 import os
 import re
@@ -23,12 +34,14 @@ SYSTEM_INSTRUCTIONS = (
 
 @dataclass
 class Chunk:
+    """表示一个文档切分后的小片段（chunk）。"""
     source_label: str
     content: str
     score: int = 0
 
 
 def parse_args() -> argparse.Namespace:
+    """解析命令行参数：问题文本、文档目录与模型名。"""
     parser = argparse.ArgumentParser(
         description="Minimal local RAG demo for document QA."
     )
@@ -47,6 +60,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client() -> OpenAI:
+    """从 `OPENAI_API_KEY` 创建 OpenAI 客户端，缺失则退出。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -55,6 +69,7 @@ def build_client() -> OpenAI:
 
 
 def iter_text_files(base_dir: Path) -> list[Path]:
+    """递归查找支持的文本文件并返回排序后的列表。"""
     files = []
     for path in base_dir.rglob("*"):
         if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
@@ -63,6 +78,7 @@ def iter_text_files(base_dir: Path) -> list[Path]:
 
 
 def chunk_text(text: str) -> list[str]:
+    """把长文本切分为带重叠的 chunk，用于保留跨块上下文信息。"""
     normalized = text.replace("\r\n", "\n").strip()
     if not normalized:
         return []
@@ -80,6 +96,7 @@ def chunk_text(text: str) -> list[str]:
 
 
 def build_chunks(base_dir: Path) -> list[Chunk]:
+    """读取目录下文件并把文件切分为带标签的 `Chunk` 列表。"""
     chunks: list[Chunk] = []
     for file_path in iter_text_files(base_dir):
         try:
@@ -95,10 +112,15 @@ def build_chunks(base_dir: Path) -> list[Chunk]:
 
 
 def tokenize(text: str) -> set[str]:
+    """对文本进行简单分词（英文、数字、部分中文/日文字符），用于关键词检索示例。"""
     return set(re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower()))
 
 
 def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
+    """基于关键词重合度对 chunk 进行打分并返回 top-k。
+
+    注意：这是教学用的简单检索方法，生产请使用向量检索。
+    """
     question_tokens = tokenize(question)
     ranked = []
 
@@ -115,6 +137,7 @@ def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
 
 
 def build_context(top_chunks: list[Chunk]) -> str:
+    """把 top-k chunks 拼接为模型可读的检索上下文。"""
     if not top_chunks:
         return "No relevant local document chunks were retrieved."
 
@@ -125,7 +148,7 @@ def build_context(top_chunks: list[Chunk]) -> str:
 
 
 def answer_question(client: OpenAI, model: str, question: str, context: str) -> str:
-    # Constrain the model to the retrieved context so the demo behaves like a minimal RAG flow.
+    """调用模型回答，强制其仅基于传入的检索上下文回答问题。"""
     prompt = (
         f"Question:\n{question}\n\n"
         f"Retrieved context:\n{context}\n\n"

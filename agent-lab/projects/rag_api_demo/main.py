@@ -1,3 +1,13 @@
+"""rag_api_demo: 使用 FastAPI 提供的最小 RAG API 服务示例。
+
+功能概览：
+- 扫描指定目录（支持 .md/.txt/.pdf）并把文档切分为 chunk
+- 基于关键词重合度做本地检索（PoC），取 top-k 作为上下文
+- 将检索到的上下文发送给模型并返回带来源的回答
+
+此示例适合 PoC 与教学，生产请替换为 embeddings + 向量检索，加入认证、限流与缓存。
+"""
+
 import os
 import re
 from dataclasses import dataclass
@@ -25,6 +35,7 @@ SYSTEM_INSTRUCTIONS = (
 
 @dataclass
 class Chunk:
+    """文档切分后的片段对象：包含来源标签、内容与得分。"""
     source_label: str
     content: str
     score: int = 0
@@ -54,6 +65,7 @@ class ReloadResponse(BaseModel):
 
 
 def build_client() -> OpenAI:
+    """根据环境变量创建 OpenAI 客户端，缺失抛出异常以便上层处理。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set.")
@@ -61,6 +73,7 @@ def build_client() -> OpenAI:
 
 
 def get_docs_dir() -> Path:
+    """获取并校验用于 RAG 的文档目录（可通过环境变量覆盖）。"""
     docs_dir = os.getenv("RAG_API_DOCS_DIR", DEFAULT_DOCS_DIR)
     path = Path(docs_dir).resolve()
     if not path.exists() or not path.is_dir():
@@ -69,6 +82,7 @@ def get_docs_dir() -> Path:
 
 
 def iter_text_files(base_dir: Path) -> list[Path]:
+    """递归列出支持类型的文件路径并返回排序列表。"""
     files = []
     for path in base_dir.rglob("*"):
         if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
@@ -77,6 +91,7 @@ def iter_text_files(base_dir: Path) -> list[Path]:
 
 
 def read_document_text(file_path: Path) -> str:
+    """根据文件类型读取文本内容；对 PDF 使用 `pypdf` 做基本提取。"""
     suffix = file_path.suffix.lower()
 
     if suffix in {".md", ".txt"}:
@@ -96,6 +111,7 @@ def read_document_text(file_path: Path) -> str:
 
 
 def chunk_text(text: str) -> list[str]:
+    """把文本切分为带重叠的 chunk，保留跨块上下文。"""
     normalized = text.replace("\r\n", "\n").strip()
     if not normalized:
         return []
@@ -113,6 +129,7 @@ def chunk_text(text: str) -> list[str]:
 
 
 def build_chunks(base_dir: Path) -> list[Chunk]:
+    """读取指定目录下的文件并构建带来源标签的 chunk 列表。"""
     chunks: list[Chunk] = []
     for file_path in iter_text_files(base_dir):
         try:
@@ -127,10 +144,12 @@ def build_chunks(base_dir: Path) -> list[Chunk]:
 
 
 def tokenize(text: str) -> set[str]:
+    """简单分词函数，支持英文、数字和部分中日韩字符，用于关键词检索示例。"""
     return set(re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower()))
 
 
 def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
+    """基于关键词重合度进行简单检索并返回 top-k。"""
     question_tokens = tokenize(question)
     ranked: list[Chunk] = []
 
@@ -146,6 +165,7 @@ def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
 
 
 def build_context(top_chunks: list[Chunk]) -> str:
+    """把检索到的 top chunks 拼接为供模型使用的上下文字符串。"""
     if not top_chunks:
         return "No relevant local document chunks were retrieved."
 
@@ -156,7 +176,7 @@ def build_context(top_chunks: list[Chunk]) -> str:
 
 
 def answer_question(client: OpenAI, model: str, question: str, context: str) -> str:
-    # The model is asked to answer only from retrieved context so the API behaves like a minimal RAG service.
+    """调用模型回答，限制其仅基于传入的检索上下文回答问题。"""
     prompt = (
         f"Question:\n{question}\n\n"
         f"Retrieved context:\n{context}\n\n"
@@ -178,6 +198,7 @@ app.state.chunks = []
 
 
 def load_state() -> None:
+    """初始化或重新加载服务状态：扫描文档目录并缓存 chunks 与客户端实例。"""
     docs_dir = get_docs_dir()
     chunks = build_chunks(docs_dir)
     if not chunks:
@@ -195,6 +216,7 @@ def startup_event() -> None:
 
 @app.get("/health")
 def health() -> dict[str, object]:
+    """健康检查接口，返回当前 docs 目录和 chunk 数量。"""
     return {
         "status": "ok",
         "docs_dir": str(app.state.docs_dir),
@@ -204,6 +226,7 @@ def health() -> dict[str, object]:
 
 @app.post("/reload", response_model=ReloadResponse)
 def reload_docs() -> ReloadResponse:
+    """手动触发重新加载文档目录并返回新的 chunk 计数。"""
     try:
         load_state()
     except Exception as exc:
@@ -216,6 +239,7 @@ def reload_docs() -> ReloadResponse:
 
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> AskResponse:
+    """对外 API：接收问题、检索文档并返回模型回答与来源信息。"""
     if app.state.client is None or app.state.docs_dir is None:
         raise HTTPException(status_code=500, detail="Service is not initialized.")
 

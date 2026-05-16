@@ -3,7 +3,48 @@
 `agent-lab/projects/` 用来存放这条学习线里的可运行样例。
 
 这些样例不是按“技术炫酷程度”排，而是按更贴近日本 IT 现场和派遣案件需求的顺序整理。
+## 🚀 快速运行
 
+每个 demo 都配有自动化运行脚本，可一键启动（自动创建虚拟环境、安装依赖、运行示例）。
+
+### Windows (PowerShell)
+
+```powershell
+cd agent-lab/projects/demo_name
+.\run_demo.ps1
+```
+
+**带自定义参数的例子：**
+- `tool_agent_demo`: `.\run_demo.ps1 -prompt "Your task" -workdir "."`
+- `workflow_agent`: `.\run_demo.ps1 -prompt "Your task"`
+- `doc_qa_agent`: `.\run_demo.ps1 -docDir "./docs"`
+- `rag_api_demo`: `.\run_demo.ps1 -port 8000`
+
+### Linux / macOS (Bash)
+
+```bash
+cd agent-lab/projects/demo_name
+bash run_demo.sh
+```
+
+**带自定义参数的例子：**
+- `tool_agent_demo`: `bash run_demo.sh -p "Your task" -w "."`
+- `workflow_agent`: `bash run_demo.sh -p "Your task"`
+- `doc_qa_agent`: `bash run_demo.sh -d "./docs"`
+- `rag_api_demo`: `bash run_demo.sh -p 8000`
+
+### 前置要求
+
+- Python 3.10+
+- 环境变量 `OPENAI_API_KEY` 必须设置
+
+```bash
+# Linux/macOS
+export OPENAI_API_KEY="your-api-key"
+
+# Windows PowerShell
+$env:OPENAI_API_KEY = "your-api-key"
+```
 ## 推荐查看顺序
 
 1. [chat_cli](D:/dev/source_code/vscode_study/agent-lab/projects/chat_cli/README.md)

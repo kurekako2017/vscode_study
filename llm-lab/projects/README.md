@@ -37,6 +37,47 @@
 4. [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md)
 5. [rag_eval_notes.md](D:/dev/source_code/vscode_study/llm-lab/projects/rag_eval_notes.md)
 
+## 🚀 运行与复制指南（补充）
+
+### 快速启动脚本
+
+每个 demo 都配有一键启动脚本，自动处理虚拟环境、依赖安装和运行。
+
+**Windows (PowerShell):**
+```powershell
+cd agent-lab/projects/chat_cli
+.\run_demo.ps1
+```
+
+**Linux / macOS (Bash):**
+```bash
+cd agent-lab/projects/chat_cli
+bash run_demo.sh
+```
+
+### 或手动运行
+
+```bash
+cd agent-lab/projects/chat_cli
+pip install -r requirements.txt
+export OPENAI_API_KEY="your_api_key"  # Windows: $env:OPENAI_API_KEY="your_api_key"
+python main.py
+```
+
+### 前置要求
+
+- Python 3.10+
+- 环境变量 `OPENAI_API_KEY` 必须设置
+
+- 如果你想在 `llm-lab/projects` 下维护副本（便于改动或演示），可以复制目录（PowerShell 示例）：
+
+```
+mkdir llm-lab\projects\chat_cli
+Copy-Item -Path agent-lab\projects\chat_cli\* -Destination llm-lab\projects\chat_cli -Recurse
+```
+
+- 备注：`llm-lab` 保持为主线文档目录，示例副本位于 `agent-lab/projects`。如需我代为复制其它 demo，请告知名称（例如 `doc_qa_agent`）。
+
 ## 推荐案例
 
 ### 模型调用

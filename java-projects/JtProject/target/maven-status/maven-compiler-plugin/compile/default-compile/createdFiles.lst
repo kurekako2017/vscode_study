@@ -7,7 +7,6 @@ com\jtspringproject\JtSpringProject\batch\quartz\QuartzProductInventoryCheckAppl
 com\jtspringproject\JtSpringProject\batch\quartz\QuartzBatchLabConfig.class
 com\jtspringproject\JtSpringProject\services\CategoryService.class
 com\jtspringproject\JtSpringProject\models\Product.class
-com\jtspringproject\JtSpringProject\batch\AppLogRotationBatchService.class
 com\jtspringproject\JtSpringProject\common\util\InputCheckUtil.class
 com\jtspringproject\JtSpringProject\services\ProductService.class
 com\jtspringproject\JtSpringProject\dao\impl\ProductDaoImpl.class
@@ -17,15 +16,12 @@ com\jtspringproject\JtSpringProject\dao\impl\UserDaoImpl.class
 com\jtspringproject\JtSpringProject\dao\CartDao.class
 com\jtspringproject\JtSpringProject\services\impl\CartServiceImpl.class
 com\jtspringproject\JtSpringProject\batch\launcher\ProductCategoryCheckBatchApplication.class
-com\jtspringproject\JtSpringProject\batch\ProductCategoryCheckBatchService.class
 com\jtspringproject\JtSpringProject\dao\CategoryDao.class
 com\jtspringproject\JtSpringProject\services\impl\UserServiceImpl.class
 com\jtspringproject\JtSpringProject\dao\impl\CartDaoImpl.class
 com\jtspringproject\JtSpringProject\models\User.class
-com\jtspringproject\JtSpringProject\batch\ProductInventoryCheckBatchService.class
 com\jtspringproject\JtSpringProject\batch\launcher\DatabaseBackupBatchApplication.class
 com\jtspringproject\JtSpringProject\batch\launcher\TestDataResetBatchApplication.class
-com\jtspringproject\JtSpringProject\batch\DatabaseBackupBatchService.class
 com\jtspringproject\JtSpringProject\common\util\TypeConversionUtil.class
 com\jtspringproject\JtSpringProject\AnotherComponent.class
 com\jtspringproject\JtSpringProject\dao\ProductDao.class
