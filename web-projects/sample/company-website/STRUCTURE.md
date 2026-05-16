@@ -155,7 +155,7 @@ Supabase 相关配置和 Edge Functions：
 1. **开始**：阅读 `README.md` 了解项目概览
 2. **学习**：跟随 `docs/GETTING_STARTED.md` 学习
 3. **开发**：在 `frontend/` 中编写代码
-4. **测试**：本地运行 `pnpm dev`
+4. **测试**：在 `frontend/` 目录执行 `npm install` 然后运行 `npm run dev`（或使用你偏好的包管理器，但仓库示例使用 `npm`）
 5. **部署**：参考 `docs/DEPLOYMENT.md` 上线
 
 ## 💡 开发建议
