@@ -4,14 +4,14 @@
 
 ### 🇯🇵 日本企业网站开发完全指南【推荐】
 
-1. **[WordPress 公司网站制作完全指南.md](docs/WordPress%20公司网站制作完全指南.md)** - WordPress公司网站制作完全指南【主题对比推荐】
+1. **[WordPress 公司网站制作完全指南.md](docs/wordpress/WordPress%20公司网站制作完全指南.md)** - WordPress公司网站制作完全指南【主题对比推荐】
    - Kadence、Elementor、Cocoon、Lightning主题对比
    - 推荐组合方案（免费/付费）
    - 各主题详细安装配置指南
    - 30分钟快速上手指南
    - SEO优化、性能优化、安全设置
 
-2. **[WordPress Cocoon主题完全开发指南.md](docs/WordPress%20Cocoon主题完全开发指南.md)** - Cocoon主题完全开发指南【最推荐】
+2. **[WordPress Cocoon主题完全开发指南.md](docs/wordpress/WordPress%20Cocoon主题完全开发指南.md)** - Cocoon主题完全开发指南【最推荐】
    - Cocoon主题介绍与优势
    - 30分钟快速安装配置
    - 企业网站页面模板（可直接复制使用）
@@ -45,18 +45,18 @@
    - Bootstrap Studio 集成
    - 现代开发工具和模板
 
-7. **[邮件和新闻功能实现指南.md](docs/邮件和新闻功能实现指南.md)** - 邮件和新闻功能实现
+7. **[邮件服务器部署与功能实现完整指南.md](docs/email/邮件服务器部署与功能实现完整指南.md)** - 邮件和新闻功能实现
    - 邮件服务器部署
    - 邮件发送功能
    - 新闻提交管理
    - 生产环境部署
 
-8. **[邮件部署快速上手.md](docs/邮件部署快速上手.md)** - 5分钟快速上手
+8. **[邮件服务快速部署指南.md](docs/email/邮件服务快速部署指南.md)** - 5分钟快速上手
    - 快速部署邮件服务
    - 简化版实现
    - 常见问题解决
 
-9. **[SEO优化指南.md](docs/SEO优化指南.md)** - SEO 优化指南
+9. **[SEO优化指南.md](docs/seo/SEO优化指南.md)** - SEO 优化指南
    - 已上线网站SEO工具
    - 本地环境SEO检查
    - 关键词研究优化
@@ -94,7 +94,7 @@
 
 ```bash
 # 🎯 超快速路径：1-2天完成专业企业网站
-1. 阅读 docs/WordPress Cocoon主题完全开发指南.md
+1. 阅读 docs/wordpress/WordPress%20Cocoon主题完全开发指南.md
 2. 安装WordPress + Cocoon主题（免费）
 3. 直接复制使用页面模板代码
 4. 自定义公司信息和图片
@@ -110,9 +110,9 @@
 
 ```bash
 # 其他方案选择
-1. docs/日本企业网站解决方案.md - 4种方案对比
-2. docs/WordPress快速入门.md - Lightning主题30分钟快速启动
-3. docs/成本比较与实际案例.md - 查看实际案例和成本
+1. docs/solutions/日本企业网站解决方案.md - 4种方案对比
+2. docs/wordpress/WordPress快速入门.md - Lightning主题30分钟快速启动
+3. docs/quotes/成本比较与实际案例.md - 查看实际案例和成本
 
 コスト: ¥0-¥9,000/年
 時間: 1-7日
@@ -122,7 +122,7 @@
 
 ```bash
 # 方案比較チャート
-docs/日本企业网站解决方案.md を確認
+docs/solutions/日本企业网站解决方案.md を確認
 
 推奨:
 - 初めて → WordPress単体 (¥0)
@@ -134,7 +134,7 @@ docs/日本企业网站解决方案.md を確認
 
 ```bash
 # 実際の制作例を確認
-docs/成本比较与实际案例.md
+docs/quotes/成本比较与实际案例.md
 
 含まれる内容:
 ✅ 中小企業の実例3件
@@ -169,7 +169,7 @@ npm init -y
 npm install express nodemailer dotenv body-parser cors
 
 # 创建文件
-# 参考 邮件部署快速上手.md
+# 参考 docs/email/邮件服务快速部署指南.md
 
 # 启动
 node server.js
@@ -200,14 +200,30 @@ npm run dev
 ```
 web-projects/
 ├── README.md                              # 本文件
-├── 网站开发指南.md                       # 开发教程
-├── 邮件和新闻功能实现指南.md             # 邮件新闻实现
-├── 邮件部署快速上手.md                   # 快速部署
-└── company-website/                       # 公司网站项目
-    ├── docs/
-    │   ├── 网页制作报价标准.md            # 报价标准
-    │   └── 邮箱服务器配置.md              # 邮件配置
-    └── [项目文件...]
+├── docs/
+│   ├── wordpress/
+│   │   ├── WordPress 公司网站制作完全指南.md
+│   │   └── WordPress Cocoon主题完全开发指南.md
+│   ├── tutorials/
+│   │   └── 网站开发指南.md               # 开发教程
+│   ├── email/
+│   │   ├── 邮件服务器部署与功能实现完整指南.md # 邮件新闻实现
+│   │   └── 邮件服务快速部署指南.md       # 快速部署
+│   ├── quotes/
+│   │   ├── 成本比较与实际案例.md
+│   │   ├── 网页制作 报价标准（通用版）.md  # 报价标准
+│   │   └── 电商网站报价方案.md
+│   ├── seo/
+│   │   └── SEO优化指南.md
+│   ├── solutions/
+│   │   └── 日本企业网站解决方案.md
+│   └── domain/
+│       └── gk-fuji-域名跳转教程.md
+└── sample/company-website/                # 公司网站项目
+   ├── docs/
+   │   ├── DEPLOYMENT.md
+   │   └── GETTING_STARTED.md
+   └── [项目文件...]
 ```
 
 ---
@@ -321,7 +337,7 @@ docker-compose up -d
 - **年维护费**：¥50,000-150,000
 - **服务器**：¥5,000-15,000/年
 
-详细报价见：[网页制作报价标准.md](company-website/docs/网页制作报价标准.md)
+详细报价见：[网页制作报价标准.md](docs/quotes/网页制作%20报价标准（通用版）.md)
 
 ---
 
