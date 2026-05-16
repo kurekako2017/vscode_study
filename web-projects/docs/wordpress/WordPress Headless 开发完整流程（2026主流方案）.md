@@ -52,12 +52,172 @@
 - 联系表单：建议使用后端 API（Edge Function / Serverless）处理并调用邮件服务（如 Brevo）
 - 对接 WordPress：可通过自定义 REST endpoint 将数据写入 WP 或直接写入 Supabase 等后端
 
+### 6.1 详细实现步骤（前端架构）
+
+- 目录示例：
+
+```
+frontend/
+├─ app/
+│  ├─ layout.tsx
+│  ├─ page.tsx
+	├─ news/
+	│  ├─ page.tsx       // Server Component 列表页
+	│  └─ [slug]/page.tsx // Server Component 详情页
+	└─ contact/
+		 └─ page.tsx       // 标记为 Client Component 如需 useState
+├─ components/
+└─ lib/
+	 └─ wpClient.ts       // 封装 WP REST / GraphQL 请求
+```
+
+- 推荐在服务端（Server Component / server action）使用环境变量存放后端 URL：
+
+```js
+// lib/wpClient.ts
+export function wpFetch(path) {
+	const base = process.env.WP_API_URL || 'https://cms.example.com';
+	return fetch(new URL(path, base).toString(), { next: { revalidate: 60 } });
+}
+```
+
+### 6.2 数据获取模式
+
+- Server Component（推荐用于 SEO）：在 `page.tsx` 中直接调用 `wpFetch('/wp-json/wp/v2/posts')`，返回 HTML 渲染。
+- Client Component（交互）：用 `fetch` 或 `swr` 在客户端拉取动态数据或表单提交。
+
+示例：Server Component 获取新闻列表
+
+```jsx
+// app/news/page.tsx (Server Component)
+import { wpFetch } from '@/lib/wpClient';
+export default async function NewsPage() {
+	const res = await wpFetch('/wp-json/wp/v2/posts');
+	const posts = await res.json();
+	return (
+		<div>
+			{posts.map(p => <article key={p.id}><h2>{p.title.rendered}</h2></article>)}
+		</div>
+	)
+}
+```
+
+---
+
+## 7. 身份认证与表单提交
+
+- 联系表单：建议使用后端 API（Edge Function / Serverless）处理并调用邮件服务（如 Brevo）
+- 对接 WordPress：可通过自定义 REST endpoint 将数据写入 WP 或直接写入 Supabase 等后端
+
+### 7.1 联系表单 - 推荐实现流程
+
+1. 前端：Contact 表单为 Client Component，提交到 Next.js API Route（或 Edge Function）。
+2. 服务端：验证字段、执行防机器人验证（reCAPTCHA 或 hCaptcha）、写入数据库或转发到 WordPress 自定义 endpoint。
+3. 发送通知：使用 Brevo / SendGrid 在服务端发送邮件通知。
+
+示例：Next.js API Route（简化）
+
+```js
+// pages/api/contact.js 或 /app/api/contact/route.js
+import fetch from 'node-fetch';
+
+export async function POST(req) {
+	const body = await req.json();
+	// 校验
+	if (!body.email || !body.message) return new Response('Bad Request', { status: 400 });
+
+	// 可选：调用 WordPress 自定义 endpoint
+	await fetch(process.env.WP_API_URL + '/wp-json/custom/v1/contact', {
+		method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+	});
+
+	// 发送邮件通知（示例：Brevo）
+	await fetch('https://api.brevo.com/v3/smtp/email', {
+		method: 'POST', headers: { 'Content-Type': 'application/json', 'api-key': process.env.BREVO_KEY },
+		body: JSON.stringify({ to: [{ email: 'admin@example.com' }], subject: 'New contact', htmlContent: `<p>${body.message}</p>` })
+	});
+
+	return new Response(JSON.stringify({ ok: true }), { status: 200 });
+}
+```
+
+### 7.2 用户认证（JWT / OAuth）
+
+- 若前端需要登录对接 WP：推荐使用 JWT 插件（例如 `jwt-auth`）或使用 OAuth2 中介服务。
+- 流程（JWT 简化）：
+	1. 用户在前端提交账号密码到后端 API
+	2. 后端向 WordPress 发起验证并获取 token
+	3. 后端返回 token 给前端，前端把 token 存入 HttpOnly cookie 或 memory（注意 XSS/CSRF 风险）
+
+示例：在服务端封装 `login` 调用并设置 cookie 的伪代码略。
+
+---
+
 ## 8. 部署与托管建议
 
 - 前端：Vercel / Netlify / Cloudflare Pages（支持 Next.js）
 - 后端（WordPress）：传统主机、Managed WordPress、或 Docker 部署在云主机
 - 静态资源与 CDN：使用 CDN 提速与缓存
 
+### 8.1 前端部署（Vercel）快速步骤
+
+1. 在 Vercel 上创建项目并连接 GitHub 仓库。
+2. 设置环境变量：`WP_API_URL`、`BREVO_KEY`、其他私钥。
+3. 部署分支（main）自动构建。
+
+示例：GitHub Actions（构建 Next.js 并部署到 Vercel via CLI）
+
+```yaml
+name: Deploy Frontend
+on: push
+jobs:
+	build:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- name: Setup Node
+				uses: actions/setup-node@v4
+				with: node-version: 20
+			- run: npm ci
+			- run: npm run build
+			- run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+```
+
+### 8.2 WordPress 部署（Docker Compose）示例
+
+```yaml
+version: '3.8'
+services:
+	db:
+		image: mysql:8
+		environment:
+			MYSQL_DATABASE: wordpress
+			MYSQL_USER: wordpress
+			MYSQL_PASSWORD: example
+			MYSQL_ROOT_PASSWORD: example
+	wordpress:
+		image: wordpress:php8.1-apache
+		ports:
+			- '8080:80'
+		environment:
+			WORDPRESS_DB_HOST: db:3306
+			WORDPRESS_DB_USER: wordpress
+			WORDPRESS_DB_PASSWORD: example
+			WORDPRESS_DB_NAME: wordpress
+```
+
+### 8.3 静态导出与同步（如需上传到传统主机）
+
+- 使用 `next export` 生成静态文件，或用 `rsync`/FTP 上传到主机。
+
+```bash
+npm run build && npm run export
+# rsync -avz out/ user@host:/var/www/html
+```
+
+---
+
+完成展开并增加示例代码与部署模板。
 ## 9. SEO 与社交分享
 
 - 在服务端（SSR/SSG）生成 meta、sitemap、Open Graph
