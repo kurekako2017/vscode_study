@@ -1,0 +1,7 @@
+# Cloudflare DNS 配置占位
+
+# 请在此处放置 DNS 记录模板，示例：
+# example.com. 3600 IN A 1.2.3.4
+# www.example.com. 3600 IN CNAME example.com.
+
+# 当前为占位文件，用于提醒维护者补充实际 DNS 配置。
