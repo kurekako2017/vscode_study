@@ -187,3 +187,60 @@ curl -X POST https://your-site.com/wp-json/ai-codex/v1/generate \
 - C: 指导你通过 VS Code Remote‑SSH 连接服务器并现场演示插件安装与测试（提供一步步命令与注意点）。
 
 请回复你要哪个选项（A / B / C），我马上为你执行。
+
+从 Staging 同步到本番（可执行流程与脚本示例）
+
+如果你的 RS 环境已经有独立的测试服务器，并且测试完成后需要把变更同步到本番，同时需要替换或调整某些文件/目录路径，下面的流程与脚本可以参考或直接使用（请先在非生产环境验证）。
+
+前提与准备
+
+- 在执行同步前：先在生产做完整备份（文件与数据库）。
+- 确保能通过 SSH 访问 staging 与 production 节点，或能在同一台服务器上访问两个路径。
+- 确认哪些目录需要同步（通常为 `wp-content/uploads`、自定义插件/主题目录、生成的静态资源），避免覆盖生产的 `wp-config.php`、`.env` 或包含私密密钥的文件。
+- 如果同步会包含域名或 URL 变化，需要准备好 `wp search-replace` 的替换命令。
+
+执行步骤（概览）
+
+1. 在生产开启 Maintenance/维护模式（避免用户在切换期间产生数据冲突）。
+  - 可用 WP 插件或 WP‑CLI：`wp maintenance-mode activate`（视环境而定）。
+2. 在生产做完整备份：
+  - 文件备份（tar 或 rsync 备份到备份目录）
+  - 数据库备份：`wp db export /tmp/prod-backup.sql`
+3. 从 staging 同步指定目录到 production（建议使用 rsync，保留权限并可增量）：
+  - 同步示例（只同步 uploads）：
+
+```bash
+rsync -avz --delete --exclude 'cache/' \ 
+  user@staging.example.com:/var/www/staging/wp-content/uploads/ /var/www/html/wp-content/uploads/
+```
+
+4. 如果需要替换 URL 或路径（staging -> prod），运行 WP‑CLI 的 search-replace：
+
+```bash
+wp search-replace 'https://staging.example.com' 'https://example.com' --skip-columns=guid
+```
+
+5. 调整文件权限（例如 Apache/nginx 的运行用户）：
+
+```bash
+chown -R www-data:www-data /var/www/html/wp-content/uploads
+find /var/www/html/wp-content -type d -exec chmod 755 {} \;
+find /var/www/html/wp-content -type f -exec chmod 644 {} \;
+```
+
+6. 清理缓存并关闭维护模式：
+
+```bash
+wp cache flush
+wp maintenance-mode deactivate
+```
+
+回滚与备份建议
+
+- 同步前保留完整备份（文件+DB），并把备份放到易于恢复的位置（例如 `/backup/$(date +%F-%T)`）。
+- rsync 可配合 `--backup` 和 `--backup-dir` 参数保留被覆盖文件，便于回滚。
+
+同步脚本：`web-projects/deploy/sync-staging-to-prod.sh`（示例）
+
+该脚本为通用示例，请根据你的服务器路径、用户和域名修改变量后在 staging 先做 `--dry-run` 验证。
+
