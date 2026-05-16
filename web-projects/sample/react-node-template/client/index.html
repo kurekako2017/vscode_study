@@ -1,4 +1,14 @@
 <!doctype html>
+<!--
+  client/index.html - 入口 HTML（教学注释）
+  说明：
+  - Vite 开发服务器在 dev 模式下会提供此文件并按 ESM 模块方式加载 `src/main.jsx`。
+  - `div#root` 是 React 应用的挂载目标（参见 `src/main.jsx` 中的 `createRoot`/`render`）。
+  - 若需要调试或修改加载行为，请查看 `client/vite.config.js`（代理配置）和 `server` 的 API 端点。
+  本地运行：在项目根目录使用 VS Code 任务或分别启动后端与前端：
+    1) 后端：cd web-projects/sample/react-node-template/server && npm run dev
+    2) 前端：cd web-projects/sample/react-node-template/client && npm run dev
+-->
 <html>
   <head>
     <meta charset="utf-8" />
@@ -6,7 +16,9 @@
     <title>React + Node Template</title>
   </head>
   <body>
+    <!-- React 应用挂载容器 -->
     <div id="root"></div>
+    <!-- 加载 React 入口模块：src/main.jsx（使用 ESM 模块） -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
