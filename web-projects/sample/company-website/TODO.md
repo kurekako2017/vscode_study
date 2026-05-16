@@ -1,24 +1,27 @@
 # 待办事项
 
-## ✅ 已完成
+## ✅ 已完成（截至 2026-05-16）
 
 - [x] 创建项目结构
 - [x] 配置 Next.js + Tailwind CSS
-- [x] 设计数据库架构
-- [x] 编写部署文档
-- [x] 编写邮件配置文档
-- [x] 创建首页示例
+- [x] 设计数据库架构（`backend/supabase/schema.sql`）
+- [x] 创建首页示例（`frontend/app/page.tsx`）
+- [x] 更新 `STRUCTURE.md`（将 dev 命令改为 `npm install && npm run dev`）
+- [x] 在 `scripts/` 添加占位脚本：`deploy.sh`, `backup.sh`
+- [x] 在 `infrastructure/` 添加占位说明（`docker/`, `terraform/`, `cloudflare/`）
+- [x] 在 `frontend/app/contact/page.tsx` 标记为 Client Component（添加 `"use client"`）以修复 hooks 错误
+- [x] 添加 `frontend/public/README.md` 占位说明
 
 ## 🚧 进行中
 
-### 前端开发
+- ### 前端开发
 - [ ] 创建所有页面组件
   - [ ] 关于我们页面
   - [ ] 服务页面
   - [ ] 案例展示页面
-  - [ ] 新闻列表页面
+  - [ ] 新闻列表页面（注意：`/news` 页面当前在 dev 时因调用 `/api/news` 报 `ERR_INVALID_URL`，需修复 fetch URL）
   - [ ] 新闻详情页面
-  - [ ] 联系页面
+  - [x] 联系页面（已修复为 Client Component）
 - [ ] 创建可复用组件
   - [ ] Header 导航栏
   - [ ] Footer 页脚
@@ -63,7 +66,7 @@
 - [ ] 配置 Brevo 邮件服务
 - [ ] 设置 CI/CD（GitHub Actions）
 - [ ] 配置监控和日志
-- [ ] 备份策略
+- [ ] 备份策略（占位脚本已添加为 `scripts/backup.sh`，需替换为真实备份实现）
 
 ## 📌 待办（优先级低）
 
@@ -103,13 +106,13 @@
 
 ## 📝 文档待完善
 
-- [ ] API 接口文档
+- [ ] API 接口文档（补充 `/api/*` 规范）
 - [ ] 组件使用文档
-- [ ] 数据库设计文档
-- [ ] 部署流程视频教程
+- [ ] 数据库设计文档（补充 ER 图与说明）
+- [ ] 部署流程示例（脚本与步骤）
 - [ ] 常见问题 FAQ
 - [ ] 贡献指南
 
 ---
 
-**更新时间**: 2026年1月5日
+**更新时间**: 2026年5月16日
