@@ -41,6 +41,8 @@ def ask_once(client: OpenAI, model: str, prompt: str) -> str:
         input=prompt,
     )
     # Responses API 提供简化的输出接口 `output_text`
+    # 注意：在复杂场景下，response 还包含 token-level 顶层结构、工具调用信息等。
+    # 这里为了教学简洁，直接返回主文本回答；如果需要详细调试，可打印完整的 response 对象。
     return response.output_text
 
 
