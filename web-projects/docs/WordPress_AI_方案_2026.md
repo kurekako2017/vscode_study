@@ -116,3 +116,74 @@
 4. 在 staging 验证生成结果，并开通审核流程（自动草稿->人工审核->发布）。
 
 如果你需要，我可以把以上推荐插件和配置示例追加到文档的表格形式，或为你的服务器环境生成一个 `staging` 部署脚本（Docker / systemd / nginx 反向代理）。
+
+在服务器直接开发 — 可执行流程（Onamae RS 场景）
+
+下面是针对你在 onamae RS 服务器上直接运行 WordPress 并在上面开发的可执行流程，包含推荐工具、常用命令与安全注意点。你可以按序执行或复制到服务器上操作。
+
+1. 推荐工作方式（最少风险、最高效率）
+
+- 在服务器上开发仍建议使用 `staging` 或通过 Feature Flag 控制新功能，避免直接影响线上用户。
+- 优先使用 VS Code Remote‑SSH 直接编辑服务器文件（体验最好），或采用 Git 推送到服务器（更安全、可回滚）。
+
+2. 使用 VS Code Remote‑SSH（强烈推荐）
+
+- 在本地 VS Code 安装 `Remote - SSH` 扩展，并配置到你服务器的 SSH 连接。
+- 通过 Remote‑SSH 打开服务器上的 WordPress 根目录（例如 `/var/www/html`），即可像本地编辑一样修改插件、主题与配置。
+- 在远端上下文使用 Codex/ChatGPT 插件可以获得上下文感知的代码生成与补全。
+
+3. 常用 WP‑CLI 操作（在服务器上执行）
+
+```bash
+# 进入 WordPress 根目录（视实际路径）
+cd /var/www/html
+
+# 安装并激活插件（示例：ai-engine）
+wp plugin install ai-engine --activate
+
+# 从 zip 安装并激活
+wp plugin install /path/to/plugin.zip --activate
+
+# 启用/禁用自定义插件
+wp plugin activate ai-codex-agent
+wp plugin deactivate ai-codex-agent
+```
+
+4. 在服务器上做自定义开发（建议步骤）
+
+- 在 `wp-content/plugins/` 下创建 `ai-codex-agent` 目录，并放入主插件文件 `ai-codex-agent.php`（可复用仓库中的示例）。
+- 在 `wp-config.php` 中通过环境变量读取 OpenAI Key：
+
+```php
+define('OPENAI_API_KEY', getenv('OPENAI_API_KEY'));
+```
+
+- 在服务器 shell 中设置环境变量（临时或在服务配置里长期生效）：
+
+```bash
+export OPENAI_API_KEY="sk-xxxx"
+```
+
+5. 安全、备份与审核要点
+
+- 不要把 API Key 提交到 Git；使用服务器环境变量或 Secret 管理器。 
+- 自动生成的内容应先保存为 `draft` 并进入人工审核流程后再发布。 
+- 为 API 调用增加缓存（`transient`、对象缓存）与速率限制，控制成本与异常。
+- 在生产上不要直接改代码，先在 `staging` 上测试，使用数据库与文件备份策略。
+
+6. 调试示例（curl 调用 REST 接口）
+
+```bash
+curl -X POST https://your-site.com/wp-json/ai-codex/v1/generate \
+  -H "Content-Type: application/json" \
+  -u admin:yourpassword \
+  -d '{"prompt":"生成一段关于X的文章"}'
+```
+
+7. 我可以为你做的具体助力（选项）
+
+- A: 在仓库中 scaffold 一个完整的 `ai-codex-agent` 插件（含主文件、README 与示例 REST 路由），你可直接把 zip 上传到服务器并启用。 
+- B: 把推荐插件清单写成表格并追加到文档（包含 WordPress.org slug 与 WP‑CLI 安装命令）。
+- C: 指导你通过 VS Code Remote‑SSH 连接服务器并现场演示插件安装与测试（提供一步步命令与注意点）。
+
+请回复你要哪个选项（A / B / C），我马上为你执行。
