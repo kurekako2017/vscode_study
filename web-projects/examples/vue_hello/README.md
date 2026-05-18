@@ -36,3 +36,35 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### 快速启动（完整步骤）
+
+1. 确保已安装 Node.js（推荐 Node 16+ 或更高）。
+2. 在项目根目录运行依赖安装：
+
+```powershell
+npm install
+```
+
+3. 启动开发服务器（带热重载）：
+
+```powershell
+npm run dev
+```
+
+4. 在浏览器中打开开发地址（默认）：
+
+```
+http://localhost:5173
+```
+
+5. 预览构建产物（可选）：
+
+```powershell
+npm run build
+npm run preview
+```
+
+常见问题：
+- 若端口被占用，Vite 会提示并尝试使用其它端口；也可以设置环境变量 `PORT` 来固定端口。
+- 遇到依赖或构建错误，先确认 Node 版本并删除 `node_modules` 后重试 `npm install`。

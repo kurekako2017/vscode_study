@@ -22,3 +22,35 @@ npm run dev
 - `src/app/app.component.html`：组件模板
 - `src/app/app.component.css`：组件样式
 - `angular.json`：Angular CLI 配置
+
+### 快速启动（完整步骤）
+
+1. 确保已安装 Node.js（推荐 Node 16+）和 `@angular/cli`（可选，本示例的脚本会使用本地安装的 CLI）。
+2. 在项目根目录安装依赖：
+
+```bash
+npm install
+```
+
+3. 启动开发服务器：
+
+```bash
+npm run dev
+```
+
+4. 在浏览器中打开默认地址（Angular CLI 默认为）：
+
+```
+http://localhost:4200
+```
+
+5. 构建并在生产模式下运行（可选）：
+
+```bash
+npm run build
+npm run start
+```
+
+常见问题：
+- 若端口占用，可在启动时传入 `--port` 参数或设置 `PORT` 环境变量。
+- 如果遇到 TypeScript 配置或编译错误，确认 `tsconfig.json` 与项目一致，并尝试清理缓存（删除 `node_modules` 并重装）。
