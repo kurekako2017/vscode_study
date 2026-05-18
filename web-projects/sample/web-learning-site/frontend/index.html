@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="株式会社サンプル - 革新的なソリューションを提供する企業">
+    <title>株式会社サンプル - 企業ホームページ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ナビゲーション -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">株式会社サンプル</div>
+            <ul class="nav-menu">
+                <li><a href="#home">ホーム</a></li>
+                <li><a href="#about">会社概要</a></li>
+                <li><a href="#services">サービス</a></li>
+                <li><a href="#news">ニュース</a></li>
+                <li><a href="#contact">お問い合わせ</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="メニュー">☰</button>
+        </div>
+    </nav>
+
+    <!-- ヒーローセクション -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1 class="hero-title">革新的なソリューションで<br>ビジネスの未来を創造</h1>
+            <p class="hero-subtitle">お客様のビジネス課題を解決する最適なサービスを提供します</p>
+            <a href="#contact" class="btn btn-primary">お問い合わせ</a>
+        </div>
+    </section>
+
+    <!-- 会社概要 -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">会社概要</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>私たちについて</h3>
+                    <p>株式会社サンプルは、2020年に設立された革新的なテクノロジー企業です。お客様のビジネス成長をサポートするため、最新のテクノロジーと専門知識を活用したソリューションを提供しています。</p>
+                    <p>私たちのミッションは、テクノロジーの力でビジネスの可能性を最大化することです。</p>
+                </div>
+                <div class="about-info">
+                    <table class="info-table">
+                        <tr>
+                            <th>会社名</th>
+                            <td>株式会社サンプル</td>
+                        </tr>
+                        <tr>
+                            <th>設立</th>
+                            <td>2020年4月1日</td>
+                        </tr>
+                        <tr>
+                            <th>資本金</th>
+                            <td>1,000万円</td>
+                        </tr>
+                        <tr>
+                            <th>所在地</th>
+                            <td>東京都渋谷区</td>
+                        </tr>
+                        <tr>
+                            <th>従業員数</th>
+                            <td>50名</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- サービス -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">サービス</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">💻</div>
+                    <h3>Webシステム開発</h3>
+                    <p>最新技術を活用した高品質なWebアプリケーション・システムを開発します。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <h3>モバイルアプリ開発</h3>
+                    <p>iOS・Android対応のネイティブ・クロスプラットフォームアプリを提供します。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">☁️</div>
+                    <h3>クラウドソリューション</h3>
+                    <p>AWSやAzureを活用したスケーラブルなクラウドインフラを構築します。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🤖</div>
+                    <h3>AI・データ分析</h3>
+                    <p>機械学習とデータ分析でビジネスインサイトを提供します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ニュース -->
+    <section id="news" class="news">
+        <div class="container">
+            <h2 class="section-title">ニュース</h2>
+            <div class="news-list">
+               
+                <article class="news-item">
+                    <time class="news-date">2026.01.05</time>
+                    <h3 class="news-title">新サービス「AIコンサルティング」をリリース</h3>
+                    <p class="news-summary">企業のAI導入を支援する新サービスの提供を開始しました。</p>
+                </article>
+                <article class="news-item">
+                    <time class="news-date">2025.12.20</time>
+                    <h3 class="news-title">年末年始の営業時間のお知らせ</h3>
+                    <p class="news-summary">12月28日から1月5日まで休業させていただきます。</p>
+                </article>
+                <article class="news-item">
+                    <time class="news-date">2025.11.15</time>
+                    <h3 class="news-title">オフィス移転のお知らせ</h3>
+                    <p class="news-summary">2026年1月より新オフィスに移転いたします。</p>
+                </article>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- お問い合わせ -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">お問い合わせ</h2>
+            <form id="contactForm" class="contact-form">
+                <div class="form-group">
+                    <label for="name">お名前 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="company">会社名</label>
+                    <input type="text" id="company" name="company">
+                </div>
+                <div class="form-group">
+                    <label for="email">メールアドレス <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">電話番号</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="message">お問い合わせ内容 <span class="required">*</span></label>
+                    <textarea id="message" name="message" rows="6" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">送信する</button>
+            </form>
+            <div id="formMessage" class="form-message"></div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>株式会社サンプル</h4>
+                    <p>〒150-0001<br>東京都渋谷区神宮前1-1-1<br>TEL: 03-1234-5678</p>
+                </div>
+                <div class="footer-section">
+                    <h4>リンク</h4>
+                    <ul>
+                        <li><a href="#home">ホーム</a></li>
+                        <li><a href="#about">会社概要</a></li>
+                        <li><a href="#services">サービス</a></li>
+                        <li><a href="#contact">お問い合わせ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>法的情報</h4>
+                    <ul>
+                        <li><a href="#">プライバシーポリシー</a></li>
+                        <li><a href="#">利用規約</a></li>
+                        <li><a href="#">特定商取引法</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 株式会社サンプル All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
