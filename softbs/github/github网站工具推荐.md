@@ -2,6 +2,8 @@
 
 整理并分类列出用户提供的工具/项目推荐，包含 URL、简短说明与分类，便于后续参考与归档。
 
+已补充工具推荐：GitNexus（https://github.com/abhigyanpatwari/GitNexus），用于把代码/项目元信息可视化成知识图谱。
+
 ## 目录
 
 - [GitHub 网站与工具推荐](#github-网站与工具推荐)
@@ -42,6 +44,10 @@
 
 - Claude Code 教程 — https://www.cccode.dev/?utm_source=chatgpt.com
 	- 面向中文的代码生成与协作工具与教程，适合代码生成、Prompt 工程与工作流集成。分类：AI Agents & Assistants / 工具与教程。
+- gpt-codex — https://github.com/xianyu110/gpt-codex
+	- 面向代码生成与编辑工作流的 AI 编码辅助仓库，适合参考其提示、流程和自动化实践。分类：AI Agents & Assistants / 编码辅助。
+- Claude Code 最佳实践 — https://code.claude.com/docs/zh-CN/best-practices
+	- Claude Code 官方最佳实践文档，包含验证、规划、上下文管理、权限、hooks、skills 与 subagents 的使用建议。分类：AI Agents & Assistants / 官方文档。
 
 ## 抓取与数据 (Web Scraping & Data)
 
@@ -100,8 +106,6 @@
 
 - QuantDinger — https://quantdinger.net/
 	- AI 驱动的量化交易 / 研究站点（个人量化工具与文章）。分类：金融 / 量化。
-- AI Hedge Fund（示例仓库） — https://github.com/virattt/ai-hedge-fund
-
 - AI Hedge Fund（示例仓库） — https://github.com/virattt/ai-hedge-fund
 	- 与 AI 驱动的对冲基金研究或示例相关的仓库。分类：金融 / 量化。
 	  - ⭐ 58.9k · License: MIT · 最近更新: 2 days ago
