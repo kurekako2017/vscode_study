@@ -18,9 +18,17 @@
 | 文件 | 作用 | 典型用法 |
 |---|---|---|
 | `scripts/wsl/start-wsl-vscode-dev.bat` | 一键打开 Ubuntu + 仓库 + VS Code（支持 `mnt/local` 模式） | `scripts\wsl\start-wsl-vscode-dev.bat local` |
+| `scripts/wsl/sync-from-wsl.bat` | 从 WSL 主目录同步最新内容到 Windows D 盘 | `scripts\wsl\sync-from-wsl.bat` |
+| `scripts/wsl/sync-from-wsl.ps1` | 同步脚本主体，支持 `-NoMirror` 等参数 | `powershell -ExecutionPolicy Bypass -File .\scripts\wsl\sync-from-wsl.ps1` |
 | `scripts/wsl/init-wsl-local-repo.sh` | 把当前仓库复制到 WSL 本地工作区 `~/workspace/vscode_study` | `bash ./scripts/wsl/init-wsl-local-repo.sh` |
 | `scripts/wsl/dev-check-gitbash.sh` | Git Bash 开发环境一键检查（Git/Java/Python/LLM 变量） | `bash ./scripts/wsl/dev-check-gitbash.sh` |
 | `scripts/wsl/gitbash_aliases.sh` | Git Bash 常用别名和函数（`gs`、`venvon`、`devcheck`） | `source /d/dev/source_code/vscode_study/scripts/wsl/gitbash_aliases.sh` |
+
+## WSL 同步建议
+
+1. 以 `scripts/wsl/sync-from-wsl.bat` 作为 Windows 双击入口。
+2. 默认使用镜像模式，把 WSL 的 `/home/victorkure/workspace/vscode_study` 同步到 `D:\dev\source_code\vscode_study`。
+3. 若想保留 Windows 端多余文件，改用 `sync-from-wsl.ps1 -NoMirror`。
 
 ## Docker 脚本与文档
 
