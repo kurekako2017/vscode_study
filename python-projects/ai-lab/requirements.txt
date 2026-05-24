@@ -7,7 +7,7 @@ matplotlib>=3.7.0       # 数据可视化
 seaborn>=0.12.0         # 统计数据可视化
 
 # 机器学习
-scikit-learn>=1.2.0     # 经典机器学习算法
+scikit-learn>=1.8.0     # 经典机器学习算法
 
 # 深度学习（可选，按需安装）
 # tensorflow>=2.12.0    # Google的深度学习框架
