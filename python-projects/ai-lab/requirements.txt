@@ -24,4 +24,4 @@ ipython>=8.10.0         # 增强型Python shell
 
 # 其他有用的库
 scipy>=1.10.0           # 科学计算
-statsmodels>=0.13.0     # 统计建模
+statsmodels>=0.14.6     # 统计建模
