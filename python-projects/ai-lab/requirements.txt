@@ -23,5 +23,5 @@ jupyter>=1.0.0          # Jupyter Notebook
 ipython>=8.10.0         # 增强型Python shell
 
 # 其他有用的库
-scipy>=1.10.0           # 科学计算
+scipy>=1.17.1           # 科学计算
 statsmodels>=0.13.0     # 统计建模
