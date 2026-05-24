@@ -16,14 +16,27 @@
 
 ```bash
 cd /workspaces/study/python-projects/ai-lab
-chmod +x setup.sh
-./setup.sh
+bash setup.sh
 ```
 
 这个脚本会：
 - ✅ 创建Python虚拟环境
 - ✅ 安装所有依赖包
 - ✅ 验证安装成功
+
+如果你想用 `./setup.sh`，先执行一次：
+
+```bash
+chmod +x setup.sh
+```
+
+前置条件：如果你的 Ubuntu/WSL 里没有 `python3-venv`，`bash setup.sh` 会在创建虚拟环境时失败。先安装下面任意一个包再继续：
+
+```bash
+sudo apt install python3.12-venv
+# 或
+sudo apt install python3-venv
+```
 
 ### 2. 激活虚拟环境
 
@@ -35,13 +48,13 @@ source .venv/bin/activate
 
 ```bash
 # 运行 Python 基础示例
-python 01_python_basics.py
+python3 01_python_basics.py
 
 # 运行 NumPy 示例
-python 02_numpy_intro.py
+python3 02_numpy_intro.py
 
 # 运行机器学习示例
-python 06_ml_intro.py
+python3 06_ml_intro.py
 ```
 
 ## 📚 学习路径
@@ -91,10 +104,18 @@ python 06_ml_intro.py
 source .venv/bin/activate
 
 # 运行任何示例
-python 01_python_basics.py
-python 02_numpy_intro.py
-python 06_ml_intro.py
+python3 01_python_basics.py
+python3 02_numpy_intro.py
+python3 06_ml_intro.py
 ```
+
+如果你第一次运行脚本，先确保已经执行过：
+
+```bash
+bash setup.sh
+```
+
+如果这一步报错，通常就是缺少 `python3-venv`。
 
 ### 方式2：Jupyter Notebook（推荐交互式学习）
 
@@ -114,6 +135,19 @@ jupyter notebook
 1. 打开此文件夹
 2. 选择虚拟环境作为 Python Interpreter
 3. 右键单击 .py 文件，选择 "Run Python File in Terminal"
+
+## 运行顺序建议
+
+如果你第一次运行这个项目，按下面顺序最稳：
+
+```bash
+cd python-projects/ai-lab
+bash setup.sh
+source .venv/bin/activate
+python3 01_python_basics.py
+```
+
+如果 `python` 命令在你的系统里没有安装，但 `python3` 有安装，就统一用 `python3`。
 
 ## 💡 学习建议
 

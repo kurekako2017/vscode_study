@@ -7,16 +7,23 @@
 cd /workspaces/study/python-projects/ai-lab
 
 # 2. 一键环境设置（仅第一次需要）
+bash setup.sh
+
+# 如果你想直接执行 ./setup.sh，先赋予执行权限
 chmod +x setup.sh
-./setup.sh
+
+# 如果这里报错 “ensurepip is not available”，先安装 python3-venv
+sudo apt install python3.12-venv
+# 或
+sudo apt install python3-venv
 
 # 3. 激活虚拟环境（每次使用前）
 source .venv/bin/activate
 
 # 4. 运行示例代码
-python 01_python_basics.py      # Python基础
-python 02_numpy_intro.py        # NumPy数组
-python 06_ml_intro.py           # 机器学习
+python3 01_python_basics.py      # Python基础
+python3 02_numpy_intro.py        # NumPy数组
+python3 06_ml_intro.py           # 机器学习
 ```
 
 ---
@@ -85,16 +92,16 @@ pip list
 
 ```bash
 # 运行 Python 文件
-python 01_python_basics.py
+python3 01_python_basics.py
 
 # 运行并看到输出
-python 01_python_basics.py | less
+python3 01_python_basics.py | less
 
 # 运行前 50 行输出
-python 01_python_basics.py | head -50
+python3 01_python_basics.py | head -50
 
 # 交互式 Python shell
-python
+python3
 
 # IPython shell（更好用）
 ipython

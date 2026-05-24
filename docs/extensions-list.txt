@@ -1,0 +1,21 @@
+# VS Code extensions list for this workspace
+# Install with: code --install-extension <extension-id>
+
+ms-python.python
+ms-python.vscode-pylance
+ms-toolsai.jupyter
+ms-toolsai.jupyter-renderers
+ms-toolsai.jupyter-keymap
+ms-azuretools.vscode-docker
+redhat.vscode-yaml
+hashicorp.terraform
+dbaeumer.vscode-eslint
+vue.volar
+angular.ng-template
+EditorConfig.EditorConfig
+streetsidesoftware.code-spell-checker
+gruntfuggly.todo-tree
+GitHub.vscode-pull-request-github
+ms-vscode-remote.remote-containers
+esbenp.prettier-vscode
+MS-CEINTL.vscode-language-pack-zh-hans

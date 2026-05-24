@@ -105,3 +105,11 @@ vscode_study/
   - `agent-lab`
 - 如果你的目标是传统对日系统开发，优先看：
   - `java-lab`
+
+## 非 Java 运行入口
+
+如果你想把这个工作区里的非 Java 代码真正跑起来，先看这 3 个文档：
+
+- [全局环境安装说明](docs/workspace-env-setup.md)
+- [非 Java 项目最短启动清单](docs/workspace-run-guide.md)
+- [VS Code 插件清单](docs/vscode-plugin-list.md)

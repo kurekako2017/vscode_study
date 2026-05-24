@@ -21,14 +21,21 @@
 ⚡ 快速开始（3步）：
 
    第1步：一键设置环境
+   $ bash setup.sh
+
+   如果你想用 ./setup.sh，请先执行：
    $ chmod +x setup.sh
-   $ ./setup.sh
+
+   如果这里报错，大概率是系统缺少 python3-venv：
+   $ sudo apt install python3.12-venv
+   或
+   $ sudo apt install python3-venv
 
    第2步：激活虚拟环境
    $ source .venv/bin/activate
 
    第3步：运行第一个示例
-   $ python 01_python_basics.py
+   $ python3 01_python_basics.py
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -121,8 +128,9 @@
 🎬 接下来：
 
    1. 运行 setup.sh 配置环境
+   1. 用 bash setup.sh 配置环境
    2. 阅读 LEARNING_GUIDE.md 了解全貌
-   3. 运行第一个示例：python 01_python_basics.py
+   3. 运行第一个示例：python3 01_python_basics.py
    4. 坚持学习，加油！💪
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
