@@ -12,6 +12,7 @@ type Props = {
   onRegister: (event: FormEvent) => void
 }
 
+// 用户登录与注册页面共用一组表单状态，避免在路由层重复拆分逻辑。
 export function UserLoginView(props: Props) {
   return (
     <section className="pageSection">

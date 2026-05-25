@@ -9,6 +9,7 @@ type Props = {
   onRemoveFromCart: (productId: number) => void
 }
 
+// 购物车页面只负责展示当前会话的商品列表和移除操作。
 export function CartView({ session, cart, message, onRemoveFromCart }: Props) {
   return (
     <section className="pageSection">

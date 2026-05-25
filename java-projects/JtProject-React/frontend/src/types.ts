@@ -6,6 +6,7 @@ export type Session = {
   adminUsername: string
 }
 
+// 这里集中放置前端和后端共享的数据结构，避免各个组件重复定义同一套字段。
 export type Product = {
   id: number
   name: string
@@ -45,6 +46,7 @@ export type ApiResult<T> = {
   data: T
 }
 
+// 空会话对象用于初始化页面状态，避免组件里到处写空值判断。
 export const emptySession: Session = {
   authenticated: false,
   username: '',

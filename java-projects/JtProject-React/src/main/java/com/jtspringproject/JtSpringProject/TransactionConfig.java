@@ -12,6 +12,8 @@ public class TransactionConfig {
 
     @Bean
     public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
+        // 统一把 Hibernate 的 SessionFactory 交给 Spring 事务管理器，
+        // 这样 DAO 层只需要依赖当前线程绑定的事务上下文即可。
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(sessionFactory);
         return transactionManager;

@@ -6,6 +6,7 @@ type Props = {
   onSubmit: (event: FormEvent) => void
 }
 
+// 后台资料编辑器只处理管理员个人资料，不混入其他管理功能。
 export function ProfileEditor({ profileForm, setProfileForm, onSubmit }: Props) {
   return (
     <article className="panel">

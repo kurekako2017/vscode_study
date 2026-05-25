@@ -9,6 +9,7 @@ type Props = {
   onAddToCart: (productId: number) => void
 }
 
+// 商品页承载浏览与加入购物车的主流程，保持视图尽量薄。
 export function ProductsView({ session, products, message, onAddToCart }: Props) {
   return (
     <section className="pageSection">

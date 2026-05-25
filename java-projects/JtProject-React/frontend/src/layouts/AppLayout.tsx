@@ -8,6 +8,7 @@ type Props = PropsWithChildren<{
   onAdminLogout: () => void
 }>
 
+// 页面统一外壳：顶部导航、退出按钮和内容容器都放在这一层。
 export function AppLayout({ authenticated, adminLoggedIn, onUserLogout, onAdminLogout, children }: Props) {
   return (
     <main className="page">

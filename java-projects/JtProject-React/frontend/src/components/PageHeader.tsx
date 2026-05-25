@@ -6,6 +6,7 @@ type Props = {
   meta?: string
 }
 
+// 复用的页面标题区，用于统一展示当前页面的主题和状态信息。
 export function PageHeader({ eyebrow, title, subtitle, message, meta }: Props) {
   return (
     <div className="pageHeader">

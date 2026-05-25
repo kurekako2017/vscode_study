@@ -58,6 +58,8 @@ function AppShell() {
     refreshAdmin
   } = useAppState()
 
+  // 登录、注册、购物车和后台管理都通过这层壳组件串联，
+  // 这里负责把表单提交和路由跳转集中起来。
   async function handleUserLogin(event: FormEvent) {
     event.preventDefault()
     try {
@@ -139,6 +141,8 @@ function AppShell() {
     }
   }
 
+  // 商品、分类和个人资料的保存/删除逻辑都在这里分发，
+  // 组件层只需要把表单状态和回调传进来。
   async function submitCategory(event: FormEvent) {
     event.preventDefault()
     try {
@@ -207,6 +211,7 @@ function AppShell() {
       onUserLogout={handleUserLogout}
       onAdminLogout={handleAdminLogout}
     >
+      {/* 根据登录态切换不同页面，未授权访问会回退到登录页。 */}
       <Routes>
         <Route
           path="/login"

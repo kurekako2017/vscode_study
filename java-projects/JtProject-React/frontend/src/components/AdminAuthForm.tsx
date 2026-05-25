@@ -8,6 +8,7 @@ type Props = {
   onLogin: (event: FormEvent) => void
 }
 
+// 管理员认证表单统一承载提示信息和输入控件，供登录页复用。
 export function AdminAuthForm({ message, adminLogin, setAdminLogin, onLogin }: Props) {
   return (
     <>

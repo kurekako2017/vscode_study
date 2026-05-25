@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // 前端编译目标保持现代浏览器可用的最小集合，避免不必要的转译开销。
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -16,6 +17,7 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  // 只编译 src/ 下的应用源码，root 级配置文件不纳入 TypeScript 产物。
   "include": ["src"],
   "references": []
 }

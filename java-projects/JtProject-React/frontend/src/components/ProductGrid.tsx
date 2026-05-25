@@ -5,6 +5,7 @@ type Props = {
   onAddToCart?: (productId: number) => void
 }
 
+// 商品网格负责纯展示，也可以在需要时追加“加入购物车”按钮。
 export function ProductGrid({ products, onAddToCart }: Props) {
   return (
     <div className="cards">

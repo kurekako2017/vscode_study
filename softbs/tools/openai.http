@@ -1,0 +1,29 @@
+### OpenAI Chat Completions 示例（REST Client 扩展）
+POST https://api.openai.com/v1/chat/completions
+Authorization: Bearer {{OPENAI_API_KEY}}
+Content-Type: application/json
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [{ "role": "user", "content": "用中文写一个排序算法示例" }]
+}
+
+### Anthropic / Claude 示例（注意：调整 endpoint 与字段以匹配最新版文档）
+POST https://api.anthropic.com/v1/complete
+x-api-key: {{CLAUDE_API_KEY}}
+Content-Type: application/json
+
+{
+  "model": "claude-2.1",
+  "prompt": "请用中文写一个排序算法示例",
+  "max_tokens": 800
+}
+
+### Google Generative / Gemini 示例（使用 query key）
+POST https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generate?key={{GEMINI_API_KEY}}
+Content-Type: application/json
+
+{
+  "prompt": { "text": "请用中文写一个排序算法示例" },
+  "temperature": 0.2
+}

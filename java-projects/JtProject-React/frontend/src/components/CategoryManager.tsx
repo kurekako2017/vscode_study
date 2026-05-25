@@ -9,6 +9,7 @@ type Props = {
   onDelete: (id: number) => void
 }
 
+// 分类管理器负责创建、编辑和删除分类，表单与列表放在同一个面板里。
 export function CategoryManager({ categories, categoryForm, setCategoryForm, onSubmit, onDelete }: Props) {
   return (
     <article className="panel">

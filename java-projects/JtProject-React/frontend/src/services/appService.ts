@@ -17,6 +17,7 @@ export type ProductForm = {
 }
 export type ProfileForm = { username: string; email: string; password: string; address: string }
 
+// 启动阶段会一次性加载会话、商品和分类，减少页面级别的重复请求。
 export async function loadBootstrapData() {
   const [sessionRes, productRes, categoryRes] = await Promise.all([
     api<Session>('/session'),
@@ -30,11 +31,13 @@ export async function loadBootstrapData() {
   }
 }
 
+// 购物车只在用户登录后才会用到，因此单独提供一个轻量加载函数。
 export async function loadCart() {
   const result = await api<Product[]>('/cart')
   return result.data
 }
 
+// 管理后台需要的概览、客户、商品、分类和个人资料在这里一次性加载。
 export async function loadAdminData() {
   const [overviewRes, customersRes, profileRes, productRes, categoryRes] = await Promise.all([
     api<Overview>('/admin/overview'),
@@ -52,6 +55,7 @@ export async function loadAdminData() {
   }
 }
 
+// 下面这些请求函数保持“页面逻辑只处理状态，网络细节统一下沉”的原则。
 export async function loginUserRequest(form: UserLoginForm) {
   return (await api<Session>('/auth/login', { method: 'POST', body: JSON.stringify(form) })).data
 }
@@ -104,6 +108,7 @@ export async function saveProfileRequest(form: ProfileForm) {
   return (await api<User>('/admin/profile', { method: 'PUT', body: JSON.stringify(form) })).data
 }
 
+// 空表单工厂函数用于在保存后快速重置编辑器状态。
 export function emptyCategoryForm(): CategoryForm {
   return { id: 0, name: '' }
 }

@@ -21,6 +21,7 @@ type Props = {
   onDelete: (id: number) => void
 }
 
+// 商品管理器把编辑表单和现有商品列表放在一起，方便后台直接维护库存数据。
 export function ProductManager({ categories, products, productForm, setProductForm, onSubmit, onDelete }: Props) {
   return (
     <article className="panel">

@@ -36,6 +36,7 @@ type Props = {
   onSubmitProfile: (event: FormEvent) => void
 }
 
+// 管理端主视图：把概览、分类、商品、客户和资料编辑拆成多个小区块展示。
 export function AdminDashboardView(props: Props) {
   const { message, overview } = props
 

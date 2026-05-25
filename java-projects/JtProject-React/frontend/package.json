@@ -2,6 +2,7 @@
   "name": "jtproject-react-frontend",
   "private": true,
   "version": "1.0.0",
+  "description": "JtProject-React 前端入口，使用 React + TypeScript + Vite。",
   "type": "module",
   "scripts": {
     "dev": "vite",

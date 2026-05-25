@@ -9,6 +9,7 @@ type Props = {
   onLogin: (event: FormEvent) => void
 }
 
+// 管理员登录页只负责收集凭据并调用统一的登录回调。
 export function AdminLoginView(props: Props) {
   return (
     <section className="pageSection">
