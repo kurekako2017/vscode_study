@@ -11,6 +11,7 @@ type Props = {
 
 // 购物车页面只负责展示当前会话的商品列表和移除操作。
 export function CartView({ session, cart, message, onRemoveFromCart }: Props) {
+  // 对应 JSP：cart.jsp、cartproduct.jsp
   return (
     <section className="pageSection">
       <article className="panel">

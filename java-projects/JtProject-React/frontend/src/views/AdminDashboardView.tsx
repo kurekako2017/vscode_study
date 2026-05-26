@@ -1,6 +1,11 @@
 import type { FormEvent } from 'react'
 import { CategoryManager } from '../components/CategoryManager'
 import { CustomerList } from '../components/CustomerList'
+// 文件说明：
+// 管理后台主视图，汇总概览、分类/商品/用户管理等板块。
+// 学习点：
+// - 该视图将多个管理组件组合在一起，展示如何在页面间传递表单状态与回调。
+// 对应 JSP：adminHome.jsp（后台首页）、categories.jsp、products.jsp、displayCustomers.jsp、updateProfile.jsp
 import { PageHeader } from '../components/PageHeader'
 import { ProductManager } from '../components/ProductManager'
 import { ProfileEditor } from '../components/ProfileEditor'
@@ -50,6 +55,7 @@ export function AdminDashboardView(props: Props) {
           message={message}
           meta={overview?.adminUsername}
         />
+        {/* 如果有概览数据，显示简要统计信息（卡片风格） */}
         {overview ? (
           <div className="chips">
             <span>{overview.categoryCount} categories</span>
@@ -78,6 +84,7 @@ export function AdminDashboardView(props: Props) {
       </section>
 
       <section className="grid wide">
+        {/* 客户列表与资料编辑并列，方便管理员快速查看并修改 */}
         <CustomerList customers={props.customers} />
         <ProfileEditor profileForm={props.profileForm} setProfileForm={props.setProfileForm} onSubmit={props.onSubmitProfile} />
       </section>
