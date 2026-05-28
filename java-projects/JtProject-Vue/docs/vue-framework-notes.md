@@ -45,6 +45,22 @@ Vue 使用模板描述页面：
 
 - `onMounted`
 
+### 5. Router
+
+在这个项目里，路由负责把 URL 和页面组件对应起来。
+
+你可以重点看：
+
+- [router.ts](../frontend/src/router.ts)
+
+### 6. Layout
+
+布局组件负责统一页面外壳。
+
+你可以重点看：
+
+- [AppLayout.vue](../frontend/src/layouts/AppLayout.vue)
+
 ## Vue 和 JSP 的差别
 
 ### JSP
@@ -67,8 +83,20 @@ Vue 使用模板描述页面：
 
 - Vue 入口：[main.ts](../frontend/src/main.ts)
 - 主组件：[App.vue](../frontend/src/App.vue)
+- 路由：[router.ts](../frontend/src/router.ts)
+- 全局布局：[AppLayout.vue](../frontend/src/layouts/AppLayout.vue)
 - 样式文件：[style.css](../frontend/src/style.css)
 - API 控制器：[ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
+
+## 推荐你这样理解 Vue 代码
+
+- `main.ts` 负责挂载。
+- `App.vue` 负责整体壳和初始化。
+- `router.ts` 负责页面切换。
+- `views/*.vue` 负责页面级编排。
+- `components/*.vue` 负责局部复用。
+- `composables/useAppStore.ts` 负责状态和操作逻辑。
+- `services/appService.ts` 负责请求封装。
 
 ## 下一步推荐重构
 

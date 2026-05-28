@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '../types'
 
+// 商品网格只负责展示，不直接访问后端，动作通过 emit 交给上层处理。
 defineProps<{
   products: Product[]
 }>()

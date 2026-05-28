@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 购物车页只负责展示列表和移除操作，具体业务逻辑放在 store 里。
 import PageHeader from '../components/PageHeader.vue'
 import CartList from '../components/CartList.vue'
 import { useAppStore } from '../composables/useAppStore'

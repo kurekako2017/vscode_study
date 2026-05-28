@@ -5,3 +5,7 @@ Use this area for:
 - AWS CLI profile/endpoint overrides
 - Service-specific examples and pitfalls
 - Troubleshooting tips
+
+## Index
+
+- [AWS知识点总览（中日对照）](./AWS_Knowledge_Map.md)

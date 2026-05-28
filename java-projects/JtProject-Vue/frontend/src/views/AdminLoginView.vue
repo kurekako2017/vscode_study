@@ -6,6 +6,7 @@ import { useAppStore } from '../composables/useAppStore'
 const router = useRouter()
 const { loginAdmin, store } = useAppStore()
 
+// 管理员登录成功后进入后台首页。
 async function submitAdminLogin() {
   await loginAdmin()
   router.push('/admin/dashboard')

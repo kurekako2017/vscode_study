@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 全局布局只负责页面外壳、导航和退出按钮，不关心具体页面内容。
 defineProps<{
   authenticated: boolean
   adminLoggedIn: boolean

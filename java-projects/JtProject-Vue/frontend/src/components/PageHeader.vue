@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 统一的页面标题区，复用在多个 view 中，减少重复模板。
 defineProps<{
   eyebrow: string
   title: string

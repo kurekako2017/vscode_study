@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 管理后台是一个组合页面，把概览、分类、商品、客户和资料编辑放在一起。
 import CategoryManager from '../components/CategoryManager.vue'
 import CustomerList from '../components/CustomerList.vue'
 import PageHeader from '../components/PageHeader.vue'

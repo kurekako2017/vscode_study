@@ -8,6 +8,11 @@
 - `scripts/bootstrap.sh`：创建 `.venv` 并安装 Python 依赖
 - `docs/`：记录笔记/踩坑
 
+文档入口：
+- [AWS知识点总览（中日对照）](./docs/AWS_Knowledge_Map.md)
+- [AWS 单页笔记索引](./docs/aws/README.md)
+- [高频架构组合索引](./docs/aws/combos/README.md)
+
 快速开始（Python 示例）：
 1) 在本目录执行 `./scripts/bootstrap.sh`，创建虚拟环境并装依赖。
 2) 确保 LocalStack 已启动（如 `localstack start` 或 docker-compose`）。

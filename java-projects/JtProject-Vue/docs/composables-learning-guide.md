@@ -66,7 +66,32 @@ composable 本质上就是：
 - `components/*.vue`
   负责可复用块
 
-## 5. 当前项目里最该观察的点
+## 5. 当前项目里的 store 结构
+
+`useAppStore()` 返回的是一个页面级 store，它把这些东西放在一起：
+
+- 全局消息 `message`
+- 登录态 `session`
+- 商品和分类 `products`、`categories`
+- 购物车 `cart`
+- 后台列表 `customers`
+- 后台概览 `overview`
+- 各种表单状态 `userLogin`、`registerForm`、`adminLogin`、`categoryForm`、`productForm`、`profileForm`
+
+## 6. 这条链路怎么跑
+
+```mermaid
+flowchart TD
+    A[view 组件触发事件] --> B[useAppStore 中的方法]
+    B --> C[appService 请求后端]
+    C --> D[/api 接口]
+    D --> E[后端 Service / Dao]
+    E --> F[返回数据]
+    F --> G[更新 reactive store]
+    G --> H[页面自动重渲染]
+```
+
+## 7. 当前项目里最该观察的点
 
 ### 请求层
 
@@ -102,7 +127,7 @@ composable 本质上就是：
 
 页面会更干净，因为逻辑已经抽到 composable。
 
-## 6. 这次“拆页面再拆组件”的实战练习
+## 8. 这次“拆页面再拆组件”的实战练习
 
 这次我额外做了一次组件拆分：
 
@@ -121,7 +146,7 @@ composable 本质上就是：
 3. 抽成组件
 4. 逻辑再抽成 composable
 
-## 7. 你现在最适合做的练习
+## 9. 你现在最适合做的练习
 
 1. 从 `useAppStore` 中再抽 `useUserApp`
 2. 再抽 `useAdminApp`

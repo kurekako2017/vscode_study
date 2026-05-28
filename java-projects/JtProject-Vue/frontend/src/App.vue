@@ -7,6 +7,7 @@ import { useAppStore } from './composables/useAppStore'
 const router = useRouter()
 const { bootstrap, logoutAdmin, logoutUser, store } = useAppStore()
 
+// 启动时先加载会话、商品和分类，后续页面再基于 store 渲染。
 async function init() {
   try {
     await bootstrap()
@@ -15,11 +16,13 @@ async function init() {
   }
 }
 
+// 用户退出后回到登录页。
 async function handleUserLogout() {
   await logoutUser()
   router.push('/login')
 }
 
+// 管理员退出后回到管理员登录页。
 async function handleAdminLogout() {
   await logoutAdmin()
   router.push('/admin/login')

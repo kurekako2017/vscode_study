@@ -89,6 +89,10 @@ userlogin.jsp
 
 Spring Boot 是当前学习重点，但不能替代你对传统项目的理解。
 
+如果你想先快速建立 Spring Boot 的整体认知，可以先看 [01-SpringBoot中日学习概要教程.md](./spring-boot/01-SpringBoot%E4%B8%AD%E6%97%A5%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%A6%81%E6%95%99%E7%A8%8B.md)。
+
+如果你已经想进入实战专题，可以直接进入 [Spring Boot 专区](./spring-boot/README.md)。
+
 ### 常见目录结构
 
 ```text

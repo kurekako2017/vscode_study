@@ -1,6 +1,7 @@
 import { api } from '../api'
 import type { Category, Overview, Product, Session, User } from '../types'
 
+// 这里统一放后端请求封装，页面和 composable 只关心“要做什么”，不关心 HTTP 细节。
 export type ProductForm = {
   id: number
   name: string
@@ -12,6 +13,7 @@ export type ProductForm = {
   image: string
 }
 
+// 启动时一次性加载会话、商品和分类，减少页面重复请求。
 export async function loadBootstrapData() {
   const [sessionRes, productsRes, categoriesRes] = await Promise.all([
     api<Session>('/session'),
@@ -25,10 +27,12 @@ export async function loadBootstrapData() {
   }
 }
 
+// 购物车只在登录用户场景下才会用到，因此单独加载。
 export async function loadCart() {
   return (await api<Product[]>('/cart')).data
 }
 
+// 管理后台需要的概览、客户、资料、商品和分类一次性并发拉取。
 export async function loadAdminData() {
   const [overviewRes, customersRes, profileRes, productsRes, categoriesRes] = await Promise.all([
     api<Overview>('/admin/overview'),
@@ -46,6 +50,7 @@ export async function loadAdminData() {
   }
 }
 
+// 登录、注册、登出和 CRUD 请求都保持轻量封装。
 export async function loginUserRequest(form: { username: string; password: string }) {
   return (await api<Session>('/auth/login', { method: 'POST', body: JSON.stringify(form) })).data
 }
@@ -98,6 +103,7 @@ export async function saveProfileRequest(form: { username: string; email: string
   return (await api<User>('/admin/profile', { method: 'PUT', body: JSON.stringify(form) })).data
 }
 
+// 商品表单重置时根据当前分类选择默认分类，避免空值。
 export function emptyProductForm(categoryId: number): ProductForm {
   return {
     id: 0,

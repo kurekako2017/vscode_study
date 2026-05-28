@@ -6,11 +6,13 @@ import { useAppStore } from '../composables/useAppStore'
 const router = useRouter()
 const { loginUser, registerUser, store } = useAppStore()
 
+// 登录和注册成功后都跳到商品页，由上层 store 统一更新会话和状态。
 async function submitUserLogin() {
   await loginUser()
   router.push('/products')
 }
 
+// 注册流程同样复用登录后的跳转路径。
 async function submitRegister() {
   await registerUser()
   router.push('/products')

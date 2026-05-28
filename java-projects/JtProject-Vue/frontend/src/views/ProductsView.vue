@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 商品页负责把页面头部和商品网格组合起来，逻辑交给 store 和 service 层。
 import PageHeader from '../components/PageHeader.vue'
 import ProductGrid from '../components/ProductGrid.vue'
 import { useAppStore } from '../composables/useAppStore'

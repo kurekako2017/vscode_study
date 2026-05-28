@@ -37,6 +37,7 @@ Vue 前端现在已经拆成这几层：
 - 页面级结构
 - 页面标题
 - 将组件组合成完整页面
+- 接收来自 composable 的状态和方法
 
 ### `components`
 
@@ -52,6 +53,12 @@ Vue 前端现在已经拆成这几层：
 - 用户列表
 - 资料编辑块
 
+这层的目标是：
+
+- 单个功能块尽量纯
+- 通过 props 接收数据
+- 通过 emits 通知上层
+
 ### `composables`
 
 放 Vue 的组合式逻辑。
@@ -65,6 +72,7 @@ Vue 前端现在已经拆成这几层：
 - 页面共享状态
 - 初始化加载
 - 登录、购物车、后台管理等操作逻辑
+- 复用一组与页面业务相关的响应式方法
 
 ### `services`
 
@@ -79,6 +87,22 @@ Vue 前端现在已经拆成这几层：
 - 调用后端 API
 - 封装请求函数
 - 返回给 composable 使用
+
+## 这套结构怎么串起来
+
+可以按下面这条链路理解：
+
+```mermaid
+flowchart LR
+	A[main.ts] --> B[App.vue]
+	B --> C[router.ts]
+	C --> D[views]
+	D --> E[components]
+	B --> F[layouts]
+	D --> G[composables]
+	G --> H[services]
+	H --> I[/api 接口]
+```
 
 ## 你应该怎么理解这套结构
 
@@ -97,6 +121,13 @@ Vue 前端现在已经拆成这几层：
 - `cart.jsp` -> `CartView`
 - `adminlogin.jsp` -> `AdminLoginView`
 - `adminHome.jsp` / `categories.jsp` / `products.jsp` / `displayCustomers.jsp` / `updateProfile.jsp` -> `AdminDashboardView`
+
+## 页面组合关系
+
+- `App.vue` 是最外层壳，负责 layout 和 router-view。
+- `AppLayout.vue` 负责导航和页面框架。
+- `ProductsView.vue`、`CartView.vue`、`UserLoginView.vue`、`AdminLoginView.vue`、`AdminDashboardView.vue` 是路由页面。
+- `PageHeader.vue`、`ProductGrid.vue`、`UserAuthForms.vue`、`CartList.vue`、`CategoryManager.vue`、`ProductManager.vue`、`CustomerList.vue`、`ProfileEditor.vue` 是页面内复用块。
 
 ## 推荐你接下来练习的重构
 
