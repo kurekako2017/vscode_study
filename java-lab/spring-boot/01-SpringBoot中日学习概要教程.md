@@ -106,6 +106,7 @@ src/
 | Spring Boot + JSP | 老项目兼容 | レガシー互換 | 既有 JSP 项目维护 |
 | Spring Boot + React | 前后端分离 | フロント分離構成 | 管理后台、SPA |
 | Spring Boot + Vue | 前后端分离 | フロント分離構成 | 后台系统、表单页面 |
+| Spring Boot + Next.js / TypeScript | 前后端分离 + 类型安全 + SSR | フロント分離 + 型安全 + SSR | 中后台、门户站点、内容展示 |
 | Spring Boot + Angular | 企业级前端 | エンタープライズ向けフロント | 大型业务系统 |
 
 ## 7. 和哪些技术结合运用比较好 / 相性の良い技術
@@ -118,6 +119,7 @@ src/
 | Kafka | 事件流 | イベントストリーム | 日志、流处理 |
 | Spring Security | 安全认证授权 | 認証認可 | 登录、权限控制 |
 | JWT / OAuth2 | 认证协议 | 認証プロトコル | 前后端分离登录 |
+| TypeScript | 类型化前端语言 | 型付きフロント言語 | 前端类型安全 |
 | Docker | 容器化部署 | コンテナ化 | 本地开发、上线部署 |
 | Nginx | 反向代理 | リバースプロキシ | 静态资源、转发 |
 | AWS ECS / Fargate | 容器运行平台 | コンテナ実行基盤 | 云上部署 |
@@ -136,27 +138,32 @@ src/
 - 中文：结构和 React 类似，适合中小型前后端分离项目。
 - 日本語：React と似た構成で、中小規模のフロント分離案件に向いています。
 
-### 场景3：Spring Boot + MyBatis
+### 场景3：Spring Boot + Next.js + TypeScript
+
+- 中文：适合需要 SSR / SSG、SEO 和强类型前端开发的现代 Web 项目。
+- 日本語：SSR / SSG、SEO、型安全なフロント開発が必要なモダン Web 案件に向いています。
+
+### 场景4：Spring Boot + MyBatis
 
 - 中文：适合日本企业常见的数据库驱动型业务，SQL 可控，便于按设计书实现。
 - 日本語：日本企業で多い DB 主導の業務に向き、SQL を細かく制御しやすいです。
 
-### 场景4：Spring Boot + JPA / Hibernate
+### 场景5：Spring Boot + JPA / Hibernate
 
 - 中文：适合 CRUD 比较多、实体建模清晰的系统。
 - 日本語：CRUD が多く、エンティティ設計が明確なシステムに向いています。
 
-### 场景5：Spring Boot + Redis + MySQL
+### 场景6：Spring Boot + Redis + MySQL
 
 - 中文：适合高频读取、会话管理、缓存优化。
 - 日本語：高頻度参照、セッション管理、キャッシュ最適化に向いています。
 
-### 场景6：Spring Boot + RabbitMQ / Kafka
+### 场景7：Spring Boot + RabbitMQ / Kafka
 
 - 中文：适合异步通知、订单处理、日志流转、事件驱动架构。
 - 日本語：非同期通知、注文処理、ログ連携、イベント駆動アーキテクチャに向いています。
 
-### 场景7：Spring Boot + Docker + ECS/Fargate
+### 场景8：Spring Boot + Docker + ECS/Fargate
 
 - 中文：适合现代云上部署和容器化交付。
 - 日本語：現代的なクラウドデプロイとコンテナ配布に向いています。
@@ -166,7 +173,7 @@ src/
 1. 先理解 Spring Boot 的启动、自动配置和项目结构。
 2. 再理解 Controller、Service、Repository/DAO 的分层。
 3. 然后把 Spring Boot 和 MyBatis 或 JPA 结合起来练 CRUD。
-4. 接着再结合 React 或 Vue 做前后端分离。
+4. 接着再结合 React、Vue 或 Next.js / TypeScript 做前后端分离。
 5. 最后补上 Redis、消息队列、安全认证和容器部署。
 
 ## 10. 初学者容易混淆的点 / 初学者が混同しやすい点
@@ -175,6 +182,8 @@ src/
 - 日本語：Spring Boot は DB フレームワークではありません。
 - 中文：Spring Boot 不是前端框架。
 - 日本語：Spring Boot はフロントエンドフレームワークではありません。
+- 中文：TypeScript 不是框架，而是前端开发里常用的类型语言。
+- 日本語：TypeScript はフレームワークではなく、フロント開発でよく使う型付き言語です。
 - 中文：Spring Boot 负责项目启动和整合，不等于业务逻辑本身。
 - 日本語：Spring Boot は起動と統合を担い、業務ロジックそのものではありません。
 - 中文：React / Vue 负责前端页面展示，不负责后端事务。
@@ -199,3 +208,5 @@ src/
 - [Spring Boot 与 MyBatis 实战](./03-SpringBoot与MyBatis实战.md)
 - [Spring Boot 与 JPA / Hibernate 对比](./04-SpringBoot与JPA_Hibernate对比.md)
 - [Spring Boot 部署运维专题](./05-SpringBoot部署运维专题.md)
+- [Spring Boot 与 Next.js / TypeScript 实战](./06-SpringBoot与Nextjs_TypeScript实战.md)
+- [Spring Boot 与 Next.js 项目结构图 / 流程图](./07-SpringBoot与Nextjs项目结构图流程图.md)
