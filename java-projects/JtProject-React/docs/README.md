@@ -1,3 +1,4 @@
+
 # JtProject-React 文档总索引
 
 这个目录是 `JtProject-React` 的项目级文档入口，重点服务于：
@@ -57,165 +58,93 @@
 
 ## 后端源码入口
 
-虽然这是 React 学习版，但后端仍然是 Spring Boot，可以从这里往下看：
-
-- API 控制器：[ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
-- 用户控制器：[UserController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
-- 管理员控制器：[AdminController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
-
-说明：
-
-- 当前项目包含两套后端实现风格：
-	1. REST API（位于 `ApiController.java`，路径前缀 `/api`），此部分已被 React 前端直接调用。
-	2. 传统的 Spring MVC 服务端渲染（通过 `UserController`、`AdminController` 等返回 JSP 视图），这些 JSP 位于 `src/main/webapp/views/` 下。
-
-- 如果你希望把后端仅保留为 API（React 前端负责所有页面渲染），可以删除 MVC 控制器和 JSP 文件。保留的 Java 文件应至少包括：
-	- `ApiController.java`（REST 接口，React 直接调用）
-	- 所有 `services/`、`dao/`、`models/`（业务逻辑与数据访问层）
-	- 项目启动类（`JtSpringProjectApplication.java`）与必要的配置（数据库/事务/Session 配置等）
-
-建议的“候选删除”清单（请确认后再删除）：
-
-JSP 视图（位于 `src/main/webapp/views/`，可删除）:
- - adminlogin.jsp
- - register.jsp
- - cart.jsp
- - adminHome.jsp
- - test.jsp
- - uproduct.jsp
- - index.jsp
- - products.jsp
- - updateProfile.jsp
- - productsUpdate.jsp
- - productsAdd.jsp
- - categories.jsp
- - cartproduct.jsp
- - test2.jsp
- - displayCustomers.jsp
- - userLogin.jsp
-
-Java 控制器（用于服务端渲染，候选删除）:
- - src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java
- - src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java
-
-可选/待审查（可能是后台任务或示例代码，确认是否需要再删除）:
- - batch/Quartz 相关类（如果不需要计划任务可删除）:
-	 - src/main/java/com/jtspringproject/JtSpringProject/batch/**
- - LazyTestComponent.java、AnotherComponent.java、测试或示例用的类
-
-重要注意事项与步骤：
-
-1. 先不要直接删除——建议先把候选文件移到备份目录（例如 `archive/removed-by-me/`）或创建一个 Git 分支备份。
-2. 删除 JSP 与 MVC 控制器后，需要：
-	 - 检查 `WebMvcConfig.java` 中的 `viewResolver()`（若不再使用 JSP，可移除或调整配置）。
-	 - 确认 `pom.xml`/Gradle 配置中是否还包含 JSP 相关依赖（如 `tomcat-embed-jasper`、JSTL），可一并清理。
-3. 保留 `ApiController` 与 `services`/`dao`/`models`，因为它们提供后端业务逻辑与数据接口。
-
-我可以：
- - 先为你在仓库中列出所有候选删除文件（已完成扫描，见下方清单），并在 docs 中保存此建议（本文件已更新）。
- - 如果你确认，我可以把这些文件移动到 `archive/`（非破坏性）或直接删除（破坏性）。
-
-TypeScript / 前端部分说明：
-
-- 前端基于 Vite + React + TypeScript：
-	- 入口： `frontend/src/main.tsx`（挂载 React 根组件）
-	- 路由与页面： `frontend/src/App.tsx`（路由分发），`frontend/src/views/`（页面视图）
-	- 组件： `frontend/src/components/`（可复用 UI 组件）
-	- 状态 Hook： `frontend/src/hooks/useAppState.ts`（集中管理应用级状态）
-	- 类型定义： `frontend/src/types.ts`（所有前端使用的类型定义）
-	- 网络请求封装： `frontend/src/api.ts`（基础 fetch 封装），`frontend/src/services/appService.ts`（具体 API 调用）
-	- Vite 配置： `frontend/vite.config.ts`
-
- - TypeScript 主要用于前端代码（`.ts` / `.tsx`），后端仍然是 Java。前端的 `package.json` 提供了启动命令：
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-项目整体框架与目录逻辑（JtProject-React 仅针对当前项目）：
-
-- frontend/  — React + TypeScript 前端源码（可单独运行）
-	- src/
-		- main.tsx（入口，挂载 React）
-		- App.tsx（路由与应用壳）
-		- api.ts（基础 fetch 封装，带凭证支持）
-		- types.ts（TypeScript 类型定义）
-		- hooks/
-			- useAppState.ts（集中状态 Hook，bootstrap、refreshCart、refreshAdmin）
-		- services/
-			- appService.ts（对后端 /api/* 的调用封装，如 loginUserRequest、saveProductRequest）
-		- views/（按路由拆分的页面视图，代表文件）
-			- UserLoginView.tsx
-			- ProductsView.tsx
-			- CartView.tsx
-			- AdminLoginView.tsx
-			- AdminDashboardView.tsx
-		- components/（可复用组件，代表文件）
-			- UserAuthForms.tsx
-			- AdminAuthForm.tsx
-			- ProductGrid.tsx
-			- ProductManager.tsx
-			- CategoryManager.tsx
-			- CartList.tsx
-			- CustomerList.tsx
-			- ProfileEditor.tsx
-
-- src/main/java/...  — 后端 Spring Boot 项目（提供 API 或 MVC）
-	- controller/ 包含 REST API（ApiController）以及历史 MVC 控制器（AdminController、UserController）
-	- services/ 业务逻辑（应保留）
-	- dao/ 数据访问（应保留）
-	- models/ 实体类（应保留）
-	- config/（例如 Hibernate、WebMvcConfig、事务配置）
-
-- src/main/webapp/views/ — 传统 JSP 页面（如果前端替换为 React，可删除）
-
-如果你确认要我执行“删除候选文件”的操作，请回复“删除并备份”或“直接删除”，并指明是否希望把文件先移动到 `archive/removed-by-me/`（我推荐先备份）。我会在执行前创建一个清晰的变更列表并应用不可逆操作前再次确认。
-
-
-## 使用建议
-
-- 想先把项目跑起来：先看 [README.md](../README.md)
-- 想按路线学习 React：先看 [react-learning-path.md](./react-learning-path.md)
-- 想先理解项目结构：先看 [project-code-map.md](./project-code-map.md)
-- 想重点学 Hooks：先看 [hooks-learning-guide.md](./hooks-learning-guide.md)
-
-## 文档模板
-
-React 和 Vue 的文档现在尽量使用同一套阅读模板，后续新增内容也建议按这个顺序组织：
-
-1. 先看入口和推荐阅读。
-2. 再看 views、components、layouts 的页面组织。
-3. 接着看类图，理解页面层和后端层的对象关系。
-4. 然后看流程图和时序图，理解一次请求怎么走完整条链路。
-5. 最后看源码入口和学习文档，继续往细节里追。
-
-## views 和 components 的关系
-
-在这个 React 版本里，views 和 components 的关系可以理解成“页面”和“积木块”：
-
-- views 是路由级页面，负责承载一个完整场景，例如商品页、购物车页、管理后台页。
-- components 是可复用的小组件，负责完成局部 UI，例如商品卡片网格、页面头部、分类管理表单。
-- App.tsx 负责把状态、事件处理和路由分发串起来，再把数据和回调传给 views。
-- views 再把更细的 UI 拆给 components，保持页面组件只做组装，不直接处理网络请求。
-
-简单说就是：App.tsx 负责调度，views 负责页面编排，components 负责局部展示与交互。
-
-## 类图
-
-下面这张图把前端和后端的主要对象关系放在一起，方便你看整体结构。
-
 ```mermaid
 classDiagram
 direction LR
 
-class App {
-	+BrowserRouter
-	+AppShell()
-}
+	class ApiController
 
-class AppShell {
+	class UserController
+	class AdminController
+
+	class UserService {
+		<<interface>>
+	}
+	class ProductService {
+		<<interface>>
+	}
+	class CategoryService {
+		<<interface>>
+	}
+	class CartService {
+		<<interface>>
+	}
+
+	class UserServiceImpl
+	class ProductServiceImpl
+	class CategoryServiceImpl
+	class CartServiceImpl
+
+	class UserDao {
+		<<interface>>
+	}
+	class ProductDao {
+		<<interface>>
+	}
+	class CategoryDao {
+		<<interface>>
+	}
+	class CartDao {
+		<<interface>>
+	}
+	class CartProductDao {
+		<<interface>>
+	}
+
+	class User
+	class Product
+	class Category
+	class Cart
+	class CartProduct
+
+	ApiController --> UserService
+	ApiController --> ProductService
+	ApiController --> CategoryService
+	ApiController --> CartService
+
+	UserController --> UserService
+	UserController --> ProductService
+	UserController --> CategoryService
+	UserController --> CartService
+
+	AdminController --> UserService
+	AdminController --> ProductService
+	AdminController --> CategoryService
+
+	UserService <|.. UserServiceImpl
+	ProductService <|.. ProductServiceImpl
+	CategoryService <|.. CategoryServiceImpl
+	CartService <|.. CartServiceImpl
+
+	UserServiceImpl --> UserDao
+	ProductServiceImpl --> ProductDao
+	CategoryServiceImpl --> CategoryDao
+	CartServiceImpl --> CartDao
+	CartServiceImpl --> CartProductDao
+
+	UserDao <|.. UserDaoImpl
+	ProductDao <|.. ProductDaoImpl
+	CategoryDao <|.. CategoryDaoImpl
+	CartDao <|.. CartDaoImpl
+	CartProductDao <|.. CartProductDaoImpl
+
+	UserDaoImpl --> User
+	ProductDaoImpl --> Product
+	CategoryDaoImpl --> Category
+	CartDaoImpl --> Cart
+	CartProductDaoImpl --> CartProduct
+```
+class AppShell["AppShell (App.tsx)"] {
 	+useAppState()
 	+handleUserLogin()
 	+handleAdminLogin()
@@ -223,24 +152,24 @@ class AppShell {
 	+submitCategory()
 }
 
-class AppLayout
-class ProductsView
-class CartView
-class UserLoginView
-class AdminLoginView
-class AdminDashboardView
+class AppLayout["AppLayout"]
+class ProductsView["ProductsView (ProductsView.tsx)"]
+class CartView["CartView (CartView.tsx)"]
+class UserLoginView["UserLoginView (UserLoginView.tsx)"]
+class AdminLoginView["AdminLoginView (AdminLoginView.tsx)"]
+class AdminDashboardView["AdminDashboardView (AdminDashboardView.tsx)"]
 
-class PageHeader
-class ProductGrid
-class CategoryManager
-class ProductManager
-class CustomerList
-class ProfileEditor
-class UserAuthForms
-class AdminAuthForm
-class CartList
+class PageHeader["PageHeader (PageHeader.tsx)"]
+class ProductGrid["ProductGrid (ProductGrid.tsx)"]
+class CategoryManager["CategoryManager (CategoryManager.tsx)"]
+class ProductManager["ProductManager (ProductManager.tsx)"]
+class CustomerList["CustomerList (CustomerList.tsx)"]
+class ProfileEditor["ProfileEditor (ProfileEditor.tsx)"]
+class UserAuthForms["UserAuthForms (UserAuthForms.tsx)"]
+class AdminAuthForm["AdminAuthForm (AdminAuthForm.tsx)"]
+class CartList["CartList (CartList.tsx)"]
 
-class appService {
+class appService["appService (appService.ts)"] {
 	+loadBootstrapData()
 	+loadCart()
 	+loadAdminData()
@@ -249,31 +178,31 @@ class appService {
 	+saveProductRequest()
 }
 
-class api {
+class api["api (api.ts)"] {
 	+fetch wrapper
 }
 
-class ApiController {
+class ApiController["ApiController (ApiController.java)"] {
 	+/api/session
 	+/api/auth/login
 	+/api/products
 	+/api/admin/*
 }
 
-class UserService
-class ProductService
-class CategoryService
-class CartService
-class UserDao
-class ProductDao
-class CategoryDao
-class CartDao
+class UserService["UserService (UserService.java)"]
+class ProductService["ProductService (ProductService.java)"]
+class CategoryService["CategoryService (CategoryService.java)"]
+class CartService["CartService (CartService.java)"]
+class UserDao["UserDao (UserDao.java)"]
+class ProductDao["ProductDao (ProductDao.java)"]
+class CategoryDao["CategoryDao (CategoryDao.java)"]
+class CartDao["CartDao (CartDao.java)"]
 	+addCategory()
 	+getCategories()
 	+getCategory()
 	+updateCategory()
 	+deletCategory()
-class CartProduct
+class CartProduct["CartProduct (CartProduct.java)"]
 
 App --> AppShell
 AppShell --> AppLayout
@@ -336,9 +265,263 @@ flowchart TD
 		N --> F
 ```
 
-## 后端细化类图
+## React 视图层 + Spring Boot 后端完整时序图
 
-如果只看 Spring Boot 后端，这条链路可以再拆成 controller、service、dao、model 四层。这里把 REST API 和历史 MVC 控制器都放进来，方便你对照当前项目的混合结构。
+这张图把前端视图层、共享状态、请求封装、控制器、服务层、DAO 和实体对象串成一条完整链路，方便你从页面一直追到数据库。
+
+小结：从页面到数据库的端到端调用链快速参考。源码索引：前端入口 [main.tsx](java-projects/JtProject-React/frontend/src/main.tsx#L1)、应用壳 [App.tsx](java-projects/JtProject-React/frontend/src/App.tsx#L1)、全局 Hook [useAppState.ts](java-projects/JtProject-React/frontend/src/hooks/useAppState.ts#L1)、服务层 [appService.ts](java-projects/JtProject-React/frontend/src/services/appService.ts#L1)、请求封装 [api.ts](java-projects/JtProject-React/frontend/src/api.ts#L1)、后端控制器 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1)。
+
+```mermaid
+sequenceDiagram
+	actor U as 用户
+	participant B as Browser
+	participant M as main.tsx
+	note right of M: frontend/src/main.tsx#L1
+	participant A as AppShell
+	note right of A: frontend/src/App.tsx#L1
+	participant V as View
+	note right of V: frontend/src/views/*.tsx
+	participant C as components
+	note right of C: frontend/src/components/*.tsx
+	participant H as useAppState
+	note right of H: frontend/src/hooks/useAppState.ts#L1
+	participant S as appService
+	note right of S: frontend/src/services/appService.ts#L1
+	participant R as api
+	note right of R: frontend/src/api.ts#L1
+	participant CT as ApiController
+	note right of CT: src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1
+	participant US as UserService
+	note right of US: src/main/java/com/jtspringproject/JtSpringProject/services/UserService.java#L1
+	participant PS as ProductService
+	note right of PS: src/main/java/com/jtspringproject/JtSpringProject/services/ProductService.java#L1
+	participant CS as CategoryService
+	note right of CS: src/main/java/com/jtspringproject/JtSpringProject/services/CategoryService.java#L1
+	participant AS as CartService
+	note right of AS: src/main/java/com/jtspringproject/JtSpringProject/services/CartService.java#L1
+	participant UD as UserDao
+	note right of UD: src/main/java/com/jtspringproject/JtSpringProject/dao/UserDao.java#L1
+	participant PD as ProductDao
+	note right of PD: src/main/java/com/jtspringproject/JtSpringProject/dao/ProductDao.java#L1
+	participant CD as CategoryDao
+	note right of CD: src/main/java/com/jtspringproject/JtSpringProject/dao/CategoryDao.java#L1
+	participant CRD as CartDao
+	note right of CRD: src/main/java/com/jtspringproject/JtSpringProject/dao/CartDao.java#L1
+	participant CPD as CartProductDao
+	note right of CPD: src/main/java/com/jtspringproject/JtSpringProject/dao/CartProductDao.java#L1
+	participant E as model/entity
+	note right of E: src/main/java/com/jtspringproject/JtSpringProject/models/*.java
+
+	U->>B: 打开页面并触发登录、浏览商品或管理操作
+	B->>M: 挂载 React 应用
+	M->>A: 渲染 AppShell
+	A->>H: 初始化全局状态 / 拉取 bootstrap 数据
+	H-->>A: session / products / categories / cart / admin data
+	A->>V: 根据路由渲染当前 view
+	V->>C: 组合页面组件展示 UI
+	U->>V: 点击按钮或提交表单
+	V->>A: 调用 AppShell 中的事件处理函数
+	A->>S: loginUserRequest / addToCartRequest / saveProductRequest 等
+	S->>R: 发起 HTTP 请求
+	R->>CT: POST / GET / PUT / DELETE /api/**
+	CT->>US: 校验用户登录 / 读取用户信息
+	CT->>PS: 查询或维护商品数据
+	CT->>CS: 查询或维护分类数据
+	CT->>AS: 查询或维护购物车数据
+	US->>UD: 访问用户表
+	PS->>PD: 访问商品表
+	CS->>CD: 访问分类表
+	AS->>CRD: 访问购物车与购物车商品表
+	UD-->>US: User
+	PD-->>PS: Product
+	CD-->>CS: Category
+	CRD-->>AS: Cart / CartProduct
+	US-->>CT: 业务结果
+	PS-->>CT: 业务结果
+	CS-->>CT: 业务结果
+	AS-->>CT: 业务结果
+	CT-->>R: JSON / Session / 列表数据
+	R-->>S: 解析后的响应数据
+	S-->>A: 返回统一结果
+	A->>H: 更新 React state
+	H-->>V: 触发界面刷新
+```
+
+## 后端分层细化类图
+
+如果只看控制器、service、dao 和 model，可以用这张更细的图来看层级关系和依赖方向。
+
+小结：聚焦后端分层（Controller → Service → DAO → Model）的依赖关系，便于定位实现文件。源码索引：控制器 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1)、示例 Service [ProductService.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/services/ProductService.java#L1)、示例 DAO [ProductDao.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/dao/ProductDao.java#L1)、实体示例 [Product.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/models/Product.java#L1)。
+
+```mermaid
+classDiagram
+direction LR
+
+	class ApiController["ApiController (ApiController.java)"] {
+		+health()
+		+session()
+		+userLogin()
+		+register()
+		+userLogout()
+		+products()
+		+categories()
+		+cart()
+		+addCartItem()
+		+deleteCartItem()
+		+adminLogin()
+		+adminLogout()
+		+adminOverview()
+		+adminCategories()
+		+createCategory()
+		+updateCategory()
+		+deleteCategory()
+		+adminProducts()
+		+createProduct()
+		+updateProduct()
+		+deleteProduct()
+		+customers()
+		+adminProfile()
+		+updateAdminProfile()
+	}
+
+	class UserController["UserController (UserController.java)"]
+	class AdminController["AdminController (AdminController.java)"]
+
+	class UserService["UserService (UserService.java)"] {
+		<<interface>>
+		+getUsers()
+		+addUser()
+		+checkLogin()
+		+getUserByUsername()
+		+getUserById()
+		+checkUserExists()
+	}
+	class ProductService["ProductService (ProductService.java)"] {
+		<<interface>>
+		+getProducts()
+		+addProduct()
+		+getProduct()
+		+updateProduct()
+		+deleteProduct()
+	}
+	class CategoryService["CategoryService (CategoryService.java)"] {
+		<<interface>>
+		+addCategory()
+		+getCategories()
+		+deleteCategory()
+		+updateCategory()
+		+getCategory()
+	}
+	class CartService["CartService (CartService.java)"] {
+		<<interface>>
+		+addCart()
+		+getCarts()
+		+updateCart()
+		+deleteCart()
+	}
+
+	class UserServiceImpl["UserServiceImpl (services/impl/UserServiceImpl.java)"]
+	class ProductServiceImpl["ProductServiceImpl (services/impl/ProductServiceImpl.java)"]
+	class CategoryServiceImpl["CategoryServiceImpl (services/impl/CategoryServiceImpl.java)"]
+	class CartServiceImpl["CartServiceImpl (services/impl/CartServiceImpl.java)"]
+
+	class UserDao["UserDao (UserDao.java)"] {
+		<<interface>>
+		+getAllUser()
+		+saveUser()
+		+getUser()
+		+getUserByUsername()
+		+getUserById()
+		+userExists()
+	}
+	class ProductDao["ProductDao (ProductDao.java)"] {
+		<<interface>>
+		+getProducts()
+		+addProduct()
+		+getProduct()
+		+updateProduct()
+		+deletProduct()
+	}
+	class CategoryDao["CategoryDao (CategoryDao.java)"] {
+		<<interface>>
+		+addCategory()
+		+getCategories()
+		+getCategory()
+		+updateCategory()
+		+deletCategory()
+	}
+	class CartDao["CartDao (CartDao.java)"] {
+		<<interface>>
+		+getCarts()
+		+addCart()
+		+updateCart()
+		+deleteCart()
+	}
+	class CartProductDao["CartProductDao (CartProductDao.java)"] {
+		<<interface>>
+		+addCartProduct()
+		+getCartProducts()
+		+updateCartProduct()
+		+deleteCartProduct()
+		+getProductByCartID()
+		+getCartProductsByProductId()
+		+getCartProductsByCartAndProductId()
+	}
+
+	class User["User (User.java)"]
+	class Product["Product (Product.java)"]
+	class Category["Category (Category.java)"]
+	class Cart["Cart (Cart.java)"]
+	class CartProduct["CartProduct (CartProduct.java)"]
+
+	ApiController --> UserService
+	ApiController --> ProductService
+	ApiController --> CategoryService
+	ApiController --> CartService
+
+	UserController --> UserService
+	UserController --> ProductService
+	UserController --> CategoryService
+	UserController --> CartService
+
+	AdminController --> UserService
+	AdminController --> ProductService
+	AdminController --> CategoryService
+
+	UserService <|.. UserServiceImpl
+	ProductService <|.. ProductServiceImpl
+	CategoryService <|.. CategoryServiceImpl
+	CartService <|.. CartServiceImpl
+
+	UserServiceImpl --> UserDao
+	ProductServiceImpl --> ProductDao
+	CategoryServiceImpl --> CategoryDao
+	CartServiceImpl --> CartDao
+	CartServiceImpl --> CartProductDao
+
+	UserDao <|.. UserDaoImpl
+	ProductDao <|.. ProductDaoImpl
+	CategoryDao <|.. CategoryDaoImpl
+	CartDao <|.. CartDaoImpl
+	CartProductDao <|.. CartProductDaoImpl
+
+	UserDaoImpl --> User
+	ProductDaoImpl --> Product
+	CategoryDaoImpl --> Category
+	CartDaoImpl --> Cart
+	CartProductDaoImpl --> CartProduct
+
+	Cart --> User
+	CartProduct --> Cart
+	CartProduct --> Product
+	Product --> Category
+	```
+
+## 旧后端总体类图（保留历史版本）
+
+下面是仓库中原有的后端总体类图（历史版本），为保持与早期文档的一致性，作为参考保留在此处：
+
+小结：历史版本的总体类图，结构更概览化，保留以便与上面的细化类图对比。主要实现可参见 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1) 与服务/DAO/实体目录。
 
 ```mermaid
 classDiagram
@@ -374,92 +557,28 @@ class ApiController {
 class UserController
 class AdminController
 
-class UserService {
-	<<interface>>
-	+getUsers()
-	+addUser()
-	+checkLogin()
-	+getUserByUsername()
-	+getUserById()
-	+checkUserExists()
-}
-class ProductService {
-	<<interface>>
-	+getProducts()
-	+addProduct()
-	+getProduct()
-	+updateProduct()
-	+deleteProduct()
-}
-class CategoryService {
-	<<interface>>
-	+addCategory()
-	+getCategories()
-	+deleteCategory()
-	+updateCategory()
-	+getCategory()
-}
-class CartService {
-	<<interface>>
-	+addCart()
-	+getCarts()
-	+updateCart()
-	+deleteCart()
-}
+class UserService
+class ProductService
+class CategoryService
+class CartService
 
-class UserServiceImpl
-class ProductServiceImpl
-class CategoryServiceImpl
-class CartServiceImpl
 
-class UserDao {
-	<<interface>>
-	+getAllUser()
-	+saveUser()
-	+getUser()
-	+getUserByUsername()
-	+getUserById()
-	+userExists()
-}
-class ProductDao {
-	<<interface>>
-	+getProducts()
-	+addProduct()
-	+getProduct()
-	+updateProduct()
-	+deletProduct()
-}
-class CategoryDao {
-	<<interface>>
-	+addCategory()
-	+getCategories()
-	+getCategory()
-	+updateCategory()
-	+deletCategory()
-}
-class CartDao {
-	<<interface>>
-	+getCarts()
-	+addCart()
-	+updateCart()
-	+deleteCart()
-}
-class CartProductDao {
-	<<interface>>
-	+addCartProduct()
-	+getCartProducts()
-	+updateCartProduct()
-	+deleteCartProduct()
-	+getProductByCartID()
-	+getCartProductsByProductId()
-	+getCartProductsByCartAndProductId()
-}
+class UserServiceImpl["UserServiceImpl (services/impl/UserServiceImpl.java)"]
+class ProductServiceImpl["ProductServiceImpl (services/impl/ProductServiceImpl.java)"]
+class CategoryServiceImpl["CategoryServiceImpl (services/impl/CategoryServiceImpl.java)"]
+class CartServiceImpl["CartServiceImpl (services/impl/CartServiceImpl.java)"]
 
-class UserDaoImpl
-class ProductDaoImpl
-class CategoryDaoImpl
-class CartDaoImpl
-class CartProductDaoImpl
+class UserDao["UserDao (dao/UserDao.java)"]
+class ProductDao["ProductDao (dao/ProductDao.java)"]
+class CategoryDao["CategoryDao (dao/CategoryDao.java)"]
+class CartDao["CartDao (dao/CartDao.java)"]
+class CartProductDao["CartProductDao (dao/CartProductDao.java)"]
+
+class UserDaoImpl["UserDaoImpl (dao/impl/UserDaoImpl.java)"]
+class ProductDaoImpl["ProductDaoImpl (dao/impl/ProductDaoImpl.java)"]
+class CategoryDaoImpl["CategoryDaoImpl (dao/impl/CategoryDaoImpl.java)"]
+class CartDaoImpl["CartDaoImpl (dao/impl/CartDaoImpl.java)"]
+class CartProductDaoImpl["CartProductDaoImpl (dao/impl/CartProductDaoImpl.java)"]
 
 class User
 class Product
@@ -512,26 +631,32 @@ Product --> Category
 
 ## 页面和组件的对照理解
 
-- 商品页：ProductsView 是页面，ProductGrid 是商品展示组件。
-- 购物车页：CartView 是页面，CartList 是购物车展示组件。
-- 用户登录页：UserLoginView 是页面，UserAuthForms 是表单组件。
-- 管理后台页：AdminDashboardView 是页面，CategoryManager、ProductManager、CustomerList、ProfileEditor 是局部组件。
+- 商品页：ProductsView (ProductsView.tsx) 是页面，ProductGrid (ProductGrid.tsx) 是商品展示组件。
+- 购物车页：CartView (CartView.tsx) 是页面，CartList (CartList.tsx) 是购物车展示组件。
+- 用户登录页：UserLoginView (UserLoginView.tsx) 是页面，UserAuthForms (UserAuthForms.tsx) 是表单组件。
+- 管理后台页：AdminDashboardView (AdminDashboardView.tsx) 是页面，CategoryManager (CategoryManager.tsx)、ProductManager (ProductManager.tsx)、CustomerList (CustomerList.tsx)、ProfileEditor (ProfileEditor.tsx) 是局部组件。
 
 ## View 时序图
 
 下面把各个 view 的核心流程拆开看，会更接近你在代码里真正看到的调用链。
+
+### AppShell
+
+- 源码位置：[`frontend/src/App.tsx`](../frontend/src/App.tsx)
+- 类职责：React 应用壳组件，负责路由入口、全局状态分发、登录/注册/购物车/后台管理等提交动作的集中处理。
+- 读图提示：下面几个 View 的时序图里，`AppShell` 都指向这个文件中的 `AppShell()`。
 
 ### UserLoginView
 
 ```mermaid
 sequenceDiagram
 	actor U as 用户
-	participant V as UserLoginView
-	participant S as AppShell
-	participant A as appService
-	participant C as ApiController
-	participant US as UserService
-	participant UD as UserDao
+	participant V as UserLoginView (UserLoginView.tsx)
+	participant S as AppShell (App.tsx)
+	participant A as appService (appService.ts)
+	participant C as ApiController (ApiController.java)
+	participant US as UserService (UserService.java)
+	participant UD as UserDao (UserDao.java)
 
 	U->>V: 输入用户名和密码，点击登录
 	V->>S: onLogin()
@@ -552,13 +677,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 	actor U as 用户
-	participant V as ProductsView
-	participant G as ProductGrid
-	participant S as AppShell
-	participant A as appService
-	participant C as ApiController
-	participant PS as ProductService
-	participant PD as ProductDao
+	participant V as ProductsView (ProductsView.tsx)
+	participant G as ProductGrid (ProductGrid.tsx)
+	participant S as AppShell (App.tsx)
+	participant A as appService (appService.ts)
+	participant C as ApiController (ApiController.java)
+	participant PS as ProductService (ProductService.java)
+	participant PD as ProductDao (ProductDao.java)
 
 	U->>V: 进入商品页
 	V->>G: 渲染商品列表
@@ -580,13 +705,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 	actor U as 用户
-	participant V as CartView
-	participant L as CartList
-	participant S as AppShell
-	participant A as appService
-	participant C as ApiController
-	participant CS as CartService
-	participant CPD as CartProductDao
+	participant V as CartView (CartView.tsx)
+	participant L as CartList (CartList.tsx)
+	participant S as AppShell (App.tsx)
+	participant A as appService (appService.ts)
+	participant C as ApiController (ApiController.java)
+	participant CS as CartService (CartService.java)
+	participant CPD as CartProductDao (CartProductDao.java)
 
 	U->>V: 打开购物车页
 	V->>L: 渲染购物车列表
@@ -607,12 +732,12 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 	actor A1 as 管理员
-	participant V as AdminLoginView
-	participant S as AppShell
-	participant AS as appService
-	participant C as ApiController
-	participant US as UserService
-	participant UD as UserDao
+	participant V as AdminLoginView (AdminLoginView.tsx)
+	participant S as AppShell (App.tsx)
+	participant AS as appService (appService.ts)
+	participant C as ApiController (ApiController.java)
+	participant US as UserService (UserService.java)
+	participant UD as UserDao (UserDao.java)
 
 	A1->>V: 输入管理员账号密码并登录
 	V->>S: onLogin()
@@ -633,16 +758,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 	actor A1 as 管理员
-	participant V as AdminDashboardView
-	participant C1 as CategoryManager
-	participant P1 as ProductManager
-	participant P2 as ProfileEditor
-	participant S as AppShell
-	participant AS as appService
-	participant C as ApiController
-	participant CS as CategoryService
-	participant PS as ProductService
-	participant US as UserService
+	participant V as AdminDashboardView (AdminDashboardView.tsx)
+	participant C1 as CategoryManager (CategoryManager.tsx)
+	participant P1 as ProductManager (ProductManager.tsx)
+	participant P2 as ProfileEditor (ProfileEditor.tsx)
+	participant S as AppShell (App.tsx)
+	participant AS as appService (appService.ts)
+	participant C as ApiController (ApiController.java)
+	participant CS as CategoryService (CategoryService.java)
+	participant PS as ProductService (ProductService.java)
+	participant US as UserService (UserService.java)
 
 	A1->>V: 查看后台首页
 	V->>V: 显示概览、分类、商品、客户、资料
@@ -696,21 +821,21 @@ sequenceDiagram
 		- hooks/
 			- useAppState.ts （集中状态 Hook，实现 bootstrap、refreshCart、refreshAdmin）
 		- views/
-			- AdminDashboardView.tsx
-			- AdminLoginView.tsx
-			- CartView.tsx
-			- ProductsView.tsx
-			- UserLoginView.tsx
+			- AdminDashboardView.tsx （管理后台主页视图）
+			- AdminLoginView.tsx （管理员登录视图）
+			- CartView.tsx （购物车视图）
+			- ProductsView.tsx （商品列表视图）
+			- UserLoginView.tsx （用户登录视图）
 		- components/
-			- PageHeader.tsx
-			- ProductGrid.tsx
-			- ProductManager.tsx
-			- CategoryManager.tsx
-			- ProfileEditor.tsx
-			- UserAuthForms.tsx
-			- AdminAuthForm.tsx
-			- CartList.tsx
-			- CustomerList.tsx
+			- PageHeader.tsx （页面头部）
+			- ProductGrid.tsx （商品网格）
+			- ProductManager.tsx （商品管理表单）
+			- CategoryManager.tsx （分类管理表单）
+			- ProfileEditor.tsx （个人资料编辑）
+			- UserAuthForms.tsx （用户认证表单）
+			- AdminAuthForm.tsx （管理员认证表单）
+			- CartList.tsx （购物车列表）
+			- CustomerList.tsx （客户列表）
 		- services/
 			- appService.ts （对后端 /api/* 的函数封装，如 loginUserRequest、saveProductRequest 等）
 

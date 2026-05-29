@@ -66,6 +66,17 @@
 
 - [devops-lab/README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
 
+## 在 IDEA 里确认是 Windows 还是 WSL
+
+打开这个工作区后，可以用下面几个点快速判断当前项目是按 Windows 路径打开，还是按 WSL 环境打开：
+
+- 看项目根路径。如果路径像 `\\wsl$\Ubuntu\home\victorkure\workspace\vscode_study`，说明是通过 WSL 共享路径打开的；如果像 `D:\...` 或 `C:\...`，就是 Windows 本地路径。
+- 看终端默认环境。IDEA 里打开 Terminal，如果命令提示符是 Linux shell，且能直接执行 `uname -a`、`pwd`、`ls`，通常就是 WSL 环境。
+- 看解释器/SDK 配置。如果 Python Interpreter、JDK、Node 等配置项显示的是 WSL 里的路径，说明项目在用 WSL 工具链；如果是 `C:\Program Files\...`、`D:\...`，说明走的是 Windows 工具链。
+- 看文件系统特征。WSL 打开的项目通常能看到 Linux 风格路径和权限信息；Windows 打开的项目则是 NTFS 路径风格。
+
+如果你想最稳妥地确认，可以在 IDEA 的 Terminal 里运行 `pwd`，再对照项目根路径：只要显示的是 `/home/victorkure/workspace/vscode_study`，就说明当前是在 WSL 侧打开。
+
 ## 推荐查看顺序
 
 如果你现在主要想学生成 AI 并贴日本现场：

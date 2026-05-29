@@ -15,6 +15,7 @@
 - [ECR 学习笔记](./ECR.md)
 - [ECS 学习笔记](./ECS.md)
 - [Fargate 学习笔记](./Fargate.md)
+- [EKS 学习笔记](./EKS.md)
 - [KMS 学习笔记](./KMS.md)
 - [Secrets Manager 学习笔记](./SecretsManager.md)
 - [Route 53 学习笔记](./Route53.md)
@@ -28,6 +29,7 @@
 - [S3 + CloudFront](./combos/S3_CloudFront.md)
 - [EC2 + ALB](./combos/EC2_ALB.md)
 - [SQS + Lambda](./combos/SQS_Lambda.md)
+- [Docker / ECR / ECS](./combos/Docker_ECR_ECS.md)
 - [ECS + ECR + Fargate](./combos/ECS_ECR_Fargate.md)
 - [RDS + CloudWatch](./combos/RDS_CloudWatch.md)
 - [S3 + Lambda](./combos/S3_Lambda.md)
@@ -47,10 +49,12 @@
 - [Lake Formation + Athena](./combos/LakeFormation_Athena.md)
 - [QuickSight + Lake Formation](./combos/QuickSight_LakeFormation.md)
 - [Redshift + Lake Formation](./combos/Redshift_LakeFormation.md)
+- [Web Project 部署流程](./combos/WebProject_Deployment.md)
+- [Batch 部署流程](./combos/Batch_Deployment.md)
 
 ## 建议阅读顺序
 
 1. 先看 [AWS知识点总览（中日对照）](../AWS_Knowledge_Map.md)
-2. 再按 S3、IAM、VPC、EC2、Lambda、SQS、SNS、CloudWatch、ECR、ECS、Fargate、KMS、Secrets Manager、Route 53、CloudFormation、CDK、Terraform 的顺序阅读
+2. 再按 S3、IAM、VPC、EC2、Lambda、SQS、SNS、CloudWatch、ECR、ECS、EKS、Fargate、KMS、Secrets Manager、Route 53、CloudFormation、CDK、Terraform 的顺序阅读
 3. 然后看高频架构组合，把单服务串成一条完整链路
 4. 最后配合 LocalStack 的项目示例做实操

@@ -18,81 +18,7 @@
 如果你是第一次看这个项目，推荐顺序：
 
 1. [README.md](../README.md)
-2. [vue-learning-path.md](./vue-learning-path.md)
-3. [vue-framework-notes.md](./vue-framework-notes.md)
-4. [project-code-map.md](./project-code-map.md)
-5. [composables-learning-guide.md](./composables-learning-guide.md)
-
-## 文档分区
-
-### 学习路线
-
-- [vue-learning-path.md](./vue-learning-path.md)
-
-适合按顺序学习 Vue 页面、状态和项目演进路线。
-
-### 框架与概念
-
-- [vue-framework-notes.md](./vue-framework-notes.md)
-- [composables-learning-guide.md](./composables-learning-guide.md)
-
-适合理解 Vue 关键概念、响应式状态和组合式函数用法。
-
-### 项目结构与页面组织
-
-- [project-code-map.md](./project-code-map.md)
-- [page-structure-guide.md](./page-structure-guide.md)
-
-适合理解目录结构、页面拆分、组件边界和服务层组织。
-
-## 前端源码入口
-
-如果你想边读文档边看 Vue 代码，可以从这里开始：
-
-- 前端入口：[main.ts](../frontend/src/main.ts)
-- 前端主页面：[App.vue](../frontend/src/App.vue)
-- 全局样式：[style.css](../frontend/src/style.css)
-- 状态组合：[useAppStore.ts](../frontend/src/composables/useAppStore.ts)
-- 业务 Service：[appService.ts](../frontend/src/services/appService.ts)
-
-## 后端源码入口
-
-虽然这是 Vue 学习版，但后端仍然是 Spring Boot，可以从这里往下看：
-
-- API 控制器：[ApiController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java)
-- 用户控制器：[UserController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/UserController.java)
-- 管理员控制器：[AdminController.java](../src/main/java/com/jtspringproject/JtSpringProject/controller/AdminController.java)
-
-## 使用建议
-
-- 想先把项目跑起来：先看 [README.md](../README.md)
-- 想按路线学习 Vue：先看 [vue-learning-path.md](./vue-learning-path.md)
-- 想先理解项目结构：先看 [project-code-map.md](./project-code-map.md)
-- 想重点学 Composables：先看 [composables-learning-guide.md](./composables-learning-guide.md)
-
-## 文档模板
-
-Vue 和 React 的文档现在尽量使用同一套阅读模板，后续新增内容也建议按这个顺序组织：
-
-1. 先看入口和推荐阅读。
-2. 再看 views、components、layouts 的页面组织。
-3. 接着看类图，理解页面层和后端层的对象关系。
-4. 然后看流程图和时序图，理解一次请求怎么走完整条链路。
-5. 最后看源码入口和学习文档，继续往细节里追。
-
-## views 和 components 的关系
-
-在这个 Vue 版本里，views 和 components 的关系可以理解成“页面”和“积木块”：
-
-- views 是路由级页面，负责承载一个完整场景，例如商品页、购物车页、管理后台页。
-- components 是可复用的小组件，负责完成局部 UI，例如商品网格、页面头部、分类管理表单。
-- App.vue 负责把全局布局、鉴权态和路由出口串起来，再把数据交给 views。
-- views 再把更细的 UI 拆给 components，保持页面组件只做组装，不直接承担网络请求。
-
-一句话理解：App.vue 负责调度，views 负责页面编排，components 负责局部展示与交互。
-
-## 类图
-
+- [App.vue](../frontend/src/App.vue) 负责把全局布局、鉴权态和路由出口串起来，再把数据交给 [views](../frontend/src/views/)。
 ```mermaid
 classDiagram
 direction LR
@@ -199,159 +125,7 @@ CartDao --> Cart
 CartProductDao --> CartProduct
 ```
 
-## 处理流程图
-
-```mermaid
-flowchart TD
-		A[浏览器打开应用] --> B[main.ts 挂载 Vue App]
-		B --> C[App.vue 初始化布局与路由出口]
-		C --> D[onMounted 调用 useAppStore.bootstrap]
-		D --> E[并发拉取 session / products / categories]
-		E --> F[路由切换到某个 view]
-		F --> G[view 组合 components 渲染页面]
-		G --> H[用户点击按钮或提交表单]
-		H --> I[view 或 store 方法处理事件]
-		I --> J[appService 调用 /api 接口]
-		J --> K[ApiController 接收请求]
-		K --> L[Service 层执行业务逻辑]
-		L --> M[DAO 访问数据库]
-		M --> N[(MySQL / 数据库)]
-		N --> M --> L --> K --> J --> I
-		I --> O[更新 reactive store]
-		O --> G
-```
-
-## 页面和组件的对照理解
-
-- 商品页：ProductsView 是页面，ProductGrid 是商品展示组件。
-- 购物车页：CartView 是页面，CartList 是购物车展示组件。
-- 用户登录页：UserLoginView 是页面，UserAuthForms 是表单组件。
-- 管理后台页：AdminDashboardView 是页面，CategoryManager、ProductManager、CustomerList、ProfileEditor 是局部组件。
-
-如果你愿意，我还可以继续把这份文档补成“Vue 视图层 + Spring Boot 后端”的完整时序图版本，或者再画一张更细的“controller / service / dao / model”类图。
-
-
-## 后端细化类图
-
-这一张图只展开 Spring Boot 后端，重点看 controller / service / dao / model 的真实依赖关系。
-
-```mermaid
-classDiagram
-direction LR
-
-class ApiController {
-	+health()
-	+session()
-	+userLogin()
-	+register()
-	+userLogout()
-	+products()
-	+categories()
-	+cart()
-	+addCartItem()
-	+deleteCartItem()
-	+adminLogin()
-	+adminLogout()
-	+adminOverview()
-	+adminCategories()
-	+createCategory()
-	+updateCategory()
-	+deleteCategory()
-	+adminProducts()
-	+createProduct()
-	+updateProduct()
-	+deleteProduct()
-	+customers()
-	+adminProfile()
-	+updateAdminProfile()
-}
-
-class UserController {
-	+login()
-	+register()
-	+cart()
-	+logout()
-}
-
-class AdminController {
-	+login()
-	+dashboard()
-	+categories()
-	+products()
-	+customers()
-	+profile()
-}
-
-class UserService {
-	<<interface>>
-	+getUsers()
-	+addUser()
-	+checkLogin()
-	+getUserByUsername()
-	+getUserById()
-	+checkUserExists()
-}
-
-class ProductService {
-	<<interface>>
-	+getProducts()
-	+addProduct()
-	+getProduct()
-	+updateProduct()
-	+deleteProduct()
-}
-
-class CategoryService {
-	<<interface>>
-	+addCategory()
-	+getCategories()
-	+deleteCategory()
-	+updateCategory()
-	+getCategory()
-}
-
-class CartService {
-	<<interface>>
-	+addCart()
-	+getCarts()
-	+updateCart()
-	+deleteCart()
-}
-
-class UserServiceImpl
-class ProductServiceImpl
-class CategoryServiceImpl
-class CartServiceImpl
-
-class UserDao {
-	<<interface>>
-	+getAllUser()
-	+saveUser()
-	+getUser()
-	+getUserByUsername()
-	+getUserById()
-	+userExists()
-}
-
-class ProductDao {
-	<<interface>>
-	+getProducts()
-	+addProduct()
-	+getProduct()
-	+updateProduct()
-	+deletProduct()
-}
-
-class CategoryDao {
-	<<interface>>
-	+getCategories()
-	+addCategory()
-	+getCategory()
-	+updateCategory()
-	+deleteCategory()
-}
-
-class CartDao {
+## View 时序图
 	<<interface>>
 	+getCarts()
 	+addCart()
@@ -434,12 +208,12 @@ Product --> Category
 ```mermaid
 sequenceDiagram
 		actor U as 用户
-		participant V as UserLoginView
-		participant S as useAppStore
-		participant A as appService
-		participant C as ApiController
-		participant US as UserService
-		participant UD as UserDao
+		participant V as UserLoginView (UserLoginView.vue)
+		participant S as useAppStore (useAppStore.ts)
+		participant A as appService (appService.ts)
+		participant C as ApiController (ApiController.java)
+		participant US as UserService (UserService.java)
+		participant UD as UserDao (UserDao.java)
 
 		U->>V: 输入用户名和密码，点击登录
 		V->>S: loginUser()
@@ -463,32 +237,32 @@ sequenceDiagram
 	- package.json（项目依赖与启动脚本）
 	- vite.config.ts（Vite 配置）
 	- src/
-		- main.ts（应用入口，挂载 Vue）
-		- App.vue（路由壳与全局布局）
-		- router.ts（路由分发与访问控制）
-		- style.css（全局样式）
+		- [main.ts](../frontend/src/main.ts)（应用入口，挂载 Vue）
+		- [App.vue](../frontend/src/App.vue)（路由壳与全局布局）
+		- [router.ts](../frontend/src/router.ts)（路由分发与访问控制）
+		- [style.css](../frontend/src/style.css)（全局样式）
 		- composables/
-			- useAppStore.ts（集中状态 composable，实现 bootstrap、refreshCart、refreshAdmin）
+			- [useAppStore.ts](../frontend/src/composables/useAppStore.ts)（集中状态 composable，实现 bootstrap、refreshCart、refreshAdmin）
 		- services/
-			- appService.ts（对后端 /api/* 的调用封装，如 loginUserRequest、saveProductRequest）
+			- [appService.ts](../frontend/src/services/appService.ts)（对后端 /api/* 的调用封装，如 loginUserRequest、saveProductRequest）
 		- views/（按路由拆分的页面视图，代表文件）
-			- UserLoginView.vue
-			- ProductsView.vue
-			- CartView.vue
-			- AdminLoginView.vue
-			- AdminDashboardView.vue
+			- [UserLoginView.vue](../frontend/src/views/UserLoginView.vue)
+			- [ProductsView.vue](../frontend/src/views/ProductsView.vue)
+			- [CartView.vue](../frontend/src/views/CartView.vue)
+			- [AdminLoginView.vue](../frontend/src/views/AdminLoginView.vue)
+			- [AdminDashboardView.vue](../frontend/src/views/AdminDashboardView.vue)
 		- components/（可复用组件，代表文件）
-			- PageHeader.vue
-			- UserAuthForms.vue
-			- AdminAuthForm.vue
-			- ProductGrid.vue
-			- ProductManager.vue
-			- CategoryManager.vue
-			- CartList.vue
-			- CustomerList.vue
-			- ProfileEditor.vue
+			- [PageHeader.vue](../frontend/src/components/PageHeader.vue)
+			- [UserAuthForms.vue](../frontend/src/components/UserAuthForms.vue)
+			- [AdminAuthForm.vue](../frontend/src/components/AdminAuthForm.vue)
+			- [ProductGrid.vue](../frontend/src/components/ProductGrid.vue)
+			- [ProductManager.vue](../frontend/src/components/ProductManager.vue)
+			- [CategoryManager.vue](../frontend/src/components/CategoryManager.vue)
+			- [CartList.vue](../frontend/src/components/CartList.vue)
+			- [CustomerList.vue](../frontend/src/components/CustomerList.vue)
+			- [ProfileEditor.vue](../frontend/src/components/ProfileEditor.vue)
 		- layouts/
-			- AppLayout.vue
+			- [AppLayout.vue](../frontend/src/layouts/AppLayout.vue)
 
 - src/main/java/... — 后端 Spring Boot 项目（提供 API 或 MVC）
 	- controller/ 包含 REST API（ApiController）以及历史 MVC 控制器（AdminController、UserController）
@@ -512,13 +286,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 		actor U as 用户
-		participant V as ProductsView
-		participant G as ProductGrid
-		participant S as useAppStore
-		participant A as appService
-		participant C as ApiController
-		participant PS as ProductService
-		participant PD as ProductDao
+		participant V as ProductsView (ProductsView.vue)
+		participant G as ProductGrid (ProductGrid.vue)
+		participant S as useAppStore (useAppStore.ts)
+		participant A as appService (appService.ts)
+		participant C as ApiController (ApiController.java)
+		participant PS as ProductService (ProductService.java)
+		participant PD as ProductDao (ProductDao.java)
 
 		U->>V: 进入商品页
 		V->>G: 渲染商品列表
@@ -540,14 +314,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 		actor U as 用户
-		participant V as CartView
-		participant L as CartList
-		participant S as useAppStore
-		participant A as appService
-		participant C as ApiController
-		participant CS as CartService
-		participant CD as CartDao
-		participant CPD as CartProductDao
+		participant V as CartView (CartView.vue)
+		participant L as CartList (CartList.vue)
+		participant S as useAppStore (useAppStore.ts)
+		participant A as appService (appService.ts)
+		participant C as ApiController (ApiController.java)
+		participant CS as CartService (CartService.java)
+		participant CD as CartDao (CartDao.java)
+		participant CPD as CartProductDao (CartProductDao.java)
 
 		U->>V: 打开购物车页
 		V->>L: 渲染购物车列表
@@ -570,12 +344,12 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 		actor A1 as 管理员
-		participant V as AdminLoginView
-		participant S as useAppStore
-		participant AS as appService
-		participant C as ApiController
-		participant US as UserService
-		participant UD as UserDao
+		participant V as AdminLoginView (AdminLoginView.vue)
+		participant S as useAppStore (useAppStore.ts)
+		participant AS as appService (appService.ts)
+		participant C as ApiController (ApiController.java)
+		participant US as UserService (UserService.java)
+		participant UD as UserDao (UserDao.java)
 
 		A1->>V: 输入管理员账号密码并登录
 		V->>S: loginAdmin()
@@ -596,16 +370,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 		actor A1 as 管理员
-		participant V as AdminDashboardView
-		participant C1 as CategoryManager
-		participant P1 as ProductManager
-		participant P2 as ProfileEditor
-		participant S as useAppStore
-		participant AS as appService
-		participant C as ApiController
-		participant CS as CategoryService
-		participant PS as ProductService
-		participant US as UserService
+		participant V as AdminDashboardView (AdminDashboardView.vue)
+		participant C1 as CategoryManager (CategoryManager.vue)
+		participant P1 as ProductManager (ProductManager.vue)
+		participant P2 as ProfileEditor (ProfileEditor.vue)
+		participant S as useAppStore (useAppStore.ts)
+		participant AS as appService (appService.ts)
+		participant C as ApiController (ApiController.java)
+		participant CS as CategoryService (CategoryService.java)
+		participant PS as ProductService (ProductService.java)
+		participant US as UserService (UserService.java)
 
 		A1->>V: 查看后台首页
 		V->>V: 显示概览、分类、商品、客户、资料

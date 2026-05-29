@@ -9,8 +9,11 @@
 | [S3 + CloudFront](./S3_CloudFront.md) | S3 存静态资源，CloudFront 做全球分发。 | S3 に静的資産を置き、CloudFront がグローバル配信を担当します。 |
 | [EC2 + ALB](./EC2_ALB.md) | EC2 承载应用，ALB 负责流量分发和负载均衡。 | EC2 がアプリを実行し、ALB がトラフィック分散と負荷分散を担います。 |
 | [SQS + Lambda](./SQS_Lambda.md) | SQS 缓冲消息，Lambda 异步消费处理。 | SQS がメッセージをバッファし、Lambda が非同期で処理します。 |
+| [Docker / ECR / ECS](./Docker_ECR_ECS.md) | Docker 打镜像，ECR 存镜像，ECS 跑容器服务，适合 Web、API、Batch 和 Worker。 | Docker でイメージ化し、ECR に保存し、ECS で Web / API / バッチ / worker を動かします。 |
 | [ECS + ECR + Fargate](./ECS_ECR_Fargate.md) | ECR 管镜像，ECS + Fargate 运行容器。 | ECR がイメージを管理し、ECS + Fargate がコンテナを実行します。 |
 | [RDS + CloudWatch](./RDS_CloudWatch.md) | RDS 提供数据库，CloudWatch 做监控告警。 | RDS が DB を提供し、CloudWatch が監視とアラームを担います。 |
+| [Web Project 部署流程](./WebProject_Deployment.md) | 以 Route 53 / ALB / EC2 / Auto Scaling 说明 Web 项目部署。 | Route 53 / ALB / EC2 / Auto Scaling で Web デプロイを学びます。 |
+| [Batch 部署流程](./Batch_Deployment.md) | 以 EventBridge Scheduler / Lambda / S3 / SQS 说明批处理部署。 | EventBridge Scheduler / Lambda / S3 / SQS でバッチデプロイを学びます。 |
 | [S3 + Lambda](./S3_Lambda.md) | S3 事件触发 Lambda 做自动处理。 | S3 イベントで Lambda を起動して自動処理します。 |
 | [SQS + SNS](./SQS_SNS.md) | SNS 广播消息，SQS 负责排队消费。 | SNS が配信し、SQS がキュー処理を担当します。 |
 | [S3 + SNS](./S3_SNS.md) | S3 对象事件通知 SNS，再分发给订阅者。 | S3 のオブジェクトイベントを SNS で通知し、購読先へ配信します。 |
@@ -37,8 +40,11 @@ flowchart TD
 	B --> C[S3 + CloudFront]
 	B --> D[EC2 + ALB]
 	B --> E[SQS + Lambda]
+	B --> E1[Docker / ECR / ECS 路线]
 	B --> F[ECS + ECR + Fargate]
 	B --> G[RDS + CloudWatch]
+	B --> H1[Web Project 部署流程]
+	B --> H2[Batch 部署流程]
 	B --> H[S3 + Lambda]
 	B --> I[SQS + SNS]
 	B --> Q[S3 + SNS]
@@ -59,6 +65,7 @@ flowchart TD
 	C --> J[存储与分发]
 	D --> K[负载均衡与扩展]
 	E --> L[异步处理]
+	E1 --> M1[容器交付链路]
 	F --> M[容器交付链路]
 	G --> N[数据库监控]
 	H --> O[事件驱动数据处理]
