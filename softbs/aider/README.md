@@ -4,10 +4,10 @@
 
 推荐阅读顺序：
 
-1. [UM890_Aider_Local_LLM_Install.md](D:/dev/source_code/vscode_study/softbs/aider/UM890_Aider_Local_LLM_Install.md)
-2. [aider_quickstart.md](D:/dev/source_code/vscode_study/softbs/aider/aider_quickstart.md)
-3. [aider_local_usage.md](D:/dev/source_code/vscode_study/softbs/aider/aider_local_usage.md)
-4. [03_Aider 项目级实战工作流.md](D:/dev/source_code/vscode_study/softbs/aider/03_Aider 项目级实战工作流.md)
+1. [UM890_Aider_Local_LLM_Install.md](UM890_Aider_Local_LLM_Install.md)
+2. [aider_quickstart.md](aider_quickstart.md)
+3. [aider_local_usage.md](aider_local_usage.md)
+4. [03_Aider 项目级实战工作流.md](03_Aider 项目级实战工作流.md)
 
 补充资料：
 

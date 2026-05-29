@@ -265,52 +265,31 @@ flowchart TD
 		N --> F
 ```
 
-## React 视图层 + Spring Boot 后端完整时序图
+## React 视图层 + Spring Boot 后端时序图
 
-这张图把前端视图层、共享状态、请求封装、控制器、服务层、DAO 和实体对象串成一条完整链路，方便你从页面一直追到数据库。
+这一节拆成两张小图：前端只看 React 视图层，后端只看 Spring Boot 请求链路。这样在页面里更容易完整看清。
 
-小结：从页面到数据库的端到端调用链快速参考。源码索引：前端入口 [main.tsx](java-projects/JtProject-React/frontend/src/main.tsx#L1)、应用壳 [App.tsx](java-projects/JtProject-React/frontend/src/App.tsx#L1)、全局 Hook [useAppState.ts](java-projects/JtProject-React/frontend/src/hooks/useAppState.ts#L1)、服务层 [appService.ts](java-projects/JtProject-React/frontend/src/services/appService.ts#L1)、请求封装 [api.ts](java-projects/JtProject-React/frontend/src/api.ts#L1)、后端控制器 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1)。
+### 1. React 视图层时序图
 
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}} }%%
 sequenceDiagram
 	actor U as 用户
 	participant B as Browser
 	participant M as main.tsx
-	note right of M: frontend/src/main.tsx#L1
+	note right of M: main.tsx
 	participant A as AppShell
-	note right of A: frontend/src/App.tsx#L1
+	note right of A: App.tsx
 	participant V as View
-	note right of V: frontend/src/views/*.tsx
+	note right of V: views/*.tsx
 	participant C as components
-	note right of C: frontend/src/components/*.tsx
+	note right of C: components/*.tsx
 	participant H as useAppState
-	note right of H: frontend/src/hooks/useAppState.ts#L1
+	note right of H: useAppState.ts
 	participant S as appService
-	note right of S: frontend/src/services/appService.ts#L1
+	note right of S: appService.ts
 	participant R as api
-	note right of R: frontend/src/api.ts#L1
-	participant CT as ApiController
-	note right of CT: src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1
-	participant US as UserService
-	note right of US: src/main/java/com/jtspringproject/JtSpringProject/services/UserService.java#L1
-	participant PS as ProductService
-	note right of PS: src/main/java/com/jtspringproject/JtSpringProject/services/ProductService.java#L1
-	participant CS as CategoryService
-	note right of CS: src/main/java/com/jtspringproject/JtSpringProject/services/CategoryService.java#L1
-	participant AS as CartService
-	note right of AS: src/main/java/com/jtspringproject/JtSpringProject/services/CartService.java#L1
-	participant UD as UserDao
-	note right of UD: src/main/java/com/jtspringproject/JtSpringProject/dao/UserDao.java#L1
-	participant PD as ProductDao
-	note right of PD: src/main/java/com/jtspringproject/JtSpringProject/dao/ProductDao.java#L1
-	participant CD as CategoryDao
-	note right of CD: src/main/java/com/jtspringproject/JtSpringProject/dao/CategoryDao.java#L1
-	participant CRD as CartDao
-	note right of CRD: src/main/java/com/jtspringproject/JtSpringProject/dao/CartDao.java#L1
-	participant CPD as CartProductDao
-	note right of CPD: src/main/java/com/jtspringproject/JtSpringProject/dao/CartProductDao.java#L1
-	participant E as model/entity
-	note right of E: src/main/java/com/jtspringproject/JtSpringProject/models/*.java
+	note right of R: api.ts
 
 	U->>B: 打开页面并触发登录、浏览商品或管理操作
 	B->>M: 挂载 React 应用
@@ -323,29 +302,121 @@ sequenceDiagram
 	V->>A: 调用 AppShell 中的事件处理函数
 	A->>S: loginUserRequest / addToCartRequest / saveProductRequest 等
 	S->>R: 发起 HTTP 请求
-	R->>CT: POST / GET / PUT / DELETE /api/**
-	CT->>US: 校验用户登录 / 读取用户信息
-	CT->>PS: 查询或维护商品数据
-	CT->>CS: 查询或维护分类数据
-	CT->>AS: 查询或维护购物车数据
-	US->>UD: 访问用户表
-	PS->>PD: 访问商品表
-	CS->>CD: 访问分类表
-	AS->>CRD: 访问购物车与购物车商品表
-	UD-->>US: User
-	PD-->>PS: Product
-	CD-->>CS: Category
-	CRD-->>AS: Cart / CartProduct
-	US-->>CT: 业务结果
-	PS-->>CT: 业务结果
-	CS-->>CT: 业务结果
-	AS-->>CT: 业务结果
-	CT-->>R: JSON / Session / 列表数据
 	R-->>S: 解析后的响应数据
 	S-->>A: 返回统一结果
 	A->>H: 更新 React state
 	H-->>V: 触发界面刷新
 ```
+
+小结：这张图只看前端页面、状态和请求封装的关系。源码索引：前端入口 [main.tsx](java-projects/JtProject-React/frontend/src/main.tsx#L1)、应用壳 [App.tsx](java-projects/JtProject-React/frontend/src/App.tsx#L1)、全局 Hook [useAppState.ts](java-projects/JtProject-React/frontend/src/hooks/useAppState.ts#L1)、服务层 [appService.ts](java-projects/JtProject-React/frontend/src/services/appService.ts#L1)、请求封装 [api.ts](java-projects/JtProject-React/frontend/src/api.ts#L1)。
+
+### 2. Spring Boot 后端时序图
+
+这一部分再拆成两张小图：第一张看 Controller / Service，第二张看 DAO / Entity。
+
+#### 2.1 Controller / Service
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}} }%%
+sequenceDiagram
+	actor U as 用户
+	participant R as api
+	participant CT as ApiController
+	note right of CT: ApiController.java
+	participant US as UserService
+	note right of US: UserService.java
+	participant PS as ProductService
+	note right of PS: ProductService.java
+	participant CS as CategoryService
+	note right of CS: CategoryService.java
+	participant AS as CartService
+	note right of AS: CartService.java
+
+	U->>R: 提交登录、浏览或管理请求
+	R->>CT: POST / GET / PUT / DELETE /api/**
+	CT->>US: 校验用户登录 / 读取用户信息
+	CT->>PS: 查询或维护商品数据
+	CT->>CS: 查询或维护分类数据
+	CT->>AS: 查询或维护购物车数据
+	US-->>CT: 业务结果
+	PS-->>CT: 业务结果
+	CS-->>CT: 业务结果
+	AS-->>CT: 业务结果
+	CT-->>R: JSON / Session / 列表数据
+	R-->>U: 返回结果
+```
+
+> 注意：UserController.java 和 AdminController.java 为遗留 JSP 控制器（返回 JSP 视图）。React 前端并不直接通过它们交互，前端使用 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1) 暴露的 /api/** 接口。
+
+小结：这张图只看控制器和 Service 的调用链。源码索引：后端控制器 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1)、示例 Service [ProductService.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/services/ProductService.java#L1)。
+
+#### 2.2 DAO / Entity
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}} }%%
+sequenceDiagram
+	actor U as 用户
+	participant CT as ApiController
+	note right of CT: ApiController.java
+	participant US as UserService
+	note right of US: UserService.java
+	participant PS as ProductService
+	note right of PS: ProductService.java
+	participant CS as CategoryService
+	note right of CS: CategoryService.java
+	participant AS as CartService
+	note right of AS: CartService.java
+	participant UD as UserDao
+	note right of UD: UserDao.java
+	participant PD as ProductDao
+	note right of PD: ProductDao.java
+	participant CD as CategoryDao
+	note right of CD: CategoryDao.java
+	participant CRD as CartDao
+	note right of CRD: CartDao.java
+	participant CPD as CartProductDao
+	note right of CPD: CartProductDao.java
+	participant UE as User
+	note right of UE: User.java
+	participant PE as Product
+	note right of PE: Product.java
+	participant CE as Category
+	note right of CE: Category.java
+	participant CAE as Cart
+	note right of CAE: Cart.java
+	participant CPE as CartProduct
+	note right of CPE: CartProduct.java
+
+	U->>CT: 请求已经到达后端
+	CT->>US: 查询用户相关数据
+	CT->>PS: 查询商品相关数据
+	CT->>CS: 查询分类相关数据
+	CT->>AS: 查询购物车相关数据
+	US->>UD: 访问用户表
+	PS->>PD: 访问商品表
+	CS->>CD: 访问分类表
+	AS->>CRD: 访问购物车表
+	AS->>CPD: 访问购物车商品表
+	UD-->>UE: User
+	PD-->>PE: Product
+	CD-->>CE: Category
+	CRD-->>CAE: Cart
+	CPD-->>CPE: CartProduct
+	UE-->>US: User
+	PE-->>PS: Product
+	CE-->>CS: Category
+	CAE-->>AS: Cart
+	CPE-->>AS: CartProduct
+	US-->>CT: 业务结果
+	PS-->>CT: 业务结果
+	CS-->>CT: 业务结果
+	AS-->>CT: 业务结果
+	CT-->>U: 返回结果
+```
+
+> 注意：UserController.java 和 AdminController.java 为遗留 JSP 控制器（返回 JSP 视图）。React 前端并不直接通过它们交互，前端使用 [ApiController.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/controller/ApiController.java#L1) 暴露的 /api/** 接口。
+
+小结：这张图只看 DAO 和实体层的调用链。源码索引：示例 DAO [ProductDao.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/dao/ProductDao.java#L1)、实体示例 [Product.java](java-projects/JtProject-React/src/main/java/com/jtspringproject/JtSpringProject/models/Product.java#L1)。
 
 ## 后端分层细化类图
 
@@ -357,122 +428,91 @@ sequenceDiagram
 classDiagram
 direction LR
 
-	class ApiController["ApiController (ApiController.java)"] {
+	class ApiController["ApiController.java"] {
 		+health()
 		+session()
-		+userLogin()
-		+register()
-		+userLogout()
+		+auth() 
 		+products()
 		+categories()
 		+cart()
-		+addCartItem()
-		+deleteCartItem()
-		+adminLogin()
-		+adminLogout()
 		+adminOverview()
 		+adminCategories()
-		+createCategory()
-		+updateCategory()
-		+deleteCategory()
 		+adminProducts()
-		+createProduct()
-		+updateProduct()
-		+deleteProduct()
-		+customers()
 		+adminProfile()
-		+updateAdminProfile()
 	}
 
-	class UserController["UserController (UserController.java)"]
-	class AdminController["AdminController (AdminController.java)"]
+	class UserController["UserController.java (legacy JSP controller)"]
+	class AdminController["AdminController.java (legacy JSP controller)"]
 
-	class UserService["UserService (UserService.java)"] {
+	class UserService["UserService.java"] {
 		<<interface>>
+		+checkLogin()
 		+getUsers()
 		+addUser()
-		+checkLogin()
-		+getUserByUsername()
-		+getUserById()
-		+checkUserExists()
 	}
-	class ProductService["ProductService (ProductService.java)"] {
+	class ProductService["ProductService.java"] {
 		<<interface>>
 		+getProducts()
-		+addProduct()
 		+getProduct()
-		+updateProduct()
-		+deleteProduct()
+		+saveOrDelete()
 	}
-	class CategoryService["CategoryService (CategoryService.java)"] {
+	class CategoryService["CategoryService.java"] {
 		<<interface>>
 		+addCategory()
 		+getCategories()
-		+deleteCategory()
 		+updateCategory()
-		+getCategory()
+		+deleteCategory()
 	}
-	class CartService["CartService (CartService.java)"] {
+	class CartService["CartService.java"] {
 		<<interface>>
 		+addCart()
 		+getCarts()
 		+updateCart()
-		+deleteCart()
 	}
 
-	class UserServiceImpl["UserServiceImpl (services/impl/UserServiceImpl.java)"]
-	class ProductServiceImpl["ProductServiceImpl (services/impl/ProductServiceImpl.java)"]
-	class CategoryServiceImpl["CategoryServiceImpl (services/impl/CategoryServiceImpl.java)"]
-	class CartServiceImpl["CartServiceImpl (services/impl/CartServiceImpl.java)"]
+	class UserServiceImpl["UserServiceImpl.java"]
+	class ProductServiceImpl["ProductServiceImpl.java"]
+	class CategoryServiceImpl["CategoryServiceImpl.java"]
+	class CartServiceImpl["CartServiceImpl.java"]
 
-	class UserDao["UserDao (UserDao.java)"] {
+	class UserDao["UserDao.java"] {
 		<<interface>>
-		+getAllUser()
-		+saveUser()
 		+getUser()
-		+getUserByUsername()
-		+getUserById()
+		+saveUser()
 		+userExists()
 	}
-	class ProductDao["ProductDao (ProductDao.java)"] {
+	class ProductDao["ProductDao.java"] {
 		<<interface>>
 		+getProducts()
-		+addProduct()
 		+getProduct()
-		+updateProduct()
-		+deletProduct()
+		+saveProduct()
 	}
-	class CategoryDao["CategoryDao (CategoryDao.java)"] {
+	class CategoryDao["CategoryDao.java"] {
 		<<interface>>
 		+addCategory()
 		+getCategories()
-		+getCategory()
 		+updateCategory()
-		+deletCategory()
+		+deleteCategory()
 	}
-	class CartDao["CartDao (CartDao.java)"] {
+	class CartDao["CartDao.java"] {
 		<<interface>>
 		+getCarts()
 		+addCart()
 		+updateCart()
-		+deleteCart()
 	}
-	class CartProductDao["CartProductDao (CartProductDao.java)"] {
+	class CartProductDao["CartProductDao.java"] {
 		<<interface>>
 		+addCartProduct()
 		+getCartProducts()
 		+updateCartProduct()
 		+deleteCartProduct()
-		+getProductByCartID()
-		+getCartProductsByProductId()
-		+getCartProductsByCartAndProductId()
 	}
 
-	class User["User (User.java)"]
-	class Product["Product (Product.java)"]
-	class Category["Category (Category.java)"]
-	class Cart["Cart (Cart.java)"]
-	class CartProduct["CartProduct (CartProduct.java)"]
+	class User["User.java"]
+	class Product["Product.java"]
+	class Category["Category.java"]
+	class Cart["Cart.java"]
+	class CartProduct["CartProduct.java"]
 
 	ApiController --> UserService
 	ApiController --> ProductService
@@ -554,8 +594,8 @@ class ApiController {
 	+updateAdminProfile()
 }
 
-class UserController
-class AdminController
+class UserController["UserController (legacy JSP controller)"]
+class AdminController["AdminController (legacy JSP controller)"]
 
 class UserService
 class ProductService

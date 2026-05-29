@@ -4,10 +4,10 @@
 
 推荐阅读：
 
-- [OpenClaw_实用使用教程.md](D:/dev/source_code/vscode_study/softbs/openclaw/OpenClaw_实用使用教程.md)
-- [OpenClaw_Win11_WSL_安装配置教程.md](D:/dev/source_code/vscode_study/softbs/openclaw/OpenClaw_Win11_WSL_安装配置教程.md)
-- [OpenClaw_本地模型与自动切换教程.md](D:/dev/source_code/vscode_study/softbs/openclaw/OpenClaw_本地模型与自动切换教程.md)
-- [Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md](D:/dev/source_code/vscode_study/softbs/openclaw/Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md)
+- [OpenClaw_实用使用教程.md](OpenClaw_实用使用教程.md)
+- [OpenClaw_Win11_WSL_安装配置教程.md](OpenClaw_Win11_WSL_安装配置教程.md)
+- [OpenClaw_本地模型与自动切换教程.md](OpenClaw_本地模型与自动切换教程.md)
+- [Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md](Win11_OpenClaw_微信命令配置_qwen2.5-coder_1.5b.md)
 
 目录说明：
 

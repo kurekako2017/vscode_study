@@ -15,7 +15,7 @@
 
 如果你的目标是贴近日本 IT 现场、企业 PoC 和派遣案件要求，建议优先看：
 
-- [llm-lab/README.md](D:/dev/source_code/vscode_study/llm-lab/README.md)
+- [llm-lab/README.md](llm-lab/README.md)
 
 这条线重点是：
 
@@ -30,7 +30,7 @@
 
 如果你已经有了 `LLM 应用开发` 基础，再继续看：
 
-- [agent-lab/README.md](D:/dev/source_code/vscode_study/agent-lab/README.md)
+- [agent-lab/README.md](agent-lab/README.md)
 
 这条线重点是：
 
@@ -43,7 +43,7 @@
 
 如果你的目标是传统对日项目开发、Java、文档、流程和测试，建议看：
 
-- [java-lab/README.md](D:/dev/source_code/vscode_study/java-lab/README.md)
+- [java-lab/README.md](java-lab/README.md)
 
 这条线重点是：
 
@@ -64,34 +64,66 @@
 
 建议看：
 
-- [devops-lab/README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
+- [devops-lab/README.md](devops-lab/README.md)
 
-## 在 IDEA 里确认是 Windows 还是 WSL
+## 在 IDEA 里确认是否连的是 WSL
 
-打开这个工作区后，可以用下面几个点快速判断当前项目是按 Windows 路径打开，还是按 WSL 环境打开：
+如果你的目标是让 IDEA 通过 Remote Development 连接到 WSL，并且和 VS Code + WSL 保持同一套路径，那么重点不是“Windows 还是 WSL 机器”，而是“当前项目是不是在 WSL 文件系统里打开”。
 
-- 看项目根路径。如果路径像 `\\wsl$\Ubuntu\home\victorkure\workspace\vscode_study`，说明是通过 WSL 共享路径打开的；如果像 `D:\...` 或 `C:\...`，就是 Windows 本地路径。
-- 看终端默认环境。IDEA 里打开 Terminal，如果命令提示符是 Linux shell，且能直接执行 `uname -a`、`pwd`、`ls`，通常就是 WSL 环境。
-- 看解释器/SDK 配置。如果 Python Interpreter、JDK、Node 等配置项显示的是 WSL 里的路径，说明项目在用 WSL 工具链；如果是 `C:\Program Files\...`、`D:\...`，说明走的是 Windows 工具链。
-- 看文件系统特征。WSL 打开的项目通常能看到 Linux 风格路径和权限信息；Windows 打开的项目则是 NTFS 路径风格。
+可以这样确认：
 
-如果你想最稳妥地确认，可以在 IDEA 的 Terminal 里运行 `pwd`，再对照项目根路径：只要显示的是 `/home/victorkure/workspace/vscode_study`，就说明当前是在 WSL 侧打开。
+- 在 IDEA 首页进入 `Remote Development`，再选择 `WSL` 的 `New Connection`。这表示 IDE 会把开发环境放到 WSL 里，而不是 Windows 本地环境。
+- 打开项目后，看项目根路径。如果路径是 `/home/victorkure/workspace/vscode_study`，说明你和 VS Code + WSL 用的是同一个 Linux 路径；如果是 `D:\...`、`C:\...`，那就是 Windows 本地路径。
+- 看 Terminal。若默认 shell 是 Linux shell，并且 `pwd` 输出 `/home/victorkure/workspace/vscode_study`，就说明当前终端确实连在 WSL 上。
+- 看解释器和 SDK 配置。Python、JDK、Node 等如果指向 WSL 路径，就说明工具链也在 WSL 中。
+
+如果你是为了和 VS Code 的 WSL 开发保持一致，建议统一使用同一个路径，例如 `/home/victorkure/workspace/vscode_study`，不要一边用 `D:\...`，一边用 `/home/...`。这样代码位置、依赖安装和终端环境都会一致。
+
+### 配置步骤
+
+第一步：打开远程开发入口
+
+1. 启动 IntelliJ IDEA，进入 Welcome 欢迎界面。
+2. 在左侧菜单栏中点击 `Remote Development`（远程开发）。
+3. 找到 `WSL` 选项，点击 `New Connection`（新建连接）。
+
+第二步：选择 WSL 发行版与项目路径
+
+1. `Linux distribution`：在下拉菜单中选择你正在使用的 WSL 子系统，例如 `Ubuntu`。
+2. `Project directory`：点击文件夹图标，选择你存储在 WSL 内的项目路径。
+3. 注意：请确保项目路径是在 Linux 内部，例如 `/home/victorkure/...`，而不是 `/mnt/c/...`，否则会拖慢文件读写性能。
+4. 点击 `Next`。
+
+第三步：下载并启动 IDE 后端
+
+1. `IDE version`：选择你想要在 WSL 内部运行的 IDEA 版本，建议选择最新推荐的 Stable 版本。
+2. 点击 `Start IDE and Connect`。
+3. 此时，IDEA 会自动在你的 WSL 子系统内部下载、解压并启动一个无界面的 IDE 后端（JetBrains Client Agent）。
+4. 下载完成后，Windows 侧会弹出一个专用的轻量级前端窗口（JetBrains Client），之后你就可以像操作本地 IDEA 一样写代码。
+
+💡 进阶技巧：使用 JetBrains Gateway 管理
+
+如果你每次打开 IDEA 都去找远程连接入口，建议下载官方的 JetBrains Gateway 独立软件（也可以通过 JetBrains Toolbox 安装）。
+
+1. 打开 JetBrains Gateway。
+2. 同样选择 WSL，它会自动扫描出当前运行的 Linux 子系统。
+3. 这样你可以统一管理所有的 WSL、SSH 远程项目，一键即可连接。
 
 ## 推荐查看顺序
 
 如果你现在主要想学生成 AI 并贴日本现场：
 
-1. [llm-lab/README.md](D:/dev/source_code/vscode_study/llm-lab/README.md)
-2. [llm-lab/projects/README.md](D:/dev/source_code/vscode_study/llm-lab/projects/README.md)
-3. [agent-lab/README.md](D:/dev/source_code/vscode_study/agent-lab/README.md)
+1. [llm-lab/README.md](llm-lab/README.md)
+2. [llm-lab/projects/README.md](llm-lab/projects/README.md)
+3. [agent-lab/README.md](agent-lab/README.md)
 
 如果你现在主要想学对日 Java 开发：
 
-1. [java-lab/README.md](D:/dev/source_code/vscode_study/java-lab/README.md)
+1. [java-lab/README.md](java-lab/README.md)
 
 如果你现在主要想补 `DevOps / SRE`：
 
-1. [devops-lab/README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
+1. [devops-lab/README.md](devops-lab/README.md)
 
 ## 当前目录概览
 
