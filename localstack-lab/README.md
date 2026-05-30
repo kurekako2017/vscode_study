@@ -10,8 +10,14 @@
 
 文档入口：
 - [AWS知识点总览（中日对照）](./docs/AWS_Knowledge_Map.md)
+- [AWS 系统学习路线（LocalStack 版）](./docs/aws/AWS系统学习路线.md)
 - [AWS 单页笔记索引](./docs/aws/README.md)
 - [高频架构组合索引](./docs/aws/combos/README.md)
+
+建议学习顺序：
+1. 先看系统路线，理解 AWS 的访问入口、计算、网络、数据、消息、权限、监控、IaC 分层。
+2. 再按场景学习：Web 部署、异步处理、容器交付、数据分析。
+3. 最后用 LocalStack 做 CLI / SDK 实操，重点观察 endpoint、资源名、日志和执行结果。
 
 快速开始（Python 示例）：
 1) 在本目录执行 `./scripts/bootstrap.sh`，创建虚拟环境并装依赖。

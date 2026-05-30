@@ -13,6 +13,8 @@
 - `JtProject-Thymeleaf`：Thymeleaf 学习版
 - `JtProject-React`：React + TypeScript 学习版
 - `JtProject-Vue`：Vue 3 + TypeScript 学习版
+- `JtProject-Next`：Next.js + TypeScript 学习版
+- `JtProject-TypeScript`：纯 TypeScript 全栈学习版
 
 目录说明：
 
@@ -20,6 +22,8 @@
 - `JtProject-Thymeleaf/`：Thymeleaf 改写版源码与学习文档
 - `JtProject-React/`：React 前后端分离版源码与文档
 - `JtProject-Vue/`：Vue 前后端分离版源码与文档
+- `JtProject-Next/`：Next.js 前后端分离版源码与文档
+- `JtProject-TypeScript/`：Node.js + Express + React + TypeScript 全栈版源码与文档
 - `doc/`：`java-projects` 级别的 IDEA 和通用辅助文档
 - `data/`：部分项目运行后生成的本地数据目录
 - `Java项目总启动导航.md`：总启动入口
@@ -27,9 +31,9 @@
 
 如果你只是想尽快跑起来，直接打开上面的总启动导航即可。
 
-## 四个版本对比
+## 六个版本对比
 
-这四个项目不是“完全不同的业务”，而是围绕同一套电商业务做的不同技术栈练习。它们最适合拿来对比“同一业务在不同前端/视图技术下，知识点到底差在哪里”。
+这六个项目不是“完全不同的业务”，而是围绕同一套电商业务做的不同技术栈练习。它们最适合拿来对比“同一业务在不同前端/视图技术下，知识点到底差在哪里”。
 
 | 版本 | 主要学习内容 | 核心知识点 | 和其他版本的区别 |
 | --- | --- | --- | --- |
@@ -37,6 +41,8 @@
 | `JtProject-Thymeleaf` | JSP 到 Thymeleaf 的视图层迁移 | `th:text`、`th:if`、`th:each`、`th:href`、模板片段复用、模型数据绑定 | 业务链路基本不变，重点是“视图层替换”；比 JSP 更现代，但仍是服务端渲染 |
 | `JtProject-React` | React + TypeScript + Vite 前后端分离 | 组件拆分、Hooks、状态提升、路由、表单控制、API 封装、前后端分离、TypeScript 类型设计 | 前端从“页面模板”变成“组件树 + 状态驱动 UI”，页面交互和数据请求都在前端控制 |
 | `JtProject-Vue` | Vue 3 + TypeScript + Vite 前后端分离 | 组合式 API、响应式状态、组件通信、路由、表单控制、API 调用、TypeScript 类型设计 | 和 React 一样是前后端分离，但写法更偏“响应式数据 + 组合函数”，适合对比两种现代前端思路 |
+| `JtProject-Next` | Next.js + TypeScript 前后端分离 | App Router、客户端组件、API 封装、环境变量、TypeScript 类型设计 | 用 Next.js 组织页面和前端入口，适合继续学习 React 生态里的应用框架写法 |
+| `JtProject-TypeScript` | 纯 TypeScript 全栈 | Express API、React 前端、共享类型、泛型 API、前后端类型一致性 | 不再使用 Java 后端，前后端都用 TypeScript，适合学习全栈 TS 的数据流和类型复用 |
 
 ### 一眼看懂的差异
 
@@ -44,24 +50,28 @@
 - 如果你想学“服务端模板如何比 JSP 更清晰”，看 `JtProject-Thymeleaf`
 - 如果你想学“现代前端如何用组件和状态组织页面”，看 `JtProject-React`
 - 如果你想学“Vue 3 的响应式思路和组件组织方式”，看 `JtProject-Vue`
+- 如果你想学“Next.js 如何在 React 基础上组织应用”，看 `JtProject-Next`
+- 如果你想学“前后端都用 TypeScript 如何共享类型”，看 `JtProject-TypeScript`
 
 ### 按知识点拆开看
 
-| 知识点 | `JtProject` | `JtProject-Thymeleaf` | `JtProject-React` | `JtProject-Vue` |
-| --- | --- | --- | --- | --- |
-| 页面渲染方式 | JSP 服务端渲染 | Thymeleaf 服务端渲染 | 前端组件渲染 | 前端组件渲染 |
-| 数据流向 | 后端 Controller -> JSP | 后端 Controller -> 模板 | 后端 API -> 前端状态 -> 组件 | 后端 API -> 响应式状态 -> 组件 |
-| 状态管理 | 主要在后端和会话里 | 主要在后端和模型里 | 前端 state / hooks 管理 | 前端响应式数据 / composables 管理 |
-| 表单处理 | JSP 表单 + Controller | 模板表单 + Controller | 受控表单 + 事件回调 | 双向绑定 / 响应式表单 |
-| 路由方式 | 后端跳转为主 | 后端跳转为主 | 前端路由切换 | 前端路由切换 |
-| 类型体系 | Java 后端类型 | Java 后端类型 | TypeScript 前端类型 | TypeScript 前端类型 |
+| 知识点 | `JtProject` | `JtProject-Thymeleaf` | `JtProject-React` | `JtProject-Vue` | `JtProject-Next` | `JtProject-TypeScript` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 页面渲染方式 | JSP 服务端渲染 | Thymeleaf 服务端渲染 | 前端组件渲染 | 前端组件渲染 | Next.js 页面 + 客户端组件 | React + Vite 前端组件 |
+| 数据流向 | 后端 Controller -> JSP | 后端 Controller -> 模板 | 后端 API -> 前端状态 -> 组件 | 后端 API -> 响应式状态 -> 组件 | 后端 API -> Next 页面状态 -> 组件 | Express API -> 共享类型 -> React 状态 -> 组件 |
+| 状态管理 | 主要在后端和会话里 | 主要在后端和模型里 | 前端 state / hooks 管理 | 前端响应式数据 / composables 管理 | React state / hooks 管理 | React state + TypeScript Store |
+| 表单处理 | JSP 表单 + Controller | 模板表单 + Controller | 受控表单 + 事件回调 | 双向绑定 / 响应式表单 | 受控表单 + Next 页面事件 | 受控表单 + Express JSON API |
+| 路由方式 | 后端跳转为主 | 后端跳转为主 | 前端路由切换 | 前端路由切换 | App Router | Express API 路由 + 单页前端 |
+| 类型体系 | Java 后端类型 | Java 后端类型 | TypeScript 前端类型 | TypeScript 前端类型 | TypeScript 前端类型 | 前后端共享 TypeScript 类型 |
 
 ### 学习顺序建议
 
 1. 先看 `JtProject`，理解原始业务和页面流转
 2. 再看 `JtProject-Thymeleaf`，理解服务端模板替换
 3. 然后看 `JtProject-React`，理解前后端分离和组件化状态管理
-4. 最后看 `JtProject-Vue`，对比 Vue 3 的响应式写法和 React 的区别
+4. 再看 `JtProject-Vue`，对比 Vue 3 的响应式写法和 React 的区别
+5. 再看 `JtProject-Next`，理解 React 生态里的应用框架组织方式
+6. 最后看 `JtProject-TypeScript`，理解前后端共享 TypeScript 类型的全栈写法
 
 如果你的目标是“把同一套业务完整学一遍”，最好的方式不是只看单个项目，而是把这四个版本按上面的顺序串起来看。
 

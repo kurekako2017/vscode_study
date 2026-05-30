@@ -69,6 +69,7 @@ http://localhost:5173
 ## 学习文档
 
 - 学习入口：[docs/README.md](./docs/README.md)
+- React 框架系统学习指南：[docs/react-framework-guide.md](./docs/react-framework-guide.md)
 - React 学习路线：[docs/react-learning-path.md](./docs/react-learning-path.md)
 - React 框架速查：[docs/react-framework-notes.md](./docs/react-framework-notes.md)
 - 项目源码导读：[docs/project-code-map.md](./docs/project-code-map.md)

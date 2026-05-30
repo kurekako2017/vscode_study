@@ -1,0 +1,8 @@
+シナリオID,業務区分,対象URL/機能,試験種別,同時ユーザー数,繰返し回数,ランプアップ秒,目標応答秒,許容エラー率,使用ツール,担当者,実施日,実績平均秒,実績最大秒,実績エラー率,判定,備考
+PERF-01,一般ユーザー,GET /index,性能試験,1,30,0,3,0%,JMeter,, , , , , ,
+PERF-02,一般ユーザー,POST /userloginvalidate,性能試験,1,20,0,3,0%,JMeter,, , , , , ,
+PERF-03,一般ユーザー,POST /products/addtocart,負荷試験,5,50,10,3,1%,JMeter,, , , , , ,
+PERF-04,一般ユーザー,GET /user/cart,性能試験,5,30,10,3,0%,JMeter,, , , , , ,
+PERF-05,管理者,POST /admin/loginvalidate,性能試験,1,20,0,3,0%,JMeter,, , , , , ,
+PERF-06,管理者,GET /admin/products,負荷試験,5,30,10,5,1%,JMeter,, , , , , ,
+PERF-07,管理者,POST /admin/products/add,負荷試験,3,20,10,5,1%,JMeter,, , , , , ,

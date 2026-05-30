@@ -19,10 +19,11 @@
 如果你是第一次看这个项目，推荐顺序：
 
 1. [README.md](../README.md)
-2. [react-learning-path.md](./react-learning-path.md)
-3. [react-framework-notes.md](./react-framework-notes.md)
-4. [project-code-map.md](./project-code-map.md)
-5. [hooks-learning-guide.md](./hooks-learning-guide.md)
+2. [react-framework-guide.md](./react-framework-guide.md)
+3. [react-learning-path.md](./react-learning-path.md)
+4. [react-framework-notes.md](./react-framework-notes.md)
+5. [project-code-map.md](./project-code-map.md)
+6. [hooks-learning-guide.md](./hooks-learning-guide.md)
 
 ## 文档分区
 
@@ -34,10 +35,11 @@
 
 ### 框架与概念
 
+- [react-framework-guide.md](./react-framework-guide.md)
 - [react-framework-notes.md](./react-framework-notes.md)
 - [hooks-learning-guide.md](./hooks-learning-guide.md)
 
-适合理解 React 关键概念、状态管理和 Hook 用法。
+适合理解 React 框架分层、关键概念、状态管理和 Hook 用法。
 
 ### 项目结构与页面组织
 

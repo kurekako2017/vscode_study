@@ -4,12 +4,65 @@
 
 如果你的目标是“先学 AWS 基础概念，再在本地做验证”，把内容放在 `localstack-lab` 里最合适；如果后面要扩展到真实云环境、生产部署、CI/CD、Terraform 或多账号管理，再单独拆一个 `aws-lab` 也不迟。
 
+## 0. 快速总览 / クイック概要
+
+如果 Markdown 预览器不支持 Mermaid 图，先看这张表也能理解整体结构。
+
+| AWS 系统层 | 代表服务 | 是什么 | 核心作用 | LocalStack 学习重点 |
+|---|---|---|---|---|
+| 访问入口层 | Route 53 / CloudFront / ALB | 用户进入系统的入口 | 域名解析、CDN 分发、负载均衡 | 先理解链路，部分功能以概念为主 |
+| 应用运行层 | EC2 / Lambda / ECS / Fargate | 执行业务代码的地方 | 运行 Web、API、函数、容器、批处理 | Lambda、部分容器流程可结合本地理解 |
+| 网络边界层 | VPC / Subnet / Security Group | 云上网络隔离与访问边界 | 控制资源放在哪里、谁能访问谁 | 重点理解概念和架构图 |
+| 数据存储层 | S3 / RDS / DynamoDB / Redshift | 保存文件、业务数据、分析数据 | 对象存储、数据库、数据仓库 | S3 最适合 LocalStack 上手 |
+| 消息事件层 | SQS / SNS / EventBridge / Kinesis | 系统之间异步通信的通道 | 排队、通知、事件驱动、流数据 | SQS / SNS / Lambda 组合最适合练习 |
+| 权限安全层 | IAM / KMS / Secrets Manager | 身份、权限、密钥和敏感信息管理 | 控制谁能访问什么、如何保护密钥 | 先理解 IAM Role / Policy |
+| 监控运维层 | CloudWatch | 观察系统运行状态 | 日志、指标、告警、排查问题 | 学会看执行结果和日志 |
+| IaC 交付层 | CloudFormation / CDK / Terraform / ECR | 用代码管理基础设施和发布物 | 创建资源、复用环境、构建发布 | 后期从 CLI 过渡到模板 |
+| 本地模拟层 | LocalStack / endpoint-url | 本地模拟 AWS API | 不上云也能练 CLI / SDK 流程 | 记住 `--endpoint-url=http://localhost:4566` |
+
+推荐先读完整路线：
+
+- [AWS 系统学习路线（LocalStack 版）](./aws/AWS系统学习路线.md)
+
 ## 1. 学习范围 / 学習範囲
 
 - 中文：先掌握 AWS 的通用概念、常见服务、网络与权限模型，再学习 LocalStack 如何模拟这些服务。
 - 日本語：まず AWS の共通概念、代表的なサービス、ネットワークと権限モデルを理解し、その後 LocalStack でどう再現するかを学ぶ。
 
 ## 2. 核心概念 / 基本概念
+
+先从系统分层看 AWS：
+
+```mermaid
+flowchart TD
+    A["访问入口<br/>Route 53 / CloudFront / ALB"]
+    B["应用运行<br/>EC2 / Lambda / ECS / Fargate"]
+    C["网络边界<br/>VPC / Subnet / Security Group"]
+    D["数据存储<br/>S3 / RDS / DynamoDB / Redshift"]
+    E["消息事件<br/>SQS / SNS / EventBridge / Kinesis"]
+    F["权限安全<br/>IAM / KMS / Secrets Manager"]
+    G["监控运维<br/>CloudWatch"]
+    H["IaC 交付<br/>CloudFormation / CDK / Terraform"]
+    I["LocalStack 本地模拟<br/>endpoint-url / localhost:4566"]
+
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    F --> A
+    F --> B
+    F --> D
+    G --> B
+    H --> B
+    I -.本地验证.-> A
+    I -.本地验证.-> B
+    I -.本地验证.-> D
+    I -.本地验证.-> E
+```
+
+更完整的学习路线见：
+
+- [AWS 系统学习路线（LocalStack 版）](./aws/AWS系统学习路线.md)
 
 | 英文 | 中文说明 | 日本語説明 | LocalStack 关系 |
 |---|---|---|---|

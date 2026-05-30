@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        BATCH_MAIN_CLASS = 'com.jtspringproject.JtSpringProject.batch.launcher.ProductInventoryCheckBatchApplication'
+        BATCH_ARGS = '--batch.jobName=productInventoryCheck'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            if [ -x "./mvnw" ]; then
+                              ./mvnw -q -DskipTests compile || mvn -q -DskipTests compile
+                            else
+                              mvn -q -DskipTests compile
+                            fi
+                        '''
+                    } else {
+                        bat '''
+                            @echo off
+                            if exist mvnw.cmd (
+                              call mvnw.cmd -q -DskipTests compile
+                              if %ERRORLEVEL% EQU 0 exit /b 0
+                              echo mvnw.cmd failed. Falling back to mvn.
+                            )
+                            mvn -q -DskipTests compile
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Run Batch') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh """
+                            if [ -x "./mvnw" ]; then
+                              ./mvnw -q -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=${env.BATCH_MAIN_CLASS} -Dexec.args=\\"${env.BATCH_ARGS}\\" || mvn -q -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=${env.BATCH_MAIN_CLASS} -Dexec.args=\\"${env.BATCH_ARGS}\\"
+                            else
+                              mvn -q -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=${env.BATCH_MAIN_CLASS} -Dexec.args=\\"${env.BATCH_ARGS}\\"
+                            fi
+                        """
+                    } else {
+                        bat """
+                            @echo off
+                            if exist mvnw.cmd (
+                              call mvnw.cmd -q -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=%BATCH_MAIN_CLASS% -Dexec.args=\\"%BATCH_ARGS%\\"
+                              if %ERRORLEVEL% EQU 0 exit /b 0
+                              echo mvnw.cmd failed. Falling back to mvn.
+                            )
+                            mvn -q -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=%BATCH_MAIN_CLASS% -Dexec.args=\\"%BATCH_ARGS%\\"
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'batch-output/*.csv, logs/batch/*.log', allowEmptyArchive: true
+        }
+    }
+}

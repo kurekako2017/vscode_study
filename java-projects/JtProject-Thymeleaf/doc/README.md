@@ -18,10 +18,11 @@
 如果你是第一次看这个项目，推荐顺序：
 
 1. [README.md](../README.md)
-2. [Thymeleaf学习指南.md](./reference/Thymeleaf学习指南.md)
-3. [userLogin.html跳转到UserController的完整流程.md](./reference/userLogin.html跳转到UserController的完整流程.md)
-4. [数据访问层与调用链学习文档.md](./reference/数据访问层与调用链学习文档.md)
-5. [JSP页面 vs Thymeleaf页面逐页对照.md](./reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)
+2. [Thymeleaf 框架系统学习指南](./reference/thymeleaf-framework-guide.md)
+3. [Thymeleaf学习指南.md](./reference/Thymeleaf学习指南.md)
+4. [userLogin.html跳转到UserController的完整流程.md](./reference/userLogin.html跳转到UserController的完整流程.md)
+5. [数据访问层与调用链学习文档.md](./reference/数据访问层与调用链学习文档.md)
+6. [JSP页面 vs Thymeleaf页面逐页对照.md](./reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)
 
 ## 目录分区
 
@@ -43,6 +44,7 @@
 
 推荐文档：
 
+- [thymeleaf-framework-guide.md](./reference/thymeleaf-framework-guide.md)
 - [Thymeleaf学习指南.md](./reference/Thymeleaf学习指南.md)
 - [数据访问层与调用链学习文档.md](./reference/数据访问层与调用链学习文档.md)
 - [JSP页面 vs Thymeleaf页面逐页对照.md](./reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)
@@ -105,6 +107,7 @@
 ## 使用建议
 
 - 想快速跑起来：先看 [README.md](../README.md)
+- 想系统理解 Thymeleaf 框架：先看 [thymeleaf-framework-guide.md](./reference/thymeleaf-framework-guide.md)
 - 想学 Thymeleaf 基础语法：先看 [Thymeleaf学习指南.md](./reference/Thymeleaf学习指南.md)
 - 想看页面如何进入 Controller：先看 [userLogin.html跳转到UserController的完整流程.md](./reference/userLogin.html跳转到UserController的完整流程.md)
 - 想做 JSP 和 Thymeleaf 对照：先看 [JSP页面 vs Thymeleaf页面逐页对照.md](./reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)

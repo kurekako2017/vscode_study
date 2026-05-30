@@ -26,11 +26,27 @@
 
 ## 建议学习顺序
 
-1. [01-学习路线.md](D:/dev/source_code/vscode_study/agent-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
-2. [02-模型调用基础.md](D:/dev/source_code/vscode_study/agent-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
-3. [04-RAG.md](D:/dev/source_code/vscode_study/agent-lab/04-RAG.md)
-4. [03-Tool%20Calling.md](D:/dev/source_code/vscode_study/agent-lab/03-Tool%20Calling.md)
-5. [05-Agent工作流.md](D:/dev/source_code/vscode_study/agent-lab/05-Agent%E5%B7%A5%E4%BD%9C%E6%B5%81.md)
+1. [Agent系统框架与术语.md](./Agent系统框架与术语.md)
+2. [01-学习路线.md](D:/dev/source_code/vscode_study/agent-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
+3. [02-模型调用基础.md](D:/dev/source_code/vscode_study/agent-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
+4. [04-RAG.md](D:/dev/source_code/vscode_study/agent-lab/04-RAG.md)
+5. [03-Tool%20Calling.md](D:/dev/source_code/vscode_study/agent-lab/03-Tool%20Calling.md)
+6. [05-Agent工作流.md](D:/dev/source_code/vscode_study/agent-lab/05-Agent%E5%B7%A5%E4%BD%9C%E6%B5%81.md)
+
+## 先理解的系统知识
+
+如果你觉得“Agent、角色、工具、记忆、计划、观察、工作流、终止条件”这些词还不清楚，先看：
+
+- [Agent系统框架与术语.md](./Agent系统框架与术语.md)
+- [术语速查表.md](./术语速查表.md)
+
+这份文档补充了：
+
+- Agent 系统分层
+- 各角色是什么、作用是什么
+- Tool Calling、Agent Loop、Memory、Observation 等术语解释
+- Agent 和普通 LLM 调用的区别
+- 什么时候不该用 Agent
 
 ## 推荐输出物
 

@@ -30,11 +30,28 @@
 
 如果你现在只想知道“应该先点哪几个文件”，直接按这个顺序：
 
-1. [00-Python学习范围（面向LLM应用开发）.md](D:/dev/source_code/vscode_study/llm-lab/00-Python%E5%AD%A6%E4%B9%A0%E8%8C%83%E5%9B%B4%EF%BC%88%E9%9D%A2%E5%90%91LLM%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%EF%BC%89.md)
-2. [01-学习路线.md](D:/dev/source_code/vscode_study/llm-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
-3. [02-模型调用基础.md](D:/dev/source_code/vscode_study/llm-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
-4. [03-结构化输出.md](D:/dev/source_code/vscode_study/llm-lab/03-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA.md)
-5. [04-RAG.md](D:/dev/source_code/vscode_study/llm-lab/04-RAG.md)
+1. [LLM应用框架系统知识.md](./LLM应用框架系统知识.md)
+2. [00-Python学习范围（面向LLM应用开发）.md](./00-Python学习范围（面向LLM应用开发）.md)
+3. [01-学习路线.md](./01-学习路线.md)
+4. [02-模型调用基础.md](./02-模型调用基础.md)
+5. [03-结构化输出.md](./03-结构化输出.md)
+6. [04-RAG.md](./04-RAG.md)
+
+## 先理解的系统知识
+
+如果你觉得“模型、RAG、角色、Prompt、Embedding、结构化输出、评估”这些词有点散，先看：
+
+- [LLM应用框架系统知识.md](./LLM应用框架系统知识.md)
+- [术语速查表.md](./术语速查表.md)
+
+这份文档补充了：
+
+- LLM 应用的系统分层
+- 每个角色是什么、作用是什么
+- 常见术语的概念性解释
+- 最小 LLM 应用数据流
+- RAG 应用数据流
+- 各教程在系统中的位置
 
 ## 这套资料怎么用
 
@@ -71,11 +88,12 @@
 
 ## 推荐学习顺序
 
-1. [00-Python学习范围（面向LLM应用开发）.md](D:/dev/source_code/vscode_study/llm-lab/00-Python%E5%AD%A6%E4%B9%A0%E8%8C%83%E5%9B%B4%EF%BC%88%E9%9D%A2%E5%90%91LLM%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%EF%BC%89.md)
-2. [01-学习路线.md](D:/dev/source_code/vscode_study/llm-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
-3. [02-模型调用基础.md](D:/dev/source_code/vscode_study/llm-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
-4. [03-结构化输出.md](D:/dev/source_code/vscode_study/llm-lab/03-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA.md)
-5. [04-RAG.md](D:/dev/source_code/vscode_study/llm-lab/04-RAG.md)
+1. [LLM应用框架系统知识.md](./LLM应用框架系统知识.md)
+2. [00-Python学习范围（面向LLM应用开发）.md](D:/dev/source_code/vscode_study/llm-lab/00-Python%E5%AD%A6%E4%B9%A0%E8%8C%83%E5%9B%B4%EF%BC%88%E9%9D%A2%E5%90%91LLM%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%EF%BC%89.md)
+3. [01-学习路线.md](D:/dev/source_code/vscode_study/llm-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
+4. [02-模型调用基础.md](D:/dev/source_code/vscode_study/llm-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
+5. [03-结构化输出.md](D:/dev/source_code/vscode_study/llm-lab/03-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA.md)
+6. [04-RAG.md](D:/dev/source_code/vscode_study/llm-lab/04-RAG.md)
 6. [05-FastAPI与企业集成.md](D:/dev/source_code/vscode_study/llm-lab/05-FastAPI%E4%B8%8E%E4%BC%81%E4%B8%9A%E9%9B%86%E6%88%90.md)
 7. [06-评估与运维.md](D:/dev/source_code/vscode_study/llm-lab/06-%E8%AF%84%E4%BC%B0%E4%B8%8E%E8%BF%90%E7%BB%B4.md)
 8. [07-日本现场应用与案件关键词.md](D:/dev/source_code/vscode_study/llm-lab/07-%E6%97%A5%E6%9C%AC%E7%8E%B0%E5%9C%BA%E5%BA%94%E7%94%A8%E4%B8%8E%E6%A1%88%E4%BB%B6%E5%85%B3%E9%94%AE%E8%AF%8D.md)

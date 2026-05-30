@@ -2,6 +2,37 @@
 
 这里收录按“服务联动场景”组织的中日对照笔记，适合从单服务学习切换到架构学习。
 
+组合文档很多，不建议从上到下硬读。先按项目现场场景分组：
+
+## 场景路线图
+
+```mermaid
+flowchart TD
+    A["单服务基础<br/>S3 / IAM / VPC / Lambda / SQS"] --> B["场景组合学习"]
+    B --> C["Web 部署路线<br/>Route 53 / ALB / EC2 / CloudFront"]
+    B --> D["异步事件路线<br/>SQS / SNS / Lambda / DLQ"]
+    B --> E["容器交付路线<br/>Docker / ECR / ECS / Fargate"]
+    B --> F["数据分析路线<br/>S3 / Glue / Athena / Redshift / QuickSight"]
+    B --> G["数据治理路线<br/>Lake Formation / Glue / Athena"]
+    C --> H["能说明用户访问 Web 系统的完整链路"]
+    D --> I["能说明消息如何排队、消费、失败补偿"]
+    E --> J["能说明镜像如何构建、入库、运行"]
+    F --> K["能说明数据如何落地、编目、查询、可视化"]
+    G --> L["能说明数据权限如何治理和共享"]
+```
+
+## 按场景聚合阅读
+
+| 场景 | 先学组合 | 再学组合 | 学完要能说明什么 |
+| --- | --- | --- | --- |
+| Web 部署 | [S3 + CloudFront](./S3_CloudFront.md) / [EC2 + ALB](./EC2_ALB.md) | [Web Project 部署流程](./WebProject_Deployment.md) | 用户访问如何经过 DNS、CDN、LB 到应用 |
+| 异步处理 | [SQS + Lambda](./SQS_Lambda.md) / [SQS + SNS](./SQS_SNS.md) | [SQS + Lambda + DLQ](./SQS_Lambda_DLQ.md) | 消息如何排队、消费、失败后进入 DLQ |
+| 容器交付 | [Docker / ECR / ECS](./Docker_ECR_ECS.md) | [ECS + ECR + Fargate](./ECS_ECR_Fargate.md) | 镜像如何从本地构建到云上运行 |
+| 数据湖查询 | [S3 + Athena](./S3_Athena.md) / [Glue + S3](./Glue_S3.md) | [Athena + Glue](./Athena_Glue.md) | S3 数据如何被 Glue 编目并由 Athena 查询 |
+| 报表分析 | [Athena + QuickSight](./Athena_QuickSight.md) | [Redshift + QuickSight](./Redshift_QuickSight.md) | 查询结果如何变成 BI 看板 |
+| 数据治理 | [Lake Formation + Glue](./LakeFormation_Glue.md) | [Lake Formation + Athena](./LakeFormation_Athena.md) | 数据访问权限如何统一控制 |
+| 实时处理 | [Kinesis + Lambda](./Kinesis_Lambda.md) | [Kinesis + Firehose](./Kinesis_Firehose.md) | 流数据如何实时处理或落地 |
+
 ## 索引
 
 | 组合 | 中文说明 | 日本語説明 |

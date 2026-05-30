@@ -18,6 +18,24 @@
 如果你是第一次看这个项目，推荐顺序：
 
 1. [README.md](../README.md)
+2. [vue-framework-guide.md](./vue-framework-guide.md)
+3. [vue-learning-path.md](./vue-learning-path.md)
+4. [vue-framework-notes.md](./vue-framework-notes.md)
+5. [composables-learning-guide.md](./composables-learning-guide.md)
+
+## 框架系统知识
+
+- [vue-framework-guide.md](./vue-framework-guide.md)
+- [vue-framework-notes.md](./vue-framework-notes.md)
+- [composables-learning-guide.md](./composables-learning-guide.md)
+
+适合理解 Vue 3 框架分层、组合式 API、响应式状态、路由和 Service 调用。
+
+## 项目结构与页面组织
+
+- [project-code-map.md](./project-code-map.md)
+- [page-structure-guide.md](./page-structure-guide.md)
+
 - [App.vue](../frontend/src/App.vue) 负责把全局布局、鉴权态和路由出口串起来，再把数据交给 [views](../frontend/src/views/)。
 ```mermaid
 classDiagram

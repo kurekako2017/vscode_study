@@ -83,6 +83,7 @@ http://localhost:8085/h2-console
 ## 学习文档
 
 - 文档总入口：[doc/README.md](./doc/README.md)
+- Thymeleaf 框架系统学习指南：[doc/reference/thymeleaf-framework-guide.md](./doc/reference/thymeleaf-framework-guide.md)
 - Thymeleaf 学习指南：[doc/reference/Thymeleaf学习指南.md](./doc/reference/Thymeleaf学习指南.md)
 - 数据访问层与调用链：[doc/reference/数据访问层与调用链学习文档.md](./doc/reference/数据访问层与调用链学习文档.md)
 - JSP/Thymeleaf 对照文档：[doc/reference/JSP页面 vs Thymeleaf页面逐页对照.md](./doc/reference/JSP页面%20vs%20Thymeleaf页面逐页对照.md)

@@ -1,0 +1,200 @@
+# ✅ IDEA运行按钮问题已解决
+
+## 我已经为你完成了以下配置：
+
+### 1. ✅ 更新了运行配置文件
+- 位置：`.idea/runConfigurations/JtSpringProjectApplication.xml`
+- 配置了Spring Boot应用类型
+- 设置了主类：`com.jtspringproject.JtSpringProject.JtSpringProjectApplication`
+
+### 2. ✅ 更新了workspace配置
+- 位置：`.idea/workspace.xml`
+- 设置默认运行配置为：JtSpringProjectApplication
+- 添加了代码覆盖率支持
+
+### 3. ✅ 创建了修复脚本
+- 文件：`修复IDEA运行按钮.ps1`
+- 可在需要时重新运行
+
+---
+
+## 🎯 接下来你需要做的（3个简单步骤）：
+
+### 步骤1：重启IDEA
+1. 如果IDEA正在运行，请完全关闭它
+2. 重新打开IDEA
+3. 打开项目：`D:\dev\source_code\vscode_study\java-projects\JtProject`
+
+### 步骤2：等待索引完成
+- 打开IDEA后，查看右下角
+- 会显示"Indexing..."或"Building..."
+- **等待进度条完成**（这很重要！）
+
+### 步骤3：查看运行按钮
+打开文件：`src/main/java/com/jtspringproject/JtSpringProject/JtSpringProjectApplication.java`
+
+你应该会看到：
+- ✅ **行号41** 的 `main` 方法左侧有**绿色三角形按钮** ▶️
+- ✅ IDEA右上角有**运行配置下拉框**，显示"JtSpringProjectApplication"
+- ✅ 右上角有**绿色运行按钮**和**绿色调试按钮**
+
+---
+
+## 🚀 运行项目的4种方式：
+
+### 方式1：点击行号旁的绿色按钮（最简单）
+1. 找到第41行的 `public static void main` 方法
+2. 点击左侧的**绿色三角形按钮** ▶️
+3. 选择 "Run 'JtSpringProjectApplication'" 或 "Debug 'JtSpringProjectApplication'"
+
+### 方式2：使用快捷键（推荐）
+在 `JtSpringProjectApplication.java` 文件中：
+- 按 **Ctrl + Shift + F10** → 运行当前文件
+- 按 **Ctrl + Shift + F9** → 调试当前文件
+
+### 方式3：右键菜单
+1. 在 `main` 方法内或类名上右键
+2. 选择 "Run 'JtSpringProjectApplication.main()'"
+
+### 方式4：使用顶部工具栏
+1. 确认右上角配置框显示 "JtSpringProjectApplication"
+2. 点击绿色运行按钮 ▶️ 或调试按钮 🐞
+
+---
+
+## ⌨️ 常用快捷键（一定要记住！）
+
+### 运行和调试
+| 快捷键 | 功能 |
+|--------|------|
+| **Ctrl + Shift + F10** | 运行当前文件（最常用） |
+| **Shift + F10** | 运行上次配置 |
+| **Ctrl + Shift + F9** | 调试当前文件 |
+| **Shift + F9** | 调试上次配置 |
+| **Ctrl + F2** | 停止运行 |
+
+### 编辑
+| 快捷键 | 功能 |
+|--------|------|
+| **Ctrl + Space** | 代码提示 |
+| **Ctrl + Alt + L** | 格式化代码 |
+| **Ctrl + /** | 单行注释/取消注释 |
+| **Ctrl + Shift + /** | 多行注释/取消注释 |
+| **Ctrl + D** | 复制当前行 |
+| **Ctrl + Y** | 删除当前行 |
+
+### 导航
+| 快捷键 | 功能 |
+|--------|------|
+| **Ctrl + N** | 查找类 |
+| **Ctrl + Shift + N** | 查找文件 |
+| **Ctrl + B** | 跳转到定义 |
+| **Ctrl + Alt + ←** | 返回上一个位置 |
+| **Ctrl + Alt + →** | 前进到下一个位置 |
+| **Alt + ←/→** | 切换标签页 |
+
+### 重构
+| 快捷键 | 功能 |
+|--------|------|
+| **Shift + F6** | 重命名 |
+| **Ctrl + Alt + M** | 提取方法 |
+| **Ctrl + Alt + V** | 提取变量 |
+
+### 其他
+| 快捷键 | 功能 |
+|--------|------|
+| **Alt + Enter** | 快速修复 |
+| **Ctrl + W** | 扩展选择 |
+| **Ctrl + /** | 行注释 |
+| **Alt + F12** | 打开终端 |
+
+---
+
+## 🔧 如果还是看不到运行按钮，请尝试：
+
+### 方法A：刷新Maven项目
+1. 点击 **View → Tool Windows → Maven**（或按 **Ctrl + E**，输入"Maven"）
+2. 在Maven面板中点击**刷新按钮**（圆形箭头 🔄）
+3. 等待下载依赖完成
+
+### 方法B：清除缓存并重启
+1. 点击 **File → Invalidate Caches...**
+2. 勾选所有选项
+3. 点击 **Invalidate and Restart**
+4. 等待IDEA重启和重新索引
+
+### 方法C：检查项目结构
+1. 按 **Ctrl + Alt + Shift + S** 打开项目结构
+2. 检查：
+   - **Project** → SDK应该是 **Java 11**
+   - **Modules** → JtSpringProject应该存在
+   - **Libraries** → 应该有Maven依赖
+
+### 方法D：手动添加运行配置
+1. 点击右上角 **Add Configuration...**
+2. 点击 **+ → Spring Boot**
+3. 配置：
+   - Name: `JtSpringProjectApplication`
+   - Main class: 点击 **...** 按钮，选择 `JtSpringProjectApplication`
+   - Module: 选择 `JtSpringProject`
+4. 点击 **OK**
+
+---
+
+## ✅ 验证是否成功
+
+运行项目后，控制台应该显示：
+```
+========================================
+JT电商系统启动中...
+========================================
+[启动日志...]
+========================================
+JT电商系统启动成功！
+访问地址: http://localhost:8082
+========================================
+```
+
+在浏览器中访问：`http://localhost:8082`
+
+---
+
+## 📞 如果遇到其他问题
+
+### Maven依赖下载失败
+```powershell
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+.\mvnw.cmd clean install
+```
+
+### 检查项目状态
+```powershell
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+.\check-status.ps1
+```
+
+### 一键启动（不用IDEA）
+```powershell
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+.\start-simple.ps1
+```
+
+---
+
+## 🎨 IDEA黑色主题设置
+
+如果你想要黑色主题：
+1. **Ctrl + Alt + S** 打开设置
+2. 搜索 "Theme"
+3. 选择 **Darcula** 主题
+4. 点击 **OK**
+
+更多主题选项：
+- File → Settings → Appearance & Behavior → Appearance
+- Theme: 选择 **Darcula**（经典黑色）、**High contrast**（高对比度）或安装其他主题插件
+
+---
+
+**配置已完成！现在请重启IDEA，运行按钮应该会出现了！** 🎉
+
+
