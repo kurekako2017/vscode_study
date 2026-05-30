@@ -74,7 +74,10 @@ def parse_args() -> argparse.Namespace:
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失情况
-    """创建 OpenAI 客户端，要求通过环境变量提供 `OPENAI_API_KEY`。"""
+    """创建 OpenAI 客户端，要求通过环境变量提供 `OPENAI_API_KEY`。
+
+    说明：在 mock 模式下不会调用此函数；在真实模式下，如果没有 API Key，程序会提示错误并退出。
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -106,9 +109,12 @@ def build_mock_plan(prompt: str) -> AgentPlan:
 
 def generate_plan(client: OpenAI | None, model: str, prompt: str, mode: str) -> AgentPlan:
     # 层次: 调用层 — 请求模型并使用 SDK 的 parse 功能将输出映射为 `AgentPlan`（支持 mock）
+    # 如果是 mock 模式，直接返回示例结构；用于离线学习与测试。
     if mode == "mock":
         return build_mock_plan(prompt)
 
+    # 在真实模式下，使用 SDK 的 `parse` 功能直接把模型输出解析为 Pydantic 类型（`AgentPlan`）。
+    # 这能让我们在模型输出与后续系统之间建立一个明确的契约（contract）。
     response = client.responses.parse(
         model=model,
         instructions=SYSTEM_INSTRUCTIONS,

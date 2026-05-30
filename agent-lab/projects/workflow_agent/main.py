@@ -75,7 +75,10 @@ def parse_args() -> argparse.Namespace:
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失 Key 的退出策略
-    """创建 OpenAI 客户端，需通过环境变量提供 API Key。"""
+    """创建 OpenAI 客户端，需通过环境变量提供 API Key。
+
+    说明：该函数在需要真实调用时才会被执行；在 mock 模式下上层会绕过此函数以避免外部依赖。
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -113,7 +116,11 @@ def build_mock_final(prompt: str) -> str:
 
 
 def analyze_task(client: OpenAI | None, model: str, prompt: str, mode: str) -> str:
-    """分析阶段：把用户请求转换为简洁的分析文本，供下一步计划使用。"""
+    """分析阶段：把用户请求转换为简洁的分析文本，供下一步计划使用。
+
+    - mock 模式下返回示例分析文本，便于离线学习。
+    - 真实模式下使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入。
+    """
     if mode == "mock":
         return build_mock_analysis(prompt)
     response = client.responses.create(
@@ -125,7 +132,11 @@ def analyze_task(client: OpenAI | None, model: str, prompt: str, mode: str) -> s
 
 
 def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> WorkflowPlan:
-    """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。"""
+    """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。
+
+    - 在真实模式下使用 SDK 的 `parse` 功能把模型输出直接映射为 `WorkflowPlan`，以便下一阶段可靠消费。
+    - 在 mock 模式下返回示例 `WorkflowPlan`。
+    """
     if mode == "mock":
         return build_mock_plan(analysis)
     response = client.responses.parse(
@@ -138,7 +149,11 @@ def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> Wo
 
 
 def finalize_task(client: OpenAI | None, model: str, analysis: str, plan: WorkflowPlan, mode: str) -> str:
-    """总结阶段：基于分析与计划生成最终简短建议。"""
+    """总结阶段：基于分析与计划生成最终简短建议。
+
+    - 该阶段会把前两阶段的输出拼接为模型输入，提醒模型只基于已验证的信息生成最终建议，减少幻觉风险。
+    - mock 模式下直接返回示例文本。
+    """
     if mode == "mock":
         return build_mock_final(analysis)
     # The final step consumes prior workflow state instead of re-reading the original task alone.

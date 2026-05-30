@@ -77,7 +77,13 @@ def parse_args() -> argparse.Namespace:
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理环境依赖
-    """从 `OPENAI_API_KEY` 创建 OpenAI 客户端，缺失则退出。"""
+    """从 `OPENAI_API_KEY` 创建 OpenAI 客户端。
+
+    说明（初学者）：
+    - 该函数负责读取环境变量中的 `OPENAI_API_KEY`，并用它构造 SDK 客户端。
+    - 如果找不到 API Key，会打印错误并退出，避免后续调用抛出未处理异常。
+    - 在 mock 模式下不会调用此函数（调用方会根据 mode 决定是否构建客户端）。
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -86,7 +92,12 @@ def build_client() -> OpenAI:
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
-    """决定运行模式：'mock' | 'real'。"""
+    """决定运行模式：'mock' | 'real'。
+
+    - 当用户指定 `--mock` 时，强制使用本地 mock（无网络）。
+    - 当用户指定 `--real` 时，检查 `OPENAI_API_KEY` 是否存在；若不存在则报错并退出。
+    - 未指定时，自动根据环境决定：若有 API Key 则使用真实模式，否则降级为 mock。
+    """
     if force_mock:
         return "mock"
     if force_real:
@@ -195,7 +206,13 @@ def build_context(top_chunks: list[Chunk]) -> str:
 
 def answer_question(client: OpenAI | None, model: str, question: str, context: str, mode: str) -> str:
     # 层次: 调用层 — 将构建好的 prompt 传给模型并返回答案（支持 mock）
-    """调用模型回答，支持 mock 模式返回教学用文本。"""
+    """调用模型回答，支持 mock 模式返回教学用文本。
+
+    说明：
+    - 若 mode == 'mock'，直接返回本地构造的示例回答，方便在无 API Key 环境下学习。
+    - 在真实模式下，会把问题和检索到的上下文拼接成 prompt，并调用 SDK 的 Responses API。
+    - 返回值为模型的主文本输出（`response.output_text`），上层负责打印或进一步处理。
+    """
     if mode == "mock":
         return build_mock_answer(question, [])
 

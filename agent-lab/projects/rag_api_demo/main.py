@@ -82,7 +82,10 @@ class ReloadResponse(BaseModel):
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并在缺失时抛出以便上层处理
-    """根据环境变量创建 OpenAI 客户端，缺失抛出异常以便上层处理。"""
+    """根据环境变量创建 OpenAI 客户端，缺失抛出异常以便上层处理。
+
+    说明：在需要真实调用时使用此函数；若找不到 API Key 会抛出异常，调用方应当捕获或在启动阶段处理。
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set.")
@@ -90,14 +93,20 @@ def build_client() -> OpenAI:
 
 
 def resolve_mode() -> str:
-    """决定服务运行模式：'mock' 或 'real'。可通过环境变量 RAG_API_MOCK=1 强制 mock。"""
+    """决定服务运行模式：'mock' 或 'real'。可通过环境变量 RAG_API_MOCK=1 强制 mock。
+
+    优先级：RAG_API_MOCK 环境变量 > OPENAI_API_KEY 自动判断。
+    """
     if os.getenv("RAG_API_MOCK") == "1":
         return "mock"
     return "real" if os.getenv("OPENAI_API_KEY") else "mock"
 
 
 def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
-    """生成 RAG mock 回答，包含检索提示与练习建议。"""
+    """生成 RAG mock 回答，包含检索提示与练习建议。
+
+    说明：用于在没有外网或 API Key 的环境中做本地学习和验证，回答中包含检索到的片段数量以便观察检索效果。
+    """
     lines = ["[MOCK MODE]", f"问题: {question}"]
     lines.append("检索到的片段数量: {}".format(len(top_chunks)))
     lines.append("练习建议: 将检索替换为向量检索并在 real 模式下测试。")

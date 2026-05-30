@@ -62,7 +62,10 @@ def parse_args() -> argparse.Namespace:
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失 Key 的退出策略
-    """从环境变量读取 API Key 并返回 OpenAI 客户端实例（不存在则退出）。"""
+    """从环境变量读取 API Key 并返回 OpenAI 客户端实例（不存在则退出）。
+
+    说明：该函数用于在真实模式（非 mock）下构建客户端。若没有设置 API Key，程序将打印错误并退出，避免运行时异常。
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
@@ -71,6 +74,12 @@ def build_client() -> OpenAI:
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    """解析运行模式：mock 或 real。
+
+    - `--mock` 强制本地 mock，不发起网络请求。
+    - `--real` 强制真实调用，若未设置 API Key 则退出并提示。
+    - 未指定时根据环境自动选择（有 API Key -> real，否则 mock）。
+    """
     if force_mock:
         return "mock"
     if force_real:
@@ -87,7 +96,12 @@ def build_mock_agent_response(prompt: str) -> str:
 
 def resolve_path(base_dir: Path, relative_path: str) -> Path:
     # 层次: 安全/IO 层 — 解析路径并确保文件操作受限于 workdir
-    """解析相对路径并确保不越出 base_dir（安全限制）。"""
+    """解析相对路径并确保不越出 base_dir（安全限制）。
+
+    说明：
+    - 为避免模型或用户传入类似 `../` 的路径导致访问到不允许的文件，这里会把路径解析为绝对路径并检查其是否位于 `base_dir` 之下。
+    - 若路径越界，会抛出 `ValueError`，调用者应捕获并处理。
+    """
     candidate = (base_dir / relative_path).resolve()
     base_resolved = base_dir.resolve()
     # Keep every file operation inside the declared workdir.
@@ -98,7 +112,10 @@ def resolve_path(base_dir: Path, relative_path: str) -> Path:
 
 def list_files(base_dir: Path, path: str = ".") -> dict[str, Any]:
     # 层次: 工具层 — 列出目录供模型参考的工具接口
-    """列出目录内容，返回结构化的 entries 对象供模型参考。"""
+    """列出目录内容，返回结构化的 entries 对象供模型参考。
+
+    说明：该函数作为工具由 agent 在运行时调用，返回结构化数据（而非直接打印）以便模型理解目录结构。
+    """
     target = resolve_path(base_dir, path)
     if not target.exists():
         return {"ok": False, "error": "Path does not exist."}
@@ -118,7 +135,10 @@ def list_files(base_dir: Path, path: str = ".") -> dict[str, Any]:
 
 def read_file(base_dir: Path, path: str) -> dict[str, Any]:
     # 层次: 工具层 — 读取文件并限制返回大小以避免过大返回
-    """读取文件并返回前 12000 字符，避免一次性返回过大内容。"""
+    """读取文件并返回前 12000 字符，避免一次性返回过大内容。
+
+    说明：工具向模型返回内容时，通常需要限制大小以防止超出 token 上限或网络负担，因此这里只返回前 12k 字符。
+    """
     target = resolve_path(base_dir, path)
     if not target.exists():
         return {"ok": False, "error": "File does not exist."}
@@ -137,7 +157,7 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
     # 层次: 工具层 — 在文件中搜索文本，返回行级证据供模型引用
     """在路径下所有文件中按行搜索 query（不区分大小写），返回匹配的行和行号。
 
-    返回行级别证据便于模型在最终回答中引用来源。
+    说明：返回行级证据能够让模型在最终回答中精确地引用文件位置（例如文件名与行号），比只返回文件名更有助于可验证性。
     """
     target = resolve_path(base_dir, path)
     if not target.exists():
@@ -170,7 +190,10 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
 
 def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]:
     # 层次: 工具协调层 — 根据模型请求分发到具体工具实现
-    """根据模型返回的工具调用名执行相应工具函数并返回结果。"""
+    """根据模型返回的工具调用名执行相应工具函数并返回结果。
+
+    说明：这是模型与本地函数之间的桥梁，模型发起 `function_call`，这里负责把调用映射到真实实现并返回结构化结果。
+    """
     if name == "list_files":
         return list_files(base_dir, path=args.get("path", "."))
     if name == "read_file":
@@ -251,6 +274,7 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
     3. 重复直到模型返回最终回答或超过最大轮次
     """
     tools = build_tools()
+    # 在 mock 模式下直接返回模拟回答，避免 SDK 调用
     if mode == "mock":
         return build_mock_agent_response(prompt)
     input_items: list[dict[str, Any]] = [
@@ -265,6 +289,7 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
 
     # Minimal tool loop: ask the model, execute tool calls, then feed tool results back.
     for _ in range(MAX_TOOL_ROUNDS):
+        # 调用模型并传入工具描述，模型可能返回 `function_call` 指示需要执行某个工具
         response = client.responses.create(
             model=model,
             instructions=SYSTEM_INSTRUCTIONS,
@@ -279,12 +304,13 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
 
         for tool_call in tool_calls:
             try:
+                # 解析模型提供的工具调用参数并执行对应工具
                 args = json.loads(tool_call.arguments)
                 result = call_tool(base_dir, tool_call.name, args)
             except Exception as exc:
                 result = {"ok": False, "error": str(exc)}
 
-            # function_call_output is the bridge between local tool execution and the next model step.
+            # 把工具执行结果以特定消息类型回填给模型，模型会把这些结果纳入下一次推理输入
             input_items.append(
                 {
                     "type": "function_call_output",
