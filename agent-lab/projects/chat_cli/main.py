@@ -47,6 +47,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Minimal OpenAI Responses API chat CLI demo."
     )
+    # 一个可选的位置参数：一次性提问（若省略则进入交互模式）
     parser.add_argument(
         "prompt",
         nargs="?",
@@ -57,6 +58,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
+    # 模式选择：互斥组，分别强制 mock 或强制 real
     mode_group = parser.add_mutually_exclusive_group()
     mode_group.add_argument(
         "--mock",
