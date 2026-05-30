@@ -83,17 +83,22 @@ def build_client(use_mock: bool) -> Any:
 
     若未配置 `OPENAI_API_KEY`，则打印错误并退出。
     """
+    # 如果处于 mock 模式，直接返回 None，调用方会根据此判断不发起真实网络请求
     if use_mock:
         return None
 
+    # 如果没有安装 openai SDK，提示用户并退出程序（因为后续会需要调用 SDK）
     if OpenAI is None:
         print("ERROR: openai package is not installed. Run: pip install -r requirements.txt", file=sys.stderr)
         sys.exit(1)
 
+    # 从环境中读取 API Key，若不存在则安全退出并提示如何设置
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
         sys.exit(1)
+
+    # 返回一个已配置的 OpenAI 客户端实例，后续可以调用 client.responses.create(...)
     return OpenAI(api_key=api_key)
 
 
@@ -113,10 +118,12 @@ def resolve_mode(force_mock: bool, force_real: bool) -> bool:
         return False
 
     if not os.getenv("OPENAI_API_KEY"):
+        # 没有找到 API Key，自动切换到 mock 模式（本地演练而不触网）
         print("INFO: OPENAI_API_KEY not set, auto-switching to MOCK mode.", file=sys.stderr)
         return True
 
     if OpenAI is None:
+        # 未安装 SDK 时也自动切换到 mock，避免运行时出错
         print("INFO: openai package not installed, auto-switching to MOCK mode.", file=sys.stderr)
         return True
 
@@ -141,20 +148,34 @@ def build_mock_answer(prompt: str) -> str:
 def ask_once(client: Any, model: str, prompt: str, use_mock: bool) -> str:
     # 层次: 调用层 — 封装单次模型调用（支持 mock 或真实调用）
     """对给定 prompt 发起一次 Responses API 请求并返回主文本回答。"""
+    # 如果是 mock 模式，返回本地生成的示例回答（无需网络）
     if use_mock:
         return build_mock_answer(prompt)
 
+    # 在真实模式下，使用 SDK 发起请求并返回模型的主文本输出
+    # 注意：不同 SDK/版本可能返回的结构不同，这里期望 `response.output_text` 为字符串
     response = client.responses.create(
         model=model,
         instructions=SYSTEM_INSTRUCTIONS,
         input=prompt,
     )
+
+    # 直接返回 SDK 提供的文本字段，调用者会处理后续显示或截断
     return response.output_text
 
 
 def format_output(answer: str, max_chars: int | None) -> str:
     # 层次: 业务逻辑层 — 根据参数对模型输出做后处理（例如截断）
     """按 max_chars 对输出做截断，便于练习参数驱动的业务逻辑。"""
+
+    说明：
+    - 如果 `max_chars` 为 `None`，返回完整 `answer`。
+    - 如果 `max_chars` 为正整数且小于 `answer` 长度，返回截断后的字符串并在末尾标注被省略的字符数。
+    - 如果 `max_chars` <= 0，会抛出 `ValueError`，提醒调用者传入合法参数。
+
+    示例：
+        format_output("Hello world", 5) -> "Hello\n...[truncated 6 chars]"
+    """
     if max_chars is None:
         return answer
 
@@ -171,32 +192,41 @@ def format_output(answer: str, max_chars: int | None) -> str:
 def run_interactive(client: Any, model: str, use_mock: bool, max_chars: int | None) -> None:
     # 层次: 控制层 — 实现交互循环、退出条件与异常处理
     """进入交互循环，逐条读取用户输入并请求模型回答。"""
+    # 启动提示信息
     print(f"chat_cli started with model: {model}")
     if use_mock:
         print("Running in MOCK mode (no API key required).")
     print("Type 'exit' or 'quit' to stop.")
 
+    # 循环读取用户输入，逐次发起模型请求
     while True:
         try:
+            # 从标准输入读取用户的问题
             user_input = input("\nYou> ").strip()
         except (EOFError, KeyboardInterrupt):
+            # 当用户按 Ctrl+C 或 Ctrl+D 时优雅退出
             print("\nBye.")
             return
 
+        # 忽略空输入
         if not user_input:
             continue
 
+        # 支持键入 'exit' 或 'quit' 来结束交互
         if user_input.lower() in {"exit", "quit"}:
             print("Bye.")
             return
 
         try:
+            # 发起一次调用并对结果进行可选截断
             answer = ask_once(client, model, user_input, use_mock)
             answer = format_output(answer, max_chars)
         except Exception as exc:
+            # 捕获请求或处理过程中的异常，打印并继续交互循环
             print(f"ERROR: request failed: {exc}", file=sys.stderr)
             continue
 
+        # 打印模型或 mock 的回答
         print(f"\nAssistant> {answer}")
 
 
@@ -210,15 +240,16 @@ def main() -> None:
 
     if args.prompt:
         try:
-            # 一次性调用：请求 -> 输出截断（可选）-> 打印。
+            # 一次性（非交互）调用：调用一次 ask 并输出结果
             answer = ask_once(client, args.model, args.prompt, use_mock)
             print(format_output(answer, args.max_chars))
         except Exception as exc:
+            # 如果发生任何错误，打印并以非零状态码退出（方便脚本检测失败）
             print(f"ERROR: request failed: {exc}", file=sys.stderr)
             sys.exit(1)
         return
 
-    # 交互调用：循环读取输入并复用同一套业务逻辑。
+    # 若没有指定 prompt，则进入交互模式，复用同一 client 和参数
     run_interactive(client, args.model, use_mock, args.max_chars)
 
 
