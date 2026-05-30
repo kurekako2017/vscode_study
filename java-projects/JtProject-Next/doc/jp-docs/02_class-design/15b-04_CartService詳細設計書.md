@@ -46,12 +46,20 @@
 
 処理フロー図:
 
+[Mermaid source: 15b-04_CartService詳細設計書-mermaid-1.mmd](assets/15b-04_CartService詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[customer 付き Cart受領] --> B[CartDao.addCart]
     B --> C[永続化済Cart受領]
     C --> D[Cart返却]
 ```
+</details>
+
+
 
 ### 4.2 `getCarts()`
 
@@ -63,12 +71,20 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15b-04_CartService詳細設計書-mermaid-2.mmd](assets/15b-04_CartService詳細設計書-mermaid-2.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[getCarts呼出] --> B[CartDao.getCarts]
     B --> C[List<Cart>受領]
     C --> D[結果返却]
 ```
+</details>
+
+
 
 利用場面:
 
@@ -103,12 +119,20 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15b-04_CartService詳細設計書-mermaid-3.mmd](assets/15b-04_CartService詳細設計書-mermaid-3.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[削除対象Cart受領] --> B[CartDao.deleteCart]
     B --> C[削除完了]
     C --> D[呼出元へ制御返却]
 ```
+</details>
+
+
 
 ## 5. 設計上の注意
 

@@ -115,6 +115,11 @@ Next 会自动生成页面 `<title>`、description 等 head 信息。
 
 本项目采用 Client Component 从 Spring Boot API 获取数据：
 
+[Mermaid source: nextjs-framework-guide-mermaid-1.mmd](assets/nextjs-framework-guide-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A["浏览器访问<br/>层: Browser<br/>地址: localhost:3000<br/>作用: 请求 Next.js 前端页面"]
@@ -130,6 +135,9 @@ flowchart TD
 
     A --> B --> C --> D --> E --> F --> G --> H --> E --> C --> I --> J
 ```
+</details>
+
+
 
 ### 数据流节点追记
 

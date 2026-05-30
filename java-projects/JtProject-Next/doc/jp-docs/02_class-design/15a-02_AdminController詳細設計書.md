@@ -93,6 +93,11 @@
 
 処理フロー図:
 
+[Mermaid source: 15a-02_AdminController詳細設計書-mermaid-1.mmd](assets/15a-02_AdminController詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[id と更新値受領] --> B[CategoryService.getCategory]
@@ -107,6 +112,9 @@ flowchart TD
     I --> J[ProductService.updateProduct]
     J --> K[/admin/productsへリダイレクト]
 ```
+</details>
+
+
 
 ### 4.6 `profileDisplay()` / `updateUserProfile()`
 

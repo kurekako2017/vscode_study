@@ -54,6 +54,11 @@
 
 処理フロー図:
 
+[Mermaid source: 15c-04_CartDao詳細設計書-mermaid-1.mmd](assets/15c-04_CartDao詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[getCurrentSession] --> B[HQL from Cart 実行]
@@ -61,6 +66,9 @@ flowchart TD
     C --> D[件数ログ出力]
     D --> E[一覧返却]
 ```
+</details>
+
+
 
 ### 4.3 `updateCart(cart)`
 

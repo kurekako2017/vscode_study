@@ -69,12 +69,20 @@
 
 処理フロー図:
 
+[Mermaid source: 15c-02_ProductDao詳細設計書-mermaid-1.mmd](assets/15c-02_ProductDao詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[更新対象Product受領] --> B[Session.update(product)]
     B --> C[更新完了]
     C --> D[Product返却]
 ```
+</details>
+
+
 
 ### 4.5 `deletProduct(id)`
 
@@ -87,6 +95,11 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15c-02_ProductDao詳細設計書-mermaid-2.mmd](assets/15c-02_ProductDao詳細設計書-mermaid-2.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[id受領] --> B[Session.load(Product.class, id)]
@@ -95,6 +108,9 @@ flowchart TD
     C -- Yes --> E[delete実行]
     E --> F[true返却]
 ```
+</details>
+
+
 
 ## 5. 設計上の注意
 

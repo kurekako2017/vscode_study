@@ -14,6 +14,11 @@
 
 ## 3. CRUD 全体図
 
+[Mermaid source: 72_CRUD一覧-mermaid-1.mmd](assets/72_CRUD一覧-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart LR
     UI[画面 / URL] --> C[Controller]
@@ -23,6 +28,9 @@ flowchart LR
     D --> DB[(MySQL / CUSTOMER CATEGORY PRODUCT CART CART_PRODUCT)]
     D2 --> DB
 ```
+</details>
+
+
 
 補足:
 

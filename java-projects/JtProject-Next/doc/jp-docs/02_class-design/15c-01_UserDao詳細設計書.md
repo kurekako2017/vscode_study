@@ -66,6 +66,11 @@
 
 処理フロー図:
 
+[Mermaid source: 15c-01_UserDao詳細設計書-mermaid-1.mmd](assets/15c-01_UserDao詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[username/password受領] --> B[HQLでusername検索]
@@ -76,6 +81,9 @@ flowchart TD
     F -- Yes --> G[User返却]
     F -- No --> D
 ```
+</details>
+
+
 
 ### 4.4 `getUserByUsername(username)`
 

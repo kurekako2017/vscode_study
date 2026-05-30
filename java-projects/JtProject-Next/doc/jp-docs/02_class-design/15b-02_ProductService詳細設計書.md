@@ -88,6 +88,11 @@
 
 処理フロー図:
 
+[Mermaid source: 15b-02_ProductService詳細設計書-mermaid-1.mmd](assets/15b-02_ProductService詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[id と Product受領] --> B[product.setId(id)]
@@ -95,6 +100,9 @@ flowchart TD
     C --> D[更新済Product受領]
     D --> E[結果返却]
 ```
+</details>
+
+
 
 ### 4.5 `deleteProduct(id)`
 

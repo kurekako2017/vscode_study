@@ -42,6 +42,11 @@
 
 処理フロー図:
 
+[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-1.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-1.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[name受領] --> B[new Category()]
@@ -49,6 +54,9 @@ flowchart TD
     C --> D[persist(category)]
     D --> E[Category返却]
 ```
+</details>
+
+
 
 ### 4.2 `getCategories()`
 
@@ -61,6 +69,11 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-2.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-2.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[getCategories呼出] --> B[HQL from Category 実行]
@@ -68,6 +81,9 @@ flowchart TD
     C --> D[件数ログ出力]
     D --> E[一覧返却]
 ```
+</details>
+
+
 
 ### 4.3 `deletCategory(id)`
 
@@ -85,6 +101,11 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-3.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-3.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[id受領] --> B[EntityManager.find(Category, id)]
@@ -93,6 +114,9 @@ flowchart TD
     C -- Yes --> E[remove(category)]
     E --> F[true返却]
 ```
+</details>
+
+
 
 ### 4.4 `updateCategory(id, name)`
 
@@ -106,6 +130,11 @@ flowchart TD
 
 処理フロー図:
 
+[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-4.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-4.mmd)
+
+<details>
+<summary>Mermaid source (editable)</summary>
+
 ```mermaid
 flowchart TD
     A[id と name 受領] --> B[EntityManager.find(Category, id)]
@@ -115,6 +144,9 @@ flowchart TD
     E --> F[merge(category)]
     F --> G[Category返却]
 ```
+</details>
+
+
 
 ### 4.5 `getCategory(id)`
 
