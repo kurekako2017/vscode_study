@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor User as 一般ユーザー
+    participant JSP as userLogin.jsp
+    participant C as UserController
+    participant S as UserService
+    participant D as UserDao
+    participant DB as CUSTOMER
+    participant PS as ProductService
+    participant PDB as PRODUCT
+
+    User->>JSP: ユーザー名/パスワード入力
+    JSP->>C: POST /userloginvalidate
+    C->>S: checkLogin(username, password)
+    S->>D: getUser(username, password)
+    D->>DB: usernameで検索
+    DB-->>D: ユーザー情報返却
+    D-->>S: User or 空User
+    S-->>C: 認証結果返却
+    alt 認証成功
+        C->>PS: getProducts()
+        PS->>PDB: 商品一覧取得
+        PDB-->>PS: 商品一覧
+        PS-->>C: 商品一覧
+        C-->>JSP: index.jsp表示
+    else 認証失敗
+        C-->>JSP: userLogin.jsp + エラーメッセージ
+    end

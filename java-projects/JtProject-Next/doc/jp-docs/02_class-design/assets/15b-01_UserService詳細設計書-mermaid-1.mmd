@@ -1,0 +1,7 @@
+flowchart TD
+    A[username/password受領] --> B[UserDao.getUser]
+    B --> C{戻り値 user.id > 0 ?}
+    C -- Yes --> D[認証成功ログ]
+    C -- No --> E[認証失敗ログ]
+    D --> F[User返却]
+    E --> F

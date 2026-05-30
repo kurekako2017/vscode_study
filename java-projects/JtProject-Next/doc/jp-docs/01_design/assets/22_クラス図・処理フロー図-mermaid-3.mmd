@@ -1,0 +1,16 @@
+flowchart TD
+    A[ログイン画面入力] --> B[UserController.userlogin]
+    B --> C[UserService.checkLogin]
+    C --> D[UserDao.getUser]
+    D --> E[(CUSTOMER検索)]
+    E --> F{ユーザー存在?}
+    F -- No --> G[空User返却]
+    F -- Yes --> H{パスワード一致?}
+    H -- No --> G
+    H -- Yes --> I[User返却]
+    G --> J[ログイン失敗メッセージ設定]
+    I --> K[Cookie/Session設定]
+    K --> L[ProductService.getProducts]
+    L --> M[(PRODUCT一覧取得)]
+    M --> N[index.jsp返却]
+    J --> O[userLogin.jsp返却]

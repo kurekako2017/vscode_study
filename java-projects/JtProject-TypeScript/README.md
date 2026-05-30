@@ -82,17 +82,4 @@ JtProject-TypeScript/
 
 [docs/fullstack-typescript-flow.md](./docs/fullstack-typescript-flow.md)
 
-```mermaid
-flowchart TD
-    Browser[Browser: localhost:5175] --> React[React + TypeScript App]
-    React --> ApiHelper[apps/web/src/api.ts api<T>()]
-    ApiHelper --> Express[Express API: localhost:8090/api]
-    Express --> Store[TypeScript Store]
-    Store --> Memory[(In-memory data)]
-    Memory --> Store
-    Store --> Express
-    Express --> Json[ApiResult<T> JSON]
-    Json --> ApiHelper
-    ApiHelper --> State[React state]
-    State --> UI[Rendered UI]
-```
+![纯 TypeScript 全栈整体流程](docs/assets/fullstack-typescript-overall.svg)

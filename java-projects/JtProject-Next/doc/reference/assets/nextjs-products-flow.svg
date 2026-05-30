@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">商品列表加载流程</title>
+  <desc id="desc">页面打开后调用商品接口，后端查询数据库并返回商品列表，前端更新状态并渲染商品卡片。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .title { font: 700 22px Arial, sans-serif; fill: #111827; }
+      .box { fill: #f8fafc; stroke: #1f2937; stroke-width: 2; rx: 10; }
+      .txt { font: 700 15px Arial, sans-serif; fill: #111827; }
+      .sub { font: 400 13px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="980" height="420" fill="#ffffff"/>
+  <text x="40" y="44" class="title">商品列表加载流程</text>
+
+  <rect x="45" y="95" width="180" height="65" class="box"/>
+  <text x="72" y="123" class="txt">Browser</text>
+  <text x="72" y="145" class="sub">打开首页</text>
+
+  <rect x="270" y="95" width="190" height="65" class="box"/>
+  <text x="298" y="123" class="txt">app/page.tsx</text>
+  <text x="298" y="145" class="sub">loadInitialData</text>
+
+  <rect x="505" y="95" width="180" height="65" class="box"/>
+  <text x="532" y="123" class="txt">lib/api.ts</text>
+  <text x="532" y="145" class="sub">GET /api/products</text>
+
+  <rect x="730" y="95" width="200" height="65" class="box"/>
+  <text x="758" y="123" class="txt">ApiController</text>
+  <text x="758" y="145" class="sub">接收请求</text>
+
+  <rect x="270" y="245" width="190" height="65" class="box"/>
+  <text x="298" y="273" class="txt">ProductService</text>
+  <text x="298" y="295" class="sub">业务处理</text>
+
+  <rect x="505" y="245" width="180" height="65" class="box"/>
+  <text x="532" y="273" class="txt">ProductDao</text>
+  <text x="532" y="295" class="sub">查询商品</text>
+
+  <rect x="730" y="245" width="200" height="65" class="box"/>
+  <text x="758" y="273" class="txt">H2 Database</text>
+  <text x="758" y="295" class="sub">返回商品记录</text>
+
+  <rect x="390" y="350" width="220" height="50" class="box"/>
+  <text x="418" y="382" class="txt">setProducts 后渲染商品卡片</text>
+
+  <path d="M 225 128 L 270 128" class="arrow"/>
+  <path d="M 460 128 L 505 128" class="arrow"/>
+  <path d="M 685 128 L 730 128" class="arrow"/>
+  <path d="M 830 160 L 830 205 L 365 205 L 365 245" class="arrow"/>
+  <path d="M 460 278 L 505 278" class="arrow"/>
+  <path d="M 685 278 L 730 278" class="arrow"/>
+  <path d="M 830 310 L 830 375 L 610 375" class="arrow"/>
+</svg>

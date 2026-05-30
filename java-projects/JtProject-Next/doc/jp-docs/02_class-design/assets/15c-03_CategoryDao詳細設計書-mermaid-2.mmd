@@ -1,0 +1,5 @@
+flowchart TD
+    A[getCategories呼出] --> B[HQL from Category 実行]
+    B --> C[List<Category>取得]
+    C --> D[件数ログ出力]
+    D --> E[一覧返却]

@@ -14,77 +14,15 @@
 
 ## 整体处理流程
 
-```mermaid
-flowchart TD
-    A[浏览器访问 http://localhost:3000] --> B[Next.js App Router 匹配 app/page.tsx]
-    B --> C[page.tsx 作为 Client Component 在浏览器运行]
-    C --> D[useEffect 首次加载调用 loadInitialData]
-    D --> E[api<T>() 统一封装 fetch 请求]
-    E --> F[请求 Spring Boot: http://localhost:8086/api]
-    F --> G[ApiController 接收请求]
-    G --> H[Service 层执行业务逻辑]
-    H --> I[DAO / Hibernate 访问 H2 数据库]
-    I --> J[(data/jtproject-next H2 文件库)]
-    J --> I --> H --> G
-    G --> K[返回 ApiResult<T> JSON]
-    K --> E
-    E --> L[TypeScript 根据 T 推断 data 类型]
-    L --> M[setProducts / setSession / setCart 更新 React state]
-    M --> N[React 重新渲染页面 UI]
-```
+![Next.js + TypeScript 整体处理流程](assets/nextjs-overall-flow.svg)
 
 ## 商品列表加载流程
 
-```mermaid
-sequenceDiagram
-    participant Browser as Browser
-    participant Page as app/page.tsx
-    participant Api as lib/api.ts
-    participant Controller as ApiController
-    participant Service as ProductService
-    participant Dao as ProductDao
-    participant Db as H2 Database
-
-    Browser->>Page: 打开首页
-    Page->>Page: useEffect() 执行 loadInitialData()
-    Page->>Api: api<Product[]>('/products')
-    Api->>Controller: GET /api/products
-    Controller->>Service: productService.getProducts()
-    Service->>Dao: 查询商品
-    Dao->>Db: select products
-    Db-->>Dao: 商品记录
-    Dao-->>Service: Product 列表
-    Service-->>Controller: Product 列表
-    Controller-->>Api: ApiResult<Product[]>
-    Api-->>Page: 类型化后的 result.data
-    Page->>Page: setProducts(result.data)
-    Page-->>Browser: 渲染商品卡片
-```
+![商品列表加载流程](assets/nextjs-products-flow.svg)
 
 ## 登录和购物车流程
 
-```mermaid
-sequenceDiagram
-    participant User as 用户
-    participant Page as app/page.tsx
-    participant Api as api<T>()
-    participant Auth as Spring Boot Auth API
-    participant Cart as Spring Boot Cart API
-    participant Session as Spring Session Cookie
-
-    User->>Page: 提交 lisa / 765
-    Page->>Api: api<SessionInfo>('/auth/login', POST)
-    Api->>Auth: 携带 JSON username/password
-    Auth->>Session: 写入 JSESSIONID 对应的登录状态
-    Auth-->>Api: ApiResult<SessionInfo>
-    Api-->>Page: 返回 session data
-    Page->>Page: setSession(result.data)
-    Page->>Api: api<Product[]>('/cart')
-    Api->>Cart: credentials include 自动带 cookie
-    Cart-->>Api: 当前登录用户购物车
-    Api-->>Page: Product[]
-    Page->>Page: setCart(result.data)
-```
+![登录和购物车流程](assets/nextjs-login-cart-flow.svg)
 
 ## TypeScript 在这里解决什么问题
 

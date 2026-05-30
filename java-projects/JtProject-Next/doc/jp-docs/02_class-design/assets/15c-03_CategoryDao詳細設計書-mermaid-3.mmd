@@ -1,0 +1,6 @@
+flowchart TD
+    A[id受領] --> B[EntityManager.find(Category, id)]
+    B --> C{対象存在?}
+    C -- No --> D[false返却]
+    C -- Yes --> E[remove(category)]
+    E --> F[true返却]

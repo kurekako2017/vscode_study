@@ -1,0 +1,4 @@
+flowchart TD
+    A[customer 付き Cart受領] --> B[CartDao.addCart]
+    B --> C[永続化済Cart受領]
+    C --> D[Cart返却]

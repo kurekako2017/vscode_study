@@ -1,0 +1,43 @@
+classDiagram
+    class User {
+        +int id
+        +String username
+        +String email
+        +String password
+        +String role
+        +String address
+    }
+
+    class Category {
+        +int id
+        +String name
+    }
+
+    class Product {
+        +int id
+        +String name
+        +String image
+        +int quantity
+        +int price
+        +int weight
+        +String description
+        +Category category
+        +User customer
+    }
+
+    class Cart {
+        +int id
+        +User customer
+    }
+
+    class CartProduct {
+        +int id
+        +Cart cart
+        +Product product
+    }
+
+    User "1" --> "0..*" Cart : owns
+    User "1" --> "0..*" Product : may_register
+    Category "1" --> "0..*" Product : classifies
+    Cart "1" --> "0..*" CartProduct : contains
+    Product "1" --> "0..*" CartProduct : selected_in

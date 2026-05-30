@@ -1,0 +1,9 @@
+flowchart TD
+    A[username/password受領] --> B[UserService.checkLogin]
+    B --> C{user.id > 0 かつ username 一致?}
+    C -- No --> D[msg設定]
+    D --> E[userLogin返却]
+    C -- Yes --> F[Cookie設定]
+    F --> G[Session設定]
+    G --> H[ProductService.getProducts]
+    H --> I[index返却]

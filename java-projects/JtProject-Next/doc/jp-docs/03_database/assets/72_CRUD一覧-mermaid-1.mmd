@@ -1,0 +1,7 @@
+flowchart LR
+    UI[画面 / URL] --> C[Controller]
+    C --> S[Service]
+    C --> D2[DAO直参照]
+    S --> D[DAO]
+    D --> DB[(MySQL / CUSTOMER CATEGORY PRODUCT CART CART_PRODUCT)]
+    D2 --> DB

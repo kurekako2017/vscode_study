@@ -1,0 +1,12 @@
+flowchart TD
+    A[cartId受領] --> B[HQLでCartProduct一覧取得]
+    B --> C{明細有?}
+    C -- No --> D[空List返却]
+    C -- Yes --> E[for each CartProduct]
+    E --> F{product != null ?}
+    F -- Yes --> G[products に追加]
+    F -- No --> H[skip]
+    G --> I{次明細有?}
+    H --> I
+    I -- Yes --> E
+    I -- No --> J[Product一覧返却]

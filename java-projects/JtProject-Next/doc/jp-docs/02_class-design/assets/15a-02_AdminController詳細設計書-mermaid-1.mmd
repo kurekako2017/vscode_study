@@ -1,0 +1,12 @@
+flowchart TD
+    A[id と更新値受領] --> B[CategoryService.getCategory]
+    B --> C[ProductService.getProduct]
+    C --> D{既存商品有?}
+    D -- No --> E[一覧へ戻る]
+    D -- Yes --> F{画像入力有?}
+    F -- No --> G[既存画像を引継ぐ]
+    F -- Yes --> H[入力画像を採用]
+    G --> I[更新用Product組立]
+    H --> I
+    I --> J[ProductService.updateProduct]
+    J --> K[/admin/productsへリダイレクト]

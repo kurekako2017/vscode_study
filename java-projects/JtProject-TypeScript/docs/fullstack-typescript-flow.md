@@ -24,72 +24,15 @@
 
 ## 整体流程
 
-```mermaid
-flowchart TD
-    A[浏览器访问 http://localhost:5175] --> B[Vite 返回 React 应用]
-    B --> C[apps/web/src/main.tsx 挂载 App]
-    C --> D[App.tsx useEffect 加载初始数据]
-    D --> E[api<T>() 调用 fetch]
-    E --> F[Express: http://localhost:8090/api]
-    F --> G[server.ts 路由函数]
-    G --> H[Store 内存数据层]
-    H --> I[(seed 数据 + carts Map)]
-    I --> H --> G
-    G --> J[ApiResult<T> JSON]
-    J --> E
-    E --> K[TypeScript 根据 T 推断 data 类型]
-    K --> L[setProducts / setSession / setCart]
-    L --> M[React 重新渲染 UI]
-```
+![纯 TypeScript 全栈整体流程](assets/fullstack-typescript-overall.svg)
 
 ## 商品列表加载流程
 
-```mermaid
-sequenceDiagram
-    participant Browser as Browser
-    participant App as App.tsx
-    participant Api as api<T>()
-    participant Server as Express server.ts
-    participant Store as Store
-
-    Browser->>App: 打开页面
-    App->>App: useEffect() 调用 loadInitialData()
-    App->>Api: api<Product[]>('/products')
-    Api->>Server: GET /api/products
-    Server->>Store: store.getProducts()
-    Store-->>Server: Product[]
-    Server-->>Api: ApiResult<Product[]>
-    Api-->>App: result.data 类型为 Product[]
-    App->>App: setProducts(result.data)
-    App-->>Browser: 渲染商品卡片
-```
+![商品列表加载流程](assets/fullstack-typescript-products.svg)
 
 ## 登录和购物车流程
 
-```mermaid
-sequenceDiagram
-    participant User as 用户
-    participant App as App.tsx
-    participant Api as api<T>()
-    participant Server as Express API
-    participant Cookie as Cookie
-    participant Store as Store
-
-    User->>App: 提交 lisa / 765
-    App->>Api: api<SessionInfo>('/auth/login', POST)
-    Api->>Server: JSON username/password
-    Server->>Store: store.checkLogin()
-    Store-->>Server: User
-    Server->>Cookie: 写入 jt_ts_session
-    Server-->>Api: ApiResult<SessionInfo>
-    Api-->>App: session data
-    App->>Api: api<Product[]>('/cart')
-    Api->>Server: credentials include 携带 cookie
-    Server->>Store: store.getCartProducts(user.id)
-    Store-->>Server: Product[]
-    Server-->>Api: ApiResult<Product[]>
-    Api-->>App: 购物车商品
-```
+![登录和购物车流程](assets/fullstack-typescript-login-cart.svg)
 
 ## 共享类型如何工作
 

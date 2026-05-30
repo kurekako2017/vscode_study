@@ -1,0 +1,15 @@
+flowchart TD
+    A[商品更新画面入力] --> B[AdminController.updateProduct]
+    B --> C[CategoryService.getCategory]
+    C --> D[カテゴリ取得]
+    B --> E[ProductService.getProduct]
+    E --> F[既存商品取得]
+    F --> G{画像入力有?}
+    G -- No --> H[既存画像を引継ぐ]
+    G -- Yes --> I[入力画像を採用]
+    H --> J[更新用Product作成]
+    I --> J
+    J --> K[ProductService.updateProduct]
+    K --> L[ProductDao.updateProduct]
+    L --> M[(PRODUCT更新)]
+    M --> N[/admin/productsへ遷移]

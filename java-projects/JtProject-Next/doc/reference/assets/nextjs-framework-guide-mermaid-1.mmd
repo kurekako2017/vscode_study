@@ -1,0 +1,13 @@
+flowchart TD
+    A["浏览器访问<br/>层: Browser<br/>地址: localhost:3000<br/>作用: 请求 Next.js 前端页面"]
+    B["根布局<br/>层: Next Layout<br/>文件: frontend/app/layout.tsx<br/>作用: 包裹页面、加载全局 CSS、提供 metadata"]
+    C["首页组件<br/>层: Next Page / Client Component<br/>文件: frontend/app/page.tsx<br/>作用: 保存 state、处理表单和按钮事件"]
+    D["初始化副作用<br/>层: React Hook<br/>函数: useEffect -> loadInitialData()<br/>作用: 页面打开后请求 session 和 products"]
+    E["API Client<br/>层: Frontend API<br/>文件: frontend/lib/api.ts<br/>作用: api<T>() 统一 fetch、cookie、错误处理"]
+    F["后端 Controller<br/>层: Spring Boot API<br/>类: ApiController.java<br/>作用: 接收 /api 请求并返回 ApiResult"]
+    G["业务 / 数据层<br/>层: Service + DAO<br/>类: ProductService/UserService/CartService + DaoImpl<br/>作用: 业务处理和数据库访问"]
+    H["JSON 响应<br/>层: HTTP Response<br/>类型: ApiResult<T><br/>作用: 把后端数据返回前端"]
+    I["状态更新<br/>层: React State<br/>文件: page.tsx<br/>作用: setProducts/setSession/setCart"]
+    J["页面重渲染<br/>层: React Runtime<br/>文件: page.tsx JSX<br/>作用: 根据最新 state 更新 UI"]
+
+    A --> B --> C --> D --> E --> F --> G --> H --> E --> C --> I --> J

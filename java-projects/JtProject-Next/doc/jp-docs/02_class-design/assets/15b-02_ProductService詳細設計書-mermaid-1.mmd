@@ -1,0 +1,5 @@
+flowchart TD
+    A[id と Product受領] --> B[product.setId(id)]
+    B --> C[ProductDao.updateProduct]
+    C --> D[更新済Product受領]
+    D --> E[結果返却]

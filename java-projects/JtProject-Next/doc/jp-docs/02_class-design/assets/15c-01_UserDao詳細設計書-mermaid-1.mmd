@@ -1,0 +1,8 @@
+flowchart TD
+    A[username/password受領] --> B[HQLでusername検索]
+    B --> C{該当件数 0 ?}
+    C -- Yes --> D[new User返却]
+    C -- No --> E[先頭1件取得]
+    E --> F{DB password と入力値一致?}
+    F -- Yes --> G[User返却]
+    F -- No --> D

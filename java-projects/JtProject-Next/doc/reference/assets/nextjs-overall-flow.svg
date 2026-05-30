@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+  <title id="title">Next.js TypeScript 整体处理流程</title>
+  <desc id="desc">浏览器访问 Next.js 页面，前端调用 API，Spring Boot 处理请求并返回 JSON，React 更新状态并重新渲染。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .box { fill: #f8fafc; stroke: #1f2937; stroke-width: 2; rx: 10; }
+      .db { fill: #fefce8; stroke: #92400e; stroke-width: 2; }
+      .txt { font: 700 15px Arial, sans-serif; fill: #111827; }
+      .sub { font: 400 13px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1180" height="620" fill="#ffffff"/>
+  <text x="48" y="44" class="title">Next.js + TypeScript 前后端整体流程</text>
+
+  <rect x="50" y="85" width="210" height="70" class="box"/>
+  <text x="78" y="115" class="txt">浏览器</text>
+  <text x="78" y="138" class="sub">访问 localhost:3000</text>
+
+  <rect x="310" y="85" width="230" height="70" class="box"/>
+  <text x="338" y="115" class="txt">Next.js App Router</text>
+  <text x="338" y="138" class="sub">匹配 app/page.tsx</text>
+
+  <rect x="590" y="85" width="240" height="70" class="box"/>
+  <text x="618" y="115" class="txt">Client Component</text>
+  <text x="618" y="138" class="sub">page.tsx 在浏览器运行</text>
+
+  <rect x="880" y="85" width="240" height="70" class="box"/>
+  <text x="908" y="115" class="txt">loadInitialData</text>
+  <text x="908" y="138" class="sub">useEffect 首次加载</text>
+
+  <rect x="740" y="235" width="240" height="70" class="box"/>
+  <text x="768" y="265" class="txt">API 封装</text>
+  <text x="768" y="288" class="sub">frontend/lib/api.ts + fetch</text>
+
+  <rect x="450" y="235" width="240" height="70" class="box"/>
+  <text x="478" y="265" class="txt">Spring Boot API</text>
+  <text x="478" y="288" class="sub">localhost:8086/api</text>
+
+  <rect x="160" y="235" width="240" height="70" class="box"/>
+  <text x="188" y="265" class="txt">ApiController</text>
+  <text x="188" y="288" class="sub">接收 JSON 请求</text>
+
+  <rect x="160" y="385" width="240" height="70" class="box"/>
+  <text x="188" y="415" class="txt">Service 层</text>
+  <text x="188" y="438" class="sub">执行业务逻辑</text>
+
+  <rect x="450" y="385" width="240" height="70" class="box"/>
+  <text x="478" y="415" class="txt">DAO / Hibernate</text>
+  <text x="478" y="438" class="sub">访问 H2 数据库</text>
+
+  <ellipse cx="860" cy="420" rx="120" ry="38" class="db"/>
+  <text x="790" y="416" class="txt">H2 Database</text>
+  <text x="780" y="439" class="sub">jtproject-next data</text>
+
+  <rect x="450" y="520" width="240" height="60" class="box"/>
+  <text x="478" y="555" class="txt">ApiResult JSON</text>
+
+  <rect x="740" y="520" width="240" height="60" class="box"/>
+  <text x="768" y="545" class="txt">React State</text>
+  <text x="768" y="566" class="sub">products / session / cart</text>
+
+  <rect x="1010" y="520" width="130" height="60" class="box"/>
+  <text x="1035" y="555" class="txt">UI 渲染</text>
+
+  <path d="M 260 120 L 310 120" class="arrow"/>
+  <path d="M 540 120 L 590 120" class="arrow"/>
+  <path d="M 830 120 L 880 120" class="arrow"/>
+  <path d="M 1000 155 L 1000 270 L 980 270" class="arrow"/>
+  <path d="M 740 270 L 690 270" class="arrow"/>
+  <path d="M 450 270 L 400 270" class="arrow"/>
+  <path d="M 280 305 L 280 385" class="arrow"/>
+  <path d="M 400 420 L 450 420" class="arrow"/>
+  <path d="M 690 420 L 740 420" class="arrow"/>
+  <path d="M 570 455 L 570 520" class="arrow"/>
+  <path d="M 690 550 L 740 550" class="arrow"/>
+  <path d="M 980 550 L 1010 550" class="arrow"/>
+</svg>

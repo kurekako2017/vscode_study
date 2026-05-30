@@ -1,0 +1,5 @@
+flowchart TD
+    A[name受領] --> B[new Category()]
+    B --> C[category.setName(name)]
+    C --> D[persist(category)]
+    D --> E[Category返却]
