@@ -1,0 +1,51 @@
+name: Render Mermaid diagrams to SVG
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'java-projects/JtProject-Next/doc/**'
+      - 'scripts/render_mermaid_to_svg.py'
+  workflow_dispatch: {}
+
+jobs:
+  render:
+    name: Render and commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install system dependencies for headless Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libx11-6 \
+            libx11-xcb1 libxcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 \
+            libpangocairo-1.0-0 libgtk-3-0 libxss1
+
+      - name: Run mermaid rendering script
+        run: python3 scripts/render_mermaid_to_svg.py
+
+      - name: Commit generated SVGs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(docs): render mermaid diagrams to SVG"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit"
+          fi
