@@ -41,3 +41,9 @@ jobs:
         run: |
           docker stop rag_demo_ci || true
           docker rm rag_demo_ci || true
+      - name: Run /ask smoke test
+        if: success()
+        run: |
+          cd agent-lab/projects/rag_api_demo
+          chmod +x smoke_check.sh
+          ./smoke_check.sh
