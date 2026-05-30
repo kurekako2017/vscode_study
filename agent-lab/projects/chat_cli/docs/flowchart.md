@@ -2,13 +2,11 @@
 
 下面是 `main.py` 的处理流程图（Mermaid 格式），可在支持 Mermaid 的渲染器中直接预览。
 
-![详细处理流程图（SVG）](/agent-lab/projects/chat_cli/docs/flowchart.svg)
+![处理流程图]( /agent-lab/projects/chat_cli/assets/flowchart_simple.svg)
 
-> 说明：此 SVG 为静态流程图，适用于在 GitHub 或不支持 Mermaid 的 Markdown 渲染器中直接查看。
+> 说明：为了保证在 GitHub 与其他不渲染 Mermaid 的环境中均可查看，`flowchart.md` 现在直接引用与 `README` 相同的静态 SVG 图（`assets/flowchart_simple.svg`）。
 
-如果平台不直接渲染 SVG，CI 会生成 `flowchart.png` 作为回退：
-
-![详细处理流程图（PNG）](/agent-lab/projects/chat_cli/docs/flowchart.png)
+如果平台或浏览器对 SVG 有限制，仓库的 CI 会在需要时生成 `docs/flowchart.png` 作为回退；若存在该 PNG 文件，也会作为备用显示。
 
 如何在本地渲染此 Mermaid 图：
 
