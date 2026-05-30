@@ -9,7 +9,7 @@
 - `pydantic_example.py`：`pydantic` 数据验证示例
 - `file_io_example.py`：JSON / CSV 读写示例
 - `text_split_example.py`：文本分割（RAG 前处理）示例
-- `model_call_example.py`：最小模型调用示例（使用 `openai` SDK，需配置 `OPENAI_API_KEY`）
+- `model_call_example.py`：最小模型调用示例（无 API Key 时自动 mock，有 Key 时可真实调用）
 
 ## 🚀 快速运行
 
@@ -51,12 +51,14 @@ python3 dataclass_example.py
 python3 pydantic_example.py
 python3 file_io_example.py
 python3 text_split_example.py
-python3 model_call_example.py "一句话解释什么是 agent"  # 需要 OPENAI_API_KEY
+python3 model_call_example.py "一句话解释什么是 agent"
+python3 model_call_example.py --mock "一句话解释什么是 agent"
+python3 model_call_example.py --real "一句话解释什么是 agent"  # 需要 OPENAI_API_KEY
 ```
 
 ## 前置要求
 
 - Python 3.10+
-- 对 `model_call_example`：需设置环境变量 `OPENAI_API_KEY`
+- 对 `model_call_example`：无 API Key 会自动进入 mock；真实调用才需要 `OPENAI_API_KEY`
 
-注意：所有示例都包含注释，便于理解每一行代码的意图。如需我把某个示例复制到 `llm-lab` 下以便修改，请告知。
+注意：所有示例都包含注释，便于理解每一行代码的意图。

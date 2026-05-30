@@ -16,11 +16,11 @@ if (-not (Test-Path $exampleFile)) {
     exit 1
 }
 
-# 检查 OPENAI_API_KEY（仅对 model_call_example 需要）
+# 提示 OPENAI_API_KEY（model_call_example 无 Key 时会自动 mock）
 if ($exampleName -eq "model_call_example" -or $exampleName -match "model") {
     if (-not $env:OPENAI_API_KEY) {
-        Write-Host "WARNING: OPENAI_API_KEY is not set." -ForegroundColor Yellow
-        Write-Host "This example may require API key. Set it if needed:" -ForegroundColor Yellow
+        Write-Host "INFO: OPENAI_API_KEY is not set; model_call_example will use mock mode." -ForegroundColor Yellow
+        Write-Host "For real API calls, set it first:" -ForegroundColor Yellow
         Write-Host "`$env:OPENAI_API_KEY = 'your-api-key'" -ForegroundColor Yellow
     }
 }

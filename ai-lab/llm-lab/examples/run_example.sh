@@ -14,11 +14,11 @@ if [ ! -f "$EXAMPLE_FILE" ]; then
     exit 1
 fi
 
-# 检查 OPENAI_API_KEY（仅对 model_call_example 需要）
+# 提示 OPENAI_API_KEY（model_call_example 无 Key 时会自动 mock）
 if [[ "$EXAMPLE_NAME" == "model_call_example" ]] || [[ "$EXAMPLE_NAME" == *"model"* ]]; then
     if [ -z "$OPENAI_API_KEY" ]; then
-        echo "WARNING: OPENAI_API_KEY is not set."
-        echo "This example may require API key. Set it if needed:"
+        echo "INFO: OPENAI_API_KEY is not set; model_call_example will use mock mode."
+        echo "For real API calls, set it first:"
         echo "export OPENAI_API_KEY='your-api-key'"
     fi
 fi
