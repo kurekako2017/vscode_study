@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="560" viewBox="0 0 1080 560" role="img" aria-labelledby="title desc">
+  <title id="title">Next.js Hello 处理流程与分层</title>
+  <desc id="desc">Next.js Pages Router 示例从请求、应用包装、页面组件、全局样式到浏览器渲染的流程图。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .box { fill: #f8fafc; stroke: #1f2937; stroke-width: 2; rx: 10; }
+      .sub { font: 400 14px Arial, sans-serif; fill: #374151; }
+      .txt { font: 700 16px Arial, sans-serif; fill: #111827; }
+      .note { font: 400 13px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1080" height="560" fill="#ffffff"/>
+  <text x="48" y="44" class="title">Next.js Hello 处理流程（Pages Router）</text>
+
+  <rect x="60" y="86" width="220" height="78" class="box"/>
+  <text x="88" y="119" class="txt">浏览器请求 /</text>
+  <text x="88" y="145" class="sub">路由层：匹配 pages/index.js</text>
+
+  <rect x="330" y="86" width="220" height="78" class="box"/>
+  <text x="358" y="119" class="txt">pages/_app.js</text>
+  <text x="358" y="145" class="sub">应用包装层：加载全局样式</text>
+
+  <rect x="600" y="86" width="250" height="78" class="box"/>
+  <text x="628" y="119" class="txt">pages/index.js</text>
+  <text x="628" y="145" class="sub">页面组件层：Home 函数组件</text>
+
+  <rect x="205" y="245" width="250" height="86" class="box"/>
+  <text x="233" y="279" class="txt">styles/globals.css</text>
+  <text x="233" y="305" class="sub">全局样式层：页面基础外观</text>
+
+  <rect x="515" y="245" width="250" height="86" class="box"/>
+  <text x="543" y="279" class="txt">next.config.js</text>
+  <text x="543" y="305" class="sub">框架配置层：Next 行为配置</text>
+
+  <rect x="360" y="412" width="360" height="78" class="box"/>
+  <text x="388" y="445" class="txt">Next 编译 / 渲染 / 浏览器显示</text>
+  <text x="388" y="471" class="sub">React 组件输出 HTML、CSS 和 JS</text>
+
+  <path d="M 280 125 L 330 125" class="arrow"/>
+  <path d="M 550 125 L 600 125" class="arrow"/>
+  <path d="M 440 164 L 440 205 L 330 205 L 330 245" class="arrow"/>
+  <path d="M 725 164 L 725 205 L 640 205 L 640 245" class="arrow"/>
+  <path d="M 330 331 L 456 412" class="arrow"/>
+  <path d="M 640 331 L 612 412" class="arrow"/>
+
+  <text x="60" y="528" class="note">学习重点：当前示例没有 class 组件，核心是 _app.js 的应用包装函数与 index.js 的页面函数组件。</text>
+</svg>

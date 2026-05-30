@@ -22,6 +22,8 @@ npm run dev
 - `styles/globals.css`：全局样式
 - `next.config.js`：Next.js 配置
 
+更详细的处理流程图与分层说明见 [LEARN.md](LEARN.md)。
+
 ### 快速启动（完整步骤）
 
 1. 确保已安装 Node.js（推荐 Node 16+）。

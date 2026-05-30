@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="560" viewBox="0 0 1080 560" role="img" aria-labelledby="title desc">
+  <title id="title">TypeScript Hello 处理流程与分层</title>
+  <desc id="desc">TypeScript + Vite 示例从 HTML 宿主、main.ts 类型代码、样式、Vite 编译到浏览器运行的流程图。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .box { fill: #f8fafc; stroke: #1f2937; stroke-width: 2; rx: 10; }
+      .sub { font: 400 14px Arial, sans-serif; fill: #374151; }
+      .txt { font: 700 16px Arial, sans-serif; fill: #111827; }
+      .note { font: 400 13px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1080" height="560" fill="#ffffff"/>
+  <text x="48" y="44" class="title">TypeScript Hello 处理流程（Vanilla TS + Vite）</text>
+
+  <rect x="60" y="86" width="220" height="78" class="box"/>
+  <text x="88" y="119" class="txt">index.html</text>
+  <text x="88" y="145" class="sub">HTML 宿主层：提供 #app</text>
+
+  <rect x="330" y="86" width="220" height="78" class="box"/>
+  <text x="358" y="119" class="txt">src/main.ts</text>
+  <text x="358" y="145" class="sub">业务入口层：类型 + DOM 渲染</text>
+
+  <rect x="600" y="86" width="250" height="78" class="box"/>
+  <text x="628" y="119" class="txt">src/style.css</text>
+  <text x="628" y="145" class="sub">样式层：页面外观</text>
+
+  <rect x="205" y="245" width="250" height="86" class="box"/>
+  <text x="233" y="279" class="txt">tsconfig.json</text>
+  <text x="233" y="305" class="sub">类型检查层：编译规则</text>
+
+  <rect x="515" y="245" width="250" height="86" class="box"/>
+  <text x="543" y="279" class="txt">Vite</text>
+  <text x="543" y="305" class="sub">构建层：TS 转 JS、热更新</text>
+
+  <rect x="360" y="412" width="360" height="78" class="box"/>
+  <text x="388" y="445" class="txt">浏览器运行 JavaScript</text>
+  <text x="388" y="471" class="sub">类型在编译期检查，运行期执行 JS</text>
+
+  <path d="M 280 125 L 330 125" class="arrow"/>
+  <path d="M 550 125 L 600 125" class="arrow"/>
+  <path d="M 440 164 L 440 205 L 330 205 L 330 245" class="arrow"/>
+  <path d="M 725 164 L 725 205 L 640 205 L 640 245" class="arrow"/>
+  <path d="M 330 331 L 456 412" class="arrow"/>
+  <path d="M 640 331 L 612 412" class="arrow"/>
+
+  <text x="60" y="528" class="note">学习重点：TypeScript 的类型帮助你在开发期发现问题，浏览器最终运行的是 Vite 转换后的 JavaScript。</text>
+</svg>

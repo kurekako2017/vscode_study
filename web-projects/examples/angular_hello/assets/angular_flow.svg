@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="560" viewBox="0 0 1080 560" role="img" aria-labelledby="title desc">
+  <title id="title">Angular Hello 处理流程与分层</title>
+  <desc id="desc">Angular standalone component 示例从 HTML 宿主、main.ts 启动、AppComponent、模板样式到浏览器渲染的流程图。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .box { fill: #f8fafc; stroke: #1f2937; stroke-width: 2; rx: 10; }
+      .sub { font: 400 14px Arial, sans-serif; fill: #374151; }
+      .txt { font: 700 16px Arial, sans-serif; fill: #111827; }
+      .note { font: 400 13px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1080" height="560" fill="#ffffff"/>
+  <text x="48" y="44" class="title">Angular Hello 处理流程（standalone component）</text>
+
+  <rect x="60" y="86" width="220" height="78" class="box"/>
+  <text x="86" y="119" class="txt">src/index.html</text>
+  <text x="86" y="145" class="sub">HTML 宿主层：提供 app-root</text>
+
+  <rect x="330" y="86" width="220" height="78" class="box"/>
+  <text x="356" y="119" class="txt">src/main.ts</text>
+  <text x="356" y="145" class="sub">入口层：bootstrapApplication</text>
+
+  <rect x="600" y="86" width="260" height="78" class="box"/>
+  <text x="626" y="119" class="txt">AppComponent 类</text>
+  <text x="626" y="145" class="sub">@Component 元数据绑定模板样式</text>
+
+  <rect x="185" y="238" width="250" height="86" class="box"/>
+  <text x="213" y="272" class="txt">app.component.html</text>
+  <text x="213" y="298" class="sub">模板层：声明页面结构</text>
+
+  <rect x="495" y="238" width="250" height="86" class="box"/>
+  <text x="523" y="272" class="txt">app.component.css</text>
+  <text x="523" y="298" class="sub">组件样式层：限定组件外观</text>
+
+  <rect x="805" y="238" width="210" height="86" class="box"/>
+  <text x="833" y="272" class="txt">src/styles.css</text>
+  <text x="833" y="298" class="sub">全局样式层</text>
+
+  <rect x="345" y="404" width="390" height="86" class="box"/>
+  <text x="373" y="438" class="txt">Angular 编译与浏览器渲染</text>
+  <text x="373" y="464" class="sub">模板 + 类 + 样式组合成页面</text>
+
+  <path d="M 280 125 L 330 125" class="arrow"/>
+  <path d="M 550 125 L 600 125" class="arrow"/>
+  <path d="M 730 164 L 730 200 L 310 200 L 310 238" class="arrow"/>
+  <path d="M 730 164 L 730 200 L 620 200 L 620 238" class="arrow"/>
+  <path d="M 730 164 L 730 200 L 910 200 L 910 238" class="arrow"/>
+  <path d="M 310 324 L 438 404" class="arrow"/>
+  <path d="M 620 324 L 588 404" class="arrow"/>
+  <path d="M 910 324 L 704 404" class="arrow"/>
+
+  <text x="60" y="528" class="note">学习重点：Angular 当前示例有真实 TypeScript 类 AppComponent，HTML 模板与 CSS 通过 @Component 元数据挂到这个类上。</text>
+</svg>

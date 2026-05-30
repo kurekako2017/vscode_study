@@ -3,6 +3,16 @@
 > 目标：在 **Windows 11（UM890 Pro）** 上搭建一套“日常开发尽量在 Linux 里完成”的环境，做到接近 macOS 终端开发体验。  
 > 适用：Java / Python 项目开发、容器化测试、本地大模型辅助编码（Aider / VS Code Copilot Chat + 本地模型）。
 
+> 文档状态：这是合并后的主文档。原 `softbs/vscode/` 下同名文件已改为指向本文件的索引说明，后续只维护这一份，避免两处内容漂移。
+
+## 快速目录
+
+- 第 1-7 节：Win11、WSL2、Docker Desktop、VS Code Remote WSL 的基础环境。
+- 第 8-10 节：Java、Python、Docker 开发工具链。
+- 第 11 节：Ollama、Aider、CoPaw / OpenClaw 等本地模型辅助开发。
+- 第 12 节：日常工作流、Java / Python 调用示例、远程 Linux 部署、GitHub Actions、安全发布。
+- 第 13-18 节：故障排查、模拟 macOS 开发习惯、差异说明、自检清单和结论。
+
 ---
 
 ## 1. 你将得到什么

@@ -19,6 +19,16 @@
 
 参见 [Vite Configuration Reference](https://vite.dev/config/)。
 
+## 学习重点
+
+- `index.html`：页面宿主入口
+- `src/main.js`：Vue 应用启动入口
+- `src/App.vue`：单文件组件
+- `src/style.css`：全局样式
+- `vite.config.js`：Vite 与 Vue 插件配置
+
+更详细的处理流程图与分层说明见 [LEARN.md](LEARN.md)。
+
 ## 项目设置
 
 ```sh

@@ -23,6 +23,8 @@ npm run dev
 - `src/app/app.component.css`：组件样式
 - `angular.json`：Angular CLI 配置
 
+更详细的处理流程图与分层说明见 [LEARN.md](LEARN.md)。
+
 ### 快速启动（完整步骤）
 
 1. 确保已安装 Node.js（推荐 Node 16+）和 `@angular/cli`（可选，本示例的脚本会使用本地安装的 CLI）。

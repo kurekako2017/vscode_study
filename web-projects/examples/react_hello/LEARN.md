@@ -85,3 +85,38 @@
 ---
 
 如需我现在开始其中一项（例如：直接为 `src/App.jsx` 添加中文逐行注释，或在本机运行并修复依赖），回复要执行的步骤名称，我会继续并把变更写回仓库。
+
+---
+
+## React 处理流程图（当前项目）
+
+下面是 `react_hello` 的当前处理流程图（静态 SVG，兼容 GitHub / IDEA Markdown 预览）：
+
+![React 处理流程与分层](assets/react_flow.svg)
+
+### 当前文件分层说明
+
+| 文件 / 位置 | 分层 | 主要功能 | 学习重点 |
+| --- | --- | --- | --- |
+| `index.html` | HTML 宿主层 | 提供页面根节点 `<div id="root">`，Vite 从这里加载前端应用 | React 并不是直接替代 HTML，而是挂载到 HTML 根节点 |
+| `src/main.jsx` | React 入口层 | 导入 `React`、`ReactDOM`、`App` 和全局样式，调用 `createRoot(...).render(...)` | 理解 React 应用从哪里启动 |
+| `src/App.jsx` | 根组件 / 页面层 | 定义 `App` 函数组件，返回页面 JSX 结构 | 理解组件函数、JSX、页面结构 |
+| `src/style.css` | 样式层 | 定义全局字体、背景、布局、卡片和文字样式 | 理解样式如何影响 JSX 渲染结果 |
+| `package.json` | 工程配置层 | 定义 `dev`、`build` 等脚本和依赖 | 理解 npm 命令背后执行什么 |
+| `vite.config.js` | 构建工具层 | 配置 Vite 和 React 插件 | 理解开发服务器、热更新、打包入口 |
+
+### 后续扩展分层建议
+
+| 建议目录 / 文件 | 分层 | 适合放什么 |
+| --- | --- | --- |
+| `src/components/` | 通用组件层 | `Button`、`Card`、`Header` 等可复用 UI |
+| `src/views/` | 页面视图层 | `Home.jsx`、`About.jsx`、`Demo.jsx` 等路由页面 |
+| `src/hooks/` | 状态与逻辑复用层 | `useCounter`、`useFetch`、`useForm` 等自定义 Hook |
+| `src/services/` | API 访问层 | `fetch` / `axios` 请求封装 |
+| `src/context/` | 全局状态层 | `ThemeContext`、`UserContext` 等跨组件共享状态 |
+
+### 一句话理解
+
+```text
+index.html 提供挂载点 -> main.jsx 启动 React -> App.jsx 返回组件结构 -> style.css 控制外观 -> 浏览器渲染页面
+```

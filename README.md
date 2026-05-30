@@ -1,204 +1,132 @@
 # vscode_study 工作区入口
 
-这个目录是当前学习工作区的总入口。
+这是当前学习工作区的总入口。它把生成 AI、Agent、Java、Web、DevOps、SAP、LocalStack、WSL/VS Code 环境教程放在同一个目录里，方便按学习方向逐步推进。
 
-🚀 **新用户？从这里开始**: [QUICK_START_NAVIGATION.md](QUICK_START_NAVIGATION.md) — 30 秒进入开发状态 + 完整项目地图
+快速启动请先看：
 
-它的作用是：
+[QUICK_START_NAVIGATION.md](QUICK_START_NAVIGATION.md)
 
-- 说明这个工作区里有哪些主学习线
-- 给出每条主线最适合先看的入口文档
+## 主学习线
 
-## 当前主学习线
-
-### 1. LLM 应用开发主线
-
-如果你的目标是贴近日本 IT 现场、企业 PoC 和派遣案件要求，建议优先看：
-
-- [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md)
-
-这条线重点是：
-
-- 模型调用
-- 结构化输出
-- `RAG / 社内検索`
-- `FastAPI`
-- 企业集成
-- 评估与运维
-
-### 2. Agent 进阶主线
-
-如果你已经有了 `LLM 应用开发` 基础，再继续看：
-
-- [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md)
-
-这条线重点是：
-
-- Tool Calling
-- 单 Agent
-- 多 Agent
-- 工作流
-
-### 3. 对日 Java 开发主线
-
-如果你的目标是传统对日项目开发、Java、文档、流程和测试，建议看：
-
-- [java-lab/README.md](java-lab/README.md)
-
-这条线重点是：
-
-- Java
-- 对日项目常用工具
-- SQL 与数据库
-- 项目结构
-- 日式文档与测试资料
-
-### 4. DevOps / SRE 补充主线
-
-如果你想基于当前工作区已有内容补：
-
-- `Docker`
-- `CI/CD`
-- 自动化运维
-- `Kubernetes` 入门
-
-建议看：
-
-- [devops-lab/README.md](devops-lab/README.md)
-
-## 在 IDEA 里确认是否连的是 WSL
-
-如果你的目标是让 IDEA 通过 Remote Development 连接到 WSL，并且和 VS Code + WSL 保持同一套路径，那么重点不是“Windows 还是 WSL 机器”，而是“当前项目是不是在 WSL 文件系统里打开”。
-
-可以这样确认：
-
-- 在 IDEA 首页进入 `Remote Development`，再选择 `WSL` 的 `New Connection`。这表示 IDE 会把开发环境放到 WSL 里，而不是 Windows 本地环境。
-- 打开项目后，看项目根路径。如果路径是 `/home/victorkure/workspace/vscode_study`，说明你和 VS Code + WSL 用的是同一个 Linux 路径；如果是 `D:\...`、`C:\...`，那就是 Windows 本地路径。
-- 看 Terminal。若默认 shell 是 Linux shell，并且 `pwd` 输出 `/home/victorkure/workspace/vscode_study`，就说明当前终端确实连在 WSL 上。
-- 看解释器和 SDK 配置。Python、JDK、Node 等如果指向 WSL 路径，就说明工具链也在 WSL 中。
-
-如果你是为了和 VS Code 的 WSL 开发保持一致，建议统一使用同一个路径，例如 `/home/victorkure/workspace/vscode_study`，不要一边用 `D:\...`，一边用 `/home/...`。这样代码位置、依赖安装和终端环境都会一致。
-
-### 配置步骤
-
-第一步：打开远程开发入口
-
-1. 启动 IntelliJ IDEA，进入 Welcome 欢迎界面。
-2. 在左侧菜单栏中点击 `Remote Development`（远程开发）。
-3. 找到 `WSL` 选项，点击 `New Connection`（新建连接）。
-
-第二步：选择 WSL 发行版与项目路径
-
-1. `Linux distribution`：在下拉菜单中选择你正在使用的 WSL 子系统，例如 `Ubuntu`。
-2. `Project directory`：点击文件夹图标，选择你存储在 WSL 内的项目路径。
-3. 注意：请确保项目路径是在 Linux 内部，例如 `/home/victorkure/...`，而不是 `/mnt/c/...`，否则会拖慢文件读写性能。
-4. 点击 `Next`。
-
-第三步：下载并启动 IDE 后端
-
-1. `IDE version`：选择你想要在 WSL 内部运行的 IDEA 版本，建议选择最新推荐的 Stable 版本。
-2. 点击 `Start IDE and Connect`。
-3. 此时，IDEA 会自动在你的 WSL 子系统内部下载、解压并启动一个无界面的 IDE 后端（JetBrains Client Agent）。
-4. 下载完成后，Windows 侧会弹出一个专用的轻量级前端窗口（JetBrains Client），之后你就可以像操作本地 IDEA 一样写代码。
-
-💡 进阶技巧：使用 JetBrains Gateway 管理
-
-如果你每次打开 IDEA 都去找远程连接入口，建议下载官方的 JetBrains Gateway 独立软件（也可以通过 JetBrains Toolbox 安装）。
-
-1. 打开 JetBrains Gateway。
-2. 同样选择 WSL，它会自动扫描出当前运行的 Linux 子系统。
-3. 这样你可以统一管理所有的 WSL、SSH 远程项目，一键即可连接。
-
-## 推荐查看顺序
-
-如果你现在主要想学生成 AI 并贴日本现场：
-
-1. [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md)
-2. [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md)
-
-如果你现在主要想学对日 Java 开发：
-
-1. [java-lab/README.md](java-lab/README.md)
-
-如果你现在主要想补 `DevOps / SRE`：
-
-1. [devops-lab/README.md](devops-lab/README.md)
+| 学习线 | 入口 | 适合目标 |
+| --- | --- | --- |
+| LLM 应用开发 | [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md) | 模型调用、结构化输出、RAG、FastAPI、企业集成 |
+| Agent 进阶 | [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md) | Tool Calling、单 Agent、多 Agent、工作流 |
+| 对日 Java | [java-lab/README.md](java-lab/README.md) | Java、SQL、项目结构、日式文档、测试 |
+| Java 项目实战 | [java-projects/README.md](java-projects/README.md) | Spring Boot、前后端项目、部署练习 |
+| Web / 企业站 | [web-projects/README.md](web-projects/README.md) | React、Vue、Angular、Next.js、WordPress、企业官网 |
+| DevOps / SRE | [devops-lab/README.md](devops-lab/README.md) | Docker、CI/CD、Kubernetes、自动化运维 |
+| SAP | [sap-lab/README.md](sap-lab/README.md) | ABAP、CDS、RAP、CAP |
+| AWS 本地模拟 | [localstack-lab/README.md](localstack-lab/README.md) | LocalStack、S3、DynamoDB、本地云服务测试 |
+| 环境与工具教程 | [softbs/README.md](softbs/README.md) | WSL、VS Code、GitHub、Aider、OpenClaw、本地模型 |
+| 脚本工具 | [scripts/README.md](scripts/README.md) | WSL、Docker、LocalStack、部署脚本 |
 
 ## 当前目录概览
 
 ```text
 vscode_study/
-|-- ai-lab/          # 生成 AI 学习总入口
-|   |-- llm-lab/     # LLM 应用开发主线
-|   `-- agent-lab/   # Agent 进阶专题
-|-- java-lab/         # 对日 Java 开发主线
-|-- devops-lab/       # DevOps / SRE 补充主线
-|-- java-projects/    # Java 项目实战
-|-- python-projects/  # Python 项目
-|-- web-projects/     # Web 项目
-|-- sap-lab/          # SAP 学习资料
-`-- scripts/          # 脚本和工具
+  QUICK_START_NAVIGATION.md   # 快速导航
+  README.md                   # 本文件
+  ai-lab/                     # 生成 AI 学习总入口
+    llm-lab/                  # LLM 应用开发
+    agent-lab/                # AI Agent 工作流
+  java-lab/                   # 对日 Java 学习资料
+  java-projects/              # Java 项目实战
+  web-projects/               # Web 示例、企业站、WordPress、插件
+  devops-lab/                 # Docker / CI/CD / Kubernetes
+  sap-lab/                    # SAP 学习资料和项目
+  localstack-lab/             # AWS 本地模拟学习
+  python-projects/            # Python 历史/补充项目
+  scripts/                    # 自动化脚本
+  softbs/                     # 软件、环境、AI 编程工具教程
+  docs/                       # 工作区环境和运行说明
 ```
 
-## Agent Demos — 快速学习路线
+## 推荐查看顺序
 
-本工作区在 `ai-lab/agent-lab/projects/` 下包含一组教学用的 Python demo，用于示范 RAG、Tool Calling、结构化输出与工作流分阶段设计。每个 demo 的详细学习要点见各自的 `README_LEARN.md`。下面是汇总与快速运行示例：
+### 如果你现在主要想学生成 AI 并贴近日本现场
 
-- `ai-lab/agent-lab/projects/chat_cli/` — Minimal CLI chat demo
-  - 快速运行（mock）:
-    ```bash
-    python3 ai-lab/agent-lab/projects/chat_cli/main.py --mock "你好，帮我总结"
-    ```
-  - 快速运行（real）:
-    ```bash
-    OPENAI_API_KEY=sk-... python3 ai-lab/agent-lab/projects/chat_cli/main.py --real "请总结文档"
-    ```
+1. [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md)
+2. [ai-lab/llm-lab/examples/README.md](ai-lab/llm-lab/examples/README.md)
+3. [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md)
+4. [ai-lab/agent-lab/projects/chat_cli/README.md](ai-lab/agent-lab/projects/chat_cli/README.md)
 
-- `ai-lab/agent-lab/projects/doc_qa_agent/` — 本地 RAG（文件切分 + 关键词检索）
-  - 快速运行（mock）:
-    ```bash
-    python3 ai-lab/agent-lab/projects/doc_qa_agent/main.py --mock --docs ai-lab "项目简介是什么"
-    ```
+没有 API Key 时，优先使用 mock 模式：
 
-- `ai-lab/agent-lab/projects/rag_api_demo/` — FastAPI RAG 微服务示例（/ask, /reload, /health）
-  - 启动服务（mock）:
-    ```bash
-    cd ai-lab/agent-lab/projects/rag_api_demo
-    RAG_API_MOCK=1 uvicorn main:app --reload --port 8000
-    ```
-  - 测试接口:
-    ```bash
-    curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档"}'
-    ```
+```bash
+python3 ai-lab/agent-lab/projects/chat_cli/main.py --mock "你好，帮我总结"
+```
 
-- `ai-lab/agent-lab/projects/structured_output_demo/` — 演示 Pydantic 结构化输出解析
-  - 快速运行（mock）:
-    ```bash
-    python3 ai-lab/agent-lab/projects/structured_output_demo/main.py --mock "请生成计划"
-    ```
+### 如果你现在主要想学 Web / 前端 / 企业站
 
-- `ai-lab/agent-lab/projects/tool_agent_demo/` — Tool-calling agent 示例（本地工具：list/read/search）
-  - 快速运行（mock）:
-    ```bash
-    python3 ai-lab/agent-lab/projects/tool_agent_demo/main.py --mock --workdir ai-lab "查找关键字"
-    ```
+1. [web-projects/README.md](web-projects/README.md)
+2. [web-projects/examples/README.md](web-projects/examples/README.md)
+3. [web-projects/sample/README.md](web-projects/sample/README.md)
 
-- `ai-lab/agent-lab/projects/workflow_agent/` — 三阶段工作流示例（analyze → plan → finalize）
-  - 快速运行（mock）:
-    ```bash
-    python3 ai-lab/agent-lab/projects/workflow_agent/main.py --mock "请制定发布计划"
-    ```
+先从最小示例开始：
 
-每个项目目录下的 `README_LEARN.md` 包含更多学习建议与练习题，建议先以 mock 模式熟悉行为，再在有 `OPENAI_API_KEY` 的环境切换到 real 测试。
+```bash
+cd web-projects/examples/typescript_hello
+npm install
+npm run dev
+```
 
-## 使用建议
+### 如果你现在主要想学对日 Java 开发
 
-- 先选一条主线，不要多个方向同时发散。
-- 如果你的目标是日本现场生成 AI 开发，优先顺序是：
-  - `llm-lab`
-  - `agent-lab`
-- 如果你的目标是传统对日系统开发，优先看：
-  - `java-lab`
+1. [java-lab/README.md](java-lab/README.md)
+2. [java-projects/README.md](java-projects/README.md)
+3. [devops-lab/README.md](devops-lab/README.md)
+
+示例启动：
+
+```bash
+cd java-projects/JtProject
+./mvnw spring-boot:run
+```
+
+### 如果你现在主要想补 DevOps / SRE
+
+1. [devops-lab/README.md](devops-lab/README.md)
+2. [devops-lab/QUICK_REFERENCE.md](devops-lab/QUICK_REFERENCE.md)
+3. [localstack-lab/README.md](localstack-lab/README.md)
+
+## WSL / VS Code / IDEA 建议
+
+建议统一使用 WSL 文件系统中的工作区路径，例如：
+
+```text
+/home/victorkure/workspace/vscode_study
+```
+
+不要一边用 Windows 路径 `D:\...`，一边用 WSL 路径 `/home/...`。统一路径可以减少依赖安装、终端环境、文件权限和构建缓存问题。
+
+### VS Code
+
+推荐使用 Remote - WSL 打开本工作区：
+
+```bash
+cd /home/victorkure/workspace/vscode_study
+code .
+```
+
+### IntelliJ IDEA / JetBrains Gateway
+
+如果使用 IDEA Remote Development：
+
+1. 打开 `Remote Development`。
+2. 选择 `WSL`。
+3. 选择 Ubuntu 发行版。
+4. 项目路径选择 `/home/victorkure/workspace/vscode_study`。
+5. 打开后检查 Terminal 的 `pwd` 是否仍是这个路径。
+
+如果看到的是 `D:\...` 或 `C:\...`，说明当前不是 WSL 内部项目路径。
+
+更详细的环境教程见：
+
+- [softbs/vscode/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md](softbs/vscode/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md)
+- [softbs/vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md](softbs/vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md)
+- [docs/workspace-env-setup.md](docs/workspace-env-setup.md)
+- [docs/workspace-run-guide.md](docs/workspace-run-guide.md)
 
 ## 非 Java 运行入口
 
@@ -207,3 +135,10 @@ vscode_study/
 - [全局环境安装说明](docs/workspace-env-setup.md)
 - [非 Java 项目最短启动清单](docs/workspace-run-guide.md)
 - [VS Code 插件清单](docs/vscode-plugin-list.md)
+
+## 一句话速记
+
+```text
+不知道看哪里：先看 QUICK_START_NAVIGATION.md。
+AI 看 ai-lab，Web 看 web-projects，Java 看 java-lab/java-projects，环境看 softbs/vscode。
+```

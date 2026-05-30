@@ -1,7 +1,7 @@
-# 🚀 VS Code 操作指南 - 完全入门教程
+# VS Code 操作指南
 
-> 为 SAP 学习者优化的 VS Code 使用指南  
-> 涵盖快捷键、功能和最佳实践
+> 面向当前 `vscode_study` 工作区的 VS Code 使用指南。  
+> 覆盖基础快捷键、Markdown 阅读、Python/Java/Web 开发、WSL 远程开发和常用扩展工具。
 
 ---
 
@@ -221,7 +221,7 @@ Ctrl + Shift + E      ← 打开文件浏览器
   # 标题
   - 列表
   **加粗**
-  [链接](url)
+  [链接](https://example.com)
 ```
 
 #### 2️⃣ 预览模式（格式化显示）⭐ 推荐阅读
@@ -396,6 +396,7 @@ Ctrl + K Z    ← 禅模式（最小干扰编辑）
   5. 快速切换：Ctrl + 1/2/3 在编辑器间切换
 
 结果：左边编码，右边看文档说明，底部运行命令
+```
 
 ---
 
@@ -441,14 +442,6 @@ Ctrl + K Z    ← 禅模式（最小干扰编辑）
 - **使用虚拟环境（推荐）**：在项目根创建 `.venv`，并在 `settings.json` 或命令面板中选择该解释器，保证依赖在项目隔离环境内。
 
 ---
-
-如果你希望，我可以：
-
-- 把上述快捷键整理为可打印的 cheatsheet（PDF/MD），或
-- 把常用操作（选择解释器、创建 venv、运行测试、格式化）写成脚本或任务（`.vscode/tasks.json`），一键运行。
-
-请选择需要的后续操作，我来继续实现。
-```
 
 #### 🔍 调试时（专注）
 ```
@@ -556,41 +549,98 @@ Ctrl + Shift + D 打开运行和调试
 
 ### 5️⃣ 扩展（插件）
 
-```
-Ctrl + Shift + X 打开扩展市场
-
-为 SAP 项目推荐安装的扩展：
-
-📦 必装（提高效率）：
-  • REST Client (humao.rest-client)
-    → 直接在 VS Code 中测试 API
-  • Thunder Client (rangav.vscode-thunder-client)
-    → 内置的 API 测试工具
-  • GitLens (eamodio.gitlens)
-    → 增强 Git 功能
-  • ES7+ React/Redux/React-Native snippets
-    → 快速输入代码片段
-
-📦 推荐（针对 SAP）：
-  • SAP ABAP (larshp.vscode-abap)
-    → ABAP 语言支持
-  • SAP Fiori tools (sapse.appbuilder-ext-web)
-    → SAPUI5 开发工具
-
-📦 可选（增强体验）：
-  • Prettier (esbenp.prettier-vscode)
-    → 自动格式化代码
-  • Error Lens (usernamehw.errorlens)
-    → 显示错误和警告信息
-  • Better Comments (aaron-bond.better-comments)
-    → 彩色注释
+快捷键：`Ctrl + Shift + X` 打开扩展市场。
 
 安装方法：
-  1. 搜索扩展名
-  2. 点击"安装"按钮
-  3. 等待安装完成
-  4. 可能需要重启 VS Code
+
+1. 搜索扩展名或扩展 ID。
+2. 点击 `Install`。
+3. 如果是在 WSL 项目里开发，确认扩展安装位置是 `WSL: Ubuntu`。
+4. 安装后按 `Ctrl + Shift + P`，执行 `Developer: Reload Window` 重新加载窗口。
+
+### VS Code + WSL 常用开发扩展
+
+这些扩展适合当前工作区的 WSL 开发方式。优先安装在 WSL 远程环境里，而不是只装在 Windows 本地。
+
+#### 基础必装
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| WSL | `ms-vscode-remote.remote-wsl` | 从 Windows VS Code 连接 WSL Ubuntu，直接编辑 Linux 文件系统 |
+| Dev Containers | `ms-vscode-remote.remote-containers` | 打开 `.devcontainer` 项目，统一容器开发环境 |
+| GitLens | `eamodio.gitlens` | 查看 Git 历史、改动作者、提交记录 |
+| Error Lens | `usernamehw.errorlens` | 把错误和警告直接显示在代码行旁边 |
+| Prettier | `esbenp.prettier-vscode` | 自动格式化 JavaScript、TypeScript、HTML、CSS、JSON、Markdown |
+| EditorConfig | `editorconfig.editorconfig` | 统一缩进、换行、编码等项目格式 |
+
+#### Python / LLM 开发
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| Python | `ms-python.python` | Python 运行、调试、虚拟环境选择 |
+| Pylance | `ms-python.vscode-pylance` | Python 智能提示、类型分析、跳转定义 |
+| Jupyter | `ms-toolsai.jupyter` | Notebook、实验代码、数据分析 |
+| Ruff | `charliermarsh.ruff` | Python lint 和格式化，速度快 |
+| Python Debugger | `ms-python.debugpy` | Python 调试支持 |
+
+#### Java / Spring Boot
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| Extension Pack for Java | `vscjava.vscode-java-pack` | Java 语法、调试、测试、Maven 基础套件 |
+| Spring Boot Extension Pack | `vmware.vscode-boot-dev-pack` | Spring Boot 项目识别、运行、配置提示 |
+| Maven for Java | `vscjava.vscode-maven` | Maven 项目、依赖、生命周期命令 |
+
+#### Web / 前端
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| ESLint | `dbaeumer.vscode-eslint` | JavaScript / TypeScript 代码检查 |
+| npm Intellisense | `christian-kohler.npm-intellisense` | npm 包导入提示 |
+| Path Intellisense | `christian-kohler.path-intellisense` | 文件路径自动补全 |
+| Tailwind CSS IntelliSense | `bradlc.vscode-tailwindcss` | Tailwind 类名提示 |
+| ES7+ React snippets | `dsznajder.es7-react-js-snippets` | React 常用代码片段 |
+| Vue - Official | `Vue.volar` | Vue 3 语法、类型和 SFC 支持 |
+
+#### API / Docker / DevOps
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| REST Client | `humao.rest-client` | 在 `.http` 文件里直接请求 API |
+| Thunder Client | `rangav.vscode-thunder-client` | 图形化 API 测试工具 |
+| Docker | `ms-azuretools.vscode-docker` | 查看镜像、容器、compose、日志 |
+| YAML | `redhat.vscode-yaml` | GitHub Actions、K8s、Docker Compose YAML 提示 |
+| Kubernetes | `ms-kubernetes-tools.vscode-kubernetes-tools` | K8s 资源查看和 YAML 辅助 |
+
+#### Markdown / 文档
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| Markdown All in One | `yzhang.markdown-all-in-one` | 目录、快捷键、表格、预览增强 |
+| markdownlint | `DavidAnson.vscode-markdownlint` | Markdown 格式检查 |
+| Code Spell Checker | `streetsidesoftware.code-spell-checker` | 英文拼写检查 |
+
+#### SAP 可选
+
+| 扩展 | ID | 用途 |
+| --- | --- | --- |
+| SAP ABAP | `larshp.vscode-abap` | ABAP 语言支持 |
+| SAP Fiori tools | `sapse.appbuilder-ext-web` | SAPUI5 / Fiori 开发辅助 |
+
+### WSL 扩展安装位置怎么确认
+
+打开一个 WSL 项目后，扩展面板里通常会出现两个区域：
+
+```text
+Local - Installed        # 安装在 Windows 本地
+WSL: Ubuntu - Installed  # 安装在 WSL 远程环境
 ```
+
+建议：
+
+- 和语言运行时有关的扩展装到 `WSL: Ubuntu`，例如 Python、Pylance、Java、ESLint。
+- 只影响界面的扩展可以装在本地，例如主题、图标主题。
+- 如果代码提示不工作，先看扩展是否装错位置，再执行 `Developer: Reload Window`。
 
 ---
 
@@ -966,11 +1016,11 @@ Ctrl + Shift + I  格式化整个文件
 
 ---
 
-**现在你已经准备好用 VS Code 开始 SAP 学习了！** 🚀
+**现在你已经准备好用 VS Code + WSL 开始当前工作区的学习和开发了。**
 
 建议接下来：
 1. 尝试 Ctrl + P 快速打开文件
 2. 按 Ctrl + ` 打开终端
-3. 运行：`npm run case:1`
+3. 打开 [QUICK_START_NAVIGATION.md](../../QUICK_START_NAVIGATION.md) 选择学习方向
 4. 观察输出结果
-5. 恭喜！你已经开始学习 SAP 了！ 🎉
+5. 从 `ai-lab`、`web-projects`、`java-lab` 或 `devops-lab` 中选择一个方向持续推进

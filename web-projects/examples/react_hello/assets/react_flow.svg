@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
+    .react { fill:#eef6ff; stroke:#2563eb; stroke-width:1.8; rx:8; }
+    .stylebox { fill:#f0fdf4; stroke:#16a34a; stroke-width:1.6; rx:8; }
+    .future { fill:#fff7ed; stroke:#f97316; stroke-width:1.6; rx:8; stroke-dasharray:6 4; }
+    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; }
+    .title { font-size:20px; font-weight:700; }
+    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="40" y="38" class="text title">react_hello - React 处理流程与分层</text>
+
+  <rect x="60" y="80" width="240" height="82" class="box" />
+  <text x="180" y="114" text-anchor="middle" class="text">index.html</text>
+  <text x="180" y="138" text-anchor="middle" class="small">HTML 宿主页面</text>
+  <text x="180" y="156" text-anchor="middle" class="small">提供 &lt;div id="root"&gt;</text>
+
+  <rect x="370" y="80" width="260" height="82" class="react" />
+  <text x="500" y="114" text-anchor="middle" class="text">src/main.jsx</text>
+  <text x="500" y="138" text-anchor="middle" class="small">React 应用入口</text>
+  <text x="500" y="156" text-anchor="middle" class="small">createRoot(...).render(&lt;App /&gt;)</text>
+
+  <rect x="700" y="80" width="260" height="82" class="react" />
+  <text x="830" y="114" text-anchor="middle" class="text">src/App.jsx</text>
+  <text x="830" y="138" text-anchor="middle" class="small">根组件 / 页面壳</text>
+  <text x="830" y="156" text-anchor="middle" class="small">返回 JSX 页面结构</text>
+
+  <rect x="700" y="230" width="260" height="82" class="stylebox" />
+  <text x="830" y="264" text-anchor="middle" class="text">src/style.css</text>
+  <text x="830" y="288" text-anchor="middle" class="small">全局样式层</text>
+  <text x="830" y="306" text-anchor="middle" class="small">布局、卡片、文字样式</text>
+
+  <rect x="60" y="390" width="260" height="86" class="future" />
+  <text x="190" y="424" text-anchor="middle" class="text">components/*</text>
+  <text x="190" y="448" text-anchor="middle" class="small">组件层（后续扩展）</text>
+  <text x="190" y="466" text-anchor="middle" class="small">Button / Card / Header</text>
+
+  <rect x="430" y="390" width="260" height="86" class="future" />
+  <text x="560" y="424" text-anchor="middle" class="text">views/*</text>
+  <text x="560" y="448" text-anchor="middle" class="small">页面层（后续扩展）</text>
+  <text x="560" y="466" text-anchor="middle" class="small">Home / About / Demo</text>
+
+  <rect x="800" y="390" width="260" height="86" class="future" />
+  <text x="930" y="424" text-anchor="middle" class="text">services/* / hooks/*</text>
+  <text x="930" y="448" text-anchor="middle" class="small">数据与逻辑层（后续扩展）</text>
+  <text x="930" y="466" text-anchor="middle" class="small">fetch / useState / useEffect</text>
+
+  <rect x="320" y="570" width="480" height="76" class="box" />
+  <text x="560" y="602" text-anchor="middle" class="text">浏览器渲染结果</text>
+  <text x="560" y="626" text-anchor="middle" class="small">Vite dev server 提供页面，React 更新 DOM</text>
+
+  <path d="M300 121 L370 121" class="arrow" />
+  <path d="M630 121 L700 121" class="arrow" />
+  <path d="M830 162 L830 230" class="arrow" />
+  <path d="M830 312 L830 350 L560 350 L560 570" class="arrow" />
+  <path d="M830 162 C 760 250, 620 330, 560 390" class="arrow" />
+  <path d="M830 162 C 660 260, 350 300, 190 390" class="arrow" />
+  <path d="M830 162 C 930 250, 980 320, 930 390" class="arrow" />
+  <path d="M190 476 L190 520 L560 520 L560 570" class="arrow" />
+  <path d="M560 476 L560 570" class="arrow" />
+  <path d="M930 476 L930 520 L560 520 L560 570" class="arrow" />
+
+  <text x="40" y="690" class="small">实线框表示当前项目已有文件；虚线框表示后续学习时建议扩展的 React 分层。</text>
+</svg>

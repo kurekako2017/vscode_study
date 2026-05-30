@@ -1,347 +1,152 @@
-# Web Projects - 网站开发项目
+# Web Projects
 
-## 📚 文档导航
+`web-projects` 是 Web 学习、企业网站方案、前端示例、实战样板和 WordPress 插件相关内容的总目录。
 
-### 🇯🇵 日本企业网站开发完全指南【推荐】
+## 先看这里
 
-1. **[WordPress 公司网站制作完全指南.md](docs/wordpress/WordPress%20公司网站制作完全指南.md)** - WordPress公司网站制作完全指南【主题对比推荐】
-   - Kadence、Elementor、Cocoon、Lightning主题对比
-   - 推荐组合方案（免费/付费）
-   - 各主题详细安装配置指南
-   - 30分钟快速上手指南
-   - SEO优化、性能优化、安全设置
+| 你想做什么 | 推荐入口 |
+| --- | --- |
+| 学 React / Vue / Angular / Next.js / TypeScript 最小项目 | [examples/README.md](examples/README.md) |
+| 看前后端组合项目、企业站样板、Codespaces 模板 | [sample/README.md](sample/README.md) |
+| 做日本企业官网、WordPress、报价、SEO、邮箱、域名配置 | [docs/](docs/) |
+| 看 WordPress 插件或平台扩展代码 | [plugins/](plugins/) |
+| 看部署脚本、onamae / headless 相关辅助脚本 | [deploy/](deploy/) |
 
-2. **[WordPress Cocoon主题完全开发指南.md](docs/wordpress/WordPress%20Cocoon主题完全开发指南.md)** - Cocoon主题完全开发指南【最推荐】
-   - Cocoon主题介绍与优势
-   - 30分钟快速安装配置
-   - 企业网站页面模板（可直接复制使用）
-   - 功能模块配置（短代码/按钮/标签页）
-   - 自定义设计与性能优化
-   - IT咨询/制造业实战案例
+## 目录说明
 
-3. **[日本企业网站解决方案.md](docs/solutions/日本企业网站解决方案.md)** - 日本企业网站完整开发指南（中文）
-   - 4种开发方案对比 (WordPress单体/Bootstrap Studio/VSCode/Elementor Pro)
-   - 免费邮件/新闻功能实现
-   - 部署设置 (onamae.com RSプラン)
-   - 分阶段升级策略
-
-4. **[WordPress快速入门.md](docs/wordpress/WordPress快速入门.md)** - 30分クイックスタート
-   - 問い合わせフォーム設定
-   - メール送信設定 (WP Mail SMTP)
-   - 基本ページ作成
-   - セキュリティ設定
-
-5. **[成本比较与实际案例.md](docs/quotes/成本比较与实际案例.md)** - コスト比較・実例
-   - 詳細コスト比較表
-   - 実際の制作例3件
-   - 規模別・業種別推奨方案
-   - ROI計算・年間総コスト
-
-### 🎓 通用开发教程
-
-6. **[网站开发指南.md](docs/tutorials/网站开发指南.md)** - 网站开发完整教程
-   - VS Code 网页制作基础
-   - WordPress 开发方案
-   - Bootstrap Studio 集成
-   - 现代开发工具和模板
-
-7. **[邮件服务器部署与功能实现完整指南.md](docs/email/邮件服务器部署与功能实现完整指南.md)** - 邮件和新闻功能实现
-   - 邮件服务器部署
-   - 邮件发送功能
-   - 新闻提交管理
-   - 生产环境部署
-
-8. **[邮件服务快速部署指南.md](docs/email/邮件服务快速部署指南.md)** - 5分钟快速上手
-   - 快速部署邮件服务
-   - 简化版实现
-   - 常见问题解决
-
-9. **[SEO优化指南.md](docs/seo/SEO优化指南.md)** - SEO 优化指南
-   - 已上线网站SEO工具
-   - 本地环境SEO检查
-   - 关键词研究优化
-   - WordPress SEO优化
-
-### 💼 业务文档
-
-10. **[网页制作报价标准.md](docs/quotes/网页制作 报价标准（通用版）.md)** - 网页制作报价标准
-   - 页面制作费用
-   - 服务器维护费用
-   - 企业邮箱年费
-   - 完整案例计算
-
-11. **[电商网站报价方案.md](docs/quotes/电商网站报价方案.md)** - 电商网站报价方案
-    - 购物网站功能模块
-    - 电商平台报价
-    - 支付集成费用
-
-12. **[邮箱服务器配置.md](docs/email/邮箱服务器配置.md)** - 邮箱服务器配置
-    - 域名和邮箱配置
-    - SMTP设置
-    - 企业邮箱方案
-
-13. **[gk-fuji 域名跳转教程](docs/domain/gk-fuji-%E5%9F%9F%E5%90%8D%E8%B7%B3%E8%BD%AC%E6%95%99%E7%A8%8B.md)** - gk-fuji.co.jp 到 gk-fuji.jp 跳转方案
-   - onamae.com 域名转发思路
-   - 服务器层 301 跳转配置
-   - WordPress 跳转注意事项
-   - 未来 gk-fuji.jp 废止迁移方案
-
----
-
-## 🚀 快速开始
-
-### 🏆 最推荐：使用Cocoon主题制作企业网站
-
-```bash
-# 🎯 超快速路径：1-2天完成专业企业网站
-1. 阅读 docs/wordpress/WordPress%20Cocoon主题完全开发指南.md
-2. 安装WordPress + Cocoon主题（免费）
-3. 直接复制使用页面模板代码
-4. 自定义公司信息和图片
-5. 🎉 完成专业企业网站！
-
-✅ 成本：¥0（完全免费）
-✅ 时间：1-2天
-✅ 特点：日本制作、SEO优化、高速、响应式
-✅ 无需编程知识
-```
-
-### 日本企業サイトを作りたい方
-
-```bash
-# 其他方案选择
-1. docs/solutions/日本企业网站解决方案.md - 4种方案对比
-2. docs/wordpress/WordPress快速入门.md - Lightning主题30分钟快速启动
-3. docs/quotes/成本比较与实际案例.md - 查看实际案例和成本
-
-コスト: ¥0-¥9,000/年
-時間: 1-7日
-```
-
-### どの方案を選ぶか迷っている方
-
-```bash
-# 方案比較チャート
-docs/solutions/日本企业网站解决方案.md を確認
-
-推奨:
-- 初めて → WordPress単体 (¥0)
-- デザイン重視 → Elementor Pro (¥9,000/年)
-- 完全カスタム → VSCode開発 (¥0、時間投資大)
-```
-
-### 実例・コストを知りたい方
-
-```bash
-# 実際の制作例を確認
-docs/quotes/成本比较与实际案例.md
-
-含まれる内容:
-✅ 中小企業の実例3件
-✅ 規模別・業種別推奨方案
-✅ ROI計算
-✅ 年間総コスト比較
-```
-
----
-
-## 🚀 その他の開発ガイド
-
-### 方案一：纯静态网站（最简单）
-
-```bash
-# 使用 Vite
-npm create vite@latest my-site
-cd my-site
-npm install
-npm run dev
-```
-
-### 方案二：邮件功能网站
-
-```bash
-# 创建项目
-mkdir my-website
-cd my-website
-npm init -y
-
-# 安装依赖
-npm install express nodemailer dotenv body-parser cors
-
-# 创建文件
-# 参考 docs/email/邮件服务快速部署指南.md
-
-# 启动
-node server.js
-```
-
-### 方案三：WordPress 网站
-
-```bash
-# 1. 下载 LocalWP: https://localwp.com
-# 2. 创建新站点
-# 3. 安装主题（Astra/OceanWP）
-# 4. 安装 Elementor
-# 5. 开始设计
-```
-
-### 方案四：Next.js 现代应用
-
-```bash
-npx create-next-app@latest my-site
-cd my-site
-npm run dev
-```
-
----
-
-## 📂 项目结构
-
-```
+```text
 web-projects/
-├── README.md                              # 本文件
-├── docs/
-│   ├── wordpress/
-│   │   ├── WordPress 公司网站制作完全指南.md
-│   │   └── WordPress Cocoon主题完全开发指南.md
-│   ├── tutorials/
-│   │   └── 网站开发指南.md               # 开发教程
-│   ├── email/
-│   │   ├── 邮件服务器部署与功能实现完整指南.md # 邮件新闻实现
-│   │   └── 邮件服务快速部署指南.md       # 快速部署
-│   ├── quotes/
-│   │   ├── 成本比较与实际案例.md
-│   │   ├── 网页制作 报价标准（通用版）.md  # 报价标准
-│   │   └── 电商网站报价方案.md
-│   ├── seo/
-│   │   └── SEO优化指南.md
-│   ├── solutions/
-│   │   └── 日本企业网站解决方案.md
-│   └── domain/
-│       └── gk-fuji-域名跳转教程.md
-└── sample/company-website/                # 公司网站项目
-   ├── docs/
-   │   ├── DEPLOYMENT.md
-   │   └── GETTING_STARTED.md
-   └── [项目文件...]
+  README.md       # 本文件，作为 web-projects 总入口
+  examples/       # 框架最小 hello 示例
+  sample/         # 更接近实战的组合项目和项目模板
+  docs/           # 网站制作、WordPress、SEO、邮箱、报价、域名等文档
+  plugins/        # WordPress 插件或平台扩展代码
+  deploy/         # 部署、同步、上传相关脚本
 ```
 
----
+一句话区分：
 
-## 💡 技术栈选择
+```text
+examples 学单点技术，sample 学项目组合，docs 学建站方案，plugins 放扩展代码，deploy 放部署脚本。
+```
 
-### 静态网站
-- **HTML + CSS + JavaScript** - 最基础
-- **Bootstrap** - 快速响应式
-- **Tailwind CSS** - 现代工具优先
+## Examples 示例
 
-### 动态网站
-- **Node.js + Express** - 轻量级后端
-- **WordPress** - CMS 管理
-- **Next.js** - React 全栈
+`examples/` 偏“最小可运行项目”，用于学习单个框架或语言的启动方式。
 
-### 邮件服务
-- **Nodemailer** - Node.js 邮件
-- **Gmail SMTP** - 免费方案
-- **阿里云/腾讯云** - 企业方案
+| 项目 | 用途 |
+| --- | --- |
+| `react_hello` | React + Vite 基础示例，含 React 处理流程图 |
+| `vue_hello` | Vue 3 + Vite 基础示例，含 Vue 处理流程图 |
+| `angular_hello` | Angular standalone component 基础示例，含 Angular 处理流程图 |
+| `next_hello` | Next.js Pages Router 基础示例，含 Next.js 处理流程图 |
+| `typescript_hello` | Vanilla TypeScript + Vite 基础示例，含 TypeScript 处理流程图 |
+| `headless-nextjs` | Next.js + Headless CMS / WordPress API 进阶示例 |
 
-### 数据库
-- **MySQL** - 关系型数据库
-- **MongoDB** - NoSQL 文档
-- **PostgreSQL** - 高级特性
+详细说明见：[examples/README.md](examples/README.md)
 
----
+## Sample 项目
 
-## 🛠️ 常用命令
+`sample/` 偏“实战样板”，用于学习前后端联调、企业站项目组织、Dev Container、部署准备等。
 
-### 开发命令
+| 项目 | 用途 |
+| --- | --- |
+| `react-node-demo` | 最小 React + Express 前后端联调 demo |
+| `react-node-template` | 本地 VS Code React + Node 开发模板 |
+| `codespaces-react-node-template` | GitHub Codespaces / Dev Container 模板 |
+| `company-website` | Next.js + Supabase 企业官网全栈样板 |
+| `web-learning-site` | 企业官网学习路线和静态前端原型 |
+
+详细说明见：[sample/README.md](sample/README.md)
+
+## Docs 文档
+
+`docs/` 是网站制作和业务方案文档集合。
+
+### WordPress / 企业官网
+
+- [WordPress 公司网站制作完全指南.md](docs/wordpress/WordPress%20公司网站制作完全指南.md)
+- [WordPress Cocoon主题完全开发指南.md](docs/wordpress/WordPress%20Cocoon主题完全开发指南.md)
+- [WordPress快速入门.md](docs/wordpress/WordPress快速入门.md)
+- [WordPress Headless 开发完整流程（2026主流方案）.md](docs/wordpress/WordPress%20Headless%20开发完整流程（2026主流方案）.md)
+
+### 日本企业网站方案
+
+- [日本企业网站解决方案.md](docs/solutions/日本企业网站解决方案.md)
+- [日本企业网站开发方案指南.md](docs/solutions/日本企业网站开发方案指南.md)
+- [日本企业网站完整开发指南 🇯🇵.md](docs/solutions/日本企业网站完整开发指南%20🇯🇵.md)
+
+### 教程
+
+- [VS Code 静态网页快速教程.md](docs/tutorials/VS%20Code%20静态网页快速教程.md)
+- [VS Code + Bootstrap + WordPress 后台建站教程.md](docs/tutorials/VS%20Code%20+%20Bootstrap%20+%20WordPress%20后台建站教程.md)
+- [30分钟完成带联系表单的企业网站上线 .md](docs/tutorials/30分钟完成带联系表单的企业网站上线%20.md)
+
+### 邮箱 / 域名 / SEO
+
+- [邮件服务快速部署指南.md](docs/email/邮件服务快速部署指南.md)
+- [邮件服务器部署与功能实现完整指南.md](docs/email/邮件服务器部署与功能实现完整指南.md)
+- [域名和邮箱服务器配置指南.md](docs/domain/域名和邮箱服务器配置指南.md)
+- [gk-fuji 域名跳转教程.md](docs/domain/gk-fuji-域名跳转教程.md)
+- [SEO优化指南.md](docs/seo/SEO优化指南.md)
+- [静态企业网站 SEO 检查与修改实操指南.md](docs/seo/静态企业网站%20SEO%20检查与修改实操指南.md)
+
+### 报价 / 成本
+
+- [网页制作 报价标准（通用版）.md](docs/quotes/网页制作%20报价标准（通用版）.md)
+- [电商网站报价方案.md](docs/quotes/电商网站报价方案.md)
+- [购物网站制作报价方案（通用版）.md](docs/quotes/购物网站制作报价方案（通用版）.md)
+- [企業サイト制作 完全コスト比較 & 実例.md](docs/quotes/企業サイト制作%20完全コスト比較%20&%20実例.md)
+
+## Plugins 是什么
+
+这里的 `plugins/` 指平台扩展或插件代码，目前主要是 WordPress 插件：
+
+- [plugins/ai-codex-agent/README.md](plugins/ai-codex-agent/README.md)
+
+一句话理解：
+
+```text
+plugins = 给 WordPress、构建工具或平台增加能力的扩展模块。
+```
+
+注意：它和浏览器插件不是同一类东西。这里更接近“安装到 WordPress 或项目里的功能扩展”。
+
+## Deploy 脚本
+
+`deploy/` 存放部署和同步相关脚本：
+
+- `export-and-upload.sh`：导出并上传相关资源。
+- `setup-headless-onamae.sh`：Headless / onamae 相关部署初始化。
+- `sync-staging-to-prod.sh`：从 staging 同步到 production 的辅助脚本。
+
+使用脚本前建议先打开脚本确认变量、目标服务器和路径，避免误操作。
+
+## 快速选择
+
+| 学习阶段 | 建议 |
+| --- | --- |
+| 刚学前端 | 从 `examples/typescript_hello`、`examples/react_hello` 或 `examples/vue_hello` 开始 |
+| 想理解前后端联调 | 看 `sample/react-node-demo` |
+| 想用 VS Code 做全栈模板 | 看 `sample/react-node-template` |
+| 想做企业官网 | 看 `sample/company-website` 和 `docs/wordpress/` |
+| 想做日本客户网站方案 | 看 `docs/solutions/` 和 `docs/quotes/` |
+| 想做 WordPress + AI 扩展 | 看 `plugins/ai-codex-agent` 和 `examples/headless-nextjs` |
+
+## 常用命令
+
+进入任一 Node 项目后通常可以使用：
+
 ```bash
-# 安装依赖
 npm install
-
-# 开发模式
 npm run dev
-
-# 构建生产版本
 npm run build
-
-# 启动生产服务
-npm start
 ```
 
-### Git 命令
-```bash
-# 初始化
-git init
+不同项目端口可能不同：
 
-# 提交更改
-git add .
-git commit -m "feat: add new feature"
-git push
-```
+- Vite：常见 `http://localhost:5173`
+- Next.js：常见 `http://localhost:3000`
+- Express API：示例中常见 `http://localhost:4000`
 
-### Docker 命令
-```bash
-# 构建镜像
-docker build -t my-website .
-
-# 运行容器
-docker run -p 3000:3000 my-website
-
-# 使用 docker-compose
-docker-compose up -d
-```
-
----
-
-## 📖 学习路径
-
-### 初学者（0-3个月）
-1. ✅ HTML + CSS 基础
-2. ✅ JavaScript 基础
-3. ✅ Bootstrap 框架
-4. ✅ Git 版本控制
-5. ✅ VS Code 使用
-
-### 进阶（3-6个月）
-1. ✅ Node.js + Express
-2. ✅ MySQL 数据库
-3. ✅ WordPress 主题开发
-4. ✅ React 或 Vue 基础
-5. ✅ API 开发
-
-### 高级（6-12个月）
-1. ✅ Next.js / Nuxt.js
-2. ✅ TypeScript
-3. ✅ Docker 部署
-4. ✅ CI/CD 流程
-5. ✅ 性能优化
-
----
-
-## 💰 成本估算
-
-### 小型企业网站
-- **开发费用**：¥100,000-200,000
-- **年维护费**：¥30,000-50,000
-- **服务器**：¥2,000-5,000/年
-- **域名**：¥60-100/年
-
-### 中型电商平台
-- **开发费用**：¥500,000-1,000,000
-- **年维护费**：¥100,000-200,000
-- **服务器**：¥10,000-30,000/年
-
-### 内部管理系统
-- **开发费用**：¥300,000-800,000
-- **年维护费**：¥50,000-150,000
-- **服务器**：¥5,000-15,000/年
-
-详细报价见：[网页制作报价标准.md](docs/quotes/网页制作%20报价标准（通用版）.md)
-
----
-
-## 🔗 有用的资源
-
-### 官方文档
-- [MDN Web Docs](https://developer.mozi
+具体以各项目 README 和终端输出为准。

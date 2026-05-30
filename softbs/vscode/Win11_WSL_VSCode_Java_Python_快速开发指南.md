@@ -491,7 +491,7 @@ uname -a
 
 如果你想继续深入，建议再看：
 
-- `softbs/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md`
+- `softbs/vscode/UM890Pro_Win11_WSL2_Docker_Java_Python_本地模型辅助开发教程.md`
 - `softbs/vscode/VSCode操作指南.md`
 
 这篇文档负责“快速开始”，上面两篇更适合后续扩展。
