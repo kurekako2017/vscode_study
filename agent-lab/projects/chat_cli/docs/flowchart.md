@@ -4,7 +4,7 @@
 
 为了在仓库页面上像 `README` 一样直接看到流程图，文档顶部先展示静态 SVG（优先渲染），下方保留原始 Mermaid 源以便编辑维护：
 
-![处理流程图]( /agent-lab/projects/chat_cli/assets/flowchart_simple.svg)
+![详细处理流程图]( /agent-lab/projects/chat_cli/assets/flowchart_detailed.svg)
 
 下面是 `main.py` 的处理流程（Mermaid 源，供可编辑预览用）：
 
