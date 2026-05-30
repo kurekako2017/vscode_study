@@ -112,7 +112,10 @@ python3 main.py --model gpt-5 "解释一下 Tool Calling"
 
 ![学习闭环流程图](assets/flowchart_simple.svg)
 
-> 说明：上图展示 `parse_args()` → 模式决策（mock/real/auto）→ 客户端构建或 mock 输出 → 一次性/交互路径 → `format_output()` → 终端输出 的简化闭环。若要查看更详细 Mermaid 源，请参见 `docs/flowchart.md`。
+
+如果你的平台不支持直接显示 SVG，CI 已配置为自动渲染一个 PNG 版本（`docs/flowchart.png`），若存在该文件会作为回退图像显示：
+
+![流程图 PNG](docs/flowchart.png)
 
 ## 6. 建议练习顺序
 
