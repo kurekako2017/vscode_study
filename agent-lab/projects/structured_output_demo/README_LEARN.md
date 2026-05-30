@@ -5,7 +5,9 @@ Structured Output Demo — 学习说明与快速上手
 
 快速运行
 1. Mock 模式：
+   ```bash
    RAG_API_MOCK=1 python3 main.py --prompt "请生成计划"
+   ```
 
 关键点
 - `AgentPlan`：Pydantic 模型，定义输出结构。

@@ -5,7 +5,9 @@ Tool Agent Demo — 学习说明与快速上手
 
 快速运行
 1. Mock 模式：
+   ```bash
    RAG_API_MOCK=1 python3 main.py --task "查找关键字"
+   ```
 
 关键函数
 - `tools` 列表：定义可被 agent 调用的工具函数与签名。

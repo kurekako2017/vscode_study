@@ -5,9 +5,13 @@ Chat CLI — 学习说明与快速上手
 
 快速运行
 1. Mock 模式（无需 API Key）:
+   ```bash
    RAG_API_MOCK=1 python3 main.py "你好"
+   ```
 2. 实际调用（需设置 `OPENAI_API_KEY`）:
+   ```bash
    OPENAI_API_KEY=sk... python3 main.py --real "请总结文档"
+   ```
 
 关键函数
 - `parse_args()`：解析 CLI 参数（--mock/--real/--max-chars）。

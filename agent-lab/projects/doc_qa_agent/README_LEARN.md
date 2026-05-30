@@ -5,9 +5,13 @@ Doc QA Agent — 学习说明与快速上手
 
 快速运行
 1. Mock 模式（无需 API Key）:
+   ```bash
    RAG_API_MOCK=1 python3 main.py --question "项目简介是什么"
+   ```
 2. Real 模式（需 `OPENAI_API_KEY`）:
+   ```bash
    OPENAI_API_KEY=sk... python3 main.py --question "如何部署"
+   ```
 
 关键函数
 - `build_chunks()`：从文件构建带来源的 chunk 列表。

@@ -5,9 +5,14 @@ RAG API Demo — 学习说明与快速上手
 
 快速运行（mock）
 1. 在项目目录运行：
+   ```bash
+   cd agent-lab/projects/rag_api_demo
    RAG_API_MOCK=1 uvicorn main:app --reload --port 8000
+   ```
 2. 测试：
+   ```bash
    curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档"}'
+   ```
 
 关键函数与文件
 - `load_state()`：扫描目录并缓存 chunks。

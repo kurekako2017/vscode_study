@@ -140,6 +140,57 @@ vscode_study/
 `-- scripts/          # 脚本和工具
 ```
 
+## Agent Demos — 快速学习路线
+
+本工作区在 `agent-lab/projects/` 下包含一组教学用的 Python demo，用于示范 RAG、Tool Calling、结构化输出与工作流分阶段设计。每个 demo 的详细学习要点见各自的 `README_LEARN.md`。下面是汇总与快速运行示例：
+
+- `agent-lab/projects/chat_cli/` — Minimal CLI chat demo
+  - 快速运行（mock）:
+    ```bash
+    RAG_API_MOCK=1 python3 agent-lab/projects/chat_cli/main.py "你好，帮我总结"
+    ```
+  - 快速运行（real）:
+    ```bash
+    OPENAI_API_KEY=sk-... python3 agent-lab/projects/chat_cli/main.py --real "请总结文档"
+    ```
+
+- `agent-lab/projects/doc_qa_agent/` — 本地 RAG（文件切分 + 关键词检索）
+  - 快速运行（mock）:
+    ```bash
+    RAG_API_MOCK=1 python3 agent-lab/projects/doc_qa_agent/main.py --question "项目简介是什么"
+    ```
+
+- `agent-lab/projects/rag_api_demo/` — FastAPI RAG 微服务示例（/ask, /reload, /health）
+  - 启动服务（mock）:
+    ```bash
+    cd agent-lab/projects/rag_api_demo
+    RAG_API_MOCK=1 uvicorn main:app --reload --port 8000
+    ```
+  - 测试接口:
+    ```bash
+    curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档"}'
+    ```
+
+- `agent-lab/projects/structured_output_demo/` — 演示 Pydantic 结构化输出解析
+  - 快速运行（mock）:
+    ```bash
+    RAG_API_MOCK=1 python3 agent-lab/projects/structured_output_demo/main.py --prompt "请生成计划"
+    ```
+
+- `agent-lab/projects/tool_agent_demo/` — Tool-calling agent 示例（本地工具：list/read/search）
+  - 快速运行（mock）:
+    ```bash
+    RAG_API_MOCK=1 python3 agent-lab/projects/tool_agent_demo/main.py --task "查找关键字"
+    ```
+
+- `agent-lab/projects/workflow_agent/` — 三阶段工作流示例（analyze → plan → finalize）
+  - 快速运行（mock）:
+    ```bash
+    RAG_API_MOCK=1 python3 agent-lab/projects/workflow_agent/main.py --input "请制定发布计划"
+    ```
+
+每个项目目录下的 `README_LEARN.md` 包含更多学习建议与练习题，建议先以 mock 模式熟悉行为，再在有 `OPENAI_API_KEY` 的环境切换到 real 测试。
+
 ## 使用建议
 
 - 先选一条主线，不要多个方向同时发散。
