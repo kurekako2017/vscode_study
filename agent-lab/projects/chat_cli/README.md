@@ -108,49 +108,11 @@ python3 main.py --model gpt-5 "解释一下 Tool Calling"
 | `run_interactive()` | 控制层 | 连续提问、退出、异常处理 | 程序鲁棒性基础 |
 
 学习闭环如下：
-学习闭环如下（更详细）：
+学习闭环如下（静态图，兼容 GitHub）：
 
-```mermaid
-flowchart TD
-    Start([命令行启动]) --> Parse[parse_args()]
+![学习闭环流程图](assets/flowchart_simple.svg)
 
-    Parse --> Decide{模式决策\n(--mock/--real/自动)}
-
-    Decide -->|强制 --mock| UseMockTrue[use_mock = True]
-    Decide -->|强制 --real| UseMockFalse[use_mock = False]
-    Decide -->|自动| AutoCheck[检查环境: OPENAI_API_KEY & SDK]
-
-    AutoCheck -->|无 KEY 或 无 SDK| UseMockTrue
-    AutoCheck -->|有 KEY 且 有 SDK| UseMockFalse
-
-    UseMockTrue --> BuildMock[build_mock_answer(prompt)]
-    UseMockFalse --> BuildClient[build_client() \n(检查 SDK, 读取 OPENAI_API_KEY, 创建客户端)]
-
-    Parse --> HasPrompt{是否提供一次性 `prompt`} 
-    HasPrompt -->|是| OneShot[一次性调用流程]
-    HasPrompt -->|否| Interactive[交互模式 run_interactive()]
-
-    OneShot -->|use_mock| BuildMock
-    OneShot -->|use_real| AskOnceReal[ask_once(client, model, prompt)]
-
-    Interactive --> LoopStart[(交互循环)]
-    LoopStart -->|每次输入| AskOnceLoop[ask_once(...)]
-    AskOnceLoop -->|use_mock| BuildMock
-    AskOnceLoop -->|use_real| AskOnceReal
-
-    BuildMock --> FormatMock[format_output(answer, max_chars)]
-    AskOnceReal --> FormatReal[format_output(answer, max_chars)]
-
-    FormatMock --> Output[输出到终端]
-    FormatReal --> Output
-
-    %% 错误处理路径
-    AskOnceReal -.->|请求异常| ErrorHandler[打印错误并退出或继续]
-    AskOnceLoop -.->|请求异常| LoopContinue[打印错误并返回循环]
-
-    %% 终止
-    Output --> End([结束或等待下一次输入])
-```
+> 说明：上图展示 `parse_args()` → 模式决策（mock/real/auto）→ 客户端构建或 mock 输出 → 一次性/交互路径 → `format_output()` → 终端输出 的简化闭环。若要查看更详细 Mermaid 源，请参见 `docs/flowchart.md`。
 
 ## 6. 建议练习顺序
 
