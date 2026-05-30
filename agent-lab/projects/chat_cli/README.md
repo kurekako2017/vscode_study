@@ -117,6 +117,16 @@ python3 main.py --model gpt-5 "解释一下 Tool Calling"
 
 ![流程图 PNG](docs/flowchart.png)
 
+---
+
+## Python 处理流程（main.py 详细）
+
+下面是 `main.py` 的详细处理流程图（静态 SVG），展示各个函数/分支的执行顺序，便于调试与学习：
+
+![Python 处理流程](assets/flowchart_detailed.svg)
+
+说明：此图比学习闭环更详细地展示 `parse_args`、`resolve_mode`、`build_client`、`ask_once`/`run_interactive`、`format_output` 与错误处理逻辑。
+
 ## 6. 建议练习顺序
 
 1. 跑通 `python3 main.py --mock`，确认循环与退出逻辑。
