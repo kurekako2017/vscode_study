@@ -1,6 +1,29 @@
 # RAG
 
-## 1. 为什么 `RAG` 是主线能力
+## 1. RAG 是什么
+
+`RAG` 是 `Retrieval-Augmented Generation`，中文常叫“检索增强生成”，日语现场常说 `検索拡張生成`。
+
+它不是一个单独的模型，也不是一个固定框架，而是一种 `LLM 应用架构 / 知识库问答框架思路`：
+
+```text
+先从外部资料中检索相关内容，再把检索结果交给大模型，让模型基于资料生成回答。
+```
+
+在项目里，`RAG` 通常属于：
+
+| 分类 | 说明 |
+| --- | --- |
+| 技术类型 | LLM 应用架构、知识库问答、社内搜索 |
+| 系统层次 | 文档处理层 + 检索层 + Prompt 组装层 + 模型生成层 |
+| 常见框架 | LangChain、LlamaIndex、向量数据库、FastAPI |
+| 日本现场说法 | `RAG`, `検索拡張生成`, `社内検索`, `ナレッジ検索` |
+
+一句话先记住：
+
+- `RAG` 是让模型“先查资料，再基于资料回答”的 LLM 应用架构。
+
+## 2. 为什么 `RAG` 是主线能力
 
 如果按日本企业现场和派遣案件来看，`RAG` 往往比复杂 Agent 更优先。
 
@@ -20,7 +43,20 @@
 
 所以 `RAG` 在现场里的价值，通常比“自由聊天”更高，也往往比“复杂 Agent”更早落地。
 
-## 2. 这一阶段要掌握什么
+## 3. 这一阶段要掌握什么
+
+这一阶段学的是 `RAG 应用开发的核心功能`，不是单纯学某一个 Python 函数。
+
+它对应真实项目中的这些能力：
+
+| 核心功能 | 这是什么知识 | 在系统里的位置 |
+| --- | --- | --- |
+| 文档读取 | 文件处理 / Document Loader | 文档读取层 |
+| 文本切分 | RAG 前处理 / Text Splitter | 文本处理层 |
+| 检索 | Search / Retriever | 检索层 |
+| 引用来源 | Citation / Source Tracking | 输出可信度层 |
+| 问答生成 | LLM Generation | 模型生成层 |
+| 检索质量意识 | Evaluation / Retrieval Quality | 评估层 |
 
 这一章至少要掌握这些：
 
@@ -36,7 +72,7 @@
 - 让模型基于你自己的资料回答问题
 - 而不是只根据模型预训练知识自由发挥
 
-## 3. 这一章学完后，应该会什么
+## 4. 这一章学完后，应该会什么
 
 学完这一章，至少要能做到：
 
@@ -47,26 +83,28 @@
 - 能让模型基于片段回答
 - 能在结果里带上来源
 
-## 4. RAG 系统角色先看懂
+## 5. RAG 系统角色先看懂
 
 `RAG` 这章容易卡住，是因为它不再是一次简单模型调用，而是多个模块协作。
 
-| 角色 / 名词 | 可以理解成什么 | 主要作用 | 在示例中的位置 |
-| --- | --- | --- | --- |
-| Knowledge base | 知识库 | 被查询的外部资料集合 | `--docs` 指定目录 |
-| Loader | 读取器 | 把文件内容读进程序 | `iter_text_files()` |
-| Chunk | 片段 | 文档切分后的最小检索单位 | `Chunk` |
-| Retriever | 检索器 | 从所有 chunk 里找相关内容 | `retrieve()` |
-| Top-K | 命中数量 | 控制最多拿几个片段给模型 | `TOP_K` |
-| Context builder | 上下文构造器 | 把命中片段拼成模型输入 | `build_context()` |
-| Generator | 生成器 | 基于上下文回答问题 | `answer_question()` |
-| Citation / Source | 引用来源 | 说明答案依据来自哪里 | `source_label` |
+先看“是什么”，再看“主要作用”：
+
+| 角色 / 名词 | 日本語 / 现场说法 | 是什么 | 主要作用 | 在示例中的位置 |
+| --- | --- | --- | --- | --- |
+| Knowledge base | ナレッジベース / 知識ベース | 被查询的外部资料集合 | 保存社内文档、FAQ、规程、设计资料 | `--docs` 指定目录 |
+| Loader | ローダー / 読み込み処理 | 读取文件的程序模块 | 把文件内容读进程序 | `iter_text_files()` |
+| Chunk | チャンク | 文档切分后的最小检索单位 | 让长文档变成可搜索的小片段 | `Chunk` |
+| Retriever | リトリーバー / 検索器 | 从 chunk 里找相关内容的模块 | 根据问题找出相关资料 | `retrieve()` |
+| Top-K | 上位 K 件 | 检索结果数量控制 | 控制最多拿几个片段给模型 | `TOP_K` |
+| Context builder | コンテキスト生成処理 | 上下文构造器 | 把命中片段拼成模型输入 | `build_context()` |
+| Generator | 回答生成 / 生成器 | 调用模型生成回答的模块 | 基于上下文回答问题 | `answer_question()` |
+| Citation / Source | 引用元 / 出典 | 答案依据的来源信息 | 说明答案依据来自哪里 | `source_label` |
 
 先记住一句话：
 
 - `RAG` = 检索资料 + 组织上下文 + 基于上下文生成回答。
 
-## 5. RAG 数据流和代码对应
+## 6. RAG 数据流和代码对应
 
 ```mermaid
 flowchart TD
@@ -97,7 +135,7 @@ flowchart TD
 | 8 | 模型生成层 | `answer_question()` + OpenAI Responses API | `question` + `context` | 模型回答文本 | 要求模型只基于检索上下文回答 |
 | 9 | 输出层 | `main()` | 回答文本 + Top-K `Chunk` | `Answer` + `Sources` | 输出最终回答和引用来源 |
 
-## 6. 教程：`RAG` 到底是什么
+## 7. 教程：把 `RAG` 拆成 3 步理解
 
 可以先把 `RAG` 理解成一个 3 步流程：
 
@@ -116,7 +154,7 @@ flowchart TD
 - 资料要送对
 - 回答要能说明依据
 
-## 7. 教程：最小 `RAG` 流程长什么样
+## 8. 教程：最小 `RAG` 流程长什么样
 
 最小 `RAG` 一般可以拆成 5 步：
 
@@ -183,7 +221,7 @@ flowchart TD
 - 看起来回答得很像对
 - 但其实没有依据
 
-## 8. 最小示例
+## 9. 最小示例
 
 下面给一个适合初学阶段理解的最小示例。
 
@@ -248,7 +286,7 @@ if __name__ == "__main__":
 4. 模型应该被约束在资料范围内回答
 5. `RAG` 的价值在于“资料依据”，不是“回答更花哨”
 
-## 9. 代码拆解
+## 10. 代码拆解
 
 ### 1. 为什么先不用向量库
 
@@ -303,7 +341,7 @@ if __name__ == "__main__":
 
 所以在这条学习线上，先把检索逻辑说明白，比先做复杂前端更重要。
 
-## 10. 进一小步：从固定文本进步到本地文档目录
+## 11. 进一小步：从固定文本进步到本地文档目录
 
 上面的最小示例还是写死的文本列表。
 
@@ -316,7 +354,7 @@ if __name__ == "__main__":
 
 这一步就是从“概念示例”进步到“最小文档问答系统”。
 
-## 11. 和当前工作区示例的对应关系
+## 12. 和当前工作区示例的对应关系
 
 当前工作区里最适合这一章配套练的项目是：
 
@@ -338,7 +376,7 @@ if __name__ == "__main__":
 
 也就是把 `RAG` 从命令行样例升级成 API。
 
-## 12. 最小运行方式
+## 13. 最小运行方式
 
 先安装依赖：
 
@@ -370,7 +408,7 @@ python agent-lab/projects/doc_qa_agent/main.py --docs d:/dev/source_code/vscode_
 python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/source_code/vscode_study/java-lab "总结数据库移行的重点"
 ```
 
-## 13. 常见错误与排查
+## 14. 常见错误与排查
 
 ### 1. 只调用模型，没有检索
 
@@ -429,7 +467,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 - 怎么排
 - 为什么这样回答
 
-## 14. 练习题
+## 15. 练习题
 
 下面这些练习题，建议按顺序做。
 
@@ -495,7 +533,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 
 - 训练“宁可明确不足，也不要假装知道”的意识
 
-## 15. 补充教程怎么选
+## 16. 补充教程怎么选
 
 你发的图片里列了不少 `AI Agent` 学习资源。
 
@@ -542,7 +580,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 - 看懂名词
 - 但不会自己搭基础链路
 
-## 16. 从图片里能吸收的有用点
+## 17. 从图片里能吸收的有用点
 
 参考你发的这张图，真正值得吸收进当前学习路线的，不是“谁最火”，而是这些判断：
 
@@ -555,7 +593,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 
 - 先跑通 `RAG`，再系统补 `Agent`
 
-## 17. 这一章学到什么程度算过关
+## 18. 这一章学到什么程度算过关
 
 满足下面这些条件，就可以进入下一章：
 
@@ -566,7 +604,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 - 能解释切分、检索、Top-K 的作用
 - 能读懂并修改 `doc_qa_agent`
 
-## 18. 下一步学什么
+## 19. 下一步学什么
 
 这一步完成后，最适合继续学的是：
 
@@ -580,7 +618,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 
 - 怎么把问答能力包装成后端接口，给系统或前端调用
 
-## 19. 日本现场高频关键词
+## 20. 日本现场高频关键词
 
 - `RAG`
 - `社内検索`
@@ -588,7 +626,7 @@ python agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/sourc
 - `手順書検索`
 - `規程検索`
 
-## 20. 注意点
+## 21. 注意点
 
 - 没有引用来源的问答，在企业现场说服力不够。
 - PDF 和 Office 文档支持很重要，但不必一开始就全部做完。

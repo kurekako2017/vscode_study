@@ -1,6 +1,12 @@
 # Projects
 
-`agent-lab/projects/` 用来存放这条学习线里的可运行样例。
+`agent-lab/projects/` 是可运行 demo 的实际维护目录。
+
+## 学习总导航（推荐先看）
+
+- 一页直达各章节运行命令与练习任务：[LEARNING_MAP.md](./LEARNING_MAP.md)
+
+如果你是从 `llm-lab` 进入的学习者，也会复用这里的 demo；`llm-lab/projects/README.md` 只做主线索引，不重复维护运行说明。
 
 这些样例不是按“技术炫酷程度”排，而是按更贴近日本 IT 现场和派遣案件需求的顺序整理。
 ## 🚀 快速运行

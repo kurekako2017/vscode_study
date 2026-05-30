@@ -5,6 +5,18 @@
 - 以循环方式让模型选择工具、执行工具、并把工具输出反馈回模型
 
 示例的安全考虑：所有文件操作被限制在指定的 `workdir` 内，防止路径跳出。
+
+学习地图：
+- 运行命令：
+    - python3 main.py "请概览当前目录结构" --workdir .
+    - python3 main.py "请搜索 README 中的 RAG 关键词并总结" --workdir .
+- 输入输出：
+    - 输入：用户任务 + workdir 目录范围
+    - 输出：模型最终回答（中间通过工具调用收集证据）
+- 改造练习点：
+    - 新增 write_file 工具并做白名单限制
+    - 给 search_text 增加文件类型过滤参数
+    - 记录每轮工具调用日志到本地
 """
 
 import argparse
@@ -27,6 +39,7 @@ SYSTEM_INSTRUCTIONS = (
 
 
 def parse_args() -> argparse.Namespace:
+    # 层次: 输入层 — 解析用户任务、模型与工作目录范围
     """解析命令行参数：用户任务、模型名与允许访问的工作目录。"""
     parser = argparse.ArgumentParser(
         description="Minimal tool-calling agent demo for listing files, reading files, and searching text."
@@ -46,6 +59,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client() -> OpenAI:
+    # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失 Key 的退出策略
     """从环境变量读取 API Key 并返回 OpenAI 客户端实例（不存在则退出）。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -55,6 +69,7 @@ def build_client() -> OpenAI:
 
 
 def resolve_path(base_dir: Path, relative_path: str) -> Path:
+    # 层次: 安全/IO 层 — 解析路径并确保文件操作受限于 workdir
     """解析相对路径并确保不越出 base_dir（安全限制）。"""
     candidate = (base_dir / relative_path).resolve()
     base_resolved = base_dir.resolve()
@@ -65,6 +80,7 @@ def resolve_path(base_dir: Path, relative_path: str) -> Path:
 
 
 def list_files(base_dir: Path, path: str = ".") -> dict[str, Any]:
+    # 层次: 工具层 — 列出目录供模型参考的工具接口
     """列出目录内容，返回结构化的 entries 对象供模型参考。"""
     target = resolve_path(base_dir, path)
     if not target.exists():
@@ -84,6 +100,7 @@ def list_files(base_dir: Path, path: str = ".") -> dict[str, Any]:
 
 
 def read_file(base_dir: Path, path: str) -> dict[str, Any]:
+    # 层次: 工具层 — 读取文件并限制返回大小以避免过大返回
     """读取文件并返回前 12000 字符，避免一次性返回过大内容。"""
     target = resolve_path(base_dir, path)
     if not target.exists():
@@ -100,6 +117,7 @@ def read_file(base_dir: Path, path: str) -> dict[str, Any]:
 
 
 def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
+    # 层次: 工具层 — 在文件中搜索文本，返回行级证据供模型引用
     """在路径下所有文件中按行搜索 query（不区分大小写），返回匹配的行和行号。
 
     返回行级别证据便于模型在最终回答中引用来源。
@@ -134,6 +152,7 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
 
 
 def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]:
+    # 层次: 工具协调层 — 根据模型请求分发到具体工具实现
     """根据模型返回的工具调用名执行相应工具函数并返回结果。"""
     if name == "list_files":
         return list_files(base_dir, path=args.get("path", "."))
@@ -145,6 +164,7 @@ def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]
 
 
 def build_tools() -> list[dict[str, Any]]:
+    # 层次: 工具描述层 — 向模型暴露可用工具的 schema 与说明
     """返回供模型调用的工具描述（用于 Responses API 的 tools 参数）。"""
     return [
         {
@@ -206,6 +226,7 @@ def build_tools() -> list[dict[str, Any]]:
 
 
 def run_agent(client: OpenAI, model: str, base_dir: Path, prompt: str) -> str:
+    # 层次: Agent 控制层 — 驱动模型与工具交互的主循环
     """运行一个最小的 agent 控制循环：
 
     1. 把用户指令传给模型
@@ -257,6 +278,8 @@ def run_agent(client: OpenAI, model: str, base_dir: Path, prompt: str) -> str:
 
 
 def main() -> None:
+    # 层次: 程序入口 — 验证输入并启动 agent 控制循环
+    """主流程：校验工作目录后进入工具调用循环并输出最终答案。"""
     args = parse_args()
     client = build_client()
     base_dir = Path(args.workdir).resolve()
@@ -266,6 +289,7 @@ def main() -> None:
         sys.exit(1)
 
     try:
+        # 这里会触发“模型判断 -> 调工具 -> 回填结果 -> 再判断”的闭环。
         answer = run_agent(client, args.model, base_dir, args.prompt)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)

@@ -1,184 +1,89 @@
-# Projects
+# LLM Lab Projects
 
-`llm-lab/projects/` 用来整理这条主学习线里推荐优先看的案例和评估资料。
+> 归位说明：可运行 demo 统一维护在 [../../agent-lab/projects](../../agent-lab/projects/README.md)。本目录只保留 `llm-lab` 主线的案例索引和评估资料，避免同一套运行说明在两个目录里重复维护。
 
-这里的重点不是“案例越多越好”，而是：
+## 1. 这个目录负责什么
 
-- 每个案例都对应主线里的一个关键阶段
-- 每个案例都能和日本现场常见需求对上
-- 每个案例都能逐步整理成作品集材料
+`llm-lab/projects/` 负责回答：
 
-当前为了避免重复维护，先直接复用 `agent-lab/projects/` 中已经完成的可运行样例。
-
-## 这套案例怎么用
-
-建议按下面这个方式使用：
-
-1. 先看主线文档
-2. 再跑对应案例
-3. 再自己改一版
-4. 再整理最小测试或评估记录
-
-也就是说，案例不是单独看的。
-
-更合适的节奏是：
-
-- 文档负责讲清思路
-- 案例负责建立手感
-- 自己改代码负责真正学会
-
-## 快速入口
-
-如果你现在只想知道“应该先跑哪几个案例”，直接按这个顺序：
-
-1. [chat_cli](D:/dev/source_code/vscode_study/agent-lab/projects/chat_cli/README.md)
-2. [structured_output_demo](D:/dev/source_code/vscode_study/agent-lab/projects/structured_output_demo/README.md)
-3. [doc_qa_agent](D:/dev/source_code/vscode_study/agent-lab/projects/doc_qa_agent/README.md)
-4. [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md)
-5. [rag_eval_notes.md](D:/dev/source_code/vscode_study/llm-lab/projects/rag_eval_notes.md)
-
-## 🚀 运行与复制指南（补充）
-
-### 快速启动脚本
-
-每个 demo 都配有一键启动脚本，自动处理虚拟环境、依赖安装和运行。
-
-**Windows (PowerShell):**
-```powershell
-cd agent-lab/projects/chat_cli
-.\run_demo.ps1
+```text
+学习 LLM 应用主线时，应该跑哪些 demo？这些 demo 分别对应哪一章？
 ```
 
-**Linux / macOS (Bash):**
-```bash
-cd agent-lab/projects/chat_cli
-bash run_demo.sh
+它不负责重复维护：
+
+- demo 源码
+- 每个 demo 的安装命令
+- 每个 demo 的详细 README
+
+这些内容统一看：
+
+- [../../agent-lab/projects/README.md](../../agent-lab/projects/README.md)
+
+## 2. 主线文档和案例对应关系
+
+| 学习主题 | 主线文档 | 推荐 demo / 资料 | demo 实际位置 |
+| --- | --- | --- | --- |
+| 模型调用 | [../02-模型调用基础.md](../02-模型调用基础.md) | `chat_cli` | [../../agent-lab/projects/chat_cli](../../agent-lab/projects/chat_cli/README.md) |
+| 结构化输出 | [../03-结构化输出.md](../03-结构化输出.md) | `structured_output_demo` | [../../agent-lab/projects/structured_output_demo](../../agent-lab/projects/structured_output_demo/README.md) |
+| RAG | [../04-RAG.md](../04-RAG.md) | `doc_qa_agent` | [../../agent-lab/projects/doc_qa_agent](../../agent-lab/projects/doc_qa_agent/README.md) |
+| FastAPI + RAG API | [../05-FastAPI与企业集成.md](../05-FastAPI与企业集成.md) | `rag_api_demo` | [../../agent-lab/projects/rag_api_demo](../../agent-lab/projects/rag_api_demo/README.md) |
+| 评估与运维 | [../06-评估与运维.md](../06-评估与运维.md) | `rag_eval_notes.md` | [./rag_eval_notes.md](./rag_eval_notes.md) |
+
+## 3. 推荐学习顺序
+
+```text
+chat_cli
+  -> structured_output_demo
+  -> doc_qa_agent
+  -> rag_api_demo
+  -> rag_eval_notes.md
 ```
 
-### 或手动运行
+这样安排的原因：
 
-```bash
-cd agent-lab/projects/chat_cli
-pip install -r requirements.txt
-export OPENAI_API_KEY="your_api_key"  # Windows: $env:OPENAI_API_KEY="your_api_key"
-python main.py
-```
+| 顺序 | 为什么 |
+| --- | --- |
+| `chat_cli` | 先确认你会调用模型 |
+| `structured_output_demo` | 再让输出变成程序可处理的数据 |
+| `doc_qa_agent` | 再进入 RAG 和社内搜索 |
+| `rag_api_demo` | 再把 RAG 做成 HTTP API |
+| `rag_eval_notes.md` | 最后学习如何判断质量和记录问题 |
 
-### 前置要求
+## 4. 和 agent-lab/projects 的区别
 
-- Python 3.10+
-- 环境变量 `OPENAI_API_KEY` 必须设置
+| 目录 | 负责什么 |
+| --- | --- |
+| `agent-lab/projects/` | 保存可运行 demo、运行脚本、每个项目的 README / 设计 / 测试资料 |
+| `llm-lab/projects/` | 保存 LLM 主线案例索引，以及 LLM 主线自己的评估笔记 |
 
-- 如果你想在 `llm-lab/projects` 下维护副本（便于改动或演示），可以复制目录（PowerShell 示例）：
+也就是说：
 
-```
-mkdir llm-lab\projects\chat_cli
-Copy-Item -Path agent-lab\projects\chat_cli\* -Destination llm-lab\projects\chat_cli -Recurse
-```
+- 想运行 demo：去 [../../agent-lab/projects](../../agent-lab/projects/README.md)。
+- 想知道 LLM 主线该跑哪个 demo：看本文。
+- 想学 RAG 评估：看 [rag_eval_notes.md](./rag_eval_notes.md)。
 
-- 备注：`llm-lab` 保持为主线文档目录，示例副本位于 `agent-lab/projects`。如需我代为复制其它 demo，请告知名称（例如 `doc_qa_agent`）。
+## 5. 日本现场作品集优先级
 
-## 推荐案例
-
-### 模型调用
-
-- [chat_cli](D:/dev/source_code/vscode_study/agent-lab/projects/chat_cli/README.md)
-  - 对应 `02-模型调用基础.md`
-
-### 结构化输出
-
-- [structured_output_demo](D:/dev/source_code/vscode_study/agent-lab/projects/structured_output_demo/README.md)
-  - 对应 `03-结构化输出.md`
-
-### `RAG`
-
-- [doc_qa_agent](D:/dev/source_code/vscode_study/agent-lab/projects/doc_qa_agent/README.md)
-  - 对应 `04-RAG.md`
-
-### `FastAPI + RAG API`
-
-- [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md)
-  - 对应 `05-FastAPI与企业集成.md`
-
-### 评估与运维
-
-- [rag_eval_notes.md](D:/dev/source_code/vscode_study/llm-lab/projects/rag_eval_notes.md)
-  - 对应 `06-评估与运维.md`
-
-## 为什么先复用这些
-
-因为这几项正好对应日本现场更常见的主线：
-
-- 模型调用
-- 结构化输出
-- `RAG`
-- `FastAPI + RAG API`
-- `RAG` 评估意识
-
-等后面内容继续增加，再考虑把这些样例独立复制或迁移到 `llm-lab/projects/`。
-
-## 主线文档和案例的对应关系
-
-| 学习主题 | 主线文档 | 推荐案例 |
-|---|---|---|
-| 模型调用 | [02-模型调用基础.md](D:/dev/source_code/vscode_study/llm-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md) | [chat_cli](D:/dev/source_code/vscode_study/agent-lab/projects/chat_cli/README.md) |
-| 结构化输出 | [03-结构化输出.md](D:/dev/source_code/vscode_study/llm-lab/03-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BA.md) | [structured_output_demo](D:/dev/source_code/vscode_study/agent-lab/projects/structured_output_demo/README.md) |
-| `RAG` | [04-RAG.md](D:/dev/source_code/vscode_study/llm-lab/04-RAG.md) | [doc_qa_agent](D:/dev/source_code/vscode_study/agent-lab/projects/doc_qa_agent/README.md) |
-| `FastAPI + RAG API` | [05-FastAPI与企业集成.md](D:/dev/source_code/vscode_study/llm-lab/05-FastAPI%E4%B8%8E%E4%BC%81%E4%B8%9A%E9%9B%86%E6%88%90.md) | [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md) |
-| 评估与运维 | [06-评估与运维.md](D:/dev/source_code/vscode_study/llm-lab/06-%E8%AF%84%E4%BC%B0%E4%B8%8E%E8%BF%90%E7%BB%B4.md) | [rag_eval_notes.md](D:/dev/source_code/vscode_study/llm-lab/projects/rag_eval_notes.md) |
-
-## 案例和案件能力映射表
-
-| 案例 | 学习阶段 | 日本案件高频关键词 | 现场对应场景 | 可展示能力 | 注意点 |
-|---|---|---|---|---|---|
-| `chat_cli` | 阶段 1 | `Python`, `OpenAI API`, `PoC` | 最小模型调用验证 | 会调模型、会处理最基础请求与返回 | 现场价值有限，不能只停在这里 |
-| `structured_output_demo` | 阶段 2 | `構造化出力`, `JSON`, `分類` | 需求整理、分类、任务清单、标签输出 | 会把自然语言结果稳定转成结构化数据 | 结果稳定性比“聊天效果”更重要 |
-| `doc_qa_agent` | 阶段 3 | `RAG`, `社内検索`, `ナレッジ検索` | 规程问答、设计书检索、FAQ | 会做最小本地检索、带出处回答、基础资料问答 | 当前还是关键词检索，不是向量检索 |
-| `rag_api_demo` | 阶段 4 | `FastAPI`, `RAG`, `PDF`, `API連携` | 社内検索 API、生成 AI 后端 PoC | 会把 `RAG` 做成可调用 API，支持 PDF | 最贴案件要求，建议优先打磨 |
-| `rag_eval_notes` | 阶段 5 | `評価`, `精度確認`, `PoC結果整理` | `RAG` 试验结果整理、精度确认 | 会从“能跑”走向“可评估” | 不是代码案例，而是评估思路案例 |
-
-## 如果按日本案件要求来准备作品集
-
-建议优先展示顺序：
+如果目标是日本现场或派遣案件，建议优先打磨：
 
 1. `doc_qa_agent`
 2. `rag_api_demo`
-3. `structured_output_demo`
-4. `chat_cli`
-5. `rag_eval_notes`
+3. `rag_eval_notes.md`
+4. `structured_output_demo`
+5. `chat_cli`
 
-原因是：
+原因：
 
-- `RAG` 更贴日本现场
-- `FastAPI + RAG API` 更贴案件
-- 结构化输出能体现可落地能力
-- 纯聊天样例更多是入门证明，不是核心卖点
-- 评估资料能体现你不是只会“跑通”
+- `RAG / 社内検索` 更贴近实际落地。
+- `FastAPI + RAG API` 更像后端案件交付物。
+- 评估资料能证明你不是只会“跑通 demo”。
+- 结构化输出能体现你会把模型结果接到程序流程。
+- 纯聊天 demo 主要用于证明基础，不适合作为作品集核心。
 
-## 如果你现在刚开始
+## 6. 成本与注意点
 
-如果你现在是第一次进入案例目录，推荐这样开始：
-
-1. 先跑 [chat_cli](D:/dev/source_code/vscode_study/agent-lab/projects/chat_cli/README.md)
-2. 再跑 [structured_output_demo](D:/dev/source_code/vscode_study/agent-lab/projects/structured_output_demo/README.md)
-3. 再跑 [doc_qa_agent](D:/dev/source_code/vscode_study/agent-lab/projects/doc_qa_agent/README.md)
-4. 再跑 [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md)
-5. 最后读 [rag_eval_notes.md](D:/dev/source_code/vscode_study/llm-lab/projects/rag_eval_notes.md)
-
-如果你已经会基础模型调用，建议直接从这里继续：
-
-1. [structured_output_demo](D:/dev/source_code/vscode_study/agent-lab/projects/structured_output_demo/README.md)
-2. [doc_qa_agent](D:/dev/source_code/vscode_study/agent-lab/projects/doc_qa_agent/README.md)
-3. [rag_api_demo](D:/dev/source_code/vscode_study/agent-lab/projects/rag_api_demo/README.md)
-
-## 成本与注意点
-
-- 当前这些案例大多还是学习版 / `PoC` 版，不是正式企业版系统。
-- 只要发生模型调用，就会产生实际 API 成本。
-- 如果用于找日本现场案件，最值得继续增强的是：
-  - `doc_qa_agent`
-  - `rag_api_demo`
-- 如果后面要继续补案例，优先方向建议是：
-  - 向量检索版 `RAG`
-  - 带认证的 `RAG API`
-  - 检索评估样例
+- 只要调用模型 API，就可能产生费用。
+- demo 是学习版 PoC，不是企业正式系统。
+- 不要复制多份 demo 源码造成维护混乱；优先复用 `agent-lab/projects`。
+- 如果确实需要在 `llm-lab/projects` 下维护副本，再单独复制指定 demo。

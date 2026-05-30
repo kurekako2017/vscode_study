@@ -5,6 +5,18 @@
 - 用 Responses API 的 `parse` 将模型输出解析并验证为 Pydantic 模型
 
 对下游系统而言，稳定的 schema 能显著降低解析错误和生产风险。
+
+学习地图：
+- 运行命令：
+    - python3 main.py "做一个客服 Agent 的开发计划"
+    - python3 main.py "给我一个 RAG 学习路线" --model gpt-4o
+- 输入输出：
+    - 输入：自然语言需求 prompt
+    - 输出：通过 Pydantic 校验后的 AgentPlan JSON
+- 改造练习点：
+    - 在 AgentPlan 中新增 timeline 字段并更新提示词
+    - 对 user_type 增加默认值与兜底策略
+    - 将结果保存到本地 JSON 文件
 """
 
 import argparse
@@ -44,6 +56,7 @@ class AgentPlan(BaseModel):
 
 
 def parse_args() -> argparse.Namespace:
+    # 层次: 输入层 — 解析用户的自然语言请求与模型选项
     """解析命令行参数：接收自然语言请求并可选择模型。"""
     parser = argparse.ArgumentParser(
         description="Minimal structured output demo with OpenAI Responses API."
@@ -58,6 +71,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client() -> OpenAI:
+    # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失情况
     """创建 OpenAI 客户端，要求通过环境变量提供 `OPENAI_API_KEY`。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -67,6 +81,7 @@ def build_client() -> OpenAI:
 
 
 def generate_plan(client: OpenAI, model: str, prompt: str) -> AgentPlan:
+    # 层次: 调用层 — 请求模型并使用 SDK 的 parse 功能将输出映射为 `AgentPlan`
     """调用 Responses API 的 `parse` 功能，直接将输出解析为 `AgentPlan`。
 
     `text_format=AgentPlan` 告知 SDK 使用 Pydantic 验证模型输出结构。
@@ -81,6 +96,8 @@ def generate_plan(client: OpenAI, model: str, prompt: str) -> AgentPlan:
 
 
 def main() -> None:
+    # 层次: 程序入口 — 读取参数、调用构建流程并展示结果
+    """主流程：读取参数 -> 请求结构化输出 -> 打印可读 JSON。"""
     args = parse_args()
     client = build_client()
 
@@ -90,7 +107,7 @@ def main() -> None:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    # 打印已解析的 Pydantic 对象的可读和压缩 JSON 表现，便于学习 API 输出格式。
+    # 同时打印 pretty 和 compact 两种 JSON，便于对比“人读友好”与“机器传输”格式。
     pretty_json = json.dumps(plan.model_dump(), ensure_ascii=False, indent=2)
     compact_json = plan.model_dump_json(ensure_ascii=False)
 

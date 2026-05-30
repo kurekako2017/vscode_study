@@ -8,6 +8,17 @@
 让模型按固定格式提出“我要调用哪个工具、参数是什么”，再由程序真正执行工具的机制。
 ```
 
+它属于 `Agent 工具调用框架 / LLM 与外部系统集成机制`，不是让模型自己直接操作系统。
+
+在项目里，`Tool Calling` 通常属于：
+
+| 分类 | 说明 |
+| --- | --- |
+| 技术类型 | Agent 基础能力、函数调用、外部工具集成 |
+| 系统层次 | Tool Schema 层 + Tool Router 层 + Tool Execution 层 |
+| 常见框架或 SDK | OpenAI Tools / Function Calling、LangChain Tools、LlamaIndex Tools |
+| 日本现场说法 | `ツール呼び出し`, `外部ツール連携`, `API連携 Agent` |
+
 日语现场可以说成：
 
 ```text
@@ -35,7 +46,53 @@
 - 再把这些能力接进系统
 - 最后才开始做工具调用和半自动 Agent
 
+## 2.1 先用一个具体场景理解
+
+假设用户提出这个任务：
+
+```text
+请读取当前项目的 README.md，并总结这个项目是做什么的。
+```
+
+如果没有 Tool Calling，模型只能根据已有上下文猜。
+
+有了 Tool Calling，流程会变成：
+
+```text
+用户任务
+  -> 模型判断需要读取文件
+  -> 模型发出 read_file(path="README.md")
+  -> Python 程序真正读取文件
+  -> 文件内容作为工具结果回填给模型
+  -> 模型基于真实文件内容总结
+```
+
+这就是 Tool Calling 最重要的学习点：
+
+- 模型负责判断和提出工具调用请求。
+- 程序负责真正执行工具。
+- 工具结果要回填给模型，模型才能继续回答。
+
+本章对应的 demo 是：
+
+| 文件 | 看什么 |
+| --- | --- |
+| [projects/tool_agent_demo/README.md](./projects/tool_agent_demo/README.md) | 怎么运行工具调用 Agent |
+| [projects/tool_agent_demo/main.py](./projects/tool_agent_demo/main.py) | 工具定义、工具执行、安全边界和 Agent 循环 |
+
 ## 3. 这一阶段要掌握什么
+
+这一阶段学的是 `Agent 使用外部工具的核心功能`。
+
+核心功能先看“是什么”：
+
+| 核心功能 | 这是什么知识 | 在系统里的位置 |
+| --- | --- | --- |
+| 工具接口设计 | Tool Schema / Function Schema | 工具定义层 |
+| 参数 schema | JSON Schema / Pydantic | 数据合同层 |
+| 工具选择 | LLM Reasoning | 模型决策层 |
+| 工具结果回填 | Observation | 工具结果层 |
+| 错误处理 | Error Handling / Guardrail | 安全与稳定性层 |
 
 - 工具接口设计
 - 参数 schema
@@ -108,17 +165,25 @@ flowchart TD
 
 ## 6. 推荐先做的工具
 
+初学时不要一开始就做数据库写入、文件删除、自动部署这类高风险工具。
+
+先从只读工具开始：
+
 - `read_file`
 - `list_files`
-- `write_file`
-- `http_get`
 - `search_text`
 
-如果后面偏业务系统，还可以加：
+再逐步扩展到：
 
+- `http_get`
 - `query_db`
-- `run_sql`
 - `call_internal_api`
+
+最后再考虑需要人工确认的写操作：
+
+- `write_file`
+- `run_sql`
+- `deploy_service`
 
 如果按案件导向，最有价值的往往是：
 
@@ -151,12 +216,32 @@ flowchart TD
 
 建议按这个顺序读代码：
 
-1. 先看 `build_tools()`，理解工具对模型长什么样。
-2. 再看 `list_files()` / `read_file()` / `search_text()`，理解真实动作在哪里发生。
-3. 再看 `call_tool()`，理解工具名如何分发到 Python 函数。
-4. 最后看 `run_agent()`，理解为什么需要循环。
+1. 先看 `parse_args()`：用户任务和 `--workdir` 从哪里来。
+2. 再看 `build_tools()`：工具对模型长什么样。
+3. 再看 `list_files()` / `read_file()` / `search_text()`：真实动作在哪里发生。
+4. 再看 `resolve_path()`：为什么要限制访问范围。
+5. 再看 `call_tool()`：工具名如何分发到 Python 函数。
+6. 最后看 `run_agent()`：为什么需要“模型判断 -> 工具执行 -> 结果回填”的循环。
 
 这样读会比一上来从 `main()` 往下硬看更清楚。
+
+## 9.1 跑 demo 时可以这样观察
+
+你可以试着让 demo 做一个只读任务：
+
+```bash
+python main.py --workdir . "请列出当前目录，并读取 README.md 总结项目内容"
+```
+
+观察输出时重点看：
+
+| 观察点 | 说明 |
+| --- | --- |
+| 模型有没有调用工具 | 如果直接回答，说明它没有使用真实文件 |
+| 调用了哪个工具 | 可能先 `list_files`，再 `read_file` |
+| 工具返回了什么 | 文件列表或文件内容 |
+| 最终回答是否基于工具结果 | 不应该编造文件里没有的内容 |
+| 是否限制在 `workdir` 内 | 这是安全边界 |
 
 ## 10. 中文 / 日语对照
 

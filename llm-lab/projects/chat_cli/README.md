@@ -1,33 +1,43 @@
-# chat_cli
+# chat_cli 本地副本说明
 
-最小可运行的大模型命令行对话示例（从 `agent-lab/projects/chat_cli` 复制）。
+> 归位说明：`chat_cli` 的正式 README 和维护入口在 [../../../agent-lab/projects/chat_cli/README.md](../../../agent-lab/projects/chat_cli/README.md)。本目录只是 `llm-lab` 下的可选本地副本，避免学习时来回切目录。
 
-这个项目的作用是帮你先理解最基础的 LLM 应用闭环：
+## 1. 这个副本是什么
 
-```mermaid
-flowchart TD
-    A[用户输入] --> B[Python 程序]
-    B --> C[OpenAI Client]
-    C --> D[模型]
-    D --> E[输出文本]
-    E --> F[终端显示]
+这个目录是最小模型调用 demo 的副本，用来配合：
+
+- [../../02-模型调用基础.md](../../02-模型调用基础.md)
+
+它的核心作用是帮助你理解：
+
+```text
+命令行输入 -> Python 程序 -> LLM API -> 模型回答 -> 终端输出
 ```
 
-## 快速说明
+## 2. 不在这里重复维护什么
 
-- 前置条件：Python 3.10+，设置 `OPENAI_API_KEY`
-- 安装依赖：`pip install -r requirements.txt`
-- 运行：`python main.py "一句话提问"` 或交互模式 `python main.py`
+为了避免和 `agent-lab/projects/chat_cli` 内容重复，本文件不重复维护：
 
-## 学习重点
+- 完整运行说明
+- 代码分层详解
+- 学习步骤
+- 后续扩展建议
 
-| 名词 | 概念理解 | 作用 |
-| --- | --- | --- |
-| API Key | 调用模型服务的身份凭证 | 让程序有权限访问模型 |
-| Client | API 客户端对象 | 负责发送请求 |
-| Model | 生成回答的大模型 | 根据输入返回结果 |
-| Instructions | 给模型的行为规则 | 控制回答风格和边界 |
-| Input | 用户问题 | 本次请求真正要处理的内容 |
-| Output | 模型返回文本 | 程序最终展示给用户 |
+这些统一看：
 
-详见源示例：[agent-lab/projects/chat_cli/README.md](../../../agent-lab/projects/chat_cli/README.md)
+- [../../../agent-lab/projects/chat_cli/README.md](../../../agent-lab/projects/chat_cli/README.md)
+- [../../../agent-lab/projects/chat_cli/main.py](../../../agent-lab/projects/chat_cli/main.py)
+
+## 3. 什么时候看这个目录
+
+| 场景 | 看哪里 |
+| --- | --- |
+| 想学模型调用基础 | [../../02-模型调用基础.md](../../02-模型调用基础.md) |
+| 想运行正式 demo | [../../../agent-lab/projects/chat_cli/README.md](../../../agent-lab/projects/chat_cli/README.md) |
+| 想在 `llm-lab` 内部临时修改 | 当前目录 |
+
+## 4. 注意
+
+- 如果源 demo 更新，优先以 `agent-lab/projects/chat_cli` 为准。
+- 如果这个副本和源 demo 不一致，应考虑重新复制或直接删除副本。
+- 不建议长期同时维护两份不同版本。

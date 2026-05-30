@@ -6,6 +6,18 @@
 3. `finalize` 阶段基于前两步生成最终建议
 
 使用分阶段方法能让模型在每一步聚焦单一子任务，提高可控性与可验证性。
+
+学习地图：
+- 运行命令：
+    - python3 main.py "我要做一个面向日本现场的需求整理 Agent"
+    - python3 main.py "帮我规划 4 周的 LLM 学习与作品集计划"
+- 输入输出：
+    - 输入：用户任务描述
+    - 输出：三阶段结果（analysis、结构化 plan、final summary）
+- 改造练习点：
+    - 在 plan 阶段增加 effort_estimate 字段
+    - 把三阶段耗时统计打印出来
+    - 允许跳过 finalize，只输出前两阶段
 """
 
 import argparse
@@ -45,6 +57,7 @@ class WorkflowPlan(BaseModel):
 
 
 def parse_args() -> argparse.Namespace:
+    # 层次: 输入层 — 解析用户任务与模型配置
     """解析命令行参数：用户任务与可选模型名。"""
     parser = argparse.ArgumentParser(
         description="Minimal workflow agent demo with staged OpenAI Responses API calls."
@@ -59,6 +72,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client() -> OpenAI:
+    # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失 Key 的退出策略
     """创建 OpenAI 客户端，需通过环境变量提供 API Key。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -68,6 +82,7 @@ def build_client() -> OpenAI:
 
 
 def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
+    # 层次: 分析层 — 提取目标、限制和期望交付物的简洁分析
     """分析阶段：把用户请求转换为简洁的分析文本，供下一步计划使用。"""
     response = client.responses.create(
         model=model,
@@ -78,6 +93,7 @@ def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
 
 
 def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
+    # 层次: 计划层 — 生成结构化计划并使用 Pydantic 验证结果
     """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。"""
     response = client.responses.parse(
         model=model,
@@ -89,6 +105,7 @@ def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
 
 
 def finalize_task(client: OpenAI, model: str, analysis: str, plan: WorkflowPlan) -> str:
+    # 层次: 总结层 — 基于前两阶段的输出生成最终建议文本
     """总结阶段：基于分析与计划生成最终简短建议。"""
     # The final step consumes prior workflow state instead of re-reading the original task alone.
     final_input = (
@@ -106,6 +123,8 @@ def finalize_task(client: OpenAI, model: str, analysis: str, plan: WorkflowPlan)
 
 
 def main() -> None:
+    # 层次: 程序入口 — 按阶段顺序执行工作流并展示每阶段输出
+    """主流程：执行 analyze -> plan -> finalize 三阶段，并逐段输出结果。"""
     args = parse_args()
     client = build_client()
 

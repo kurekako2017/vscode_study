@@ -29,9 +29,13 @@
 1. [Agent系统框架与术语.md](./Agent系统框架与术语.md)
 2. [01-学习路线.md](D:/dev/source_code/vscode_study/agent-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
 3. [02-模型调用基础.md](D:/dev/source_code/vscode_study/agent-lab/02-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%E5%9F%BA%E7%A1%80.md)
-4. [04-RAG.md](D:/dev/source_code/vscode_study/agent-lab/04-RAG.md)
+4. [04-RAG.md](D:/dev/source_code/vscode_study/agent-lab/04-RAG.md) - Agent 中的 RAG：把 RAG 当作知识工具使用
 5. [03-Tool%20Calling.md](D:/dev/source_code/vscode_study/agent-lab/03-Tool%20Calling.md)
 6. [05-Agent工作流.md](D:/dev/source_code/vscode_study/agent-lab/05-Agent%E5%B7%A5%E4%BD%9C%E6%B5%81.md)
+
+主线跑通后，再看：
+
+- [LLM-Agent学习路径与计划.md](./LLM-Agent学习路径与计划.md) - Agent 进阶扩展计划，不是入门路线
 
 ## 先理解的系统知识
 
@@ -48,7 +52,14 @@
 - Agent 和普通 LLM 调用的区别
 - 什么时候不该用 Agent
 
+如果你要学 RAG 基础，请优先看 [llm-lab/04-RAG.md](D:/dev/source_code/vscode_study/llm-lab/04-RAG.md)。
+`agent-lab/04-RAG.md` 只讲 Agent 如何调用 RAG、如何把 RAG 放进 Tool Calling 和 Workflow。
+
 ## 推荐输出物
+
+先看总导航（按章节一页直达运行命令与练习任务）：
+
+- [projects/LEARNING_MAP.md](./projects/LEARNING_MAP.md)
 
 - `chat_cli`
 - `structured_output_demo`
@@ -166,6 +177,7 @@ agent-lab/
 |-- 03-Tool Calling.md
 |-- 04-RAG.md
 |-- 05-Agent工作流.md
+|-- LLM-Agent学习路径与计划.md
 `-- projects/
     |-- chat_cli/
     |   |-- README.md

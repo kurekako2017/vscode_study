@@ -43,12 +43,14 @@
 
 - [LLM应用框架系统知识.md](./LLM应用框架系统知识.md)
 - [术语速查表.md](./术语速查表.md)
+- [日语对照速查表.md](./日语对照速查表.md)
 
 这份文档补充了：
 
 - LLM 应用的系统分层
 - 每个角色是什么、作用是什么
 - 常见术语的概念性解释
+- 常见术语的中文、English、日本語对照
 - 最小 LLM 应用数据流
 - RAG 应用数据流
 - 各教程在系统中的位置
@@ -86,6 +88,28 @@
 - 先会评估
 - 再进入 Agent 进阶
 
+## 日本现场日语对照
+
+如果你的目标是找日本项目现场，建议从一开始就把技术词和日语现场说法绑定起来。
+
+最先要记住的对照：
+
+| 中文 | English | 日本語 / 现场说法 | 为什么重要 |
+| --- | --- | --- | --- |
+| 生成 AI | Generative AI | 生成AI | 日本案件标题里最常出现的大类词 |
+| LLM 应用 | LLM Application | LLMアプリ / 生成AIアプリ | 表示不是研究模型，而是做业务应用 |
+| RAG | Retrieval-Augmented Generation | RAG / 検索拡張生成 | 社内搜索、知识库问答的核心架构 |
+| 社内搜索 | Internal Search | 社内検索 | 日本企业里很常见的落地场景 |
+| 概念验证 | PoC | PoC / 概念検証 | 很多生成 AI 案件先从小范围验证开始 |
+| API 集成 | API Integration | API連携 | 后端开发和企业系统接入的关键表达 |
+| 需求定义 | Requirements Definition | 要件定義 | 现场上游工程常用词 |
+| 基本设计 | Basic Design | 基本設計 | 日本项目设计书里常见阶段 |
+| 运维维护 | Operation / Maintenance | 運用保守 | 上线后监控、故障、成本管理 |
+
+完整对照请看：
+
+- [日语对照速查表.md](./日语对照速查表.md)
+
 ## 推荐学习顺序
 
 1. [LLM应用框架系统知识.md](./LLM应用框架系统知识.md)
@@ -100,6 +124,7 @@
 9. [08-云平台与企业环境.md](D:/dev/source_code/vscode_study/llm-lab/08-%E4%BA%91%E5%B9%B3%E5%8F%B0%E4%B8%8E%E4%BC%81%E4%B8%9A%E7%8E%AF%E5%A2%83.md)
 10. [09-岗位与技能要求对照.md](D:/dev/source_code/vscode_study/llm-lab/09-%E5%B2%97%E4%BD%8D%E4%B8%8E%E6%8A%80%E8%83%BD%E8%A6%81%E6%B1%82%E5%AF%B9%E7%85%A7.md)
 11. [10-作品集与面试准备.md](D:/dev/source_code/vscode_study/llm-lab/10-%E4%BD%9C%E5%93%81%E9%9B%86%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87.md)
+12. [日语对照速查表.md](./日语对照速查表.md)
 
 ## 每一篇是干什么的
 

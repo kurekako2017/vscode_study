@@ -21,6 +21,38 @@ Agent 可以先理解成：
 - 观察结果
 - 重试和终止条件
 
+## 1.1 用一个业务场景理解 Agent
+
+假设日本现场有一个需求：
+
+```text
+用户输入“帮我确认 API 失败时的处理流程，并整理成任务清单”。
+```
+
+普通聊天模型可能直接回答一段说明。
+
+Agent 更像这样工作：
+
+```text
+1. 理解用户目标：确认 API 失败处理流程
+2. 判断需要资料：需要查设计书或手顺书
+3. 调用工具：搜索文档、读取文件
+4. 观察结果：拿到相关文档片段
+5. 生成计划：整理处理步骤和注意点
+6. 输出结果：回答 + 来源 + 后续任务清单
+```
+
+所以 Agent 不是“更会聊天的模型”，而是一个把模型、工具、状态和流程组合起来的应用系统。
+
+对应到本目录：
+
+| 学习内容 | 对应文件 / demo |
+| --- | --- |
+| 会调用模型 | [02-模型调用基础.md](./02-模型调用基础.md)、`projects/chat_cli` |
+| 会查资料 | [../llm-lab/04-RAG.md](../llm-lab/04-RAG.md)、`projects/doc_qa_agent` |
+| 会使用工具 | [03-Tool Calling.md](./03-Tool%20Calling.md)、`projects/tool_agent_demo` |
+| 会分阶段处理任务 | [05-Agent工作流.md](./05-Agent工作流.md)、`projects/workflow_agent` |
+
 ## 2. Agent 系统分层
 
 ```mermaid
@@ -146,7 +178,8 @@ sequenceDiagram
 | 教程 | 属于哪一层 | 学到什么 |
 | --- | --- | --- |
 | `02-模型调用基础.md` | LLM Reasoner 基础 | Agent 仍然依赖模型调用 |
-| `04-RAG.md` | 知识工具层 | 让 Agent 能查资料 |
+| `../llm-lab/04-RAG.md` | RAG 基础层 | 学会文档读取、切分、检索和引用 |
+| `04-RAG.md` | Agent 知识工具层 | 学会 Agent 如何把 RAG 当作工具 |
 | `03-Tool Calling.md` | 工具调用层 | 让模型选择工具并给参数 |
 | `05-Agent工作流.md` | Agent Controller / Workflow | 多步骤执行、状态、终止条件 |
 | `tool_agent_demo` | Tool Calling 示例 | 一个能调用工具的最小 Agent |

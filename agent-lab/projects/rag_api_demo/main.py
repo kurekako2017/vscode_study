@@ -6,6 +6,18 @@
 - 将检索到的上下文发送给模型并返回带来源的回答
 
 此示例适合 PoC 与教学，生产请替换为 embeddings + 向量检索，加入认证、限流与缓存。
+
+学习地图：
+- 运行命令：
+    - uvicorn main:app --reload --port 8000
+    - curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档重点"}'
+- 输入输出：
+    - 输入：HTTP JSON 请求（question、model） + 本地 docs 目录
+    - 输出：结构化 JSON（answer、sources、source_count）
+- 改造练习点：
+    - 新增 /config endpoint 暴露当前 chunk 参数
+    - 为 /ask 增加 top_k 可选参数
+    - 将 load_state 改为可热更新的服务层对象
 """
 
 import os
@@ -42,16 +54,19 @@ class Chunk:
 
 
 class AskRequest(BaseModel):
+    """/ask 请求体：问题文本 + 可选模型名。"""
     question: str = Field(min_length=1, description="Question about local documents.")
     model: str = Field(default=DEFAULT_MODEL, description="OpenAI model to use.")
 
 
 class SourceItem(BaseModel):
+    """来源条目：用于告诉调用方答案依据来自哪些文档片段。"""
     source_label: str
     score: int
 
 
 class AskResponse(BaseModel):
+    """/ask 响应体：答案正文 + 来源摘要，便于前端或调用方渲染。"""
     answer: str
     model: str
     docs_dir: str
@@ -60,11 +75,13 @@ class AskResponse(BaseModel):
 
 
 class ReloadResponse(BaseModel):
+    """/reload 响应体：用于确认文档索引是否已刷新。"""
     docs_dir: str
     chunk_count: int
 
 
 def build_client() -> OpenAI:
+    # 层次: 基础设施层 — 构建 OpenAI 客户端并在缺失时抛出以便上层处理
     """根据环境变量创建 OpenAI 客户端，缺失抛出异常以便上层处理。"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -73,6 +90,7 @@ def build_client() -> OpenAI:
 
 
 def get_docs_dir() -> Path:
+    # 层次: 配置/IO 层 — 解析并校验文档目录配置
     """获取并校验用于 RAG 的文档目录（可通过环境变量覆盖）。"""
     docs_dir = os.getenv("RAG_API_DOCS_DIR", DEFAULT_DOCS_DIR)
     path = Path(docs_dir).resolve()
@@ -82,6 +100,7 @@ def get_docs_dir() -> Path:
 
 
 def iter_text_files(base_dir: Path) -> list[Path]:
+    # 层次: IO/索引层 — 列出支持的文档文件路径
     """递归列出支持类型的文件路径并返回排序列表。"""
     files = []
     for path in base_dir.rglob("*"):
@@ -91,6 +110,7 @@ def iter_text_files(base_dir: Path) -> list[Path]:
 
 
 def read_document_text(file_path: Path) -> str:
+    # 层次: IO/解析层 — 根据文件类型提取文本（支持 md/txt/pdf）
     """根据文件类型读取文本内容；对 PDF 使用 `pypdf` 做基本提取。"""
     suffix = file_path.suffix.lower()
 
@@ -111,6 +131,7 @@ def read_document_text(file_path: Path) -> str:
 
 
 def chunk_text(text: str) -> list[str]:
+    # 层次: 索引构建层 — 切分文本为带重叠 chunk
     """把文本切分为带重叠的 chunk，保留跨块上下文。"""
     normalized = text.replace("\r\n", "\n").strip()
     if not normalized:
@@ -129,6 +150,7 @@ def chunk_text(text: str) -> list[str]:
 
 
 def build_chunks(base_dir: Path) -> list[Chunk]:
+    # 层次: 索引构建层 — 构建带来源标签的 chunk 列表并返回
     """读取指定目录下的文件并构建带来源标签的 chunk 列表。"""
     chunks: list[Chunk] = []
     for file_path in iter_text_files(base_dir):
@@ -144,11 +166,13 @@ def build_chunks(base_dir: Path) -> list[Chunk]:
 
 
 def tokenize(text: str) -> set[str]:
+    # 层次: 工具层 — 简单分词实现，用于检索评分
     """简单分词函数，支持英文、数字和部分中日韩字符，用于关键词检索示例。"""
     return set(re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower()))
 
 
 def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
+    # 层次: 检索层 — 使用关键词重合度实现简单检索（PoC）
     """基于关键词重合度进行简单检索并返回 top-k。"""
     question_tokens = tokenize(question)
     ranked: list[Chunk] = []
@@ -165,6 +189,7 @@ def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
 
 
 def build_context(top_chunks: list[Chunk]) -> str:
+    # 层次: 上下文构建层 — 将 top chunks 拼接为模型可读的上下文
     """把检索到的 top chunks 拼接为供模型使用的上下文字符串。"""
     if not top_chunks:
         return "No relevant local document chunks were retrieved."
@@ -176,6 +201,7 @@ def build_context(top_chunks: list[Chunk]) -> str:
 
 
 def answer_question(client: OpenAI, model: str, question: str, context: str) -> str:
+    # 层次: 调用层 — 用检索上下文构造 prompt 并请求模型回答
     """调用模型回答，限制其仅基于传入的检索上下文回答问题。"""
     prompt = (
         f"Question:\n{question}\n\n"
@@ -192,6 +218,7 @@ def answer_question(client: OpenAI, model: str, question: str, context: str) -> 
 
 
 app = FastAPI(title="rag_api_demo", version="0.1.0")
+# 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 app.state.client = None
 app.state.docs_dir = None
 app.state.chunks = []
@@ -211,6 +238,7 @@ def load_state() -> None:
 
 @app.on_event("startup")
 def startup_event() -> None:
+    """服务启动时预热：加载文档并构建内存索引。"""
     load_state()
 
 
