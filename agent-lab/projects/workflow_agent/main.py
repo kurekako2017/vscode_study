@@ -58,7 +58,7 @@ class WorkflowPlan(BaseModel):
 
 def parse_args() -> argparse.Namespace:
     # 层次: 输入层 — 解析用户任务与模型配置
-    """解析命令行参数：用户任务与可选模型名。"""
+    """解析命令行参数：用户任务与可选模型名（支持 mock/real）。"""
     parser = argparse.ArgumentParser(
         description="Minimal workflow agent demo with staged OpenAI Responses API calls."
     )
@@ -68,6 +68,8 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
+    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
     return parser.parse_args()
 
 
@@ -81,9 +83,39 @@ def build_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
-    # 层次: 分析层 — 提取目标、限制和期望交付物的简洁分析
+def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    if force_mock:
+        return "mock"
+    if force_real:
+        if not os.getenv("OPENAI_API_KEY"):
+            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+            sys.exit(1)
+        return "real"
+    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
+
+
+def build_mock_analysis(prompt: str) -> str:
+    return f"[MOCK MODE] Analysis for: {prompt}\n- goals: mock goal\n- constraints: none"
+
+
+def build_mock_plan(prompt: str) -> WorkflowPlan:
+    return WorkflowPlan(
+        goal=f"Mock plan for: {prompt}",
+        priority="medium",
+        steps=["step1", "step2"],
+        deliverables=["demo"],
+        risks=["mock only"],
+    )
+
+
+def build_mock_final(prompt: str) -> str:
+    return f"[MOCK MODE] Final recommendation for: {prompt}"
+
+
+def analyze_task(client: OpenAI | None, model: str, prompt: str, mode: str) -> str:
     """分析阶段：把用户请求转换为简洁的分析文本，供下一步计划使用。"""
+    if mode == "mock":
+        return build_mock_analysis(prompt)
     response = client.responses.create(
         model=model,
         instructions=ANALYZE_INSTRUCTIONS,
@@ -92,9 +124,10 @@ def analyze_task(client: OpenAI, model: str, prompt: str) -> str:
     return response.output_text
 
 
-def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
-    # 层次: 计划层 — 生成结构化计划并使用 Pydantic 验证结果
+def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> WorkflowPlan:
     """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。"""
+    if mode == "mock":
+        return build_mock_plan(analysis)
     response = client.responses.parse(
         model=model,
         instructions=PLAN_INSTRUCTIONS,
@@ -104,9 +137,10 @@ def plan_task(client: OpenAI, model: str, analysis: str) -> WorkflowPlan:
     return response.output_parsed
 
 
-def finalize_task(client: OpenAI, model: str, analysis: str, plan: WorkflowPlan) -> str:
-    # 层次: 总结层 — 基于前两阶段的输出生成最终建议文本
+def finalize_task(client: OpenAI | None, model: str, analysis: str, plan: WorkflowPlan, mode: str) -> str:
     """总结阶段：基于分析与计划生成最终简短建议。"""
+    if mode == "mock":
+        return build_mock_final(analysis)
     # The final step consumes prior workflow state instead of re-reading the original task alone.
     final_input = (
         "Analysis:\n"
@@ -126,13 +160,16 @@ def main() -> None:
     # 层次: 程序入口 — 按阶段顺序执行工作流并展示每阶段输出
     """主流程：执行 analyze -> plan -> finalize 三阶段，并逐段输出结果。"""
     args = parse_args()
-    client = build_client()
+    mode = resolve_mode(args.mock, args.real)
+    client = None
+    if mode == "real":
+        client = build_client()
 
     try:
         # 分阶段执行：先分析，再计划，最后总结
-        analysis = analyze_task(client, args.model, args.prompt)
-        plan = plan_task(client, args.model, analysis)
-        final_summary = finalize_task(client, args.model, analysis, plan)
+        analysis = analyze_task(client, args.model, args.prompt, mode)
+        plan = plan_task(client, args.model, analysis, mode)
+        final_summary = finalize_task(client, args.model, analysis, plan, mode)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)

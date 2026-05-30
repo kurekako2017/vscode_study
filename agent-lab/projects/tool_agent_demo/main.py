@@ -39,7 +39,7 @@ SYSTEM_INSTRUCTIONS = (
 
 
 def parse_args() -> argparse.Namespace:
-    # 层次: 输入层 — 解析用户任务、模型与工作目录范围
+    # 层次: 输入层 — 解析用户任务、模型与工作目录范围（支持 mock/real）
     """解析命令行参数：用户任务、模型名与允许访问的工作目录。"""
     parser = argparse.ArgumentParser(
         description="Minimal tool-calling agent demo for listing files, reading files, and searching text."
@@ -55,6 +55,8 @@ def parse_args() -> argparse.Namespace:
         default=".",
         help="Working directory the tools can access. Default: current directory.",
     )
+    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
     return parser.parse_args()
 
 
@@ -66,6 +68,21 @@ def build_client() -> OpenAI:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
         sys.exit(1)
     return OpenAI(api_key=api_key)
+
+
+def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    if force_mock:
+        return "mock"
+    if force_real:
+        if not os.getenv("OPENAI_API_KEY"):
+            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+            sys.exit(1)
+        return "real"
+    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
+
+
+def build_mock_agent_response(prompt: str) -> str:
+    return f"[MOCK MODE] Mocked tool agent response for: {prompt}\n(Use --real to call the API)"
 
 
 def resolve_path(base_dir: Path, relative_path: str) -> Path:
@@ -225,7 +242,7 @@ def build_tools() -> list[dict[str, Any]]:
     ]
 
 
-def run_agent(client: OpenAI, model: str, base_dir: Path, prompt: str) -> str:
+def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mode: str) -> str:
     # 层次: Agent 控制层 — 驱动模型与工具交互的主循环
     """运行一个最小的 agent 控制循环：
 
@@ -234,6 +251,8 @@ def run_agent(client: OpenAI, model: str, base_dir: Path, prompt: str) -> str:
     3. 重复直到模型返回最终回答或超过最大轮次
     """
     tools = build_tools()
+    if mode == "mock":
+        return build_mock_agent_response(prompt)
     input_items: list[dict[str, Any]] = [
         {
             "role": "user",
@@ -281,7 +300,10 @@ def main() -> None:
     # 层次: 程序入口 — 验证输入并启动 agent 控制循环
     """主流程：校验工作目录后进入工具调用循环并输出最终答案。"""
     args = parse_args()
-    client = build_client()
+    mode = resolve_mode(args.mock, args.real)
+    client = None
+    if mode == "real":
+        client = build_client()
     base_dir = Path(args.workdir).resolve()
 
     if not base_dir.exists() or not base_dir.is_dir():
@@ -290,7 +312,7 @@ def main() -> None:
 
     try:
         # 这里会触发“模型判断 -> 调工具 -> 回填结果 -> 再判断”的闭环。
-        answer = run_agent(client, args.model, base_dir, args.prompt)
+        answer = run_agent(client, args.model, base_dir, args.prompt, mode)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)

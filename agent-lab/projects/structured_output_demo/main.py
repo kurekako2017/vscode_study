@@ -67,6 +67,8 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
+    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
     return parser.parse_args()
 
 
@@ -80,12 +82,33 @@ def build_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def generate_plan(client: OpenAI, model: str, prompt: str) -> AgentPlan:
-    # 层次: 调用层 — 请求模型并使用 SDK 的 parse 功能将输出映射为 `AgentPlan`
-    """调用 Responses API 的 `parse` 功能，直接将输出解析为 `AgentPlan`。
+def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    if force_mock:
+        return "mock"
+    if force_real:
+        if not os.getenv("OPENAI_API_KEY"):
+            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+            sys.exit(1)
+        return "real"
+    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
 
-    `text_format=AgentPlan` 告知 SDK 使用 Pydantic 验证模型输出结构。
-    """
+
+def build_mock_plan(prompt: str) -> AgentPlan:
+    return AgentPlan(
+        goal=f"Mock goal for: {prompt}",
+        user_type="beginner",
+        core_capabilities=["search", "summarize"],
+        tools=["local_docs"],
+        deliverables=["demo"],
+        risks=["mock-only"],
+    )
+
+
+def generate_plan(client: OpenAI | None, model: str, prompt: str, mode: str) -> AgentPlan:
+    # 层次: 调用层 — 请求模型并使用 SDK 的 parse 功能将输出映射为 `AgentPlan`（支持 mock）
+    if mode == "mock":
+        return build_mock_plan(prompt)
+
     response = client.responses.parse(
         model=model,
         instructions=SYSTEM_INSTRUCTIONS,
@@ -99,10 +122,13 @@ def main() -> None:
     # 层次: 程序入口 — 读取参数、调用构建流程并展示结果
     """主流程：读取参数 -> 请求结构化输出 -> 打印可读 JSON。"""
     args = parse_args()
-    client = build_client()
+    mode = resolve_mode(args.mock, args.real)
+    client = None
+    if mode == "real":
+        client = build_client()
 
     try:
-        plan = generate_plan(client, args.model, args.prompt)
+        plan = generate_plan(client, args.model, args.prompt, mode)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)

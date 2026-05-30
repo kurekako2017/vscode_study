@@ -89,6 +89,21 @@ def build_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
+def resolve_mode() -> str:
+    """决定服务运行模式：'mock' 或 'real'。可通过环境变量 RAG_API_MOCK=1 强制 mock。"""
+    if os.getenv("RAG_API_MOCK") == "1":
+        return "mock"
+    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
+
+
+def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
+    """生成 RAG mock 回答，包含检索提示与练习建议。"""
+    lines = ["[MOCK MODE]", f"问题: {question}"]
+    lines.append("检索到的片段数量: {}".format(len(top_chunks)))
+    lines.append("练习建议: 将检索替换为向量检索并在 real 模式下测试。")
+    return "\n".join(lines)
+
+
 def get_docs_dir() -> Path:
     # 层次: 配置/IO 层 — 解析并校验文档目录配置
     """获取并校验用于 RAG 的文档目录（可通过环境变量覆盖）。"""
@@ -200,9 +215,14 @@ def build_context(top_chunks: list[Chunk]) -> str:
     return "\n\n".join(parts)
 
 
-def answer_question(client: OpenAI, model: str, question: str, context: str) -> str:
-    # 层次: 调用层 — 用检索上下文构造 prompt 并请求模型回答
+def answer_question(client: OpenAI | None, model: str, question: str, context: str) -> str:
+    # 层次: 调用层 — 用检索上下文构造 prompt 并请求模型回答或返回 mock
     """调用模型回答，限制其仅基于传入的检索上下文回答问题。"""
+    mode = resolve_mode()
+    if mode == "mock":
+        # Try to include minimal top-k info in mock answer (context may be large)
+        return build_mock_answer(question, [])
+
     prompt = (
         f"Question:\n{question}\n\n"
         f"Retrieved context:\n{context}\n\n"
@@ -231,7 +251,11 @@ def load_state() -> None:
     if not chunks:
         raise RuntimeError("No readable .md, .txt, or .pdf files were found in docs directory.")
     # Cache the parsed chunks in memory so each request does not rescan the directory.
-    app.state.client = build_client()
+    mode = resolve_mode()
+    if mode == "real":
+        app.state.client = build_client()
+    else:
+        app.state.client = None
     app.state.docs_dir = docs_dir
     app.state.chunks = chunks
 

@@ -70,6 +70,8 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
+    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
     return parser.parse_args()
 
 
@@ -81,6 +83,29 @@ def build_client() -> OpenAI:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
         sys.exit(1)
     return OpenAI(api_key=api_key)
+
+
+def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    """决定运行模式：'mock' | 'real'。"""
+    if force_mock:
+        return "mock"
+    if force_real:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+            sys.exit(1)
+        return "real"
+    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
+
+
+def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
+    """生成教学用的 mock 回答文本（没有外部依赖）。"""
+    lines = ["[MOCK MODE]", f"收到问题: {question}"]
+    lines.append("练习建议:")
+    lines.append("1) 检查 parse_args() 如何接收参数")
+    lines.append("2) 检查检索与上下文拼接流程")
+    lines.append("3) 在有真实 API 时再切换 --real 进行完整测试")
+    return "\n".join(lines)
 
 
 def iter_text_files(base_dir: Path) -> list[Path]:
@@ -168,9 +193,12 @@ def build_context(top_chunks: list[Chunk]) -> str:
     return "\n\n".join(parts)
 
 
-def answer_question(client: OpenAI, model: str, question: str, context: str) -> str:
-    # 层次: 调用层 — 将构建好的 prompt 传给模型并返回答案
-    """调用模型回答，强制其仅基于传入的检索上下文回答问题。"""
+def answer_question(client: OpenAI | None, model: str, question: str, context: str, mode: str) -> str:
+    # 层次: 调用层 — 将构建好的 prompt 传给模型并返回答案（支持 mock）
+    """调用模型回答，支持 mock 模式返回教学用文本。"""
+    if mode == "mock":
+        return build_mock_answer(question, [])
+
     prompt = (
         f"Question:\n{question}\n\n"
         f"Retrieved context:\n{context}\n\n"
@@ -205,9 +233,13 @@ def main() -> None:
     top_chunks = retrieve(args.question, chunks)
     context = build_context(top_chunks)
 
-    client = build_client()
+    mode = resolve_mode(args.mock, args.real)
+    client = None
+    if mode == "real":
+        client = build_client()
+
     try:
-        answer = answer_question(client, args.model, args.question, context)
+        answer = answer_question(client, args.model, args.question, context, mode)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)
