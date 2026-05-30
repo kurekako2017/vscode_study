@@ -2,7 +2,11 @@
 
 下面是 `main.py` 的处理流程图（Mermaid 格式），可在支持 Mermaid 的渲染器中直接预览。
 
-下面是 `main.py` 的处理流程（Mermaid 源）：
+为了在仓库页面上像 `README` 一样直接看到流程图，文档顶部先展示静态 SVG（优先渲染），下方保留原始 Mermaid 源以便编辑维护：
+
+![处理流程图]( /agent-lab/projects/chat_cli/assets/flowchart_simple.svg)
+
+下面是 `main.py` 的处理流程（Mermaid 源，供可编辑预览用）：
 
 ```mermaid
 flowchart TD
@@ -46,8 +50,7 @@ flowchart TD
 	Output --> End([结束或等待下一次输入])
 ```
 
-注意：
-- 如果你在某些查看器或平台上无法直接渲染 Mermaid（例如某些静态站点或老版本 Markdown 预览器），仓库同时保留了静态 SVG（`assets/flowchart_simple.svg`）和 CI 渲染的 PNG (`docs/flowchart.png`) 作为回退，请按需查看。
+说明：若平台不支持 SVG 渲染，仓库 CI 会生成 `docs/flowchart.png`（回退），文档中也会显示该 PNG（若存在）。
 
 如何在本地渲染此 Mermaid 图：
 
