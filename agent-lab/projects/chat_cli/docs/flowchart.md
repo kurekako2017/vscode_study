@@ -2,11 +2,52 @@
 
 下面是 `main.py` 的处理流程图（Mermaid 格式），可在支持 Mermaid 的渲染器中直接预览。
 
-![处理流程图]( /agent-lab/projects/chat_cli/assets/flowchart_simple.svg)
+下面是 `main.py` 的处理流程（Mermaid 源）：
 
-> 说明：为了保证在 GitHub 与其他不渲染 Mermaid 的环境中均可查看，`flowchart.md` 现在直接引用与 `README` 相同的静态 SVG 图（`assets/flowchart_simple.svg`）。
+```mermaid
+flowchart TD
+	Start([命令行启动]) --> Parse[parse_args()]
 
-如果平台或浏览器对 SVG 有限制，仓库的 CI 会在需要时生成 `docs/flowchart.png` 作为回退；若存在该 PNG 文件，也会作为备用显示。
+	Parse --> Decide{模式决策\n(--mock/--real/自动)}
+
+	Decide -->|强制 --mock| UseMockTrue[use_mock = True]
+	Decide -->|强制 --real| UseMockFalse[use_mock = False]
+	Decide -->|自动| AutoCheck[检查环境: OPENAI_API_KEY & SDK]
+
+	AutoCheck -->|无 KEY 或 无 SDK| UseMockTrue
+	AutoCheck -->|有 KEY 且 有 SDK| UseMockFalse
+
+	UseMockTrue --> BuildMock[build_mock_answer(prompt)]
+	UseMockFalse --> BuildClient[build_client() \n(检查 SDK, 读取 OPENAI_API_KEY, 创建客户端)]
+
+	Parse --> HasPrompt{是否提供一次性 `prompt`} 
+	HasPrompt -->|是| OneShot[一次性调用流程]
+	HasPrompt -->|否| Interactive[交互模式 run_interactive()]
+
+	OneShot -->|use_mock| BuildMock
+	OneShot -->|use_real| AskOnceReal[ask_once(client, model, prompt)]
+
+	Interactive --> LoopStart[(交互循环)]
+	LoopStart -->|每次输入| AskOnceLoop[ask_once(...)]
+	AskOnceLoop -->|use_mock| BuildMock
+	AskOnceLoop -->|use_real| AskOnceReal
+
+	BuildMock --> FormatMock[format_output(answer, max_chars)]
+	AskOnceReal --> FormatReal[format_output(answer, max_chars)]
+
+	FormatMock --> Output[输出到终端]
+	FormatReal --> Output
+
+	%% 错误处理路径
+	AskOnceReal -.->|请求异常| ErrorHandler[打印错误并退出或继续]
+	AskOnceLoop -.->|请求异常| LoopContinue[打印错误并返回循环]
+
+	%% 终止
+	Output --> End([结束或等待下一次输入])
+```
+
+注意：
+- 如果你在某些查看器或平台上无法直接渲染 Mermaid（例如某些静态站点或老版本 Markdown 预览器），仓库同时保留了静态 SVG（`assets/flowchart_simple.svg`）和 CI 渲染的 PNG (`docs/flowchart.png`) 作为回退，请按需查看。
 
 如何在本地渲染此 Mermaid 图：
 
