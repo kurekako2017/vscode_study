@@ -12,18 +12,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install librsvg (for rsvg-convert)
+      - name: Setup Node.js and install mermaid-cli
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install mermaid-cli
+        run: |
+          npm install -g @mermaid-js/mermaid-cli
+
+      - name: Install librsvg (for rsvg-convert fallback)
         run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
 
-      - name: Convert SVG to PNG
+      - name: Render Mermaid .mmd -> PNG (preferred)
+        run: |
+          MMD=agent-lab/projects/chat_cli/docs/flowchart.mmd
+          PNG=agent-lab/projects/chat_cli/docs/flowchart.png
+          if [ -f "$MMD" ]; then
+            echo "Rendering $MMD -> $PNG using mmdc"
+            mmdc -i "$MMD" -o "$PNG" -w 1200 -H 900 || echo "mmdc failed"
+          else
+            echo "No .mmd source found, will fallback to SVG conversion if available"
+          fi
+
+      - name: Convert SVG to PNG (fallback)
         run: |
           SVG=agent-lab/projects/chat_cli/docs/flowchart.svg
           PNG=agent-lab/projects/chat_cli/docs/flowchart.png
-          if [ -f "$SVG" ]; then
+          if [ -f "$PNG" ]; then
+            echo "$PNG already exists, skipping SVG fallback"
+          elif [ -f "$SVG" ]; then
             rsvg-convert -w 1200 -h 900 -o "$PNG" "$SVG"
             echo "Converted $SVG -> $PNG"
           else
-            echo "SVG not found: $SVG" && exit 1
+            echo "No SVG or MMD source found: nothing to render" && exit 1
           fi
 
       - name: Commit and push generated PNG
