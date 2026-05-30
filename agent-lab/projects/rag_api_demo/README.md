@@ -1,3 +1,58 @@
+# RAG API Demo — 运行说明
+
+本示例服务支持两种运行方式：
+
+- 本地虚拟环境（推荐用于开发）
+- Docker 容器（推荐用于受限环境或当系统无法创建 venv 时）
+
+同时项目提供 `mock_test.py`，可在无任何依赖的情况下快速验证 mock 输出。
+
+## 1) 快速验证（无需依赖）
+
+在项目根目录下运行：
+
+```bash
+python3 mock_test.py
+```
+
+脚本会打印模拟的 /ask 返回 JSON，适合离线验证逻辑与模板。
+
+## 2) 在本机创建 venv 并运行（需要系统支持 python3-venv）
+
+```bash
+cd $(pwd)/agent-lab/projects/rag_api_demo
+./run-dev.sh
+```
+
+`run-dev.sh` 会尝试：
+1. 创建 `.venv`（`python3 -m venv .venv`）
+2. 激活并安装 `requirements.txt`
+3. 以 `RAG_API_MOCK=1` 启动 `uvicorn main:app`（mock 模式）
+
+若遇到 `ensurepip is not available` 或类似错误，请在 Debian/Ubuntu 上安装系统包后重试：
+
+```bash
+sudo apt update && sudo apt install python3-venv
+```
+
+## 3) 使用 Docker（当系统无法创建 venv 或希望在容器中运行时）
+
+构建镜像并运行（会在容器内以 mock 模式运行）：
+
+```bash
+cd agent-lab/projects/rag_api_demo
+docker build -t rag_api_demo:dev .
+docker run -e RAG_API_MOCK=1 -p 8000:8000 rag_api_demo:dev
+```
+
+运行后访问：`http://localhost:8000/ask`（POST 接口）或根据项目示例使用 curl 测试。
+
+## 常见问题
+- 如果系统受管（无法创建 venv）且也没有 Docker，请在具有权限的开发机或 CI 中运行上述 Docker 步骤。
+- 如果需要我把示例 curl 请求或简单的 health-check 脚本加入仓库，请回复我会追加。
+
+---
+文件位于：`agent-lab/projects/rag_api_demo/`。
 # rag_api_demo
 
 最小可运行的 `FastAPI` 版 `RAG` 后端示例。
