@@ -1,0 +1,43 @@
+name: RAG API Demo CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  mock-test:
+    name: Run mock_test.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run mock_test.py (no deps)
+        run: |
+          cd agent-lab/projects/rag_api_demo
+          python3 mock_test.py
+
+  docker-build:
+    name: Build and run Docker image
+    runs-on: ubuntu-latest
+    needs: mock-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          cd agent-lab/projects/rag_api_demo
+          docker build -t rag_api_demo:ci .
+      - name: Run container and check health
+        run: |
+          docker run -d --name rag_demo_ci -p 8000:8000 rag_api_demo:ci
+          for i in {1..30}; do
+            if curl -sS http://localhost:8000/health >/dev/null 2>&1; then
+              echo 'health ok'
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'health check failed' && docker logs rag_demo_ci && exit 1
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop rag_demo_ci || true
+          docker rm rag_demo_ci || true
