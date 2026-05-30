@@ -28,15 +28,21 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install system dependencies for headless Chromium
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libx11-6 \
-            libx11-xcb1 libxcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 \
-            libpangocairo-1.0-0 libgtk-3-0 libxss1
-
-      - name: Run mermaid rendering script
-        run: python3 scripts/render_mermaid_to_svg.py
+      - name: Render .mmd files using mermaid-cli docker image
+        uses: addnab/docker-run-action@v3
+        with:
+          image: minlag/mermaid-cli
+          options: -v ${{ github.workspace }}:/work -w /work
+          run: |
+            set -e
+            # find all .mmd files and render to .svg next to them
+            for m in $(find java-projects/JtProject-Next/doc -name '*.mmd' -print); do
+              out="${m%.mmd}.svg"
+              echo "Rendering $m -> $out"
+              mmdc -i "$m" -o "$out" || echo "Failed to render $m"
+            done
+            # also run Python script to update Markdown references (idempotent)
+            python3 scripts/render_mermaid_to_svg.py || echo "render script failed"
 
       - name: Commit generated SVGs
         run: |
