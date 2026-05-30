@@ -168,7 +168,7 @@ def ask_once(client: Any, model: str, prompt: str, use_mock: bool) -> str:
 
 def format_output(answer: str, max_chars: int | None) -> str:
     # 层次: 业务逻辑层 — 根据参数对模型输出做后处理（例如截断）
-    """按 max_chars 对输出做截断，便于练习参数驱动的业务逻辑。"""
+    """按 max_chars 对输出做截断，便于练习参数驱动的业务逻辑。
 
     说明：
     - 如果 `max_chars` 为 `None`，返回完整 `answer`。
