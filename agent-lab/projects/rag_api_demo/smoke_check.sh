@@ -13,5 +13,22 @@ if [ -z "$RESP" ]; then
   exit 1
 fi
 
-echo "OK: /ask responded"
-echo "$RESP"
+echo "Response: $RESP"
+
+# Basic JSON validation: ensure 'answer' and 'source_count' keys exist
+python3 - <<'PY'
+import sys, json
+try:
+    obj = json.loads(sys.stdin.read())
+except Exception as e:
+    print('ERROR: response is not valid JSON:', e, file=sys.stderr)
+    sys.exit(1)
+
+if 'answer' not in obj or 'source_count' not in obj:
+    print('ERROR: required fields missing in response. Keys:', list(obj.keys()), file=sys.stderr)
+    sys.exit(1)
+
+print('OK: /ask returned required fields (answer, source_count)')
+PY <<EOF
+$RESP
+EOF
