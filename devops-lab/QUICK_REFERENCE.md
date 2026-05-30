@@ -16,14 +16,28 @@
 
 ## 2. 当前工作区最重要入口
 
-- [README.md](D:/dev/source_code/vscode_study/devops-lab/README.md)
-- [01-学习路线.md](D:/dev/source_code/vscode_study/devops-lab/01-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF.md)
-- [02-Docker与容器.md](D:/dev/source_code/vscode_study/devops-lab/02-Docker%E4%B8%8E%E5%AE%B9%E5%99%A8.md)
-- [03-CI_CD与自动化运维.md](D:/dev/source_code/vscode_study/devops-lab/03-CI_CD%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%8C%96%E8%BF%90%E7%BB%B4.md)
-- [05-Kubernetes最小入门.md](D:/dev/source_code/vscode_study/devops-lab/05-Kubernetes%E6%9C%80%E5%B0%8F%E5%85%A5%E9%97%A8.md)
-- [11-监控与可观测性入口.md](D:/dev/source_code/vscode_study/devops-lab/11-%E7%9B%91%E6%8E%A7%E4%B8%8E%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E5%85%A5%E5%8F%A3.md)
-- [12-Prometheus_Grafana最小入门.md](D:/dev/source_code/vscode_study/devops-lab/12-Prometheus_Grafana%E6%9C%80%E5%B0%8F%E5%85%A5%E9%97%A8.md)
-- [13-docker-compose_最小监控栈演练页.md](D:/dev/source_code/vscode_study/devops-lab/13-docker-compose_%E6%9C%80%E5%B0%8F%E7%9B%91%E6%8E%A7%E6%A0%88%E6%BC%94%E7%BB%83%E9%A1%B5.md)
+- [README.md](README.md)
+- [00-DevOps系统学习路线.md](00-DevOps系统学习路线.md)
+- [01-学习路线.md](01-学习路线.md)
+- [02-Docker与容器.md](02-Docker与容器.md)
+- [03-CI_CD与自动化运维.md](03-CI_CD与自动化运维.md)
+- [05-Kubernetes最小入门.md](05-Kubernetes最小入门.md)
+- [11-监控与可观测性入口.md](11-监控与可观测性入口.md)
+- [12-Prometheus_Grafana最小入门.md](12-Prometheus_Grafana最小入门.md)
+- [13-docker-compose_最小监控栈演练页.md](13-docker-compose_最小监控栈演练页.md)
+
+## 2.1 系统分层速查
+
+| 层 | 工具 / 文件 | 作用 |
+| --- | --- | --- |
+| 代码管理 | Git / GitHub | 管理源码、PR、变更历史 |
+| 本地开发 | Docker / docker compose | 本地复现运行环境 |
+| CI | GitHub Actions workflow | 自动构建、测试、检查 |
+| 制品 | Docker image / artifact | 保存可部署产物 |
+| CD | deploy workflow / scripts | 发布到目标环境 |
+| 运行平台 | Docker / Kubernetes | 运行应用实例 |
+| 自动化运维 | PowerShell / shell scripts | 状态检查、日志收集、诊断 |
+| 可观测性 | Logs / Metrics / Prometheus / Grafana | 发现和定位问题 |
 
 ## 3. 最重要现成材料
 

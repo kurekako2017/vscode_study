@@ -54,6 +54,35 @@
 2. 自动收集日志
 3. 自动执行常见运维动作
 
+## 5.1 CI/CD 在 DevOps 里的处理流程
+
+```mermaid
+flowchart TD
+    A["触发层 / Trigger<br/>文件: .github/workflows/*.yml<br/>配置: on<br/>作用: push / PR / 手动触发"]
+    B["任务编排层 / Job<br/>配置: jobs<br/>作用: 定义在哪个 runner 上执行"]
+    C["步骤执行层 / Step<br/>配置: steps<br/>作用: checkout、setup、build、test、deploy"]
+    D["构建测试层 / CI<br/>命令: npm test / mvn test / docker build<br/>作用: 验证代码可用"]
+    E["部署发布层 / CD<br/>命令: deploy script / upload artifact<br/>作用: 发布产物"]
+    F["日志反馈层 / Run Logs<br/>位置: GitHub Actions 页面<br/>作用: 排查失败原因"]
+    G["运维脚本层 / Ops Script<br/>文件: scripts/*.ps1<br/>作用: 本地状态检查和诊断"]
+
+    A --> B --> C --> D
+    D -->|通过| E
+    D -->|失败| F
+    E --> F
+    G --> F
+```
+
+| 顺序 | DevOps 层 | 文件 / 配置 | 输入是什么 | 输出是什么 | 作用 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 触发层 | `.github/workflows/*.yml` -> `on` | push、PR、手动运行 | workflow run | 决定什么时候执行 |
+| 2 | 任务编排层 | `jobs` | workflow 配置 | 一个或多个 job | 定义执行环境和任务 |
+| 3 | 步骤执行层 | `steps` | job 环境 | step 执行结果 | 按顺序执行 checkout、build、test |
+| 4 | CI 层 | build / test 命令 | 源码 | 检查结果 | 判断代码是否能合并或发布 |
+| 5 | CD 层 | deploy workflow / script | 构建产物 | 部署结果 | 把应用发布到目标环境 |
+| 6 | 日志反馈层 | GitHub Actions logs | 每个 step 输出 | 错误原因 | 支持排障和重试 |
+| 7 | 运维自动化层 | `scripts/*.ps1` | 本地服务状态 | 状态报告 | 辅助日常检查和诊断 |
+
 ## 6. 最小示例
 
 这一章最适合先看的不是自己新写工作流，而是先读现成的工作流文件。

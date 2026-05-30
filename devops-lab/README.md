@@ -23,18 +23,33 @@
 
 如果你现在只想知道“先看什么”，直接按这个顺序：
 
-1. [01-学习路线.md](01-学习路线.md)
-2. [02-Docker与容器.md](02-Docker与容器.md)
-3. [03-CI_CD与自动化运维.md](03-CI_CD与自动化运维.md)
-4. [05-Kubernetes最小入门.md](05-Kubernetes最小入门.md)
-5. [06-GitHub_Actions最小示例项目页.md](06-GitHub_Actions最小示例项目页.md)
-6. [07-kind_k3d本地练习模板页.md](07-kind_k3d本地练习模板页.md)
-7. [08-自己写第一个GitHub_Actions_Workflow.md](08-自己写第一个GitHub_Actions_Workflow.md)
-8. [09-Docker_GitHub_Actions_最小部署演练.md](09-Docker_GitHub_Actions_最小部署演练.md)
-9. [10-kind_k3d_hello_nginx_本地实操页.md](10-kind_k3d_hello_nginx_本地实操页.md)
-10. [11-监控与可观测性入口.md](11-监控与可观测性入口.md)
-11. [12-Prometheus_Grafana最小入门.md](12-Prometheus_Grafana最小入门.md)
-12. [13-docker-compose_最小监控栈演练页.md](13-docker-compose_最小监控栈演练页.md)
+1. [00-DevOps系统学习路线.md](00-DevOps系统学习路线.md)
+2. [01-学习路线.md](01-学习路线.md)
+3. [02-Docker与容器.md](02-Docker与容器.md)
+4. [03-CI_CD与自动化运维.md](03-CI_CD与自动化运维.md)
+5. [05-Kubernetes最小入门.md](05-Kubernetes最小入门.md)
+6. [06-GitHub_Actions最小示例项目页.md](06-GitHub_Actions最小示例项目页.md)
+7. [07-kind_k3d本地练习模板页.md](07-kind_k3d本地练习模板页.md)
+8. [08-自己写第一个GitHub_Actions_Workflow.md](08-自己写第一个GitHub_Actions_Workflow.md)
+9. [09-Docker_GitHub_Actions_最小部署演练.md](09-Docker_GitHub_Actions_最小部署演练.md)
+10. [10-kind_k3d_hello_nginx_本地实操页.md](10-kind_k3d_hello_nginx_本地实操页.md)
+11. [11-监控与可观测性入口.md](11-监控与可观测性入口.md)
+12. [12-Prometheus_Grafana最小入门.md](12-Prometheus_Grafana最小入门.md)
+13. [13-docker-compose_最小监控栈演练页.md](13-docker-compose_最小监控栈演练页.md)
+
+## 系统分层总览
+
+```mermaid
+flowchart LR
+    A["代码管理<br/>Git / GitHub"] --> B["本地开发<br/>Docker"]
+    B --> C["CI<br/>GitHub Actions"]
+    C --> D["制品<br/>Docker image"]
+    D --> E["CD<br/>Deploy workflow"]
+    E --> F["运行平台<br/>Docker / Kubernetes"]
+    F --> G["监控可观测<br/>Logs / Prometheus / Grafana"]
+    G --> H["反馈改进<br/>Issue / PR / Runbook"]
+    H --> A
+```
 
 ## 这套资料怎么用
 
@@ -71,6 +86,8 @@
 
 ## 每一篇是干什么的
 
+- [00-DevOps系统学习路线.md](00-DevOps系统学习路线.md)
+  - 从系统分层角度说明 `DevOps` 全流程
 - [01-学习路线.md](01-学习路线.md)
   - 给出学习顺序和当前工作区里的材料分布
 - [02-Docker与容器.md](02-Docker与容器.md)

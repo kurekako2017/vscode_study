@@ -31,6 +31,31 @@
 4. 查看日志
 5. 排查启动失败
 
+## 3.1 Docker 在 DevOps 里的位置
+
+```mermaid
+flowchart TD
+    A["源码层<br/>文件: Dockerfile / app code<br/>作用: 描述应用和运行环境"]
+    B["镜像构建层<br/>命令: docker build<br/>产物: image<br/>作用: 打包可运行环境"]
+    C["容器运行层<br/>命令: docker run / docker compose up<br/>对象: container<br/>作用: 启动应用实例"]
+    D["网络端口层<br/>配置: ports / networks<br/>作用: 暴露服务、连接依赖"]
+    E["日志排障层<br/>命令: docker logs / docker ps<br/>作用: 看运行状态和错误"]
+    F["CI/CD 衔接层<br/>工具: GitHub Actions<br/>作用: 自动构建镜像或运行测试"]
+
+    A --> B --> C --> D
+    C --> E
+    B --> F
+```
+
+| 顺序 | DevOps 层 | 文件 / 命令 / 工具 | 输入是什么 | 输出是什么 | 作用 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 源码层 | `Dockerfile`、应用代码 | 应用源码和运行依赖 | 构建上下文 | 说明应用如何被打包 |
+| 2 | 镜像构建层 | `docker build` | Dockerfile + 源码 | Docker image | 生成可重复运行的镜像 |
+| 3 | 容器运行层 | `docker run` / `docker compose up` | image + 配置 | container | 启动应用实例 |
+| 4 | 网络端口层 | `ports` / Docker network | 容器端口配置 | 可访问服务 | 让外部能访问容器 |
+| 5 | 日志排障层 | `docker ps` / `docker logs` | 容器状态 | 状态和日志 | 判断是否正常运行 |
+| 6 | CI/CD 衔接层 | GitHub Actions | workflow 配置 | 自动构建结果 | 把本地构建流程自动化 |
+
 ## 4. 当前工作区里的教程
 
 - [DOCKER_INSTALL_GUIDE.md](D:/dev/source_code/vscode_study/scripts/docker/DOCKER_INSTALL_GUIDE.md)

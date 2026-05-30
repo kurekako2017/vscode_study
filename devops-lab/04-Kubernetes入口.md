@@ -58,6 +58,34 @@
 - `kubectl`
 - 为什么需要编排
 
+## 4.1 Kubernetes 在 DevOps 里的位置
+
+```mermaid
+flowchart TD
+    A["镜像层<br/>对象: Docker image<br/>来源: CI/CD 构建产物"]
+    B["声明配置层<br/>文件: YAML manifest<br/>对象: Deployment / Service<br/>作用: 描述期望状态"]
+    C["集群控制层<br/>工具: kubectl<br/>作用: 把 manifest 提交给集群"]
+    D["编排层<br/>对象: Kubernetes Deployment<br/>作用: 管理副本数和滚动更新"]
+    E["运行层<br/>对象: Pod<br/>作用: 真正运行容器"]
+    F["访问层<br/>对象: Service<br/>作用: 给 Pod 提供稳定访问入口"]
+    G["观察层<br/>命令: kubectl get / logs / describe<br/>作用: 查看状态和排障"]
+
+    A --> B --> C --> D --> E
+    D --> F
+    E --> G
+    F --> G
+```
+
+| Kubernetes 层 | 文件 / 对象 / 命令 | 是什么 | 核心作用 |
+| --- | --- | --- | --- |
+| 镜像层 | Docker image | 应用的可运行包 | 给 Pod 提供容器镜像 |
+| 声明配置层 | YAML manifest | 期望状态说明书 | 描述要创建什么资源 |
+| 集群控制层 | `kubectl apply` | 提交配置的命令 | 把 YAML 交给集群 |
+| 编排层 | Deployment | 管理 Pod 副本的资源 | 负责滚动更新和副本维护 |
+| 运行层 | Pod | Kubernetes 最小运行单元 | 真正运行容器 |
+| 访问层 | Service | 稳定访问入口 | 让外部或集群内访问 Pod |
+| 观察层 | `kubectl get/logs/describe` | 状态和日志命令 | 排查部署和运行问题 |
+
 ## 5. 练习题
 
 ### 练习 1

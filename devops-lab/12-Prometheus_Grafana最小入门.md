@@ -80,6 +80,29 @@
 
 - `Prometheus + Grafana + 被监控对象`
 
+## 4.1 Prometheus / Grafana 数据流
+
+```mermaid
+flowchart TD
+    A["被监控服务层 / Target<br/>文件: app/app.py<br/>接口: /metrics<br/>作用: 暴露应用指标"]
+    B["抓取配置层 / Scrape Config<br/>文件: prometheus/prometheus.yml<br/>字段: scrape_configs / targets<br/>作用: 告诉 Prometheus 抓谁"]
+    C["指标采集层 / Prometheus<br/>服务: prometheus<br/>端口: 9090<br/>作用: 定时抓取并存储时间序列指标"]
+    D["查询层 / PromQL<br/>作用: 查询指标数据"]
+    E["可视化层 / Grafana<br/>服务: grafana<br/>端口: 3000<br/>作用: 连接 Prometheus 并展示 dashboard"]
+    F["人 / 运维视角<br/>作用: 看趋势、发现异常、定位问题"]
+
+    A --> B --> C --> D --> E --> F
+```
+
+| 顺序 | 监控层 | 文件 / 服务 / 配置 | 输入是什么 | 输出是什么 | 作用 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 被监控服务层 | `app/app.py` -> `/metrics` | 应用运行状态 | metrics 文本 | 暴露可被抓取的指标 |
+| 2 | 抓取配置层 | `prometheus/prometheus.yml` | target 地址 | scrape 配置 | 告诉 Prometheus 去哪里抓 |
+| 3 | 指标采集层 | `prometheus` 服务 | `/metrics` 数据 | 时间序列数据 | 定时抓取并保存指标 |
+| 4 | 查询层 | PromQL | 指标名和查询条件 | 查询结果 | 从指标库里取数据 |
+| 5 | 可视化层 | `grafana` 服务 | Prometheus 查询结果 | dashboard 图表 | 让人更容易看趋势 |
+| 6 | 排障反馈层 | 人 / Runbook / Issue | 图表和日志线索 | 排查结论 | 判断是否需要修复或告警 |
+
 ## 5. 最小配置要看什么
 
 ### Prometheus 关注两个点

@@ -15,10 +15,35 @@ docker-actions-demo/
 |-- index.html
 |-- Dockerfile
 |-- README.md
-`-- .github/
-    `-- workflows/
-        `-- demo-ci.yml
 ```
+
+注意：
+
+- 这个目录本身只放最小应用文件。
+- 仓库真实可参考的 workflow 在根目录 `.github/workflows/`，例如 `jtproject-ci.yml`。
+- 如果你要给这个模板单独加 CI，可以自己创建 `.github/workflows/demo-ci.yml`。
+
+## 这个模板在 DevOps 流程里的位置
+
+```mermaid
+flowchart TD
+    A["代码层<br/>文件: index.html<br/>作用: 模拟应用源码"]
+    B["容器定义层<br/>文件: Dockerfile<br/>作用: 把 index.html 放进 nginx 镜像"]
+    C["本地构建层<br/>命令: docker build -t devops-demo:local .<br/>作用: 生成本地镜像"]
+    D["本地运行层<br/>命令: docker run --rm -p 8080:80 devops-demo:local<br/>作用: 启动容器并暴露端口"]
+    E["CI 参考层<br/>文件: ../../.github/workflows/jtproject-ci.yml<br/>作用: 学习 GitHub Actions 的 on / jobs / steps"]
+
+    A --> B --> C --> D
+    B --> E
+```
+
+| 顺序 | 层 | 文件 / 命令 | 输入是什么 | 输出是什么 | 功能作用 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 代码层 | `index.html` | 页面内容 | 静态文件 | 模拟一次业务代码变更 |
+| 2 | 容器定义层 | `Dockerfile` | `index.html` 和 nginx 基础镜像 | 镜像构建规则 | 定义如何打包应用 |
+| 3 | 本地构建层 | `docker build -t devops-demo:local .` | Dockerfile + 当前目录 | `devops-demo:local` 镜像 | 验证镜像能否构建 |
+| 4 | 本地运行层 | `docker run --rm -p 8080:80 devops-demo:local` | 镜像 | 本地 Web 服务 | 验证容器能否运行 |
+| 5 | CI 参考层 | `.github/workflows/jtproject-ci.yml` | push / PR | workflow 执行结果 | 学习自动化构建检查 |
 
 ## 本地运行
 
@@ -40,11 +65,12 @@ docker run --rm -p 8080:80 devops-demo:local
 
 ## GitHub Actions
 
-模板里自带：
+这个模板目录没有内置 workflow。你可以参考仓库里的真实 workflow：
 
-- `.github/workflows/demo-ci.yml`
+- [../../../.github/workflows/jtproject-ci.yml](../../../.github/workflows/jtproject-ci.yml)
+- [../../../.github/workflows/jtproject-deploy.yml](../../../.github/workflows/jtproject-deploy.yml)
 
-它会做最小检查：
+如果自己写 `demo-ci.yml`，最小检查通常包含：
 
 - 检出代码
 - 构建 Docker 镜像
