@@ -23,3 +23,37 @@ RAG API Demo — 学习说明与快速上手
 学习建议
 - 先在 mock 模式熟悉 API，然后在 CI 或有 API Key 的环境中切换为 real。
 - 将检索替换为向量检索并引入 embeddings 服务作为进阶任务。
+
+运行本地 smoke-test 并解析错误日志
+--------------------------------
+
+项目包含一个便捷的本地 smoke 测试脚本 `smoke_local.sh`，用于在 mock 模式下启动服务、等待 `/health`、调用 `/ask` 并做简单校验。使用步骤：
+
+```bash
+# 从仓库根或任意位置运行脚本（脚本会自动 cd 到项目目录）
+./agent-lab/projects/rag_api_demo/smoke_local.sh
+```
+
+脚本会把服务日志写入 `agent-lab/projects/rag_api_demo/server.log`，并在退出前停止服务。
+
+常见失败原因与排查方法：
+
+- 超时未就绪（脚本在等待 `/health` 时超时，错误码 2）
+   - 检查 `server.log`，查找导入错误（ImportError）、依赖缺失或启动异常（Traceback）。
+   - 常见：`uvicorn` 未安装（"command not found"）或 Python 包缺失。
+   - 解决：在项目目录创建虚拟环境并安装依赖，或全局安装 uvicorn：
+      ```bash
+      python3 -m venv .venv && source .venv/bin/activate
+      pip install -r ../../requirements-runtime.txt  # or pip install uvicorn
+      ```
+
+- 端口被占用（server.log 包含 "Address already in use"）
+   - 使用 `lsof -i :8000` 或 `ss -ltnp` 查找并释放端口，或修改脚本中 `PORT` 变量为其他端口。
+
+- /ask 返回格式不符合预期（脚本报告缺少 `answer` 或 `source_count`）
+   - 打开 `server.log` 与脚本输出，查看 `load_state()` 是否成功加载了文档目录（没有可读文档会导致服务抛出错误）。
+   - 确认 `RAG_API_DOCS_DIR` 指向包含 `.md`/`.txt`/`.pdf` 的目录，或把示例文档放到当前目录下测试。
+
+如果需要我：
+- 我可以把 `smoke_local.sh` 标记为可执行（chmod +x 并 commit），或
+- 在 README 中加入示例 `.md` 文档以便 smoke-test 在空目录下也能通过。告诉我你想要哪个，我来执行。
