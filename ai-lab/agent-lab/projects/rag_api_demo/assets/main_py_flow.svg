@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="780" viewBox="0 0 1160 780">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
+    .api { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
+    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; }
+    .title { font-weight:700; font-size:20px; }
+    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="text title">rag_api_demo - main.py 详细处理流程</text>
+
+  <rect x="60" y="80" width="250" height="80" class="box" />
+  <text x="185" y="112" text-anchor="middle" class="text">FastAPI app 初始化</text>
+  <text x="185" y="135" text-anchor="middle" class="small">app.state 保存 client / docs / chunks</text>
+
+  <rect x="370" y="80" width="250" height="80" class="box" />
+  <text x="495" y="112" text-anchor="middle" class="text">startup_event()</text>
+  <text x="495" y="135" text-anchor="middle" class="small">服务启动时调用 load_state()</text>
+
+  <rect x="680" y="80" width="250" height="80" class="box" />
+  <text x="805" y="112" text-anchor="middle" class="text">load_state()</text>
+  <text x="805" y="135" text-anchor="middle" class="small">get_docs_dir() + build_chunks()</text>
+
+  <rect x="60" y="240" width="250" height="80" class="box" />
+  <text x="185" y="272" text-anchor="middle" class="text">read_document_text()</text>
+  <text x="185" y="295" text-anchor="middle" class="small">读取 md / txt / pdf</text>
+
+  <rect x="370" y="240" width="250" height="80" class="box" />
+  <text x="495" y="272" text-anchor="middle" class="text">chunk_text()</text>
+  <text x="495" y="295" text-anchor="middle" class="small">切分为带重叠 chunk</text>
+
+  <rect x="680" y="240" width="250" height="80" class="box" />
+  <text x="805" y="272" text-anchor="middle" class="text">resolve_mode()</text>
+  <text x="805" y="295" text-anchor="middle" class="small">RAG_API_MOCK / OPENAI_API_KEY</text>
+
+  <rect x="60" y="410" width="250" height="80" class="api" />
+  <text x="185" y="442" text-anchor="middle" class="text">POST /ask</text>
+  <text x="185" y="465" text-anchor="middle" class="small">接收 AskRequest(question, model)</text>
+
+  <rect x="370" y="410" width="250" height="80" class="box" />
+  <text x="495" y="442" text-anchor="middle" class="text">retrieve()</text>
+  <text x="495" y="465" text-anchor="middle" class="small">从 app.state.chunks 取 TOP_K</text>
+
+  <rect x="680" y="410" width="250" height="80" class="box" />
+  <text x="805" y="442" text-anchor="middle" class="text">build_context()</text>
+  <text x="805" y="465" text-anchor="middle" class="small">拼接检索上下文</text>
+
+  <rect x="260" y="590" width="250" height="80" class="box" />
+  <text x="385" y="622" text-anchor="middle" class="text">answer_question()</text>
+  <text x="385" y="645" text-anchor="middle" class="small">mock 回答或 Responses API</text>
+
+  <rect x="650" y="590" width="250" height="80" class="api" />
+  <text x="775" y="622" text-anchor="middle" class="text">AskResponse</text>
+  <text x="775" y="645" text-anchor="middle" class="small">answer / sources / source_count</text>
+
+  <path d="M310 120 L370 120" class="arrow" />
+  <path d="M620 120 L680 120" class="arrow" />
+  <path d="M805 160 L805 200 L185 200 L185 240" class="arrow" />
+  <path d="M310 280 L370 280" class="arrow" />
+  <path d="M620 280 L680 280" class="arrow" />
+  <path d="M805 320 L805 360 L185 360 L185 410" class="arrow" />
+  <path d="M310 450 L370 450" class="arrow" />
+  <path d="M620 450 L680 450" class="arrow" />
+  <path d="M805 490 L805 540 L385 540 L385 590" class="arrow" />
+  <path d="M510 630 L650 630" class="arrow" />
+
+  <text x="40" y="730" class="small">提示：这是服务型 RAG，启动时建索引，请求时检索、生成并返回结构化 JSON。</text>
+</svg>

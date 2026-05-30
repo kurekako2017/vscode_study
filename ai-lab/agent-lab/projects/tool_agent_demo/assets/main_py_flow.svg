@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
+    .tool { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
+    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; }
+    .title { font-weight:700; font-size:20px; }
+    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="text title">tool_agent_demo - main.py 详细处理流程</text>
+
+  <rect x="60" y="80" width="230" height="70" class="box" />
+  <text x="175" y="110" text-anchor="middle" class="text">parse_args()</text>
+  <text x="175" y="132" text-anchor="middle" class="small">prompt / --workdir / --model</text>
+
+  <rect x="345" y="80" width="230" height="70" class="box" />
+  <text x="460" y="110" text-anchor="middle" class="text">resolve_mode()</text>
+  <text x="460" y="132" text-anchor="middle" class="small">mock / real / auto</text>
+
+  <rect x="630" y="80" width="230" height="70" class="box" />
+  <text x="745" y="110" text-anchor="middle" class="text">build_client()</text>
+  <text x="745" y="132" text-anchor="middle" class="small">真实模式读取 API Key</text>
+
+  <rect x="60" y="220" width="230" height="80" class="box" />
+  <text x="175" y="252" text-anchor="middle" class="text">校验 workdir</text>
+  <text x="175" y="275" text-anchor="middle" class="small">限制工具访问范围</text>
+
+  <rect x="345" y="220" width="230" height="80" class="tool" />
+  <text x="460" y="252" text-anchor="middle" class="text">build_tools()</text>
+  <text x="460" y="275" text-anchor="middle" class="small">暴露 list/read/search schema</text>
+
+  <rect x="630" y="220" width="260" height="80" class="box" />
+  <text x="760" y="252" text-anchor="middle" class="text">run_agent()</text>
+  <text x="760" y="275" text-anchor="middle" class="small">模型判断是否需要工具</text>
+
+  <rect x="150" y="380" width="250" height="90" class="tool" />
+  <text x="275" y="412" text-anchor="middle" class="text">call_tool()</text>
+  <text x="275" y="435" text-anchor="middle" class="small">分发到 list_files / read_file / search_text</text>
+
+  <rect x="470" y="380" width="250" height="90" class="box" />
+  <text x="595" y="412" text-anchor="middle" class="text">function_call_output</text>
+  <text x="595" y="435" text-anchor="middle" class="small">工具结果回填给模型继续推理</text>
+
+  <rect x="790" y="380" width="250" height="90" class="box" />
+  <text x="915" y="412" text-anchor="middle" class="text">最终回答</text>
+  <text x="915" y="435" text-anchor="middle" class="small">没有工具调用或超过最大轮次</text>
+
+  <rect x="380" y="570" width="360" height="80" class="box" />
+  <text x="560" y="602" text-anchor="middle" class="text">main() 输出 answer</text>
+  <text x="560" y="625" text-anchor="middle" class="small">异常时 stderr + sys.exit(1)</text>
+
+  <path d="M290 115 L345 115" class="arrow" />
+  <path d="M575 115 L630 115" class="arrow" />
+  <path d="M460 150 L460 185 L175 185 L175 220" class="arrow" />
+  <path d="M290 260 L345 260" class="arrow" />
+  <path d="M575 260 L630 260" class="arrow" />
+  <path d="M760 300 L760 340 L275 340 L275 380" class="arrow" />
+  <path d="M400 425 L470 425" class="arrow" />
+  <path d="M720 425 L790 425" class="arrow" />
+  <path d="M595 470 C595 520, 760 520, 760 300" class="arrow" />
+  <path d="M915 470 L915 535 L560 535 L560 570" class="arrow" />
+
+  <text x="40" y="710" class="small">提示：工具调用闭环是“模型请求工具 -> Python 执行工具 -> 结果回填 -> 模型继续判断”。</text>
+</svg>

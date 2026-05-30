@@ -48,12 +48,12 @@ D:\dev\source_code\vscode_study
 │   ├── QUICK_REFERENCE.md                 ← 命令速查
 │   └── templates/                         ← Docker/K8s 模板
 │
-├── 📁 llm-lab/                            ← LLM 应用工程
+├── 📁 ai-lab/llm-lab/                            ← LLM 应用工程
 │   ├── 00-Python学习范围.md
 │   ├── 02-模型调用基础.md
 │   └── projects/
 │
-├── 📁 agent-lab/                          ← AI Agent 实验
+├── 📁 ai-lab/agent-lab/                          ← AI Agent 实验
 │   ├── 02-模型调用基础.md
 │   ├── 05-Agent工作流.md
 │   └── projects/
@@ -103,7 +103,7 @@ mkvenv ai-lab                              # 为 ai-lab 创建虚拟环境
 | 栈 | 启动命令 | 文档 |
 |---|------|------|
 | **Spring Boot** (Java) | `cd java-projects/JtProject && ./mvnw spring-boot:run` | [java-projects/README.md](java-projects/README.md) |
-| **Python LLM** | `cd python-projects/ai-lab && python projects/llm_api_demo.py` | [llm-lab/README.md](llm-lab/README.md) |
+| **Python LLM** | `cd python-projects/ai-lab && python projects/llm_api_demo.py` | [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md) |
 | **AWS LocalStack** | `scripts/localstack/verify-localstack.ps1` | [localstack-lab/QUICK_REFERENCE.md](localstack-lab/QUICK_REFERENCE.md) |
 | **SAP ABAP** | 打开 [sap-lab/LEARNING_GUIDE.md](sap-lab/LEARNING_GUIDE.md) | [sap-lab/README.md](sap-lab/README.md) |
 | **DevOps CI/CD** | 查看 [devops-lab/README.md](devops-lab/README.md) | [devops-lab/QUICK_REFERENCE.md](devops-lab/QUICK_REFERENCE.md) |
@@ -119,8 +119,8 @@ mkvenv ai-lab                              # 为 ai-lab 创建虚拟环境
 | **LocalStack** | AWS S3/DynamoDB 本地模拟 | `scripts/localstack/wait-for-docker-and-run.ps1` | [快速参考](localstack-lab/QUICK_REFERENCE.md) | ✅ Active |
 | **sap-lab** | SAP ABAP/CDS/RAP/CAP 课程 | 手动代码审查 + 系统测试 | [7 模块课程](sap-lab/LEARNING_GUIDE.md) | 📚 Learning |
 | **DevOps Lab** | Docker/K8s/GitHub Actions | 参考 [QUICK_REFERENCE.md](devops-lab/QUICK_REFERENCE.md) | [README](devops-lab/README.md) | 📚 Learning |
-| **LLM Lab** | 大模型应用工程 | `cd llm-lab/projects && python main.py` | [学习范围](llm-lab/00-Python学习范围.md) | 📚 Learning |
-| **Agent Lab** | AI Agent 工作流 | 参考项目文档 | [LLM-Agent 学习路径](agent-lab/LLM-Agent学习路径与计划.md) | 📚 Learning |
+| **LLM Lab** | 大模型应用工程 | `cd ai-lab/agent-lab/projects/chat_cli && python3 main.py --mock "你好"` | [学习范围](ai-lab/llm-lab/00-Python学习范围（面向LLM应用开发）.md) | 📚 Learning |
+| **Agent Lab** | AI Agent 工作流 | 参考项目文档 | [LLM-Agent 学习路径](ai-lab/agent-lab/LLM-Agent学习路径与计划.md) | 📚 Learning |
 
 ---
 
@@ -217,7 +217,7 @@ python projects/llm_api_demo.py           # 运行 LLM 演示
 
 ### **第 2 周：选择技术栈**
 - **Java 方向**: [java-lab/04-Java基础教程.md](java-lab/04-Java基础教程.md) → [JtProject README](java-projects/JtProject/README.md)
-- **Python LLM 方向**: [llm-lab/02-模型调用基础.md](llm-lab/02-模型调用基础.md) → [ai-lab LEARNING_GUIDE](python-projects/ai-lab/LEARNING_GUIDE.md)
+- **Python LLM 方向**: [ai-lab/llm-lab/02-模型调用基础.md](ai-lab/llm-lab/02-模型调用基础.md) → [ai-lab LEARNING_GUIDE](python-projects/ai-lab/LEARNING_GUIDE.md)
 - **SAP 方向**: [sap-lab/LEARNING_GUIDE.md](sap-lab/LEARNING_GUIDE.md) (7 模块渐进式)
 - **DevOps 方向**: [devops-lab/02-Docker与容器.md](devops-lab/02-Docker与容器.md) → [QUICK_REFERENCE](devops-lab/QUICK_REFERENCE.md)
 

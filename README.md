@@ -15,7 +15,7 @@
 
 如果你的目标是贴近日本 IT 现场、企业 PoC 和派遣案件要求，建议优先看：
 
-- [llm-lab/README.md](llm-lab/README.md)
+- [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md)
 
 这条线重点是：
 
@@ -30,7 +30,7 @@
 
 如果你已经有了 `LLM 应用开发` 基础，再继续看：
 
-- [agent-lab/README.md](agent-lab/README.md)
+- [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md)
 
 这条线重点是：
 
@@ -113,9 +113,8 @@
 
 如果你现在主要想学生成 AI 并贴日本现场：
 
-1. [llm-lab/README.md](llm-lab/README.md)
-2. [llm-lab/projects/README.md](llm-lab/projects/README.md)
-3. [agent-lab/README.md](agent-lab/README.md)
+1. [ai-lab/llm-lab/README.md](ai-lab/llm-lab/README.md)
+2. [ai-lab/agent-lab/README.md](ai-lab/agent-lab/README.md)
 
 如果你现在主要想学对日 Java 开发：
 
@@ -129,8 +128,9 @@
 
 ```text
 vscode_study/
-|-- llm-lab/          # LLM 应用开发主线
-|-- agent-lab/        # Agent 进阶专题
+|-- ai-lab/          # 生成 AI 学习总入口
+|   |-- llm-lab/     # LLM 应用开发主线
+|   `-- agent-lab/   # Agent 进阶专题
 |-- java-lab/         # 对日 Java 开发主线
 |-- devops-lab/       # DevOps / SRE 补充主线
 |-- java-projects/    # Java 项目实战
@@ -142,28 +142,28 @@ vscode_study/
 
 ## Agent Demos — 快速学习路线
 
-本工作区在 `agent-lab/projects/` 下包含一组教学用的 Python demo，用于示范 RAG、Tool Calling、结构化输出与工作流分阶段设计。每个 demo 的详细学习要点见各自的 `README_LEARN.md`。下面是汇总与快速运行示例：
+本工作区在 `ai-lab/agent-lab/projects/` 下包含一组教学用的 Python demo，用于示范 RAG、Tool Calling、结构化输出与工作流分阶段设计。每个 demo 的详细学习要点见各自的 `README_LEARN.md`。下面是汇总与快速运行示例：
 
-- `agent-lab/projects/chat_cli/` — Minimal CLI chat demo
+- `ai-lab/agent-lab/projects/chat_cli/` — Minimal CLI chat demo
   - 快速运行（mock）:
     ```bash
-    RAG_API_MOCK=1 python3 agent-lab/projects/chat_cli/main.py "你好，帮我总结"
+    python3 ai-lab/agent-lab/projects/chat_cli/main.py --mock "你好，帮我总结"
     ```
   - 快速运行（real）:
     ```bash
-    OPENAI_API_KEY=sk-... python3 agent-lab/projects/chat_cli/main.py --real "请总结文档"
+    OPENAI_API_KEY=sk-... python3 ai-lab/agent-lab/projects/chat_cli/main.py --real "请总结文档"
     ```
 
-- `agent-lab/projects/doc_qa_agent/` — 本地 RAG（文件切分 + 关键词检索）
+- `ai-lab/agent-lab/projects/doc_qa_agent/` — 本地 RAG（文件切分 + 关键词检索）
   - 快速运行（mock）:
     ```bash
-    RAG_API_MOCK=1 python3 agent-lab/projects/doc_qa_agent/main.py --question "项目简介是什么"
+    python3 ai-lab/agent-lab/projects/doc_qa_agent/main.py --mock --docs ai-lab "项目简介是什么"
     ```
 
-- `agent-lab/projects/rag_api_demo/` — FastAPI RAG 微服务示例（/ask, /reload, /health）
+- `ai-lab/agent-lab/projects/rag_api_demo/` — FastAPI RAG 微服务示例（/ask, /reload, /health）
   - 启动服务（mock）:
     ```bash
-    cd agent-lab/projects/rag_api_demo
+    cd ai-lab/agent-lab/projects/rag_api_demo
     RAG_API_MOCK=1 uvicorn main:app --reload --port 8000
     ```
   - 测试接口:
@@ -171,22 +171,22 @@ vscode_study/
     curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档"}'
     ```
 
-- `agent-lab/projects/structured_output_demo/` — 演示 Pydantic 结构化输出解析
+- `ai-lab/agent-lab/projects/structured_output_demo/` — 演示 Pydantic 结构化输出解析
   - 快速运行（mock）:
     ```bash
-    RAG_API_MOCK=1 python3 agent-lab/projects/structured_output_demo/main.py --prompt "请生成计划"
+    python3 ai-lab/agent-lab/projects/structured_output_demo/main.py --mock "请生成计划"
     ```
 
-- `agent-lab/projects/tool_agent_demo/` — Tool-calling agent 示例（本地工具：list/read/search）
+- `ai-lab/agent-lab/projects/tool_agent_demo/` — Tool-calling agent 示例（本地工具：list/read/search）
   - 快速运行（mock）:
     ```bash
-    RAG_API_MOCK=1 python3 agent-lab/projects/tool_agent_demo/main.py --task "查找关键字"
+    python3 ai-lab/agent-lab/projects/tool_agent_demo/main.py --mock --workdir ai-lab "查找关键字"
     ```
 
-- `agent-lab/projects/workflow_agent/` — 三阶段工作流示例（analyze → plan → finalize）
+- `ai-lab/agent-lab/projects/workflow_agent/` — 三阶段工作流示例（analyze → plan → finalize）
   - 快速运行（mock）:
     ```bash
-    RAG_API_MOCK=1 python3 agent-lab/projects/workflow_agent/main.py --input "请制定发布计划"
+    python3 ai-lab/agent-lab/projects/workflow_agent/main.py --mock "请制定发布计划"
     ```
 
 每个项目目录下的 `README_LEARN.md` 包含更多学习建议与练习题，建议先以 mock 模式熟悉行为，再在有 `OPENAI_API_KEY` 的环境切换到 real 测试。

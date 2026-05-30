@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="620" viewBox="0 0 1040 620">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
+    .state { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
+    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; }
+    .title { font-weight:700; font-size:20px; }
+    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="text title">workflow_agent - main.py 详细处理流程</text>
+
+  <rect x="60" y="80" width="220" height="70" class="box" />
+  <text x="170" y="110" text-anchor="middle" class="text">parse_args()</text>
+  <text x="170" y="132" text-anchor="middle" class="small">读取任务 prompt 与模型参数</text>
+
+  <rect x="330" y="80" width="220" height="70" class="box" />
+  <text x="440" y="110" text-anchor="middle" class="text">resolve_mode()</text>
+  <text x="440" y="132" text-anchor="middle" class="small">选择 mock 或 real</text>
+
+  <rect x="600" y="80" width="220" height="70" class="box" />
+  <text x="710" y="110" text-anchor="middle" class="text">build_client()</text>
+  <text x="710" y="132" text-anchor="middle" class="small">真实模式构建 SDK 客户端</text>
+
+  <rect x="60" y="220" width="260" height="80" class="box" />
+  <text x="190" y="252" text-anchor="middle" class="text">Step 1: analyze_task()</text>
+  <text x="190" y="275" text-anchor="middle" class="small">输出 analysis 文本状态</text>
+
+  <rect x="390" y="220" width="260" height="80" class="state" />
+  <text x="520" y="252" text-anchor="middle" class="text">Step 2: plan_task()</text>
+  <text x="520" y="275" text-anchor="middle" class="small">生成 WorkflowPlan 结构化状态</text>
+
+  <rect x="720" y="220" width="260" height="80" class="box" />
+  <text x="850" y="252" text-anchor="middle" class="text">Step 3: finalize_task()</text>
+  <text x="850" y="275" text-anchor="middle" class="small">基于 analysis + plan 总结</text>
+
+  <rect x="330" y="390" width="380" height="80" class="box" />
+  <text x="520" y="422" text-anchor="middle" class="text">main() 打印三阶段结果</text>
+  <text x="520" y="445" text-anchor="middle" class="small">Analysis / Plan JSON / Final Summary</text>
+
+  <rect x="760" y="390" width="220" height="80" class="box" />
+  <text x="870" y="422" text-anchor="middle" class="text">异常处理</text>
+  <text x="870" y="445" text-anchor="middle" class="small">stderr 输出并 sys.exit(1)</text>
+
+  <path d="M280 115 L330 115" class="arrow" />
+  <path d="M550 115 L600 115" class="arrow" />
+  <path d="M440 150 L440 180 L190 180 L190 220" class="arrow" />
+  <path d="M320 260 L390 260" class="arrow" />
+  <path d="M650 260 L720 260" class="arrow" />
+  <path d="M850 300 L850 340 L520 340 L520 390" class="arrow" />
+  <path d="M700 150 L700 180 L850 180 L850 220" class="arrow" />
+  <path d="M850 300 L870 390" class="arrow" />
+
+  <text x="40" y="560" class="small">提示：这个示例的重点是固定阶段、显式中间状态和结构化计划。</text>
+</svg>

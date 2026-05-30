@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
+    .schema { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
+    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; }
+    .title { font-weight:700; font-size:20px; }
+    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="text title">structured_output_demo - main.py 详细处理流程</text>
+
+  <rect x="60" y="80" width="240" height="70" class="box" />
+  <text x="180" y="110" text-anchor="middle" class="text">parse_args()</text>
+  <text x="180" y="132" text-anchor="middle" class="small">读取 prompt / --model / --mock / --real</text>
+
+  <rect x="370" y="80" width="240" height="70" class="box" />
+  <text x="490" y="110" text-anchor="middle" class="text">resolve_mode()</text>
+  <text x="490" y="132" text-anchor="middle" class="small">mock / real / auto 模式决策</text>
+
+  <rect x="680" y="80" width="240" height="70" class="box" />
+  <text x="800" y="110" text-anchor="middle" class="text">build_client()</text>
+  <text x="800" y="132" text-anchor="middle" class="small">真实模式读取 OPENAI_API_KEY</text>
+
+  <rect x="60" y="215" width="260" height="90" class="schema" />
+  <text x="190" y="248" text-anchor="middle" class="text">AgentPlan schema</text>
+  <text x="190" y="270" text-anchor="middle" class="small">goal / user_type / tools / risks</text>
+
+  <rect x="390" y="215" width="260" height="90" class="box" />
+  <text x="520" y="248" text-anchor="middle" class="text">generate_plan()</text>
+  <text x="520" y="270" text-anchor="middle" class="small">mock: build_mock_plan()</text>
+  <text x="520" y="290" text-anchor="middle" class="small">real: responses.parse()</text>
+
+  <rect x="710" y="215" width="210" height="90" class="box" />
+  <text x="815" y="248" text-anchor="middle" class="text">output_parsed</text>
+  <text x="815" y="270" text-anchor="middle" class="small">Pydantic 校验后的对象</text>
+
+  <rect x="260" y="380" width="460" height="80" class="box" />
+  <text x="490" y="412" text-anchor="middle" class="text">main() 输出</text>
+  <text x="490" y="435" text-anchor="middle" class="small">model_dump() pretty JSON + model_dump_json() raw JSON</text>
+
+  <path d="M300 115 L370 115" class="arrow" />
+  <path d="M610 115 L680 115" class="arrow" />
+  <path d="M800 150 L800 180 L520 180 L520 215" class="arrow" />
+  <path d="M320 260 L390 260" class="arrow" />
+  <path d="M650 260 L710 260" class="arrow" />
+  <path d="M815 305 L815 340 L490 340 L490 380" class="arrow" />
+  <path d="M490 150 L490 215" class="arrow" />
+
+  <text x="40" y="520" class="small">提示：无 OPENAI_API_KEY 时可用 mock 模式练习完整结构化输出闭环。</text>
+</svg>

@@ -26,12 +26,12 @@ jupyter notebook
 
 ## 2. Agent Lab
 
-目录：`agent-lab/projects/<demo>`
+目录：`ai-lab/agent-lab/projects/<demo>`
 
 最短启动：
 
 ```bash
-cd agent-lab/projects/chat_cli
+cd ai-lab/agent-lab/projects/chat_cli
 bash run_demo.sh
 ```
 
@@ -43,7 +43,7 @@ bash run_demo.sh
 
 目录：`llm-lab`
 
-这个目录本身主要是学习文档，真正可运行的 demo 现在集中在 `agent-lab/projects`。
+这个目录本身主要是学习文档，真正可运行的 demo 现在集中在 `ai-lab/agent-lab/projects`。
 
 ## 4. Web Projects
 
@@ -102,7 +102,7 @@ kubectl apply -f <yaml-file>
 
 前置条件：Docker、kubectl、YAML 支持。
 
-如果当前 WSL 里还没有 `docker`，先看：[docs/docker-wsl-quickstart.md](docs/docker-wsl-quickstart.md)
+如果当前 WSL 里还没有 `docker`，先看：[docs/docker-wsl-quickstart.md](docker-wsl-quickstart.md)
 
 ## 7. LocalStack Lab
 
@@ -121,7 +121,7 @@ python projects/hello-localstack/main.py
 
 当前状态：LocalStack CLI 已安装；剩下的关键阻塞仍是 WSL 里的 Docker 可用性。
 
-如果 `docker` 还不可用，先看：[docs/docker-wsl-quickstart.md](docs/docker-wsl-quickstart.md)
+如果 `docker` 还不可用，先看：[docs/docker-wsl-quickstart.md](docker-wsl-quickstart.md)
 
 ## 8. SAP Lab
 
@@ -142,7 +142,7 @@ cd sap-lab
 
 1. `python-projects/ai-lab`
 2. `web-projects/examples/vue_hello`
-3. `agent-lab/projects/chat_cli`
+3. `ai-lab/agent-lab/projects/chat_cli`
 4. `localstack-lab`
 5. `devops-lab`
 
