@@ -15,7 +15,7 @@
 1. 进入项目目录：
 
 ```powershell
-cd D:\dev\source_code\vscode_study\java-projects\JtProject
+cd D:\dev\source_code\vscode_study\java-projects\JtProject-Next
 ```
 
 1. 确认 Java 环境（若提示 `JAVA_HOME not found`，先设置）：

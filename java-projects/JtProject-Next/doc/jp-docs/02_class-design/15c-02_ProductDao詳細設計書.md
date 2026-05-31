@@ -69,10 +69,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15c-02_ProductDao詳細設計書-mermaid-1.mmd](assets/15c-02_ProductDao詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -80,10 +76,6 @@ flowchart TD
     B --> C[更新完了]
     C --> D[Product返却]
 ```
-</details>
-
-
-
 ### 4.5 `deletProduct(id)`
 
 処理手順:
@@ -95,10 +87,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15c-02_ProductDao詳細設計書-mermaid-2.mmd](assets/15c-02_ProductDao詳細設計書-mermaid-2.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -108,10 +96,6 @@ flowchart TD
     C -- Yes --> E[delete実行]
     E --> F[true返却]
 ```
-</details>
-
-
-
 ## 5. 設計上の注意
 
 - メソッド名が `deletProduct` となっており、表記揺れがある。

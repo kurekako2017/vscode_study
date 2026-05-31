@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本書は `JtProject` における主要テーブルの CRUD 実装を、画面 URL、Controller、Service、DAO、DB 操作の観点で整理するための資料である。
+本書は `JtProject-Next` における主要テーブルの CRUD 実装を、画面 URL、Controller、Service、DAO、DB 操作の観点で整理するための資料である。
 
 ## 2. 対象テーブル
 
@@ -14,10 +14,6 @@
 
 ## 3. CRUD 全体図
 
-[Mermaid source: 72_CRUD一覧-mermaid-1.mmd](assets/72_CRUD一覧-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart LR
@@ -28,10 +24,6 @@ flowchart LR
     D --> DB[(MySQL / CUSTOMER CATEGORY PRODUCT CART CART_PRODUCT)]
     D2 --> DB
 ```
-</details>
-
-
-
 補足:
 
 - 基本構成は `Controller -> Service -> DAO -> DB`

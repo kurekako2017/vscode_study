@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="790" viewBox="0 0 920 790" role="img" aria-labelledby="title desc">
+  <title id="title">管理者商品更新処理フロー図</title>
+  <desc id="desc">商品更新入力からカテゴリ取得、既存商品取得、画像判定、商品更新まで</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10z" fill="#334155"/></marker>
+    <style>
+      text { font-family: "Noto Sans JP", "Yu Gothic", Arial, sans-serif; fill: #172033; font-size: 14px; }
+      .title { font-size: 24px; font-weight: 700; }
+      .box { fill: #fff; stroke: #2563eb; stroke-width: 1.4; rx: 7; }
+      .decision { fill: #fff7ed; stroke: #f97316; stroke-width: 1.4; }
+      .db { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.4; rx: 7; }
+      .line { stroke: #334155; stroke-width: 1.35; fill: none; marker-end: url(#arrow); }
+      .label { font-size: 13px; fill: #475569; }
+    </style>
+  </defs>
+  <rect width="920" height="760" fill="#fff"/>
+  <text x="460" y="42" text-anchor="middle" class="title">管理者商品更新処理フロー図</text>
+  <g transform="translate(320,80)">
+    <rect class="box" width="280" height="44"/><text x="140" y="28" text-anchor="middle">商品更新画面入力</text>
+    <rect class="box" y="70" width="280" height="44"/><text x="140" y="98" text-anchor="middle">AdminController.updateProduct</text>
+    <rect class="box" y="210" width="280" height="44"/><text x="140" y="238" text-anchor="middle">ProductService.getProduct</text>
+    <rect class="box" y="280" width="280" height="44"/><text x="140" y="308" text-anchor="middle">既存商品取得</text>
+    <polygon class="decision" points="140,360 280,402 140,444 0,402"/><text x="140" y="407" text-anchor="middle">画像入力有?</text>
+    <rect class="box" y="520" width="280" height="44"/><text x="140" y="548" text-anchor="middle">更新用 Product 作成</text>
+    <rect class="box" y="590" width="280" height="44"/><text x="140" y="618" text-anchor="middle">ProductService.updateProduct</text>
+    <rect class="box" y="660" width="280" height="44"/><text x="140" y="688" text-anchor="middle">ProductDao.updateProduct</text>
+  </g>
+  <g transform="translate(50,220)">
+    <rect class="box" width="230" height="44"/><text x="115" y="28" text-anchor="middle">CategoryService.getCategory</text>
+    <rect class="box" y="70" width="230" height="44"/><text x="115" y="98" text-anchor="middle">カテゴリ取得</text>
+  </g>
+  <g transform="translate(650,462)">
+    <rect class="box" width="230" height="44"/><text x="115" y="28" text-anchor="middle">入力画像を採用</text>
+  </g>
+  <g transform="translate(50,462)">
+    <rect class="box" width="230" height="44"/><text x="115" y="28" text-anchor="middle">既存画像を引継ぐ</text>
+  </g>
+  <g transform="translate(320,720)">
+    <rect class="db" width="280" height="44"/><text x="140" y="28" text-anchor="middle">PRODUCT 更新</text>
+  </g>
+  <g transform="translate(640,720)">
+    <rect class="box" width="230" height="44"/><text x="115" y="28" text-anchor="middle">/admin/products へ遷移</text>
+  </g>
+  <path class="line" d="M460 124 L460 150"/>
+  <path class="line" d="M320 172 C260 172 220 220 165 220"/>
+  <path class="line" d="M165 264 L165 290"/>
+  <path class="line" d="M460 194 L460 290"/>
+  <path class="line" d="M460 324 L460 440"/>
+  <path class="line" d="M320 482 L280 484"/><text x="292" y="472" class="label">No</text>
+  <path class="line" d="M600 482 L650 484"/><text x="618" y="472" class="label">Yes</text>
+  <path class="line" d="M280 484 C330 510 380 530 460 600"/>
+  <path class="line" d="M650 484 C590 510 530 530 460 600"/>
+  <path class="line" d="M460 644 L460 670"/>
+  <path class="line" d="M460 704 L460 720"/>
+  <path class="line" d="M600 742 L640 742"/>
+</svg>

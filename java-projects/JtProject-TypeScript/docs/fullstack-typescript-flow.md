@@ -24,13 +24,19 @@
 
 ## 整体流程
 
+看图时按这条线明记：`App.tsx` 是前端页面层，`api.ts` 是前端请求封装层，`server.ts` 是后端 Controller 层，`Store` 是后端数据层类名，`seed.ts` 是初始数据文件。
+
 ![纯 TypeScript 全栈整体流程](assets/fullstack-typescript-overall.svg)
 
 ## 商品列表加载流程
 
+商品列表重点记：`App.tsx` 调 `api.ts`，`server.ts` 处理 `/api/products`，最后进入 `Store.getProducts()`，返回类型是 `Product[]`。
+
 ![商品列表加载流程](assets/fullstack-typescript-products.svg)
 
 ## 登录和购物车流程
+
+登录和购物车重点记：登录入口在 `App.tsx`，请求经过 `api.ts` 到 `server.ts`，校验和购物车数据都落到 `Store` 类的方法。
 
 ![登录和购物车流程](assets/fullstack-typescript-login-cart.svg)
 

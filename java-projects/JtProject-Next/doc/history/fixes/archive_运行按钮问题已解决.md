@@ -23,7 +23,7 @@
 ### 步骤1：重启IDEA
 1. 如果IDEA正在运行，请完全关闭它
 2. 重新打开IDEA
-3. 打开项目：`D:\dev\source_code\vscode_study\java-projects\JtProject`
+3. 打开项目：`D:\dev\source_code\vscode_study\java-projects\JtProject-Next`
 
 ### 步骤2：等待索引完成
 - 打开IDEA后，查看右下角
@@ -163,19 +163,19 @@ JT电商系统启动成功！
 
 ### Maven依赖下载失败
 ```powershell
-cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject-Next"
 .\mvnw.cmd clean install
 ```
 
 ### 检查项目状态
 ```powershell
-cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject-Next"
 .\check-status.ps1
 ```
 
 ### 一键启动（不用IDEA）
 ```powershell
-cd "D:\dev\source_code\vscode_study\java-projects\JtProject"
+cd "D:\dev\source_code\vscode_study\java-projects\JtProject-Next"
 .\start-simple.ps1
 ```
 

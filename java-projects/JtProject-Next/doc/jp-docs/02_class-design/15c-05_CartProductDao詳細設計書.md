@@ -65,10 +65,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15c-05_CartProductDao詳細設計書-mermaid-1.mmd](assets/15c-05_CartProductDao詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -84,10 +80,6 @@ flowchart TD
     I -- Yes --> E
     I -- No --> J[Product一覧返却]
 ```
-</details>
-
-
-
 ### 4.4 `updateCartProduct(cartProduct)`
 
 処理手順:

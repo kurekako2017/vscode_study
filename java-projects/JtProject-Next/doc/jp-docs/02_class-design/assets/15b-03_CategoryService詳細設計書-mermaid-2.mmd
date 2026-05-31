@@ -1,5 +1,0 @@
-flowchart TD
-    A[id と name 受領] --> B[CategoryDao.updateCategory]
-    B --> C{更新成功?}
-    C -- Yes --> D[Category返却]
-    C -- No --> E[例外送出]

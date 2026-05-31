@@ -26,7 +26,7 @@
    - 双击桌面图标或开始菜单中的IDEA。
 2. **打开项目**
    - `File` → `Open`。
-   - 选择目录：`D:\dev\source_code\vscode_study\java-projects\JtProject`。
+   - 选择目录：`D:\dev\source_code\vscode_study\java-projects\JtProject-Next`。
    - 点击 `OK`。
 3. **等待项目加载**
    - IDEA会自动识别Maven项目。
@@ -86,7 +86,7 @@ JT电商系统启动成功！
 
 ```powershell
 # 1. 进入项目目录
-cd D:\dev\source_code\vscode_study\java-projects\JtProject
+cd D:\dev\source_code\vscode_study\java-projects\JtProject-Next
 
 # 2. 查找占用8082端口的进程
 netstat -ano | findstr ":8082"
@@ -313,10 +313,10 @@ Get-Process -Name java | Stop-Process -Force
 
 ## 📚 相关文档
 
-- [IDEA完整启动指南.md](IDEA完整启动指南.md)：IDEA详细教程。
-- [IDEA黑色主题完整设置指南.md](IDEA黑色主题完整设置指南.md)：主题设置。
-- [项目框架与内容总结.md](项目框架与内容总结.md)：项目完整文档。
-- [启动问题解决.md](启动问题解决.md)：常见问题汇总。
+- [IDEA完整启动指南.md](../../guides/手动启动项目完整指南-IDEA版.md)：IDEA详细教程。
+- [IDEA黑色主题完整设置指南.md](../../../../doc/IDEA黑色主题完整设置指南.md)：主题设置。
+- [项目框架与内容总结.md](../../reference/项目框架与内容总结.md)：项目完整文档。
+- [启动问题解决.md](../fixes/archive_启动问题解决.md)：常见问题汇总。
 
 ---
 

@@ -18,7 +18,7 @@
 
 ### Q1. プロジェクトの起動方法は？
 
-**A.** `JtProject` 直下で以下を実行する。
+**A.** `JtProject-Next` 直下で以下を実行する。
 
 ```powershell
 .\mvnw.cmd spring-boot:run

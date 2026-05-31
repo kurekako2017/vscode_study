@@ -46,10 +46,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15b-04_CartService詳細設計書-mermaid-1.mmd](assets/15b-04_CartService詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -57,10 +53,6 @@ flowchart TD
     B --> C[永続化済Cart受領]
     C --> D[Cart返却]
 ```
-</details>
-
-
-
 ### 4.2 `getCarts()`
 
 処理手順:
@@ -71,10 +63,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15b-04_CartService詳細設計書-mermaid-2.mmd](assets/15b-04_CartService詳細設計書-mermaid-2.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -82,10 +70,6 @@ flowchart TD
     B --> C[List<Cart>受領]
     C --> D[結果返却]
 ```
-</details>
-
-
-
 利用場面:
 
 - ログインユーザーのカート存在確認
@@ -119,10 +103,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15b-04_CartService詳細設計書-mermaid-3.mmd](assets/15b-04_CartService詳細設計書-mermaid-3.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -130,10 +110,6 @@ flowchart TD
     B --> C[削除完了]
     C --> D[呼出元へ制御返却]
 ```
-</details>
-
-
-
 ## 5. 設計上の注意
 
 - 顧客単位のカート取得 API がないため、上位層で全件取得後に絞り込む実装になっている。

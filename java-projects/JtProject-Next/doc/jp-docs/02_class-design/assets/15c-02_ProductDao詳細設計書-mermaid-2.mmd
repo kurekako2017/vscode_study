@@ -1,6 +1,0 @@
-flowchart TD
-    A[id受領] --> B[Session.load(Product.class, id)]
-    B --> C{対象取得可?}
-    C -- No --> D[false or 例外]
-    C -- Yes --> E[delete実行]
-    E --> F[true返却]

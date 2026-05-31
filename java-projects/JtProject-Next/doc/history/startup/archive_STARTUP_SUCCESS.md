@@ -34,7 +34,7 @@ http://localhost:8082
 #### Windows PowerShell
 ```powershell
 # 进入项目目录
-cd D:\dev\study\java-projects\JtProject
+cd D:\dev\study\java-projects\JtProject-Next
 
 # 使用启动脚本
 .\start-app.ps1
@@ -96,7 +96,7 @@ Stop-Process -Id <PID> -Force
 **解决方案**:
 ```powershell
 # 清理并重新编译
-cd D:\dev\study\java-projects\JtProject
+cd D:\dev\study\java-projects\JtProject-Next
 $env:JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-11.0.28.6-hotspot"
 mvn clean package "-Dmaven.test.skip=true"
 ```
@@ -149,10 +149,10 @@ logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 ### 开发工具集成
 
 #### IntelliJ IDEA（推荐）⭐
-详细的 IDEA 使用指南请查看: **[IDEA_启动指南.md](IDEA_启动指南.md)**
+详细的 IDEA 使用指南请查看: **[IDEA启动指南.md](../../guides/手动启动项目完整指南-IDEA版.md)**
 
 **快速开始**:
-1. 打开项目: `File -> Open -> D:\dev\study\java-projects\JtProject`
+1. 打开项目: `File -> Open -> D:\dev\study\java-projects\JtProject-Next`
 2. Maven自动导入依赖
 3. 配置JDK 11: `File -> Project Structure -> Project SDK`
 4. 运行主类: 
@@ -169,17 +169,17 @@ logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 - ✅ HTTP 客户端测试
 - ✅ Git 版本控制
 
-详见: [IDEA_启动指南.md](IDEA_启动指南.md)
+详见: [IDEA启动指南.md](../../guides/手动启动项目完整指南-IDEA版.md)
 
 #### Eclipse
 1. 导入Maven项目: `File -> Import -> Existing Maven Projects`
-2. 选择目录: `D:\dev\study\java-projects\JtProject`
+2. 选择目录: `D:\dev\study\java-projects\JtProject-Next`
 3. 右键项目 -> `Run As -> Spring Boot App`
 
 ### 项目结构
 
 ```
-JtProject/
+JtProject-Next/
 ├── src/main/
 │   ├── java/com/jtspringproject/JtSpringProject/
 │   │   ├── controller/        # 控制器层
@@ -236,11 +236,11 @@ JtProject/
 
 ### 相关文档
 
-- [IDEA启动指南](IDEA_启动指南.md) - IntelliJ IDEA 完整使用教程
-- [Controller注释说明](CONTROLLER_注释说明.md)
-- [JavaDoc和日志总结](JAVADOC_LOGGING_SUMMARY.md)
-- [重构指南](REFACTORING_GUIDE.md)
-- [测试指南](TESTING_GUIDE.md)
+- [IDEA启动指南](../../guides/手动启动项目完整指南-IDEA版.md) - IntelliJ IDEA 完整使用教程
+- [Controller注释说明](../../reference/CONTROLLER_注释说明.md)
+- [JavaDoc和日志总结](../../reference/JAVADOC_LOGGING_SUMMARY.md)
+- [重构指南](../../guides/REFACTORING_GUIDE.md)
+- [测试指南](../../guides/TESTING_GUIDE.md)
 
 ---
 

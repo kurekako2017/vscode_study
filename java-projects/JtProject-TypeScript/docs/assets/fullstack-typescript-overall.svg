@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="700" viewBox="0 0 1180 700" role="img" aria-labelledby="title desc">
   <title id="title">纯 TypeScript 全栈整体流程</title>
   <desc id="desc">React TypeScript 前端通过统一 API 函数调用 Express TypeScript 后端，后端访问内存数据并返回 JSON，前端更新状态。</desc>
   <defs>
@@ -14,55 +14,67 @@
       .arrow { stroke: #1f2937; stroke-width: 2; fill: none; marker-end: url(#arrow); }
     </style>
   </defs>
-  <rect width="1180" height="620" fill="#ffffff"/>
+  <rect width="1180" height="700" fill="#ffffff"/>
   <text x="48" y="44" class="title">纯 TypeScript 全栈整体流程</text>
 
-  <rect x="50" y="85" width="210" height="70" class="box"/>
+  <rect x="50" y="85" width="210" height="92" class="box"/>
   <text x="78" y="115" class="txt">Browser</text>
   <text x="78" y="138" class="sub">访问 localhost:5175</text>
+  <text x="78" y="160" class="sub">分层：浏览器客户端</text>
 
-  <rect x="310" y="85" width="230" height="70" class="box"/>
+  <rect x="310" y="85" width="230" height="92" class="box"/>
   <text x="338" y="115" class="txt">React TypeScript</text>
   <text x="338" y="138" class="sub">Vite 前端应用</text>
+  <text x="338" y="160" class="sub">记：App.tsx 页面层</text>
 
-  <rect x="590" y="85" width="240" height="70" class="box"/>
+  <rect x="590" y="85" width="240" height="92" class="box"/>
   <text x="618" y="115" class="txt">api.ts</text>
   <text x="618" y="138" class="sub">统一 fetch 请求封装</text>
+  <text x="618" y="160" class="sub">分层：前端 API Service</text>
 
-  <rect x="880" y="85" width="240" height="70" class="box"/>
+  <rect x="880" y="85" width="240" height="92" class="box"/>
   <text x="908" y="115" class="txt">Express API</text>
   <text x="908" y="138" class="sub">localhost:8090/api</text>
+  <text x="908" y="160" class="sub">文件：server.ts</text>
 
-  <rect x="720" y="235" width="240" height="70" class="box"/>
+  <rect x="720" y="245" width="240" height="92" class="box"/>
   <text x="748" y="265" class="txt">server.ts</text>
   <text x="748" y="288" class="sub">路由函数处理请求</text>
+  <text x="748" y="310" class="sub">分层：Controller</text>
 
-  <rect x="430" y="235" width="240" height="70" class="box"/>
+  <rect x="430" y="245" width="240" height="92" class="box"/>
   <text x="458" y="265" class="txt">Store</text>
   <text x="458" y="288" class="sub">内存数据仓库</text>
+  <text x="458" y="310" class="sub">类名：Store；数据层</text>
 
-  <ellipse cx="220" cy="270" rx="125" ry="38" class="db"/>
-  <text x="148" y="266" class="txt">Seed Data</text>
-  <text x="136" y="289" class="sub">products / users / cart</text>
+  <ellipse cx="220" cy="291" rx="145" ry="58" class="db"/>
+  <text x="148" y="276" class="txt">Seed Data</text>
+  <text x="116" y="299" class="sub">文件：data/seed.ts</text>
+  <text x="116" y="321" class="sub">分层：初始数据 data.sql</text>
 
-  <rect x="430" y="405" width="240" height="70" class="box"/>
-  <text x="458" y="435" class="txt">ApiResult JSON</text>
-  <text x="458" y="458" class="sub">统一返回结构</text>
+  <rect x="430" y="435" width="240" height="92" class="box"/>
+  <text x="458" y="465" class="txt">ApiResult JSON</text>
+  <text x="458" y="488" class="sub">统一返回结构</text>
+  <text x="458" y="510" class="sub">类型：ApiResult&lt;T&gt;</text>
+  <text x="458" y="532" class="sub">文件：shared/index.ts</text>
 
-  <rect x="720" y="405" width="240" height="70" class="box"/>
-  <text x="748" y="435" class="txt">React State</text>
-  <text x="748" y="458" class="sub">products / session / cart</text>
+  <rect x="720" y="435" width="240" height="92" class="box"/>
+  <text x="748" y="465" class="txt">React State</text>
+  <text x="748" y="488" class="sub">products / session / cart</text>
+  <text x="748" y="510" class="sub">文件：App.tsx</text>
+  <text x="748" y="532" class="sub">分层：前端状态层</text>
 
-  <rect x="880" y="525" width="240" height="60" class="box"/>
-  <text x="908" y="560" class="txt">Rendered UI</text>
+  <rect x="880" y="590" width="240" height="72" class="box"/>
+  <text x="908" y="620" class="txt">Rendered UI</text>
+  <text x="908" y="643" class="sub">文件：App.tsx JSX</text>
 
-  <path d="M 260 120 L 310 120" class="arrow"/>
-  <path d="M 540 120 L 590 120" class="arrow"/>
-  <path d="M 830 120 L 880 120" class="arrow"/>
-  <path d="M 1000 155 L 1000 270 L 960 270" class="arrow"/>
-  <path d="M 720 270 L 670 270" class="arrow"/>
-  <path d="M 430 270 L 345 270" class="arrow"/>
-  <path d="M 550 305 L 550 405" class="arrow"/>
-  <path d="M 670 440 L 720 440" class="arrow"/>
-  <path d="M 840 475 L 960 525" class="arrow"/>
+  <path d="M 260 131 L 310 131" class="arrow"/>
+  <path d="M 540 131 L 590 131" class="arrow"/>
+  <path d="M 830 131 L 880 131" class="arrow"/>
+  <path d="M 1000 177 L 1000 291 L 960 291" class="arrow"/>
+  <path d="M 720 291 L 670 291" class="arrow"/>
+  <path d="M 430 291 L 365 291" class="arrow"/>
+  <path d="M 550 337 L 550 435" class="arrow"/>
+  <path d="M 670 481 L 720 481" class="arrow"/>
+  <path d="M 840 527 L 960 590" class="arrow"/>
 </svg>

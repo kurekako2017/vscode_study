@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="900" viewBox="0 0 1120 900" role="img" aria-labelledby="title desc">
+  <title id="title">カート追加処理フロー図</title>
+  <desc id="desc">商品追加操作からログイン確認、カート取得または作成、商品確認、明細登録まで</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10z" fill="#334155"/></marker>
+    <style>
+      text { font-family: "Noto Sans JP", "Yu Gothic", Arial, sans-serif; fill: #172033; font-size: 14px; }
+      .title { font-size: 24px; font-weight: 700; }
+      .box { fill: #fff; stroke: #2563eb; stroke-width: 1.4; rx: 7; }
+      .decision { fill: #fff7ed; stroke: #f97316; stroke-width: 1.4; }
+      .db { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.4; rx: 7; }
+      .line { stroke: #334155; stroke-width: 1.35; fill: none; marker-end: url(#arrow); }
+      .label { font-size: 13px; fill: #475569; }
+    </style>
+  </defs>
+  <rect width="1120" height="900" fill="#fff"/>
+  <text x="560" y="42" text-anchor="middle" class="title">カート追加処理フロー図</text>
+  <g transform="translate(420,80)">
+    <rect class="box" width="280" height="44"/><text x="140" y="28" text-anchor="middle">商品追加操作</text>
+    <rect class="box" y="68" width="280" height="44"/><text x="140" y="96" text-anchor="middle">UserController.addToCart</text>
+    <rect class="box" y="136" width="280" height="44"/><text x="140" y="164" text-anchor="middle">ログインユーザー取得</text>
+    <polygon class="decision" points="140,208 280,250 140,292 0,250"/><text x="140" y="255" text-anchor="middle">ログイン済?</text>
+    <rect class="box" y="326" width="280" height="44"/><text x="140" y="354" text-anchor="middle">UserService.getUserByUsername</text>
+    <polygon class="decision" points="140,404 280,446 140,488 0,446"/><text x="140" y="451" text-anchor="middle">ユーザー存在?</text>
+    <polygon class="decision" points="140,526 280,568 140,610 0,568"/><text x="140" y="573" text-anchor="middle">ROLE_ADMIN?</text>
+    <rect class="box" y="642" width="280" height="44"/><text x="140" y="670" text-anchor="middle">CartService.getCarts</text>
+    <polygon class="decision" points="140,720 280,762 140,804 0,762"/><text x="140" y="767" text-anchor="middle">既存カート有?</text>
+  </g>
+  <g transform="translate(70,292)">
+    <rect class="box" width="250" height="44"/><text x="125" y="28" text-anchor="middle">メッセージ設定して終了</text>
+    <rect class="box" y="196" width="250" height="44"/><text x="125" y="224" text-anchor="middle">再ログイン要求</text>
+    <rect class="box" y="318" width="250" height="44"/><text x="125" y="346" text-anchor="middle">管理画面へ誘導</text>
+  </g>
+  <g transform="translate(780,780)">
+    <rect class="box" width="250" height="44"/><text x="125" y="28" text-anchor="middle">CartService.addCart</text>
+    <rect class="box" y="68" width="250" height="44"/><text x="125" y="96" text-anchor="middle">ProductService.getProduct</text>
+  </g>
+  <g transform="translate(70,780)">
+    <rect class="box" width="250" height="44"/><text x="125" y="28" text-anchor="middle">既存カート使用</text>
+    <rect class="box" y="68" width="250" height="44"/><text x="125" y="96" text-anchor="middle">ProductService.getProduct</text>
+  </g>
+  <g transform="translate(780,490)">
+    <polygon class="decision" points="125,0 250,42 125,84 0,42"/><text x="125" y="47" text-anchor="middle">商品存在?</text>
+    <rect class="box" y="118" width="250" height="44"/><text x="125" y="146" text-anchor="middle">CartProductDao.addCartProduct</text>
+    <rect class="db" y="186" width="250" height="44"/><text x="125" y="214" text-anchor="middle">CART_PRODUCT 登録</text>
+    <rect class="box" y="254" width="250" height="44"/><text x="125" y="282" text-anchor="middle">/user/cart へ遷移</text>
+  </g>
+  <g transform="translate(70,608)">
+    <rect class="box" width="250" height="44"/><text x="125" y="28" text-anchor="middle">商品不存在メッセージ</text>
+  </g>
+  <path class="line" d="M560 124 L560 148"/><path class="line" d="M560 192 L560 216"/><path class="line" d="M560 292 L560 406"/>
+  <path class="line" d="M420 330 L320 314"/><text x="360" y="306" class="label">No</text>
+  <path class="line" d="M560 370 L560 484"/><text x="575" y="390" class="label">Yes</text>
+  <path class="line" d="M420 526 L320 510"/><text x="360" y="500" class="label">No</text>
+  <path class="line" d="M560 568 L560 606"/><text x="575" y="592" class="label">Yes</text>
+  <path class="line" d="M420 648 L320 632"/><text x="360" y="622" class="label">Yes</text>
+  <path class="line" d="M560 610 L560 722"/><text x="575" y="638" class="label">No</text>
+  <path class="line" d="M560 686 L560 800"/>
+  <path class="line" d="M700 842 L905 780"/><text x="748" y="802" class="label">No</text>
+  <path class="line" d="M420 842 L320 802"/><text x="360" y="806" class="label">Yes</text>
+  <path class="line" d="M905 824 L905 848"/>
+  <path class="line" d="M320 870 C500 870 660 870 780 870"/>
+  <path class="line" d="M905 848 C930 760 930 640 905 574"/>
+  <path class="line" d="M780 532 C600 550 420 600 320 630"/><text x="555" y="560" class="label">No</text>
+  <path class="line" d="M905 574 L905 608"/><text x="920" y="592" class="label">Yes</text>
+  <path class="line" d="M905 652 L905 676"/><path class="line" d="M905 720 L905 744"/>
+</svg>

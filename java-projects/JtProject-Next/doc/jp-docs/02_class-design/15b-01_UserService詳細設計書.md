@@ -49,10 +49,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15b-01_UserService詳細設計書-mermaid-1.mmd](assets/15b-01_UserService詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -63,10 +59,6 @@ flowchart TD
     D --> F[User返却]
     E --> F
 ```
-</details>
-
-
-
 ### 4.2 `addUser(user)`
 
 処理手順:

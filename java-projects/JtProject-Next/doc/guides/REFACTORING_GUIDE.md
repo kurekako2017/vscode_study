@@ -390,7 +390,7 @@ public class OrderController {
 
 ### 1. 编译检查
 ```bash
-cd /workspaces/study/java-projects/JtProject
+cd /workspaces/study/java-projects/JtProject-Next
 mvn clean compile
 # 输出: BUILD SUCCESS
 ```

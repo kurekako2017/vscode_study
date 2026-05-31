@@ -1,7 +1,0 @@
-flowchart TD
-    A[id と name 受領] --> B[EntityManager.find(Category, id)]
-    B --> C{対象存在?}
-    C -- No --> D[RuntimeException送出]
-    C -- Yes --> E[category.setName(name)]
-    E --> F[merge(category)]
-    F --> G[Category返却]

@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="880" viewBox="0 0 1240 880" role="img" aria-labelledby="title desc">
+  <title id="title">后端全局处理流程图</title>
+  <desc id="desc">Spring Boot 后端从 HTTP 请求进入 Controller、Service、DAO、Hibernate、数据库，再返回 JSON 的主流程</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: "Noto Sans SC", "Microsoft YaHei", "Noto Sans JP", Arial, sans-serif; fill: #172033; }
+      .title { font-size: 26px; font-weight: 700; }
+      .box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.4; rx: 7; }
+      .green { stroke: #16a34a; }
+      .orange { stroke: #f97316; }
+      .purple { stroke: #7c3aed; }
+      .gray { stroke: #64748b; }
+      .decision { fill: #fff7ed; stroke: #f97316; stroke-width: 1.4; }
+      .db { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.4; rx: 7; }
+      .text { font-size: 14px; }
+      .small { font-size: 12px; fill: #475569; }
+      .line { stroke: #334155; stroke-width: 1.35; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 7 5; }
+    </style>
+  </defs>
+  <rect width="1240" height="880" fill="#ffffff"/>
+  <text x="620" y="42" text-anchor="middle" class="title">后端全局处理流程图：Spring Boot API 如何处理请求</text>
+
+  <g transform="translate(50,90)">
+    <rect class="box gray" width="220" height="74"/>
+    <text x="110" y="26" text-anchor="middle" class="text">前端 fetch 请求</text>
+    <text x="110" y="45" text-anchor="middle" class="small">localhost:8086/api/*</text>
+    <text x="110" y="62" text-anchor="middle" class="small">带 Cookie / JSESSIONID</text>
+  </g>
+
+  <g transform="translate(330,90)">
+    <rect class="box" width="240" height="74"/>
+    <text x="120" y="26" text-anchor="middle" class="text">Spring Boot 启动环境</text>
+    <text x="120" y="45" text-anchor="middle" class="small">JtSpringProjectApplication</text>
+    <text x="120" y="62" text-anchor="middle" class="small">内嵌 Tomcat</text>
+  </g>
+
+  <g transform="translate(630,90)">
+    <rect class="box" width="240" height="74"/>
+    <text x="120" y="26" text-anchor="middle" class="text">Spring MVC 分发</text>
+    <text x="120" y="45" text-anchor="middle" class="small">DispatcherServlet</text>
+    <text x="120" y="62" text-anchor="middle" class="small">按 URL + Method 匹配</text>
+  </g>
+
+  <g transform="translate(930,90)">
+    <rect class="box orange" width="240" height="74"/>
+    <text x="120" y="26" text-anchor="middle" class="text">跨域与会话</text>
+    <text x="120" y="45" text-anchor="middle" class="small">@CrossOrigin</text>
+    <text x="120" y="62" text-anchor="middle" class="small">HttpSession / Cookie</text>
+  </g>
+
+  <g transform="translate(500,220)">
+    <rect class="box" width="240" height="86"/>
+    <text x="120" y="26" text-anchor="middle" class="text">ApiController</text>
+    <text x="120" y="45" text-anchor="middle" class="small">@RestController</text>
+    <text x="120" y="62" text-anchor="middle" class="small">@RequestMapping("/api")</text>
+    <text x="120" y="79" text-anchor="middle" class="small">返回 JSON，不返回页面</text>
+  </g>
+
+  <polygon class="decision" points="620,350 760,398 620,446 480,398"/>
+  <text x="620" y="392" text-anchor="middle" class="text">接口类型</text>
+  <text x="620" y="411" text-anchor="middle" class="small">公开 / 用户 / 管理员</text>
+
+  <g transform="translate(90,500)">
+    <rect class="box green" width="250" height="86"/>
+    <text x="125" y="26" text-anchor="middle" class="text">公开查询接口</text>
+    <text x="125" y="45" text-anchor="middle" class="small">GET /products</text>
+    <text x="125" y="62" text-anchor="middle" class="small">GET /categories</text>
+    <text x="125" y="79" text-anchor="middle" class="small">不要求登录</text>
+  </g>
+
+  <g transform="translate(495,500)">
+    <rect class="box orange" width="250" height="86"/>
+    <text x="125" y="26" text-anchor="middle" class="text">用户接口</text>
+    <text x="125" y="45" text-anchor="middle" class="small">POST /auth/login</text>
+    <text x="125" y="62" text-anchor="middle" class="small">GET /cart</text>
+    <text x="125" y="79" text-anchor="middle" class="small">校验普通用户 session</text>
+  </g>
+
+  <g transform="translate(900,500)">
+    <rect class="box purple" width="250" height="86"/>
+    <text x="125" y="26" text-anchor="middle" class="text">管理员接口</text>
+    <text x="125" y="45" text-anchor="middle" class="small">POST /admin/login</text>
+    <text x="125" y="62" text-anchor="middle" class="small">/admin/products / categories</text>
+    <text x="125" y="79" text-anchor="middle" class="small">校验 ADMIN_LOGGED_IN</text>
+  </g>
+
+  <g transform="translate(90,650)">
+    <rect class="box" width="250" height="74"/>
+    <text x="125" y="26" text-anchor="middle" class="text">Service 层</text>
+    <text x="125" y="45" text-anchor="middle" class="small">User/Product/Cart/Category</text>
+    <text x="125" y="62" text-anchor="middle" class="small">业务编排</text>
+  </g>
+
+  <g transform="translate(385,650)">
+    <rect class="box" width="250" height="74"/>
+    <text x="125" y="26" text-anchor="middle" class="text">DAO 层</text>
+    <text x="125" y="45" text-anchor="middle" class="small">Dao 接口 + Impl</text>
+    <text x="125" y="62" text-anchor="middle" class="small">CRUD / 查询</text>
+  </g>
+
+  <g transform="translate(680,650)">
+    <rect class="box" width="250" height="74"/>
+    <text x="125" y="26" text-anchor="middle" class="text">Hibernate SessionFactory</text>
+    <text x="125" y="45" text-anchor="middle" class="small">HibernateSessionFactoryConfig</text>
+    <text x="125" y="62" text-anchor="middle" class="small">实体映射 models</text>
+  </g>
+
+  <g transform="translate(975,650)">
+    <rect class="db" width="200" height="100"/>
+    <text x="100" y="26" text-anchor="middle" class="text">数据库</text>
+    <text x="100" y="45" text-anchor="middle" class="small">CUSTOMER / PRODUCT</text>
+    <text x="100" y="62" text-anchor="middle" class="small">CATEGORY / CART</text>
+    <text x="100" y="79" text-anchor="middle" class="small">CART_PRODUCT</text>
+  </g>
+
+  <g transform="translate(500,785)">
+    <rect class="box green" width="240" height="66"/>
+    <text x="120" y="24" text-anchor="middle" class="text">统一响应结构</text>
+    <text x="120" y="43" text-anchor="middle" class="small">{ success, message, data }</text>
+    <text x="120" y="60" text-anchor="middle" class="small">ResponseEntity + HTTP Status</text>
+  </g>
+
+  <g transform="translate(930,250)">
+    <rect class="box gray" width="240" height="72"/>
+    <text x="120" y="25" text-anchor="middle" class="text">旧版 JSP 对照线</text>
+    <text x="120" y="44" text-anchor="middle" class="small">UserController/AdminController</text>
+    <text x="120" y="61" text-anchor="middle" class="small">返回 /views/*.jsp</text>
+  </g>
+
+  <path class="line" d="M270 127 L330 127"/>
+  <path class="line" d="M570 127 L630 127"/>
+  <path class="line" d="M870 127 L930 127"/>
+  <path class="line" d="M1050 164 C1050 210 780 228 740 254"/>
+  <path class="line" d="M620 306 L620 350"/>
+  <path class="line" d="M500 398 C370 410 260 455 215 500"/>
+  <path class="line" d="M620 446 L620 500"/>
+  <path class="line" d="M740 398 C860 410 970 455 1025 500"/>
+  <path class="line" d="M215 586 C215 620 215 625 215 650"/>
+  <path class="line" d="M620 586 C520 610 350 620 215 650"/>
+  <path class="line" d="M1025 586 C830 615 520 625 215 650"/>
+  <path class="line" d="M340 687 L385 687"/>
+  <path class="line" d="M635 687 L680 687"/>
+  <path class="line" d="M930 687 L975 700"/>
+  <path class="line" d="M975 730 C870 800 760 820 740 818"/>
+  <path class="line" d="M680 724 C640 760 620 780 620 785"/>
+  <path class="line" d="M500 818 C360 805 185 760 215 724"/>
+  <path class="line" d="M740 818 C900 805 1030 780 1050 750"/>
+  <path class="line" d="M500 263 C420 235 360 220 300 210 C230 200 160 180 160 164"/>
+  <path class="line dash" d="M740 263 L930 286"/>
+</svg>

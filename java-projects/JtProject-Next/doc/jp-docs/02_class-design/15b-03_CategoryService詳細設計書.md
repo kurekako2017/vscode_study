@@ -60,10 +60,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15b-03_CategoryService詳細設計書-mermaid-1.mmd](assets/15b-03_CategoryService詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -71,10 +67,6 @@ flowchart TD
     B --> C[List<Category>受領]
     C --> D[結果返却]
 ```
-</details>
-
-
-
 ### 4.3 `deleteCategory(id)`
 
 処理手順:
@@ -105,10 +97,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15b-03_CategoryService詳細設計書-mermaid-2.mmd](assets/15b-03_CategoryService詳細設計書-mermaid-2.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -117,10 +105,6 @@ flowchart TD
     C -- Yes --> D[Category返却]
     C -- No --> E[例外送出]
 ```
-</details>
-
-
-
 ### 4.5 `getCategory(id)`
 
 処理手順:

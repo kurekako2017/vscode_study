@@ -42,10 +42,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-1.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -54,10 +50,6 @@ flowchart TD
     C --> D[persist(category)]
     D --> E[Category返却]
 ```
-</details>
-
-
-
 ### 4.2 `getCategories()`
 
 処理手順:
@@ -69,10 +61,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-2.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-2.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -81,10 +69,6 @@ flowchart TD
     C --> D[件数ログ出力]
     D --> E[一覧返却]
 ```
-</details>
-
-
-
 ### 4.3 `deletCategory(id)`
 
 処理手順:
@@ -101,10 +85,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-3.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-3.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -114,10 +94,6 @@ flowchart TD
     C -- Yes --> E[remove(category)]
     E --> F[true返却]
 ```
-</details>
-
-
-
 ### 4.4 `updateCategory(id, name)`
 
 処理手順:
@@ -130,10 +106,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15c-03_CategoryDao詳細設計書-mermaid-4.mmd](assets/15c-03_CategoryDao詳細設計書-mermaid-4.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -144,10 +116,6 @@ flowchart TD
     E --> F[merge(category)]
     F --> G[Category返却]
 ```
-</details>
-
-
-
 ### 4.5 `getCategory(id)`
 
 処理手順:

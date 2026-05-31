@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本書は `JtProject` の URL、HTTP メソッド、用途、担当 Controller を一覧化する。
+本書は `JtProject-Next` の URL、HTTP メソッド、用途、担当 Controller を一覧化する。
 
 ## 2. URL 一覧
 

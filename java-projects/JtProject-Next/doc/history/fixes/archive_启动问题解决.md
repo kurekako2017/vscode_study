@@ -67,14 +67,14 @@ TCP    [::]:8082              [::]:0                 LISTENING       25848
 ### 方法1: 使用启动脚本（推荐）
 
 ```powershell
-cd D:\dev\source_code\vscode_study\java-projects\JtProject
+cd D:\dev\source_code\vscode_study\java-projects\JtProject-Next
 .\start-app.ps1
 ```
 
 ### 方法2: 手动启动
 
 ```powershell
-cd D:\dev\source_code\vscode_study\java-projects\JtProject
+cd D:\dev\source_code\vscode_study\java-projects\JtProject-Next
 $env:JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-11.0.28.6-hotspot"
 java -jar target\JtSpringProject-0.0.1-SNAPSHOT.jar
 ```
@@ -82,7 +82,7 @@ java -jar target\JtSpringProject-0.0.1-SNAPSHOT.jar
 ### 方法3: Maven启动（开发模式）
 
 ```powershell
-cd D:\dev\source_code\vscode_study\java-projects\JtProject
+cd D:\dev\source_code\vscode_study\java-projects\JtProject-Next
 $env:JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-11.0.28.6-hotspot"
 mvn spring-boot:run "-Dmaven.test.skip=true"
 ```
@@ -127,9 +127,9 @@ mvn spring-boot:run "-Dmaven.test.skip=true"
 
 ## 相关文档
 
-- [详细启动指南](STARTUP_SUCCESS.md) - 完整的启动说明和故障排除
-- [JavaDoc和日志总结](JAVADOC_LOGGING_SUMMARY.md) - 代码注释和日志功能说明
-- [Controller注释说明](CONTROLLER_注释说明.md) - 控制器层详细说明
+- [启动成功归档](../startup/archive_STARTUP_SUCCESS.md) - 完整的启动说明和故障排除
+- [JavaDoc和日志总结](../../reference/JAVADOC_LOGGING_SUMMARY.md) - 代码注释和日志功能说明
+- [Controller注释说明](../../reference/CONTROLLER_注释说明.md) - 控制器层详细说明
 
 ## 注意事项
 

@@ -1,6 +1,6 @@
-# JtProject 日本项目文档集
+# JtProject-Next 日本项目文档集
 
-本目录用于模拟日本开发项目常见的文档交付物，结合 `JtProject` 当前实际功能整理。
+本目录用于模拟日本开发项目常见的文档交付物，结合 `JtProject-Next` 当前实际功能整理。前端主线是 Next.js + TypeScript，原始 JSP 画面保留为后端 MVC 对照资料。
 
 ## 目录结构
 
@@ -151,7 +151,7 @@
 
 - 可以把这里的 Markdown 直接作为项目学习资料使用。
 - 如果后续要模拟更正式的日本项目交付，可以把这些表格迁移到 Excel。
-- 当前内容已经按 `JtProject` 实际 Controller / JSP 功能做了样例填充，不是空白模板。
+- 当前内容已经按 `JtProject-Next` 的实际 Controller、JSON API、Next.js 前端和保留的 JSP 对照功能做了样例填充，不是空白模板。
 
 ## 関連文書
 
@@ -163,5 +163,4 @@
 - [84_模擬ジョブネット一覧.md](06_operations/84_模擬ジョブネット一覧.md)
 - [33_運用手順書.md](06_operations/33_運用手順書.md)
 - [37_監視・障害対応手順書.md](06_operations/37_監視・障害対応手順書.md)
-
 

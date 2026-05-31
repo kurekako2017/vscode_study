@@ -13,7 +13,7 @@
 - 方法2: 在IDE运行配置中添加VM参数：`-Dspring.profiles.active=remote`
 
 **VS Code配置运行参数（可选）：**
-创建 `java-projects/JtProject/.vscode/launch.json`（项目根目录下）：
+创建 `java-projects/JtProject-Next/.vscode/launch.json`（项目根目录下）：
 ```json
 {
   "version": "0.2.0",
@@ -51,7 +51,7 @@
 
 ### 方式2: 使用Maven命令行
 ```bash
-cd /workspaces/study/java-projects/JtProject
+cd /workspaces/study/java-projects/JtProject-Next
 
 # 默认启动（H2持久化）
 mvn spring-boot:run
@@ -62,7 +62,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=remote
 
 ### 方式3: 使用启动脚本（交互式）
 ```bash
-cd /workspaces/study/java-projects/JtProject
+cd /workspaces/study/java-projects/JtProject-Next
 ./start.sh
 # 然后选择环境：1-默认H2, 2-local, 3-remote, 4-mysql
 ```
@@ -134,7 +134,7 @@ db.url=jdbc:h2:file:./data/ecommjava;MODE=MySQL;AUTO_SERVER=TRUE
 - ✅ 可以备份/迁移数据文件
 - ✅ 无需外部数据库服务
 
-**数据文件位置**: `/workspaces/study/java-projects/JtProject/data/ecommjava.mv.db`
+**数据文件位置**: `/workspaces/study/java-projects/JtProject-Next/data/ecommjava.mv.db`
 
 ### 数据初始化机制
 应用使用Spring Boot的SQL初始化功能：
@@ -153,7 +153,7 @@ db.url=jdbc:h2:file:./data/ecommjava;MODE=MySQL;AUTO_SERVER=TRUE
 ### Codespaces环境
 **推荐配置**: 使用默认H2配置
 ```bash
-cd /workspaces/study/java-projects/JtProject
+cd /workspaces/study/java-projects/JtProject-Next
 mvn spring-boot:run
 ```
 **特点**:
@@ -167,7 +167,7 @@ mvn spring-boot:run
 **选项1: 使用H2（推荐）**
 ```bash
 git clone <repo>
-cd java-projects/JtProject
+cd java-projects/JtProject-Next
 mvn spring-boot:run
 ```
 - 无需额外配置，开箱即用

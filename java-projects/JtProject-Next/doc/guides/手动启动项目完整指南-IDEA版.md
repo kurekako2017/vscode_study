@@ -26,12 +26,12 @@
 
 **位置说明**：
 - 看IDEA窗口**左侧**，有一个项目结构面板
-- 应该能看到 `JtProject` 文件夹
+- 应该能看到 `JtProject-Next` 文件夹
 - 文件夹下面有 `src`、`pom.xml` 等文件
 
 **如果没有看到**：
 1. 点击顶部菜单：`File` → `Open`
-2. 选择：`D:\dev\source_code\vscode_study\java-projects\JtProject`
+2. 选择：`D:\dev\source_code\vscode_study\java-projects\JtProject-Next`
 3. 点击 `OK`
 
 ### 2. 等待Maven依赖下载完成
@@ -67,7 +67,7 @@
 #### 方法B：手动导航
 1. 在左侧项目面板中，找到并展开：
    ```
-   JtProject
+   JtProject-Next
    └── src
        └── main
            └── java
@@ -196,10 +196,10 @@ JT电商系统启动成功！
   - 或者直接输入：`com.jtspringproject.JtSpringProject.JtSpringProjectApplication`
 
 - **Use classpath of module**（使用的模块）：
-  - 下拉选择：`JtProject`
+  - 下拉选择：`JtProject-Next`
 
 - **Working directory**（工作目录）：
-  - 应该自动填充为：`D:\dev\source_code\vscode_study\java-projects\JtProject`
+  - 应该自动填充为：`D:\dev\source_code\vscode_study\java-projects\JtProject-Next`
   - 如果没有，点击右边的文件夹图标，选择项目根目录
 
 ### 步骤3：保存配置
@@ -395,7 +395,7 @@ Unsupported class file major version
 
 在启动前，确认以下事项：
 
-- [ ] IDEA已打开JtProject项目
+- [ ] IDEA已打开JtProject-Next项目
 - [ ] 右下角没有进度条（Maven依赖已下载完成）
 - [ ] JDK已正确配置（JDK 11+）
 - [ ] 8082端口没有被占用
@@ -448,6 +448,6 @@ Unsupported class file major version
 如果遇到问题，请查看：
 - `Run` 面板中的错误信息
 - 右下角的 `Event Log`（事件日志）
-- 或参考 [IDEA操作完整指南-新手版.md](./IDEA操作完整指南-新手版.md)
+- 或参考 [IDEA操作完整指南-新手版.md](../../../doc/IDEA操作完整指南-新手版.md)
 
 

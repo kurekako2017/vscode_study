@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="820" viewBox="0 0 1220 820" role="img" aria-labelledby="title desc">
+  <title id="title">前端全局处理流程图</title>
+  <desc id="desc">Next.js 前端从浏览器访问、页面初始化、API 请求、状态更新到重新渲染的主流程</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: "Noto Sans SC", "Microsoft YaHei", "Noto Sans JP", Arial, sans-serif; fill: #172033; }
+      .title { font-size: 26px; font-weight: 700; }
+      .lane { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.4; rx: 8; }
+      .laneTitle { font-size: 18px; font-weight: 700; fill: #0f172a; }
+      .box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.4; rx: 7; }
+      .green { stroke: #16a34a; }
+      .orange { stroke: #f97316; }
+      .gray { stroke: #64748b; }
+      .text { font-size: 14px; }
+      .small { font-size: 12px; fill: #475569; }
+      .line { stroke: #334155; stroke-width: 1.35; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 7 5; }
+    </style>
+  </defs>
+  <rect width="1220" height="820" fill="#ffffff"/>
+  <text x="610" y="42" text-anchor="middle" class="title">前端全局处理流程图：Next.js 页面如何调用后端</text>
+
+  <rect x="40" y="80" width="240" height="610" class="lane"/>
+  <text x="160" y="112" text-anchor="middle" class="laneTitle">浏览器</text>
+
+  <rect x="320" y="80" width="360" height="610" class="lane"/>
+  <text x="500" y="112" text-anchor="middle" class="laneTitle">Next.js / React</text>
+
+  <rect x="720" y="80" width="220" height="610" class="lane"/>
+  <text x="830" y="104" text-anchor="middle" class="laneTitle">前端 API 调用层</text>
+  <text x="830" y="126" text-anchor="middle" class="small">frontend/lib/api.ts</text>
+
+  <rect x="980" y="80" width="200" height="610" class="lane"/>
+  <text x="1080" y="104" text-anchor="middle" class="laneTitle">后端 Controller 层</text>
+  <text x="1080" y="126" text-anchor="middle" class="small">ApiController.java</text>
+
+  <g transform="translate(70,150)">
+    <rect class="box gray" width="180" height="58"/>
+    <text x="90" y="24" text-anchor="middle" class="text">访问首页</text>
+    <text x="90" y="43" text-anchor="middle" class="small">localhost:3000</text>
+
+    <rect class="box orange" y="360" width="180" height="74"/>
+    <text x="90" y="26" text-anchor="middle" class="text">用户操作</text>
+    <text x="90" y="45" text-anchor="middle" class="small">登录 / 加购物车</text>
+    <text x="90" y="62" text-anchor="middle" class="small">删除 / 刷新</text>
+  </g>
+
+  <g transform="translate(360,135)">
+    <rect class="box" width="280" height="58"/>
+    <text x="140" y="24" text-anchor="middle" class="text">App Router 布局</text>
+    <text x="140" y="43" text-anchor="middle" class="small">frontend/app/layout.tsx</text>
+
+    <rect class="box" y="86" width="280" height="58"/>
+    <text x="140" y="110" text-anchor="middle" class="text">首页 Client Component</text>
+    <text x="140" y="129" text-anchor="middle" class="small">frontend/app/page.tsx</text>
+
+    <rect class="box" y="172" width="280" height="74"/>
+    <text x="140" y="198" text-anchor="middle" class="text">初始化 React state</text>
+    <text x="140" y="217" text-anchor="middle" class="small">products / cart / session</text>
+    <text x="140" y="234" text-anchor="middle" class="small">message / loading</text>
+
+    <rect class="box" y="274" width="280" height="74"/>
+    <text x="140" y="300" text-anchor="middle" class="text">useEffect 首次挂载</text>
+    <text x="140" y="319" text-anchor="middle" class="small">loadInitialData()</text>
+    <text x="140" y="336" text-anchor="middle" class="small">/session + /products</text>
+
+    <rect class="box orange" y="390" width="280" height="74"/>
+    <text x="140" y="416" text-anchor="middle" class="text">事件处理函数</text>
+    <text x="140" y="435" text-anchor="middle" class="small">submitUserLogin()</text>
+    <text x="140" y="452" text-anchor="middle" class="small">addToCart() / removeFromCart()</text>
+
+    <rect class="box green" y="492" width="280" height="74"/>
+    <text x="140" y="518" text-anchor="middle" class="text">setState 更新页面数据</text>
+    <text x="140" y="537" text-anchor="middle" class="small">setSession / setProducts</text>
+    <text x="140" y="554" text-anchor="middle" class="small">setCart / setMessage</text>
+  </g>
+
+  <g transform="translate(750,270)">
+    <rect class="box" width="160" height="74"/>
+    <text x="80" y="22" text-anchor="middle" class="text">api&lt;T&gt;()</text>
+    <text x="80" y="41" text-anchor="middle" class="small">API Client 函数</text>
+    <text x="80" y="58" text-anchor="middle" class="small">封装 fetch / JSON</text>
+    <text x="80" y="75" text-anchor="middle" class="small">统一错误处理</text>
+
+    <rect class="box" y="120" width="160" height="88"/>
+    <text x="80" y="146" text-anchor="middle" class="text">浏览器 fetch 层</text>
+    <text x="80" y="165" text-anchor="middle" class="small">API_BASE + path</text>
+    <text x="80" y="182" text-anchor="middle" class="small">credentials: include</text>
+    <text x="80" y="199" text-anchor="middle" class="small">Content-Type: JSON</text>
+
+    <rect class="box green" y="254" width="160" height="74"/>
+    <text x="80" y="280" text-anchor="middle" class="text">解析 ApiResult</text>
+    <text x="80" y="299" text-anchor="middle" class="small">success/message/data</text>
+    <text x="80" y="316" text-anchor="middle" class="small">失败 throw Error</text>
+  </g>
+
+  <g transform="translate(1010,300)">
+    <rect class="box green" width="140" height="104"/>
+    <text x="70" y="24" text-anchor="middle" class="text">ApiController</text>
+    <text x="70" y="43" text-anchor="middle" class="small">@RestController</text>
+    <text x="70" y="60" text-anchor="middle" class="small">/api/session</text>
+    <text x="70" y="77" text-anchor="middle" class="small">/api/products</text>
+    <text x="70" y="94" text-anchor="middle" class="small">/api/cart / admin</text>
+
+    <rect class="box green" y="140" width="140" height="90"/>
+    <text x="70" y="164" text-anchor="middle" class="text">Service / DAO</text>
+    <text x="70" y="183" text-anchor="middle" class="small">业务逻辑</text>
+    <text x="70" y="200" text-anchor="middle" class="small">Hibernate</text>
+    <text x="70" y="217" text-anchor="middle" class="small">Database</text>
+
+    <rect class="box green" y="270" width="140" height="74"/>
+    <text x="70" y="296" text-anchor="middle" class="text">JSON 响应</text>
+    <text x="70" y="315" text-anchor="middle" class="small">ApiResult&lt;T&gt;</text>
+    <text x="70" y="332" text-anchor="middle" class="small">success/message/data</text>
+  </g>
+
+  <path class="line" d="M250 179 L360 164"/>
+  <path class="line" d="M500 193 L500 221"/>
+  <path class="line" d="M500 279 L500 307"/>
+  <path class="line" d="M500 381 L750 307"/>
+  <path class="line" d="M910 307 L1010 352"/>
+  <path class="line" d="M1080 404 L1080 440"/>
+  <path class="line" d="M1080 530 L1080 570"/>
+  <path class="line" d="M1010 607 L910 561"/>
+  <path class="line" d="M750 561 L640 529"/>
+  <path class="line" d="M500 566 C500 630 210 650 160 584"/>
+  <path class="line dash" d="M250 547 L360 427"/>
+  <path class="line" d="M640 427 L750 427"/>
+  <path class="line" d="M830 344 L830 390"/>
+  <path class="line" d="M830 478 L830 524"/>
+</svg>

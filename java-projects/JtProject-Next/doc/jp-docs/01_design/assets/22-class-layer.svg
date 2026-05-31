@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="780" viewBox="0 0 1180 780" role="img" aria-labelledby="title desc">
+  <title id="title">クラス層構造図</title>
+  <desc id="desc">View、Controller、Service、DAO、Entity のクラス層構造</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: "Noto Sans JP", "Yu Gothic", Arial, sans-serif; fill: #172033; }
+      .title { font-size: 24px; font-weight: 700; }
+      .layer { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 8; }
+      .label { font-size: 17px; font-weight: 700; fill: #0f172a; }
+      .box { fill: #ffffff; stroke: #2563eb; stroke-width: 1.4; rx: 6; }
+      .box text { font-size: 14px; }
+      .line { stroke: #334155; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1180" height="780" fill="#ffffff"/>
+  <text x="590" y="42" text-anchor="middle" class="title">クラス層構造図</text>
+
+  <g transform="translate(40,80)">
+    <rect class="layer" width="200" height="620"/>
+    <text x="100" y="34" text-anchor="middle" class="label">View Layer</text>
+    <g transform="translate(25,65)">
+      <rect class="box" width="150" height="44"/><text x="75" y="28" text-anchor="middle">userLogin.jsp</text>
+      <rect class="box" y="64" width="150" height="44"/><text x="75" y="92" text-anchor="middle">index.jsp</text>
+      <rect class="box" y="128" width="150" height="44"/><text x="75" y="156" text-anchor="middle">products.jsp</text>
+      <rect class="box" y="192" width="150" height="44"/><text x="75" y="220" text-anchor="middle">categories.jsp</text>
+      <rect class="box" y="256" width="150" height="44"/><text x="75" y="284" text-anchor="middle">cart.jsp</text>
+    </g>
+  </g>
+
+  <g transform="translate(285,80)">
+    <rect class="layer" width="180" height="620"/>
+    <text x="90" y="34" text-anchor="middle" class="label">Controller</text>
+    <g transform="translate(20,110)">
+      <rect class="box" width="140" height="48"/><text x="70" y="30" text-anchor="middle">UserController</text>
+      <rect class="box" y="160" width="140" height="48"/><text x="70" y="190" text-anchor="middle">AdminController</text>
+    </g>
+  </g>
+
+  <g transform="translate(510,80)">
+    <rect class="layer" width="220" height="620"/>
+    <text x="110" y="34" text-anchor="middle" class="label">Service Layer</text>
+    <g transform="translate(20,80)">
+      <rect class="box" width="180" height="52"/><text x="90" y="23" text-anchor="middle">UserService</text><text x="90" y="40" text-anchor="middle">UserServiceImpl</text>
+      <rect class="box" y="86" width="180" height="52"/><text x="90" y="109" text-anchor="middle">ProductService</text><text x="90" y="126" text-anchor="middle">ProductServiceImpl</text>
+      <rect class="box" y="172" width="180" height="52"/><text x="90" y="195" text-anchor="middle">CategoryService</text><text x="90" y="212" text-anchor="middle">CategoryServiceImpl</text>
+      <rect class="box" y="258" width="180" height="52"/><text x="90" y="281" text-anchor="middle">CartService</text><text x="90" y="298" text-anchor="middle">CartServiceImpl</text>
+    </g>
+  </g>
+
+  <g transform="translate(775,80)">
+    <rect class="layer" width="220" height="620"/>
+    <text x="110" y="34" text-anchor="middle" class="label">DAO Layer</text>
+    <g transform="translate(20,62)">
+      <rect class="box" width="180" height="48"/><text x="90" y="22" text-anchor="middle">UserDao</text><text x="90" y="38" text-anchor="middle">UserDaoImpl</text>
+      <rect class="box" y="72" width="180" height="48"/><text x="90" y="94" text-anchor="middle">ProductDao</text><text x="90" y="110" text-anchor="middle">ProductDaoImpl</text>
+      <rect class="box" y="144" width="180" height="48"/><text x="90" y="166" text-anchor="middle">CategoryDao</text><text x="90" y="182" text-anchor="middle">CategoryDaoImpl</text>
+      <rect class="box" y="216" width="180" height="48"/><text x="90" y="238" text-anchor="middle">CartDao</text><text x="90" y="254" text-anchor="middle">CartDaoImpl</text>
+      <rect class="box" y="288" width="180" height="48"/><text x="90" y="310" text-anchor="middle">CartProductDao</text><text x="90" y="326" text-anchor="middle">CartProductDaoImpl</text>
+    </g>
+  </g>
+
+  <g transform="translate(1030,80)">
+    <rect class="layer" width="110" height="620"/>
+    <text x="55" y="34" text-anchor="middle" class="label">Entity</text>
+    <g transform="translate(15,66)">
+      <rect class="box" width="80" height="38"/><text x="40" y="24" text-anchor="middle">User</text>
+      <rect class="box" y="72" width="80" height="38"/><text x="40" y="96" text-anchor="middle">Product</text>
+      <rect class="box" y="144" width="80" height="38"/><text x="40" y="168" text-anchor="middle">Category</text>
+      <rect class="box" y="216" width="80" height="38"/><text x="40" y="240" text-anchor="middle">Cart</text>
+      <rect class="box" y="288" width="80" height="38"/><text x="40" y="312" text-anchor="middle">CartProduct</text>
+    </g>
+  </g>
+
+  <path class="line" d="M215 167 C250 167 250 214 305 214"/>
+  <path class="line" d="M215 231 C250 231 250 214 305 214"/>
+  <path class="line" d="M215 295 C250 295 250 374 305 374"/>
+  <path class="line" d="M215 359 C250 359 250 374 305 374"/>
+  <path class="line" d="M215 423 C250 423 250 214 305 214"/>
+  <path class="line" d="M445 214 C480 214 480 186 530 186"/>
+  <path class="line" d="M445 214 C480 214 480 272 530 272"/>
+  <path class="line" d="M445 214 C480 214 480 444 530 444"/>
+  <path class="line" d="M445 374 C480 374 480 272 530 272"/>
+  <path class="line" d="M445 374 C480 374 480 358 530 358"/>
+  <path class="line" d="M710 186 C745 186 745 166 795 166"/>
+  <path class="line" d="M710 272 C745 272 745 238 795 238"/>
+  <path class="line" d="M710 358 C745 358 745 310 795 310"/>
+  <path class="line" d="M710 444 C745 444 745 382 795 382"/>
+  <path class="line" d="M955 166 C990 166 990 165 1045 165"/>
+  <path class="line" d="M955 238 C990 238 990 237 1045 237"/>
+  <path class="line" d="M955 310 C990 310 990 309 1045 309"/>
+  <path class="line" d="M955 382 C990 382 990 381 1045 381"/>
+  <path class="line" d="M955 454 C990 454 990 453 1045 453"/>
+</svg>

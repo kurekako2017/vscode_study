@@ -66,10 +66,6 @@
 
 処理フロー図:
 
-[Mermaid source: 15a-01_UserController詳細設計書-mermaid-1.mmd](assets/15a-01_UserController詳細設計書-mermaid-1.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -82,10 +78,6 @@ flowchart TD
     G --> H[ProductService.getProducts]
     H --> I[index返却]
 ```
-</details>
-
-
-
 ### 4.2 `newUseRegister()`
 
 処理手順:
@@ -111,10 +103,6 @@ flowchart TD
 
 処理フロー図:
 
-[Mermaid source: 15a-01_UserController詳細設計書-mermaid-2.mmd](assets/15a-01_UserController詳細設計書-mermaid-2.mmd)
-
-<details>
-<summary>Mermaid source (editable)</summary>
 
 ```mermaid
 flowchart TD
@@ -135,10 +123,6 @@ flowchart TD
     M -- Yes --> O[CartProductDao.addCartProduct]
     O --> P[/user/cartへリダイレクト]
 ```
-</details>
-
-
-
 ### 4.4 `showCart()`
 
 処理手順:
