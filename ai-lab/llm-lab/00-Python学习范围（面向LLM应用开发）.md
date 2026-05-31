@@ -1,565 +1,311 @@
 # 00. Python 学习范围（面向 LLM 应用开发）
 
-如果目标是：
+这篇只回答一个问题：
 
-- 学 `LLM` 应用开发
-- 学 `RAG`
-- 学 `FastAPI`
-- 学 `Agent` 的前置基础
-- 贴近日本 IT 现场和派遣案件
+> 为了做 `LLM / RAG / FastAPI / Agent` 应用，Python 先学到什么范围就够用？
 
-那么 `Python` 不需要一开始学得很“全”，而应该先学最实用、最常用、最容易马上落到项目里的部分。
+结论是：不要一开始把 Python 当成“全栈语言大百科”来学。当前最有效的路线是先掌握能马上落到项目里的能力。
 
-这一篇的重点是整理：
+```text
+Python 基础 -> JSON / 文件处理 -> API 调用 -> Pydantic -> FastAPI -> RAG
+```
 
-- 该学什么
-- 暂时不用学什么
-- 建议学习顺序
+## 1. 先说结论
 
-## 0.1 先说结论
+当前阶段最优先学这些：
 
-对 `LLM` 应用开发来说，最值得先学好的 `Python` 内容是：
+| 优先级 | 内容 | 用在什么地方 |
+| --- | --- | --- |
+| 必学 | 基础语法 | 读懂 demo、改函数、写流程 |
+| 必学 | `dict / list / json` | 处理模型输入输出、API 请求响应 |
+| 必学 | 文件与路径 | RAG 文档读取、配置、日志 |
+| 必学 | 异常处理 | API Key、文件、模型调用失败时能定位问题 |
+| 必学 | 类型标注 | 看懂现代 Python 项目 |
+| 必学 | `Pydantic` | 结构化输出、请求体、响应校验 |
+| 必学 | `FastAPI` | 把 LLM/RAG 能力封装成接口 |
+| 后补 | `TypeScript` | 前端页面、Node.js、前后端联动 |
 
-- 基础语法
-- JSON 和字典处理
-- 文件处理
-- 异常处理
-- 类型标注
-- `Pydantic`
-- `FastAPI`
-- 环境变量和配置读取
+最核心的一句话：
 
-如果把范围再压缩成最核心的一句，就是：
+```text
+先把 Python + Pydantic + FastAPI + 文件处理 学到能改项目。
+```
 
-- `Python + Pydantic + FastAPI + 文件处理`
+## 2. 为什么是这个范围
 
-这套组合比一开始去学复杂算法、爬虫、桌面开发、深度框架实现更实用。
+LLM 应用开发不是只写 prompt。实际项目里经常要处理：
 
-## 0.2 为什么 Python 很重要
+- 读取本地文件或企业文档
+- 把用户输入变成模型请求
+- 把模型结果变成 JSON
+- 校验字段是否稳定
+- 封装成 HTTP API
+- 记录错误、成本、延迟和评估结果
 
-虽然 `LLM` 和 `Agent` 开发不只限于 `Python`，但当前最常见、最实用的还是 `Python`。
+所以 Python 学习重点不是“语法多全面”，而是能不能支撑下面这些项目：
 
-原因主要是：
+- `chat_cli`：命令行模型调用
+- `structured_output_demo`：结构化输出
+- `doc_qa_agent`：本地文档问答
+- `rag_api_demo`：FastAPI 版 RAG 服务
 
-- 大模型 SDK 支持成熟
-- `RAG` 相关生态丰富
-- 文档处理和数据处理库很多
-- `FastAPI` 很适合做 PoC 和后端接口
-- 日本现场很多生成 AI PoC 也常见 `Python`
+## 3. Python 必学范围
 
-所以更现实的策略是：
+### 3.1 基础语法
 
-- 主线先学 `Python`
-- 后面需要时再补 `TypeScript`
+先学到能看懂和修改项目代码：
 
-## 0.3 必须优先学的内容
-
-### 1. 基础语法
-
-先学这些最常用的基础：
-
-- 变量
-- 字符串
-- 数字
-- 布尔值
-- 列表
-- 字典
-- 集合
-- `if`
-- `for`
-- `while`
+- 变量、字符串、数字、布尔值
+- `list / dict / set`
+- `if / for / while`
 - 函数
 - `import`
+- 模块拆分
 
-这里的目标不是背语法，而是能写出这种代码：
+验收标准：
 
-- 遍历文档
-- 处理 JSON
-- 调函数
-- 组合结果
+- 能读懂一个 `main.py`
+- 能新增一个函数
+- 能把重复逻辑拆成函数
 
-### 2. 字典、列表、JSON 处理
+### 3.2 JSON、字典和列表
 
-这块很重要，因为 `LLM` 开发里大量数据都是：
+LLM 应用里大量数据都是 JSON：
 
-- JSON 请求
-- JSON 响应
-- schema 数据
-- 检索结果列表
+- 请求参数
+- 模型响应
+- 检索结果
+- 结构化输出
+- API 返回值
 
-要重点掌握：
+重点掌握：
 
 - `dict.get()`
-- 列表遍历
-- 列表过滤
-- 排序
-- `json.dumps()`
+- 遍历列表
+- 过滤和排序列表
 - `json.loads()`
+- `json.dumps(..., ensure_ascii=False, indent=2)`
 
-### 3. 文件处理
+验收标准：
 
-这对 `RAG`、日志、配置、文档问答非常重要。
+- 能从 JSON 中取字段
+- 能把 Python 对象保存成 JSON
+- 能把模型结果整理成固定结构
 
-要重点学：
+### 3.3 文件和路径处理
+
+RAG、日志、配置都离不开文件处理。
+
+重点掌握：
 
 - 读取文本文件
 - 写入文本文件
-- 读取 `json`
+- 读取 JSON 文件
 - 遍历目录
 - 判断文件和目录
-- 拼接路径
+- 使用 `pathlib.Path`
 
-推荐重点掌握：
+验收标准：
 
-- `pathlib`
+- 能读取一个资料目录中的 `.md` / `.txt`
+- 能把结果写入 `json`
+- 能看懂 `Path(__file__).parent`
 
-因为它比传统字符串拼路径更稳定、更适合项目代码。
+### 3.4 异常处理
 
-### 4. 异常处理
+LLM 应用常见错误：
 
-在 `LLM` 应用里，出错很常见：
-
-- API Key 没配
+- 没有 `OPENAI_API_KEY`
 - 文件不存在
-- PDF 读失败
-- 请求超时
-- 模型调用失败
+- PDF 或文本解析失败
+- 模型调用超时
+- 返回结构不符合预期
 
-所以要掌握：
+重点掌握：
 
 - `try / except`
 - `raise`
-- 怎么输出清楚的错误信息
+- 自定义清楚的错误信息
+- 什么时候让程序退出，什么时候返回错误响应
 
-### 5. 函数与模块拆分
+验收标准：
 
-你至少要会把逻辑拆成函数，比如：
+- 出错时能看懂原因
+- 能给 CLI 或 API 返回清楚错误
 
-- `build_client()`
-- `load_docs()`
-- `search_chunks()`
-- `ask_question()`
+### 3.5 类型标注
 
-然后逐步学会拆成多个文件和模块。
-
-### 6. 类型标注
-
-现在的 `Python` 项目里，尤其是 `LLM / FastAPI / Pydantic` 相关代码，经常会写：
+不用一开始学得很深，但必须能看懂这些：
 
 - `str`
+- `int`
+- `bool`
 - `list[str]`
 - `dict[str, Any]`
 - `Optional[str]`
 - `Literal["low", "medium", "high"]`
 
-所以不用一开始学特别深，但至少要能看懂并能自己写基础类型标注。
+验收标准：
 
-## 0.4 面向 LLM 应用必须补的内容
+- 能给函数参数和返回值补基础类型
+- 能读懂 `Pydantic` model 的字段类型
 
-### 1. 环境变量与配置
+## 4. LLM 应用必须补的 Python 生态
 
-要会：
+### 4.1 环境变量与配置
 
-- 读取 `OPENAI_API_KEY`
-- 读取路径配置
-- 读取模型名
-- 管理不同环境参数
+重点掌握：
 
-最常见的就是：
+- `os.getenv("OPENAI_API_KEY")`
+- 模型名、资料路径、运行模式的配置
+- mock 模式和 real 模式切换
 
-- `os.getenv()`
+验收标准：
 
-### 2. `Pydantic`
+- 没有 API Key 时能跑 mock
+- 有 API Key 时能切到真实模型调用
 
-这是 `LLM` 应用里很实用的一块。
+### 4.2 Pydantic
 
-主要用来做：
+`Pydantic` 是结构化输出和 FastAPI 的共同基础。
 
-- 结构化输出 schema
-- 请求参数定义
-- 响应结果校验
-- API 数据模型
-
-要掌握这些：
+重点掌握：
 
 - `BaseModel`
 - `Field`
+- `Literal`
 - `model_dump()`
 - `model_dump_json()`
 
-### 3. `FastAPI`
+用在：
 
-如果想贴近案件要求，这块几乎一定要学。
+- 定义模型输出 schema
+- 校验 API 请求体
+- 生成稳定 JSON
 
-要掌握：
+### 4.3 FastAPI
 
-- 路由定义
-- `GET`
-- `POST`
-- 请求体模型
-- 响应 JSON
-- 启动服务
+当前阶段不需要成为 Web 框架专家，先会写最小接口。
 
-重点不是把 `FastAPI` 学成框架专家，而是要能做这种最小后端：
+重点掌握：
 
 - `GET /health`
 - `POST /ask`
-- `POST /reload`
+- 请求体模型
+- JSON 响应
+- 启动服务
+- 基础错误处理
 
-### 4. 文档与文本处理
+验收标准：
 
-这对 `RAG` 很重要。
+- 能把命令行 demo 改成 API
+- 能用 curl 或浏览器调用接口
 
-要掌握：
+### 4.4 文档与文本处理
+
+RAG 的前置基础：
 
 - 文本切分
-- 基础清洗
+- 简单清洗
 - 关键词匹配
 - 简单评分
-- 结果排序
+- 检索结果排序
+- 引用来源
 
-如果处理文档，还要逐步补：
+验收标准：
 
-- `md`
-- `txt`
-- `pdf`
+- 能读取本地资料
+- 能返回相关片段
+- 能说明答案来自哪个文件
 
-## 0.5 暂时不用优先学的内容
+## 5. 暂时不用优先学
 
-如果目标是尽快进入 `LLM` 应用开发，下面这些不是最优先：
+下面这些不是没用，而是当前投入产出比不高：
 
-- 复杂算法与数据结构刷题
+- 复杂算法刷题
 - 深度学习底层实现
-- `Python` Web 全家桶
 - 爬虫进阶
 - GUI 开发
 - 游戏开发
 - 科学计算全套
-- 装饰器、元类、协程底层细节学得过深
+- 元类、装饰器、协程底层细节
+- Django / Flask / Tornado 全家桶
 
-不是说这些没用，而是：
+当前策略：
 
-- 现在先学这些，投入产出比不高
+```text
+先做出 LLM 应用，再按项目需要补深水区。
+```
 
-## 0.6 建议学习顺序
+## 6. 当前工作区怎么练
 
-推荐顺序如下：
+推荐按这个顺序跑：
 
-1. `Python` 基础语法
-2. 列表 / 字典 / JSON 处理
-3. 文件和路径处理
-4. 异常处理
-5. 环境变量与配置
-6. `OpenAI API` 调用
-7. 类型标注
-8. `Pydantic`
-9. `FastAPI`
-10. 文档处理与最小 `RAG`
-11. Tool Calling
-12. Workflow / Agent
+| 顺序 | 项目 | 主要练什么 |
+| --- | --- | --- |
+| 1 | `../agent-lab/projects/chat_cli` | Python 基础、API 调用、环境变量 |
+| 2 | `../agent-lab/projects/structured_output_demo` | Pydantic、结构化输出 |
+| 3 | `../agent-lab/projects/doc_qa_agent` | 文件处理、文本切分、最小 RAG |
+| 4 | `../agent-lab/projects/rag_api_demo` | FastAPI、RAG API 化 |
+| 5 | `../agent-lab/projects/tool_agent_demo` | Tool Calling |
+| 6 | `../agent-lab/projects/workflow_agent` | 工作流和多阶段处理 |
 
-如果再压缩成适合你当前路线的版本，就是：
+建议每个项目都完成 3 步：
 
-1. `Python` 基础
-2. JSON / 文件处理
-3. 模型调用
-4. `Pydantic`
-5. `FastAPI`
-6. `RAG`
-7. Tool Calling
-8. Agent
+1. 跑通原始 demo
+2. 改一个小功能
+3. 写下这个项目的输入、处理、输出
 
-## 0.7 对应到当前工作区怎么学
+## 7. 学到什么程度算够用
 
-你现在这个工作区里，其实已经有很合适的练习顺序：
+满足下面条件，就可以进入 RAG 和 FastAPI 主线：
 
-1. `chat_cli`
-2. `structured_output_demo`
-3. `doc_qa_agent`
-4. `rag_api_demo`
-5. `tool_agent_demo`
-6. `workflow_agent`
-
-可以这样对应：
-
-- `chat_cli`
-  - 练 `Python` 基础 + API 调用
-- `structured_output_demo`
-  - 练 `Pydantic` + 结构化输出
-- `doc_qa_agent`
-  - 练文件处理 + 文本切分 + 最小 `RAG`
-- `rag_api_demo`
-  - 练 `FastAPI` + `PDF` + API 化
-- `tool_agent_demo`
-  - 练 Tool Calling
-- `workflow_agent`
-  - 练工作流状态和多阶段处理
-
-## 0.8 学到什么程度算够用
-
-对当前阶段来说，不需要把 `Python` 学成高级语言专家。
-
-够用的标准是：
-
-- 能读懂项目代码
-- 能自己改 demo
-- 能自己写最小 API
-- 能处理文件和 JSON
+- 能读懂项目里的 `main.py`
+- 能自己改 CLI 参数
+- 能处理 JSON 和文件
 - 能写基础异常处理
 - 能看懂 `Pydantic` model
-- 能写简单 `FastAPI`
+- 能写一个 `GET /health`
+- 能写一个 `POST /ask`
 
-如果能做到这些，就已经足够支撑你继续学：
+不需要等到“Python 全学完”再继续。
 
-- `RAG`
-- 企业 PoC
-- Tool Calling
-- Workflow Agent
+## 8. TypeScript 什么时候补
 
-## 0.9 常见误区
+`TypeScript` 后面值得补，但不是当前第一主线。
 
-### 误区 1：要先把 Python 学得非常全
+建议等下面几项稳定后再补：
 
-不需要。
+- 能独立改 Python demo
+- 能写最小 FastAPI 接口
+- 能处理 JSON / 文件
+- 能做一个最小 RAG
 
-更好的做法是：
+TypeScript 先补到这个范围即可：
 
-- 先学会项目里会用到的部分
-- 再边做边补
-
-### 误区 2：先直接冲 Agent
-
-如果 `Python` 基础、文件处理、`Pydantic`、`FastAPI` 都没稳，直接做 Agent 往往会很空。
-
-### 误区 3：只会调用模型就够了
-
-不够。
-
-现场真正需要的是：
-
-- 数据处理
-- 文件处理
-- API 化
-- 结构化输出
-
-## 0.10 当前最推荐的学习组合
-
-如果只记一套组合，建议记这个：
-
-- `Python`
-- `Pydantic`
-- `FastAPI`
-- 文件处理
-- `RAG`
-
-这套能力比单独学“聊天机器人”更贴近日本现场实际。
-
-## 0.11 成本与注意点
-
-- 不要一开始把学习面铺得太宽。
-- 先把 `Python + Pydantic + FastAPI + 文件处理` 打牢，再继续往 `RAG` 和 Agent 走。
-- 代码练习比纯看概念更重要。
-- 模型调用会产生 API 成本，可以先多做本地文本处理和接口结构练习，再增加真实调用次数。
-
-## 0.12 为什么后面还要补 TypeScript
-
-`TypeScript` 不是当前主线，但后面很值得补。
-
-原因主要是：
-
-- 很多 `Web UI` 和前后端联动项目会用到它
-- `Node.js` 生态里大量工程都默认使用 `TypeScript`
-- 一些 Agent SDK、自动化工具、前端集成方案会优先提供 `TypeScript` 示例
-- 如果以后要做完整产品，而不只是后端 PoC，`TypeScript` 很常见
-
-所以更合适的顺序不是：
-
-- 一开始同时硬学 `Python + TypeScript`
-
-而是：
-
-1. 先把 `Python` 学到能独立做小项目
-2. 再补 `JavaScript / TypeScript`
-3. 再做 `Python + TypeScript` 联动项目
-
-## 0.13 TypeScript 要补到什么范围
-
-如果目标是配合 `LLM` 应用开发使用，不需要一开始就学很深。
-
-先补这些最实用的内容：
-
-### 1. 先补 JavaScript 基础
-
-- 变量
-- 字符串
-- 数组
-- 对象
-- 条件判断
-- 循环
-- 函数
-- 模块导入导出
-
-## 附：一句话概括
-
-- **RAG**：检索增强生成，把外部文档检索结果与生成式模型结合，提升答案准确性并增强可解释性。
-- **FastAPI**：高性能的 Python Web 框架，用于快速构建异步 RESTful API 并自动生成 OpenAPI 文档。
-- **POC**：概念验证，通过最小化原型快速验证技术或想法的可行性与价值。
+- JavaScript 基础
 - `Promise`
 - `async / await`
-
-### 2. 再补 TypeScript 类型系统
-
 - `type`
 - `interface`
-- 基础类型标注
-- 可选字段
-- 联合类型
-- 泛型
-- 函数参数和返回值类型
-
-目标不是先把类型系统学得很理论，而是能看懂并改这种代码：
-
-- API 请求参数
-- API 响应类型
-- 前端表单数据
-- SDK 调用结果
-
-### 3. 再补 Node.js 基础
-
 - `npm`
-- 包管理
-- 项目脚本
-- 环境变量
-- 读取文件
-- 调 HTTP API
-- 启动最小服务
+- 前端调用后端 API
 
-### 4. 如果要做界面，再补前端框架
+## 9. 常见误区
 
-后面如果要做网页界面，再补：
+| 误区 | 更好的做法 |
+| --- | --- |
+| 先把 Python 全学完 | 先围绕项目学最常用部分 |
+| 只会调用模型就够了 | 还要会文件、JSON、API、校验 |
+| 直接冲复杂 Agent | 先把 Pydantic、RAG、FastAPI 打稳 |
+| 只看教程不改代码 | 每章都跑 demo 并改一版 |
 
-- `React`
-- `Next.js`
-- 表单处理
-- 调后端接口
-- 基础状态管理
+## 10. 一句话概括
 
-## 0.14 教程和示例要怎么补
+当前最推荐的学习组合：
 
-这块建议不要只看教程，也不要只抄项目。
+```text
+Python + Pydantic + FastAPI + 文件处理 + RAG
+```
 
-更有效的方式是：
-
-- 教程负责补概念和语法
-- 示例负责把知识点变成可运行代码
-- 每学完一块就自己改一版
-
-可以按这个节奏补：
-
-### 阶段 1：Python 主线
-
-教程重点：
-
-- 语法基础
-- JSON / 文件处理
-- 环境变量
-- `Pydantic`
-- `FastAPI`
-
-示例重点：
-
-- 读写 `json`
-- 读取目录中的文档
-- 调模型 API
-- 写最小 `/ask` 接口
-
-### 阶段 2：Python AI 小项目
-
-教程重点：
-
-- 结构化输出
-- `RAG`
-- 文本切分
-- 错误处理
-
-示例重点：
-
-- 命令行聊天
-- 结构化结果提取
-- 本地文档问答
-- `FastAPI` 版问答接口
-
-### 阶段 3：TypeScript 补课
-
-教程重点：
-
-- `JavaScript` 基础
-- `TypeScript` 类型
-- `Node.js`
-- `async / await`
-
-示例重点：
-
-- 读取本地文件
-- 调 LLM API
-- 返回结构化 JSON
-- 写一个最小后端接口
-
-### 阶段 4：前后端联动
-
-教程重点：
-
-- 前端调用后端
-- 表单提交
-- 错误提示
-- 环境变量区分
-
-示例重点：
-
-- 一个聊天页面
-- 一个文档问答页面
-- 一个调用 `Python FastAPI` 后端的前端页面
-
-## 0.15 最推荐的补法
-
-如果要尽量贴近你当前路线，建议这样分配：
-
-- `Python` 学习和项目：`70%`
-- `LLM / RAG / FastAPI` 实战：`20%`
-- `TypeScript` 起步补课：`10%`
-
-等你已经能独立做出 2 到 3 个 `Python` 小项目后，再把 `TypeScript` 比重提高。
-
-也就是说，现阶段不用焦虑“是不是两门都要同时学”。
-
-更现实的答案是：
-
-- 是，后面最好补 `TypeScript`
-- 但现在先把 `Python` 学扎实更重要
-
-## 0.16 对应到当前工作区怎么补教程和示例
-
-可以直接按现在这个工作区的内容来练：
-
-### 先练 Python 主线
-
-- `ai-lab/agent-lab/projects/chat_cli`
-  - 练 API 调用、命令行交互、基础异常处理
-- `ai-lab/agent-lab/projects/structured_output_demo`
-  - 练结构化输出、数据模型、结果解析
-- `ai-lab/agent-lab/projects/doc_qa_agent`
-  - 练文件处理、文本切分、最小 `RAG`
-- `ai-lab/agent-lab/projects/rag_api_demo`
-  - 练 `FastAPI`、接口化、文档问答
-
-### 再补 Web / TypeScript 方向
-
-- `web-projects`
-  - 用来熟悉前端项目结构、`TypeScript`、页面与接口联动
-
-所以你的学习文档可以先按这个理解：
-
-1. 主线先学 `Python`
-2. 主线项目先做 `LLM + RAG + FastAPI`
-3. 后面再补 `TypeScript`
-4. 最后做前后端一体的 AI 应用
+这套能力比单独学“聊天机器人”更贴近日本现场的生成 AI PoC 和企业集成案件。
