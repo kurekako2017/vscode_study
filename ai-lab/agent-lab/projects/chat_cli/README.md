@@ -117,7 +117,7 @@ python3 main.py --model gpt-5 "解释一下 Tool Calling"
 
 ![Python 处理流程（main.py 详细）](assets/flowchart_detailed.svg)
 
-说明：此图比学习闭环更详细地展示 `parse_args()`、`resolve_mode()`、`build_client()`、`ask_once()` / `run_interactive()`、`format_output()` 与错误处理逻辑。
+说明：此图比学习闭环更详细地展示 `parse_args()`、`resolve_mode()`、`build_client()`、`ask_once()` / `run_interactive()`、`format_output()` 与错误处理逻辑。图中使用 `main.py::方法名()` 标注源码入口，方便你直接对应阅读 `main.py`。
 
 
 如果你的平台不支持直接显示 SVG，可以后续把 `assets/flowchart_simple.svg` 渲染成 PNG 后再追加图片引用。

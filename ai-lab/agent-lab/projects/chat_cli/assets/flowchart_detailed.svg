@@ -18,53 +18,53 @@
   <!-- Row 1 -->
   <rect x="60" y="80" width="380" height="70" class="box" />
   <text x="250" y="118" text-anchor="middle" class="text">命令行输入 &amp; 参数解析</text>
-  <text x="250" y="136" text-anchor="middle" class="text">(parse_args: prompt, --model, --mock, --real, --max-chars)</text>
+  <text x="250" y="136" text-anchor="middle" class="text">(main.py::parse_args)</text>
 
   <rect x="460" y="80" width="320" height="70" class="box" />
   <text x="620" y="112" text-anchor="middle" class="text">模式决策</text>
-  <text x="620" y="132" text-anchor="middle" class="text">(resolve_mode: --mock/--real/auto)</text>
+  <text x="620" y="132" text-anchor="middle" class="text">(main.py::resolve_mode)</text>
 
   <rect x="800" y="80" width="320" height="70" class="box" />
   <text x="960" y="110" text-anchor="middle" class="text">环境检查</text>
-  <text x="960" y="130" text-anchor="middle" class="text">(OPENAI_API_KEY, SDK 是否存在)</text>
+  <text x="960" y="130" text-anchor="middle" class="text">(main.py::resolve_mode / build_client)</text>
 
   <!-- Row 2: branches -->
   <rect x="60" y="190" width="440" height="80" class="box" />
   <text x="280" y="230" text-anchor="middle" class="text">Mock 路径</text>
-  <text x="280" y="250" text-anchor="middle" class="text">build_mock_answer(prompt)</text>
+  <text x="280" y="250" text-anchor="middle" class="text">main.py::build_mock_answer(prompt)</text>
 
   <rect x="520" y="190" width="560" height="80" class="box" />
   <text x="800" y="230" text-anchor="middle" class="text">真实路径</text>
-  <text x="800" y="250" text-anchor="middle" class="text">build_client() → OpenAI(api_key) (可能退出)</text>
+  <text x="800" y="250" text-anchor="middle" class="text">main.py::build_client() → OpenAI(api_key) (可能退出)</text>
 
   <!-- Row 3: one-shot vs interactive -->
   <rect x="160" y="310" width="880" height="110" class="box" />
   <text x="600" y="350" text-anchor="middle" class="text">一次性调用 或 交互循环</text>
-  <text x="600" y="370" text-anchor="middle" class="text">(if prompt → ask_once; else → run_interactive loop)</text>
+  <text x="600" y="370" text-anchor="middle" class="text">(main.py::main: if prompt → ask_once; else → run_interactive)</text>
 
   <!-- ask_once details -->
   <rect x="140" y="460" width="420" height="100" class="box" />
-  <text x="350" y="500" text-anchor="middle" class="text">ask_once()</text>
+  <text x="350" y="500" text-anchor="middle" class="text">main.py::ask_once()</text>
   <text x="350" y="520" text-anchor="middle" class="text">if mock → 返回 mock; else → client.responses.create(...)</text>
 
   <rect x="640" y="460" width="420" height="100" class="box" />
-  <text x="850" y="500" text-anchor="middle" class="text">run_interactive()</text>
+  <text x="850" y="500" text-anchor="middle" class="text">main.py::run_interactive()</text>
   <text x="850" y="520" text-anchor="middle" class="text">循环读取输入，调用 ask_once，每次支持 exit/quit</text>
 
   <!-- format_output -->
   <rect x="320" y="600" width="560" height="90" class="box" />
-  <text x="600" y="640" text-anchor="middle" class="text">format_output(answer, max_chars)</text>
+  <text x="600" y="640" text-anchor="middle" class="text">main.py::format_output(answer, max_chars)</text>
   <text x="600" y="660" text-anchor="middle" class="text">截断或返回完整输出；异常 → ValueError</text>
 
   <!-- Output and Exit -->
   <rect x="320" y="740" width="560" height="80" class="box" />
   <text x="600" y="776" text-anchor="middle" class="text">终端输出 / 退出策略</text>
-  <text x="600" y="794" text-anchor="middle" class="text">一次性发生错误退出(非交互)；交互发生错误继续循环</text>
+  <text x="600" y="794" text-anchor="middle" class="text">main.py::main / run_interactive 决定退出或继续</text>
 
   <!-- Error handling box -->
   <rect x="920" y="540" width="220" height="90" class="box" />
   <text x="1030" y="580" text-anchor="middle" class="text">错误处理</text>
-  <text x="1030" y="600" text-anchor="middle" class="note">打印到 stderr，并根据模式决定是否退出</text>
+  <text x="1030" y="600" text-anchor="middle" class="note">main.py::main / run_interactive / build_client</text>
 
   <!-- Arrows -->
   <path d="M440 150 L460 150" class="arrow" />
@@ -87,6 +87,6 @@
   <path d="M730 520 L920 520" class="arrow" />
 
   <!-- Footer note -->
-  <text x="40" y="1320" class="note">注：当未安装 SDK 或未设置 OPENAI_API_KEY 时，程序会自动降级为 Mock 模式以便本地练习。</text>
+  <text x="40" y="1320" class="note">注：图中 main.py::方法名 表示可直接在 main.py 中搜索该方法；未安装 SDK 或未设置 OPENAI_API_KEY 时会自动降级为 Mock 模式。</text>
 
 </svg>
