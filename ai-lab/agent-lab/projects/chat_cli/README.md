@@ -109,18 +109,18 @@ python3 main.py --model gpt-5 "解释一下 Tool Calling"
 
 学习闭环如下（静态图，兼容 GitHub）：
 
-![学习闭环流程图](assets/flowchart_simple.svg)
+![学习闭环流程图](assets/flowchart_simple.svg?v=5b74d8b)
 
 ## Python 处理流程（main.py 详细）
 
 下面是 `main.py` 的详细处理流程图（静态 SVG，兼容 GitHub），展示从参数解析、模式决策、客户端构建，到一次性调用 / 交互循环、输出格式化和异常处理的完整顺序：
 
-![Python 处理流程（main.py 详细）](assets/flowchart_detailed.svg)
+![Python 处理流程（main.py 详细）](assets/flowchart_detailed.svg?v=5b74d8b)
 
 说明：此图比学习闭环更详细地展示 `parse_args()`、`resolve_mode()`、`build_client()`、`ask_once()` / `run_interactive()`、`format_output()` 与错误处理逻辑。图中使用 `main.py::方法名()` 标注源码入口，方便你直接对应阅读 `main.py`。
 
 
-如果你的平台不支持直接显示 SVG，可以后续把 `assets/flowchart_simple.svg` 渲染成 PNG 后再追加图片引用。
+如果你的平台不支持直接显示 SVG，可以后续把 `assets/flowchart_simple.svg?v=5b74d8b` 渲染成 PNG 后再追加图片引用。
 
 ---
 
