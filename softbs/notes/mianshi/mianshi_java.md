@@ -69,7 +69,7 @@
 
 ### 2.4 海外旅行システム / 採点システム / 生命保険系Web改修
 
-> Java、Spring Boot、JSP、JavaScript、Oracle、MySQLなどを利用したWebアプリケーション開発、既存機能改修、内部結合テスト、障害修正を担当しました。  
+> Java、Spring Boot、JavaScript、Oracle、MySQLなどを利用したWebアプリケーション開発、既存機能改修、内部結合テスト、障害修正を担当しました。  
 > 既存システムの仕様を読み解きながら、画面、Controller、Service、SQL、DBデータの流れを確認し、影響範囲を整理して対応しておりました。
 
 ---
@@ -207,7 +207,6 @@
 
 | English | 日本語読み | 中文理解 |
 | --- | --- | --- |
-| Java | ジャバ | Java 语言 |
 | Spring Boot | スプリングブート | Java 框架 |
 | Kotlin | コトリン | JVM 上运行的编程语言 |
 | Repository | リポジトリ | 数据访问层 / 代码仓库 |
