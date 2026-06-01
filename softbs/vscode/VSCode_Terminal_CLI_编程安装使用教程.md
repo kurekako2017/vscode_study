@@ -2,6 +2,36 @@
 
 本文面向 Windows 11 + VS Code 用户，目标是把 VS Code 和终端 CLI 组合成日常开发环境。CLI 是 Command Line Interface，也就是命令行工具。学会 CLI 后，可以更高效地运行项目、管理 Git、安装依赖、执行测试和调用 AI 编程工具。
 
+章节速览：
+
+- [1. 推荐环境](#1-推荐环境)
+- [2. 安装 VS Code](#2-安装-vs-code)
+- [3. 安装常用 CLI 工具](#3-安装常用-cli-工具)
+   - [3.1 Git](#31-git)
+   - [3.2 Node.js 和 npm](#32-nodejs-和-npm)
+   - [3.3 Python](#33-python)
+   - [3.4 Java 和 Maven](#34-java-和-maven)
+   - [3.5 OpenAI Codex CLI](#35-openai-codex-cli)
+   - [3.6 Codex CLI 添加图片和截图](#36-codex-cli-添加图片和截图)
+   - [3.7 GitHub Copilot CLI](#37-github-copilot-cli)
+- [4. 在 VS Code 中使用终端](#4-在-vs-code-中使用终端)
+- [5. 用 CLI 打开项目](#5-用-cli-打开项目)
+- [6. CLI 编程基本工作流](#6-cli-编程基本工作流)
+- [7. VS Code 插件建议](#7-vs-code-插件建议)
+- [8. 常用 CLI 命令速查](#8-常用-cli-命令速查)
+   - [文件和目录](#文件和目录)
+   - [搜索](#搜索)
+   - [端口检查](#端口检查)
+- [9. 前端项目实战](#9-前端项目实战)
+- [10. Java Spring Boot 项目实战](#10-java-spring-boot-项目实战)
+- [11. Python CLI 脚本实战](#11-python-cli-脚本实战)
+- [12. 常见问题](#12-常见问题)
+   - [code 命令不可用](#code-命令不可用)
+   - [npm 命令不可用](#npm-命令不可用)
+   - [PowerShell 无法激活 Python 虚拟环境](#powershell-无法激活-python-虚拟环境)
+   - [命令在 VS Code 终端和系统终端表现不同](#命令在-vs-code-终端和系统终端表现不同)
+- [13. 学习顺序建议](#13-学习顺序建议)
+
 ## 1. 推荐环境
 
 建议使用以下组合：
@@ -9,10 +39,6 @@
 | 工具 | 用途 |
 | --- | --- |
 | VS Code | 代码编辑、终端集成、插件管理 |
-| Windows Terminal | Windows 下更好用的终端入口 |
-| PowerShell | Windows 默认命令行环境 |
-| Git Bash | Git 和类 Linux 命令体验 |
-| WSL2 Ubuntu | 接近服务器的 Linux 开发环境 |
 | Git | 版本管理 |
 | Node.js / npm | 前端项目和 CLI 工具 |
 | Python | 脚本、自动化、AI 应用开发 |
@@ -23,7 +49,6 @@
 
 1. VS Code
 2. Git
-3. Node.js LTS
 4. Python
 5. Windows Terminal
 
@@ -135,11 +160,6 @@ java -version
 在 WSL 或 Linux 终端中：
 
 ```bash
-./mvnw -v
-./mvnw test
-./mvnw spring-boot:run
-```
-
 ### 3.5 OpenAI Codex CLI
 
 Codex CLI 是 OpenAI 的终端编程助手，可以在 VS Code 终端里直接读取当前工作区，帮助你理解代码、修改文件、运行命令、做代码审查和排查错误。
@@ -225,11 +245,6 @@ victorkure@um890pro:~/workspace/vscode_study$
 
 ```bash
 codex
-```
-
-Codex 会把当前目录当作工作区上下文。如果当前目录是 `~/workspace/vscode_study`，它会读取整个 `vscode_study` 仓库；如果先进入某个子项目，它就会优先围绕该子项目工作。
-
-推荐先试一个带任务的启动方式：
 
 ```bash
 codex "请阅读当前工作区，告诉我这个仓库主要有哪些学习模块"
@@ -482,6 +497,96 @@ codex -i tmp/screenshots/mermaid-error.png "这是 Markdown 预览里的 Mermaid
 ```bash
 codex -i "tmp/screenshots/error screen.png" "请分析这张错误截图"
 ```
+
+### 3.7 GitHub Copilot CLI
+
+GitHub Copilot CLI 可以在 VS Code 终端里直接使用 Copilot 来解释命令、生成命令和和当前工作区对话。旧版 `gh copilot` 已经退役，新的推荐方式是直接使用 Copilot CLI。
+
+安装方式可任选其一：
+
+```bash
+curl -fsSL https://gh.io/copilot-install | bash
+```
+
+```bash
+npm install -g @github/copilot
+```
+
+```powershell
+winget install GitHub.Copilot
+```
+
+验证安装：
+
+```bash
+copilot --version
+copilot --help
+```
+
+首次使用时直接启动：
+
+```bash
+cd /home/victorkure/workspace/vscode_study
+copilot
+```
+
+常见用法：
+
+```text
+请帮我解释当前目录的结构，并告诉我应该先看哪些文件
+```
+
+如果提示未登录，就按界面提示完成 GitHub 登录流程即可。建议在 VS Code 的集成终端里运行，并先切到目标项目根目录，这样 Copilot 能读取更准确的上下文。
+
+#### 常用命令
+
+```bash
+copilot --help
+```
+
+查看版本：
+
+```bash
+copilot --version
+```
+
+进入交互式界面：
+
+```bash
+copilot
+```
+
+在实验模式下启动：
+
+```bash
+copilot --experimental
+```
+
+如果你想让它直接围绕当前项目工作，先切到仓库根目录，再执行 `copilot`。如果你在 Windows / WSL 混合环境里工作，优先用 WSL 终端打开当前仓库，这样路径和工具链更一致。
+
+#### 使用技巧
+
+先说目标，再说约束，Copilot 通常会给出更稳定的建议。比如不要只问“怎么修”，而是补上当前目录、报错信息和期望结果。
+
+更推荐的问法是：
+
+```text
+请检查当前工作区中的启动脚本，并告诉我如何在 VS Code 终端里启动这个项目
+```
+
+如果你想让它帮你分析命令，可以直接把整条命令贴进去：
+
+```text
+请解释这条命令的每一部分，并告诉我它会修改什么文件
+```
+
+使用时建议注意这些点：
+
+- 在项目根目录启动，避免上下文太小。
+- 把报错原文贴完整，尤其是第一行和最后一行。
+- 如果涉及 PowerShell、Git Bash、WSL，不要混用命令语法。
+- 涉及敏感信息时，先把 Token、密码、邮箱和内部地址打码。
+- 如果 Copilot 给出的命令可能有破坏性，先人工确认再执行。
 
 ## 4. 在 VS Code 中使用终端
 
