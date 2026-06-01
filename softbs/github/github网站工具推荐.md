@@ -128,6 +128,7 @@ Voice-Pro 学习定位：
 | Figma | https://www.figma.com/ | UI 设计和原型协作工具 | 页面设计、组件设计、作品集展示 |
 | Warp | https://www.warp.dev/ | 现代终端工具 | 命令管理、终端工作流、AI 辅助命令 |
 | GitNexus | https://github.com/abhigyanpatwari/GitNexus | 项目知识图谱工具 | 理解代码仓库结构、项目关系和知识管理 |
+| CodeGraph | https://github.com/colbymchenry/codegraph | 本地预索引代码知识图谱工具 | 代码结构索引、符号关系、调用链分析、AI 编程工具集成 |
 
 建议用法：
 - GitHub Pages：放静态学习文档和作品集。
