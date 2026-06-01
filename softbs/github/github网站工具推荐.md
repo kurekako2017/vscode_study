@@ -23,6 +23,7 @@
 | AI 编程助手 | Claude Code 文档、AI-Coding-Guide-Zh、gpt-codex | Prompt、上下文管理、代码修改流程、验证流程 |
 | 语音/视频/字幕处理 | Voice-Pro、NeMo、Riva | ASR、翻译、TTS、字幕生成、模型推理 |
 | 网页抓取与自动化 | Scrapling、browser-use、Public APIs | 爬虫、浏览器自动化、数据源整理 |
+| 开源 UI 组件与界面灵感 | Galaxy、Figma、GitHub Pages | 组件复用、页面布局、设计系统、作品集展示 |
 | 模型部署 | Triton Inference Server、NGC、NeMo | 模型服务、GPU 推理、容器化部署 |
 | 前端和作品集 | GitHub Pages、Vercel、Netlify、Figma | 静态站点、Next.js 部署、UI 原型 |
 | DevOps | GitHub Actions、Docker、Kubernetes 示例项目 | CI/CD、镜像构建、部署、日志监控 |
@@ -120,6 +121,7 @@ Voice-Pro 学习定位：
 
 | 工具 / 平台 | 链接 | 是什么 | 适合学习 |
 | --- | --- | --- | --- |
+| Galaxy | https://github.com/uiverse-io/galaxy | 开源 UI 组件库和界面灵感站点 | 组件分类、页面片段复用、设计系统、前端审美 |
 | GitHub Pages | https://pages.github.com/ | GitHub 静态网站托管 | 发布学习笔记、作品集、项目文档 |
 | Vercel | https://vercel.com/ | 前端和 Next.js 部署平台 | Next.js 部署、预览环境、环境变量 |
 | Netlify | https://www.netlify.com/ | 静态站点和前端部署平台 | React / Vue 静态部署、表单、预览 |
