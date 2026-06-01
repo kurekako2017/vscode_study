@@ -209,6 +209,7 @@
 | --- | --- | --- |
 | Java | ジャバ | Java 语言 |
 | Spring Boot | スプリングブート | Java 框架 |
+| Kotlin | コトリン | JVM 上运行的编程语言 |
 | Repository | リポジトリ | 数据访问层 / 代码仓库 |
 | MyBatis | マイバティス | Java SQL 映射框架 |
 | AWS Lambda | エーダブリューエス ラムダ | AWS 无服务器函数 |
@@ -227,7 +228,6 @@
 | Hooks | フックス | React 状态和副作用机制 |
 | PostgreSQL | ポストグレスキューエル | 开源关系型数据库 |
 | Thymeleaf | タイムリーフ | Java / Spring 模板引擎 |
-| JSP | ジェーエスピー | Java Server Pages |
 | Struts | ストラッツ | Java Web 框架 |
 
 ---
