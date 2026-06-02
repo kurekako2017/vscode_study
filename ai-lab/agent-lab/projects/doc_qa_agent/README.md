@@ -188,3 +188,12 @@ flowchart TD
 2. 增加向量检索
 3. 增加 PDF 解析
 4. 增加检索评估
+
+## 13. Python 处理流程（速查）
+
+1. **parse_args**：处理命令行输入（问题、--docs、--model、--mock/--real）。
+2. **resolve_mode**：判断运行模式（自动 / mock / real）。
+3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+4. **build_mock_answer**：生成 mock 数据（无 API Key 也可演练）。
+5. **核心业务**：`build_chunks()` 读文件并切分，`retrieve()` 检索，`build_context()` 拼上下文，`answer_question()` 调用模型。
+6. **main**：总流程入口，校验目录 -> 索引 -> 检索 -> 回答 -> 输出来源。

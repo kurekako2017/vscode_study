@@ -5,13 +5,14 @@
 - 项目根入口：[README.md](./README.md)
 - IDEA / 通用文档索引：[doc/README.md](./doc/README.md)
 
-这个目录里现在主要有 6 个相关项目：
+这个目录里现在主要有 7 个相关项目：
 
 - `JtProject`：原始 Spring Boot + JSP 项目
 - `JtProject-Thymeleaf`：独立复制版，页面模板改为 Thymeleaf
 - `JtProject-React`：独立复制版，前端改为 React + TypeScript
 - `JtProject-Vue`：独立复制版，前端改为 Vue 3 + TypeScript
 - `JtProject-Next`：独立复制版，前端改为 Next.js + TypeScript
+- `JtProject-SpringBoot-TypeScript`：独立复制版，前端改为原生 TypeScript
 - `JtProject-TypeScript`：独立复制版，改为 Node.js + Express + React 的纯 TypeScript 全栈项目
 
 ---
@@ -25,6 +26,7 @@
 - 学习 React 版前后端分离写法：启动 `JtProject-React`
 - 学习 Vue 版前后端分离写法：启动 `JtProject-Vue`
 - 学习 Next.js 版前后端分离写法：启动 `JtProject-Next`
+- 学习 Spring Boot + 纯 TypeScript 前端写法：启动 `JtProject-SpringBoot-TypeScript`
 - 学习纯 TypeScript 全栈写法：启动 `JtProject-TypeScript`
 
 最常见的选择建议：
@@ -32,6 +34,7 @@
 - 想看“最原始版本”时，先跑 `JtProject`
 - 想做 JSP 和 Thymeleaf 对照时，同时看 `JtProject` 和 `JtProject-Thymeleaf`
 - 想学现代前端页面组织方式时，跑 `JtProject-React` 或 `JtProject-Vue`
+- 想先看框架之前的 TypeScript、Fetch、DOM 和状态更新时，跑 `JtProject-SpringBoot-TypeScript`
 
 ---
 
@@ -262,7 +265,55 @@ http://localhost:3000/
 
 ---
 
-## 6. 纯 TypeScript 全栈项目：JtProject-TypeScript
+## 6. Spring Boot + 纯 TypeScript 项目：JtProject-SpringBoot-TypeScript
+
+项目目录：
+
+```powershell
+cd d:\dev\source_code\vscode_study\java-projects\JtProject-SpringBoot-TypeScript
+```
+
+启动后端：
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+后端地址：
+
+```text
+http://localhost:8087/api
+```
+
+启动前端：
+
+```powershell
+cd d:\dev\source_code\vscode_study\java-projects\JtProject-SpringBoot-TypeScript\frontend
+npm install
+npm run dev
+```
+
+前端地址：
+
+```text
+http://localhost:5177/
+```
+
+说明：
+
+- 这是独立复制出来的 Spring Boot + 纯 TypeScript 学习项目
+- 后端仍然是 Spring Boot
+- 前端使用 Vite + TypeScript + 原生 DOM / Fetch API
+- 数据库改为本地 H2 文件库
+
+学习入口：
+
+- [JtProject-SpringBoot-TypeScript/README.md](JtProject-SpringBoot-TypeScript/README.md)
+- [JtProject-SpringBoot-TypeScript/docs/README.md](JtProject-SpringBoot-TypeScript/docs/README.md)
+
+---
+
+## 7. 纯 TypeScript 全栈项目：JtProject-TypeScript
 
 项目目录：
 
@@ -318,6 +369,7 @@ http://localhost:5175/
 | `JtProject-React` | `http://localhost:8083/api` | `http://localhost:5173/` |
 | `JtProject-Vue` | `http://localhost:8084/api` | `http://localhost:5174/` |
 | `JtProject-Next` | `http://localhost:8086/api` | `http://localhost:3000/` |
+| `JtProject-SpringBoot-TypeScript` | `http://localhost:8087/api` | `http://localhost:5177/` |
 | `JtProject-TypeScript` | `http://localhost:8090/api` | `http://localhost:5175/` |
 
 ---
@@ -419,7 +471,30 @@ npm run dev
 http://localhost:3000/
 ```
 
-### 6. 启动纯 TypeScript 全栈项目
+### 6. 启动 Spring Boot + 纯 TypeScript 项目
+
+后端窗口：
+
+```powershell
+cd d:\dev\source_code\vscode_study\java-projects\JtProject-SpringBoot-TypeScript
+.\mvnw.cmd spring-boot:run
+```
+
+前端窗口：
+
+```powershell
+cd d:\dev\source_code\vscode_study\java-projects\JtProject-SpringBoot-TypeScript\frontend
+npm install
+npm run dev
+```
+
+打开：
+
+```text
+http://localhost:5177/
+```
+
+### 7. 启动纯 TypeScript 全栈项目
 
 ```powershell
 cd d:\dev\source_code\vscode_study\java-projects\JtProject-TypeScript
@@ -433,7 +508,7 @@ npm run dev
 http://localhost:5175/
 ```
 
-### 7. 想同时对照学习两套页面
+### 8. 想同时对照学习两套页面
 
 推荐组合：
 
@@ -441,6 +516,7 @@ http://localhost:5175/
 - `JtProject` + `JtProject-React`
 - `JtProject` + `JtProject-Vue`
 - `JtProject` + `JtProject-Next`
+- `JtProject` + `JtProject-SpringBoot-TypeScript`
 - `JtProject` + `JtProject-TypeScript`
 
 这样最容易对照同一套业务在不同视图技术里的写法差异。
@@ -454,7 +530,8 @@ http://localhost:5175/
 3. 再运行 `JtProject-React`，对照学习 React 的组件、路由、hooks
 4. 再运行 `JtProject-Vue`，对照学习 Vue 的组件、路由、composables
 5. 再运行 `JtProject-Next`，对照学习 Next.js 的 App Router 和 React 应用框架写法
-6. 最后运行 `JtProject-TypeScript`，对照学习纯 TypeScript 全栈写法
+6. 再运行 `JtProject-SpringBoot-TypeScript`，对照学习框架之前的 TypeScript、Fetch、DOM 和状态更新
+7. 最后运行 `JtProject-TypeScript`，对照学习纯 TypeScript 全栈写法
 
 ---
 
@@ -471,11 +548,13 @@ http://localhost:5175/
 - `8084`：`JtProject-Vue` 后端
 - `8085`：`JtProject-Thymeleaf`
 - `8086`：`JtProject-Next` 后端
+- `8087`：`JtProject-SpringBoot-TypeScript` 后端
 - `8090`：`JtProject-TypeScript` 后端
 - `3000`：`JtProject-Next` 前端
 - `5173`：`JtProject-React` 前端
 - `5174`：`JtProject-Vue` 前端
 - `5175`：`JtProject-TypeScript` 前端
+- `5177`：`JtProject-SpringBoot-TypeScript` 前端
 
 可以先在 PowerShell 里查看端口占用：
 
@@ -516,7 +595,7 @@ Get-ChildItem mvnw.cmd
 
 ### 4. 前端项目启动失败
 
-`JtProject-React` 和 `JtProject-Vue` 需要分别启动前端。
+`JtProject-React`、`JtProject-Vue`、`JtProject-Next` 和 `JtProject-SpringBoot-TypeScript` 需要分别启动前端。
 
 标准顺序：
 
@@ -557,6 +636,7 @@ npm run dev
 - `JtProject-React`：本地 H2 文件库
 - `JtProject-Vue`：本地 H2 文件库
 - `JtProject-Next`：本地 H2 文件库
+- `JtProject-SpringBoot-TypeScript`：本地 H2 文件库
 - `JtProject-TypeScript`：内存数据仓库，重启后恢复初始数据
 
 如果是 `JtProject` 启动时报数据库连接错误，要优先检查：
@@ -565,7 +645,7 @@ npm run dev
 - 用户名密码是否正确
 - 当前使用的 profile 是否正确
 
-如果是另外三个学习版项目，一般先看本地 H2 文件是否能正常创建，以及配置文件是否被误改。
+如果是 Spring Boot 学习版项目，一般先看本地 H2 文件是否能正常创建，以及配置文件是否被误改。
 
 ### 7. 该先看哪个 README
 
@@ -576,6 +656,7 @@ npm run dev
 - [JtProject-React/README.md](JtProject-React/README.md)
 - [JtProject-Vue/README.md](JtProject-Vue/README.md)
 - [JtProject-Next/README.md](JtProject-Next/README.md)
+- [JtProject-SpringBoot-TypeScript/README.md](JtProject-SpringBoot-TypeScript/README.md)
 - [JtProject-TypeScript/README.md](JtProject-TypeScript/README.md)
 
 总原则是：

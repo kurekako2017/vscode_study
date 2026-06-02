@@ -150,3 +150,12 @@ python3 main.py --mock --max-chars 80 "请用较长内容解释 agent、tool cal
 1. 增加 JSON 结构化输出
 2. 把 mock 分支改成可插拔策略（函数或类）
 3. 再进入 Tool Calling / RAG
+
+## 9. Python 处理流程（速查）
+
+1. **parse_args**：处理命令行输入（prompt、--model、--mock/--real、--max-chars）。
+2. **resolve_mode**：判断运行模式（自动 / mock / real）。
+3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+4. **build_mock_answer**：生成 mock 数据（无 API Key 也能跑通流程）。
+5. **核心业务**：`ask_once()` 发起调用，`format_output()` 可选截断，`run_interactive()` 处理交互循环。
+6. **main**：总流程入口，串起参数解析、模式决策、调用与输出。

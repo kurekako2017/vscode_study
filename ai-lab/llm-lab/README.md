@@ -70,15 +70,20 @@ Python 基础范围
 从工作区根目录运行：
 
 ```bash
+# mock 模式运行 chat_cli
 python3 ai-lab/agent-lab/projects/chat_cli/main.py --mock "用一句话解释什么是 agent"
+# mock 模式运行 structured_output_demo
 python3 ai-lab/agent-lab/projects/structured_output_demo/main.py --mock "做一个读取 Markdown 的摘要工具"
+# mock 模式运行 doc_qa_agent 并指定文档目录
 python3 ai-lab/agent-lab/projects/doc_qa_agent/main.py --mock --docs ai-lab "这个目录主要讲什么？"
 ```
 
 进入 demo 目录运行：
 
 ```bash
+# 进入 demo 目录
 cd ai-lab/agent-lab/projects/chat_cli
+# mock 模式快速测试
 python3 main.py --mock "你好"
 ```
 

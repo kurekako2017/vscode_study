@@ -28,6 +28,7 @@ LLM 应用不是“直接问模型一句话”这么简单。
 ## 2. LLM 应用的系统分层
 
 ```mermaid
+%% LLM 应用分层结构
 flowchart TD
     A["用户层<br/>角色: 业务用户 / 操作员<br/>作用: 提问、上传资料、确认结果"]
     B["前端或接口层<br/>框架: Web UI / CLI / API<br/>作用: 接收输入，展示输出"]
@@ -97,6 +98,7 @@ flowchart TD
 ## 6. 最小 LLM 应用的数据流
 
 ```mermaid
+%% 最小 LLM 应用数据流（问答 -> 解析 -> 返回）
 sequenceDiagram
     participant User as 用户
     participant App as Python App / FastAPI
@@ -117,6 +119,7 @@ sequenceDiagram
 ## 7. RAG 应用的数据流
 
 ```mermaid
+%% RAG 应用数据流（检索 -> 组上下文 -> 生成回答）
 sequenceDiagram
     participant User as 用户
     participant API as FastAPI

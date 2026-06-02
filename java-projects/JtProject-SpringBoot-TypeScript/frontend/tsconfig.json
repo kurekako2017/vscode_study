@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // 前端编译目标保持现代浏览器可用的最小集合，避免不必要的转译开销。
+    "target": "ES2021",
+    "useDefineForClassFields": true,
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  // 只编译 src/ 下的应用源码，root 级配置文件不纳入 TypeScript 产物。
+  "include": ["src"],
+  "references": []
+}

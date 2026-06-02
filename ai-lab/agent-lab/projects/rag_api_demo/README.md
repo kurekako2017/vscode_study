@@ -186,3 +186,18 @@ uvicorn main:app --reload
 2. 增加认证
 3. 增加日志和评估
 4. 增加检索质量测试
+
+## 9. Python 处理流程（速查）
+
+**main.py**
+
+1. **resolve_mode**：判断运行模式（看 `RAG_API_MOCK` 与 `OPENAI_API_KEY`）。
+2. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+3. **build_mock_answer**：生成 mock 数据（无 Key 时返回固定风格回答）。
+4. **核心业务**：`get_docs_dir()` 读配置并校验目录，`build_chunks()` 切分文档，`retrieve()` 检索，`build_context()` 拼上下文，`answer_question()` 调模型，`load_state()` 缓存状态。
+5. **main（FastAPI 入口）**：`startup_event()` 预热，`/ask` 处理问答，`/health` 状态检查，`/reload` 触发重载。
+
+**mock_test.py**
+
+1. **build_mock_answer**：生成 mock 文本。
+2. **main**：组装与 `/ask` 一致的 JSON 并输出。

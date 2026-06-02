@@ -91,6 +91,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
 
 def build_mock_agent_response(prompt: str) -> str:
+    """生成本地 mock 的最终回答文本（不调用 API）。"""
     return f"[MOCK MODE] Mocked tool agent response for: {prompt}\n(Use --real to call the API)"
 
 

@@ -140,3 +140,12 @@ flowchart TD
 1. 把输出结果写入文件
 2. 把输出结果接到 `RAG` 或 API
 3. 再把结构化结果接到 Tool Calling
+
+## 11. Python 处理流程（速查）
+
+1. **parse_args**：处理命令行输入（prompt、--model、--mock/--real）。
+2. **resolve_mode**：判断运行模式（自动 / mock / real）。
+3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+4. **build_mock_plan**：生成 mock 数据（结构化计划）。
+5. **generate_plan**：核心业务（`responses.parse` 解析为 `AgentPlan`）。
+6. **main**：总流程入口，串起参数、模式、调用与 JSON 输出。

@@ -152,3 +152,12 @@ python main.py --model gpt-5 --workdir d:/dev/source_code/vscode_study/java-lab 
 1. 增加内部文档搜索工具
 2. 增加数据库查询或 API 工具
 3. 增加任务计划和步骤日志
+
+## 11. Python 处理流程（速查）
+
+1. **parse_args**：处理命令行输入（任务、--model、--workdir、--mock/--real）。
+2. **resolve_mode**：判断运行模式（自动 / mock / real）。
+3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+4. **build_mock_agent_response**：生成 mock 数据（本地返回固定风格答案）。
+5. **核心业务**：`build_tools()` 暴露工具 schema，`run_agent()` 驱动工具调用闭环，`call_tool()` 调度 `list_files/read_file/search_text`。
+6. **main**：总流程入口，校验工作目录 -> 启动 agent 循环 -> 输出最终回答。

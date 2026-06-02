@@ -15,6 +15,7 @@ QUESTION = sys.argv[1] if len(sys.argv) > 1 else "这是一次烟雾测试"
 
 
 def build_mock_answer(question: str, top_chunks: list) -> str:
+    """生成 mock 回答文本，模拟 /ask 在 mock 模式下的输出。"""
     lines = ["[MOCK MODE]", f"问题: {question}"]
     lines.append(f"检索到的片段数量: {len(top_chunks)}")
     lines.append("练习建议: 将检索替换为向量检索并在 real 模式下测试。")
@@ -22,9 +23,11 @@ def build_mock_answer(question: str, top_chunks: list) -> str:
 
 
 def main():
-    # In a real run top_chunks would be retrieved from documents; here we keep it empty.
+    """入口：构造 mock 响应并以 JSON 形式输出到终端。"""
+    # 在真实服务中 top_chunks 会来自检索流程，这里留空以保持脚本轻量
     top_chunks = []
     ans = build_mock_answer(QUESTION, top_chunks)
+    # 组装与 /ask 一致的响应结构，便于本地验证
     out = {
         "answer": ans,
         "model": "mock",

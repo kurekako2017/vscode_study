@@ -17,15 +17,21 @@
 
 **Windows (PowerShell):**
 ```powershell
+# 运行 Python 基础示例
 .\run_example.ps1 basics
+# 运行 Pydantic 示例
 .\run_example.ps1 pydantic_example
+# 运行最小模型调用示例
 .\run_example.ps1 model_call_example
 ```
 
 **Linux / macOS (Bash):**
 ```bash
+# 运行 Python 基础示例
 bash run_example.sh basics
+# 运行 Pydantic 示例
 bash run_example.sh pydantic_example
+# 运行最小模型调用示例
 bash run_example.sh model_call_example
 ```
 
@@ -34,18 +40,21 @@ bash run_example.sh model_call_example
 1. 进入示例目录：
 
 ```bash
+# 进入示例目录
 cd ai-lab/llm-lab/examples
 ```
 
 2. 安装依赖（可选）：
 
 ```bash
+# 安装依赖（可选）
 pip3 install -r requirements.txt
 ```
 
 3. 运行示例：
 
 ```bash
+# 依次运行各示例
 python3 basics.py
 python3 dataclass_example.py
 python3 pydantic_example.py
@@ -53,6 +62,7 @@ python3 file_io_example.py
 python3 text_split_example.py
 python3 model_call_example.py "一句话解释什么是 agent"
 python3 model_call_example.py --mock "一句话解释什么是 agent"
+# 真实调用需要 OPENAI_API_KEY
 python3 model_call_example.py --real "一句话解释什么是 agent"  # 需要 OPENAI_API_KEY
 ```
 

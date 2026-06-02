@@ -98,10 +98,12 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
 
 def build_mock_analysis(prompt: str) -> str:
+    """生成离线用的分析文本示例，便于学习流程。"""
     return f"[MOCK MODE] Analysis for: {prompt}\n- goals: mock goal\n- constraints: none"
 
 
 def build_mock_plan(prompt: str) -> WorkflowPlan:
+    """生成离线用的结构化计划示例（Pydantic 模型）。"""
     return WorkflowPlan(
         goal=f"Mock plan for: {prompt}",
         priority="medium",
@@ -112,6 +114,7 @@ def build_mock_plan(prompt: str) -> WorkflowPlan:
 
 
 def build_mock_final(prompt: str) -> str:
+    """生成离线用的最终建议示例。"""
     return f"[MOCK MODE] Final recommendation for: {prompt}"
 
 

@@ -107,6 +107,7 @@
 ## 6. RAG 数据流和代码对应
 
 ```mermaid
+%% RAG 数据流：输入到输出的主链路
 flowchart TD
     A["输入层<br/>来源: User question<br/>作用: 用户提出问题"]
     B["入口层 / 参数解析<br/>文件: ai-lab/agent-lab/projects/doc_qa_agent/main.py<br/>函数: parse_args()<br/>作用: 读取 question、--docs、--model"]
@@ -237,6 +238,7 @@ import sys
 from openai import OpenAI
 
 
+# 演示用的本地资料（label, content）
 DOCS = [
     ("doc1", "RAG 是先检索资料，再基于资料生成回答的方式。"),
     ("doc2", "FastAPI 很适合把文档问答能力包装成后端接口。"),
@@ -245,16 +247,21 @@ DOCS = [
 
 
 def main() -> None:
+    # 读取 API Key，缺失则退出
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
         sys.exit(1)
 
+    # 用户问题
     question = "RAG 和 FastAPI 有什么关系？"
 
+    # 入门版检索：关键词匹配挑选相关资料
     matched = [item for item in DOCS if "RAG" in item[1] or "FastAPI" in item[1]]
+    # 拼接上下文并保留来源标签
     context = "\n\n".join([f"[SOURCE: {label}] {text}" for label, text in matched])
 
+    # 调用模型，约束只基于上下文回答
     client = OpenAI(api_key=api_key)
     response = client.responses.create(
         model="gpt-5",
@@ -269,10 +276,12 @@ def main() -> None:
         ),
     )
 
+    # 输出模型回答
     print(response.output_text)
 
 
 if __name__ == "__main__":
+    # 脚本入口
     main()
 ```
 
@@ -381,30 +390,35 @@ if __name__ == "__main__":
 先安装依赖：
 
 ```bash
+# 安装示例依赖
 pip install -r ai-lab/agent-lab/projects/doc_qa_agent/requirements.txt
 ```
 
 Windows PowerShell 设置环境变量：
 
 ```powershell
+# Windows PowerShell 设置环境变量
 $env:OPENAI_API_KEY="your_api_key"
 ```
 
 默认读取当前目录下的 `md` / `txt` 文件：
 
 ```bash
+# 默认读取当前目录下的 md/txt 文档
 python ai-lab/agent-lab/projects/doc_qa_agent/main.py "这个目录里数据库相关内容主要讲了什么？"
 ```
 
 指定文档目录：
 
 ```bash
+# 指定文档目录
 python ai-lab/agent-lab/projects/doc_qa_agent/main.py --docs d:/dev/source_code/vscode_study/java-lab "对日项目里的 RDS 和 Aurora 有什么区别？"
 ```
 
 指定模型：
 
 ```bash
+# 指定模型并设置文档目录
 python ai-lab/agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --docs d:/dev/source_code/vscode_study/java-lab "总结数据库移行的重点"
 ```
 

@@ -30,6 +30,7 @@
 ## 3. 最小 API 数据流
 
 ```mermaid
+%% 最小 API 数据流：请求进来，检索+组上下文，再返回 JSON
 flowchart TD
     A["HTTP POST /ask"] --> B["AskRequest"]
     B --> C["retrieve()"]
@@ -51,22 +52,27 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 
+# 创建服务入口
 app = FastAPI()
 
 
+# 请求体 schema
 class AskRequest(BaseModel):
     question: str
 
 
+# 响应体 schema
 class AskResponse(BaseModel):
     answer: str
 
 
+# 健康检查端点
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+# 核心问答端点
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> AskResponse:
     return AskResponse(answer=f"收到问题: {request.question}")
@@ -84,24 +90,28 @@ def ask(request: AskRequest) -> AskResponse:
 从仓库根目录进入 demo：
 
 ```bash
+# 进入 demo 目录
 cd ai-lab/agent-lab/projects/rag_api_demo
 ```
 
 mock 模式启动：
 
 ```bash
+# mock 模式启动服务
 RAG_API_MOCK=1 uvicorn main:app --reload --port 8000
 ```
 
 测试健康检查：
 
 ```bash
+# 调用健康检查接口
 curl http://127.0.0.1:8000/health
 ```
 
 测试问答接口：
 
 ```bash
+# 调用问答接口
 curl -X POST http://127.0.0.1:8000/ask \
   -H "Content-Type: application/json" \
   -d '{"question":"请总结文档重点"}'

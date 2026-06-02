@@ -1,0 +1,17 @@
+{
+  "name": "jtproject-springboot-typescript-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "JtProject-SpringBoot-TypeScript 前端入口，使用 Vite + 原生 TypeScript。",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

@@ -86,6 +86,12 @@ def build_client() -> OpenAI:
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    """决定运行模式：mock 或 real。
+
+    - force_mock 为真时强制 mock
+    - force_real 为真时强制 real（无 Key 则报错）
+    - 否则根据是否配置 OPENAI_API_KEY 自动选择
+    """
     if force_mock:
         return "mock"
     if force_real:
@@ -97,6 +103,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
 
 def build_mock_plan(prompt: str) -> AgentPlan:
+    """构造本地示例计划，用于离线演练结构化输出。"""
     return AgentPlan(
         goal=f"Mock goal for: {prompt}",
         user_type="beginner",
@@ -108,6 +115,7 @@ def build_mock_plan(prompt: str) -> AgentPlan:
 
 
 def generate_plan(client: OpenAI | None, model: str, prompt: str, mode: str) -> AgentPlan:
+    """根据模式生成结构化计划：mock 返回示例，real 调用模型。"""
     # 层次: 调用层 — 请求模型并使用 SDK 的 parse 功能将输出映射为 `AgentPlan`（支持 mock）
     # 如果是 mock 模式，直接返回示例结构；用于离线学习与测试。
     if mode == "mock":

@@ -147,3 +147,12 @@ flowchart TD
 2. 增加失败重试
 3. 增加步骤日志
 4. 再考虑多 Agent
+
+## 11. Python 处理流程（速查）
+
+1. **parse_args**：处理命令行输入（任务、--model、--mock/--real）。
+2. **resolve_mode**：判断运行模式（自动 / mock / real）。
+3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
+4. **build_mock_analysis / build_mock_plan / build_mock_final**：生成 mock 数据（三阶段离线输出）。
+5. **核心业务**：`analyze_task()` -> `plan_task()` -> `finalize_task()` 串起三阶段流程。
+6. **main**：总流程入口，按阶段执行并输出结果。
