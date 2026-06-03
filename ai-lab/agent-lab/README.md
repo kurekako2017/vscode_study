@@ -28,11 +28,13 @@
 4. [04-RAG.md](./04-RAG.md)
 5. [03-Tool Calling.md](./03-Tool%20Calling.md)
 6. [05-Agent工作流.md](./05-Agent工作流.md)
-7. [LLM-Agent学习路径与计划.md](./LLM-Agent学习路径与计划.md)
+7. [06-Agent产品化与部署.md](./06-Agent产品化与部署.md)
+8. [LLM-Agent学习路径与计划.md](./LLM-Agent学习路径与计划.md)
 
 辅助资料：
 
 - [术语速查表.md](./术语速查表.md)
+- [06-Agent产品化与部署.md](./06-Agent产品化与部署.md)
 - [projects/LEARNING_MAP.md](./projects/LEARNING_MAP.md)
 
 ## 可运行 Demo
@@ -68,7 +70,7 @@ python3 main.py --mock --workdir ../../.. "列出 AI Lab 的结构"
 | 目录 | 重点 |
 | --- | --- |
 | [../llm-lab](../llm-lab/README.md) | 模型调用、结构化输出、RAG、FastAPI、评估、日本现场对照 |
-| `agent-lab` | Tool Calling、Agent Loop、Workflow、自动化执行和进阶项目 |
+| `agent-lab` | Tool Calling、Agent Loop、Workflow、Agent 产品化、自动化执行和进阶项目 |
 
 日本现场通常先落地 `RAG / 社内検索 / FastAPI API`，再逐步加入工具调用和 Agent 工作流。因此建议先完成 `llm-lab` 主线，再把本目录作为进阶展示。
 
@@ -82,6 +84,7 @@ agent-lab/
 |-- 03-Tool Calling.md
 |-- 04-RAG.md
 |-- 05-Agent工作流.md
+|-- 06-Agent产品化与部署.md
 |-- Agent系统框架与术语.md
 |-- LLM-Agent学习路径与计划.md
 `-- projects/

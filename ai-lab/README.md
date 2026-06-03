@@ -24,6 +24,7 @@
 6. [RAG](./llm-lab/04-RAG.md)
 7. [FastAPI 与企业集成](./llm-lab/05-FastAPI与企业集成.md)
 8. [Agent 学习路线](./agent-lab/01-学习路线.md)
+9. [Agent 产品化与部署](./agent-lab/06-Agent产品化与部署.md)
 
 ## 可运行 Demo
 
