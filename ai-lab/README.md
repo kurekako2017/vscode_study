@@ -26,6 +26,10 @@
 8. [Agent 学习路线](./agent-lab/01-学习路线.md)
 9. [Agent 产品化与部署](./agent-lab/06-Agent产品化与部署.md)
 
+速查：
+
+- [AI / LLM / Agent 术语速查表](./术语速查表.md)
+
 ## 可运行 Demo
 
 可运行示例统一维护在 [agent-lab/projects](./agent-lab/projects/README.md)：

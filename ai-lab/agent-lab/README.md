@@ -33,7 +33,7 @@
 
 辅助资料：
 
-- [术语速查表.md](./术语速查表.md)
+- [../术语速查表.md](../术语速查表.md)
 - [06-Agent产品化与部署.md](./06-Agent产品化与部署.md)
 - [projects/LEARNING_MAP.md](./projects/LEARNING_MAP.md)
 
