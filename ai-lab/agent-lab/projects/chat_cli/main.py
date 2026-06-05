@@ -197,7 +197,7 @@ def run_interactive(client: Any, model: str, use_mock: bool, max_chars: int | No
     # 启动提示信息
     print(f"chat_cli 以模型启动: {model}")
     if use_mock:
-        print("Running in MOCK mode (no API key required).")
+        print("以模拟模式运行（无需 API 密钥）.")
     print("Type 'exit' or 'quit' to stop.")
 
     # 循环读取用户输入，逐次发起模型请求
