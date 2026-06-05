@@ -121,7 +121,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> bool:
 
     if not os.getenv("OPENAI_API_KEY"):
         # 没有找到 API Key，自动切换到 mock 模式（本地演练而不触网）
-        print("INFO: OPENAI_API_KEY not set, auto-switching to MOCK mode.", file=sys.stderr)
+        print("INFO: 未设置 OPENAI_API_KEY，自动切换到 MOCK 模式.", file=sys.stderr)
         return True
 
     if OpenAI is None:
@@ -195,7 +195,7 @@ def run_interactive(client: Any, model: str, use_mock: bool, max_chars: int | No
     # 层次: 控制层 — 实现交互循环、退出条件与异常处理
     """进入交互循环，逐条读取用户输入并请求模型回答。"""
     # 启动提示信息
-    print(f"chat_cli started with model: {model}")
+    print(f"chat_cli 以模型启动: {model}")
     if use_mock:
         print("Running in MOCK mode (no API key required).")
     print("Type 'exit' or 'quit' to stop.")
