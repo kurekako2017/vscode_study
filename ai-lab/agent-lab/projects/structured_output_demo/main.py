@@ -28,31 +28,32 @@ from typing import Literal
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
-
+#   默认模型名，可用 `--model` 覆盖。
 DEFAULT_MODEL = "gpt-4o"
+#  系统指令：引导模型生成符合 `AgentPlan` 结构的输出，强调清晰简洁。
 SYSTEM_INSTRUCTIONS = (
-    "You are an assistant for an LLM agent learning lab. "
-    "Analyze the user's idea and return a structured development plan."
+    "您是LLM智能体学习实验室的助理. "
+    "分析用户的想法并返回一份结构化的开发计划."
 )
 
-
+#   AgentPlan 模型定义：使用 Pydantic 定义期望的输出结构，包括字段类型和描述。
 class AgentPlan(BaseModel):
     """Pydantic 模型：定义期望的结构化输出字段与类型。
 
     当将模型输出解析到该类型时，若字段缺失或类型不匹配，SDK 会抛出错误，便于及早发现问题。
     """
-    goal: str = Field(description="The main goal of the requested agent.")
+    goal: str = Field(description="所请求代理的主要目标.")
     user_type: Literal["beginner", "intermediate", "advanced"] = Field(
-        description="Estimated user level for this project."
+        description="此项目的预计用户级别."
     )
     # core_capabilities 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     core_capabilities: list[str] = Field(
-        description="Key capabilities the agent should have."
+        description="代理应具备的关键能力."
     )
     # tools 和 deliverables 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     tools: list[str] = Field(description="Recommended tools or functions.")
     deliverables: list[str] = Field(
-        description="Concrete output artifacts or demos to build."
+        description="要构建的具体输出成果或演示。"
     )
     # risks 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     risks: list[str] = Field(description="Main development risks or cautions.")
@@ -62,7 +63,7 @@ def parse_args() -> argparse.Namespace:
     # 层次: 输入层 — 解析用户的自然语言请求与模型选项
     """解析命令行参数：接收自然语言请求并可选择模型。"""
     parser = argparse.ArgumentParser(
-        description="Minimal structured output demo with OpenAI Responses API."
+        description="使用 OpenAI Responses API 的最小结构化输出演示。"
     )
     parser.add_argument("prompt", help="Natural-language project request.")
     parser.add_argument(
@@ -107,6 +108,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
 def build_mock_plan(prompt: str) -> AgentPlan:
     """构造本地示例计划，用于离线演练结构化输出。"""
+    # 层次: 调用层 — 在 mock 模式下返回一个符合 AgentPlan 结构的示例数据，便于离线测试和学习。
     return AgentPlan(
         goal=f"Mock goal for: {prompt}",
         user_type="beginner",
@@ -143,6 +145,7 @@ def main() -> None:
     mode = resolve_mode(args.mock, args.real)
     # 以下是与客户端交互的设置，后续调用 generate_plan 时会根据 mode 决定是否发起真实请求。
     client = None
+    # 只有在 real 模式下才构建客户端，mock 模式下直接使用本地生成的示例数据，避免不必要的环境依赖。
     if mode == "real":
         client = build_client()
 
