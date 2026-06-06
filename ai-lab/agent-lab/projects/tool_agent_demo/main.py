@@ -350,12 +350,15 @@ def main() -> None:
     # 层次: 程序入口 — 验证输入并启动 agent 控制循环
     """主流程：校验工作目录后进入工具调用循环并输出最终答案。"""
     args = parse_args()
+    # 解析运行模式（mock/real）并根据模式构建客户端（仅 real 模式需要）
     mode = resolve_mode(args.mock, args.real)
+    # 在 real 模式下构建 OpenAI 客户端，mock 模式下保持 None 以避免 SDK 调用
     client = None
     if mode == "real":
         client = build_client()
+        #   在 real 模式下，确保工作目录存在且是一个目录，否则退出并提示错误
     base_dir = Path(args.workdir).resolve()
-
+    # 这里的安全检查确保了所有工具函数在访问文件时都受限于这个 base_dir，防止路径跳出导致安全问题。
     if not base_dir.exists() or not base_dir.is_dir():
         print("ERROR: --workdir must be an existing directory.", file=sys.stderr)
         sys.exit(1)

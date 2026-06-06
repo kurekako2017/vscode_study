@@ -70,14 +70,14 @@ export OPENAI_API_KEY="your_api_key"
 ## 4. 运行方式
 
 在当前目录工作练习：
+```练习列目录：
+python3 main.py "帮我列出当前目录的文件"
 ```
-练习列目录： python3 main.py "帮我列出当前目录的文件"
+```练习读文件： 
+python3 main.py "读取 README 内容"
 ```
-```
-练习读文件： python3 main.py "读取 README 内容"
-```
-```
-练习搜索： python3 main.py "搜索包含 README 的地方"
+```练习搜索： 
+python3 main.py "搜索包含 README 的地方"
 ```
 
 默认会在当前目录工作：
