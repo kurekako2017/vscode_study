@@ -45,13 +45,16 @@ class AgentPlan(BaseModel):
     user_type: Literal["beginner", "intermediate", "advanced"] = Field(
         description="Estimated user level for this project."
     )
+    # core_capabilities 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     core_capabilities: list[str] = Field(
         description="Key capabilities the agent should have."
     )
+    # tools 和 deliverables 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     tools: list[str] = Field(description="Recommended tools or functions.")
     deliverables: list[str] = Field(
         description="Concrete output artifacts or demos to build."
     )
+    # risks 字段展示了如何使用列表类型来表达多个条目，增加输出的丰富度和实用性。
     risks: list[str] = Field(description="Main development risks or cautions.")
 
 
@@ -136,12 +139,15 @@ def main() -> None:
     # 层次: 程序入口 — 读取参数、调用构建流程并展示结果
     """主流程：读取参数 -> 请求结构化输出 -> 打印可读 JSON。"""
     args = parse_args()
+    # 模式决策。先根据参数和环境决定是否使用 mock，再构建客户端，减少分支散落。
     mode = resolve_mode(args.mock, args.real)
+    # 以下是与客户端交互的设置，后续调用 generate_plan 时会根据 mode 决定是否发起真实请求。
     client = None
     if mode == "real":
         client = build_client()
 
     try:
+        # 根据模式生成计划  — mock 模式下返回示例数据，real 模式下调用模型并解析输出为 AgentPlan。
         plan = generate_plan(client, args.model, args.prompt, mode)
     except Exception as exc:
         print(f"ERROR: request failed: {exc}", file=sys.stderr)

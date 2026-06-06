@@ -1,9 +1,12 @@
 """chat_cli: 最小可运行命令行对话示例（带注释）
 
+层次划分说明：环境检查、模式决策、客户端构建、单次调用封装、输出格式化、交互循环等功能被划分为不同层次，便于理解和练习程序结构
+
 演示内容：
 - 从环境变量读取 `OPENAI_API_KEY` 并构建客户端
 - 支持一次性提问或交互模式
 - 调用 Responses API 并打印文本回答
+
 
 此文件为学习用途，生产环境需要补入重试、超时和安全的密钥管理。
 
@@ -45,7 +48,7 @@ def parse_args() -> argparse.Namespace:
     # 层次: 输入层 — 负责命令行参数的定义与解析
     """解析命令行参数：支持自动模式、强制模式与输出截断配置。"""
     parser = argparse.ArgumentParser(
-        description="Minimal OpenAI Responses API chat CLI demo."
+        description="最小 OpenAI 响应 API 聊天 CLI 演示程序."
     )
     # 一个可选的位置参数：一次性提问（若省略则进入交互模式）
     parser.add_argument(
@@ -78,7 +81,8 @@ def parse_args() -> argparse.Namespace:
     )
     return parser.parse_args()
 
-
+# 层次划分说明：环境检查、模式决策、客户端构建、单次调用封装、输出格式化、交互循环等功能被划分为不同层次，便于理解和练习程序结构。
+# - 输入层：负责解析命令行参数，定义用户可配置的选项        
 def build_client(use_mock: bool) -> Any:
     # 层次: 基础设施层 — 负责客户端构建与外部依赖读取
     """从环境变量读取 API Key 并返回 OpenAI 客户端实例。
@@ -148,6 +152,8 @@ def build_mock_answer(prompt: str) -> str:
 
 
 def ask_once(client: Any, model: str, prompt: str, use_mock: bool) -> str:
+    #打印调试信息，显示调用的 prompt 和模式（mock 或 real），帮助理解程序流程
+    print(f"DEBUG: ask_once 被调用，提示词为: {prompt[:30]}... (use_mock={use_mock})", file=sys.stderr)
     # 层次: 调用层 — 封装单次模型调用（支持 mock 或真实调用）
     """对给定 prompt 发起一次 Responses API 请求并返回主文本回答。"""
     # 如果是 mock 模式，返回本地生成的示例回答（无需网络）
@@ -236,7 +242,7 @@ def main() -> None:
     # 层次: 程序入口 — 组织整体流程：解析参数、决策模式、调用和输出
     """程序入口：串起参数解析、模式决策、模型调用与输出格式化。"""
     args = parse_args()
-    # 先根据参数和环境决定是否使用 mock，再构建客户端，减少分支散落。
+    # 模式决策。先根据参数和环境决定是否使用 mock，再构建客户端，减少分支散落。
     use_mock = resolve_mode(args.mock, args.real)
     # 以下是与客户端交互的设置，后续调用 ask_once 时会根据 use_mock 决定是否发起真实请求。
     client = build_client(use_mock)

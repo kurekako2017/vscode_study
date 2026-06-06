@@ -56,13 +56,13 @@ export OPENAI_API_KEY="your_api_key"
 ## 4. 运行方式
 
 ```bash
-python main.py "做一个读取本地 Markdown 并输出摘要的 agent"
+python3 main.py "做一个读取本地 Markdown 并输出摘要的 agent"
 ```
 
 指定模型：
 
 ```bash
-python main.py --model gpt-4o "帮我做一个带搜索功能的知识库 agent"
+python3 main.py --model gpt-4o "帮我做一个带搜索功能的知识库 agent"
 ```
 
 ## 5. 输出内容
