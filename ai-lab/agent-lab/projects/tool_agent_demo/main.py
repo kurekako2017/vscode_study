@@ -276,8 +276,31 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
     """
     tools = build_tools()
     # 在 mock 模式下直接返回模拟回答，避免 SDK 调用
+    # 改进：在 Mock 模式下模拟简单的工具调用逻辑，以便用户练习
     if mode == "mock":
+        print(f"\n[MOCK MODE] 模拟 AI 思考中... 任务: {prompt}")
+        
+        # 简单的规则引擎：根据关键词模拟模型决定调用哪个工具
+        mock_tool_name = None
+        mock_args = {}
+        
+        if "列出" in prompt or "list" in prompt.lower() or "目录" in prompt:
+            mock_tool_name = "list_files"
+            mock_args = {"path": "."}
+        elif "读取" in prompt or "read" in prompt.lower():
+            mock_tool_name = "read_file"
+            mock_args = {"path": "README.md"} # 默认读取 README
+        elif "搜索" in prompt or "search" in prompt.lower():
+            mock_tool_name = "search_text"
+            mock_args = {"query": "README", "path": "."}
+
+        if mock_tool_name:
+            print(f"[MOCK CALL] 模型决定调用工具: {mock_tool_name} 参数: {mock_args}")
+            result = call_tool(base_dir, mock_tool_name, mock_args)
+            return f"[MOCK RESULT] 工具返回结果: {json.dumps(result, ensure_ascii=False, indent=2)}\n\n(这是模拟运行，设置 API Key 后可体验完整推理)"
+        
         return build_mock_agent_response(prompt)
+
     input_items: list[dict[str, Any]] = [
         {
             "role": "user",
