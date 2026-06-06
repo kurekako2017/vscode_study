@@ -4,6 +4,8 @@
 
 推荐阅读：
 
+- [GitHub 网站工具与热门项目学习地图.md](github网站工具推荐.md)
+- [AI Agent & 大模型开源项目学习参考资料github.md](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md)
 - [Windows_Git_Bash_开发实战教程_Java_Python_LLM.md](Windows_Git_Bash_开发实战教程_Java_Python_LLM.md)
 - [GitHub学生版学习与DevOps实践教程.md](GitHub学生版学习与DevOps实践教程.md)
 - [GitHub学生版14天DevOps学习打卡计划.md](GitHub学生版14天DevOps学习打卡计划.md)
