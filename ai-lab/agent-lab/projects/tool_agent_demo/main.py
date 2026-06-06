@@ -195,10 +195,12 @@ def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]
 
     说明：这是模型与本地函数之间的桥梁，模型发起 `function_call`，这里负责把调用映射到真实实现并返回结构化结果。
     """
+    # 根据工具名称调用对应函数，任何未识别的工具都会返回错误信息。
     if name == "list_files":
         return list_files(base_dir, path=args.get("path", "."))
-    if name == "read_file":
+    #   这里的工具调用接口非常简单，直接根据工具名称分发到对应函数。实际应用中可以添加更多工具并在此处进行分发。    if name == "read_file":
         return read_file(base_dir, path=args["path"])
+    #  search_text 工具需要 query 参数，path 参数可选（默认为当前目录），调用时会返回匹配行的文件名、行号和文本内容。
     if name == "search_text":
         return search_text(base_dir, query=args["query"], path=args.get("path", "."))
     return {"ok": False, "error": f"Unknown tool: {name}"}
@@ -207,6 +209,7 @@ def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]
 def build_tools() -> list[dict[str, Any]]:
     # 层次: 工具描述层 — 向模型暴露可用工具的 schema 与说明
     """返回供模型调用的工具描述（用于 Responses API 的 tools 参数）。"""
+    # 说明：这里定义了工具的接口规范，包括参数类型、描述和调用约束，模型会根据这些信息来决定何时以及如何调用工具。
     return [
         {
             "type": "function",
@@ -330,6 +333,7 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
             try:
                 # 解析模型提供的工具调用参数并执行对应工具
                 args = json.loads(tool_call.arguments)
+                # 执行工具并捕获结果，任何异常都被捕获并以错误信息形式返回给模型
                 result = call_tool(base_dir, tool_call.name, args)
             except Exception as exc:
                 result = {"ok": False, "error": str(exc)}
