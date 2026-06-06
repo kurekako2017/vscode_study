@@ -72,19 +72,19 @@ export OPENAI_API_KEY="your_api_key"
 默认会在当前目录工作：
 
 ```bash
-python main.py "帮我看看这个目录里有哪些 markdown 文件，并总结 README 重点"
+python3 main.py "帮我看看这个目录里有哪些 markdown 文件，并总结 README 重点"
 ```
 
 指定工作目录：
 
 ```bash
-python main.py --workdir d:/dev/source_code/vscode_study/agent-lab "列出文件并读取 README"
+python3 main.py --workdir d:/dev/source_code/vscode_study/agent-lab "列出文件并读取 README"
 ```
 
 指定模型：
 
 ```bash
-python main.py --model gpt-5 --workdir d:/dev/source_code/vscode_study/java-lab "帮我找数据库相关文档"
+python3 main.py --model gpt-5 --workdir d:/dev/source_code/vscode_study/java-lab "帮我找数据库相关文档"
 ```
 
 ## 5. 内置工具
