@@ -324,17 +324,29 @@ def load_state() -> None:
     app.state.chunks = chunks
     # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 
-# 服务启动时预热：加载文档并构建内存索引。  
-@app.on_event("startup")
-def startup_event() -> None:
-    # 层次: 启动管理层 — 服务启动时预热：加载文档并构建内存索引。
-    """服务启动时预热：加载文档并构建内存索引。"""
-    load_state()
+def ensure_state_loaded() -> None:
+    """按需初始化服务状态，避免应用启动时就预热。"""
+    if getattr(app.state, "chunks", None) is None or getattr(app.state, "docs_dir", None) is None:
+        load_state()
+
+
+@app.get("/")
+def root() -> dict[str, object]:
+    """根路径提示，避免手动验证时把 404 误判为启动失败。"""
+    return {
+        "service": "rag_api_demo",
+        "status": "ok",
+        "message": "Service is running. Use /health, /ask, and /reload.",
+        "endpoints": ["/health", "/ask", "/reload"],
+    }
+
+
 # 健康检查接口，返回当前 docs 目录和 chunk 数量。
 @app.get("/health")
 def health() -> dict[str, object]:
     # 层次: 健康检查层 — 健康检查接口，返回当前 docs 目录和 chunk 数量。
     """健康检查接口，返回当前 docs 目录和 chunk 数量。"""
+    ensure_state_loaded()
     return {
         # 返回状态     （返回状态）
         "status": "ok",
@@ -367,8 +379,7 @@ def reload_docs() -> ReloadResponse:
 def ask(request: AskRequest) -> AskResponse:
     """对外 API：接收问题、检索文档并返回模型回答与来源信息。"""
     # 层次: 业务接口层 — 对外 API：接收问题、检索文档并返回模型回答与来源信息。
-    if app.state.docs_dir is None:
-        raise HTTPException(status_code=500, detail="Service is not initialized.")
+    ensure_state_loaded()
     # 检索文档     （检索文档）
     top_chunks = retrieve(request.question, app.state.chunks)
     # 构建上下文     （构建上下文）
