@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 这个示例额外引入 PropTypes，用来做属性类型检查 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+    <script src="../build/prop-types.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/babel">
+
+      // 故意传入数字，方便观察类型校验的提示
+      var data = 123;
+
+      // static propTypes 说明组件希望收到什么类型的 props
+      class MyTitle extends React.Component {
+        static propTypes = {
+          title: PropTypes.string.isRequired,
+        }
+        render() {
+          // 这里直接读取 props.title
+          return <h1> {this.props.title} </h1>;
+        }
+      }
+
+      // 由于 data 不是字符串，浏览器控制台会看到类型警告
+      ReactDOM.render(
+        <MyTitle title={data} />,
+        document.getElementById('example')
+      );
+
+    </script>
+  </body>
+</html>

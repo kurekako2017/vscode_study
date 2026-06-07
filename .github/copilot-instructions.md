@@ -1,25 +1,25 @@
-# Study Repository - AI Coding Agent Instructions
+# 学习仓库 - AI 编程助手指令
 
-## 📁 Repository Architecture
+## 📁 仓库架构
 
-Multi-domain learning workspace with **four completely isolated projects**:
+包含**四个完全独立项目**的多领域学习工作区：
 
-| Project | Type | Status | Purpose |
+| 项目 | 类型 | 状态 | 用途 |
 |---------|------|--------|---------|
-| `java-projects/JtProject/` | Spring Boot 2.7 + Hibernate | Active | E-commerce app, manual Hibernate config |
-| `sap-lab/` | ABAP/CDS/RAP/CAP | Learning | 7-module SAP skill progression |
-| `python-projects/ai-lab/` | Python ML/AI | Active | ML fundamentals + LLM experiments |
-| `localstack-lab/` | AWS emulation | Active | S3/DynamoDB local testing |
+| `java-projects/JtProject/` | Spring Boot 2.7 + Hibernate | 活跃 | 电子商务应用，手动 Hibernate 配置 |
+| `sap-lab/` | ABAP/CDS/RAP/CAP | 学习 | 7 模块 SAP 技能进阶 |
+| `python-projects/ai-lab/` | Python ML/AI | 活跃 | ML 基础 + LLM 实验 |
+| `localstack-lab/` | AWS 模拟 | 活跃 | S3/DynamoDB 本地测试 |
 
 ---
 
-## 🔧 Java Spring Boot E-Commerce (JtProject)
+## 🔧 Java Spring Boot 电子商务 (JtProject)
 
-### Critical Architecture: Manual Hibernate + 3-Layer JSP
+### 关键架构：手动 Hibernate + 3 层 JSP
 
-**Why manual?** `@SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)` disables Spring Data JPA. All session management is in [HibernateConfiguration.java](java-projects/JtProject/src/main/java/com/jtspringproject/JtSpringProject/HibernateConfiguration.java).
+**为什么要手动配置？** `@SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)` 禁用了 Spring Data JPA。所有的会话管理都在 HibernateConfiguration.java 中进行。
 
-**Data flow:**
+**数据流：**
 ```
 Controller (static auth vars) 
   ↓ 

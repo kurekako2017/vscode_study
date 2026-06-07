@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 这个示例展示如何通过 ref 直接拿到 DOM 节点 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <!-- https://reactjs.org/docs/refs-and-the-dom.html#callback-refs -->
+    <script type="text/babel">
+      // 通过 createRef 保存输入框实例，后面可以直接调用 focus()
+      class MyComponent extends React.Component {
+        constructor(props) {
+          super(props);
+          this.myTextInput = React.createRef();
+          this.handleClick = this.handleClick.bind(this)
+        }
+        // 点击按钮后，把光标聚焦到输入框上
+        handleClick() {
+          this.myTextInput.current.focus();
+        }
+        render() {
+          return (
+            <div>
+              {/* ref 绑定到 input 上，current 会指向真实 DOM */}
+              <input type="text" ref={this.myTextInput} />
+              <input type="button" value="Focus the text input" onClick={this.handleClick} />
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        <MyComponent />,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

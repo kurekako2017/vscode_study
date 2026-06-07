@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 这个示例开始进入组件写法 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/babel">
+      // 定义一个类组件，render 方法负责描述界面
+      class HelloMessage extends React.Component {
+        render() {
+          // props 是父组件传进来的只读数据
+          return <h1>Hello {this.props.name}</h1>;
+        }
+      }
+
+      // JSX 形式创建组件实例并传入属性
+      ReactDOM.render(
+        <HelloMessage name="John" />,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 先引入 React、ReactDOM 和 Babel，方便在浏览器里直接运行 JSX 示例 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <!-- React 负责把内容渲染到这个挂载节点里 -->
+    <div id="example"></div>
+    <script type="text/babel">
+      // ReactDOM.render 用 JSX 生成一个最简单的页面内容
+      ReactDOM.render(
+        <h1>Hello, world! 第一个Demo！</h1>,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

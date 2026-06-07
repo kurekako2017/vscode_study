@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 运行 JSX 需要 React、ReactDOM 和 Babel -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <!-- 页面最终渲染到这个节点 -->
+    <div id="example"></div>
+    <script type="text/babel">
+      // 原始数据数组，后面用 map 生成多个 React 元素
+      var names = ['Alice', 'Emily', 'Kate'];
+
+      // 在 JSX 里用花括号嵌入 JavaScript 表达式
+      ReactDOM.render(
+        <div>
+        {
+          // 每个成员都映射成一个子节点，key 让 React 能稳定识别列表项
+          names.map(function (name, index) {
+            return <div key={index}>Hello, {name}!</div>
+          })
+        }
+        </div>,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

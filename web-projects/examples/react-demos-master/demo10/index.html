@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 这个示例演示生命周期里启动定时器 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/babel">
+      // 组件挂载后开启定时器，不断修改 opacity
+      class Hello extends React.Component {
+        constructor(props) {
+          super(props)
+          // opacity 会在定时器里持续变化
+          this.state = {
+            opacity: 1.0
+          };
+        }
+
+        componentDidMount() {
+          // 挂载完成后开始动画
+          this.timer = setInterval(function () {
+            var opacity = this.state.opacity;
+            opacity -= .05;
+            // 透明度降到一定程度后重置
+            if (opacity < 0.1) {
+              opacity = 1.0;
+            }
+            this.setState({
+              opacity: opacity
+            });
+          }.bind(this), 100);
+        }
+
+        render() {
+          // 通过内联样式把 state 映射到页面视觉效果
+          return (
+            <div style={{opacity: this.state.opacity}}>
+              Hello {this.props.name}
+            </div>
+          );
+        }
+      }
+        
+      ReactDOM.render(
+        <Hello name="world"/>,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

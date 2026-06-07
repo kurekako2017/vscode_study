@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 这个示例开始使用 state 来保存组件内部状态 -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/babel">
+      // 点一下就切换 liked 状态
+      class LikeButton extends React.Component {
+        constructor(props) {
+          super(props)
+          // state 是组件私有数据，改变后会触发重新渲染
+          this.state = {
+            liked: false
+          }
+          this.handleClick = this.handleClick.bind(this)
+        }
+        handleClick(event) {
+          // 根据旧状态翻转 liked 值
+          this.setState({ liked: !this.state.liked });
+        }
+        render() {
+          // 根据状态计算显示文本
+          var text = this.state.liked ? 'like' : 'haven\'t liked';
+          return (
+            <p onClick={this.handleClick}>
+              You {text} this. Click to toggle.
+            </p>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        <LikeButton />,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- children 示例也需要 React 运行时和 Babel -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+  </head>
+  <body>
+    <!-- 渲染结果会放在这里 -->
+    <div id="example"></div>
+    <script type="text/babel">
+      // 这个组件把外部传进来的子节点包装成列表
+      class NotesList extends React.Component {
+        render() {
+          return (
+            <ol>
+              {
+                // React.Children.map 适合统一处理 children
+                React.Children.map(this.props.children, function (child) {
+                  return <li>{child}</li>;
+                })
+              }
+            </ol>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        // 传入多个子节点，组件内部会拿到 this.props.children
+        <NotesList>
+          <span>hello</span>
+          <span>world</span>
+        </NotesList>,
+        document.getElementById('example')
+      );
+    </script>
+  </body>
+</html>
