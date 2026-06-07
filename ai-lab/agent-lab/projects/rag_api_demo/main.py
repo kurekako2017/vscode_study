@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException  # pyright: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware  # pyright: ignore[reportMissingImports]
 from openai import OpenAI  # pyright: ignore[reportMissingImports]
 from pydantic import BaseModel, Field
 from pypdf import PdfReader  # pyright: ignore[reportMissingImports]    
@@ -47,6 +48,16 @@ SYSTEM_INSTRUCTIONS = (
     "If the context is insufficient, say that clearly. "
     "Mention source labels when possible."
 )
+
+# 浏览器客户端默认允许的来源，便于本地 React/Next.js 前端访问。
+DEFAULT_CORS_ORIGINS = {
+    "http://localhost:3000",
+    "http://localhost:4173",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:4173",
+    "http://127.0.0.1:5173",
+}
 
 # 文档切分后的片段对象：包含来源标签、内容与得分。
 @dataclass
@@ -290,6 +301,22 @@ def answer_question(client: OpenAI | None, model: str, question: str, context: s
 
 # 创建 FastAPI 应用     （创建 FastAPI 应用）
 app = FastAPI(title="rag_api_demo", version="0.1.0")
+
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("RAG_API_CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if not cors_origins:
+    cors_origins = sorted(DEFAULT_CORS_ORIGINS)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。     （将运行时状态挂在 app.state，方便在多个 endpoint 间共享。）
 # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 app.state.client = None

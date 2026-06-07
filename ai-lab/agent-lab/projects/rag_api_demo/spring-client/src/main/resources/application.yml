@@ -1,0 +1,10 @@
+server:
+  port: 8088
+
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+rag:
+  api:
+    base-url: ${RAG_API_BASE_URL:http://127.0.0.1:8000}
