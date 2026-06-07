@@ -18,6 +18,19 @@
 
 ---
 
+## 1.5 如何“安装”下文提到的 Skills？
+
+这些 Skills 并非全部是 VS Code 插件，请根据下表方式启用：
+
+| Skill 类型 | 安装/启用方法 | 适用场景 |
+| :--- | :--- | :--- |
+| **自定义指令** | 进入 VS Code 设置 -> 搜索 `Custom Instructions` -> 粘贴对应的 Skill 提示词 | 全局行为改变（如 Superpowers） |
+| **项目规则文件** | 在项目根目录创建 `.cursorrules` 或 `.github/copilot-instructions.md` | 特定项目的代码风格约束（如 Antfu Skills） |
+| **工作流文件** | 手动创建 `PLAN.md` 或 `TODO.md` 并在对话时用 `@` 引用 | 复杂逻辑的长时记忆（如 Planning with Files） |
+| **开源框架** | 通过 Python/Node.js 环境 `pip install` 或 `npm install` | 需要调用外部 API 或工具（如 Composio） |
+
+---
+
 ## 2. 核心进阶：Codex 必装十大 Skills 指南
 
 为了让 Codex 从一个“代码补全器”变成“资深架构师”，建议在你的工作流中引入以下 Skills：
@@ -25,12 +38,12 @@
 ### 2.1 工程质量与流程控制类
 1. **Superpowers (TDD 强化)**:
    - **用法**: 强制要求 AI 先写单元测试再写业务代码。
-   - **技巧**: 在 Chat 提示词中加入：“按 Superpowers 规则，先输出 Test Case，验证失败后再提供实现代码”。
+   - **启用**: 在自定义指令中加入：“You are an expert developer. You MUST always follow TDD: write a failing test first, then the minimal code to pass it.”
 2. **SuperClaude Framework (斜杠命令集)**:
    - **描述**: 预设 30+ 条高频命令（如 `/optimize`, `/refactor`）。
-   - **Windows 实践**: 可以在 VS Code 的 `settings.json` 中配置 Custom Prompts 模拟这些指令。
+   - **启用**: 复制开源社区提供的 Prompts 模板，存入 VS Code 的 `User Snippets` 或 Chat 预设指令中。
 3. **Vercel Agent Skills (前端性能准则)**:
-   - **价值**: 针对 React/Next.js 开发，自动注入性能优化规则（如 `useMemo` 检查）。
+   - **启用**: 在项目根目录创建 `.cursorrules`，写入 Vercel 官方的 React 最佳实践文档链接或内容。
 
 ### 2.2 上下文与记忆管理类
 4. **Planning with Files (长期记忆库)**:
@@ -39,12 +52,12 @@
 5. **Context Engineering Skills (上下文压缩)**:
    - **核心**: 避免 Token 溢出。在长对话中，使用“总结当前进度并开启新会话”的方式保持 AI 清醒。
 6. **Antfu Skills (风格化规则)**:
-   - **参考**: 借鉴 Anthony Fu 的配置，在项目根目录放置 `.cursorrules` 或相关配置文件，约束 AI 的代码审美（如禁止使用 `any`，强制使用特定缩进）。
+   - **启用**: 访问 `github.com/antfu/dotfiles` 复制其规则内容至你的项目配置文件中。
 
 ### 2.3 自动化与外部联动类
 7. **Composio Skills (SaaS 插件化)**:
    - **功能**: 让 AI 具备调用外部工具（GitHub API, Slack, 本地 Shell）的能力。
-   - **场景**: “查一下 GitHub Repo 最近的 PR，并帮我写一个本地脚本自动合入”。
+   - **安装**: 这是一个真实的库，需执行 `pip install composio_core` 并按照官网文档连接你的 GitHub 账号。
 8. **MiniMax Skills (全栈模版包)**:
    - **价值**: 提供现成的工业级前端/移动端代码块，减少重复起步工作。
 9. **Anthropic/Official Skills (官方示范)**:
