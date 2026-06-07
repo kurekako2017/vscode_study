@@ -6,6 +6,7 @@
 
 1. 先走 [llm-lab](./llm-lab/README.md)：模型调用、结构化输出、RAG、FastAPI、评估与日本现场对照。
 2. 再走 [agent-lab](./agent-lab/README.md)：Tool Calling、Agent 工作流、工具循环和进阶项目。
+3. 再进阶到 [agent-advanced](./agent-advanced/README.md)：LangChain、LlamaIndex、LangGraph、高级 RAG、多 Agent、React 客户端和工程化。
 
 ## 目录职责
 
@@ -13,6 +14,7 @@
 | --- | --- | --- |
 | [llm-lab](./llm-lab/README.md) | LLM 应用开发主线 | 想先做能落地的 `Python + RAG + FastAPI` PoC |
 | [agent-lab](./agent-lab/README.md) | Agent 进阶专题和可运行 demo | 已经理解模型调用、结构化输出、RAG 后继续进阶 |
+| [agent-advanced](./agent-advanced/README.md) | 高级 Agent / 高级 RAG / 框架专题 | 想系统学习 LangChain、LlamaIndex、LangGraph、多 Agent 和前后端集成 |
 
 ## 最短学习路线
 
@@ -25,6 +27,7 @@
 7. [FastAPI 与企业集成](./llm-lab/05-FastAPI与企业集成.md)
 8. [Agent 学习路线](./agent-lab/01-学习路线.md)
 9. [Agent 产品化与部署](./agent-lab/06-Agent产品化与部署.md)
+10. [Agent Advanced 学习路线](./agent-advanced/学习路线.md)
 
 速查：
 
@@ -82,4 +85,18 @@ ai-lab/
         |-- rag_api_demo/
         |-- tool_agent_demo/
         `-- workflow_agent/
+`-- agent-advanced/
+    |-- README.md
+    |-- 学习路线.md
+    |-- 核心技术栈总览.md
+    |-- projects/
+    |-- frameworks/
+    |   |-- langchain/
+    |   |-- llamaindex/
+    |   `-- langgraph/
+    |-- rag/
+    |-- multi-agent/
+    |-- frontend/
+    |-- eval/
+    `-- deployment/
 ```

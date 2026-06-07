@@ -3,6 +3,7 @@ import { chapters } from './data/chapters'
 import HomePage from './chapters/home/HomePage'
 import HooksPage from './chapters/hooks/HooksPage'
 import RouterPage from './chapters/router/RouterPage'
+import { AboutPage, RouterHome, UserProfile } from './chapters/router/RouterPage'
 import ContextPage from './chapters/context/ContextPage'
 import ApiPage from './chapters/api/ApiPage'
 import TestPage from './chapters/test/TestPage'
@@ -38,7 +39,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/hooks" element={<HooksPage />} />
-        <Route path="/router" element={<RouterPage />} />
+        <Route path="/router/*" element={<RouterPage />}>
+          <Route index element={<RouterHome />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="users/:id" element={<UserProfile />} />
+          <Route path="*" element={<Navigate to="." replace />} />
+        </Route>
         <Route path="/context" element={<ContextPage />} />
         <Route path="/api" element={<ApiPage />} />
         <Route path="/test" element={<TestPage />} />

@@ -1,0 +1,17 @@
+{
+  "name": "ai-agents-from-zero",
+  "version": "1.0.0",
+  "description": "AI 智能体实战速成指南：从零到企业级落地 | ai-agents-from-zero",
+  "author": "didilili <dili@outlook.com>",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "serve": "docsify serve . --open"
+  },
+  "devDependencies": {
+    "docsify-cli": "^4.4.3",
+    "@commitlint/cli": "^20.4.0",
+    "@commitlint/config-conventional": "^20.4.0",
+    "husky": "^9.1.7"
+  }
+}

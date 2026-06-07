@@ -1,53 +1,5 @@
-import { MemoryRouter, NavLink, Navigate, Route, Routes, useParams } from 'react-router-dom'
-
-function UserProfile() {
-  const { id } = useParams()
-  return <p>当前用户 ID: <strong>{id}</strong></p>
-}
-
-function RouterHome() {
-  return <p>这里是站内路由示例首页。可以切到 About 或用户详情页。</p>
-}
-
-function AboutPage() {
-  return <p>About 页面演示了简单的页面切换。</p>
-}
-
+// 这个文件保留为学习参考：旧版实现曾经使用嵌套 MemoryRouter。
+// 当前项目已改成 App 内的嵌套路由实现，避免在 BrowserRouter 里面再套一个 Router。
 export default function RouterDemo() {
-  return (
-    <article className="card stack">
-      <span className="pill">MemoryRouter</span>
-      <MemoryRouter initialEntries={['/']}>
-        <nav className="button-row">
-          <NavLink
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-            to="/"
-          >
-            Home
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-            to="/about"
-          >
-            About
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-            to="/users/42"
-          >
-            User 42
-          </NavLink>
-        </nav>
-
-        <div className="card" style={{ boxShadow: 'none', background: '#f8fafc' }}>
-          <Routes>
-            <Route path="/" element={<RouterHome />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/users/:id" element={<UserProfile />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </MemoryRouter>
-    </article>
-  )
+  return <p>Router 示例已切换到嵌套路由版本，请打开 RouterPage 查看。</p>
 }
