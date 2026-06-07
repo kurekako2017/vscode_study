@@ -8,6 +8,7 @@
 - 后端端口：`8090`
 - 前端端口：`5175`
 - 数据：内存数据仓库，初始数据来自原始 `JtProject/src/main/resources/data.sql`
+- 这个项目不保留 JSP，也不依赖 Spring Boot，属于独立的纯 TypeScript 全栈路线
 
 ## 快速启动
 

@@ -35,6 +35,7 @@
 
 - [../术语速查表.md](../术语速查表.md)
 - [06-Agent产品化与部署.md](./06-Agent产品化与部署.md)
+- [API配置与兼容策略.md](./API配置与兼容策略.md)
 - [projects/LEARNING_MAP.md](./projects/LEARNING_MAP.md)
 
 ## 可运行 Demo

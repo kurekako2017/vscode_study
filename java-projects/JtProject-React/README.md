@@ -16,6 +16,15 @@
 - 前端端口：`5173`
 - 数据库改为本地 H2 文件库，路径在项目 `data/` 目录下
 - 原始 `JtProject` 保持不变，这里是独立副本
+- 传统 JSP 视图仍在运行链路中，暂时不能直接删除
+
+## 结构说明
+
+这个项目当前是混合结构：
+
+- `frontend/`：React + TypeScript + Vite
+- `src/main/webapp/views/`：传统 JSP 页面，当前仍被部分控制器使用
+- `src/main/java/`：Spring Boot 后端，既有 REST API，也有返回 JSP 的 MVC 控制器
 
 ## 快速启动（Windows / PowerShell）
 
@@ -69,6 +78,7 @@ http://localhost:5173
 ## 学习文档
 
 - 学习入口：[docs/README.md](./docs/README.md)
+- 目录结构总览：[docs/目录结构总览.md](./docs/目录结构总览.md)
 - React 框架系统学习指南：[docs/react-framework-guide.md](./docs/react-framework-guide.md)
 - React 学习路线：[docs/react-learning-path.md](./docs/react-learning-path.md)
 - React 框架速查：[docs/react-framework-notes.md](./docs/react-framework-notes.md)

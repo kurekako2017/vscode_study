@@ -19,11 +19,12 @@
 如果你是第一次看这个项目，推荐顺序：
 
 1. [README.md](../README.md)
-2. [react-framework-guide.md](./react-framework-guide.md)
-3. [react-learning-path.md](./react-learning-path.md)
-4. [react-framework-notes.md](./react-framework-notes.md)
-5. [project-code-map.md](./project-code-map.md)
-6. [hooks-learning-guide.md](./hooks-learning-guide.md)
+2. [目录结构总览.md](./目录结构总览.md)
+3. [react-framework-guide.md](./react-framework-guide.md)
+4. [react-learning-path.md](./react-learning-path.md)
+5. [react-framework-notes.md](./react-framework-notes.md)
+6. [project-code-map.md](./project-code-map.md)
+7. [hooks-learning-guide.md](./hooks-learning-guide.md)
 
 ## 文档分区
 

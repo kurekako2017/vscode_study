@@ -5,6 +5,7 @@
 这里主要是方法论和拆解文档，对应的可运行代码在：
 
 - [projects/advanced_rag_pipeline_demo](../projects/advanced_rag_pipeline_demo/README.md)
+- [projects/internal_hybrid_rag_demo](../projects/internal_hybrid_rag_demo/README.md)
 
 建议拆成这些部分：
 
@@ -16,3 +17,4 @@
 - multi-query
 - 引用来源展示
 - 评估与调优
+- 社内文件与 Wiki 混合检索

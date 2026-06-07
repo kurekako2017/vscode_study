@@ -16,6 +16,13 @@
 - 前端端口：`5174`
 - 数据库改为本地 H2 文件库，路径在项目 `data/` 目录下
 - 原始 `JtProject` 保持不变，这里是独立副本
+- `src/main/webapp/views/` 里的 JSP 仍保留在项目中，并且当前仍被部分后端控制器使用
+
+## 现状说明
+
+这个项目不是纯 Vue 项目，而是“Spring Boot + Vue 3 + JSP 对照页”的混合结构。
+
+如果你要把它继续往纯 Vue 方向推进，需要先确认哪些 Controller 还在返回 JSP 视图，再逐步迁移到 API + Vue 页面。
 
 ## 快速启动（Windows / PowerShell）
 

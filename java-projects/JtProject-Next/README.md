@@ -60,12 +60,18 @@ http://localhost:3000
 
 ## 项目结构
 
-- `src/main/java`：Spring Boot 后端源码
+- `src/main/java`：Spring Boot 后端源码，部分控制器仍返回 JSP 视图
 - `src/main/resources`：后端配置、初始化数据、静态资源
-- `src/main/webapp/views`：原始 JSP 页面副本，保留作对照
+- `src/main/webapp/views`：原始 JSP 页面副本，当前仍保留在运行链路中，不能直接删除
 - `frontend/app`：Next.js App Router 页面，重点看 `layout.tsx` 和 `page.tsx`
 - `frontend/lib`：TypeScript 类型和 API 封装
 - `doc/reference/nextjs-typescript-flow.md`：Next.js + TypeScript 前后端流程图
+
+## 现状说明
+
+这个项目不是纯 Next.js 项目，而是“Spring Boot + Next.js + JSP 对照页”的混合结构。
+
+如果你要把它继续往纯 Next 方向推进，需要先确认哪些 Controller 还在返回 JSP 视图，再逐步迁移到 API + Next 页面。
 
 ## 学习重点
 

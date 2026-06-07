@@ -58,6 +58,7 @@
 | [projects/langchain_chain_demo](./projects/langchain_chain_demo/README.md) | LangChain 链式编排、Prompt、输出解析 | `python3 main.py "..." --mock` |
 | [projects/langgraph_workflow_demo](./projects/langgraph_workflow_demo/README.md) | LangGraph 状态图、分支、循环 | `python3 main.py "..."` |
 | [projects/advanced_rag_pipeline_demo](./projects/advanced_rag_pipeline_demo/README.md) | 高级 RAG、切分、检索、rerank、引用 | `python3 main.py "..."` |
+| [projects/internal_hybrid_rag_demo](./projects/internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索、权限过滤、引用 | `python3 main.py "..." --role employee` |
 | [projects/llamaindex_index_demo](./projects/llamaindex_index_demo/README.md) | LlamaIndex 风格的索引和查询引擎概念 | `python3 main.py "..."` |
 | [projects/multi_agent_team_demo](./projects/multi_agent_team_demo/README.md) | 多 Agent 协作、监督者、规划者、审校者 | `python3 main.py "..."` |
 
@@ -65,6 +66,7 @@
 
 - 框架对比笔记
 - 高级 RAG 管线拆解
+- 社内文件 + Wiki 混合检索
 - 多 Agent 协调模式
 - React 客户端与 API 的联调
 - 评估体系、Tracing、日志、成本控制

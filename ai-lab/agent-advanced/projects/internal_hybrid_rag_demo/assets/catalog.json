@@ -1,0 +1,50 @@
+[
+  {
+    "doc_id": "server-vacation",
+    "source_type": "server",
+    "title": "休假与远程办公制度",
+    "path": "server_docs/vacation_policy.md",
+    "acl": ["employee", "manager", "it_admin"],
+    "url": "file://server_docs/vacation_policy.md"
+  },
+  {
+    "doc_id": "server-expense",
+    "source_type": "server",
+    "title": "差旅与报销流程",
+    "path": "server_docs/expense_policy.md",
+    "acl": ["employee", "manager", "it_admin"],
+    "url": "file://server_docs/expense_policy.md"
+  },
+  {
+    "doc_id": "server-incident",
+    "source_type": "server",
+    "title": "事故响应与升级制度",
+    "path": "server_docs/incident_response.md",
+    "acl": ["manager", "it_admin"],
+    "url": "file://server_docs/incident_response.md"
+  },
+  {
+    "doc_id": "wiki-deployment",
+    "source_type": "wiki",
+    "title": "发布与部署 FAQ",
+    "path": "wiki_docs/deployment_faq.md",
+    "acl": ["employee", "manager", "it_admin"],
+    "url": "wiki://deployment-faq"
+  },
+  {
+    "doc_id": "wiki-guide",
+    "source_type": "wiki",
+    "title": "应用部署操作指南",
+    "path": "wiki_docs/deployment_guide.md",
+    "acl": ["employee", "manager", "it_admin"],
+    "url": "wiki://deployment-guide"
+  },
+  {
+    "doc_id": "wiki-access",
+    "source_type": "wiki",
+    "title": "访问控制与权限矩阵",
+    "path": "wiki_docs/access_matrix.md",
+    "acl": ["manager", "it_admin"],
+    "url": "wiki://access-matrix"
+  }
+]
