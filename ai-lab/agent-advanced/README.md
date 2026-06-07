@@ -37,10 +37,12 @@
 
 1. [学习路线](./学习路线.md)
 2. [核心技术栈总览](./核心技术栈总览.md)
-3. [projects/](./projects/README.md) 里的可运行案例
-4. `frameworks/` 下的框架专题
-5. `rag/` 下的高级检索专题
-6. `multi-agent/` 下的多 Agent 专题
+3. [开发测试部署流程](./开发测试部署流程.md)
+4. [交付前检查清单](./交付前检查清单.md)
+5. [projects/](./projects/README.md) 里的可运行案例
+6. `frameworks/` 下的框架专题
+7. `rag/` 下的高级检索专题
+8. `multi-agent/` 下的多 Agent 专题
 
 ## 先看什么
 
@@ -48,8 +50,10 @@
 
 1. 先看 [学习路线](./学习路线.md)，知道这条线怎么学
 2. 再看 [核心技术栈总览](./核心技术栈总览.md)，知道现在缺什么、补什么
-3. 打开 [projects/README.md](./projects/README.md)，直接跑最小可运行 demo
-4. 回到 `frameworks/`、`rag/`、`multi-agent/` 里补概念和对比
+3. 看 [开发测试部署流程](./开发测试部署流程.md)，先把测试和上线顺序记住
+4. 看 [交付前检查清单](./交付前检查清单.md)，把交付前该勾的项列出来
+5. 打开 [projects/README.md](./projects/README.md)，直接跑最小可运行 demo
+6. 回到 `frameworks/`、`rag/`、`multi-agent/` 里补概念和对比
 
 ## 可运行案例
 
