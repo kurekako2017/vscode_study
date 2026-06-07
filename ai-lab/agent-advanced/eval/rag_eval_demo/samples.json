@@ -1,0 +1,14 @@
+[
+  {
+    "question": "远程办公申请怎么走？",
+    "gold_sources": ["休假与远程办公制度"],
+    "retrieved_sources": ["休假与远程办公制度", "发布与部署 FAQ"],
+    "answer": "先申请再远程办公。"
+  },
+  {
+    "question": "事故发生后怎么升级？",
+    "gold_sources": ["事故响应与升级制度"],
+    "retrieved_sources": ["差旅与报销流程", "事故响应与升级制度"],
+    "answer": "生产事故需要按升级路径通报。"
+  }
+]

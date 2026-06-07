@@ -16,38 +16,52 @@ from langgraph.graph import END, START, StateGraph
 
 
 class WorkflowState(TypedDict, total=False):
+    # 当前主题。
     topic: str
+    # 分类后的任务意图。
     intent: str
+    # 研究阶段收集到的笔记。
     research_notes: list[str]
+    # 草稿文本。
     draft: str
+    # 审核意见。
     review_notes: list[str]
+    # 修订轮次。
     revision_round: int
+    # 最终输出。
     final_answer: str
 
 
 def parse_args() -> argparse.Namespace:
+    # 创建命令行参数解析器。
     parser = argparse.ArgumentParser(description="LangGraph 风格最小状态图 demo")
+    # 主题参数有默认值，这样可以直接运行。
     parser.add_argument(
         "topic",
         nargs="?",
         default="LangGraph 适合什么场景",
         help="要处理的主题",
     )
+    # 解析参数并返回。
     return parser.parse_args()
 
 
 def classify_intent(state: WorkflowState) -> dict:
+    # 从状态里取出主题。
     topic = state["topic"]
+    # 根据主题中的关键词来判断任务类型。
     if any(key in topic for key in ["区别", "对比", "比较"]):
         intent = "compare"
     elif any(key.lower() in topic.lower() for key in ["rag", "retrieval"]):
         intent = "rag"
     else:
         intent = "explain"
+    # 返回局部更新值，LangGraph 会把它合并进状态。
     return {"intent": intent, "revision_round": state.get("revision_round", 0)}
 
 
 def research(state: WorkflowState) -> dict:
+    # 根据意图准备不同的研究笔记。
     intent = state["intent"]
     if intent == "compare":
         notes = [
@@ -67,55 +81,73 @@ def research(state: WorkflowState) -> dict:
             "再补一个最小流程图。",
             "最后给出实践建议。",
         ]
+    # 只更新 research_notes。
     return {"research_notes": notes}
 
 
 def draft(state: WorkflowState) -> dict:
+    # 读取前面节点的输入。
     topic = state["topic"]
     intent = state["intent"]
     notes = state["research_notes"]
+    # 把研究笔记整理成草稿文本。
     draft_text = (
         f"主题：{topic}\n"
         f"意图：{intent}\n"
         "要点：\n- " + "\n- ".join(notes)
     )
+    # 返回草稿。
     return {"draft": draft_text}
 
 
 def review(state: WorkflowState) -> dict:
+    # 审核阶段只检查草稿够不够完整。
     draft_text = state["draft"]
+    # review_notes 用于存放问题列表。
     review_notes = []
+    # 太短说明内容还不够展开。
     if len(draft_text) < 120:
         review_notes.append("内容偏短，建议补充实践建议。")
+    # 如果没有“步骤”这个词，就提示补步骤。
     if "步骤" not in draft_text:
         review_notes.append("建议加入步骤化表达。")
+    # 没有问题就直接通过。
     if not review_notes:
         review_notes.append("通过。")
+    # 返回审核意见。
     return {"review_notes": review_notes}
 
 
 def revise(state: WorkflowState) -> dict:
+    # 在原草稿基础上追加补充说明。
     revised = state["draft"] + "\n\n补充：\n- 这是一条从状态到节点再到边的最小工作流。"
+    # revision_round + 1 表示修订次数加一。
     return {"draft": revised, "revision_round": state.get("revision_round", 0) + 1}
 
 
 def route_after_review(state: WorkflowState) -> Literal["revise", "finalize"]:
+    # 如果还没修订过，而且审核意见不是通过，就走 revise。
     if state.get("revision_round", 0) < 1 and state.get("review_notes") != ["通过。"]:
         return "revise"
+    # 否则直接收尾。
     return "finalize"
 
 
 def finalize(state: WorkflowState) -> dict:
+    # 把草稿和审核意见拼起来，形成最终答案。
     final = (
         f"{state['draft']}\n\n"
         f"审核结果：{'；'.join(state.get('review_notes', []))}\n"
         "结论：这张图已经具备最小的规划、执行和回路控制能力。"
     )
+    # 只写回 final_answer。
     return {"final_answer": final}
 
 
 def build_app():
+    # 创建一个 StateGraph，泛型参数是 WorkflowState。
     graph = StateGraph(WorkflowState)
+    # 添加节点。
     graph.add_node("classify_intent", classify_intent)
     graph.add_node("research", research)
     graph.add_node("draft", draft)
@@ -123,10 +155,13 @@ def build_app():
     graph.add_node("revise", revise)
     graph.add_node("finalize", finalize)
 
+    # 从 START 进入第一个节点。
     graph.add_edge(START, "classify_intent")
+    # 按固定顺序连接前半段。
     graph.add_edge("classify_intent", "research")
     graph.add_edge("research", "draft")
     graph.add_edge("draft", "review")
+    # 审核节点后面要根据状态决定走哪条边。
     graph.add_conditional_edges(
         "review",
         route_after_review,
@@ -135,18 +170,26 @@ def build_app():
             "finalize": "finalize",
         },
     )
+    # revise 后回到 review，形成循环。
     graph.add_edge("revise", "review")
+    # finalize 后结束。
     graph.add_edge("finalize", END)
+    # 编译后得到可执行 app。
     return graph.compile()
 
 
 def main() -> None:
+    # 解析命令行主题。
     args = parse_args()
+    # 构建并编译工作流。
     app = build_app()
+    # 初始状态里放入主题和修订轮次。
     result = app.invoke({"topic": args.topic, "revision_round": 0})
 
+    # 打印流程图。
     print("=== LangGraph Mermaid ===")
     print(app.get_graph().draw_mermaid())
+    # 打印最终结果。
     print("=== 最终结果 ===")
     print(result["final_answer"])
 

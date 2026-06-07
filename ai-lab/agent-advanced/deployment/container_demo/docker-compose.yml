@@ -1,0 +1,7 @@
+services:
+  demo:
+    build: .
+    ports:
+      - "8088:8088"
+    environment:
+      APP_NAME: agent-advanced-container-demo

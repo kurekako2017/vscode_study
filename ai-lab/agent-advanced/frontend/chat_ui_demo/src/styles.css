@@ -1,0 +1,108 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #e5eef7;
+  background: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+.page {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  padding: 24px;
+}
+
+.panel {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+.header h1,
+.sidebar h2 {
+  margin: 0 0 8px;
+}
+
+.header p {
+  margin: 0 0 16px;
+  color: #94a3b8;
+}
+
+.composer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.composer input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #0b1120;
+  color: #e2e8f0;
+}
+
+.composer button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: #082f49;
+  font-weight: 700;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bubble {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+}
+
+.bubble.user {
+  background: #1e293b;
+}
+
+.bubble.assistant {
+  background: #172554;
+}
+
+.bubble p {
+  margin: 8px 0 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.sidebar li {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+}
+
+.sidebar span,
+.sidebar em {
+  color: #94a3b8;
+  font-style: normal;
+}

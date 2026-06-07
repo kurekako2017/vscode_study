@@ -62,6 +62,14 @@
 | [projects/llamaindex_index_demo](./projects/llamaindex_index_demo/README.md) | LlamaIndex 风格的索引和查询引擎概念 | `python3 main.py "..."` |
 | [projects/multi_agent_team_demo](./projects/multi_agent_team_demo/README.md) | 多 Agent 协作、监督者、规划者、审校者 | `python3 main.py "..."` |
 
+## 专题代码
+
+| 目录 | 角色 | 说明 |
+| --- | --- | --- |
+| [frontend/](./frontend/README.md) | 前端专题区 | 这里放 Agent / RAG 前端接入说明和 React UI demo |
+| [eval/](./eval/README.md) | 评估专题区 | 这里放 RAG / Agent 评估说明和本地评估脚本 |
+| [deployment/](./deployment/README.md) | 部署专题区 | 这里放 Docker / 环境变量 / 发布方式示例 |
+
 ## 未来会放什么
 
 - 框架对比笔记

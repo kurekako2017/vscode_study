@@ -21,6 +21,14 @@
 | [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex 概念版索引 | Document、Node、Index、QueryEngine | `python3 main.py "LlamaIndex 和 LangChain 有什么区别？"` |
 | [multi_agent_team_demo](./multi_agent_team_demo/README.md) | 多 Agent 协作 | Planner、Researcher、Writer、Critic、Supervisor | `python3 main.py "如何学习 LangGraph 和高级 RAG"` |
 
+## 专题代码区
+
+| 目录 | 主题 | 你会学到什么 |
+| --- | --- | --- |
+| [../frontend](../frontend/README.md) | 前端专题 | React UI 壳、消息流、来源展示 |
+| [../eval](../eval/README.md) | 评估专题 | RAG 命中率、引用覆盖率、本地评估报告 |
+| [../deployment](../deployment/README.md) | 部署专题 | Docker、环境变量、最小可容器化服务 |
+
 ## 目录阅读建议
 
 先跑代码，再回来看文档：
@@ -31,5 +39,8 @@
 4. `internal_hybrid_rag_demo/`
 5. `llamaindex_index_demo/`
 6. `multi_agent_team_demo/`
+7. `../frontend/chat_ui_demo/`
+8. `../eval/rag_eval_demo/`
+9. `../deployment/container_demo/`
 
 每个目录里的 `README.md` 都只讲这一小段代码，不会把所有概念混在一起。

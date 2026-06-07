@@ -19,12 +19,19 @@ from typing import Iterable
 
 @dataclass
 class TeamState:
+    # 当前主题。
     topic: str
+    # 规划出来的任务列表。
     plan: list[str] = field(default_factory=list)
+    # 调研笔记。
     research_notes: list[str] = field(default_factory=list)
+    # 草稿文本。
     draft: str = ""
+    # 批评/审核意见。
     critique: list[str] = field(default_factory=list)
+    # 最终答案。
     final_answer: str = ""
+    # 协作日志。
     log: list[str] = field(default_factory=list)
 
 
@@ -49,17 +56,21 @@ KNOWLEDGE_BASE = {
 
 
 def parse_args() -> argparse.Namespace:
+    # 创建命令行解析器。
     parser = argparse.ArgumentParser(description="多 Agent 协作 demo")
+    # 主题参数。
     parser.add_argument(
         "topic",
         nargs="?",
         default="如何学习 LangGraph 和高级 RAG",
         help="要协作处理的主题",
     )
+    # 返回解析结果。
     return parser.parse_args()
 
 
 def planner_agent(topic: str) -> list[str]:
+    # planner 负责把大主题拆成更小的任务。
     if any(word in topic.lower() for word in ["rag", "检索"]):
         return ["梳理检索目标", "整理检索策略", "给出引用与调优建议"]
     if any(word in topic.lower() for word in ["graph", "workflow", "langgraph"]):
@@ -68,6 +79,7 @@ def planner_agent(topic: str) -> list[str]:
 
 
 def expand_keywords(topic: str) -> Iterable[str]:
+    # 根据主题从知识库里挑关键字。
     lower = topic.lower()
     for key in KNOWLEDGE_BASE:
         if key in lower or key in topic:
@@ -75,20 +87,26 @@ def expand_keywords(topic: str) -> Iterable[str]:
 
 
 def researcher_agent(topic: str, plan: list[str]) -> list[str]:
+    # 调研结果。
     notes: list[str] = []
+    # 把知识库里对应主题的知识补进来。
     for keyword in expand_keywords(topic):
         notes.extend(KNOWLEDGE_BASE[keyword])
+    # 如果没有命中知识库，就使用通用模板。
     if not notes:
         notes = [
             "先明确问题背景。",
             "再给出可执行步骤。",
             "最后补充风险与下一步。",
         ]
+    # 把 plan 里的任务也转换成 notes。
     notes.extend([f"执行项：{item}" for item in plan])
+    # 返回调研笔记。
     return notes
 
 
 def writer_agent(topic: str, plan: list[str], research_notes: list[str]) -> str:
+    # writer 负责把信息组织成可读内容。
     return (
         f"主题：{topic}\n\n"
         "计划：\n- " + "\n- ".join(plan) + "\n\n"
@@ -98,39 +116,53 @@ def writer_agent(topic: str, plan: list[str], research_notes: list[str]) -> str:
 
 
 def critic_agent(draft: str) -> list[str]:
+    # critic 负责找缺点。
     issues = []
+    # 缺少风险就是一个常见问题。
     if "风险" not in draft:
         issues.append("缺少风险提示")
+    # 没有步骤化表达也要提醒。
     if "步骤" not in draft and "计划" not in draft:
         issues.append("缺少步骤化表达")
+    # 没有结论就不完整。
     if "结论" not in draft:
         issues.append("缺少最终结论")
+    # 返回问题列表。
     return issues
 
 
 def supervisor(topic: str) -> TeamState:
+    # 创建一个共享状态对象。
     state = TeamState(topic=topic)
+    # 记录流程日志。
     state.log.append("Supervisor: 开始任务")
 
+    # 先让 planner 产出计划。
     state.plan = planner_agent(topic)
     state.log.append(f"Planner: {state.plan}")
 
+    # 再让 researcher 基于 plan 收集知识。
     state.research_notes = researcher_agent(topic, state.plan)
     state.log.append(f"Researcher: 收集到 {len(state.research_notes)} 条研究要点")
 
+    # writer 生成第一版草稿。
     state.draft = writer_agent(topic, state.plan, state.research_notes)
     state.log.append("Writer: 生成第一版草稿")
 
+    # critic 检查草稿是否完整。
     state.critique = critic_agent(state.draft)
     state.log.append(f"Critic: {state.critique or ['通过']}")
 
+    # 如果有问题，就进入第二轮修订。
     if state.critique:
+        # 补充一条说明，告诉 writer 应该补风险等内容。
         state.research_notes.append("补充：需要显式写出风险、步骤和结论。")
         state.draft = writer_agent(topic, state.plan, state.research_notes)
         state.critique = critic_agent(state.draft)
         state.log.append("Writer: 根据 Critic 反馈修订草稿")
         state.log.append(f"Critic: {state.critique or ['通过']}")
 
+    # 拼成最终答案。
     state.final_answer = (
         state.draft
         + "\n\n"
@@ -138,13 +170,17 @@ def supervisor(topic: str) -> TeamState:
         + "\n- ".join(state.log)
         + "\n\n风险提示：多 Agent 适合复杂任务，但角色过多时要注意成本和终止条件。"
     )
+    # 返回整个状态。
     return state
 
 
 def main() -> None:
+    # 读取参数。
     args = parse_args()
+    # 运行监督者流程。
     state = supervisor(args.topic)
 
+    # 打印最终答案。
     print("=== 最终答案 ===")
     print(state.final_answer)
 
