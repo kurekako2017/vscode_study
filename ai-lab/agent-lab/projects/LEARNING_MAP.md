@@ -151,7 +151,12 @@ python3 main.py "哪些文件提到了 tool calling" --docs ../../..
 
 ```bash
 cd ai-lab/agent-lab/projects/rag_api_demo
-uvicorn main:app --reload --port 8000
+./run-dev.sh
+```
+
+服务启动后，再在另一个终端执行：
+
+```bash
 curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"请总结文档重点"}'
 ```
 

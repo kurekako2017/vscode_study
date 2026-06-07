@@ -87,23 +87,32 @@ def build_client() -> OpenAI:
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
+    # 如果 force_mock 为 True，则返回 "mock"
     if force_mock:
+        # 返回 "mock"     （返回 "mock"）
         return "mock"
     if force_real:
+        # 如果 OPENAI_API_KEY 未设置，则打印错误信息并退出     （如果 OPENAI_API_KEY 未设置，则打印错误信息并退出）
         if not os.getenv("OPENAI_API_KEY"):
+            # 退出程序     （退出程序）
             print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
             sys.exit(1)
+        # 返回 "real"     （返回 "real"）
         return "real"
+    # 如果 OPENAI_API_KEY 设置，则返回 "real"     （如果 OPENAI_API_KEY 设置，则返回 "real"）
+    # 如果 OPENAI_API_KEY 未设置，则返回 "mock"     （如果 OPENAI_API_KEY 未设置，则返回 "mock"）
     return "real" if os.getenv("OPENAI_API_KEY") else "mock"
 
 
 def build_mock_analysis(prompt: str) -> str:
     """生成离线用的分析文本示例，便于学习流程。"""
+    # 返回一个符合分析文本示例的文本     （返回一个符合分析文本示例的文本）
     return f"[MOCK MODE] Analysis for: {prompt}\n- goals: mock goal\n- constraints: none"
 
 
 def build_mock_plan(prompt: str) -> WorkflowPlan:
     """生成离线用的结构化计划示例（Pydantic 模型）。"""
+    # 返回一个符合 WorkflowPlan 结构的示例数据     （返回一个符合 WorkflowPlan 结构的示例数据）
     return WorkflowPlan(
         goal=f"Mock plan for: {prompt}",
         priority="medium",
@@ -115,6 +124,7 @@ def build_mock_plan(prompt: str) -> WorkflowPlan:
 
 def build_mock_final(prompt: str) -> str:
     """生成离线用的最终建议示例。"""
+    # 返回一个符合最终建议示例的文本     （返回一个符合最终建议示例的文本）
     return f"[MOCK MODE] Final recommendation for: {prompt}"
 
 
@@ -126,11 +136,14 @@ def analyze_task(client: OpenAI | None, model: str, prompt: str, mode: str) -> s
     """
     if mode == "mock":
         return build_mock_analysis(prompt)
+    # 使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入     （使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入）
+    # 返回模型的输出文本     （返回模型的输出文本）
     response = client.responses.create(
         model=model,
         instructions=ANALYZE_INSTRUCTIONS,
         input=prompt,
     )
+    # 返回模型的输出文本     （返回模型的输出文本）
     return response.output_text
 
 
@@ -142,12 +155,15 @@ def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> Wo
     """
     if mode == "mock":
         return build_mock_plan(analysis)
+    # 使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入     （使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入）
+    # 返回模型的输出文本     （返回模型的输出文本）
     response = client.responses.parse(
         model=model,
         instructions=PLAN_INSTRUCTIONS,
         input=analysis,
         text_format=WorkflowPlan,
     )
+    # 返回模型的输出文本     （返回模型的输出文本）
     return response.output_parsed
 
 
@@ -166,11 +182,14 @@ def finalize_task(client: OpenAI | None, model: str, analysis: str, plan: Workfl
         "Plan:\n"
         f"{json.dumps(plan.model_dump(), ensure_ascii=False, indent=2)}"
     )
+    # 使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入     （使用 Responses API 请求模型，返回的文本将作为 plan 阶段的输入）
+    # 返回模型的输出文本     （返回模型的输出文本）
     response = client.responses.create(
         model=model,
         instructions=FINALIZE_INSTRUCTIONS,
         input=final_input,
     )
+    # 返回模型的输出文本     （返回模型的输出文本）
     return response.output_text
 
 
@@ -180,24 +199,33 @@ def main() -> None:
     args = parse_args()
     mode = resolve_mode(args.mock, args.real)
     client = None
+    # 如果 mode 为 "real"，则构建客户端     （如果 mode 为 "real"，则构建客户端）
     if mode == "real":
+        # 构建客户端     （构建客户端）
         client = build_client()
 
     try:
         # 分阶段执行：先分析，再计划，最后总结
         analysis = analyze_task(client, args.model, args.prompt, mode)
+        # 计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）     （计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证））
         plan = plan_task(client, args.model, analysis, mode)
+        # 总结阶段：基于分析与计划生成最终简短建议     （总结阶段：基于分析与计划生成最终简短建议）
         final_summary = finalize_task(client, args.model, analysis, plan, mode)
     except Exception as exc:
+        # 打印错误信息     （打印错误信息）
         print(f"ERROR: request failed: {exc}", file=sys.stderr)
         sys.exit(1)
 
     # 打印每个阶段的结果，便于学习和调试
     print("=== Step 1: Analysis ===")
+    # 打印分析结果     （打印分析结果）
     print(analysis)
+    # 打印计划结果     （打印计划结果）
     print("\n=== Step 2: Plan ===")
     print(json.dumps(plan.model_dump(), ensure_ascii=False, indent=2))
+    # 打印总结结果     （打印总结结果）
     print("\n=== Step 3: Final Summary ===")
+    # 打印总结结果     （打印总结结果）
     print(final_summary)
 
 

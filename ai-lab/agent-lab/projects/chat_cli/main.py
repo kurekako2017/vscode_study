@@ -37,52 +37,51 @@ except ImportError:  # pragma: no cover - used only when dependency is missing
 
 DEFAULT_MODEL = "gpt-5"
 """默认模型名，可用 `--model` 覆盖。"""
-
+# 系统提示词，用于告诉模型如何回答问题
 SYSTEM_INSTRUCTIONS = (
-    "You are a concise assistant for an LLM agent learning lab. "
-    "Answer clearly and briefly."
+    "你是一个简洁的助手，用于一个 LLM 代理学习实验室。"
+    "回答清晰明了。"
 )
 
-
+# 层次: 输入层 — 负责命令行参数的定义与解析
 def parse_args() -> argparse.Namespace:
-    # 层次: 输入层 — 负责命令行参数的定义与解析
     """解析命令行参数：支持自动模式、强制模式与输出截断配置。"""
     parser = argparse.ArgumentParser(
         description="最小 OpenAI 响应 API 聊天 CLI 演示程序."
     )
-    # 一个可选的位置参数：一次性提问（若省略则进入交互模式）
+    # 用户任务 ：用户任务说明
     parser.add_argument(
         "prompt",
-        nargs="?",
-        help="Optional one-shot prompt. If omitted, interactive mode starts.",
+        help="用户任务说明",
     )
+    # 模型名 ：使用的模型名
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
-        help=f"Model name to use. Default: {DEFAULT_MODEL}",
+        help=f"使用的模型名。默认: {DEFAULT_MODEL}",
     )
     # 模式选择：互斥组，分别强制 mock 或强制 real
     mode_group = parser.add_mutually_exclusive_group()
     mode_group.add_argument(
         "--mock",
         action="store_true",
-        help="Force mock mode (no API key required).",
+        help="强制 mock 模式（无需 API 密钥）。",
     )
     mode_group.add_argument(
         "--real",
         action="store_true",
-        help="Force real API mode (requires OPENAI_API_KEY).",
+        help="强制真实 API 模式（需要 OPENAI_API_KEY）。",
     )
     parser.add_argument(
         "--max-chars",
         type=int,
         default=None,
-        help="Optional max output characters. Example: --max-chars 120",
+        help="可选的最大输出字符数。示例：--max-chars 120",
     )
     return parser.parse_args()
 
 # 层次划分说明：环境检查、模式决策、客户端构建、单次调用封装、输出格式化、交互循环等功能被划分为不同层次，便于理解和练习程序结构。
-# - 输入层：负责解析命令行参数，定义用户可配置的选项        
+# - 基础设施层：负责客户端构建与外部依赖读取     （构建客户端并返回实例）       
 def build_client(use_mock: bool) -> Any:
     # 层次: 基础设施层 — 负责客户端构建与外部依赖读取
     """从环境变量读取 API Key 并返回 OpenAI 客户端实例。
@@ -117,22 +116,27 @@ def resolve_mode(force_mock: bool, force_real: bool) -> bool:
     - 明确 `--real`：使用真实 API
     - 未指定：检测环境，缺少 Key 或 SDK 时自动使用 mock
     """
+    # 如果明确指定使用 mock 模式，则返回 True
     if force_mock:
         return True
 
+    # 如果明确指定使用真实模式，则返回 False
     if force_real:
         return False
 
+    # 如果未指定模式，则根据环境变量决定使用哪种模式
     if not os.getenv("OPENAI_API_KEY"):
-        # 没有找到 API Key，自动切换到 mock 模式（本地演练而不触网）
+        # 没有找到 API Key，自动切换到 mock 模式（本地演练而不触网）     （如果未找到 API Key，则自动切换到 mock 模式）
         print("INFO: 未设置 OPENAI_API_KEY，自动切换到 MOCK 模式.", file=sys.stderr)
         return True
 
+    # 如果未安装 SDK，则自动切换到 mock 模式     （如果未安装 SDK，则自动切换到 mock 模式）
     if OpenAI is None:
-        # 未安装 SDK 时也自动切换到 mock，避免运行时出错
+        # 未安装 SDK 时也自动切换到 mock，避免运行时出错     （如果未安装 SDK，则自动切换到 mock 模式）  （如果未安装 SDK，则自动切换到 mock 模式）
         print("INFO: openai package not installed, auto-switching to MOCK mode.", file=sys.stderr)
         return True
 
+    # 如果未指定模式，则根据环境变量决定使用哪种模式     （如果未指定模式，则根据环境变量决定使用哪种模式）
     return False
 
 
@@ -184,16 +188,21 @@ def format_output(answer: str, max_chars: int | None) -> str:
     示例：
         format_output("Hello world", 5) -> "Hello\n...[truncated 6 chars]"
     """
+    # 如果 max_chars 为 None，则返回完整 answer
     if max_chars is None:
         return answer
 
+    # 如果 max_chars 小于等于 0，则抛出异常
     if max_chars <= 0:
         raise ValueError("--max-chars must be greater than 0")
 
+    # 如果 answer 长度小于等于 max_chars，则返回完整 answer
     if len(answer) <= max_chars:
         return answer
 
+    # 计算被截断的字符数
     omitted = len(answer) - max_chars
+    # 返回截断后的 answer     （返回截断后的 answer，并在末尾标注被省略的字符数）
     return f"{answer[:max_chars]}\n...[truncated {omitted} chars]"
 
 
@@ -202,22 +211,29 @@ def run_interactive(client: Any, model: str, use_mock: bool, max_chars: int | No
     """进入交互循环，逐条读取用户输入并请求模型回答。"""
     # 启动提示信息
     print(f"chat_cli 以模型启动: {model}")
+    # 如果 use_mock 为 True，则打印提示信息
     if use_mock:
+        # 打印提示信息     （如果 use_mock 为 True，则打印提示信息）
         print("以模拟模式运行（无需 API 密钥）.")
+    # 打印提示信息     （如果 use_mock 为 False，则打印提示信息）
     print("Type 'exit' or 'quit' to stop.")
+    # 打印提示信息     （如果 use_mock 为 False，则打印提示信息）
 
     # 循环读取用户输入，逐次发起模型请求
     while True:
         try:
             # 从标准输入读取用户的问题
+            # 从标准输入读取用户的问题     （从标准输入读取用户的问题）
             user_input = input("\nYou> ").strip()
         except (EOFError, KeyboardInterrupt):
             # 当用户按 Ctrl+C 或 Ctrl+D 时优雅退出
+            # 当用户按 Ctrl+C 或 Ctrl+D 时优雅退出     （当用户按 Ctrl+C 或 Ctrl+D 时优雅退出）
             print("\nBye.")
             return
 
         # 忽略空输入
         if not user_input:
+            # 忽略空输入     （如果 user_input 为空，则继续循环）
             continue
 
         # 支持键入 'exit' 或 'quit' 来结束交互

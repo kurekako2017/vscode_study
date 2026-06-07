@@ -25,18 +25,22 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
-from openai import OpenAI
+from fastapi import FastAPI, HTTPException  # pyright: ignore[reportMissingImports]
+from openai import OpenAI  # pyright: ignore[reportMissingImports]
 from pydantic import BaseModel, Field
-from pypdf import PdfReader
+from pypdf import PdfReader  # pyright: ignore[reportMissingImports]    
 
-
+# 默认模型名
 DEFAULT_MODEL = "gpt-5"
 DEFAULT_DOCS_DIR = "."
 SUPPORTED_EXTENSIONS = {".md", ".txt", ".pdf"}
+# 每个 chunk 的大小
 CHUNK_SIZE = 1200
+# 每个 chunk 的重叠大小
 CHUNK_OVERLAP = 200
+# 每个问题返回的 chunk 数量
 TOP_K = 4
+# 系统指令
 SYSTEM_INSTRUCTIONS = (
     "You are a document QA assistant for a Japanese IT project learning lab. "
     "Answer only from the provided retrieved context. "
@@ -44,7 +48,7 @@ SYSTEM_INSTRUCTIONS = (
     "Mention source labels when possible."
 )
 
-
+# 文档切分后的片段对象：包含来源标签、内容与得分。
 @dataclass
 class Chunk:
     """文档切分后的片段对象：包含来源标签、内容与得分。"""
@@ -53,18 +57,21 @@ class Chunk:
     score: int = 0
 
 
+# /ask 请求体：问题文本 + 可选模型名。
 class AskRequest(BaseModel):
     """/ask 请求体：问题文本 + 可选模型名。"""
     question: str = Field(min_length=1, description="Question about local documents.")
     model: str = Field(default=DEFAULT_MODEL, description="OpenAI model to use.")
 
 
+# 来源条目：用于告诉调用方答案依据来自哪些文档片段。
 class SourceItem(BaseModel):
     """来源条目：用于告诉调用方答案依据来自哪些文档片段。"""
     source_label: str
     score: int
 
 
+# /ask 响应体：答案正文 + 来源摘要，便于前端或调用方渲染。
 class AskResponse(BaseModel):
     """/ask 响应体：答案正文 + 来源摘要，便于前端或调用方渲染。"""
     answer: str
@@ -74,12 +81,14 @@ class AskResponse(BaseModel):
     sources: list[SourceItem]
 
 
+# /reload 响应体：用于确认文档索引是否已刷新。
 class ReloadResponse(BaseModel):
     """/reload 响应体：用于确认文档索引是否已刷新。"""
     docs_dir: str
     chunk_count: int
 
 
+# 构建 OpenAI 客户端，缺失抛出异常以便上层处理。
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并在缺失时抛出以便上层处理
     """根据环境变量创建 OpenAI 客户端，缺失抛出异常以便上层处理。
@@ -92,6 +101,7 @@ def build_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
+# 决定服务运行模式：'mock' 或 'real'。可通过环境变量 RAG_API_MOCK=1 强制 mock。
 def resolve_mode() -> str:
     """决定服务运行模式：'mock' 或 'real'。可通过环境变量 RAG_API_MOCK=1 强制 mock。
 
@@ -102,6 +112,7 @@ def resolve_mode() -> str:
     return "real" if os.getenv("OPENAI_API_KEY") else "mock"
 
 
+# 生成 RAG mock 回答，包含检索提示与练习建议。
 def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
     """生成 RAG mock 回答，包含检索提示与练习建议。
 
@@ -113,6 +124,7 @@ def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
     return "\n".join(lines)
 
 
+# 获取并校验用于 RAG 的文档目录（可通过环境变量覆盖）。
 def get_docs_dir() -> Path:
     # 层次: 配置/IO 层 — 解析并校验文档目录配置
     """获取并校验用于 RAG 的文档目录（可通过环境变量覆盖）。"""
@@ -134,81 +146,108 @@ def iter_text_files(base_dir: Path) -> list[Path]:
 
 
 def read_document_text(file_path: Path) -> str:
-    # 层次: IO/解析层 — 根据文件类型提取文本（支持 md/txt/pdf）
-    """根据文件类型读取文本内容；对 PDF 使用 `pypdf` 做基本提取。"""
+    """根据文件类型读取文本内容；对 PDF 使用 pypdf 做基本提取。"""
+    # 获取文件后缀     （获取文件后缀）
     suffix = file_path.suffix.lower()
-
-    if suffix in {".md", ".txt"}:
-        return file_path.read_text(encoding="utf-8")
-
+    # 如果文件后缀为 .pdf，则使用 pypdf 读取文本     （如果文件后缀为 .pdf，则使用 pypdf 读取文本）
     if suffix == ".pdf":
-        # PDF text extraction quality depends on the original document structure.
         reader = PdfReader(str(file_path))
-        pages = []
-        for index, page in enumerate(reader.pages, start=1):
-            text = page.extract_text() or ""
-            if text.strip():
-                pages.append(f"[PAGE {index}]\n{text}")
-        return "\n\n".join(pages)
-
-    raise ValueError(f"Unsupported file type: {suffix}")
+        # 初始化 parts 列表     （初始化 parts 列表）
+        parts: list[str] = []
+        # 遍历每一页     （遍历每一页）
+        for page in reader.pages:
+            text = page.extract_text()
+            # 如果 text 不为空，则添加到 parts 列表     （如果 text 不为空，则添加到 parts 列表）
+            if text:
+                # 添加 text     （添加 text）
+                parts.append(text)
+        # 返回 parts 列表     （返回 parts 列表）
+        return "\n".join(parts)
+    # 如果文件后缀为 .txt 或 .md，则使用 read_text 读取文本     （如果文件后缀为 .txt 或 .md，则使用 read_text 读取文本）
+    elif suffix == ".txt" or suffix == ".md":
+        return file_path.read_text(encoding="utf-8")
+    # 如果文件后缀为其他，则抛出异常     （如果文件后缀为其他，则抛出异常）
+    else:
+        raise ValueError(f"Unsupported file type: {suffix}")
 
 
 def chunk_text(text: str) -> list[str]:
     # 层次: 索引构建层 — 切分文本为带重叠 chunk
     """把文本切分为带重叠的 chunk，保留跨块上下文。"""
+    # 标准化文本     （标准化文本）
     normalized = text.replace("\r\n", "\n").strip()
+    # 如果标准化文本为空，则返回空列表     （如果标准化文本为空，则返回空列表）
     if not normalized:
         return []
 
     chunks = []
     start = 0
-    # Overlap keeps adjacent chunks from losing too much local context.
+    # 循环切分文本为 chunk，直到处理完整个文本     （循环切分文本为 chunk，直到处理完整个文本）
     while start < len(normalized):
+        # 计算 end     （计算 end）
         end = min(len(normalized), start + CHUNK_SIZE)
+        # 添加 chunk     （添加 chunk）
         chunks.append(normalized[start:end])
+        # 如果 end 大于等于 normalized 的长度，则退出循环     （如果 end 大于等于 normalized 的长度，则退出循环）
         if end >= len(normalized):
+            # 退出循环     （退出循环）
             break
+        # 计算 start     （计算 start）
         start = end - CHUNK_OVERLAP
     return chunks
 
 
+# 读取指定目录下的文件并构建带来源标签的 chunk 列表。
 def build_chunks(base_dir: Path) -> list[Chunk]:
     # 层次: 索引构建层 — 构建带来源标签的 chunk 列表并返回
     """读取指定目录下的文件并构建带来源标签的 chunk 列表。"""
+    # 初始化 chunks 列表     （初始化 chunks 列表）
     chunks: list[Chunk] = []
+    # 遍历文件路径     （遍历文件路径）
     for file_path in iter_text_files(base_dir):
         try:
+            # 读取文件文本     （读取文件文本）
             text = read_document_text(file_path)
+        # 如果异常，则继续下一个文件     （如果异常，则继续下一个文件）
         except (UnicodeDecodeError, ValueError):
             continue
-
+        # 计算相对路径     （计算相对路径）
         relative = file_path.relative_to(base_dir)
+        # 遍历 chunk     （遍历 chunk）
         for index, part in enumerate(chunk_text(text), start=1):
+            # 添加 chunk     （添加 chunk）
             chunks.append(Chunk(source_label=f"{relative}#chunk{index}", content=part))
     return chunks
 
 
+# 简单分词函数，支持英文、数字和部分中日韩字符，用于关键词检索示例。
 def tokenize(text: str) -> set[str]:
     # 层次: 工具层 — 简单分词实现，用于检索评分
     """简单分词函数，支持英文、数字和部分中日韩字符，用于关键词检索示例。"""
     return set(re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower()))
 
 
+# 基于关键词重合度进行简单检索并返回 top-k。
 def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
     # 层次: 检索层 — 使用关键词重合度实现简单检索（PoC）
     """基于关键词重合度进行简单检索并返回 top-k。"""
     question_tokens = tokenize(question)
     ranked: list[Chunk] = []
 
-    # This PoC keeps retrieval local and cheap by using keyword overlap instead of embeddings.
+    # 遍历 chunks     （遍历 chunks）
     for chunk in chunks:
+        # 分词     （分词）
         chunk_tokens = tokenize(chunk.content)
+        # 计算分数     （计算分数）
         score = len(question_tokens & chunk_tokens)
+        # 如果分数大于 0，则添加到 ranked 列表     （如果分数大于 0，则添加到 ranked 列表）
         if score > 0:
+            # 添加 chunk     （添加 chunk）
             ranked.append(Chunk(chunk.source_label, chunk.content, score))
 
+    # 排序     （排序）
     ranked.sort(key=lambda item: (-item.score, item.source_label))
+    # 返回 top-k     （返回 top-k）
     return ranked[:TOP_K]
 
 
@@ -217,114 +256,147 @@ def build_context(top_chunks: list[Chunk]) -> str:
     """把检索到的 top chunks 拼接为供模型使用的上下文字符串。"""
     if not top_chunks:
         return "No relevant local document chunks were retrieved."
-
+    # 初始化 parts 列表     （初始化 parts 列表）       
     parts = []
     for chunk in top_chunks:
+        # 添加 part     （添加 part）
         parts.append(f"[SOURCE: {chunk.source_label}]\n{chunk.content}")
     return "\n\n".join(parts)
 
-
-def answer_question(client: OpenAI | None, model: str, question: str, context: str) -> str:
+# 调用模型回答，限制其仅基于传入的检索上下文回答问题。
+def answer_question(client: OpenAI | None, model: str, question: str, context: str, top_chunks: list[Chunk] | None = None) -> str:
     # 层次: 调用层 — 用检索上下文构造 prompt 并请求模型回答或返回 mock
     """调用模型回答，限制其仅基于传入的检索上下文回答问题。"""
+    # 如果 mode 为 "mock"，则返回 mock 回答     （如果 mode 为 "mock"，则返回 mock 回答）
     mode = resolve_mode()
     if mode == "mock":
-        # Try to include minimal top-k info in mock answer (context may be large)
-        return build_mock_answer(question, [])
-
-    prompt = (
+        return build_mock_answer(question, top_chunks or [])
+    # 初始化 prompt     （初始化 prompt）     （初始化 prompt）
+    prompt = (  
         f"Question:\n{question}\n\n"
         f"Retrieved context:\n{context}\n\n"
         "Answer the question based only on the retrieved context. "
         "If the answer is not fully supported, say so clearly."
     )
+    # 创建 Responses API 请求     （创建 Responses API 请求）
     response = client.responses.create(
         model=model,
         instructions=SYSTEM_INSTRUCTIONS,
         input=prompt,
     )
+    # 返回模型的输出文本     （返回模型的输出文本）
     return response.output_text
 
 
+# 创建 FastAPI 应用     （创建 FastAPI 应用）
 app = FastAPI(title="rag_api_demo", version="0.1.0")
+# 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。     （将运行时状态挂在 app.state，方便在多个 endpoint 间共享。）
 # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 app.state.client = None
+# 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 app.state.docs_dir = None
+# 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 app.state.chunks = []
+# 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 
 
+# 初始化或重新加载服务状态：扫描文档目录并缓存 chunks 与客户端实例。
 def load_state() -> None:
+    # 层次: 状态管理层 — 初始化或重新加载服务状态：扫描文档目录并缓存 chunks 与客户端实例。
     """初始化或重新加载服务状态：扫描文档目录并缓存 chunks 与客户端实例。"""
     docs_dir = get_docs_dir()
     chunks = build_chunks(docs_dir)
+    # 如果 chunks 为空，则抛出异常     （如果 chunks 为空，则抛出异常）
     if not chunks:
         raise RuntimeError("No readable .md, .txt, or .pdf files were found in docs directory.")
     # Cache the parsed chunks in memory so each request does not rescan the directory.
+    # 缓存解析后的 chunks 在内存中，以便每个请求不需要重新扫描目录。
     mode = resolve_mode()
+    # 如果 mode 为 "real"，则构建客户端     （如果 mode 为 "real"，则构建客户端）
     if mode == "real":
         app.state.client = build_client()
+    # 如果 mode 为 "mock"，则客户端为空     （如果 mode 为 "mock"，则客户端为空）
     else:
         app.state.client = None
+    # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
     app.state.docs_dir = docs_dir
+    # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
     app.state.chunks = chunks
+    # 将运行时状态挂在 app.state，方便在多个 endpoint 间共享。
 
-
+# 服务启动时预热：加载文档并构建内存索引。  
 @app.on_event("startup")
 def startup_event() -> None:
+    # 层次: 启动管理层 — 服务启动时预热：加载文档并构建内存索引。
     """服务启动时预热：加载文档并构建内存索引。"""
     load_state()
-
-
+# 健康检查接口，返回当前 docs 目录和 chunk 数量。
 @app.get("/health")
 def health() -> dict[str, object]:
+    # 层次: 健康检查层 — 健康检查接口，返回当前 docs 目录和 chunk 数量。
     """健康检查接口，返回当前 docs 目录和 chunk 数量。"""
     return {
+        # 返回状态     （返回状态）
         "status": "ok",
         "docs_dir": str(app.state.docs_dir),
         "chunk_count": len(app.state.chunks),
     }
 
 
+# 手动触发重新加载文档目录并返回新的 chunk 计数。
 @app.post("/reload", response_model=ReloadResponse)
 def reload_docs() -> ReloadResponse:
     """手动触发重新加载文档目录并返回新的 chunk 计数。"""
+    # 层次: 重载管理层 — 手动触发重新加载文档目录并返回新的 chunk 计数。
     try:
         load_state()
+    # 如果异常，则抛出异常     （如果异常，则抛出异常）
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+    # 返回 ReloadResponse     （返回 ReloadResponse）
     return ReloadResponse(
+        # 返回 docs 目录     （返回 docs 目录）
         docs_dir=str(app.state.docs_dir),
+        # 返回 chunk 数量     （返回 chunk 数量）
         chunk_count=len(app.state.chunks),
     )
 
 
+# 对外 API：接收问题、检索文档并返回模型回答与来源信息。
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> AskResponse:
     """对外 API：接收问题、检索文档并返回模型回答与来源信息。"""
-    if app.state.client is None or app.state.docs_dir is None:
+    # 层次: 业务接口层 — 对外 API：接收问题、检索文档并返回模型回答与来源信息。
+    if app.state.docs_dir is None:
         raise HTTPException(status_code=500, detail="Service is not initialized.")
-
-    # Retrieve first, then pass only the top chunks to the model.
+    # 检索文档     （检索文档）
     top_chunks = retrieve(request.question, app.state.chunks)
+    # 构建上下文     （构建上下文）
     context = build_context(top_chunks)
-
+    # 回答问题     （回答问题） 
     try:
+        # 回答问题     （回答问题） （调用模型回答问题）    
         answer = answer_question(
             app.state.client,
             request.model,
             request.question,
             context,
+            top_chunks=top_chunks,
         )
+    # 如果异常，则抛出异常     （如果异常，则抛出异常）
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    # 返回 AskResponse     （返回 AskResponse）
     return AskResponse(
         answer=answer,
         model=request.model,
         docs_dir=str(app.state.docs_dir),
         source_count=len(top_chunks),
+        # 返回来源信息     （返回来源信息）
         sources=[
             SourceItem(source_label=chunk.source_label, score=chunk.score)
             for chunk in top_chunks
         ],
+        # 返回来源信息     （返回来源信息） 
     )

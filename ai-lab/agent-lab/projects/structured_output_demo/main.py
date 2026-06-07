@@ -96,19 +96,27 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
     - force_real 为真时强制 real（无 Key 则报错）
     - 否则根据是否配置 OPENAI_API_KEY 自动选择
     """
+    # 如果 force_mock 为 True，则返回 "mock"
     if force_mock:
         return "mock"
+    # 如果 force_real 为 True，则返回 "real"
     if force_real:
+        # 如果 OPENAI_API_KEY 未设置，则打印错误信息并退出     （如果 OPENAI_API_KEY 未设置，则打印错误信息并退出）
         if not os.getenv("OPENAI_API_KEY"):
             print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+            # 退出程序     （退出程序）
             sys.exit(1)
+        # 返回 "real"     （返回 "real"）
         return "real"
+    # 如果 OPENAI_API_KEY 未设置，则返回 "mock"     （如果 OPENAI_API_KEY 未设置，则返回 "mock"）
+    # 如果 OPENAI_API_KEY 设置，则返回 "real"     （如果 OPENAI_API_KEY 设置，则返回 "real"）
     return "real" if os.getenv("OPENAI_API_KEY") else "mock"
 
 
 def build_mock_plan(prompt: str) -> AgentPlan:
     """构造本地示例计划，用于离线演练结构化输出。"""
     # 层次: 调用层 — 在 mock 模式下返回一个符合 AgentPlan 结构的示例数据，便于离线测试和学习。
+    # 返回一个符合 AgentPlan 结构的示例数据     （返回一个符合 AgentPlan 结构的示例数据）
     return AgentPlan(
         goal=f"Mock goal for: {prompt}",
         user_type="beginner",
@@ -159,12 +167,13 @@ def main() -> None:
     # 同时打印 pretty 和 compact 两种 JSON，便于对比“人读友好”与“机器传输”格式。
     pretty_json = json.dumps(plan.model_dump(), ensure_ascii=False, indent=2)
     compact_json = plan.model_dump_json(ensure_ascii=False)
-
+    # 打印 pretty JSON     （打印 pretty JSON）
     print("=== Parsed JSON ===")
     print(pretty_json)
+    # 打印 raw JSON     （打印 raw JSON）
     print("\n=== Raw JSON ===")
     print(compact_json)
-
+    
 
 if __name__ == "__main__":
     main()

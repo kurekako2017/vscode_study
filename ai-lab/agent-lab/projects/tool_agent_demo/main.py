@@ -44,18 +44,23 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Minimal tool-calling agent demo for listing files, reading files, and searching text."
     )
+    # 用户任务 ：用户任务说明
     parser.add_argument("prompt", help="Task request for the tool agent.")
+    # 模型名 ：使用的模型名
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
+    # 工作目录 ：工具允许访问的工作目录
     parser.add_argument(
         "--workdir",
         default=".",
         help="Working directory the tools can access. Default: current directory.",
     )
+    # 模式选择 ：互斥组，分别强制 mock 或强制 real
     parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    # 模式选择 ：互斥组，分别强制 mock 或强制 real
     parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
     return parser.parse_args()
 
@@ -140,6 +145,7 @@ def read_file(base_dir: Path, path: str) -> dict[str, Any]:
 
     说明：工具向模型返回内容时，通常需要限制大小以防止超出 token 上限或网络负担，因此这里只返回前 12k 字符。
     """
+    # 解析路径并确保不越出 base_dir（安全限制）。
     target = resolve_path(base_dir, path)
     if not target.exists():
         return {"ok": False, "error": "File does not exist."}
@@ -160,32 +166,30 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
 
     说明：返回行级证据能够让模型在最终回答中精确地引用文件位置（例如文件名与行号），比只返回文件名更有助于可验证性。
     """
+    # 解析路径并确保不越出 base_dir（安全限制）。
     target = resolve_path(base_dir, path)
     if not target.exists():
         return {"ok": False, "error": "Path does not exist."}
-
+    # 如果目标是一个文件，则直接搜索该文件，否则搜索该目录下的所有文件  （递归搜索）
     matches = []
     files = [target] if target.is_file() else [p for p in target.rglob("*") if p.is_file()]
-
+    # 遍历所有文件，搜索关键词  （不区分大小写）    
     for file_path in files:
         try:
             lines = file_path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
             continue
-
-        # Return line-level matches so the final answer can point to concrete evidence.
+        # 遍历所有行，搜索关键词  （不区分大小写）                  （如果匹配到了关键词，则添加到 matches 列表中，如果 matches 列表长度大于 50，则返回结果，否则继续搜索下一个文件）
         for line_number, line in enumerate(lines, start=1):
             if query.lower() in line.lower():
-                matches.append(
-                    {
-                        "file": str(file_path),
-                        "line": line_number,
-                        "text": line.strip(),
-                    }
-                )
+                matches.append({
+                    "file": str(file_path),
+                    "line": line_number,
+                    "text": line.strip(),
+                })
                 if len(matches) >= 50:
                     return {"ok": True, "query": query, "matches": matches, "truncated": True}
-
+    # 如果 matches 列表长度小于 50，则返回结果，否则返回截断标志（True），表示结果被截断了。            
     return {"ok": True, "query": query, "matches": matches, "truncated": False}
 
 
@@ -283,10 +287,10 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
     if mode == "mock":
         print(f"\n[MOCK MODE] 模拟 AI 思考中... 任务: {prompt}")
         
-        # 简单的规则引擎：根据关键词模拟模型决定调用哪个工具
+        # 简单的规则引擎：根据关键词模拟模型决定调用哪个工具，如果关键词包含“列出”、“list”、“目录”，则调用 list_files 工具，如果关键词包含“读取”、“read”，则调用 read_file 工具，如果关键词包含“搜索”、“search”，则调用 search_text 工具
         mock_tool_name = None
         mock_args = {}
-        
+        # 简单的规则引擎：根据关键词模拟模型决定调用哪个工具
         if "列出" in prompt or "list" in prompt.lower() or "目录" in prompt:
             mock_tool_name = "list_files"
             mock_args = {"path": "."}
