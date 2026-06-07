@@ -1,6 +1,9 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "automatic",
+    "terminal.integrated.enablePersistentSessions": false,
+    "remote.autoForwardPorts": false,
+    "todo-tree.ripgrep.ripgrep": "rg",
     "aws.experimental.endpoints": {
         "s3": "http://s3.localhost.localstack.cloud:4566"
     }
