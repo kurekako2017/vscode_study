@@ -8,7 +8,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_chain(use_mock)（组装链路，优先 LangChain，缺包时走本地兼容实现）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `chain.invoke(...)（执行链路）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_chain(use_mock)（组装链路，优先 LangChain，缺包时走本地兼容实现）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `print(mermaid)（打印链路图）` -> `chain.invoke(...)（执行链路）` -> `print(result)（打印运行结果）`
 
 关键名词：
 
@@ -32,7 +32,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_app()（构建图）` -> `classify_intent()（判断意图）` -> `research()（收集要点）` -> `draft()（生成草稿）` -> `review()（审核草稿）` -> `route_after_review()（选择分支）` -> `revise()（修订草稿）` / `finalize()（生成最终结果）` -> `app.invoke(...)（运行图）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_app()（构建图）` -> `classify_intent()（判断意图）` -> `research()（收集要点）` -> `draft()（生成草稿）` -> `review()（审核草稿）` -> `route_after_review()（选择分支）` -> `revise()（修订草稿）` / `finalize()（生成最终结果）` -> `app.invoke(...)（运行图）` -> `print(mermaid)（打印图）` -> `print(final_answer)（打印最终结果）`
 
 关键名词：
 
@@ -58,7 +58,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `chunk_documents()（切分文档）` -> `retrieve()（初步检索）` -> `rerank()（二次重排）` -> `synthesize_answer()（合成答案）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `chunk_documents()（切分文档）` -> `retrieve()（初步检索）` -> `rerank()（二次重排）` -> `synthesize_answer()（合成答案）` -> `print(文档统计)（打印原始文档统计）` -> `print(chunk 数量)（打印分块数量）` -> `print(retrieval)（打印检索 + 重排结果）` -> `print(answer)（打印最终回答）`
 
 关键名词：
 
@@ -85,7 +85,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `filter_by_role()（按角色过滤）` -> `retrieve()（初步检索）` -> `rerank()（二次重排）` -> `synthesize_answer()（合成答案）` -> `print_section()（打印分段标题）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `filter_by_role()（按角色过滤）` -> `retrieve()（初步检索）` -> `rerank()（二次重排）` -> `synthesize_answer()（合成答案）` -> `print_section()（打印分段标题）` -> `print(接入层统计)（打印载入/可访问/过滤统计）` -> `print(权限层)（打印权限过滤明细）` -> `print(检索层)（打印检索与重排结果）` -> `print(引用层)（打印最终答案）`
 
 关键名词：
 
@@ -113,7 +113,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `split_into_nodes()（切分节点）` -> `build_inverted_index()（构建倒排索引）` -> `retrieve()（召回节点）` -> `synthesize_answer()（合成答案）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `split_into_nodes()（切分节点）` -> `build_inverted_index()（构建倒排索引）` -> `retrieve()（召回节点）` -> `synthesize_answer()（合成答案）` -> `print(文档统计)（打印文档大小）` -> `print(node 数量)（打印节点数量）` -> `print(召回结果)（打印检索结果）` -> `print(最终答案)（打印最终回答）`
 
 关键名词：
 
@@ -137,7 +137,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析主题）` -> `supervisor()（总调度）` -> `planner_agent()（规划任务）` -> `researcher_agent()（调研资料）` -> `writer_agent()（生成草稿）` -> `critic_agent()（审校问题）` -> `writer_agent()（修订草稿）` -> `critic_agent()（再次审校）` -> 最终汇总
+`main()（程序入口）` -> `parse_args()（解析主题）` -> `supervisor()（总调度）` -> `planner_agent()（规划任务）` -> `researcher_agent()（调研资料）` -> `writer_agent()（生成草稿）` -> `critic_agent()（审校问题）` -> `writer_agent()（修订草稿）` -> `critic_agent()（再次审校）` -> `print(final_answer)（打印最终答案）`
 
 关键名词：
 
@@ -163,7 +163,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `HTTPServer(...)（启动 HTTP 服务）` -> `Handler.do_GET()（处理 GET 请求）` -> 返回 JSON
+`main()（程序入口）` -> `HTTPServer(...)（启动 HTTP 服务）` -> `print(Serving on ...)（打印启动地址）` -> `Handler.do_GET()（处理 GET 请求）` -> 返回 JSON
 
 关键名词：
 
@@ -184,7 +184,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `load_samples()（加载样本）` -> `coverage()（计算覆盖率）` / `precision()（计算精确率）` -> 汇总输出
+`main()（程序入口）` -> `load_samples()（加载样本）` -> `coverage()（计算覆盖率）` / `precision()（计算精确率）` -> `print(report)（打印逐条报表）` -> `print(summary)（打印汇总结果）`
 
 关键名词：
 

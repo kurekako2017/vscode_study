@@ -49,13 +49,13 @@ except ImportError:
             self._parser = parser  # 解析器
 
         def get_graph(self):  # 获取图
-            class _Graph:
-                @staticmethod
-                def draw_mermaid() -> str:
+            class _Graph:  # 图
+                @staticmethod   # 静态方法
+                def draw_mermaid() -> str:  # 绘制 Mermaid 图
                     return (
                         "---\n"
                         "config:\n"
-                        "  flowchart:\n"
+                        "  flowchart:\n"    
                         "    curve: linear\n"
                         "---\n"
                         "graph TD;\n"
@@ -68,7 +68,7 @@ except ImportError:
                         "\tmock_llm --> parse_response;\n"
                     )
 
-            return _Graph()
+            return _Graph()  # 返回图
 
     # 本地实现 LangChain 的 RunnableLambda 类
     class RunnableLambda:
@@ -97,7 +97,7 @@ except ImportError:
                     value = step(value)  # 调用函数
             return value
     # 本地实现 LangChain 的 get_graph 方法
-        def get_graph(self):
+        def get_graph(self):  # 获取图
             class _Graph:
                 @staticmethod
                 def draw_mermaid() -> str:
@@ -276,11 +276,11 @@ def main() -> None:
 
     # 打印 Mermaid 图，方便学习链路结构。
     print("=== LangChain 风格链路（Mermaid） ===")
-    print(chain.get_graph().draw_mermaid())
+    print(chain.get_graph().draw_mermaid())  # 打印 Mermaid 图，方便学习链路结构。
     # 执行链路并打印结果。
     print("=== 运行结果 ===")
-    result = chain.invoke({"question": args.question})
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    result = chain.invoke({"question": args.question})  # 执行链路并打印结果。  
+    print(json.dumps(result, ensure_ascii=False, indent=2))  # 打印结果。
 
 
 if __name__ == "__main__":
