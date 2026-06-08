@@ -14,6 +14,7 @@ LangChain 风格最小链路示例。
 
 ```bash
 cd /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo
+pip3 install -r requirements.txt
 python3 main.py "什么是 LangChain 的链式编排"
 ```
 
