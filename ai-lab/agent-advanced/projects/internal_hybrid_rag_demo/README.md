@@ -12,6 +12,12 @@
 3. 权限层：按角色过滤不可见文档
 4. 引用层：输出带来源的答案
 
+## 安装
+
+这个 demo 只用 Python 标准库，不需要额外安装第三方包。
+
+如果你想先看统一环境说明，可以参考 [项目依赖总表](../DEPENDENCIES.md)。
+
 ## 你会学到什么
 
 - 怎么把文件服务器和 Wiki 当成两个资料源接入
@@ -22,7 +28,7 @@
 ## 运行方式
 
 ```bash
-python3 main.py "远程办公和发布流程有什么要求？" --role employee
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/internal_hybrid_rag_demo/main.py "远程办公和发布流程有什么要求？" --role employee
 ```
 
 可选角色：
@@ -34,8 +40,13 @@ python3 main.py "远程办公和发布流程有什么要求？" --role employee
 例如：
 
 ```bash
-python3 main.py "事故处理流程和访问控制怎么查？" --role it_admin
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/internal_hybrid_rag_demo/main.py "事故处理流程和访问控制怎么查？" --role it_admin
 ```
+
+## 常见报错
+
+- `FileNotFoundError`：通常是 `assets/` 或 `catalog.json` 路径不对，先确认在 demo 目录内运行。
+- `Permission denied` 风格的问题：先检查 `--role` 是否选对，很多文档默认只对部分角色可见。
 
 ## 目录结构
 

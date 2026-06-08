@@ -14,12 +14,12 @@
 
 | 目录 | 主题 | 你会学到什么 | 运行命令 |
 | --- | --- | --- | --- |
-| [langchain_chain_demo](./langchain_chain_demo/README.md) | LangChain 链式编排 | Prompt 模板、Runnable 组合、输出解析 | `python3 main.py "你想问的问题" --mock` |
-| [langgraph_workflow_demo](./langgraph_workflow_demo/README.md) | LangGraph 工作流 | State、Node、Edge、条件分支、循环 | `python3 main.py "LangGraph 适合什么场景"` |
-| [advanced_rag_pipeline_demo](./advanced_rag_pipeline_demo/README.md) | 高级 RAG | 切分、检索、重排、引用、答案合成 | `python3 main.py "LangGraph 适合什么场景？"` |
-| [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索 | 接入层、检索层、权限层、引用层 | `python3 main.py "远程办公和发布流程有什么要求？" --role employee` |
-| [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex 概念版索引 | Document、Node、Index、QueryEngine | `python3 main.py "LlamaIndex 和 LangChain 有什么区别？"` |
-| [multi_agent_team_demo](./multi_agent_team_demo/README.md) | 多 Agent 协作 | Planner、Researcher、Writer、Critic、Supervisor | `python3 main.py "如何学习 LangGraph 和高级 RAG"` |
+| [langchain_chain_demo](./langchain_chain_demo/README.md) | LangChain 链式编排 | Prompt 模板、Runnable 组合、输出解析 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "你想问的问题" --mock` |
+| [langgraph_workflow_demo](./langgraph_workflow_demo/README.md) | LangGraph 工作流 | State、Node、Edge、条件分支、循环 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langgraph_workflow_demo/main.py "LangGraph 适合什么场景"` |
+| [advanced_rag_pipeline_demo](./advanced_rag_pipeline_demo/README.md) | 高级 RAG | 切分、检索、重排、引用、答案合成 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/advanced_rag_pipeline_demo/main.py "LangGraph 适合什么场景？"` |
+| [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索 | 接入层、检索层、权限层、引用层 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/internal_hybrid_rag_demo/main.py "远程办公和发布流程有什么要求？" --role employee` |
+| [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex 概念版索引 | Document、Node、Index、QueryEngine | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/llamaindex_index_demo/main.py "LlamaIndex 和 LangChain 有什么区别？"` |
+| [multi_agent_team_demo](./multi_agent_team_demo/README.md) | 多 Agent 协作 | Planner、Researcher、Writer、Critic、Supervisor | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/multi_agent_team_demo/main.py "如何学习 LangGraph 和高级 RAG"` |
 
 ## 专题代码区
 
@@ -48,3 +48,7 @@
 ## 函数调用总览
 
 - [项目函数调用流程说明](./FUNCTION_FLOW.md) - 按文件梳理每个 demo 的入口、调用链和关键名词
+
+## 依赖总表
+
+- [项目依赖总表](./DEPENDENCIES.md) - 按 demo 统一整理第三方依赖和安装方式

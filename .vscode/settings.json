@@ -1,4 +1,14 @@
 {
+    "python.defaultInterpreterPath": "/usr/bin/python3",
+    "python.terminal.activateEnvironment": false,
+    "python.analysis.extraPaths": [
+        "/home/victorkure/.local/lib/python3.12/site-packages"
+    ],
+    "terminal.integrated.fontFamily": "'Microsoft YaHei Mono', 'Sarasa Mono SC', 'Cascadia Mono', Consolas, monospace",
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "/home/victorkure/.local/lib/python3.12/site-packages",
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/victorkure/.local/bin"
+    },
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "automatic",
     "terminal.integrated.enablePersistentSessions": false,

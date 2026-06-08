@@ -10,12 +10,22 @@
 - Writer
 - Critic
 
+## 安装
+
+这个 demo 只用 Python 标准库，不需要额外安装第三方包。
+
+如果你想统一查看各 demo 的依赖说明，可以看 [项目依赖总表](../DEPENDENCIES.md)。
+
 ## 运行
 
 ```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/multi_agent_team_demo
-python3 main.py "如何学习 LangGraph 和高级 RAG"
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/multi_agent_team_demo/main.py "如何学习 LangGraph 和高级 RAG"
 ```
+
+## 常见报错
+
+- 如果输出太短，通常是主题太窄，可以换一个更具体但更完整的问题。
+- 如果没有看到二轮修订，说明 `critic_agent()` 没有发现明显问题，属于正常情况。
 
 ## 学习点
 

@@ -10,12 +10,22 @@
 - QueryEngine
 - ResponseSynthesizer
 
+## 安装
+
+这个 demo 只用 Python 标准库，不需要额外安装第三方包。
+
+如需统一查看环境要求，可参考 [项目依赖总表](../DEPENDENCIES.md)。
+
 ## 运行
 
 ```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/llamaindex_index_demo
-python3 main.py "LlamaIndex 和 LangChain 有什么区别？"
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/llamaindex_index_demo/main.py "LlamaIndex 和 LangChain 有什么区别？"
 ```
+
+## 常见报错
+
+- 如果文档目录里没有 `.md` 文件，先确认 `assets/` 下的示例文档是否还在。
+- 如果输出为空，通常是查询词没命中文档内容，可以换一个更接近示例主题的问题。
 
 ## 学习点
 

@@ -10,12 +10,30 @@ LangGraph 风格最小状态图示例。
 4. `conditional edges`
 5. `loop / revision`
 
+## 安装
+
+```bash
+/usr/bin/python3 -m pip install -r /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/requirements.txt
+```
+
+依赖说明见 [项目依赖总表](../DEPENDENCIES.md)。
+
 ## 运行
 
 ```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langgraph_workflow_demo
-python3 main.py "LangGraph 适合什么场景"
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langgraph_workflow_demo/main.py "LangGraph 适合什么场景"
 ```
+
+默认只打印简洁结果。如果你想看完整 Mermaid 图，加上 `--show-graph`：
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langgraph_workflow_demo/main.py "LangGraph 适合什么场景" --show-graph
+```
+
+## 常见报错
+
+- `ModuleNotFoundError: No module named 'langgraph'`：先安装统一依赖，并确认当前终端和 VS Code 解释器一致；如果 `python3` 被别的虚拟环境劫持，直接改用 `/usr/bin/python3`。
+- 如果运行时还是红线，通常是解释器选错了，不是代码本身坏了。
 
 ## 学习点
 

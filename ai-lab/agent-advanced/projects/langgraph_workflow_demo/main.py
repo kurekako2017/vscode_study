@@ -43,6 +43,12 @@ def parse_args() -> argparse.Namespace:
         default="LangGraph 适合什么场景",
         help="要处理的主题",
     )
+    # 默认不打印 Mermaid 图，需要时再显式打开。
+    parser.add_argument(
+        "--show-graph",
+        action="store_true",
+        help="打印 Mermaid 图",
+    )
     # 解析参数并返回。
     return parser.parse_args()
 
@@ -152,6 +158,16 @@ def finalize(state: WorkflowState) -> dict:
     return {"final_answer": final}
 
 
+# 从最终答案里提取更适合终端阅读的摘要。
+def summarize_final_answer(final_answer: str) -> str:
+    # 只保留“审核结果”和“结论”两行，减少终端噪音。
+    summary_lines = []
+    for line in final_answer.splitlines():
+        if line.startswith("审核结果：") or line.startswith("结论："):
+            summary_lines.append(line)
+    return "\n".join(summary_lines) if summary_lines else final_answer
+
+
 # 组装 LangGraph 节点、边和条件分支。
 def build_app():
     # 创建一个 StateGraph，泛型参数是 WorkflowState。
@@ -196,12 +212,16 @@ def main() -> None:
     # 初始状态里放入主题和修订轮次。
     result = app.invoke({"topic": args.topic, "revision_round": 0})
 
-    # 打印流程图。
-    print("=== LangGraph Mermaid ===")
-    print(app.get_graph().draw_mermaid())
-    # 打印最终结果。
+    # 需要时才打印流程图，默认保持终端简洁。
+    if args.show_graph:
+        print("=== LangGraph Mermaid ===")
+        print(app.get_graph().draw_mermaid())
+
+    # 默认只打印摘要，降低终端噪音。
     print("=== 最终结果 ===")
-    print(result["final_answer"])
+    print(f"主题：{result['topic']}")
+    print(f"意图：{result['intent']}")
+    print(summarize_final_answer(result["final_answer"]))
 
 
 if __name__ == "__main__":

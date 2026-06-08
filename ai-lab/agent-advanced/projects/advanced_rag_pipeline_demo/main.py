@@ -51,6 +51,10 @@ def parse_args() -> argparse.Namespace:
     )
     # 取前几个 chunk。
     parser.add_argument("--top-k", type=int, default=4, help="返回前几个 chunk")
+    # 默认不展开原始统计，保持输出更紧凑。
+    parser.add_argument("--show-stats", action="store_true", help="打印原始文档统计")
+    # 默认不展开更长的调试信息。
+    parser.add_argument("--show-excerpt", action="store_true", help="打印更长的结果摘要")
     # 返回解析结果。
     return parser.parse_args()
 
@@ -215,6 +219,21 @@ def synthesize_answer(query: str, results: list[ChunkScore]) -> str:
     return "\n".join(lines)
 
 
+# 把检索结果压缩成更适合终端阅读的格式。
+def format_results(results: list[ChunkScore], show_excerpt: bool) -> list[str]:
+    # 只保留最必要的信息，避免终端输出太长。
+    lines = []
+    for item in results:
+        source = item.document.metadata.get("source", "unknown")
+        chunk_id = item.document.metadata.get("chunk_id", "?")
+        line = f"- score={item.score:.2f} source={source} chunk={chunk_id}"
+        if show_excerpt:
+            excerpt = item.document.page_content.strip().splitlines()[0][:80]
+            line += f" excerpt={excerpt}"
+        lines.append(line)
+    return lines
+
+
 # 程序入口，串起加载、切分、检索、重排和输出。
 def main() -> None:
     # 解析参数。
@@ -230,25 +249,19 @@ def main() -> None:
     # 合成答案。
     answer = synthesize_answer(args.query, reranked)
 
-    # 打印原始文档统计。
-    print("=== 1. 原始文档 ===")
-    for doc in documents:
-        print(f"- {doc.metadata['source']}: {len(doc.page_content)} chars")
+    # 默认只打印检索结果和最终结论，让输出更清爽。
+    if args.show_stats:
+        print("=== 1. 原始文档 ===")
+        for doc in documents:
+            print(f"- {doc.metadata['source']}: {len(doc.page_content)} chars")
+        print("\n=== 2. Chunk 数量 ===")
+        print(len(chunks))
 
-    # 打印 chunk 数量。
-    print("\n=== 2. Chunk 数量 ===")
-    print(len(chunks))
+    print("=== 检索结果 ===")
+    for line in format_results(reranked, args.show_excerpt):
+        print(line)
 
-    # 打印检索 + 重排结果。
-    print("\n=== 3. 检索 + Rerank 结果 ===")
-    for item in reranked:
-        print(
-            f"- score={item.score:.2f} source={item.document.metadata.get('source')} "
-            f"chunk={item.document.metadata.get('chunk_id')} matched={item.matched_terms}"
-        )
-
-    # 打印最终答案。
-    print("\n=== 4. 最终回答 ===")
+    print("\n=== 最终回答 ===")
     print(answer)
 
 

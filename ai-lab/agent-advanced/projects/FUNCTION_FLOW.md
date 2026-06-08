@@ -8,7 +8,7 @@
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_chain(use_mock)（组装链路，优先 LangChain，缺包时走本地兼容实现）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `print(mermaid)（打印链路图）` -> `chain.invoke(...)（执行链路）` -> `print(result)（打印运行结果）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_chain(use_mock)（组装链路）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `print(mermaid)（打印链路图）` -> `chain.invoke(...)（执行链路）` -> `print(result)（打印运行结果）`
 
 关键名词：
 
@@ -16,12 +16,10 @@
 - `Runnable`：LangChain 里的可组合执行单元。
 - `AIMessage`：模型输出消息对象。
 - `JSON`：示例里要求输出的结构化结果。
-- `Fallback`：没有安装 `langchain_core` 时，脚本内置的兼容实现。
-
 理解要点：
 
 - `build_prompt()` 负责定义输入格式。
-- `build_chain()` 负责把 prompt、模型和解析器串起来，并在缺包时切到本地兼容实现。
+- `build_chain()` 负责把 prompt、模型和解析器串起来。
 - `mock_llm()` 负责在不联网时模拟模型输出。
 - `parse_response()` 负责把模型消息整理成字典。
 - `main()` 负责选择模式，并确保 mock 也能独立运行。
