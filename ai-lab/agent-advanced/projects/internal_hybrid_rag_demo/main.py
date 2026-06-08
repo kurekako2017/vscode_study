@@ -79,6 +79,7 @@ class RankedDoc:
     reason: str = ""
 
 
+# 解析查询、角色和返回条数等命令行参数。
 def parse_args() -> argparse.Namespace:
     # 创建命令行解析器。
     parser = argparse.ArgumentParser(description="社内文件 + Wiki 混合检索 RAG demo")
@@ -102,6 +103,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 读取文档目录清单，作为文档元数据入口。
 def load_catalog() -> list[dict]:
     # 先确认目录配置文件存在。
     if not CATALOG_PATH.exists():
@@ -110,6 +112,7 @@ def load_catalog() -> list[dict]:
     return json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 
 
+# 按 catalog 加载全部知识文档。
 def load_documents() -> list[KnowledgeDoc]:
     # 最终文档列表。
     docs: list[KnowledgeDoc] = []
@@ -137,11 +140,13 @@ def load_documents() -> list[KnowledgeDoc]:
     return docs
 
 
+# 判断当前角色是否可以访问指定文档。
 def can_access(document: KnowledgeDoc, role: str) -> bool:
     # all 表示所有角色可见。
     return "all" in document.acl or role in document.acl
 
 
+# 按权限把文档分成可访问和被过滤两组。
 def filter_by_role(documents: list[KnowledgeDoc], role: str) -> tuple[list[KnowledgeDoc], list[KnowledgeDoc]]:
     # 可访问文档。
     accessible: list[KnowledgeDoc] = []
@@ -157,6 +162,7 @@ def filter_by_role(documents: list[KnowledgeDoc], role: str) -> tuple[list[Knowl
     return accessible, filtered
 
 
+# 把文本切成可用于检索的 token。
 def tokenize(text: str) -> list[str]:
     # 提取中英文 token。
     tokens = re.findall(r"[A-Za-z0-9_+-]{2,}|[\u4e00-\u9fff]{2,}", text.lower())
@@ -169,12 +175,14 @@ def tokenize(text: str) -> list[str]:
     return ordered
 
 
+# 判断文本里是否命中任意一个关键词。
 def contains_any(text: str, keywords: Iterable[str]) -> bool:
     # 统一大小写后匹配。
     lowered = text.lower()
     return any(keyword.lower() in lowered for keyword in keywords)
 
 
+# 根据问题类型扩展检索词，提升召回率。
 def expand_query_terms(query: str) -> list[str]:
     # 先把 query 切成词。
     terms = tokenize(query)
@@ -192,6 +200,7 @@ def expand_query_terms(query: str) -> list[str]:
     return list(dict.fromkeys(terms))
 
 
+# 给单篇文档打分，并记录命中的关键词。
 def score_document(document: KnowledgeDoc, query: str, terms: Iterable[str]) -> RankedDoc:
     # 把标题、正文、路径、来源类型拼成一个大文本方便匹配。
     haystack = f"{document.title}\n{document.content}\n{document.path.as_posix()}\n{document.source_type}".lower()
@@ -241,6 +250,7 @@ def score_document(document: KnowledgeDoc, query: str, terms: Iterable[str]) -> 
     return RankedDoc(document=document, score=score, matched_terms=matched_terms, reason=reason)
 
 
+# 对全部文档做初步检索并返回前 top_k 个结果。
 def retrieve(query: str, documents: list[KnowledgeDoc], top_k: int) -> list[RankedDoc]:
     # 扩展检索词。
     terms = expand_query_terms(query)
@@ -254,6 +264,7 @@ def retrieve(query: str, documents: list[KnowledgeDoc], top_k: int) -> list[Rank
     return ranked[:top_k]
 
 
+# 在初步检索结果上做二次重排和补分。
 def rerank(query: str, ranked: list[RankedDoc]) -> list[RankedDoc]:
     # 对初步检索结果做二次修正。
     reranked: list[RankedDoc] = []
@@ -281,6 +292,7 @@ def rerank(query: str, ranked: list[RankedDoc]) -> list[RankedDoc]:
     return reranked
 
 
+# 从正文里抽取前几行，方便在答案中展示摘要。
 def excerpt_lines(text: str, limit: int = 2) -> list[str]:
     # 保存截取出来的行。
     lines = []
@@ -296,6 +308,7 @@ def excerpt_lines(text: str, limit: int = 2) -> list[str]:
     return lines
 
 
+# 把检索结果、权限信息和引用整理成最终答案。
 def synthesize_answer(query: str, role: str, accessible_docs: list[KnowledgeDoc], filtered_docs: list[KnowledgeDoc], results: list[RankedDoc]) -> str:
     # 答案主体的第一行。
     lines = [f"问题：{query}", f"当前角色：{role}", ""]
@@ -334,11 +347,13 @@ def synthesize_answer(query: str, role: str, accessible_docs: list[KnowledgeDoc]
     return "\n".join(lines)
 
 
+# 打印分段标题，增强终端可读性。
 def print_section(title: str) -> None:
     # 分隔输出，方便阅读。
     print(f"\n=== {title} ===")
 
 
+# 程序入口，串起加载、过滤、检索、重排和输出。
 def main() -> None:
     # 解析参数。
     args = parse_args()

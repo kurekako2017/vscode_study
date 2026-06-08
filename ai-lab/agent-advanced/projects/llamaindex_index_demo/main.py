@@ -38,6 +38,7 @@ class QueryResult:
     score: float
 
 
+# 解析查询内容和 top-k 参数。
 def parse_args() -> argparse.Namespace:
     # 创建参数解析器。
     parser = argparse.ArgumentParser(description="LlamaIndex 风格概念 demo")
@@ -54,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 读取示例文档，返回文件名和正文。
 def load_documents() -> list[tuple[str, str]]:
     # 这里返回 (文件名, 内容) 的列表。
     documents: list[tuple[str, str]] = []
@@ -64,6 +66,7 @@ def load_documents() -> list[tuple[str, str]]:
     return documents
 
 
+# 把每篇文档按段落切成 Node。
 def split_into_nodes(documents: list[tuple[str, str]]) -> list[Node]:
     # nodes 保存切分后的节点。
     nodes: list[Node] = []
@@ -81,6 +84,7 @@ def split_into_nodes(documents: list[tuple[str, str]]) -> list[Node]:
     return nodes
 
 
+# 为节点构建倒排索引，方便快速召回。
 def build_inverted_index(nodes: list[Node]) -> dict[str, set[int]]:
     # 倒排索引：token -> node_id 集合。
     index: dict[str, set[int]] = defaultdict(set)
@@ -94,6 +98,7 @@ def build_inverted_index(nodes: list[Node]) -> dict[str, set[int]]:
     return index
 
 
+# 为查询补充相关词，提升检索覆盖率。
 def expand_query(query: str) -> list[str]:
     # 先提取原始词。
     terms = re.findall(r"[A-Za-z0-9_+-]{2,}|[\u4e00-\u9fff]{2,}", query.lower())
@@ -113,6 +118,7 @@ def expand_query(query: str) -> list[str]:
     return list(dict.fromkeys([term for term in terms if len(term) >= 2]))
 
 
+# 利用倒排索引召回节点并打分排序。
 def retrieve(nodes: list[Node], index: dict[str, set[int]], query: str, top_k: int) -> list[QueryResult]:
     # 把 query 转成可检索词。
     query_terms = expand_query(query)
@@ -144,6 +150,7 @@ def retrieve(nodes: list[Node], index: dict[str, set[int]], query: str, top_k: i
     return ranked[:top_k]
 
 
+# 根据召回结果拼出带引用的回答。
 def synthesize_answer(query: str, results: list[QueryResult]) -> str:
     # 先写问题。
     lines = [f"查询：{query}", "", "LlamaIndex 风格回答："]
@@ -158,6 +165,7 @@ def synthesize_answer(query: str, results: list[QueryResult]) -> str:
     return "\n".join(lines)
 
 
+# 程序入口，串联文档加载、索引和回答生成。
 def main() -> None:
     # 读取命令行参数。
     args = parse_args()

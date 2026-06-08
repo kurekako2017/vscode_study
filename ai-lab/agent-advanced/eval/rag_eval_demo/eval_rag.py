@@ -30,6 +30,7 @@ class Sample:
     answer: str
 
 
+# 从样本文件加载评估数据。
 def load_samples() -> list[Sample]:
     # 读取 JSON 原始内容。
     raw = json.loads(SAMPLES_PATH.read_text(encoding="utf-8"))
@@ -37,6 +38,7 @@ def load_samples() -> list[Sample]:
     return [Sample(**item) for item in raw]
 
 
+# 计算召回结果对标准来源的覆盖率。
 def coverage(gold_sources: list[str], retrieved_sources: list[str]) -> float:
     # 没有 gold 时，按 100% 处理，避免除零。
     if not gold_sources:
@@ -47,6 +49,7 @@ def coverage(gold_sources: list[str], retrieved_sources: list[str]) -> float:
     return len(matched) / len(set(gold_sources))
 
 
+# 计算召回结果里真正相关的比例。
 def precision(gold_sources: list[str], retrieved_sources: list[str]) -> float:
     # 没有召回结果时，precision 记为 0。
     if not retrieved_sources:
@@ -57,6 +60,7 @@ def precision(gold_sources: list[str], retrieved_sources: list[str]) -> float:
     return len(matched) / len(set(retrieved_sources))
 
 
+# 程序入口，逐条样本输出评估报表。
 def main() -> None:
     # 加载所有样本。
     samples = load_samples()

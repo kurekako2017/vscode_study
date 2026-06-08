@@ -55,6 +55,7 @@ KNOWLEDGE_BASE = {
 }
 
 
+# 解析主题输入，作为整个协作流程的起点。
 def parse_args() -> argparse.Namespace:
     # 创建命令行解析器。
     parser = argparse.ArgumentParser(description="多 Agent 协作 demo")
@@ -69,6 +70,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 规划者把大主题拆成可执行任务。
 def planner_agent(topic: str) -> list[str]:
     # planner 负责把大主题拆成更小的任务。
     if any(word in topic.lower() for word in ["rag", "检索"]):
@@ -78,6 +80,7 @@ def planner_agent(topic: str) -> list[str]:
     return ["确定主题范围", "收集核心概念", "输出可执行建议"]
 
 
+# 从主题里挑出可映射到知识库的关键词。
 def expand_keywords(topic: str) -> Iterable[str]:
     # 根据主题从知识库里挑关键字。
     lower = topic.lower()
@@ -86,6 +89,7 @@ def expand_keywords(topic: str) -> Iterable[str]:
             yield key
 
 
+# 调研者根据主题和计划收集知识要点。
 def researcher_agent(topic: str, plan: list[str]) -> list[str]:
     # 调研结果。
     notes: list[str] = []
@@ -105,6 +109,7 @@ def researcher_agent(topic: str, plan: list[str]) -> list[str]:
     return notes
 
 
+# 写作者把计划和调研结果组织成草稿。
 def writer_agent(topic: str, plan: list[str], research_notes: list[str]) -> str:
     # writer 负责把信息组织成可读内容。
     return (
@@ -115,6 +120,7 @@ def writer_agent(topic: str, plan: list[str], research_notes: list[str]) -> str:
     )
 
 
+# 审校者检查草稿缺少什么内容。
 def critic_agent(draft: str) -> list[str]:
     # critic 负责找缺点。
     issues = []
@@ -131,6 +137,7 @@ def critic_agent(draft: str) -> list[str]:
     return issues
 
 
+# 监督者串联各个 Agent，并维护共享状态。
 def supervisor(topic: str) -> TeamState:
     # 创建一个共享状态对象。
     state = TeamState(topic=topic)
@@ -174,6 +181,7 @@ def supervisor(topic: str) -> TeamState:
     return state
 
 
+# 程序入口，执行监督者协作流程并输出最终答案。
 def main() -> None:
     # 读取参数。
     args = parse_args()

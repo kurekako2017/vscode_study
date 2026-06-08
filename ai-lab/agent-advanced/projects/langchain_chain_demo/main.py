@@ -25,6 +25,7 @@ from langchain_core.runnables import RunnableLambda
 DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
 
 
+# 解析问题输入和 mock / real 模式开关。
 def parse_args() -> argparse.Namespace:
     # 创建命令行解析器。
     parser = argparse.ArgumentParser(description="LangChain 风格最小链路 demo")
@@ -52,6 +53,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 构造用于教学的 Prompt 模板。
 def build_prompt() -> ChatPromptTemplate:
     # 用 LangChain 的提示词模板封装 system + human 两段消息。
     return ChatPromptTemplate.from_messages(
@@ -66,6 +68,7 @@ def build_prompt() -> ChatPromptTemplate:
     )
 
 
+# 从问题里抽取关键词，模拟模型理解。
 def extract_keywords(text: str) -> list[str]:
     # 用正则从文本里提取中英文关键词。
     raw_terms = re.findall(r"[A-Za-z0-9_+-]{2,}|[\u4e00-\u9fff]{2,}", text)
@@ -79,6 +82,7 @@ def extract_keywords(text: str) -> list[str]:
     return cleaned[:6]
 
 
+# 用本地逻辑模拟模型输出 JSON。
 def mock_llm(prompt_value: Any) -> AIMessage:
     # 从 prompt 中取出最后一条消息，也就是 human 问题。
     question = prompt_value.to_messages()[-1].content.strip()
@@ -98,6 +102,7 @@ def mock_llm(prompt_value: Any) -> AIMessage:
     return AIMessage(content=json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# 构建真实模型客户端，供 real 模式使用。
 def build_real_llm():
     # 真实模式才需要导入 langchain_openai。
     try:
@@ -127,6 +132,7 @@ def build_real_llm():
     )
 
 
+# 把模型输出解析成结构化字典。
 def parse_response(message: AIMessage) -> dict[str, Any]:
     # 尝试把模型输出当作 JSON 解析。
     try:
@@ -140,6 +146,7 @@ def parse_response(message: AIMessage) -> dict[str, Any]:
         }
 
 
+# 组合 prompt、LLM 和解析器，形成一条链。
 def build_chain(use_mock: bool):
     # 先构造 prompt。
     prompt = build_prompt()
@@ -149,6 +156,7 @@ def build_chain(use_mock: bool):
     return prompt | llm | RunnableLambda(parse_response)
 
 
+# 程序入口，构建链路并执行一次推理。
 def main() -> None:
     # 解析命令行参数。
     args = parse_args()

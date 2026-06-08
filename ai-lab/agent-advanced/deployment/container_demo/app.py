@@ -20,6 +20,7 @@ PORT = 8088
 
 
 class Handler(BaseHTTPRequestHandler):
+    # 处理 GET 请求，返回一个健康检查 JSON。
     def do_GET(self) -> None:  # noqa: N802
         # 组装一个简单的健康检查响应。
         payload = {
@@ -40,11 +41,13 @@ class Handler(BaseHTTPRequestHandler):
         # 写出响应体。
         self.wfile.write(body)
 
+    # 覆盖默认访问日志，避免示例输出过多。
     def log_message(self, format: str, *args) -> None:  # noqa: A003
         # 这里故意不打印访问日志，避免示例输出太吵。
         return
 
 
+# 程序入口，启动一个最小 HTTP 服务。
 def main() -> None:
     # 创建 HTTPServer 实例。
     server = HTTPServer((HOST, PORT), Handler)

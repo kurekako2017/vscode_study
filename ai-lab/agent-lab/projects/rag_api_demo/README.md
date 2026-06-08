@@ -48,6 +48,41 @@
 - 第一次访问 `/health`、`/ask` 或 `/reload` 时才会真正加载
 - 这样 VS Code 打开工作区时不会因为启动脚本而提前占用资源
 
+## 2.1 前后端完整链路
+
+如果把这个 demo 当成一个完整的小应用，它的前后端链路可以这样看：
+
+### 前端链路
+
+1. 用户在 React 页面输入问题，或者在 Spring Boot 客户端里提交请求
+2. 客户端把问题包装成 HTTP JSON
+3. 客户端调用后端的 `/ask`
+4. 页面收到 `answer`、`sources`、`source_count` 后再渲染结果
+
+### 后端链路
+
+1. `FastAPI` 收到 `/ask` 请求
+2. 先通过 `ensure_state_loaded()` 确认索引已经准备好
+3. 调用 `retrieve()` 找出最相关的文档片段
+4. 调用 `build_context()` 把片段拼成上下文
+5. 调用 `answer_question()` 生成回答
+6. 返回 `AskResponse` 给前端或其他调用方
+
+### 文档整理链路
+
+1. 把要喂给 RAG 的资料放到 `docs` 目录，或者放到 `RAG_API_DOCS_DIR` 指向的目录
+2. 文档发生修改后，调用 `/reload` 重新扫描和切块
+3. 再用 `/health` 查看 `chunk_count` 是否变化
+4. 最后用 `/ask` 验证前端展示和后端回答是否同步更新
+
+你也可以直接看这张图：
+
+![main.py 处理流程图](./assets/main_py_flow.svg)
+
+如果你更想单独打开文件，也可以点这个链接：
+
+- [main.py 详细处理流程图](./assets/main_py_flow.svg)
+
 ## 3. 这个项目提供了什么接口
 
 ### `GET /`

@@ -38,6 +38,7 @@ class ChunkScore:
     matched_terms: list[str] = field(default_factory=list)
 
 
+# 解析查询文本和返回数量等参数。
 def parse_args() -> argparse.Namespace:
     # 创建参数解析器。
     parser = argparse.ArgumentParser(description="高级 RAG 风格 demo")
@@ -54,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 从 assets 目录加载原始文档。
 def load_documents() -> list[Document]:
     # 最终返回的文档列表。
     docs: list[Document] = []
@@ -65,6 +67,7 @@ def load_documents() -> list[Document]:
     return docs
 
 
+# 把长文切成适合检索的小 chunk。
 def chunk_documents(documents: list[Document]) -> list[Document]:
     # 使用递归切分器，把长文切成更适合检索的小块。
     splitter = RecursiveCharacterTextSplitter(chunk_size=320, chunk_overlap=80)
@@ -86,6 +89,7 @@ ALIASES = {
 }
 
 
+# 根据问题类型生成多个改写版本。
 def rewrite_queries(query: str) -> list[str]:
     # variants 里保存原问题和改写问题。
     variants = [query]
@@ -107,6 +111,7 @@ def rewrite_queries(query: str) -> list[str]:
     return list(dict.fromkeys(variants))
 
 
+# 结合别名、token 和改写结果扩展检索词。
 def expand_terms(query: str) -> list[str]:
     # terms 保存扩展后的检索词。
     terms = set()
@@ -126,6 +131,7 @@ def expand_terms(query: str) -> list[str]:
     return [term for term in terms if len(term) >= 2]
 
 
+# 对单个 chunk 做关键词打分。
 def score_chunk(document: Document, terms: Iterable[str]) -> ChunkScore:
     # 把正文和 source 一起拿来做匹配。
     text = (document.page_content + " " + document.metadata.get("source", "")).lower()
@@ -150,6 +156,7 @@ def score_chunk(document: Document, terms: Iterable[str]) -> ChunkScore:
     return ChunkScore(document=document, score=score, matched_terms=matched)
 
 
+# 先召回，再按分数取前 top_k 个 chunk。
 def retrieve(chunks: list[Document], query: str, top_k: int) -> list[ChunkScore]:
     # 先扩展查询词。
     terms = expand_terms(query)
@@ -161,6 +168,7 @@ def retrieve(chunks: list[Document], query: str, top_k: int) -> list[ChunkScore]
     return scored[:top_k]
 
 
+# 基于内容特征对召回结果做二次重排。
 def rerank(results: list[ChunkScore]) -> list[ChunkScore]:
     # rerank 阶段再根据内容做少量二次修正。
     reranked = []
@@ -182,6 +190,7 @@ def rerank(results: list[ChunkScore]) -> list[ChunkScore]:
     return reranked
 
 
+# 把检索命中的 chunk 组织成可读答案。
 def synthesize_answer(query: str, results: list[ChunkScore]) -> str:
     # 先写问题抬头。
     lines = [
@@ -206,6 +215,7 @@ def synthesize_answer(query: str, results: list[ChunkScore]) -> str:
     return "\n".join(lines)
 
 
+# 程序入口，串起加载、切分、检索、重排和输出。
 def main() -> None:
     # 解析参数。
     args = parse_args()

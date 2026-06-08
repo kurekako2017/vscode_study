@@ -64,6 +64,36 @@
 4. `app.state` 里的缓存被更新
 5. 返回新的 `chunk_count`
 
+### 3.5 前后端完整链路
+
+如果把这个 demo 当成“前端 + 后端”的完整小系统，可以这样理解:
+
+前端链路:
+
+1. 用户在 React 页面或 Spring Boot 客户端输入问题
+2. 客户端把问题发到 `/ask`
+3. 前端收到 `answer`、`sources`、`source_count`
+4. 页面把回答和来源展示给用户
+
+后端链路:
+
+1. `ask()` 收到请求
+2. `ensure_state_loaded()` 确认索引已准备好
+3. `retrieve()` 在内存 chunk 中找相关片段
+4. `build_context()` 把片段拼成上下文
+5. `answer_question()` 生成回答
+6. `AskResponse` 返回给前端
+
+### 3.6 文档整理流程
+
+当你新增或修改文档时，建议按下面的顺序整理:
+
+1. 把资料放进 `docs` 目录，或者放到 `RAG_API_DOCS_DIR` 指向的目录
+2. 调用 `/reload` 重新扫描文件并重建 chunk
+3. 调用 `/health` 检查 `docs_dir` 和 `chunk_count`
+4. 再调用 `/ask` 看答案和来源是否更新
+5. 前端页面同步刷新结果展示，确认前后端看到的是同一份资料
+
 ## 4. 关键函数
 
 ### `load_state()`

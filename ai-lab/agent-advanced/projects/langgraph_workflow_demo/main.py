@@ -32,6 +32,7 @@ class WorkflowState(TypedDict, total=False):
     final_answer: str
 
 
+# 解析命令行参数，决定主题输入。
 def parse_args() -> argparse.Namespace:
     # 创建命令行参数解析器。
     parser = argparse.ArgumentParser(description="LangGraph 风格最小状态图 demo")
@@ -46,6 +47,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# 根据主题判断任务意图，并初始化修订轮次。
 def classify_intent(state: WorkflowState) -> dict:
     # 从状态里取出主题。
     topic = state["topic"]
@@ -60,6 +62,7 @@ def classify_intent(state: WorkflowState) -> dict:
     return {"intent": intent, "revision_round": state.get("revision_round", 0)}
 
 
+# 根据意图生成研究阶段的要点笔记。
 def research(state: WorkflowState) -> dict:
     # 根据意图准备不同的研究笔记。
     intent = state["intent"]
@@ -85,6 +88,7 @@ def research(state: WorkflowState) -> dict:
     return {"research_notes": notes}
 
 
+# 把研究要点整理成第一版草稿。
 def draft(state: WorkflowState) -> dict:
     # 读取前面节点的输入。
     topic = state["topic"]
@@ -100,6 +104,7 @@ def draft(state: WorkflowState) -> dict:
     return {"draft": draft_text}
 
 
+# 检查草稿是否足够完整，生成审核意见。
 def review(state: WorkflowState) -> dict:
     # 审核阶段只检查草稿够不够完整。
     draft_text = state["draft"]
@@ -118,6 +123,7 @@ def review(state: WorkflowState) -> dict:
     return {"review_notes": review_notes}
 
 
+# 在草稿基础上补充内容，形成修订版。
 def revise(state: WorkflowState) -> dict:
     # 在原草稿基础上追加补充说明。
     revised = state["draft"] + "\n\n补充：\n- 这是一条从状态到节点再到边的最小工作流。"
@@ -125,6 +131,7 @@ def revise(state: WorkflowState) -> dict:
     return {"draft": revised, "revision_round": state.get("revision_round", 0) + 1}
 
 
+# 根据审核结果决定继续修订还是直接收尾。
 def route_after_review(state: WorkflowState) -> Literal["revise", "finalize"]:
     # 如果还没修订过，而且审核意见不是通过，就走 revise。
     if state.get("revision_round", 0) < 1 and state.get("review_notes") != ["通过。"]:
@@ -133,6 +140,7 @@ def route_after_review(state: WorkflowState) -> Literal["revise", "finalize"]:
     return "finalize"
 
 
+# 汇总草稿和审核意见，生成最终答案。
 def finalize(state: WorkflowState) -> dict:
     # 把草稿和审核意见拼起来，形成最终答案。
     final = (
@@ -144,6 +152,7 @@ def finalize(state: WorkflowState) -> dict:
     return {"final_answer": final}
 
 
+# 组装 LangGraph 节点、边和条件分支。
 def build_app():
     # 创建一个 StateGraph，泛型参数是 WorkflowState。
     graph = StateGraph(WorkflowState)
@@ -178,6 +187,7 @@ def build_app():
     return graph.compile()
 
 
+# 程序入口，执行完整工作流并打印结果。
 def main() -> None:
     # 解析命令行主题。
     args = parse_args()

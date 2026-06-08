@@ -44,3 +44,7 @@
 9. `../deployment/container_demo/`
 
 每个目录里的 `README.md` 都只讲这一小段代码，不会把所有概念混在一起。
+
+## 函数调用总览
+
+- [项目函数调用流程说明](./FUNCTION_FLOW.md) - 按文件梳理每个 demo 的入口、调用链和关键名词
