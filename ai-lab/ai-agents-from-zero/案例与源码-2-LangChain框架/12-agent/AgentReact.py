@@ -23,7 +23,7 @@
 
 import os
 
-from langchain_openai import ChatOpenAI
+from langchain.chat_models import init_chat_model
 from langchain.agents import create_agent
 from langchain.tools import tool
 from dotenv import load_dotenv
@@ -106,11 +106,36 @@ def check_inventory(product_id: str) -> str:
     return f"未找到产品ID: {product_id}"
 
 
-model = ChatOpenAI(
-    model="qwen-plus",
-    api_key=os.getenv("aliQwen-api"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+def build_chat_model():
+    """优先 OpenRouter free；如果没有 key，再回退到本地 Ollama。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        raise RuntimeError(
+            "未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用；请配置 OpenRouter free 或安装 langchain-ollama。"
+        ) from exc
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    )
+
+
+model = build_chat_model()
 
 # 系统提示中明确 ReAct：先推理、再选工具、基于结果继续推理直至得到完整答案
 # 这里是在“用 ReAct 作为最常见入门机制”，并不代表 Agent 只有这一种工作方式

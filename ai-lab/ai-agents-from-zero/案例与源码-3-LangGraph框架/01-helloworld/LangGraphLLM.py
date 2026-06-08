@@ -33,13 +33,37 @@ class DiliState(TypedDict):
     messages: Annotated[List, add_messages]
 
 
+def build_chat_model():
+    """优先 OpenRouter free；如果没有 key，再回退到本地 Ollama。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        raise RuntimeError(
+            "未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用；请配置 OpenRouter free 或安装 langchain-ollama。"
+        ) from exc
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    )
+
+
 # 2. 初始化大模型（与第 10 章调用方式一致）
-llm = init_chat_model(
-    model="qwen-plus",
-    model_provider="openai",
-    api_key=os.getenv("aliQwen-api"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+llm = build_chat_model()
 
 
 # 3. 定义节点 Nodes：将当前消息列表交给模型，返回新消息字典（add_messages 会追加到 state）

@@ -18,13 +18,47 @@ from langchain.messages import HumanMessage, SystemMessage
 load_dotenv()
 
 # ---------- 1. 实例化聊天模型 ----------
-# init_chat_model 会根据 model_provider 等参数创建「聊天模型」对象，后续用 invoke/stream/batch 调用
-model = init_chat_model(
-    model="qwen-plus",
-    model_provider="openai",
-    api_key=os.getenv("aliQwen-api"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+def build_chat_model():
+    """优先 OpenRouter free；失败后回退到本地 Ollama，再按需兼容 Qwen。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+
+        model = ChatOllama(
+            model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        )
+        model.invoke("ping")
+        return model
+    except Exception as ollama_exc:
+        qwen_api_key = os.getenv("QWEN_API_KEY") or os.getenv("aliQwen-api")
+        if qwen_api_key:
+            return init_chat_model(
+                model="qwen-plus",
+                model_provider="openai",
+                api_key=qwen_api_key,
+                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            )
+        raise RuntimeError(
+            "OpenRouter、Ollama 和 Qwen 都不可用；请配置 OPENROUTER_API_KEY，"
+            "或启动本地 Ollama，或补充 QWEN_API_KEY / aliQwen-api。"
+        ) from ollama_exc
+
+
+model = build_chat_model()
 
 # ---------- 2. 构建多角色消息列表（即本次请求的 Prompt）----------
 # 关系：Prompt ≥ Message ≥ 字符串。这里用两条「带角色的消息」组成一次 Prompt。

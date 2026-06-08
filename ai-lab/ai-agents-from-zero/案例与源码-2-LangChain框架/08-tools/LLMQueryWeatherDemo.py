@@ -16,16 +16,41 @@ load_dotenv(encoding="utf-8")
 import os
 from langchain_core.output_parsers import JsonOutputKeyToolsParser, StrOutputParser
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain.chat_models import init_chat_model
 from loguru import logger
 from QueryWeatherTool import get_weather
 
+def build_chat_model():
+    """优先 OpenRouter free；如果没有 key，再回退到本地 Ollama。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        raise RuntimeError(
+            "未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用；请配置 OpenRouter free 或安装 langchain-ollama。"
+        ) from exc
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    )
+
+
 # 初始化大模型（教程 5.4：需可调用工具的大模型）
-llm = ChatOpenAI(
-    model="qwen-plus",
-    api_key=os.getenv("aliQwen-api"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+llm = build_chat_model()
 
 # 将工具绑定到模型：请求时会把 get_weather 的名称、描述、参数 schema 发给模型，模型随后可能返回 tool_calls
 llm_with_tools = llm.bind_tools([get_weather])

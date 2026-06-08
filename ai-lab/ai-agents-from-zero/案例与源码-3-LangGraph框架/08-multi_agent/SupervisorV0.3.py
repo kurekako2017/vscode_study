@@ -14,7 +14,7 @@
 import os
 
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_openai import ChatOpenAI
+from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langgraph_supervisor import create_supervisor
 from dotenv import load_dotenv
@@ -48,21 +48,39 @@ def print_chinese_messages(chunk: dict):
                 print(f"{role}：{content}\n")
 
 
-def init_llm_model() -> ChatOpenAI:
+def init_llm_model():
     """初始化大语言模型（ChatOpenAI）。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+                temperature=0.1,
+                max_tokens=1024,
+            )
+            model.invoke("ping")
+            print("✅ 语言模型初始化成功")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
     try:
-        model = ChatOpenAI(
-            model="qwen-plus",
-            api_key=os.getenv("aliQwen-api"),
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-            temperature=0.1,
-            max_tokens=1024,
-        )
-        print("✅ 语言模型初始化成功")
-        return model
-    except Exception as e:
-        print(f"❌ 语言模型初始化失败：{str(e)}")
-        raise SystemExit(1)
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        print("❌ 未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用。")
+        raise SystemExit(1) from exc
+
+    model = ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        temperature=0.1,
+        max_tokens=1024,
+    )
+    print("✅ 语言模型初始化成功")
+    return model
 
 
 def book_hotel(hotel_name: str):

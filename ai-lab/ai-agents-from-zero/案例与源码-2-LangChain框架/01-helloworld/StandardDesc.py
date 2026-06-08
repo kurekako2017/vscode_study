@@ -1,17 +1,17 @@
 """
-【案例】标准/工程化写法：用 LangChain 调用大模型（DeepSeek 优先，OpenRouter free 自动兜底）
+【案例】标准/工程化写法：用 LangChain 调用大模型（OpenRouter free 优先，Ollama 自动兜底，DeepSeek 兼容）
 
 对应教程章节：第 10 章 - LangChain 快速上手与 HelloWorld → 6、实战：企业级封装与流式输出
 
 本案例演示从零到一的完整工程化写法：
-- 先尝试使用 DeepSeek 官方接口通过 LangChain 发问，掌握 invoke（一次性返回）与 stream（流式返回）两种调用方式。
-- 如果 DeepSeek 遇到认证失败、余额不足、网络不可用等问题，自动切换到 OpenRouter 的免费模型路由，保证你能继续把案例跑通。
+- 先尝试使用 OpenRouter free 通过 LangChain 发问，掌握 invoke（一次性返回）与 stream（流式返回）两种调用方式。
+- 如果 OpenRouter 遇到认证失败、网络不可用等问题，自动切换到本地 Ollama；如果你还想看历史兼容写法，也保留了 DeepSeek 作为最后兜底。
 - 将「初始化模型」封装成函数便于复用；用 .env 存密钥、logging 打日志、try/except 区分错误，符合正式项目习惯。
-- 运行前在项目根目录配置 .env 中的 DEEPSEEK_API_KEY（可选）和 OPENROUTER_API_KEY（可选但建议准备），执行：python3 案例与源码-2-LangChain框架/01-helloworld/StandardDesc.py
+- 运行前在项目根目录配置 .env 中的 OPENROUTER_API_KEY（建议准备）、OLLAMA_BASE_URL（本地 Ollama 默认即可）、DEEPSEEK_API_KEY（仅兼容兜底可选），执行：python3 案例与源码-2-LangChain框架/01-helloworld/StandardDesc.py
 
 补充说明：
 - 为了让工程化示例更直观，这里继续使用很多同学在旧资料里更常见的 `ChatOpenAI` 写法；OpenRouter 与 DeepSeek 一样都走 OpenAI 兼容接口。
-- 当前脚本的核心目标是“先学会把链路跑通”，所以默认会优先走云端，云端失败后自动回落到 OpenRouter 免费模型路由。
+- 当前脚本的核心目标是“先学会把链路跑通”，所以默认会优先走 OpenRouter free，失败后自动回落到本地 Ollama；DeepSeek 仅作为历史兼容兜底。
 """
 
 # ========== 1. 导入与环境 ==========
@@ -63,7 +63,7 @@ def init_llm_client() -> ChatOpenAI:
         or os.getenv("QWEN_API_KEY")
     )
     if not api_key:
-        raise ValueError("未配置 DeepSeek API Key，已准备切换到 OpenRouter free")
+        raise ValueError("未配置 DeepSeek API Key（仅历史兼容兜底）")
 
     # 创建客户端：指定用哪个模型、密钥、接口地址，以及「回复风格」相关参数。
     llm = ChatOpenAI(
@@ -77,7 +77,7 @@ def init_llm_client() -> ChatOpenAI:
 
 
 def init_openrouter_client() -> ChatOpenAI:
-    """初始化 OpenRouter 客户端，作为 DeepSeek 失败时的免费兜底方案。"""
+    """初始化 OpenRouter 客户端，作为当前优先的免费云端方案。"""
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         raise ValueError("未配置 OPENROUTER_API_KEY，请先在 .env 中填写 OpenRouter Key")
@@ -92,36 +92,56 @@ def init_openrouter_client() -> ChatOpenAI:
     )
 
 
+def init_ollama_client():
+    """初始化本地 Ollama 客户端，作为云端接口都不可用时的最后兜底。"""
+    from langchain_ollama import ChatOllama
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        temperature=0.7,
+        max_tokens=2048,
+    )
+
+
 def choose_runtime_model():
     """
-    按「DeepSeek 优先，OpenRouter free 兜底」顺序返回可用模型。
+    按「OpenRouter free 优先，Ollama 次之，DeepSeek 兼容兜底」顺序返回可用模型。
 
     返回值：
         tuple[模型对象, 模型来源名称]
     """
-    deepseek_error = None
+    openrouter_error = None
     try:
-        llm = init_llm_client()
-        # 先做一次最小探活，确保不仅是对象创建成功，而且真正能访问到 DeepSeek。
-        llm.invoke("ping")
-        return llm, "DeepSeek"
-    except Exception as e:
-        deepseek_error = e
-        logger.warning(f"DeepSeek 不可用，切换到 OpenRouter free：{str(e)}")
-
-    openrouter_llm = init_openrouter_client()
-    try:
+        openrouter_llm = init_openrouter_client()
+        # 先做一次最小探活，确保不仅是对象创建成功，而且真正能访问到 OpenRouter。
         openrouter_llm.invoke("ping")
         return openrouter_llm, "OpenRouter"
     except Exception as e:
-        raise RuntimeError(
-            "DeepSeek 与 OpenRouter 都不可用，请先检查：\n"
-            "1. DeepSeek API Key 是否有效、账号是否有额度；\n"
-            "2. OPENROUTER_API_KEY 是否已配置，且 OpenRouter 账号可用；\n"
-            "3. 如果你想强制指定免费模型，可把 OPENROUTER_MODEL 设为 `openrouter/free` 或某个 `:free` 模型。\n"
-            f"DeepSeek 原始错误：{deepseek_error}\n"
-            f"OpenRouter 原始错误：{e}"
-        ) from e
+        openrouter_error = e
+        logger.warning(f"OpenRouter 不可用，切换到本地 Ollama：{str(e)}")
+
+    try:
+        ollama_llm = init_ollama_client()
+        ollama_llm.invoke("ping")
+        return ollama_llm, "Ollama"
+    except Exception as ollama_error:
+        try:
+            llm = init_llm_client()
+            # DeepSeek 作为历史兼容兜底，保留但不作为默认首选。
+            llm.invoke("ping")
+            return llm, "DeepSeek"
+        except Exception as deepseek_error:
+            raise RuntimeError(
+                "OpenRouter、本地 Ollama 和 DeepSeek 都不可用，请先检查：\n"
+                "1. OPENROUTER_API_KEY 是否已配置，且 OpenRouter 账号可用；\n"
+                "2. 本地 Ollama 服务是否已启动；\n"
+                "3. DeepSeek API Key 是否有效、账号是否有额度（仅兼容兜底）；\n"
+                "4. 如果你想强制指定免费模型，可把 OPENROUTER_MODEL 设为 `openrouter/free` 或某个 `:free` 模型。\n"
+                f"OpenRouter 原始错误：{openrouter_error}\n"
+                f"Ollama 原始错误：{ollama_error}\n"
+                f"DeepSeek 原始错误：{deepseek_error}"
+            ) from deepseek_error
 
 
 # ========== 3. 主逻辑：invoke（一次性） + stream（流式）两种调用方式 ==========
@@ -131,7 +151,7 @@ def choose_runtime_model():
 def main():
     """主函数：封装核心逻辑，符合 Python 工程化规范。"""
     try:
-        # 先拿到「可对话的客户端」，优先 DeepSeek，失败后切到 OpenRouter
+        # 先拿到「可对话的客户端」，优先 OpenRouter free，失败后切到 Ollama
         llm, provider_name = choose_runtime_model()
         logger.info(f"LLM客户端初始化成功，当前使用：{provider_name}")
 
@@ -141,10 +161,10 @@ def main():
         try:
             response = llm.invoke(question)
         except Exception as e:
-            if provider_name == "DeepSeek":
-                logger.warning(f"DeepSeek 本次调用失败，自动切换到 OpenRouter free：{str(e)}")
-                llm = init_openrouter_client()
-                provider_name = "OpenRouter"
+            if provider_name == "OpenRouter":
+                logger.warning(f"OpenRouter 本次调用失败，自动切换到本地 Ollama：{str(e)}")
+                llm = init_ollama_client()
+                provider_name = "Ollama"
                 response = llm.invoke(question)
             else:
                 raise
@@ -159,10 +179,10 @@ def main():
         try:
             response_stream = llm.stream(stream_question)
         except Exception as e:
-            if provider_name == "DeepSeek":
-                logger.warning(f"DeepSeek 流式调用失败，自动切换到 OpenRouter free：{str(e)}")
-                llm = init_openrouter_client()
-                provider_name = "OpenRouter"
+            if provider_name == "OpenRouter":
+                logger.warning(f"OpenRouter 流式调用失败，自动切换到本地 Ollama：{str(e)}")
+                llm = init_ollama_client()
+                provider_name = "Ollama"
                 response_stream = llm.stream(stream_question)
             else:
                 raise

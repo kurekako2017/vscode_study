@@ -8,21 +8,20 @@
 便于排查「装错版本」「没进虚拟环境」或「解释器不是当前项目那一个」等问题。无需 API Key，可直接运行。
 """
 
+import sys  # 获取 Python 解释器信息
+import warnings  # 屏蔽第三方包的弃用提示
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import langchain  # 核心框架（Chain、Agent、Memory 等）
 import langchain_community  # 社区扩展（部分集成、第三方工具等）
-import sys  # 获取 Python 解释器信息
 
-# LangChain 核心包版本号（需与教程/文档要求的版本区间一致）
-print("langchainVersion:  " + langchain.__version__)
-# 社区扩展包版本号
-print("langchain_communityVersion:  " + langchain_community.__version__)
-# LangChain 实际安装路径（可确认是否来自当前虚拟环境）
-print("langchainfile:" + langchain.__file__)
-
-# 当前 Python 解释器版本（如 3.10.x），用于确认运行环境
-print(sys.version)
-# 当前 Python 可执行文件路径；当你怀疑“包装到了 A 环境，但运行却走了 B 环境”时尤其有用
-print("pythonExecutable:" + sys.executable)
+print("=== 环境信息 ===")
+print(f"langchain version      : {langchain.__version__}")
+print(f"langchain_community    : {langchain_community.__version__}")
+print(f"langchain install path : {langchain.__file__}")
+print(f"python version         : {sys.version.split()[0]}")
+print(f"python executable      : {sys.executable}")
 
 """
 【输出示例】

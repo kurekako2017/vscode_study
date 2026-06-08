@@ -16,7 +16,7 @@ import os
 import re
 
 from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
+from langchain.chat_models import init_chat_model
 from langgraph_supervisor import create_supervisor
 from dotenv import load_dotenv
 
@@ -24,11 +24,33 @@ load_dotenv(encoding="utf-8")
 
 
 # 1. 初始化大语言模型
-def init_llm_model() -> ChatOpenAI:
-    return ChatOpenAI(
-        model="qwen-plus",
-        api_key=os.getenv("aliQwen-api"),
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+def init_llm_model():
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+                temperature=0.1,
+                max_tokens=1024,
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        raise RuntimeError(
+            "未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用；请配置 OpenRouter free 或安装 langchain-ollama。"
+        ) from exc
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         temperature=0.1,
         max_tokens=1024,
     )

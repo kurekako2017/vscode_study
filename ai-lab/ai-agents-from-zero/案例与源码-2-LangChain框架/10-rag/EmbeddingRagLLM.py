@@ -9,11 +9,10 @@
 - 流程：文档加载（Docx2txtLoader）→ 分割（CharacterTextSplitter）→ 向量化并写入 Redis（from_documents）→ `as_retriever()` 得到检索器 → 用 LCEL 把 retriever、prompt、llm 串成链（context + question → prompt → llm）→ `invoke(question)` 得到答案。
 - `RunnablePassthrough()` 表示「把输入原样传给下一环节」；这里把用户问题同时传给 retriever（作为查询）和 prompt（作为 `{question}`）。
 - 本例刻意保留了“有 RAG / 无 RAG”的对比，便于直观看到：RAG 的价值不只是“能回答”，而是“回答时是否真的用到了外挂知识库”。
-- 运行前需启动 Redis、配置 aliQwen-api，且 alibaba-java.docx 在可访问路径（如本脚本同目录）。
+- 运行前需启动 Redis；LLM 优先走 OpenRouter free，Embedding 优先走本地 Ollama，二者都失败时再退 DashScope / aliQwen-api。`alibaba-java.docx` 仍需在可访问路径（如本脚本同目录）。
 """
 
 # pip install unstructured docx2txt python-docx
-from langchain.chat_models import init_chat_model
 import os
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_core.prompts import PromptTemplate
@@ -21,17 +20,42 @@ from langchain_classic.text_splitter import CharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_community.vectorstores import Redis
+from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 
 load_dotenv()
 
+def build_llm():
+    """优先 OpenRouter free；如果没有 key，再回退到本地 Ollama。"""
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_api_key:
+        try:
+            model = init_chat_model(
+                model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+                model_provider="openai",
+                api_key=openrouter_api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+            model.invoke("ping")
+            return model
+        except Exception as exc:
+            print(f"OpenRouter 不可用，切换到本地 Ollama：{exc}")
+
+    try:
+        from langchain_ollama import ChatOllama
+    except ImportError as exc:
+        raise RuntimeError(
+            "未配置 OPENROUTER_API_KEY，且本地 Ollama 依赖不可用；请配置 OpenRouter free 或安装 langchain-ollama。"
+        ) from exc
+
+    return ChatOllama(
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    )
+
+
 # 大模型：用于最终根据「检索到的上下文 + 用户问题」生成回答
-llm = init_chat_model(
-    model="qwen-plus",
-    model_provider="openai",
-    api_key=os.getenv("aliQwen-api"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-)
+llm = build_llm()
 
 # 提示词模板：{context} 由检索器填充，{question} 由用户输入填充；最终会生成一段字符串 Prompt 再交给聊天模型
 prompt_template = """
@@ -50,10 +74,32 @@ prompt = PromptTemplate(
     template=prompt_template, input_variables=["context", "question"]
 )
 
+def build_embeddings():
+    """优先使用本地 Ollama 向量化；没有 Ollama 时回退到 DashScope。"""
+    try:
+        from langchain_ollama import OllamaEmbeddings
+
+        ollama_model = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+        embeddings = OllamaEmbeddings(
+            model=ollama_model,
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        )
+        embeddings.embed_query("ping")
+        return embeddings
+    except Exception as exc:
+        print(f"Ollama embeddings 不可用，切换到 DashScope：{exc}")
+        dashscope_api_key = os.getenv("aliQwen-api")
+        if dashscope_api_key:
+            return DashScopeEmbeddings(
+                model="text-embedding-v3", dashscope_api_key=dashscope_api_key
+            )
+        raise RuntimeError(
+            "请配置本地 Ollama embeddings（OLLAMA_BASE_URL / OLLAMA_EMBED_MODEL），或提供 aliQwen-api 用于 DashScopeEmbeddings。"
+        )
+
+
 # 嵌入模型：用于文档与查询的向量化
-embeddings = DashScopeEmbeddings(
-    model="text-embedding-v3", dashscope_api_key=os.getenv("aliQwen-api")
-)
+embeddings = build_embeddings()
 
 # 1. 加载 docx（错误码文档）
 loader = Docx2txtLoader("alibaba-java.docx")
