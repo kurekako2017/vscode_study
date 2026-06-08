@@ -152,6 +152,27 @@
 
 结合 [在线文档](https://didilili.github.io/ai-agents-from-zero/#/) 一起学习。想马上跑通一个案例？按下面几步即可。更详细的环境说明、API 申请、常见报错处理见 [新手入门与常见问题](新手入门与常见问题.md)。
 
+### 启动说明
+
+#### 根目录运行版
+
+适合你想直接照着仓库里的相对路径命令跑的时候使用。
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero
+python3 -m pip install -r requirements.txt
+python3 案例与源码-2-LangChain框架/01-helloworld/StandardDesc.py
+```
+
+#### 绝对路径运行版
+
+适合你不想切目录，或者当前终端容易被别的 `.venv` 干扰的时候使用。
+
+```bash
+/usr/bin/python3 -m pip install -r /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/requirements.txt
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/案例与源码-2-LangChain框架/01-helloworld/StandardDesc.py
+```
+
 1. **克隆仓库并进入项目目录**
 
    ```bash

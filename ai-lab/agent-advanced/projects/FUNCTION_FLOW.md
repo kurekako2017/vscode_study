@@ -37,12 +37,12 @@
 
 关键名词：
 
-- `Prompt Template`：把问题包装成统一输入格式。
-- `Runnable`：LangChain 里的可组合执行单元。
-- `AIMessage`：模型输出消息对象。
-- `JSON`：示例里要求输出的结构化结果。
-- `raw_message.content`：模型直接返回的原始文本。
-- `parse_response()`：把原始文本重新组装成结构化字典。
+- `Prompt Template / 提示词模板`：把问题包装成统一输入格式。
+- `Runnable / 可组合执行单元`：LangChain 里的可组合执行单元。
+- `AIMessage / 模型消息`：模型输出消息对象。
+- `JSON / JSON 结构`：示例里要求输出的结构化结果。
+- `raw_message.content / 原始文本`：模型直接返回的原始文本。
+- `parse_response() / 输出解析`：把原始文本重新组装成结构化字典。
 理解要点：
 
 - “链路”就是一串按顺序衔接的处理步骤，前一步的输出会变成下一步的输入。
@@ -56,19 +56,37 @@
 链路小图：
 
 ```text
-用户问题
+用户问题 / User question
    |
    v
-Prompt 模板
+build_prompt() / Prompt 模板
    |
    v
-模型（mock_llm / real llm）
+mock_llm() / real llm / 模型调用
    |
    v
-输出解析（parse_response）
+parse_response() / 输出解析
    |
    v
-最终结果
+最终结果 / Final result
+```
+
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+build_prompt() / 提示词模板
+   |
+   v
+mock_llm() / real llm / 模型调用
+   |
+   v
+parse_response() / 输出解析
+   |
+   v
+最终结果 / Final result
 ```
 
 ## 2. LangGraph 工作流
@@ -81,11 +99,11 @@ Prompt 模板
 
 关键名词：
 
-- `State`：贯穿整个图的共享状态。
-- `Node`：图里的一个处理步骤。
-- `Edge`：节点之间的固定连线。
-- `Conditional Edge`：根据状态决定下一步走向。
-- `Loop`：`revise()` 和 `review()` 之间的循环。
+- `State / 状态`：贯穿整个图的共享状态。
+- `Node / 节点`：图里的一个处理步骤。
+- `Edge / 边`：节点之间的固定连线。
+- `Conditional Edge / 条件边`：根据状态决定下一步走向。
+- `Loop / 循环`：`revise()` 和 `review()` 之间的循环。
 
 理解要点：
 
@@ -100,23 +118,24 @@ Prompt 模板
 工作流小图：
 
 ```text
-用户问题
+用户问题 / User question
    |
    v
-classify_intent
+classify_intent() / 判断意图
    |
    v
-research
+research() / 收集要点
    |
    v
-draft
+draft() / 生成草稿
    |
    v
-review
+review() / 审核草稿
    |
-   +----> revise ----+
-   |                 |
-   +------ finalize <+
+   v
+route_after_review() / 分支判断
+  ├─ 不通过 -> revise() / 修订草稿 -> 返回 review()
+  └─ 通过    -> finalize() / 生成最终结果
 ```
 
 ## 3. 高级 RAG 管线
@@ -129,12 +148,12 @@ review
 
 关键名词：
 
-- `Document`：LangChain 文档对象。
-- `Chunk`：切分后的文本片段。
-- `rewrite query`：把问题改写成更适合检索的版本。
-- `retrieve`：初步召回相关 chunk。
-- `rerank`：对召回结果二次排序。
-- `synthesize answer`：把结果组织成最终回答。
+- `Document / 文档对象`：LangChain 文档对象。
+- `Chunk / 文本块`：切分后的文本片段。
+- `rewrite query / 查询改写`：把问题改写成更适合检索的版本。
+- `retrieve / 初步检索`：初步召回相关 chunk。
+- `rerank / 二次重排`：对召回结果二次排序。
+- `synthesize answer / 合成答案`：把结果组织成最终回答。
 
 理解要点：
 
@@ -146,6 +165,30 @@ review
 - `rerank()` 负责补分和重排。
 - `synthesize_answer()` 负责输出带引用的答案。
 
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+load_documents() / 加载文档
+   |
+   v
+chunk_documents() / 切分文档
+   |
+   v
+retrieve() / 初步检索
+   |
+   v
+rerank() / 二次重排
+   |
+   v
+synthesize_answer() / 合成答案
+   |
+   v
+print() / 打印结果
+```
+
 ## 4. 社内文件 + Wiki 混合检索
 
 文件：`internal_hybrid_rag_demo/main.py`
@@ -156,11 +199,11 @@ review
 
 关键名词：
 
-- `catalog`：文档清单。
-- `ACL`：访问控制列表。
-- `role`：当前用户角色。
+- `catalog / 文档清单`：文档清单。
+- `ACL / 访问控制列表`：访问控制列表。
+- `role / 角色`：当前用户角色。
 - `server_docs` / `wiki_docs`：两类来源文档。
-- `权限过滤`：先把不可见内容剔除，再做检索。
+- `权限过滤 / Access filter`：先把不可见内容剔除，再做检索。
 
 理解要点：
 
@@ -174,6 +217,30 @@ review
 - `rerank()` 再根据来源和命中数微调。
 - `synthesize_answer()` 把答案、引用和权限概况一起输出。
 
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+load_documents() / 加载文档目录
+   |
+   v
+filter_by_role() / 按角色过滤权限
+   |
+   v
+retrieve() / 初步检索
+   |
+   v
+rerank() / 二次重排
+   |
+   v
+synthesize_answer() / 合成带引用答案
+   |
+   v
+print_section() / print()（打印结果）
+```
+
 ## 5. LlamaIndex 概念版索引
 
 文件：`llamaindex_index_demo/main.py`
@@ -184,11 +251,11 @@ review
 
 关键名词：
 
-- `Document`：原始文档。
-- `Node`：切分后的节点。
-- `Inverted Index`：倒排索引。
-- `QueryEngine`：查询引擎思路。
-- `QueryResult`：检索结果对象。
+- `Document / 原始文档`：原始文档。
+- `Node / 节点`：切分后的节点。
+- `Inverted Index / 倒排索引`：倒排索引。
+- `QueryEngine / 查询引擎`：查询引擎思路。
+- `QueryResult / 查询结果`：检索结果对象。
 
 理解要点：
 
@@ -197,6 +264,30 @@ review
 - `expand_query()` 让问题更容易命中相关词。
 - `retrieve()` 先用索引召回，再做轻微加分。
 - `synthesize_answer()` 用结果拼出带引用的回答。
+
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+load_documents() / 加载文档
+   |
+   v
+split_into_nodes() / 切分节点
+   |
+   v
+build_inverted_index() / 构建倒排索引
+   |
+   v
+retrieve() / 召回节点
+   |
+   v
+synthesize_answer() / 合成答案
+   |
+   v
+print() / 打印结果
+```
 
 ## 6. 多 Agent 协作
 
@@ -208,12 +299,12 @@ review
 
 关键名词：
 
-- `Supervisor`：总调度者。
-- `Planner`：任务拆分者。
-- `Researcher`：资料收集者。
-- `Writer`：内容组织者。
-- `Critic`：审核者。
-- `TeamState`：共享状态容器。
+- `Supervisor / 总调度者`：总调度者。
+- `Planner / 任务拆分者`：任务拆分者。
+- `Researcher / 资料收集者`：资料收集者。
+- `Writer / 内容组织者`：内容组织者。
+- `Critic / 审核者`：审核者。
+- `TeamState / 共享状态`：共享状态容器。
 
 理解要点：
 
@@ -223,6 +314,33 @@ review
 - `writer_agent()` 生成草稿。
 - `critic_agent()` 找缺项。
 - `supervisor()` 串起整个协作闭环。
+
+工作流小图：
+
+```text
+主题 / Topic
+   |
+   v
+supervisor() / 总调度
+   |
+   v
+planner_agent() / 规划任务
+   |
+   v
+researcher_agent() / 调研资料
+   |
+   v
+writer_agent() / 生成草稿
+   |
+   v
+critic_agent() / 审校问题
+   |
+   v
+writer_agent() / 修订草稿
+   |
+   v
+print(final_answer) / 最终答案
+```
 
 ## 7. 容器化服务
 
@@ -234,16 +352,31 @@ review
 
 关键名词：
 
-- `HTTPServer`：标准库 HTTP 服务。
-- `Handler`：请求处理器。
-- `Health Check`：健康检查接口。
-- `Environment Variable`：环境变量配置。
+- `HTTPServer / HTTP 服务`：标准库 HTTP 服务。
+- `Handler / 请求处理器`：请求处理器。
+- `Health Check / 健康检查`：健康检查接口。
+- `Environment Variable / 环境变量`：环境变量配置。
 
 理解要点：
 
 - `do_GET()` 负责构造响应体。
 - `log_message()` 被重写为静默输出。
 - `main()` 负责启动服务。
+
+工作流小图：
+
+```text
+HTTPServer(...) / 启动服务
+   |
+   v
+等待请求 / Wait for request
+   |
+   v
+Handler.do_GET() / 处理 GET
+   |
+   v
+返回 JSON / Return JSON
+```
 
 ## 8. RAG 评估脚本
 
@@ -255,11 +388,11 @@ review
 
 关键名词：
 
-- `Sample`：评估样本。
-- `gold_sources`：标准来源。
-- `retrieved_sources`：检索结果来源。
-- `coverage`：覆盖率。
-- `precision`：精确率。
+- `Sample / 样本`：评估样本。
+- `gold_sources / 标准来源`：标准来源。
+- `retrieved_sources / 检索来源`：检索结果来源。
+- `coverage / 覆盖率`：覆盖率。
+- `precision / 精确率`：精确率。
 
 理解要点：
 
@@ -267,6 +400,27 @@ review
 - `coverage()` 看标准来源覆盖了多少。
 - `precision()` 看召回结果有多少是对的。
 - `main()` 逐条输出报表并计算平均值。
+
+工作流小图：
+
+```text
+样本数据 / Samples
+   |
+   v
+load_samples() / 加载样本
+   |
+   v
+coverage() / 计算覆盖率
+   |
+   v
+precision() / 计算精确率
+   |
+   v
+print(report) / 打印报表
+   |
+   v
+print(summary) / 打印汇总
+```
 
 ## 9. 快速记忆版
 
