@@ -2,13 +2,38 @@
 
 这份说明把 `projects/` 下的 Python demo 按“入口函数 -> 核心调用链 -> 关键名词”整理起来，方便快速建立整体理解。
 
+## 概念对照
+
+| 概念 | 一句话理解 | 在代码里的例子 |
+| --- | --- | --- |
+| 链路 | 一串按顺序连接的处理步骤，前一步输出给下一步输入 | `prompt | llm | parser` |
+| 工作流 | 比链路更完整的流程，通常包含分支、回路、条件判断 | `LangGraph` 里的 `review -> revise -> review` |
+| 图 | 用节点和边描述整个流程的结构 | `StateGraph` |
+| 节点 | 流程里的一个处理步骤 | `classify_intent()`、`research()` |
+| 边 | 节点之间的连接关系 | `START -> classify_intent -> research` |
+| 状态 | 流程中持续传递的共享数据 | `WorkflowState` |
+| 解析 | 把模型输出整理成更规整的数据结构 | `parse_response()` |
+| 原始输出 | 模型直接吐出来的文本 | `raw_message.content` |
+| 结构化结果 | 解析后更适合程序继续处理的结果 | `dict` / `JSON` |
+
+## LangChain vs LangGraph
+
+| 维度 | LangChain | LangGraph |
+| --- | --- | --- |
+| 核心形态 | 链路 / 管道 | 图 / 工作流 |
+| 重点 | 把 prompt、模型、解析器串起来 | 把多个处理步骤组织成可分支、可循环的流程 |
+| 适合场景 | 单次问答、简单转换、固定顺序处理 | 多步骤任务、审校回路、条件分支 |
+| 流程表达 | `prompt | llm | parser` | `state + node + edge + conditional edge` |
+| 运行方式 | 一路往下执行 | 可能回到前一步，也可能走不同分支 |
+| 你可以把它理解成 | 一条流水线 | 一张流程图 |
+
 ## 1. LangChain 风格链路
 
 文件：`langchain_chain_demo/main.py`
 
 调用流程：
 
-`main()（程序入口）` -> `parse_args()（解析参数）` -> `build_chain(use_mock)（组装链路）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `print(mermaid)（打印链路图）` -> `chain.invoke(...)（执行链路）` -> `print(result)（打印运行结果）`
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `print(模式)（打印运行模式）` -> `build_chain(use_mock)（组装解析链路）` / `build_generation_chain(use_mock)（只保留原始输出链路）` -> `build_prompt()（构造提示词）` -> `build_real_llm()（真实模型）` / `mock_llm()（本地模拟模型）` -> `parse_response()（解析输出）` -> `print(mermaid)（打印链路图）` -> `chain.invoke(...)（执行并打印解析后结果）` / `generation_chain.invoke(...)（执行并打印原始结果）`
 
 关键名词：
 
@@ -16,13 +41,35 @@
 - `Runnable`：LangChain 里的可组合执行单元。
 - `AIMessage`：模型输出消息对象。
 - `JSON`：示例里要求输出的结构化结果。
+- `raw_message.content`：模型直接返回的原始文本。
+- `parse_response()`：把原始文本重新组装成结构化字典。
 理解要点：
 
+- “链路”就是一串按顺序衔接的处理步骤，前一步的输出会变成下一步的输入。
 - `build_prompt()` 负责定义输入格式。
 - `build_chain()` 负责把 prompt、模型和解析器串起来。
+- `build_generation_chain()` 负责只拿原始模型输出，方便对比解析前后差异。
 - `mock_llm()` 负责在不联网时模拟模型输出。
 - `parse_response()` 负责把模型消息整理成字典。
-- `main()` 负责选择模式，并确保 mock 也能独立运行。
+- `main()` 负责选择模式，默认先尝试真实模型，失败后回退到 mock。
+
+链路小图：
+
+```text
+用户问题
+   |
+   v
+Prompt 模板
+   |
+   v
+模型（mock_llm / real llm）
+   |
+   v
+输出解析（parse_response）
+   |
+   v
+最终结果
+```
 
 ## 2. LangGraph 工作流
 
@@ -49,6 +96,28 @@
 - `route_after_review()` 决定继续修订还是结束。
 - `revise()` 形成一次回路修订。
 - `finalize()` 汇总最终输出。
+
+工作流小图：
+
+```text
+用户问题
+   |
+   v
+classify_intent
+   |
+   v
+research
+   |
+   v
+draft
+   |
+   v
+review
+   |
+   +----> revise ----+
+   |                 |
+   +------ finalize <+
+```
 
 ## 3. 高级 RAG 管线
 

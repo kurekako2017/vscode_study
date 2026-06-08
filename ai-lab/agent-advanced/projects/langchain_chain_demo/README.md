@@ -8,7 +8,7 @@ LangChain 风格最小链路示例。
 2. `RunnableLambda` / `|` 串起链路
 3. 结构化输出解析
 
-默认不需要 API Key，直接可以跑。
+默认会先尝试真实模型；如果没配 API Key，会自动回退到 mock。
 
 ## 安装
 
@@ -21,21 +21,30 @@ LangChain 风格最小链路示例。
 ## 运行
 
 ```bash
-/usr/bin/python3 -m pip install -r requirements.txt
 /usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "什么是 LangChain 的链式编排"
 ```
 
-尝试真实模式：
+强制 mock：
 
 ```bash
-/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py --real "什么是 LangChain 的链式编排"
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "什么是 LangChain 的链式编排" --mock
 ```
+
+如果你已经配置了 API Key，直接不加 `--mock` 就会优先尝试真实模式。
+
+如果你想同时看“模型原始输出”和“解析后的结果”，再加上 `--show-raw`。
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "什么是 LangChain 的链式编排" --show-raw
+```
+
+输出里会先看到 `=== 原始结果 ===`，再看到 `=== 解析后结果 ===`。
 
 ## 常见报错
 
 - 如果终端里的 `which python3` 还指向别的 `.venv`，就直接用 `/usr/bin/python3` 执行上面的命令。
 - 如果 VS Code 里还是红线，通常是 Python 解释器没切到当前 WSL 的 `/usr/bin/python3`，重载窗口或重新选择解释器即可。
-- `缺少 langchain-openai`：只在 `--real` 模式需要；如果只是练流程，直接用 `--mock` 即可。
+- `缺少 langchain-openai`：只在真实模式需要；如果只是练流程，直接用 `--mock` 即可。
 
 ## 学习顺序
 
@@ -43,3 +52,9 @@ LangChain 风格最小链路示例。
 2. 再看 `mock_llm()`
 3. 再看 `parse_response()`
 4. 最后看 `build_chain()`
+
+如果想理解“上面那段是原始模型输出，下面那段是重新组装后的结构化结果”，再补看一次 `--show-raw` 的输出：
+
+- `raw_message.content` 是模型直接吐出来的原始内容
+- `parse_response()` 是把原始内容重新解析成字典
+- `print(json.dumps(...))` 打印的是解析后的最终结果

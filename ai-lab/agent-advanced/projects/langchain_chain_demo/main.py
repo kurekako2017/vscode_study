@@ -48,6 +48,12 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help=f"真实模式下使用的模型名，默认 {DEFAULT_MODEL}",
     )
+    # 是否同时打印模型原始输出，便于理解“原始结果”和“解析后结果”的差别。
+    parser.add_argument(
+        "--show-raw",
+        action="store_true",
+        help="打印模型原始输出，再打印解析后的结果",
+    )
     # 解析并返回结果。
     return parser.parse_args()
 
@@ -155,32 +161,57 @@ def build_chain(use_mock: bool):
     return prompt | llm | RunnableLambda(parse_response)
 
 
+# 只构造 prompt -> llm，用于查看原始模型输出。
+def build_generation_chain(use_mock: bool):
+    # 先构造 prompt。
+    prompt = build_prompt()
+    # 根据开关决定使用 mock 还是真实模型。
+    llm = RunnableLambda(mock_llm) if use_mock else build_real_llm()
+    # prompt -> llm
+    return prompt | llm
+
+
 # 程序入口，构建链路并执行一次推理。
 def main() -> None:
     # 解析命令行参数。
     args = parse_args()
-    # 只要没有显式要求真实模式，就默认用 mock。
-    use_mock = args.mock or not args.real
 
-    # 如果用户要求真实模式，就先尝试构建真实链路。
-    if args.real and not use_mock:
+    # 默认优先尝试真实模式，只有显式指定 --mock 时才直接用 mock。
+    if args.mock:
+        print("=== 模式 ===")
+        print("mock（强制本地模拟）")
+        # 用户明确要求 mock，就跳过真实模型。
+        chain = build_chain(True)
+    else:
+        print("=== 模式 ===")
+        print("real（优先尝试真实模型，失败后回退到 mock）")
+        # 默认先尝试真实链路，不可用时再回退到 mock。
         try:
             chain = build_chain(False)
         except Exception as exc:
             # 真实模式失败时，自动回退到 mock，保证演示可继续。
             print(f"真实模式不可用，回退到 mock：{exc}")
             chain = build_chain(True)
-    else:
-        # 普通情况下直接构建 mock 链路。
-        chain = build_chain(True)
 
     # 打印 Mermaid 图，方便学习链路结构。
     print("=== LangChain 风格链路（Mermaid） ===")
     print(chain.get_graph().draw_mermaid())  # 打印 Mermaid 图，方便学习链路结构。
-    # 执行链路并打印结果。
-    print("=== 运行结果 ===")
-    result = chain.invoke({"question": args.question})  # 执行链路并打印结果。  
-    print(json.dumps(result, ensure_ascii=False, indent=2))  # 打印结果。
+
+    # 如果用户想看原始模型输出，就先打印原始内容，再打印解析结果。
+    if args.show_raw:
+        generation_chain = build_generation_chain(args.mock)
+        raw_message = generation_chain.invoke({"question": args.question})
+        print("=== 原始结果 ===")
+        print(raw_message.content)
+        print("=== 解析后结果 ===")
+        print(
+            json.dumps(parse_response(raw_message), ensure_ascii=False, indent=2)
+        )
+    else:
+        # 默认只打印解析后的结果，输出更干净。
+        print("=== 运行结果 ===")
+        result = chain.invoke({"question": args.question})  # 执行链路并打印结果。
+        print(json.dumps(result, ensure_ascii=False, indent=2))  # 打印结果。
 
 
 if __name__ == "__main__":
