@@ -12,6 +12,7 @@
 - [3. 方案一：本地全免费（最推荐练手）](#sec-3)
 - [4. 方案二：开源桥接免费云端模型](#sec-4)
 - [5. 方案三：免费额度型云端插件](#sec-5)
+- [5.2 NVIDIA NIM / Build 免费端点](#sec-5-2)
 - [6. 方案四：Token 聚合与路由节流](#sec-6)
 - [7. 按阶段怎么选](#sec-7)
 - [8. UM890 Pro 推荐组合](#sec-8)
@@ -273,6 +274,49 @@ claude
 - 补全用 **Codeium** 或 **Copilot Free**  
 - 深度改码、长上下文用 **本地 Continue** 或 **OpenRouter 桥接**  
 - 避免 **Cursor Pro / Claude Pro** 与免费方案 **重复付费**
+
+<a id="sec-5-2"></a>
+
+### 5.2 NVIDIA NIM / Build 免费端点（官方免费模型）
+
+如果你想要的是“**官方可用的免费模型端点**”，NVIDIA 的 [`build.nvidia.com`](https://build.nvidia.com/) 是一个值得补进方案里的选项。官方页面会把部分模型标成 **Free Endpoint** 或 **Downloadable Free Endpoint**，并提供 `NVIDIA_API_KEY` 的接入方式。  
+适合场景：**在线试用、Prompt 练习、Agent 走通路、需要 OpenAI 风格接口的开发测试**。
+
+| 项目 | 说明 |
+| --- | --- |
+| 平台 | [build.nvidia.com](https://build.nvidia.com/) / NVIDIA NIM APIs |
+| 费用 | 官方标注为 Free Endpoint 的模型可免费试用，具体额度与条款以官网为准 |
+| 接入方式 | 使用 `NVIDIA_API_KEY`，并通过 `https://integrate.api.nvidia.com/v1` 这类 OpenAI 兼容入口调用 |
+| 适合 | 聊天、代码辅助、规划、推理、多模态问答、RAG 试验 |
+| 注意 | 免费端点、模型名称、额度会调整，使用前先核对官方模型页 |
+
+**可优先看的模型类型：**
+
+- `nemotron` 系列：偏推理、规划、工具调用，适合 Agent / 编码辅助
+- `llama-3.3-nemotron-*`：适合聊天、代码理解、规划类任务
+- `llama-3.1-nemotron-*`：适合轻量级推理和多模态场景
+- `cosmos*`、`paligemma` 等：更偏多模态、视觉理解，不一定是编码主力，但可作为补充方案
+
+**简化接入步骤：**
+
+```bash
+# 1) 到 build.nvidia.com 申请 NVIDIA API Key
+# 2) 在支持 OpenAI 兼容接口的工具里配置：
+#    base_url = https://integrate.api.nvidia.com/v1
+#    api_key  = 你的 NVIDIA_API_KEY
+# 3) 选择官网当前可用的 Free Endpoint 模型
+```
+
+**适合放进本方案的原因：**
+
+- 你可以把它当成“**官方免费云端模型**”补进白嫖梯队
+- 和 OpenRouter 免费模型相比，NVIDIA 这条线更像“官方平台的免费入口”
+- 对写代码的人来说，`OpenAI-compatible` 接法比较容易接到 Continue / Cline / 自己的 FastAPI 里
+
+**官方入口：**
+
+- [NVIDIA Build / NIM APIs](https://build.nvidia.com/)
+- [OpenAI Compatible Services - NVIDIA Docs](https://docs.nvidia.com/nemo/curator/latest/curate-text/generate-data/connect-service/openai.html)
 
 ---
 
