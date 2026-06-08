@@ -79,7 +79,7 @@ def chunk_documents(documents: list[Document]) -> list[Document]:
     # 返回切分后的 chunk。
     return chunks
 
-
+# 层次: 数据模型层 — 建立带 source_label 的片段列表
 ALIASES = {
     "langchain": ["langchain", "链", "prompt", "runnable", "tool calling"],
     "llamaindex": ["llamaindex", "索引", "query engine", "node parser"],
@@ -88,14 +88,14 @@ ALIASES = {
     "multi-agent": ["multi-agent", "多 agent", "supervisor", "planner", "critic"],
 }
 
-
-# 根据问题类型生成多个改写版本。
+# 层次: 检索准备层 — 为关键词匹配做准备 
+# 根据问题类型生成多个改写版本。（生成多个改写版本）    
 def rewrite_queries(query: str) -> list[str]:
     # variants 里保存原问题和改写问题。
     variants = [query]
     # 统一小写版本，便于做英文判断。
     lower = query.lower()
-    # “区别/对比”类问题，顺手加一个对比版本。
+    # “区别/对比”类问题，顺手加一个对比版本。   
     if "区别" in query or "对比" in query:
         variants.append(query.replace("区别", "对比"))
     # 检索类问题，增加更泛化的检索词。
