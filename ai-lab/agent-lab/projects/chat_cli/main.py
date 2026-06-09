@@ -37,6 +37,8 @@ except ImportError:  # pragma: no cover - used only when dependency is missing
 
 DEFAULT_MODEL = "gpt-5"
 """默认模型名，可用 `--model` 覆盖。"""
+# OpenRouter 兼容服务默认基址。
+DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 # 系统提示词，用于告诉模型如何回答问题
 SYSTEM_INSTRUCTIONS = (
     "你是一个简洁的助手，用于一个 LLM 代理学习实验室。"
@@ -70,7 +72,7 @@ def parse_args() -> argparse.Namespace:
     mode_group.add_argument(
         "--real",
         action="store_true",
-        help="强制真实 API 模式（需要 OPENAI_API_KEY）。",
+        help="强制真实 API 模式（需要 OPENROUTER_API_KEY 或 OPENAI_API_KEY）。",
     )
     parser.add_argument(
         "--max-chars",
@@ -82,29 +84,43 @@ def parse_args() -> argparse.Namespace:
 
 # 层次划分说明：环境检查、模式决策、客户端构建、单次调用封装、输出格式化、交互循环等功能被划分为不同层次，便于理解和练习程序结构。
 # - 基础设施层：负责客户端构建与外部依赖读取     （构建客户端并返回实例）       
+def _has_real_credentials() -> bool:
+    # 优先支持 OpenRouter，再兼容 OpenAI 官方接口。
+    return bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY"))
+
+
+def _build_openai_client() -> Any:
+    # 统一构建 OpenAI 兼容客户端。
+    if OpenAI is None:
+        print("ERROR: openai package is not installed. Run: pip install -r requirements.txt", file=sys.stderr)
+        sys.exit(1)
+
+    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("ERROR: OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
+        sys.exit(1)
+
+    client_kwargs: dict[str, Any] = {"api_key": api_key}
+    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
+        client_kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
+    elif os.getenv("OPENAI_BASE_URL"):
+        client_kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
+
+    return OpenAI(**client_kwargs)
+
+
 def build_client(use_mock: bool) -> Any:
     # 层次: 基础设施层 — 负责客户端构建与外部依赖读取
     """从环境变量读取 API Key 并返回 OpenAI 客户端实例。
 
-    若未配置 `OPENAI_API_KEY`，则打印错误并退出。
+    若未配置 OpenRouter 或 OpenAI API Key，则打印错误并退出。
     """
     # 如果处于 mock 模式，直接返回 None，调用方会根据此判断不发起真实网络请求
     if use_mock:
         return None
 
-    # 如果没有安装 openai SDK，提示用户并退出程序（因为后续会需要调用 SDK）
-    if OpenAI is None:
-        print("ERROR: openai package is not installed. Run: pip install -r requirements.txt", file=sys.stderr)
-        sys.exit(1)
-
-    # 从环境中读取 API Key，若不存在则安全退出并提示如何设置
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
-        sys.exit(1)
-
     # 返回一个已配置的 OpenAI 客户端实例，后续可以调用 client.responses.create(...)
-    return OpenAI(api_key=api_key)
+    return _build_openai_client()
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> bool:
@@ -125,15 +141,9 @@ def resolve_mode(force_mock: bool, force_real: bool) -> bool:
         return False
 
     # 如果未指定模式，则根据环境变量决定使用哪种模式
-    if not os.getenv("OPENAI_API_KEY"):
+    if not _has_real_credentials():
         # 没有找到 API Key，自动切换到 mock 模式（本地演练而不触网）     （如果未找到 API Key，则自动切换到 mock 模式）
-        print("INFO: 未设置 OPENAI_API_KEY，自动切换到 MOCK 模式.", file=sys.stderr)
-        return True
-
-    # 如果未安装 SDK，则自动切换到 mock 模式     （如果未安装 SDK，则自动切换到 mock 模式）
-    if OpenAI is None:
-        # 未安装 SDK 时也自动切换到 mock，避免运行时出错     （如果未安装 SDK，则自动切换到 mock 模式）  （如果未安装 SDK，则自动切换到 mock 模式）
-        print("INFO: openai package not installed, auto-switching to MOCK mode.", file=sys.stderr)
+        print("INFO: 未设置 OPENROUTER_API_KEY / OPENAI_API_KEY，自动切换到 MOCK 模式.", file=sys.stderr)
         return True
 
     # 如果未指定模式，则根据环境变量决定使用哪种模式     （如果未指定模式，则根据环境变量决定使用哪种模式）

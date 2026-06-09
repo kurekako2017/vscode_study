@@ -14,9 +14,21 @@ from ragflow_sdk import RAGFlow
 from app.api.monitor import monitor
 from app.ragflow.rag_config import _load_ragflow_env
 
-# 模块级复用 RAGFlow 客户端，避免每次工具调用都重新初始化 SDK 对象
-api_key, base_url = _load_ragflow_env()
-ragflow_client = RAGFlow(api_key=api_key, base_url=base_url)
+_ragflow_client = None
+
+
+def _get_ragflow_client():
+    """Create a RAGFlow client on demand so the API can boot without credentials."""
+    global _ragflow_client
+    if _ragflow_client is not None:
+        return _ragflow_client
+
+    api_key, base_url = _load_ragflow_env()
+    if not api_key or not base_url:
+        return None
+
+    _ragflow_client = RAGFlow(api_key=api_key, base_url=base_url)
+    return _ragflow_client
 
 
 # @tool 会把函数签名和 docstring 暴露给 DeepAgents，模型据此决定是否调用以及如何填参
@@ -34,6 +46,10 @@ def get_assistant_list() -> str:
     monitor.report_tool(tool_name="ragflow聊天助手列表查询工具：get_assistant_list")
 
     try:
+        ragflow_client = _get_ragflow_client()
+        if ragflow_client is None:
+            return "RAGFLOW_API_URL 或 RAGFLOW_API_KEY 未配置，当前环境无法查询内部知识库。"
+
         # list_chats 查询的是 RAGFlow 的 Chat 层，不是 Dataset 层
         # Chat 负责对外问答，Dataset 只负责承载文档
         chat_list = ragflow_client.list_chats()
@@ -69,6 +85,10 @@ def create_ask_delete(chat_name, question) -> str:
     )
 
     try:
+        ragflow_client = _get_ragflow_client()
+        if ragflow_client is None:
+            return "RAGFLOW_API_URL 或 RAGFLOW_API_KEY 未配置，当前环境无法提问内部知识库。"
+
         # 先按名称找到 Chat 对象；真正提问时还需要在 Chat 下创建 Session
         chats = ragflow_client.list_chats(name=chat_name)
         use_chat = chats[0]

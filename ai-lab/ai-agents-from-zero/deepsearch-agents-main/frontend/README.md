@@ -19,8 +19,12 @@ VITE_WS_BASE_URL=ws://localhost:8000
 
 ## Backend Contract
 
+- `GET /api/health`
 - `POST /api/task`
 - `POST /api/upload`
 - `GET /api/files`
 - `GET /api/download`
 - `WebSocket /ws/{thread_id}`
+
+The sidebar reads `GET /api/health` to show whether the backend, model, MySQL, Tavily,
+and RAGFlow configuration are present.

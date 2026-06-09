@@ -1,5 +1,11 @@
 import { API_BASE_URL } from "./config";
-import type { CancelTaskResponse, FileListResponse, TaskResponse, UploadResponse } from "../types";
+import type {
+  CancelTaskResponse,
+  FileListResponse,
+  HealthResponse,
+  TaskResponse,
+  UploadResponse
+} from "../types";
 
 function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
@@ -54,6 +60,10 @@ export async function uploadSessionFiles(
     method: "POST",
     body: formData
   });
+}
+
+export async function getHealthStatus(): Promise<HealthResponse> {
+  return requestJson<HealthResponse>(apiUrl("/api/health"));
 }
 
 export async function listSessionFiles(path: string): Promise<FileListResponse> {

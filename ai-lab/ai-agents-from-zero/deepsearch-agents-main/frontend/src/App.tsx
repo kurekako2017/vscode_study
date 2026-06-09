@@ -13,9 +13,10 @@ import { useEffect, useRef, useState } from "react";
 import { ChatComposer } from "./components/ChatComposer";
 import { ConversationThread } from "./components/ConversationThread";
 import type { ChatTurn } from "./components/ConversationThread";
+import { getHealthStatus } from "./lib/api";
 import { API_BASE_URL, WS_BASE_URL } from "./lib/config";
 import { useDeepAgentSession } from "./hooks/useDeepAgentSession";
-import type { ConnectionState, UploadedItem } from "./types";
+import type { ConnectionState, HealthResponse, UploadedItem } from "./types";
 
 function connectionLabel(state: ConnectionState): string {
   const labels: Record<ConnectionState, string> = {
@@ -44,8 +45,31 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [stagedItems, setStagedItems] = useState<UploadedItem[]>([]);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
+  const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [healthError, setHealthError] = useState("");
   const streamRef = useRef<HTMLElement | null>(null);
   const session = useDeepAgentSession();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getHealthStatus()
+      .then((response) => {
+        if (!cancelled) {
+          setHealth(response);
+          setHealthError("");
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setHealthError(error instanceof Error ? error.message : "健康检查失败");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     setTurns((previous) => {
@@ -203,6 +227,38 @@ export default function App() {
           <span className="sidebar-label">ENDPOINTS</span>
           <code>{API_BASE_URL}</code>
           <code>{WS_BASE_URL}</code>
+        </div>
+
+        <div className="sidebar-section sidebar-health">
+          <span className="sidebar-label">HEALTH</span>
+          {health ? (
+            <>
+              <div className={`sidebar-health-row ${health.backend === "alive" ? "sidebar-health-row--ok" : ""}`}>
+                <strong>Backend</strong>
+                <span>{health.backend}</span>
+              </div>
+              <div className="sidebar-health-row">
+                <strong>LLM</strong>
+                <span>{health.llm.configured ? `${health.llm.source} / ${health.llm.model}` : "未配置"}</span>
+              </div>
+              <div className="sidebar-health-row">
+                <strong>MySQL</strong>
+                <span>{health.mysql.configured ? `${health.mysql.host}:${health.mysql.port}` : "未配置"}</span>
+              </div>
+              <div className="sidebar-health-row">
+                <strong>Services</strong>
+                <span>
+                  Tavily {health.services.tavily ? "OK" : "OFF"} · RAGFlow{" "}
+                  {health.services.ragflow ? "OK" : "OFF"}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="sidebar-health-row sidebar-health-row--muted">
+              <strong>检查</strong>
+              <span>{healthError || "正在读取后端状态..."}</span>
+            </div>
+          )}
         </div>
       </aside>
 

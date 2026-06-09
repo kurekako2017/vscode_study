@@ -40,6 +40,25 @@ export interface UploadResponse {
   files: string[];
 }
 
+export interface HealthResponse {
+  status: string;
+  backend: string;
+  llm: {
+    configured: boolean;
+    source: string;
+    model: string;
+  };
+  mysql: {
+    host: string;
+    port: string;
+    configured: boolean;
+  };
+  services: {
+    tavily: boolean;
+    ragflow: boolean;
+  };
+}
+
 export interface OutputFile {
   name: string;
   type: "file" | string;

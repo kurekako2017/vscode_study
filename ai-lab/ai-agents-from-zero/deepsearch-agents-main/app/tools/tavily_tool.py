@@ -16,9 +16,21 @@ from app.api.monitor import monitor
 
 load_dotenv()
 
+_tavily_client = None
 
-# TavilyClient 是实际访问搜索服务的客户端；模块级复用可避免每次工具调用重复初始化
-tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+
+def _get_tavily_client():
+    """Create a Tavily client on demand so the API can boot without the key."""
+    global _tavily_client
+    if _tavily_client is not None:
+        return _tavily_client
+
+    api_key = os.getenv("TAVILY_API_KEY")
+    if not api_key:
+        return None
+
+    _tavily_client = TavilyClient(api_key=api_key)
+    return _tavily_client
 
 
 # @tool 会把函数签名和 docstring 暴露给 DeepAgents，模型据此决定是否调用以及如何填参
@@ -50,6 +62,10 @@ def internet_search(
             "include_raw_content": include_raw_content,
         },
     )
+
+    tavily_client = _get_tavily_client()
+    if tavily_client is None:
+        return "TAVILY_API_KEY 未配置，当前环境无法执行网络搜索。"
 
     # Tavily 返回 query、results、title、url、content 等结构化字段，后续由子智能体阅读并汇总
     return tavily_client.search(

@@ -30,6 +30,8 @@ from pydantic import BaseModel, Field
 
 #   默认模型名，可用 `--model` 覆盖。
 DEFAULT_MODEL = "gpt-4o"
+#   OpenRouter 兼容服务默认基址。
+DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #  系统指令：引导模型生成符合 `AgentPlan` 结构的输出，强调清晰简洁。
 SYSTEM_INSTRUCTIONS = (
     "您是LLM智能体学习实验室的助理. "
@@ -72,21 +74,30 @@ def parse_args() -> argparse.Namespace:
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
     parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
-    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY).")
+    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).")
     return parser.parse_args()
+
+
+def _has_real_credentials() -> bool:
+    return bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY"))
 
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理缺失情况
-    """创建 OpenAI 客户端，要求通过环境变量提供 `OPENAI_API_KEY`。
+    """创建 OpenAI 兼容客户端，优先支持 OpenRouter。
 
     说明：在 mock 模式下不会调用此函数；在真实模式下，如果没有 API Key，程序会提示错误并退出。
     """
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
     if not api_key:
-        print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
+        print("ERROR: OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
         sys.exit(1)
-    return OpenAI(api_key=api_key)
+    kwargs: dict[str, str] = {"api_key": api_key}
+    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
+        kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
+    elif os.getenv("OPENAI_BASE_URL"):
+        kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
+    return OpenAI(**kwargs)
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
@@ -94,7 +105,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
     - force_mock 为真时强制 mock
     - force_real 为真时强制 real（无 Key 则报错）
-    - 否则根据是否配置 OPENAI_API_KEY 自动选择
+    - 否则根据是否配置 OpenRouter / OpenAI key 自动选择
     """
     # 如果 force_mock 为 True，则返回 "mock"
     if force_mock:
@@ -102,15 +113,14 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
     # 如果 force_real 为 True，则返回 "real"
     if force_real:
         # 如果 OPENAI_API_KEY 未设置，则打印错误信息并退出     （如果 OPENAI_API_KEY 未设置，则打印错误信息并退出）
-        if not os.getenv("OPENAI_API_KEY"):
-            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+        if not _has_real_credentials():
+            print("ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
             # 退出程序     （退出程序）
             sys.exit(1)
         # 返回 "real"     （返回 "real"）
         return "real"
-    # 如果 OPENAI_API_KEY 未设置，则返回 "mock"     （如果 OPENAI_API_KEY 未设置，则返回 "mock"）
-    # 如果 OPENAI_API_KEY 设置，则返回 "real"     （如果 OPENAI_API_KEY 设置，则返回 "real"）
-    return "real" if os.getenv("OPENAI_API_KEY") else "mock"
+    # 如果没有可用 key，则返回 "mock"
+    return "real" if _has_real_credentials() else "mock"
 
 
 def build_mock_plan(prompt: str) -> AgentPlan:
