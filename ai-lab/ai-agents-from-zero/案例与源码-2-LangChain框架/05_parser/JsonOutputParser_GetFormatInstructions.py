@@ -12,14 +12,15 @@
   - 模型会按 Person 的 schema 生成 JSON；当前 JsonOutputParser 解析结果为 dict（若要 Pydantic 实例与完整校验，见 PydanticOutputParser / StructuredOutput_Pydantic.py）。
 """
 
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 import os
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from loguru import logger
 from pydantic import BaseModel, Field
 
+# 读取环境变量，确保后面的模型调用能正常工作。
 load_dotenv(encoding="utf-8")
 
 
@@ -31,10 +32,11 @@ class Person(BaseModel):
     event: str = Field(description="事件")
 
 
-# 绑定 Pydantic 模型：主要驱动 get_format_instructions() 的 schema；invoke 后得到 dict
+# 绑定 Pydantic 模型：主要驱动 get_format_instructions() 的 schema。
 parser = JsonOutputParser(pydantic_object=Person)
 
 # 获取「格式说明」：描述 Person 各字段，便于拼进提示词让模型按此输出
+# 这一步的意义在于：把“你要什么格式”变成模型能直接看到的文字。
 format_instructions = parser.get_format_instructions()
 
 # 在 human 消息里加入 {format_instructions}，模型会看到「请按如下格式输出 JSON …」
@@ -45,7 +47,7 @@ chat_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-# 填 topic 和 format_instructions，得到消息列表
+# 填充 topic 和 format_instructions 后，prompt 里就包含了明确的输出规则。
 prompt = chat_prompt.format_messages(
     topic="小米su7跑车", format_instructions=format_instructions
 )
@@ -61,7 +63,7 @@ model = init_chat_model(
 result = model.invoke(prompt)
 logger.info(f"模型原始输出:\n{result}")
 
-# 用同一解析器解析，得到符合 Person 结构的数据（dict，或可转成 Person 实例）
+# 用同一个 parser 解析模型输出，确保结构符合 Person 的 schema。
 response = parser.invoke(result)
 logger.info(f"解析后的结构化结果:\n{response}")
 logger.info(f"结果类型: {type(response)}")

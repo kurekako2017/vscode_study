@@ -13,16 +13,18 @@
   - 进阶做法见 JsonOutputParser_GetFormatInstructions.py：用 get_format_instructions() 生成格式说明再拼进提示词。
 """
 
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 import os
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from loguru import logger
 
+# 统一从 .env 读取密钥。
 load_dotenv(encoding="utf-8")
 
 # 在系统消息里直接写明：返回 json，且包含 q（问题）、a（答案）字段
+# 这是最直接的“提示词约束输出”方式。
 chat_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -45,13 +47,14 @@ model = init_chat_model(
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 
-# 模型返回的可能是带 JSON 的文本
+# 模型返回的是原始对象，里面的 content 才是我们关心的 JSON 文本。
 result = model.invoke(prompt)
 logger.info(f"模型原始输出:\n{result}")
 
 print("*" * 60)
 
 # 创建 JSON 解析器（不绑 Pydantic 时，解析结果为 dict/list）
+# 适合“先把 JSON 拿出来”而不是“强制类型校验”的场景。
 parser = JsonOutputParser()
 # 尝试从 result 的 content 中解析出 JSON
 response = parser.invoke(result)

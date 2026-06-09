@@ -15,16 +15,19 @@ from typing import Annotated
 from pydantic import BaseModel, Field, ValidationError
 
 # 用 Annotated 结合 Pydantic 的 Field：ge=0, le=150 会在运行时校验，不在范围内会触发 ValidationError
+# Annotated 本身是“带元数据的类型标注”，真正的校验逻辑来自 Field。
 Age = Annotated[int, Field(ge=0, le=150, description="年龄，范围0-150")]
 
 
 class Person(BaseModel):
+    # 这里把普通字段和带强校验的字段放在一起，方便对比。
     name: str
     age: int
     age2: Age  # 这里 age2 会被 Pydantic 按 Field(ge=0, le=150) 校验
 
 
 try:
+    # age2=188 超出范围，下面会直接抛 ValidationError。
     p = Person(name="z3", age=11, age2=188)  # age2=188 超出 0–150，会抛 ValidationError
     print(p)
 except ValidationError as e:

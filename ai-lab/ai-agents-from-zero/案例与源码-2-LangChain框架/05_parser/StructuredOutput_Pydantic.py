@@ -20,6 +20,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
+# 加载 .env 中的 API Key。
 load_dotenv(encoding="utf-8")
 
 
@@ -33,18 +34,20 @@ class Product(BaseModel):
     @field_validator("description")
     def validate_description(cls, value):
         """Pydantic 校验器：description 长度必须 ≥ 10，否则抛 ValueError。"""
+        # 这里演示“模型输出不仅要能解析，还要符合业务规则”。
         if len(value) < 10:
             raise ValueError("产品简介长度必须大于等于10")
         return value
 
 
 # 创建 Pydantic 输出解析器：解析结果会转成 Product 实例并做校验
+# 这类解析器适合你后续要直接拿对象做逻辑判断、写入数据库或传给 API 的场景。
 parser = PydanticOutputParser(pydantic_object=Product)
 
-# 生成「格式说明」字符串，拼进 Prompt，引导模型按 Product 的字段输出 JSON
+# 让模型“先看懂结构，再输出结果”。
 format_instructions = parser.get_format_instructions()
 
-# 在 system 里放入 {format_instructions}，human 里放 {topic}
+# system 写规则，human 写具体任务。
 prompt_template = ChatPromptTemplate.from_messages(
     [
         ("system", "你是一个AI助手，你只能输出结构化的json数据\n{format_instructions}"),
@@ -67,7 +70,7 @@ model = init_chat_model(
 result = model.invoke(prompt)
 logger.info(f"模型原始输出:\n{result.content}")
 
-# 解析：把 result 转成 Product 实例，若格式或校验不通过会抛错
+# 解析后的结果不是 dict，而是经过校验的 Product 对象。
 response = parser.invoke(result)
 logger.info(f"解析后的结构化结果:\n{response}")
 logger.info(f"结果类型: {type(response)}")  # <class 'Product'>

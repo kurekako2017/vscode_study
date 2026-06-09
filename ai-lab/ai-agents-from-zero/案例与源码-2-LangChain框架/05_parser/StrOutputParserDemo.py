@@ -15,16 +15,18 @@
 三、典型流程：构造 Prompt → model.invoke(prompt) 得到 result → parser.invoke(result) 得到 str。
 """
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 import os
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from loguru import logger
 
+# 先从环境变量加载 API Key，避免把密钥写死在代码里。
 load_dotenv(encoding="utf-8")
 
 # 构造对话模板（与第 13 章 ChatPromptTemplate 用法一致）
+# system 负责设定角色，human 负责传入具体问题。
 chat_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", "你是一个{role}，请简短回答我提出的问题"),
@@ -32,13 +34,14 @@ chat_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-# 填充占位符，得到消息列表，供模型使用
+# 填充占位符后得到的是消息列表，而不是单纯字符串。
 prompt = chat_prompt.invoke(
     {"role": "AI助手", "question": "什么是LangChain，简洁回答100字以内"}
 )
 logger.info(prompt)
 
 # 初始化大模型（需配置 API Key 等）
+# 这里用 init_chat_model 让模型初始化方式保持和后面的案例一致。
 model = init_chat_model(
     model="qwen-plus",
     model_provider="openai",
@@ -47,6 +50,7 @@ model = init_chat_model(
 )
 
 # 调用模型：传入 prompt，得到的是 AIMessage 等对象（原始输出）
+# 原始输出还带着很多元信息，不能直接当成最终字符串。
 result = model.invoke(prompt)
 logger.info(f"模型原始输出:\n{result}")
 
@@ -56,6 +60,7 @@ logger.info(f"模型原始输出:\n{result}")
 parser = StrOutputParser()
 
 # 解析：parser.invoke(result) 等价于从 result 中取 content，得到纯字符串
+# 如果后续逻辑只需要“模型说了什么”，那 StrOutputParser 就是最轻量的选择。
 response = parser.invoke(result)
 logger.info(f"解析后的结构化结果:\n{response}")
 logger.info("\n")

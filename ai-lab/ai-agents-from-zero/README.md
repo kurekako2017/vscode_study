@@ -13,7 +13,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-Project-181717?logo=github&logoColor=white)](https://github.com/didilili/ai-agents-from-zero/)
 [![Read Online](https://img.shields.io/badge/在线阅读-点击访问-blue?logo=bookstack)](https://didilili.github.io/ai-agents-from-zero/#/)
 
-[快速开始](#quick-start) • [案例快速运行与概要](案例快速运行与概要.md) • [教程大纲](教程目录大纲.md) • [案例汇总](教程案例链接汇总.md#教程案例链接汇总源码与在线演示) • [更新日志](教程更新日志.md) • [面试题库](AI智能体与大模型应用开发面试题库.md) • [新手入门与常见问题](新手入门与常见问题.md)
+[快速开始](#quick-start) • [章节总索引](章节总索引.md) • [案例快速运行与概要](案例快速运行与概要.md) • [教程大纲](教程目录大纲.md) • [案例汇总](教程案例链接汇总.md#教程案例链接汇总源码与在线演示) • [更新日志](教程更新日志.md) • [面试题库](AI智能体与大模型应用开发面试题库.md) • [新手入门与常见问题](新手入门与常见问题.md)
 
   <p>
     <a href="https://didilili.github.io/ai-agents-from-zero/#/">📚 在线阅读</a>
@@ -73,7 +73,7 @@
 
 ## 📚 教程大纲（节选）
 
-完整导航见 **[教程目录大纲](教程目录大纲.md)** 与 [在线文档](https://didilili.github.io/ai-agents-from-zero/#/)。
+完整导航见 **[教程目录大纲](教程目录大纲.md)**、**[章节总索引](章节总索引.md)** 与 [在线文档](https://didilili.github.io/ai-agents-from-zero/#/)。
 
 > 这份大纲不是固定目录。后续将伴随 AI 技术栈继续演进，新的核心知识点、新框架和新项目实践会继续并入这条路线中。
 

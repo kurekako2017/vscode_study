@@ -11,16 +11,19 @@
 from typing import Annotated, TypedDict
 
 # Annotated[int, "年龄，范围0-150"]：类型仍是 int，后面的字符串只是元数据，运行时不会做 0–150 的校验
+# 这种写法更适合“我只是想补充说明”的场景，不负责运行时强校验。
 Age = Annotated[int, "年龄，范围0-150"]
 
 
 class Person(TypedDict):
+    # TypedDict 用来约束“键名”，但不负责像 Pydantic 那样做严格运行时校验。
     name: str
     age: int
     age2: Age  # 本质还是 int，元数据 "年龄，范围0-150" 不参与运行时校验
 
 
 # TypedDict 实例化时不会校验 age2 是否在 0–150，只要类型是 int 即可
+# 这行会成功，正是为了和 Pydantic 版本形成对比。
 p = Person(name="z3", age=111, age2=188)
 print(p)
 

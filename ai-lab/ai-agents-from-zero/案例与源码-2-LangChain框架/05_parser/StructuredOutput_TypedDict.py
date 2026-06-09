@@ -20,6 +20,7 @@ from typing import TypedDict, Annotated
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 
+# 先加载环境变量，再初始化模型。
 load_dotenv(encoding="utf-8")
 
 llm = init_chat_model(
@@ -30,21 +31,22 @@ llm = init_chat_model(
 )
 
 
-# 用 TypedDict 定义「一个动物」的结构；Annotated 里的字符串是给模型看的描述，便于生成合适内容
+# TypedDict 适合描述“字典长什么样”，Annotated 则给字段增加模型可读的说明。
 class Animal(TypedDict):
     animal: Annotated[str, "动物"]
     emoji: Annotated[str, "表情"]
 
 
-# 定义「动物列表」：一个字段 animals，类型是 Animal 的列表
+# 这里演示嵌套结构：一个字段里装的是动物列表。
 class AnimalList(TypedDict):
     animals: Annotated[list[Animal], "动物与表情列表"]
 
 
-# 普通对话消息
+# 普通对话消息，内容尽量说清楚要什么结构。
 messages = [{"role": "user", "content": "任意生成三种动物，以及他们的 emoji 表情"}]
 
 # 给模型绑定「结构化输出」：按 AnimalList 的结构返回并解析
+# with_structured_output 的好处是：你不用单独再写一个 parser。
 llm_with_structured_output = llm.with_structured_output(AnimalList)
 resp = llm_with_structured_output.invoke(messages)
 print(
