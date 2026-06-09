@@ -10,35 +10,35 @@ logging:
     level: INFO
 
 db_meta:
-  host: localhost
-  port: 3306
-  user: didilili
-  password: dili123
-  database: meta
+  host: ${oc.env:DB_META_HOST,localhost}
+  port: ${oc.env:DB_META_PORT,3306}
+  user: ${oc.env:DB_META_USER,didilili}
+  password: ${oc.env:DB_META_PASSWORD,dili123}
+  database: ${oc.env:DB_META_DATABASE,meta}
 
 db_dw:
-  host: localhost
-  port: 3306
-  user: didilili
-  password: dili123
-  database: dw
+  host: ${oc.env:DB_DW_HOST,localhost}
+  port: ${oc.env:DB_DW_PORT,3306}
+  user: ${oc.env:DB_DW_USER,didilili}
+  password: ${oc.env:DB_DW_PASSWORD,dili123}
+  database: ${oc.env:DB_DW_DATABASE,dw}
 
 qdrant:
-  host: localhost
-  port: 6333
-  embedding_size: 1024
+  host: ${oc.env:QDRANT_HOST,localhost}
+  port: ${oc.env:QDRANT_PORT,6333}
+  embedding_size: ${oc.env:QDRANT_EMBEDDING_SIZE,1024}
 
 embedding:
-  host: localhost
-  port: 8081
-  model: BAAI/bge-large-zh-v1.5
+  host: ${oc.env:EMBEDDING_HOST,localhost}
+  port: ${oc.env:EMBEDDING_PORT,8081}
+  model: ${oc.env:EMBEDDING_MODEL,BAAI/bge-large-zh-v1.5}
 
 es:
-  host: localhost
-  port: 9200
-  index_name: data_agent
+  host: ${oc.env:ES_HOST,localhost}
+  port: ${oc.env:ES_PORT,9200}
+  index_name: ${oc.env:ES_INDEX_NAME,data_agent}
 
 llm:
-  model_name: Pro/zai-org/GLM-5.1
+  model_name: ${oc.env:LLM_MODEL_NAME,Pro/zai-org/GLM-5.1}
   api_key: ${oc.env:LLM_API_KEY}
-  base_url: https://api.siliconflow.cn/v1
+  base_url: ${oc.env:LLM_BASE_URL,https://api.siliconflow.cn/v1}

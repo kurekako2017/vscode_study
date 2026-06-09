@@ -6,6 +6,7 @@
 就可以按属性方式读取日志 MySQL Qdrant Embedding Elasticsearch 和 LLM 配置
 """
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -106,6 +107,11 @@ config_file = project_root / "conf" / "app_config.yaml"
 
 # 先读取本地 .env，让 YAML 中的 ${oc.env:...} 可以解析到敏感配置
 load_dotenv(project_root / ".env")
+
+# 兼容 OpenRouter 的环境变量习惯：
+# 如果用户只设置了 OPENROUTER_API_KEY，这里会自动补到 LLM_API_KEY，避免再复制一份。
+if not os.getenv("LLM_API_KEY") and os.getenv("OPENROUTER_API_KEY"):
+    os.environ["LLM_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
 
 # 读取 YAML 配置内容
 context = OmegaConf.load(config_file)

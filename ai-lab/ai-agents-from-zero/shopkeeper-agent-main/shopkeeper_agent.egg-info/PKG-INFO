@@ -1,3 +1,29 @@
+Metadata-Version: 2.4
+Name: shopkeeper-agent
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: asyncmy>=0.2.11
+Requires-Dist: cryptography>=46.0.7
+Requires-Dist: elasticsearch[async]<9,>=8
+Requires-Dist: fastapi[standard]>=0.135.3
+Requires-Dist: greenlet>=3.4.0
+Requires-Dist: huggingface-hub>=1.10.1
+Requires-Dist: jieba>=0.42.1
+Requires-Dist: langchain>=1.2.15
+Requires-Dist: langchain-deepseek>=1.0.1
+Requires-Dist: langchain-huggingface>=1.2.1
+Requires-Dist: langgraph>=1.1.6
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: omegaconf>=2.3.0
+Requires-Dist: python-dotenv>=1.2.2
+Requires-Dist: pyyaml>=6.0.3
+Requires-Dist: qdrant-client>=1.17.1
+Requires-Dist: sqlalchemy>=2.0.49
+Dynamic: license-file
+
 <div align='center'>
   <h1 style="margin-top: 15px;">「电商问数」智能数据分析 Agent</h1>
   <h4><b>shopkeeper-agent</b></h4>

@@ -3,7 +3,7 @@ name = "shopkeeper-agent"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "asyncmy>=0.2.11",
     "cryptography>=46.0.7",
@@ -37,3 +37,10 @@ target-version = "py314"
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 ignore = ["E501"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["frontend*", "docker*", "prompts*", "conf*"]
