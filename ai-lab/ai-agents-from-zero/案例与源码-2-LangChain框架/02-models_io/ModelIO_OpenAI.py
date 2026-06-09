@@ -16,10 +16,12 @@ from openai import OpenAI
 
 from dotenv import load_dotenv
 
+# 统一从 .env 读取环境变量，避免把密钥硬编码进代码。
 load_dotenv(encoding="utf-8")
 
 # ========== 2. 初始化客户端（底层 API，直接请求厂商接口） ==========
 # 这里以 DeepSeek 官方兼容接口为例；若你切到别的 OpenAI 兼容平台，通常只需调整 base_url、api_key、model。
+# 这一段的重点是：OpenAI SDK 只负责“发请求和收响应”，不替你做 LangChain 的消息封装。
 client = OpenAI(
     api_key=os.getenv("deepseek-api"),  # 从环境变量读取，此处以 DeepSeek 为例
     base_url="https://api.deepseek.com",  # 可改为其他 OpenAI 兼容地址（如阿里百炼）
@@ -28,6 +30,7 @@ client = OpenAI(
 # ========== 3. 发起对话并打印回复 ==========
 # 注意：这里的 messages 是 OpenAI SDK 语义下的消息列表，和 LangChain 中常见的“消息列表”长得相似，
 # 但最终返回值结构并不一样。
+# 这也是为什么初学者要先分清：SDK 原生返回值和 LangChain 返回值不是同一种对象。
 response = client.chat.completions.create(
     model="deepseek-v4-flash",
     messages=[
@@ -39,4 +42,5 @@ response = client.chat.completions.create(
 
 # OpenAI SDK 的返回值需要按原生结构逐层取值：
 # response -> choices[0] -> message -> content
+# 这条链路要记住，因为它和 LangChain 的 response.content 写法不一样。
 print(response.choices[0].message.content)

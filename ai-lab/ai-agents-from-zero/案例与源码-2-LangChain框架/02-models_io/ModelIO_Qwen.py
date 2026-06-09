@@ -17,10 +17,12 @@ from langchain_core.messages import HumanMessage
 
 from dotenv import load_dotenv
 
+# 原生 provider 的特点是：写法更贴厂商，但不同厂商之间不一定完全统一。
 load_dotenv(encoding="utf-8")
 
 # ========== 2. 初始化通义千问聊天模型 ==========
 # 这里走的是阿里云原生集成，不是 OpenAI 兼容接口路线，因此不需要手动填写 base_url。
+# streaming=True 表示模型可以边生成边输出，这在聊天、实时展示里很常见。
 chat_llm = ChatTongyi(
     model="qwen-plus",
     api_key=os.getenv("aliQwen-api"),
@@ -28,12 +30,14 @@ chat_llm = ChatTongyi(
 )
 
 # ========== 3. 调用方式一：invoke 一次性返回 ==========
+# invoke 适合“等模型一次性回答完，再统一取结果”的场景。
 print(chat_llm.invoke("你是谁").content)
 
 print("*" * 60)
 
 # ========== 4. 调用方式二：stream 流式返回 ==========
 # 这里传入 HumanMessage，是为了和后续第 13 章里的“多角色消息”概念提前建立联系。
+# stream 适合“边生成边展示”的场景，比如聊天窗口逐字输出。
 for chunk in chat_llm.stream([HumanMessage(content="你好，你是谁")], streaming=True):
     print(chunk.content, end="")
 print()

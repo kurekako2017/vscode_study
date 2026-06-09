@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
 
 export default function TimerDemo() {
+  // seconds 记录这个组件已经“运行了多久”。
   const [seconds, setSeconds] = useState(0)
 
+  // useEffect 用来演示副作用：
+  // 组件挂载后启动定时器，卸载时清理定时器。
   useEffect(() => {
+    // setInterval 每 1 秒执行一次回调。
     const id = window.setInterval(() => {
+      // 同样使用函数式更新，避免拿到旧状态。
       setSeconds((value) => value + 1)
     }, 1000)
 
+    // 清理函数：组件卸载时停止定时器，防止内存泄漏。
     return () => window.clearInterval(id)
   }, [])
 

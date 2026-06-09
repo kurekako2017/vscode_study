@@ -38,7 +38,8 @@ cp .env.template .env
 # OpenRouter
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_API_KEY=你的_openrouter_api_key
-LLM_QWEN_MAX=你的_openrouter_model_name
+LLM_QWEN_MAX=openai/gpt-4o-mini
+LLM_MAX_COMPLETION_TOKENS=1024
 
 # Tavily
 TAVILY_API_KEY=你的_tavily_api_key

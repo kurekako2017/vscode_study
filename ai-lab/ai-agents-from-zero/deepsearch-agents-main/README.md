@@ -167,6 +167,17 @@ deepsearch-agents/
 
 ## 🚀 快速开始
 
+先看这个总入口：
+
+- [`docs/docs-index.md`](docs/docs-index.md)
+
+这个入口里已经分好了：
+
+- 启动 / 验证 / 排错
+- 功能快速一览
+- 功能逐项验收
+- 通用复用模板
+
 ### 1. 准备环境
 
 - Python `3.12`
@@ -203,6 +214,11 @@ cp .env.example .env
 OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 OPENAI_API_KEY=你的大模型_API_KEY
 LLM_QWEN_MAX=qwen-max
+
+# 如果你走 OpenRouter，推荐用一个稳定的文本模型，例如：
+# OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+# OPENROUTER_API_KEY=你的_openrouter_api_key
+# LLM_QWEN_MAX=openai/gpt-4o-mini
 
 # Tavily 配置
 TAVILY_API_KEY=你的_TAVILY_API_KEY

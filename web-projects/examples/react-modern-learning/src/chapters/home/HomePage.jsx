@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { chapters } from '../../data/chapters'
 
 export default function HomePage() {
+  // 首页负责做“章节总入口”。
+  // 每个章节都被做成卡片，点击后跳转到对应路由。
   return (
     <section className="page">
       <div className="card">

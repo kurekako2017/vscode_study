@@ -16,10 +16,13 @@ import os
 
 from dotenv import load_dotenv
 
+# 和原生 SDK 不同，这里先创建的是 LangChain 的聊天模型对象。
+# 之后它会返回 AIMessage，方便和 Prompt、Parser、Chain 等组件继续拼接。
 load_dotenv(encoding="utf-8")
 
 # ========== 2. 初始化聊天模型（OpenAI 兼容接口） ==========
 # 这里选择 qwen-plus + 阿里百炼兼容端点，目的是演示“如何把兼容接口接进 LangChain 模型对象”。
+# 这类写法适合想统一接入不同厂商的场景：模型参数不变，只换 api_key/base_url/model。
 chat_llm = ChatOpenAI(
     model="qwen-plus",  # 可按需更换，模型列表见阿里云文档
     api_key=os.getenv("aliQwen-api"),  # 或 os.getenv("QWEN_API_KEY")
@@ -33,6 +36,7 @@ messages = [
     {"role": "user", "content": "你是谁？"},
 ]
 
+# invoke 的返回值是 AIMessage，不是纯字符串；真正的正文在 response.content。
 response = chat_llm.invoke(messages)
 # 返回值是 AIMessage；若你要看 token 用量、finish_reason、模型名等，可继续查看 response.response_metadata。
 print(response.content)

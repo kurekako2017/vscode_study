@@ -16,6 +16,7 @@ from langchain.chat_models import init_chat_model
 
 from dotenv import load_dotenv
 
+# 先加载环境变量，再初始化模型对象。
 load_dotenv(encoding="utf-8")
 
 # ========== 2. 实例化时设置常用参数 ==========
@@ -35,6 +36,7 @@ model = init_chat_model(
 # - content：正文
 # - response_metadata：厂商原始元数据
 # - usage_metadata：统一整理后的 token 用量
+# 对初学者来说，先看 response 的整体结构，再学会从里面取 content，是最稳的学习顺序。
 print(model.invoke("写一句关于春天的词，14 字以内"))
 # <class 'langchain_openai.chat_models.base.ChatOpenAI'>
 print(type(model))

@@ -1,6 +1,7 @@
 import PostsDemo from './PostsDemo'
 
 export default function ApiPage() {
+  // 这个章节的重点不是 UI 样式，而是“请求数据后如何处理状态”。
   return (
     <section className="page">
       <div className="card">

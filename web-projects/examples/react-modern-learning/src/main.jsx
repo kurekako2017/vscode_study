@@ -4,6 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './style.css'
 
+// 入口文件的职责很单纯：
+// 1. 把 React 应用挂到页面上的 #root
+// 2. 用 BrowserRouter 包住整个应用，后续页面才能使用路由
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>

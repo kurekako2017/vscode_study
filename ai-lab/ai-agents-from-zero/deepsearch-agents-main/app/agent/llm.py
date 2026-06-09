@@ -30,8 +30,11 @@ resolved_model_name = (
     or "gpt-4o-mini"
 )
 
+max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "1024"))
+
 # 使用 OpenAI 兼容协议接入模型；具体模型名由上面的 resolved_model_name 控制
 model = init_chat_model(
     model=resolved_model_name,
     model_provider="openai",
+    max_completion_tokens=max_completion_tokens,
 )

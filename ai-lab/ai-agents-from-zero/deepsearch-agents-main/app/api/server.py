@@ -112,7 +112,11 @@ async def health_check():
         "backend": "alive",
         "llm": {
             "configured": bool(llm_api_key and llm_base_url and llm_model),
-            "source": "openai" if os.getenv("OPENAI_API_KEY") else ("openrouter" if os.getenv("OPENROUTER_API_KEY") else "unset"),
+            "source": (
+                "openrouter"
+                if "openrouter.ai" in (llm_base_url or "").lower()
+                else ("openai" if os.getenv("OPENAI_API_KEY") else ("openrouter" if os.getenv("OPENROUTER_API_KEY") else "unset"))
+            ),
             "model": llm_model,
         },
         "mysql": {

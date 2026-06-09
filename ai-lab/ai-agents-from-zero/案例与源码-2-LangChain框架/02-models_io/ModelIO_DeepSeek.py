@@ -16,10 +16,12 @@ from langchain_deepseek import ChatDeepSeek
 
 from dotenv import load_dotenv
 
+# 读取环境变量，避免把密钥写死在源码里。
 load_dotenv(encoding="utf-8")
 
 # ========== 2. 初始化 DeepSeek 聊天模型 ==========
 # 这里显式写出 temperature、timeout、max_retries，是为了让你看到原生 provider 也支持常见模型参数。
+# 原生 provider 的好处是更贴近厂商官方能力；缺点是不同厂商写法不完全一样。
 model = ChatDeepSeek(
     model="deepseek-v4-flash",
     temperature=0,
@@ -31,4 +33,5 @@ model = ChatDeepSeek(
 
 # ========== 3. 调用并打印回复 ==========
 # 返回结果仍然是 LangChain 风格的 AIMessage，因此先读 .content 即可。
+# 这也是 LangChain 统一封装的好处：不管底层供应商是谁，上层调用方式相对一致。
 print(model.invoke("什么是 LangChain？100 字以内回答，简洁。").content)

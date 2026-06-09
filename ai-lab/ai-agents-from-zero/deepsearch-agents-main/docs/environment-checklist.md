@@ -68,6 +68,7 @@ OPENAI_API_KEY=
 OPENROUTER_BASE_URL=
 OPENROUTER_API_KEY=
 LLM_QWEN_MAX=
+LLM_MAX_COMPLETION_TOKENS=
 
 # 互联网搜索
 TAVILY_API_KEY=
@@ -89,7 +90,7 @@ MYSQL_SQL_MODE=
 
 建议优先策略：
 
-1. 先确认大模型 API 可用，`OPENAI_*` 和 `OPENROUTER_*` 任意一套都可以。
+1. 先确认大模型 API 可用，`OPENAI_*` 和 `OPENROUTER_*` 任意一套都可以，推荐 `openai/gpt-4o-mini` 这类文本模型，并把 `LLM_MAX_COMPLETION_TOKENS` 控制在一个合理范围内。
 2. 再确认 MySQL 连接可用。
 3. 然后补 Tavily。
 4. 最后补 RAGFlow。
@@ -156,7 +157,9 @@ MYSQL_SQL_MODE=
    - 方案 B：连接一个已有的远端 MySQL
    - 方案 C：先不跑数据库，只验证非数据库链路
 4. 如果想直接填值，可以先参考项目根目录的 `.env.template`。
-5. 如果你决定采用本机 Docker MySQL，建议直接看这份说明：[`local-setup-openrouter-docker-mysql.md`](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/docs/local-setup-openrouter-docker-mysql.md)
+5. 如果你决定采用本机 Docker MySQL，建议直接看这份说明：[`local-setup-openrouter-docker-mysql.md`](local-setup-openrouter-docker-mysql.md)
+6. 如果你想直接按“当前工作区能跑起来”的顺序执行，建议直接看：[`workspace-run-guide.md`](workspace-run-guide.md)
+7. 如果你想先看整套文档入口，建议直接看：[`docs-index.md`](docs-index.md)
 
 ## 8. 当前落地进度
 

@@ -1,6 +1,7 @@
 import Counter from './Counter'
 
 export default function TestPage() {
+  // 这个页面负责把“组件”和“测试文件”放在同一个章节里，方便对照学习。
   return (
     <section className="page">
       <div className="card">
