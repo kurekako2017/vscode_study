@@ -211,12 +211,12 @@ TAVILY_API_KEY=你的_TAVILY_API_KEY
 RAGFLOW_API_URL=http://your-ragflow-host
 RAGFLOW_API_KEY=ragflow-your-api-key
 
-# MySQL 配置
+# MySQL 配置（当前工作区推荐直接连 NAS 上的 JtProject 数据库）
 MYSQL_USER=root
-MYSQL_PASSWORD=root
-MYSQL_DATABASE=deepsearch_db
-MYSQL_HOST=localhost
-MYSQL_PORT=3307
+MYSQL_PASSWORD=123456
+MYSQL_DATABASE=ecommjava
+MYSQL_HOST=192.168.10.2
+MYSQL_PORT=3306
 MYSQL_CHARSET=utf8mb4
 MYSQL_COLLATION=utf8mb4_unicode_ci
 MYSQL_SQL_MODE=TRADITIONAL
@@ -224,7 +224,9 @@ MYSQL_SQL_MODE=TRADITIONAL
 
 ### 5. 启动 MySQL 教学库
 
-本仓库的 `docker/mysql/mysql.sql` 会在 MySQL 容器首次创建数据目录时自动导入药品、库存和销售记录模拟数据。
+如果你想使用仓库自带的教学库，可以让 `docker/mysql/mysql.sql` 在 MySQL 容器首次创建数据目录时自动导入药品、库存和销售记录模拟数据。
+
+当前这份工作区已经优先接入 NAS 上的 `JtProject` MySQL，因此你可以先不启动本机 MySQL 容器，直接用 NAS 数据库验证“数据库查询子智能体”的链路。
 
 ```bash
 docker compose -f docker/docker-compose.yaml up -d

@@ -20,6 +20,8 @@ frontend/.vite/
 
 # Python
 .venv/
+.venv-runtime/
+.deps/
 .uv-cache/
 venv/
 env/

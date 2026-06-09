@@ -48,14 +48,14 @@
 - `Python 3.12.3`，可用
 - `Node v22.22.1`，可用
 - `uv`，当前不可用
-- `docker`，Windows 侧路径可见，但在当前 WSL 会话里不可直接使用
+- `docker`，当前不作为这条链路的必需项
 - `pnpm`，当前不可用
 
 说明：
 
-- 这意味着后端 Python 代码可以继续推进，但如果要完全按仓库推荐方式起 MySQL 容器，会受限于当前 WSL 环境。
-- 如果你已经在 Docker Desktop 里开启了 WSL 集成，MySQL 这一步就可以直接补齐。
-- 如果暂时不想动 Docker，也可以先换成一个可访问的远端 MySQL。
+- 这意味着后端 Python 代码可以继续推进，而且 MySQL 已经切到 NAS 远端数据库，不再依赖本机容器。
+- 如果后续你想切回 Docker MySQL，再回到 Docker Desktop 的 WSL 集成设置即可。
+- 如果暂时不想动 Docker，也可以继续使用这个 NAS MySQL 方案。
 
 ## 4. 必备环境变量
 
@@ -171,13 +171,14 @@ MYSQL_SQL_MODE=
 - 已启动后端 `FastAPI` 服务。
 - 已安装前端依赖并通过 `npm run build`。
 - 已启动前端 `Vite` 开发服务器。
+- 已确认 NAS MySQL 可用，并把深度研搜的教学库导入到 `deepsearch_db`。
 
 ### 待完成
 
 - `uv` 依赖管理工具未安装。
 - `pnpm` 未安装，当前前端用 `npm` 作为临时替代。
-- `TAVILY_API_KEY`、`RAGFLOW_*`、`MYSQL_*` 和模型 key/base_url 还没有补齐。
-- MySQL 容器还无法在当前 WSL 里直接起来，需要 Docker Desktop 的 WSL 集成，或者改接远端 MySQL。
+- `TAVILY_API_KEY`、`RAGFLOW_*` 和部分外部服务信息还没有补齐。
+- 如果后续要启用 Tavily 和 RAGFlow，还需要继续补真实的外部服务地址和 key。
 
 ## 9. 结论
 
