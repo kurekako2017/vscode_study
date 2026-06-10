@@ -13,6 +13,8 @@
   -> 看 feature-usage-test-full.md
 想复用到别的项目
   -> 看 feature-usage-template-generic.md
+想规划测试方案和测试骨架
+  -> 看 testing-strategy-and-skeleton.md
 ```
 
 ## 1. 先看哪份
@@ -22,18 +24,24 @@
 - 功能快速一览：[`当前项目功能使用与测试最短版`](feature-usage-test-template.md)
 - 功能逐项验收：[`当前项目功能使用与测试完整版`](feature-usage-test-full.md)
 - 通用复用模板：[`通用功能使用与测试模板`](feature-usage-template-generic.md)
+- 测试方案与骨架：[`测试方案与测试骨架规划`](testing-strategy-and-skeleton.md)
+- 测试目录树说明：[`测试目录树说明页`](testing-skeleton-directory-guide.md)
 
 ## 2. 运行相关
 
 - [当前工作区运行指南](workspace-run-guide.md)
 - [环境清单](environment-checklist.md)
 - [OpenRouter + NAS MySQL 说明](local-setup-openrouter-docker-mysql.md)
+- [测试方案与测试骨架规划](testing-strategy-and-skeleton.md)
+- [测试目录树说明页](testing-skeleton-directory-guide.md)
 
 ## 3. 功能文档模板
 
 - [当前项目功能使用与测试最短版](feature-usage-test-template.md)
 - [当前项目功能使用与测试完整版](feature-usage-test-full.md)
 - [通用功能使用与测试模板](feature-usage-template-generic.md)
+- [测试方案与测试骨架规划](testing-strategy-and-skeleton.md)
+- [测试目录树说明页](testing-skeleton-directory-guide.md)
 
 ## 4. 当前项目已验证的功能示例
 
