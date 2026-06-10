@@ -25,6 +25,20 @@
 
 ![电商问数前端首页：样例问题、自然语言输入和智能数据分析 Agent 界面](docs/images/shopkeeper-agent-home.jpg)
 
+## 📚 文档入口
+
+如果你想先看文档目录，建议直接从这里开始：
+
+- [文档总目录](docs/docs-index.md)
+- [启动 / 验证 / 排错最终说明](docs/workspace-run-guide.md)
+- [环境清单](docs/environment-checklist.md)
+- [功能一览与测试指南](docs/feature-usage-test-template.md)
+- [功能使用与测试完整版](docs/feature-usage-test-full.md)
+- [功能使用与测试通用模板](docs/feature-usage-template-generic.md)
+- [功能检查清单](docs/feature-checklist.md)
+- [OpenRouter + NAS MySQL 说明](docs/local-setup-openrouter-docker-mysql.md)
+- [复制即启动](docs/quick-start-copy.md)
+
 ## 📖 项目介绍
 
 在真实问数场景里，业务同学通常不会写 SQL，数据分析同学也很难随时记住所有表结构、字段含义、指标口径和字段取值。单纯把自然语言问题直接交给大模型，很容易出现表选错、字段选错、指标理解错和 SQL 幻觉等问题。
@@ -198,6 +212,12 @@ VITE_API_BASE_URL=
 - [Mock 优先启动说明](docs/mock-first-quickstart.md)
 - [Mock 启动命令块](docs/mock-first-copy-paste.md)
 - [Mock 最短 5 行命令](docs/mock-first-5lines.md)
+- [OpenRouter + NAS MySQL 启动说明](docs/openrouter-nas-mysql-quickstart.md)
+- [OpenRouter + NAS MySQL 命令块](docs/openrouter-nas-mysql-copy-paste.md)
+- [OpenRouter + NAS MySQL 最短 5 行命令](docs/openrouter-nas-mysql-5lines.md)
+- [功能一览与测试指南](docs/feature-overview-and-test-guide.md)
+- [功能检查清单](docs/feature-checklist.md)
+- [启动 / 验证 / 排错最终说明](docs/start-verify-troubleshoot-final.md)
 
 ### 5. 准备 Embedding 模型
 

@@ -27,6 +27,16 @@
 - 如果暂时不修 Docker，可以先走 mock 版本启动
   - 参考文档：[Mock 优先启动说明](mock-first-quickstart.md)
   - 最短命令版：[Mock 启动命令块](mock-first-copy-paste.md)
+  - 5 行极简版：[Mock 最短 5 行命令](mock-first-5lines.md)
+- 如果要切回真实模式，可以走 OpenRouter + NAS MySQL
+  - 参考文档：[OpenRouter + NAS MySQL 启动说明](openrouter-nas-mysql-quickstart.md)
+  - 最短命令版：[OpenRouter + NAS MySQL 命令块](openrouter-nas-mysql-copy-paste.md)
+  - 5 行极简版：[OpenRouter + NAS MySQL 最短 5 行命令](openrouter-nas-mysql-5lines.md)
+- 如果想先看功能和测试方法
+  - 参考文档：[功能一览与测试指南](feature-overview-and-test-guide.md)
+  - 清单版：[功能检查清单](feature-checklist.md)
+- 如果想先看最终版总入口
+  - 参考文档：[启动 / 验证 / 排错最终说明](start-verify-troubleshoot-final.md)
 - 准备 `.env`
 - 准备 Embedding 模型文件
   - 现在 NAS 友好 compose 已改成首次启动自动拉取 `BAAI/bge-large-zh-v1.5`
