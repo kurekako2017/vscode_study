@@ -431,3 +431,43 @@ print(summary) / 打印汇总
 - “重排”的函数通常是：`rerank()`
 - “生成答案”的函数通常是：`synthesize_answer()`
 - “主流程”的函数通常是：`main()`
+
+## 10. 向量数据库骨架
+
+### 10.1 真实 Qdrant 版
+
+文件：`vector_db_qdrant_demo/main.py`
+
+调用流程：
+
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `build_embedder()（构造向量化方案）` -> `run_mock() / run_real()（按模式执行）` -> `upsert()（写入 collection）` -> `search()（相似度检索）` -> `print_hits()（打印结果）`
+
+关键名词：
+
+- `Qdrant Client / 客户端`：真实 Qdrant 接入层
+- `collection / 集合`：存储文档向量的容器
+- `payload / 元数据`：随向量一起保存的文本与来源信息
+- `upsert / 写入`：新增或更新文档
+- `search / 检索`：按向量相似度召回结果
+
+### 10.2 真实 Chroma 版
+
+文件：`vector_db_chroma_demo/main.py`
+
+调用流程：
+
+`main()（程序入口）` -> `parse_args()（解析参数）` -> `load_documents()（加载文档）` -> `build_embedder()（构造向量化方案）` -> `run_mock() / run_real()（按模式执行）` -> `collection.upsert()（写入 collection）` -> `collection.query()（查询）` -> `print_hits()（打印结果）`
+
+关键名词：
+
+- `PersistentClient / 持久化客户端`：本地持久化接入层
+- `collection / 集合`：存储文档的集合
+- `metadata / 元数据`：文档附带信息
+- `query / 查询`：检索相似内容
+- `persist_dir / 持久化目录`：本地落盘目录
+
+理解要点：
+
+- Qdrant 版更像远端服务接入模板。
+- Chroma 版更像本地原型和持久化模板。
+- 两个版本都先做 embedding，再入库，再检索。

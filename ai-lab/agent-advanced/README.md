@@ -2,6 +2,17 @@
 
 `agent-advanced/` 是 `ai-lab` 里更高阶的一条学习线，目标是把基础 Agent、RAG 和后端集成继续往工程化方向推进。
 
+## 章节链接
+
+- [学习定位](#agent-advanced)
+- [目录分工](#和现有目录的分工)
+- [目录约定](#目录约定)
+- [学习路线 + 入口建议](#学习路线--入口建议)
+- [先看什么](#先看什么)
+- [可运行案例](#可运行案例)
+- [专题代码](#专题代码)
+- [未来会放什么](#未来会放什么)
+
 这里已经不是“只有笔记”的目录了，而是分成两层：
 
 - `frameworks/`、`rag/`、`multi-agent/`、`frontend/`、`eval/`、`deployment/`：学习文档和路线图
@@ -33,27 +44,49 @@
 - React 客户端、Python 服务、测试和部署示例分开维护
 - 尽量保留“学习笔记”和“可运行项目”两条线
 
-## 推荐入口
+## 学习路线 + 入口建议
 
-1. [学习路线](./学习路线.md)
-2. [核心技术栈总览](./核心技术栈总览.md)
-3. [开发测试部署流程](./开发测试部署流程.md)
-4. [交付前检查清单](./交付前检查清单.md)
-5. [projects/](./projects/README.md) 里的可运行案例
-6. `frameworks/` 下的框架专题
-7. `rag/` 下的高级检索专题
-8. `multi-agent/` 下的多 Agent 专题
+### 适用对象
 
-## 先看什么
+- 第一次进入 `agent-advanced/` 的人
+- 想先看清“学习路线、工程流程、可运行 demo”三层关系的人
+- 需要在文档和代码之间快速切换的人
 
-如果你是第一次进入这个目录，建议按这个顺序：
+### 推荐顺序
+
+如果你是第一次进入 `agent-advanced/`，建议按这个顺序看：
 
 1. 先看 [学习路线](./学习路线.md)，知道这条线怎么学
 2. 再看 [核心技术栈总览](./核心技术栈总览.md)，知道现在缺什么、补什么
-3. 看 [开发测试部署流程](./开发测试部署流程.md)，先把测试和上线顺序记住
-4. 看 [交付前检查清单](./交付前检查清单.md)，把交付前该勾的项列出来
-5. 打开 [projects/README.md](./projects/README.md)，直接跑最小可运行 demo
+3. 接着看 [开发测试部署流程](./开发测试部署流程.md)，把测试和上线顺序先记住
+4. 再看 [交付前检查清单](./交付前检查清单.md)，知道交付前要检查什么
+5. 打开 [projects/README.md](./projects/README.md)，先从最短路径跑 demo
 6. 回到 `frameworks/`、`rag/`、`multi-agent/` 里补概念和对比
+
+如果你是按“目标”来选入口，可以直接参考下面这个表：
+
+| 你的目标 | 优先看哪个入口 | 原因 |
+| --- | --- | --- |
+| 先把整体学习路线看懂 | [学习路线](./学习路线.md) | 最适合先建立目录级别的学习顺序 |
+| 想知道当前缺什么、补什么 | [核心技术栈总览](./核心技术栈总览.md) | 适合先做能力盘点 |
+| 想先把测试和上线顺序搞清楚 | [开发测试部署流程](./开发测试部署流程.md) | 适合先建立工程化意识 |
+| 想先确认交付前要查什么 | [交付前检查清单](./交付前检查清单.md) | 适合把容易漏的项先固定住 |
+| 想先跑一个 demo | [projects/](./projects/README.md) | 最适合直接上手 |
+| 想先补框架知识 | `frameworks/` | 适合先看 LangChain / LlamaIndex / LangGraph 对比 |
+| 想先补 RAG 知识 | `rag/` | 适合看高级检索和混合检索专题 |
+| 想先补多 Agent 知识 | `multi-agent/` | 适合看协作模式和调度方式 |
+
+### 快速判断
+
+- 想“先看懂全局结构”，先看学习路线和技术栈总览
+- 想“先看工程流程”，先看开发测试部署流程和交付前检查清单
+- 想“先上手代码”，直接进 [projects/](./projects/README.md)
+
+如果你只想先跑一个 demo，不想做选择，默认从 [projects/README.md](./projects/README.md) 里推荐的最短路径开始：
+
+1. `langchain_chain_demo/`
+2. `vector_db_demo/`
+3. `langgraph_workflow_demo/`
 
 ## 可运行案例
 
@@ -66,6 +99,8 @@
 | [projects/llamaindex_index_demo](./projects/llamaindex_index_demo/README.md) | LlamaIndex 风格的索引和查询引擎概念 | `python3 main.py "..."` |
 | [projects/multi_agent_team_demo](./projects/multi_agent_team_demo/README.md) | 多 Agent 协作、监督者、规划者、审校者 | `python3 main.py "..."` |
 | [projects/vector_db_demo](./projects/vector_db_demo/README.md) | 向量数据库最小教学版、collection、相似度检索 | `python3 main.py "..." --backend qdrant` |
+| [projects/vector_db_qdrant_demo](./projects/vector_db_qdrant_demo/README.md) | 真实 Qdrant 版骨架、collection、payload、search | `python3 main.py "..."` |
+| [projects/vector_db_chroma_demo](./projects/vector_db_chroma_demo/README.md) | 真实 Chroma 版骨架、collection、metadata、query | `python3 main.py "..."` |
 
 ## 专题代码
 

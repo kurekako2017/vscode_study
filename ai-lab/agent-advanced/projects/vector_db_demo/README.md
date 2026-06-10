@@ -73,7 +73,9 @@ vector_db_demo/
 
 - 如果结果很乱，通常是样本太少，换一个更接近内容的 query。
 - 如果输出为空，先确认你是在 demo 目录下运行，且 `assets/` 没被删。
-- 如果你想改成真实 Qdrant / Chroma，下一步就是把 `MemoryVectorDB` 替换成真实客户端。
+- 如果你想改成真实 Qdrant / Chroma，下一步可以直接参考：
+  - [真实 Qdrant 版骨架](../vector_db_qdrant_demo/README.md)
+  - [真实 Chroma 版骨架](../vector_db_chroma_demo/README.md)
 
 ## 学习点
 

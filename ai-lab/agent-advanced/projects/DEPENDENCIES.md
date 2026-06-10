@@ -19,6 +19,8 @@
 | `llamaindex_index_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `multi_agent_team_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `vector_db_demo/` | 无第三方依赖 | 仅使用 Python 标准库，教学版向量数据库风格模拟 |
+| `vector_db_qdrant_demo/` | `qdrant-client`、`sentence-transformers` | 真实 Qdrant 版骨架，包含 collection、payload、upsert、search |
+| `vector_db_chroma_demo/` | `chromadb`、`sentence-transformers` | 真实 Chroma 版骨架，包含 collection、metadata、upsert、query |
 | `deployment/container_demo/` | 无第三方依赖 | 服务本身仅使用标准库；如果你想用 `uvicorn` 启动 ASGI 服务，可以额外安装 `uvicorn` |
 | `eval/rag_eval_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 
@@ -83,6 +85,20 @@
 - 无第三方依赖
 - 说明：
   - 用标准库模拟 Qdrant / Chroma / Memory 风格的 collection、向量写入和相似度检索
+
+### 10. `vector_db_qdrant_demo`
+
+- 主依赖：`qdrant-client`、`sentence-transformers`
+- 作用：
+  - 用真实 Qdrant Client 演示 collection、payload、upsert、search
+  - 适合后面接企业知识库、FAQ、工单库
+
+### 11. `vector_db_chroma_demo`
+
+- 主依赖：`chromadb`、`sentence-transformers`
+- 作用：
+  - 用真实 Chroma Client 演示 collection、metadata、upsert、query
+  - 适合快速本地原型、教学和小型知识库 demo
 
 ## 说明
 
