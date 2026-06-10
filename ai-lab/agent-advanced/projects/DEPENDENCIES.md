@@ -18,6 +18,7 @@
 | `internal_hybrid_rag_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `llamaindex_index_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `multi_agent_team_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
+| `vector_db_demo/` | 无第三方依赖 | 仅使用 Python 标准库，教学版向量数据库风格模拟 |
 | `deployment/container_demo/` | 无第三方依赖 | 服务本身仅使用标准库；如果你想用 `uvicorn` 启动 ASGI 服务，可以额外安装 `uvicorn` |
 | `eval/rag_eval_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 
@@ -76,6 +77,12 @@
 - 无第三方依赖
 - 说明：
   - 用标准库做最小 RAG 评估
+
+### 9. `vector_db_demo`
+
+- 无第三方依赖
+- 说明：
+  - 用标准库模拟 Qdrant / Chroma / Memory 风格的 collection、向量写入和相似度检索
 
 ## 说明
 

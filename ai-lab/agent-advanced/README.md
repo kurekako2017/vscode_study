@@ -65,6 +65,7 @@
 | [projects/internal_hybrid_rag_demo](./projects/internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索、权限过滤、引用 | `python3 main.py "..." --role employee` |
 | [projects/llamaindex_index_demo](./projects/llamaindex_index_demo/README.md) | LlamaIndex 风格的索引和查询引擎概念 | `python3 main.py "..."` |
 | [projects/multi_agent_team_demo](./projects/multi_agent_team_demo/README.md) | 多 Agent 协作、监督者、规划者、审校者 | `python3 main.py "..."` |
+| [projects/vector_db_demo](./projects/vector_db_demo/README.md) | 向量数据库最小教学版、collection、相似度检索 | `python3 main.py "..." --backend qdrant` |
 
 ## 专题代码
 

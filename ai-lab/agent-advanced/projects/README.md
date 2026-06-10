@@ -20,6 +20,7 @@
 | [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索 | 接入层、检索层、权限层、引用层 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/internal_hybrid_rag_demo/main.py "远程办公和发布流程有什么要求？" --role employee` |
 | [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex 概念版索引 | Document、Node、Index、QueryEngine | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/llamaindex_index_demo/main.py "LlamaIndex 和 LangChain 有什么区别？"` |
 | [multi_agent_team_demo](./multi_agent_team_demo/README.md) | 多 Agent 协作 | Planner、Researcher、Writer、Critic、Supervisor | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/multi_agent_team_demo/main.py "如何学习 LangGraph 和高级 RAG"` |
+| [vector_db_demo](./vector_db_demo/README.md) | 向量数据库最小教学版 | 文本向量化、collection、相似度检索、top-k 召回 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/vector_db_demo/main.py "怎么申请出差报销？"` |
 
 ## 专题代码区
 
@@ -39,9 +40,10 @@
 4. `internal_hybrid_rag_demo/`
 5. `llamaindex_index_demo/`
 6. `multi_agent_team_demo/`
-7. `../frontend/chat_ui_demo/`
-8. `../eval/rag_eval_demo/`
-9. `../deployment/container_demo/`
+7. `vector_db_demo/`
+8. `../frontend/chat_ui_demo/`
+9. `../eval/rag_eval_demo/`
+10. `../deployment/container_demo/`
 
 每个目录里的 `README.md` 都只讲这一小段代码，不会把所有概念混在一起。
 
