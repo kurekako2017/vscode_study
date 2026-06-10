@@ -180,8 +180,24 @@ llm:
 - `ES_*`
 - `LLM_*`
 - `OPENROUTER_API_KEY` 也会自动映射到 `LLM_API_KEY`
+- `MOCK_MODE=true` 可以把后端切到 mock SSE 模式，先在没有 Docker 的情况下联调前端
 - `VITE_DEV_PROXY_TARGET`
 - `VITE_API_BASE_URL`
+
+如果你现在只想先把前端和接口流程跑起来，可以直接在 `.env` 里加：
+
+```bash
+MOCK_MODE=true
+VITE_API_BASE_URL=
+```
+
+这样后端会走 mock `/api/query`，前端仍然可以正常展示 SSE 流程和结果卡片。
+
+如果你想先按“最小可运行版本”启动，可以直接看这份说明：
+
+- [Mock 优先启动说明](docs/mock-first-quickstart.md)
+- [Mock 启动命令块](docs/mock-first-copy-paste.md)
+- [Mock 最短 5 行命令](docs/mock-first-5lines.md)
 
 ### 5. 准备 Embedding 模型
 

@@ -11,13 +11,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.conf.app_config import app_config
-from app.clients.embedding_client_manager import embedding_client_manager
-from app.clients.es_client_manager import es_client_manager
-from app.clients.mysql_client_manager import (
-    dw_mysql_client_manager,
-    meta_mysql_client_manager,
-)
-from app.clients.qdrant_client_manager import qdrant_client_manager
 
 
 @asynccontextmanager
@@ -27,6 +20,14 @@ async def lifespan(app: FastAPI):
     if app_config.runtime.mock_mode:
         yield
         return
+
+    from app.clients.embedding_client_manager import embedding_client_manager
+    from app.clients.es_client_manager import es_client_manager
+    from app.clients.mysql_client_manager import (
+        dw_mysql_client_manager,
+        meta_mysql_client_manager,
+    )
+    from app.clients.qdrant_client_manager import qdrant_client_manager
 
     # 启动阶段：先建立各类外部服务客户端，后续依赖函数会从 manager 中取已初始化对象
     qdrant_client_manager.init()

@@ -5,6 +5,7 @@
 ## 已完成
 
 - 后端配置已改成可通过 `.env` 覆盖
+- 已增加 `MOCK_MODE`，可在没有 Docker 的情况下先跑 mock SSE 链路
 - 已补充 `.env.example`
 - 已确认后端会在启动时加载项目根目录 `.env`
 - 已确认前端支持 `VITE_DEV_PROXY_TARGET` / `VITE_API_BASE_URL`
@@ -12,6 +13,7 @@
 - 已把 Embedding 客户端改成兼容本机 TEI 的适配器，不再把 URL 误传给 Hugging Face Hub 包装器
 - 已验证 `main.py` 能生成 OpenAPI，且 `/api/query` 已挂载到 FastAPI 应用上
 - 已验证 `uvicorn main:app` 可以完成启动
+- 当前这个 WSL 里常规 `docker` CLI / Windows 互通命令不可用，但 Docker 守护进程本身是可达的，现有 `Qdrant` / `Elasticsearch` / `Kibana` / `Embedding` 容器仍在运行
 - 已确认 NAS 友好版 `docker/docker-compose.nas.yaml` 能成功创建并启动 `Qdrant`、`Elasticsearch`、`Kibana` 和 `Embedding`
 - 已确认 NAS MySQL 中的 `meta` 和 `dw` 库已创建并导入初始化表结构与样例数据
 - 已确认 `build_meta_knowledge` 可以跑通并成功写入元数据、向量索引和全文索引
@@ -22,6 +24,9 @@
   - 已倾向采用 `OpenRouter + NAS MySQL`
   - 当前实际连通测试优先使用 NAS `root / 123456`
   - 参考文档：[OpenRouter + NAS MySQL 本地方案](openrouter-nas-mysql-setup.md)
+- 如果暂时不修 Docker，可以先走 mock 版本启动
+  - 参考文档：[Mock 优先启动说明](mock-first-quickstart.md)
+  - 最短命令版：[Mock 启动命令块](mock-first-copy-paste.md)
 - 准备 `.env`
 - 准备 Embedding 模型文件
   - 现在 NAS 友好 compose 已改成首次启动自动拉取 `BAAI/bge-large-zh-v1.5`
@@ -31,6 +36,9 @@
 - 等待 `embedding` 首次下载 `BAAI/bge-large-zh-v1.5` 完成后，再做向量召回验证
 - 后续可以继续验证后端问数接口和前端页面联动
 - 当前这个 WSL 里 `docker` 命令不可用，需要先在 Docker Desktop 里打开当前发行版的 WSL Integration 才能继续容器层验证
+- 已验证 mock 模式下 `main.openapi()` 仍然有 `/api/query`
+- 已验证 mock 模式下 SSE 事件流能输出 progress 事件
+- 已调整 mock 模式为轻启动链路，避免因为真实路由和外部客户端导入而被 `omegaconf` / `qdrant_client` / `elasticsearch` / `asyncmy` 等缺失依赖卡住
 
 ## 待执行
 

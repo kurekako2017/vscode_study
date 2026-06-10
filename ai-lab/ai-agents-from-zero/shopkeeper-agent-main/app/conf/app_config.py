@@ -7,11 +7,13 @@
 """
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
-from omegaconf import OmegaConf
+import yaml
 
 
 @dataclass
@@ -109,6 +111,63 @@ class AppConfig:
     runtime: RuntimeConfig
 
 
+_ENV_PATTERN = re.compile(r"^\$\{oc\.env:([^,}]+)(?:,([^}]*))?\}$")
+
+
+def _coerce_value(value: Any) -> Any:
+    """把 YAML 读出来的字符串环境占位符转换成更合适的 Python 类型。"""
+
+    if isinstance(value, str):
+        lowered = value.lower()
+        if lowered == "true":
+            return True
+        if lowered == "false":
+            return False
+        if value.isdigit():
+            return int(value)
+    return value
+
+
+def _resolve_env_placeholders(value: Any) -> Any:
+    """递归展开 YAML 里的 ${oc.env:VAR,default} 占位符。"""
+
+    if isinstance(value, dict):
+        return {key: _resolve_env_placeholders(item) for key, item in value.items()}
+
+    if isinstance(value, list):
+        return [_resolve_env_placeholders(item) for item in value]
+
+    if isinstance(value, str):
+        match = _ENV_PATTERN.match(value)
+        if match:
+            env_name = match.group(1)
+            default = match.group(2)
+            resolved = os.getenv(env_name, default if default is not None else "")
+            return _coerce_value(resolved)
+        return value
+
+    return value
+
+
+def _build_dataclass(dataclass_type, data: dict[str, Any]):
+    """用字典构造嵌套 dataclass 配置对象。"""
+
+    return dataclass_type(
+        **{
+            field.name: _build_value(field.type, data[field.name])
+            for field in dataclass_type.__dataclass_fields__.values()
+        }
+    )
+
+
+def _build_value(field_type, value: Any):
+    """根据字段类型把字典或标量转换成对应对象。"""
+
+    if hasattr(field_type, "__dataclass_fields__") and isinstance(value, dict):
+        return _build_dataclass(field_type, value)
+    return value
+
+
 # 从当前文件位置回到项目根目录，再定位到 conf/app_config.yaml
 project_root = Path(__file__).parents[2]
 config_file = project_root / "conf" / "app_config.yaml"
@@ -122,13 +181,13 @@ if not os.getenv("LLM_API_KEY") and os.getenv("OPENROUTER_API_KEY"):
     os.environ["LLM_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
 
 # 读取 YAML 配置内容
-context = OmegaConf.load(config_file)
+with config_file.open("r", encoding="utf-8") as file:
+    context = yaml.safe_load(file)
 
-# 根据 AppConfig 生成结构化配置 schema
-schema = OmegaConf.structured(AppConfig)
+context = _resolve_env_placeholders(context)
 
-# 把配置结构和配置值合并，再转换成可以直接按属性访问的对象
-app_config: AppConfig = OmegaConf.to_object(OmegaConf.merge(schema, context))
+# 把配置字典转换成可以直接按属性访问的 dataclass 对象
+app_config: AppConfig = _build_dataclass(AppConfig, context)
 
 if __name__ == "__main__":
     # 简单测试：验证配置是否能正常读取
