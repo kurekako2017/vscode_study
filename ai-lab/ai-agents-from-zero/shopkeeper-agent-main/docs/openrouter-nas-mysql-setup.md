@@ -45,19 +45,20 @@ LLM_BASE_URL=https://openrouter.ai/api/v1
 # NAS MySQL - 元数据
 DB_META_HOST=192.168.10.2
 DB_META_PORT=3306
-DB_META_USER=didilili
-DB_META_PASSWORD=dili123
+DB_META_USER=root
+DB_META_PASSWORD=123456
 DB_META_DATABASE=meta
 
 # NAS MySQL - 数仓
 DB_DW_HOST=192.168.10.2
 DB_DW_PORT=3306
-DB_DW_USER=didilili
-DB_DW_PASSWORD=dili123
+DB_DW_USER=root
+DB_DW_PASSWORD=123456
 DB_DW_DATABASE=dw
 ```
 
-> 这里 `didilili / dili123` 与仓库里 `docker/mysql/meta.sql`、`docker/mysql/dw.sql` 的授权写法保持一致，方便你后续直接复用导入脚本。
+> 这里先用 `root / 123456` 做最小连通性验证，确认 NAS Docker MySQL 可以直接接入。
+> 如果你更希望使用独立账号，再在 NAS MySQL 里单独创建 `didilili / dili123` 并授权给 `meta` 和 `dw`。
 > 如果你更习惯把 key 只放在 `OPENROUTER_API_KEY`，后端也会自动识别，不必再重复写一份到 `LLM_API_KEY`。
 
 ## 5. NAS 上的准备步骤
@@ -82,6 +83,8 @@ GRANT ALL PRIVILEGES ON meta.* TO 'didilili'@'%';
 GRANT ALL PRIVILEGES ON dw.* TO 'didilili'@'%';
 FLUSH PRIVILEGES;
 ```
+
+如果你先用 `root / 123456` 跑通环境，这一步也可以先不做，直接让 root 使用 `meta` 和 `dw` 两个库即可。
 
 ### 5.3 导入项目初始化 SQL
 

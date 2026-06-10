@@ -89,6 +89,13 @@ class LLMConfig:
 
 
 @dataclass
+class RuntimeConfig:
+    """运行时开关配置"""
+
+    mock_mode: bool = False
+
+
+@dataclass
 class AppConfig:
     """项目级总配置入口"""
 
@@ -99,6 +106,7 @@ class AppConfig:
     embedding: EmbeddingConfig
     es: ESConfig
     llm: LLMConfig
+    runtime: RuntimeConfig
 
 
 # 从当前文件位置回到项目根目录，再定位到 conf/app_config.yaml

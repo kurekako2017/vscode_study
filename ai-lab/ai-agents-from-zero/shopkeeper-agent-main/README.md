@@ -133,6 +133,8 @@ shopkeeper-agent/
 - Docker 与 Docker Compose
 - Node.js 与 `pnpm`
 
+> 如果你在 WSL 里执行 `docker` 提示 `command not found`，通常是 Docker Desktop 的 WSL Integration 没有给当前发行版打开。先在 Docker Desktop 的 `Settings -> Resources -> WSL integration` 里勾选当前 WSL 发行版，再回到终端继续。
+
 ### 2. 克隆项目
 
 ```bash
@@ -193,6 +195,16 @@ uv run hf download BAAI/bge-large-zh-v1.5 --local-dir docker/embedding/bge-large
 
 ### 6. 启动 Docker 基础服务
 
+如果你使用的是 NAS MySQL 方案，建议启动只包含 `Qdrant`、`Elasticsearch`、`Kibana`、`Embedding` 的本地栈，避免抢占 NAS 已占用的 `3306`：
+
+```bash
+bash scripts/up_local_stack.sh up
+```
+
+`embedding` 第一次启动时会自动从 Hugging Face 拉取 `BAAI/bge-large-zh-v1.5`，模型较大，启动会慢一些，但不需要你先手动准备本地模型目录。
+
+如果你要启动仓库原始的完整本地环境，再用下面这个命令：
+
 ```bash
 docker compose -f docker/docker-compose.yaml up -d
 ```
@@ -208,6 +220,7 @@ docker compose -f docker/docker-compose.yaml up -d
 | Embedding     | `8081` |
 
 > `docker/mysql/meta.sql` 和 `docker/mysql/dw.sql` 会在 MySQL 容器首次启动时自动初始化元数据库和教学数仓。
+> 如果你改走 NAS MySQL，就不要再启动原始 compose 里的 `mysql` 服务，直接用 `docker/docker-compose.nas.yaml` 或 `scripts/up_local_stack.sh` 即可。
 
 ### 7. 构建元数据知识库
 
