@@ -434,6 +434,51 @@ print(summary) / 打印汇总
 
 ## 10. 向量数据库骨架
 
+### 10.0 最小教学版
+
+文件：`vector_db_demo/main.py`
+
+调用流程：
+
+`main()（程序入口）` -> `load_documents()（加载样本文档）` -> `build_store()（选择后端风格）` -> `upsert() / add_documents()（写入 collection）` -> `search() / query()（相似度检索）` -> `print_hits()（打印结果）`
+
+关键名词：
+
+- `Document / 文档对象`：一篇待检索的示例文本。
+- `collection / 集合`：向量和文档的存储容器。
+- `metadata / 元数据`：来源、主题等附加信息。
+- `vector / 向量`：文本转成的数值表示。
+- `top-k / 前 K 条`：只返回最相关的几条结果。
+
+理解要点：
+
+- `load_documents()` 会把 `assets/` 里的 markdown 文件读进来。
+- `embed_text()` 会把文本变成固定长度向量。
+- `MemoryVectorDB` 负责保存文档和向量。
+- `QdrantLikeStore` 和 `ChromaLikeStore` 只是接口风格不同，底层流程一样。
+- `main()` 根据 `--backend` 选择不同的演示后端。
+
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+load_documents() / 加载样本文档
+   |
+   v
+build_store() / 选择后端风格
+   |
+   v
+upsert() / add_documents() / 写入 collection
+   |
+   v
+search() / query() / 相似度检索
+   |
+   v
+print_hits() / 打印 top-k 结果
+```
+
 ### 10.1 真实 Qdrant 版
 
 文件：`vector_db_qdrant_demo/main.py`
@@ -450,6 +495,27 @@ print(summary) / 打印汇总
 - `upsert / 写入`：新增或更新文档
 - `search / 检索`：按向量相似度召回结果
 
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+build_embedder() / 构造 embedding
+   |
+   v
+run_mock() / run_real() / 选择执行模式
+   |
+   v
+upsert() / 写入 collection
+   |
+   v
+search() / 相似度检索
+   |
+   v
+print_hits() / 打印命中结果
+```
+
 ### 10.2 真实 Chroma 版
 
 文件：`vector_db_chroma_demo/main.py`
@@ -465,6 +531,27 @@ print(summary) / 打印汇总
 - `metadata / 元数据`：文档附带信息
 - `query / 查询`：检索相似内容
 - `persist_dir / 持久化目录`：本地落盘目录
+
+工作流小图：
+
+```text
+用户问题 / User question
+   |
+   v
+build_embedder() / 构造 embedding
+   |
+   v
+run_mock() / run_real() / 选择执行模式
+   |
+   v
+collection.upsert() / 写入 collection
+   |
+   v
+collection.query() / 查询相似内容
+   |
+   v
+print_hits() / 打印命中结果
+```
 
 理解要点：
 

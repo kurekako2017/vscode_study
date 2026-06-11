@@ -26,6 +26,8 @@ HASH_VECTOR_SIZE = 64
 
 @dataclass
 class Document:
+    """最小文档对象，模拟 Chroma 里要入库的文本块。"""
+
     id: str
     text: str
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -33,6 +35,8 @@ class Document:
 
 @dataclass
 class SearchHit:
+    """检索返回的一条结果。"""
+
     id: str
     score: float
     text: str
@@ -41,16 +45,20 @@ class SearchHit:
 
 @dataclass
 class Embedder:
+    """把文本变成向量的工具对象。"""
+
     name: str
     vector_size: int
     encode: Callable[[str], list[float]]
 
 
 def tokenize(text: str) -> list[str]:
+    # 保留中英文和数字，其余字符都视为分隔符。
     return [token for token in re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", text.lower()) if token]
 
 
 def hash_embed(text: str, size: int = HASH_VECTOR_SIZE) -> list[float]:
+    # 和教学版一致：把 token 映射到固定桶位，方便离线演示。
     vector = [0.0] * size
     for token in tokenize(text):
         bucket = sum(ord(ch) for ch in token) % size
@@ -60,6 +68,7 @@ def hash_embed(text: str, size: int = HASH_VECTOR_SIZE) -> list[float]:
 
 
 def build_embedder(kind: str) -> Embedder:
+    # `auto` 会优先尝试真实模型，失败后再回退到 hash embedding。
     if kind in {"auto", "sentence-transformers"}:
         try:
             from sentence_transformers import SentenceTransformer
@@ -68,6 +77,7 @@ def build_embedder(kind: str) -> Embedder:
             vector_size = int(model.get_sentence_embedding_dimension())
 
             def encode(text: str) -> list[float]:
+                # 真实模型通常会返回 numpy / tensor，这里统一转成普通 list。
                 embedding = model.encode(text, normalize_embeddings=True)
                 if hasattr(embedding, "tolist"):
                     embedding = embedding.tolist()
@@ -77,12 +87,14 @@ def build_embedder(kind: str) -> Embedder:
         except Exception as exc:  # pragma: no cover
             if kind == "sentence-transformers":
                 raise SystemExit(f"无法加载 sentence-transformers：{exc}") from exc
+            # 没装依赖时，先用 hash 版本把流程跑通。
             print(f"[warn] sentence-transformers 不可用，回退到 hash embedding：{exc}", file=sys.stderr)
 
     return Embedder(name="hash", vector_size=HASH_VECTOR_SIZE, encode=lambda text: hash_embed(text, HASH_VECTOR_SIZE))
 
 
 def load_documents(source_dir: Path = ASSET_DIR) -> list[Document]:
+    # 约定：每个 markdown 文件都是一个示例文档。
     documents: list[Document] = []
     for file_path in sorted(source_dir.glob("*.md")):
         documents.append(
@@ -99,6 +111,7 @@ def load_documents(source_dir: Path = ASSET_DIR) -> list[Document]:
 
 
 def print_hits(title: str, hits: list[SearchHit]) -> None:
+    # 打印时把长文本截断，让初学者更容易看结果。
     print(f"\n=== {title} ===")
     for index, hit in enumerate(hits, start=1):
         print(f"{index}. id={hit.id} score={hit.score:.4f} source={hit.metadata.get('source')}")
@@ -107,12 +120,15 @@ def print_hits(title: str, hits: list[SearchHit]) -> None:
 
 
 class MockVectorStore:
+    """不依赖 chromadb 的本地模拟实现。"""
+
     def __init__(self, collection_name: str, embedder: Embedder):
         self.collection_name = collection_name
         self.embedder = embedder
         self._items: list[dict[str, Any]] = []
 
     def upsert(self, documents: list[Document]) -> None:
+        # 这里模拟 collection.upsert()：保存文档、元数据和向量。
         for doc in documents:
             self._items.append(
                 {
@@ -124,6 +140,7 @@ class MockVectorStore:
             )
 
     def query(self, query: str, top_k: int) -> list[SearchHit]:
+        # 先把 query 转向量，再对每个文档算相似度。
         query_vector = self.embedder.encode(query)
         hits: list[SearchHit] = []
         for item in self._items:
@@ -134,6 +151,7 @@ class MockVectorStore:
 
 
 def run_mock(documents: list[Document], query: str, top_k: int, embedder: Embedder, collection_name: str) -> None:
+    # mock 模式下不依赖外部服务，适合先看数据流。
     store = MockVectorStore(collection_name=collection_name, embedder=embedder)
     store.upsert(documents)
     print(f"mode = mock")
@@ -146,6 +164,7 @@ def run_mock(documents: list[Document], query: str, top_k: int, embedder: Embedd
 
 
 def build_chroma_client(persist_dir: str) -> Any:
+    # 真实模式才会导入 chromadb，避免 mock 模式也强制安装依赖。
     try:
         import chromadb
     except ImportError as exc:  # pragma: no cover
@@ -155,6 +174,7 @@ def build_chroma_client(persist_dir: str) -> Any:
 
 
 def recreate_collection(client: Any, collection_name: str) -> None:
+    # 调试时如果 collection 旧了，可以先删掉再重建。
     try:
         client.delete_collection(name=collection_name)
     except Exception:
@@ -174,6 +194,7 @@ def run_real(
     if recreate:
         recreate_collection(client, collection_name)
 
+    # 真实 Chroma 里先创建或获取 collection，再批量 upsert 文档。
     collection = client.get_or_create_collection(name=collection_name, metadata={"hnsw:space": "cosine"})
     ids = [doc.id for doc in documents]
     texts = [doc.text for doc in documents]
@@ -181,6 +202,7 @@ def run_real(
     embeddings = [embedder.encode(doc.text) for doc in documents]
     collection.upsert(ids=ids, documents=texts, metadatas=metadatas, embeddings=embeddings)
 
+    # query_embeddings 是“先把查询句子转成向量，再做检索”。
     result = collection.query(
         query_embeddings=[embedder.encode(query)],
         n_results=top_k,
@@ -189,6 +211,7 @@ def run_real(
 
     hits: list[SearchHit] = []
     for idx, doc_id in enumerate(result["ids"][0]):
+        # Chroma 返回的是距离，不是直接的相似度分数，这里简单转一下。
         distance = float(result["distances"][0][idx])
         text = result["documents"][0][idx]
         metadata = result["metadatas"][0][idx] or {}
@@ -232,6 +255,7 @@ def main() -> None:
         raise SystemExit(f"{source_dir} 中没有找到示例文档")
 
     embedder = build_embedder(args.embedding)
+    # mock 和 real 共用同一套文档加载和 embedding，只是存储层不同。
     if args.mode == "mock":
         run_mock(documents, args.query, args.top_k, embedder, args.collection)
     else:

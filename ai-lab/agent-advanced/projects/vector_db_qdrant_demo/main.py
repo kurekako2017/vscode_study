@@ -29,6 +29,8 @@ HASH_VECTOR_SIZE = 64
 
 @dataclass
 class Document:
+    """最小文档对象，模拟 Qdrant 里要入库的内容。"""
+
     id: str
     text: str
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -36,6 +38,8 @@ class Document:
 
 @dataclass
 class SearchHit:
+    """检索返回的一条命中。"""
+
     id: str
     score: float
     text: str
@@ -44,16 +48,20 @@ class SearchHit:
 
 @dataclass
 class Embedder:
+    """把文本映射成向量的工具对象。"""
+
     name: str
     vector_size: int
     encode: Callable[[str], list[float]]
 
 
 def tokenize(text: str) -> list[str]:
+    # 这里保留中英文和数字，方便教学场景下看懂分词结果。
     return [token for token in re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", text.lower()) if token]
 
 
 def hash_embed(text: str, size: int = HASH_VECTOR_SIZE) -> list[float]:
+    # 跟教学版一样，先做一个离线可跑的简单 hash embedding。
     vector = [0.0] * size
     for token in tokenize(text):
         bucket = sum(ord(ch) for ch in token) % size
@@ -77,6 +85,7 @@ def build_embedder(kind: str) -> Embedder:
             vector_size = int(model.get_sentence_embedding_dimension())
 
             def encode(text: str) -> list[float]:
+                # 统一把模型输出转成 list，后面才能直接存入 payload / vector。
                 embedding = model.encode(text, normalize_embeddings=True)
                 if hasattr(embedding, "tolist"):
                     embedding = embedding.tolist()
@@ -86,12 +95,14 @@ def build_embedder(kind: str) -> Embedder:
         except Exception as exc:  # pragma: no cover - 运行环境不同会走到这里
             if kind == "sentence-transformers":
                 raise SystemExit(f"无法加载 sentence-transformers：{exc}") from exc
+            # 没有真实模型时，先退回到 hash embedding，保证流程可跑。
             print(f"[warn] sentence-transformers 不可用，回退到 hash embedding：{exc}", file=sys.stderr)
 
     return Embedder(name="hash", vector_size=HASH_VECTOR_SIZE, encode=lambda text: hash_embed(text, HASH_VECTOR_SIZE))
 
 
 def load_documents(source_dir: Path = ASSET_DIR) -> list[Document]:
+    # 约定每个 markdown 文件就是一条演示文档。
     documents: list[Document] = []
     for file_path in sorted(source_dir.glob("*.md")):
         documents.append(
@@ -108,6 +119,7 @@ def load_documents(source_dir: Path = ASSET_DIR) -> list[Document]:
 
 
 def print_hits(title: str, hits: list[SearchHit]) -> None:
+    # 截断长文本，避免终端输出太长不好阅读。
     print(f"\n=== {title} ===")
     for index, hit in enumerate(hits, start=1):
         print(f"{index}. id={hit.id} score={hit.score:.4f} source={hit.metadata.get('source')}")
@@ -116,12 +128,15 @@ def print_hits(title: str, hits: list[SearchHit]) -> None:
 
 
 class MockVectorStore:
+    """不依赖真实 Qdrant 的本地模拟实现。"""
+
     def __init__(self, collection_name: str, embedder: Embedder):
         self.collection_name = collection_name
         self.embedder = embedder
         self._items: list[dict[str, Any]] = []
 
     def upsert(self, documents: list[Document]) -> None:
+        # 模拟把文档写入 collection。
         for doc in documents:
             self._items.append(
                 {
@@ -133,6 +148,7 @@ class MockVectorStore:
             )
 
     def search(self, query: str, top_k: int) -> list[SearchHit]:
+        # 模拟用 query 向量去做相似度搜索。
         query_vector = self.embedder.encode(query)
         hits: list[SearchHit] = []
         for item in self._items:
@@ -143,6 +159,7 @@ class MockVectorStore:
 
 
 def run_mock(documents: list[Document], query: str, top_k: int, embedder: Embedder, collection_name: str) -> None:
+    # mock 模式只展示流程，不依赖任何外部服务。
     store = MockVectorStore(collection_name=collection_name, embedder=embedder)
     store.upsert(documents)
     print(f"mode = mock")
@@ -155,6 +172,7 @@ def run_mock(documents: list[Document], query: str, top_k: int, embedder: Embedd
 
 
 def build_qdrant_client(url: str, api_key: str | None) -> Any:
+    # 真实模式才导入 qdrant-client，避免 mock 模式强制安装依赖。
     try:
         from qdrant_client import QdrantClient
     except ImportError as exc:  # pragma: no cover - 依赖缺失时提示
@@ -167,6 +185,7 @@ def build_qdrant_client(url: str, api_key: str | None) -> Any:
 
 
 def recreate_collection(client: Any, collection_name: str) -> None:
+    # 调试时可以直接删掉旧 collection，避免旧向量干扰结果。
     try:
         client.delete_collection(collection_name)
     except Exception:
@@ -192,18 +211,21 @@ def run_real(
     if recreate:
         recreate_collection(client, collection_name)
 
+    # 如果 collection 不存在，就先建一个；向量维度必须和 embedding 维度一致。
     if not client.collection_exists(collection_name):
         client.create_collection(
             collection_name=collection_name,
             vectors_config=qmodels.VectorParams(size=embedder.vector_size, distance=qmodels.Distance.COSINE),
         )
 
+    # 先把每篇文档封装成 PointStruct，再批量 upsert。
     points = [
         qmodels.PointStruct(id=doc.id, vector=embedder.encode(doc.text), payload={"text": doc.text, **doc.metadata})
         for doc in documents
     ]
     client.upsert(collection_name=collection_name, points=points)
 
+    # search 接收的是 query_vector，不是原始文本。
     results = client.search(
         collection_name=collection_name,
         query_vector=embedder.encode(query),
@@ -214,6 +236,7 @@ def run_real(
         SearchHit(
             id=str(result.id),
             score=float(result.score),
+            # payload 里把原文 text 拿出来，方便打印 snippet。
             text=str((result.payload or {}).get("text", "")),
             metadata={k: v for k, v in (result.payload or {}).items() if k != "text"},
         )
@@ -252,6 +275,7 @@ def main() -> None:
         raise SystemExit(f"{source_dir} 中没有找到示例文档")
 
     embedder = build_embedder(args.embedding)
+    # mock 和 real 共享文档和 embedding，差别只在存储后端。
     if args.mode == "mock":
         run_mock(documents, args.query, args.top_k, embedder, args.collection)
     else:

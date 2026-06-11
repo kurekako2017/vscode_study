@@ -24,7 +24,9 @@ from pathlib import Path
 from typing import Any
 
 
+# 示例文档目录，程序会把这里的 `.md` 文件读进来做检索演示。
 ASSET_DIR = Path(__file__).parent / "assets"
+# 向量长度固定，方便教学时理解“文本 -> 向量 -> 相似度”的完整流程。
 VECTOR_SIZE = 32
 
 
@@ -57,6 +59,7 @@ def tokenize(text: str) -> list[str]:
     这里故意不引入第三方分词库，只做教学演示。
     """
 
+    # 用正则把标点、空白和其他分隔符去掉，保留中英文和数字。
     return [token for token in re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", text.lower()) if token]
 
 
@@ -72,10 +75,13 @@ def embed_text(text: str, size: int = VECTOR_SIZE) -> list[float]:
         return vector
 
     for token in tokens:
+        # 把每个 token 映射到一个固定桶位，多个词会累积到同一个位置。
         bucket = sum(ord(ch) for ch in token) % size
+        # 词越长，权重略高一点，让向量更容易体现文本差异。
         weight = 1.0 + (len(token) / 10.0)
         vector[bucket] += weight
 
+    # 归一化后再做相似度计算，结果会更稳定。
     norm = math.sqrt(sum(value * value for value in vector))
     if norm == 0:
         return vector
@@ -93,6 +99,7 @@ def load_documents() -> list[Document]:
 
     docs: list[Document] = []
     for file_path in sorted(ASSET_DIR.glob("*.md")):
+        # 每个 markdown 文件都当成一篇小文档，便于演示文档入库。
         docs.append(
             Document(
                 id=file_path.stem,
@@ -117,6 +124,7 @@ class MemoryVectorDB:
         self._items: list[dict[str, Any]] = []
 
     def upsert(self, documents: list[Document]) -> None:
+        # 这里模拟“写入 collection”的动作：保存原文、元数据和向量。
         for doc in documents:
             self._items.append(
                 {
@@ -128,6 +136,7 @@ class MemoryVectorDB:
             )
 
     def search(self, query: str, top_k: int = 3) -> list[SearchHit]:
+        # 查询同样先转向量，再和库里的每个文档逐个算相似度。
         query_vector = embed_text(query)
         hits: list[SearchHit] = []
         for item in self._items:
@@ -152,6 +161,7 @@ class QdrantLikeStore:
         self._db = MemoryVectorDB(collection_name)
 
     def upsert(self, documents: list[Document]) -> None:
+        # 教学版不连真实服务，只复用内存实现来表现接口风格。
         self._db.upsert(documents)
 
     def search(self, query: str, top_k: int = 3) -> list[SearchHit]:
@@ -166,6 +176,7 @@ class ChromaLikeStore:
         self._db = MemoryVectorDB(collection_name)
 
     def add_documents(self, documents: list[Document]) -> None:
+        # Chroma 常用的是 `add_documents()` 这样的命名，所以这里保留这个接口。
         self._db.upsert(documents)
 
     def query(self, query: str, n_results: int = 3) -> list[SearchHit]:
@@ -187,10 +198,13 @@ def build_store(backend: str) -> Any:
     """根据参数创建不同风格的向量库。"""
 
     if backend == "qdrant":
+        # 这里强调的是“Qdrant 风格”的 API 形状，而不是实际连接服务。
         return QdrantLikeStore(collection_name="knowledge_chunks")
     if backend == "chroma":
+        # 这里强调的是“Chroma 风格”的 API 形状。
         return ChromaLikeStore(collection_name="knowledge_chunks")
     if backend == "memory":
+        # 最朴素的内存实现，最适合先理解数据流。
         return MemoryVectorDB(collection_name="knowledge_chunks")
     raise ValueError(f"Unsupported backend: {backend}")
 
@@ -211,6 +225,7 @@ def main() -> None:
     print(f"collection = {store.collection_name}")
     print(f"documents = {len(documents)}")
 
+    # 不同后端只是“写入和查询的方法名”不同，底层数据流是一致的。
     if isinstance(store, QdrantLikeStore):
         store.upsert(documents)
         hits = store.search(args.query, top_k=args.top_k)
