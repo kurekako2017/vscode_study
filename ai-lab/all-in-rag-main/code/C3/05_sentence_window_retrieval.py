@@ -7,7 +7,7 @@ from llama_index.core.postprocessor import MetadataReplacementPostProcessor
 
 # 1. 配置模型
 Settings.llm = OpenAILike(
-    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
     temperature=0.1,
     api_key=os.getenv("OPENROUTER_API_KEY"),
     api_base="https://openrouter.ai/api/v1",

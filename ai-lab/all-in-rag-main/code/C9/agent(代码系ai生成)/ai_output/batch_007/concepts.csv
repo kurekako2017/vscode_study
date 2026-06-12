@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000071,Recipe,蚂蚁上树,蚂蚁上树 (Recipe),蚂蚁上树,[],其他,3,,,,,,dishes/meat_dish/蚂蚁上树.md
+201000072,Recipe,乡村啤酒鸭,乡村啤酒鸭 (Recipe),乡村啤酒鸭,[],其他,4,,,,,,dishes/meat_dish/乡村啤酒鸭.md
+201000073,Recipe,商芝肉,商芝肉 (Recipe),商芝肉,[],荤菜,5,,,,,,dishes/meat_dish/商芝肉.md
+201000074,Recipe,冷吃兔,冷吃兔 (Recipe),冷吃兔,[],其他,4,,,,,,dishes/meat_dish/冷吃兔.md
+201000075,Recipe,孜然牛肉,孜然牛肉 (Recipe),孜然牛肉,[],荤菜,3,,,,,,dishes/meat_dish/孜然牛肉.md
+201000076,Recipe,糖醋里脊,糖醋里脊 (Recipe),糖醋里脊,"[{'term': 'sweet and sour里脊', 'language': 'en', 'language_code': 'en-US'}]",其他,4,,,,,,dishes/meat_dish/糖醋里脊.md
+201000077,Recipe,香干肉丝,香干肉丝 (Recipe),香干肉丝,[],荤菜,3,,,,,,dishes/meat_dish/香干肉丝.md
+201000078,Recipe,甜辣烤全翅,甜辣烤全翅 (Recipe),甜辣烤全翅,"[{'term': '甜辣baked全翅', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '甜辣烘烤全翅', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '甜辣roasted全翅', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,3,,,,,,dishes/meat_dish/甜辣烤全翅.md
+201000079,Recipe,咕噜肉,咕噜肉 (Recipe),咕噜肉,[],荤菜,4,,,,,,dishes/meat_dish/咕噜肉.md
+201000080,Recipe,肉饼炖蛋,肉饼炖蛋 (Recipe),肉饼炖蛋,"[{'term': '肉饼stewed蛋', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '肉饼煲蛋', 'language': 'zh', 'language_code': 'zh-CN'}]",素菜,3,,,,,,dishes/meat_dish/肉饼炖蛋.md

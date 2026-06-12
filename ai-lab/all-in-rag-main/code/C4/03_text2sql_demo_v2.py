@@ -326,7 +326,7 @@ def demo():
     embedding_function = BGESmallEmbeddingFunction()
     test_texts = ["查询用户", "统计数据"]
     embeddings = embedding_function.encode_text(test_texts)
-    print(f"向量维度: {embeddings.shape}")
+    print(f"向量维度: {np.asarray(embeddings).shape}")
     
     # 数据库查询演示
     db_path = "demo.db"

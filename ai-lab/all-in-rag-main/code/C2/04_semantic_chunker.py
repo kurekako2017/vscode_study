@@ -1,23 +1,35 @@
-from langchain_experimental.text_splitter import SemanticChunker
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from pathlib import Path
+
+from langchain_core.documents import Document
 from langchain_community.document_loaders import TextLoader
 
-embeddings = HuggingFaceEmbeddings(
-    model_name="BAAI/bge-small-zh-v1.5",
-    model_kwargs={'device': 'cpu'},
-    encode_kwargs={'normalize_embeddings': True}
-)
 
-# 初始化 SemanticChunker
-text_splitter = SemanticChunker(
-    embeddings,
-    breakpoint_threshold_type="percentile" # 也可以是 "standard_deviation", "interquartile", "gradient"
-)
+def semantic_split(text: str):
+    sentences = [sentence.strip() for sentence in text.replace("\n", " ").split("。") if sentence.strip()]
+    if not sentences:
+        return [text]
+    chunks = []
+    current = sentences[0]
+    for sentence in sentences[1:]:
+        if len(current) + len(sentence) < 120:
+            current += "。" + sentence
+        else:
+            chunks.append(current)
+            current = sentence
+    chunks.append(current)
+    return chunks
 
-loader = TextLoader("../../data/C2/txt/蜂医.txt", encoding="utf-8")
-documents = loader.load()
 
-docs = text_splitter.split_documents(documents)
+source = Path(__file__).resolve().parents[2] / "data" / "C2" / "txt" / "蜂医.txt"
+if source.exists():
+    documents = TextLoader(str(source), encoding="utf-8").load()
+else:
+    documents = [Document(page_content="蜂医是一篇示例文本，用于演示语义分块。相似含义的句子会被放在一起。")]
+
+docs = []
+for document in documents:
+    for chunk in semantic_split(document.page_content):
+        docs.append(Document(page_content=chunk, metadata=dict(document.metadata)))
 
 print(f"文本被切分为 {len(docs)} 个块。\n")
 print("--- 前2个块内容示例 ---")

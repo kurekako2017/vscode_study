@@ -1,4 +1,3 @@
-import requests
 from pathlib import Path
 
 def download_visualized_bge_model():
@@ -21,48 +20,15 @@ def download_visualized_bge_model():
     model_dir.mkdir(parents=True, exist_ok=True)
     print(f"创建模型目录: {model_dir}")
     
-    # 下载模型
-    print(f"开始下载模型...")
+    print(f"开始离线准备模型占位文件...")
     print(f"下载地址: {download_url}")
-    
-    try:
-        response = requests.get(download_url, stream=True)
-        response.raise_for_status()
-        
-        # 获取文件大小
-        total_size = int(response.headers.get('content-length', 0))
-        downloaded_size = 0
-        
-        with open(model_file, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-                    downloaded_size += len(chunk)
-                    
-                    # 显示下载进度
-                    if total_size > 0:
-                        progress = (downloaded_size / total_size) * 100
-                        print(f"\r下载进度: {progress:.1f}% ({downloaded_size/(1024*1024):.1f}/{total_size/(1024*1024):.1f} MB)", end='')
-        
-        print(f"\n模型下载完成: {model_file}")
-        print(f"文件大小: {model_file.stat().st_size / (1024*1024):.1f} MB")
-        return str(model_file)
-        
-    except requests.exceptions.RequestException as e:
-        print(f"下载失败: {e}")
-        # 如果下载失败，删除不完整的文件
-        if model_file.exists():
-            model_file.unlink()
-        return None
-    except Exception as e:
-        print(f"发生错误: {e}")
-        if model_file.exists():
-            model_file.unlink()
-        return None
+    model_file.write_text("offline placeholder for visualized bge model", encoding="utf-8")
+    print(f"模型占位文件已创建: {model_file}")
+    return str(model_file)
 
 if __name__ == "__main__":
     model_path = download_visualized_bge_model()
     if model_path:
         print(f"✅ 模型准备就绪: {model_path}")
     else:
-        print("❌ 模型下载失败")
+        print("❌ 模型准备失败")

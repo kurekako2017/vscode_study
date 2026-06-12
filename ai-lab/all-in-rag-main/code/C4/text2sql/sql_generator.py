@@ -1,7 +1,6 @@
 import os
 from typing import List, Dict, Any
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
 
 
 class SimpleSQLGenerator:
@@ -9,7 +8,7 @@ class SimpleSQLGenerator:
     
     def __init__(self, api_key: str = None):
         self.llm = ChatOpenAI(
-            model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+            model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
             temperature=0,
             api_key=api_key or os.getenv("OPENROUTER_API_KEY"),
             base_url="https://openrouter.ai/api/v1"
@@ -36,8 +35,7 @@ class SimpleSQLGenerator:
 
 SQL语句："""
 
-        messages = [HumanMessage(content=prompt)]
-        response = self.llm.invoke(messages)
+        response = self.llm.invoke(prompt)
         
         # 清理SQL语句
         sql = response.content.strip()
@@ -67,8 +65,7 @@ SQL语句："""
 
 请返回修复后的SQL语句（只返回SQL，不要解释）："""
 
-        messages = [HumanMessage(content=prompt)]
-        response = self.llm.invoke(messages)
+        response = self.llm.invoke(prompt)
         
         # 清理SQL语句
         fixed_sql = response.content.strip()

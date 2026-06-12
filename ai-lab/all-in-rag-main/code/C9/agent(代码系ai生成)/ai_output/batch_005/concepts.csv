@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000051,Recipe,尖椒炒牛肉,尖椒炒牛肉 (Recipe),尖椒炒牛肉,[],荤菜,3,,,,,,dishes/meat_dish/尖椒炒牛肉.md
+201000052,Recipe,黄焖鸡,黄焖鸡 (Recipe),黄焖鸡,"[{'term': '黄braised鸡', 'language': 'en', 'language_code': 'en-US'}, {'term': '黄闷鸡', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/meat_dish/黄焖鸡.md
+201000053,Recipe,小酥肉,小酥肉 (Recipe),小酥肉,[],荤菜,3,,,,,,dishes/meat_dish/小酥肉.md
+201000054,Recipe,番茄红酱,番茄红酱 (Recipe),番茄红酱,[],其他,4,,,,,,dishes/meat_dish/番茄红酱.md
+201000055,Recipe,麻辣香锅,麻辣香锅 (Recipe),麻辣香锅,[],其他,3,,,,,,dishes/meat_dish/麻辣香锅.md
+201000056,Recipe,辣椒炒肉,辣椒炒肉 (Recipe),辣椒炒肉,[],荤菜,3,,,,,,dishes/meat_dish/辣椒炒肉.md
+201000057,Recipe,水煮肉片,水煮肉片 (Recipe),水煮肉片,[],荤菜,5,,,,,,dishes/meat_dish/水煮肉片.md
+201000058,Recipe,山西过油肉,山西过油肉 (Recipe),山西过油肉,[],荤菜,4,,,,,,dishes/meat_dish/山西过油肉.md
+201000059,Recipe,小炒肉,小炒肉 (Recipe),小炒肉,[],荤菜,3,,,,,,dishes/meat_dish/小炒肉.md
+201000060,Recipe,黄瓜炒肉,黄瓜炒肉 (Recipe),黄瓜炒肉,[],荤菜,3,,,,,,dishes/meat_dish/黄瓜炒肉.md

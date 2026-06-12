@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000181,Recipe,鲣鱼海苔玉米饭,鲣鱼海苔玉米饭 (Recipe),鲣鱼海苔玉米饭,[],荤菜,2,,,,,,dishes/staple/鲣鱼海苔玉米饭/鲣鱼海苔玉米饭.md
+201000182,Recipe,日式咖喱饭,日式咖喱饭 (Recipe),日式咖喱饭,[],其他,4,,,,,,dishes/staple/日式咖喱饭/日式咖喱饭.md
+201000183,Recipe,火腿饭团,火腿饭团 (Recipe),火腿饭团,[],其他,4,,,,,,dishes/staple/火腿饭团/火腿饭团.md
+201000184,Recipe,微波炉腊肠煲仔饭,微波炉腊肠煲仔饭 (Recipe),微波炉腊肠煲仔饭,[],其他,2,,,,,,dishes/staple/微波炉腊肠煲仔饭/微波炉腊肠煲仔饭.md
+201000185,Recipe,烙饼,烙饼 (Recipe),烙饼,[],其他,4,,,,,,dishes/staple/烙饼/烙饼.md
+201000186,Recipe,茄子肉煎饼,茄子肉煎饼 (Recipe),茄子肉煎饼,"[{'term': '紫茄子肉煎饼', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'eggplant肉煎饼', 'language': 'en', 'language_code': 'en-US'}, {'term': '茄子肉pan-fried饼', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '青茄子肉煎饼', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/staple/茄子肉煎饼/茄子肉煎饼.md
+201000187,Recipe,空气炸锅照烧鸡饭,空气炸锅照烧鸡饭 (Recipe),空气炸锅照烧鸡饭,"[{'term': '空气油炸锅照烧鸡饭', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '空气deep-fried锅照烧鸡饭', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,4,,,,,,dishes/staple/空气炸锅照烧鸡饭/空气炸锅照烧鸡饭.md
+201000188,Recipe,老友猪肉粉,老友猪肉粉 (Recipe),老友猪肉粉,[],荤菜,3,,,,,,dishes/staple/老友猪肉粉/老友猪肉粉.md
+201000189,Recipe,芝麻烧饼,芝麻烧饼 (Recipe),芝麻烧饼,[],其他,3,,,,,,dishes/staple/烧饼/芝麻烧饼.md
+201000190,Recipe,炒意大利面,炒意大利面 (Recipe),炒意大利面,[],其他,3,,,,,,dishes/staple/炒意大利面/炒意大利面.md

@@ -168,10 +168,12 @@ class SimpleKnowledgeBase:
         
         results = []
         for hit in search_results[0]:
+            entity = hit.entity if hasattr(hit, "entity") else hit["entity"]
+            score = hit.distance if hasattr(hit, "distance") else hit["distance"]
             results.append({
-                "content": hit["entity"]["content"],
-                "type": hit["entity"]["type"],
-                "score": hit["distance"]
+                "content": entity["content"],
+                "type": entity["type"],
+                "score": score
             })
         
         return results

@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000241,Recipe,蒜香酱油,蒜香酱油 (Recipe),蒜香酱油,[],其他,2,,,,,,dishes/condiment/蒜香酱油.md
+201000242,Recipe,葱油,葱油 (Recipe),葱油,[],其他,3,,,,,,dishes/condiment/葱油.md
+201000243,Recipe,糖醋汁,糖醋汁 (Recipe),糖醋汁,"[{'term': 'sweet and sour汁', 'language': 'en', 'language_code': 'en-US'}]",其他,2,,,,,,dishes/condiment/糖醋汁.md
+201000244,Recipe,炸串酱料,炸串酱料 (Recipe),炸串酱料,"[{'term': 'deep-fried串酱料', 'language': 'en', 'language_code': 'en-US'}, {'term': '油炸串酱料', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,2,,,,,,dishes/condiment/炸串酱料.md
+201000245,Recipe,蔗糖糖浆,蔗糖糖浆 (Recipe),蔗糖糖浆,[],其他,1,,,,,,dishes/condiment/蔗糖糖浆/蔗糖糖浆.md
+201000246,Recipe,油泼辣子,油泼辣子 (Recipe),油泼辣子,[],其他,3,,,,,,dishes/condiment/油泼辣子/油泼辣子.md
+201000247,Recipe,草莓酱,草莓酱 (Recipe),草莓酱,[],其他,2,,,,,,dishes/condiment/草莓酱/草莓酱.md
+201000248,Recipe,陕北熬豆角,陕北熬豆角 (Recipe),陕北熬豆角,[],其他,2,,,,,,dishes/vegetable_dish/陕北熬豆角.md
+201000249,Recipe,蚝油生菜,蚝油生菜 (Recipe),蚝油生菜,[],其他,2,,,,,,dishes/vegetable_dish/蚝油生菜.md
+201000250,Recipe,凉拌金针菇,凉拌金针菇 (Recipe),凉拌金针菇,[],其他,2,,,,,,dishes/vegetable_dish/凉拌金针菇.md

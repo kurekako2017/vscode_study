@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000231,Recipe,煎饺,煎饺 (Recipe),煎饺,"[{'term': 'pan-fried饺', 'language': 'en', 'language_code': 'en-US'}]",其他,2,,,,,,dishes/breakfast/煎饺.md
+201000232,Recipe,燕麦鸡蛋饼,燕麦鸡蛋饼 (Recipe),燕麦鸡蛋饼,[],素菜,2,,,,,,dishes/breakfast/燕麦鸡蛋饼.md
+201000233,Recipe,牛奶燕麦,牛奶燕麦 (Recipe),牛奶燕麦,[],其他,1,,,,,,dishes/breakfast/牛奶燕麦.md
+201000234,Recipe,微波炉荷包蛋,微波炉荷包蛋 (Recipe),微波炉荷包蛋,[],素菜,1,,,,,,dishes/breakfast/微波炉荷包蛋.md
+201000235,Recipe,太阳蛋,太阳蛋 (Recipe),太阳蛋,[],素菜,2,,,,,,dishes/breakfast/太阳蛋.md
+201000236,Recipe,金枪鱼酱三明治,金枪鱼酱三明治 (Recipe),金枪鱼酱三明治,[],荤菜,1,,,,,,dishes/breakfast/金枪鱼酱三明治.md
+201000237,Recipe,苏格兰蛋,苏格兰蛋 (Recipe),苏格兰蛋,[],素菜,3,,,,,,dishes/breakfast/苏格兰蛋/苏格兰蛋.md
+201000238,Recipe,温泉蛋,温泉蛋 (Recipe),温泉蛋,[],素菜,3,,,,,,dishes/breakfast/温泉蛋/温泉蛋.md
+201000239,Recipe,简易版炒糖色,简易版炒糖色 (Recipe),简易版炒糖色,[],其他,4,,,,,,dishes/condiment/简易版炒糖色.md
+201000240,Recipe,油酥,油酥 (Recipe),油酥,[],其他,2,,,,,,dishes/condiment/油酥.md

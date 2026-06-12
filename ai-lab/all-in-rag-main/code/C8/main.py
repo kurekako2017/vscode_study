@@ -12,6 +12,10 @@ from typing import List
 sys.path.append(str(Path(__file__).parent))
 
 from dotenv import load_dotenv
+
+# 先加载环境变量，再导入依赖配置的模块
+load_dotenv()
+
 from config import DEFAULT_CONFIG, RAGConfig
 from rag_modules import (
     DataPreparationModule,
@@ -19,9 +23,6 @@ from rag_modules import (
     RetrievalOptimizationModule,
     GenerationIntegrationModule
 )
-
-# 加载环境变量
-load_dotenv()
 
 # 配置日志
 logging.basicConfig(
@@ -319,7 +320,16 @@ class RecipeRAGSystem:
         
         # 构建知识库
         self.build_knowledge_base()
-        
+
+        if not sys.stdin.isatty():
+            print("\n检测到非交互式终端，改为执行一个示例问题后退出。")
+            sample_question = "推荐一个简单的汤品"
+            answer = self.ask_question(sample_question, stream=False)
+            print(f"\n示例问题: {sample_question}")
+            print(f"回答: {answer}")
+            print("\n感谢使用尝尝咸淡RAG系统！")
+            return
+
         print("\n交互式问答 (输入'退出'结束):")
         
         while True:

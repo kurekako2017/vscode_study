@@ -121,7 +121,7 @@
 | 智能体框架     | `DeepAgents`                                     | 创建主智能体和子智能体，承接长任务、多工具、多助手调度                        |
 | 图与检查点     | `LangGraph`                                      | 提供底层运行时和 `InMemorySaver` 会话检查点                                   |
 | 模型与工具抽象 | `LangChain` / `langchain-core`                   | 封装 OpenAI 兼容模型、工具声明和 Agent 调用结构                               |
-| 大模型接入     | OpenAI 兼容接口                                  | 通过 `.env` 中的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`LLM_QWEN_MAX` 接入模型 |
+| 大模型接入     | OpenRouter OpenAI 兼容接口                       | 通过 `.env` 中的 `OPENROUTER_BASE_URL`、`OPENROUTER_API_KEY`、`LLM_QWEN_MAX` 接入模型 |
 | 网络搜索       | `Tavily`                                         | 为网络搜索助手提供公开资料检索                                                |
 | 结构化数据     | `MySQL` / `mysql-connector-python`               | 为数据库助手提供药品、库存、销售等教学业务数据                                |
 | 私有知识库     | `RAGFlow` / `ragflow-sdk`                        | 为知识库助手提供内部文档问答能力                                              |
@@ -170,6 +170,7 @@ deepsearch-agents/
 先看这个总入口：
 
 - [`docs/docs-index.md`](docs/docs-index.md)
+- [`RUNBOOK_OPENROUTER.md`](RUNBOOK_OPENROUTER.md)
 
 这个入口里已经分好了：
 
@@ -211,14 +212,10 @@ cp .env.example .env
 
 ```bash
 # LLM 配置
-OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-OPENAI_API_KEY=你的大模型_API_KEY
-LLM_QWEN_MAX=qwen-max
-
-# 如果你走 OpenRouter，推荐用一个稳定的文本模型，例如：
-# OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-# OPENROUTER_API_KEY=你的_openrouter_api_key
-# LLM_QWEN_MAX=openai/gpt-4o-mini
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_API_KEY=你的_openrouter_api_key
+LLM_QWEN_MAX=openai/gpt-4o-mini
+LLM_MAX_COMPLETION_TOKENS=1024
 
 # Tavily 配置
 TAVILY_API_KEY=你的_TAVILY_API_KEY

@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000081,Recipe,可乐鸡翅,可乐鸡翅 (Recipe),可乐鸡翅,[],荤菜,3,,,,,,dishes/meat_dish/可乐鸡翅.md
+201000082,Recipe,杀猪菜,杀猪菜 (Recipe),杀猪菜,[],其他,4,,,,,,dishes/meat_dish/杀猪菜.md
+201000083,Recipe,烤鸡翅,烤鸡翅 (Recipe),烤鸡翅,"[{'term': '烘烤鸡翅', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'baked鸡翅', 'language': 'en', 'language_code': 'en-US'}, {'term': 'roasted鸡翅', 'language': 'en', 'language_code': 'en-US'}]",荤菜,3,,,,,,dishes/meat_dish/烤鸡翅.md
+201000084,Recipe,贵州辣子鸡,贵州辣子鸡 (Recipe),贵州辣子鸡,[],荤菜,4,,,,,,dishes/meat_dish/贵州辣子鸡/贵州辣子鸡.md
+201000085,Recipe,回锅肉,回锅肉 (Recipe),回锅肉,[],荤菜,4,,,,,,dishes/meat_dish/回锅肉/回锅肉.md
+201000086,Recipe,卤菜,卤菜 (Recipe),卤菜,[],其他,3,,,,,,dishes/meat_dish/卤菜/卤菜.md
+201000087,Recipe,西红柿土豆炖牛肉,西红柿土豆炖牛肉 (Recipe),西红柿土豆炖牛肉,"[{'term': '西红柿土豆stewed牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'tomato土豆炖牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '番茄土豆炖牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '西红柿洋芋炖牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '西红柿土豆煲牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '西红柿马铃薯炖牛肉', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '西红柿potato炖牛肉', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,4,,,,,,dishes/meat_dish/西红柿土豆炖牛肉/西红柿土豆炖牛肉.md
+201000088,Recipe,瘦肉土豆片,瘦肉土豆片 (Recipe),瘦肉土豆片,"[{'term': '瘦肉potato片', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '瘦肉洋芋片', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '瘦肉马铃薯片', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/meat_dish/瘦肉土豆片/瘦肉土豆片.md
+201000089,Recipe,鱼香茄子,鱼香茄子 (Recipe),鱼香茄子,"[{'term': '鱼香青茄子', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鱼香eggplant', 'language': 'en', 'language_code': 'en-US'}, {'term': '鱼香紫茄子', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/meat_dish/鱼香茄子/鱼香茄子.md
+201000090,Recipe,新疆大盘鸡,新疆大盘鸡 (Recipe),新疆大盘鸡,[],荤菜,4,,,,,,dishes/meat_dish/新疆大盘鸡/新疆大盘鸡.md

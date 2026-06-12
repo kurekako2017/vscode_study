@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000111,Recipe,茭白炒肉,茭白炒肉 (Recipe),茭白炒肉,[],荤菜,3,,,,,,dishes/meat_dish/茭白炒肉/茭白炒肉.md
+201000112,Recipe,农家一碗香,农家一碗香 (Recipe),农家一碗香,[],其他,3,,,,,,dishes/meat_dish/农家一碗香/农家一碗香.md
+201000113,Recipe,凉拌鸡丝,凉拌鸡丝 (Recipe),凉拌鸡丝,[],荤菜,3,,,,,,dishes/meat_dish/凉拌鸡丝/凉拌鸡丝.md
+201000114,Recipe,口水鸡,口水鸡 (Recipe),口水鸡,[],荤菜,3,,,,,,dishes/meat_dish/口水鸡/口水鸡.md
+201000115,Recipe,豆豉鲮鱼油麦菜,豆豉鲮鱼油麦菜 (Recipe),豆豉鲮鱼油麦菜,[],荤菜,2,,,,,,dishes/meat_dish/豆豉鲮鱼油麦菜/豆豉鲮鱼油麦菜.md
+201000116,Recipe,黔式腊肠娃娃菜,黔式腊肠娃娃菜 (Recipe),黔式腊肠娃娃菜,[],其他,1,,,,,,dishes/meat_dish/黔式腊肠娃娃菜/黔式腊肠娃娃菜.md
+201000117,Recipe,老妈蹄花,老妈蹄花 (Recipe),老妈蹄花,[],其他,4,,,,,,dishes/meat_dish/老妈蹄花/老妈蹄花.md
+201000118,Recipe,冬瓜酿肉,冬瓜酿肉 (Recipe),冬瓜酿肉,[],荤菜,4,,,,,,dishes/meat_dish/冬瓜酿肉/冬瓜酿肉.md
+201000119,Recipe,梅菜扣肉,梅菜扣肉 (Recipe),梅菜扣肉,[],荤菜,4,,,,,,dishes/meat_dish/梅菜扣肉/梅菜扣肉.md
+201000120,Recipe,小炒黄牛肉,小炒黄牛肉 (Recipe),小炒黄牛肉,[],荤菜,4,,,,,,dishes/meat_dish/小炒黄牛肉/小炒黄牛肉.md

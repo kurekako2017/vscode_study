@@ -16,10 +16,16 @@ def load_config():
     config_file = "config.json"
     if os.path.exists(config_file):
         with open(config_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            config = json.load(f)
     else:
         print("❌ 未找到config.json配置文件")
         sys.exit(1)
+
+    config.setdefault("kimi", {})
+    config["kimi"].setdefault("api_key", os.getenv("OPENROUTER_API_KEY", ""))
+    config["kimi"].setdefault("base_url", os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"))
+    config["kimi"].setdefault("model", os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
+    return config
 
 def show_progress_status(output_dir: str):
     """显示处理进度状态"""
@@ -59,7 +65,7 @@ def clean_progress(output_dir: str):
     progress_file = os.path.join(output_dir, "progress.json")
     
     if os.path.exists(progress_file):
-        confirm = input("⚠️  确认要清理进度文件吗？这将删除所有处理进度 (y/N): ").strip().lower()
+        confirm = "n" if not sys.stdin.isatty() else input("⚠️  确认要清理进度文件吗？这将删除所有处理进度 (y/N): ").strip().lower()
         if confirm == 'y':
             os.remove(progress_file)
             print("✅ 进度文件已清理")
@@ -81,7 +87,7 @@ def clean_batches(output_dir: str):
     for batch_dir in sorted(batch_dirs):
         print(f"   - {batch_dir}")
     
-    confirm = input("\n⚠️  确认要删除所有批次数据吗？ (y/N): ").strip().lower()
+    confirm = "n" if not sys.stdin.isatty() else input("\n⚠️  确认要删除所有批次数据吗？ (y/N): ").strip().lower()
     if confirm == 'y':
         import shutil
         for batch_dir in batch_dirs:

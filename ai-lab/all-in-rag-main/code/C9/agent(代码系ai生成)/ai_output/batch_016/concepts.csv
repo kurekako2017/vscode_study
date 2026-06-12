@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000161,Recipe,麻油拌面,麻油拌面 (Recipe),麻油拌面,[],其他,1,,,,,,dishes/staple/麻油拌面.md
+201000162,Recipe,肉蛋盖饭,肉蛋盖饭 (Recipe),肉蛋盖饭,[],素菜,3,,,,,,dishes/staple/肉蛋盖饭.md
+201000163,Recipe,炒河粉,炒河粉 (Recipe),炒河粉,[],其他,4,,,,,,dishes/staple/炒河粉.md
+201000164,Recipe,炸酱面,炸酱面 (Recipe),炸酱面,"[{'term': 'deep-fried酱面', 'language': 'en', 'language_code': 'en-US'}, {'term': '油炸酱面', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,3,,,,,,dishes/staple/炸酱面.md
+201000165,Recipe,蒸卤面,蒸卤面 (Recipe),蒸卤面,"[{'term': '清蒸卤面', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'steamed卤面', 'language': 'en', 'language_code': 'en-US'}]",其他,4,,,,,,dishes/staple/蒸卤面.md
+201000166,Recipe,炒年糕,炒年糕 (Recipe),炒年糕,[],其他,3,,,,,,dishes/staple/炒年糕.md
+201000167,Recipe,披萨饼皮,披萨饼皮 (Recipe),披萨饼皮,[],其他,4,,,,,,dishes/staple/披萨饼皮/披萨饼皮.md
+201000168,Recipe,酱拌荞麦面,酱拌荞麦面 (Recipe),酱拌荞麦面,[],其他,2,,,,,,dishes/staple/酱拌荞麦面/酱拌荞麦面.md
+201000169,Recipe,日式肥牛丼饭,日式肥牛丼饭 (Recipe),日式肥牛丼饭,[],其他,4,,,,,,dishes/staple/日式肥牛丼饭/日式肥牛丼饭.md
+201000170,Recipe,扬州炒饭,扬州炒饭 (Recipe),扬州炒饭,[],其他,4,,,,,,dishes/staple/扬州炒饭/扬州炒饭.md

@@ -8,6 +8,7 @@ import os
 import json
 import re
 import time
+import sys
 from openai import OpenAI
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
@@ -61,9 +62,10 @@ class RecipeInfo:
 class KimiRecipeAgent:
     """OpenRouter菜谱解析AI Agent"""
     
-    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1", model_name: str = None):
         self.api_key = api_key
         self.base_url = base_url
+        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
         self.client = OpenAI(
             api_key=api_key,
             base_url=base_url
@@ -105,7 +107,7 @@ class KimiRecipeAgent:
         for attempt in range(max_retries):
             try:
                 response = self.client.chat.completions.create(
-                    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+                    model=self.model_name,
                     messages=messages,
                     temperature=0.3,
                     max_tokens=2048,
@@ -918,7 +920,7 @@ class RecipeKnowledgeGraphBuilder:
                 processed_count = progress_data.get("processed_count", 0)
                 print(f"检测到未完成任务，已处理: {processed_count} 个菜谱")
                 
-                confirm = input("\n是否继续之前的处理? (Y/n): ").strip().lower()
+                confirm = "y" if not sys.stdin.isatty() else input("\n是否继续之前的处理? (Y/n): ").strip().lower()
                 if confirm == 'n':
                     print("重新开始处理...")
                     self.processed_files.clear()

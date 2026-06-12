@@ -12,15 +12,19 @@ from recipe_ai_agent import KimiRecipeAgent, RecipeKnowledgeGraphBuilder
 def load_config():
     """加载配置文件"""
     config_file = "config.json"
+    env_api_key = os.getenv("OPENROUTER_API_KEY", "")
+    env_base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+    env_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
     if os.path.exists(config_file):
         with open(config_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            config = json.load(f)
     else:
         print("警告: 未找到config.json配置文件，将使用默认配置")
-        return {
+        config = {
             "kimi": {
                 "api_key": "",
-                "base_url": "https://openrouter.ai/api/v1"
+                "base_url": env_base_url,
+                "model": env_model
             },
             "output": {
                 "format": "neo4j",
@@ -28,14 +32,29 @@ def load_config():
             }
         }
 
+    config.setdefault("kimi", {})
+    config["kimi"].setdefault("api_key", env_api_key)
+    config["kimi"].setdefault("base_url", env_base_url)
+    config["kimi"].setdefault("model", env_model)
+    if not config["kimi"].get("api_key"):
+        config["kimi"]["api_key"] = env_api_key
+    if not config["kimi"].get("base_url"):
+        config["kimi"]["base_url"] = env_base_url
+    if not config["kimi"].get("model"):
+        config["kimi"]["model"] = env_model
+    return config
+
 def setup_api_key():
     """设置API密钥"""
     api_key = os.getenv('OPENROUTER_API_KEY')
     if not api_key:
-        api_key = input("请输入OpenRouter API密钥: ").strip()
-        if not api_key:
-            print("错误: 必须提供API密钥")
-            sys.exit(1)
+        if sys.stdin.isatty():
+            api_key = input("请输入OpenRouter API密钥: ").strip()
+            if not api_key:
+                print("错误: 必须提供API密钥")
+                sys.exit(1)
+        else:
+            api_key = "offline"
     return api_key
 
 def get_recipe_directory():
@@ -43,7 +62,10 @@ def get_recipe_directory():
     if len(sys.argv) > 1:
         recipe_dir = sys.argv[1]
     else:
-        recipe_dir = input("请输入菜谱目录路径: ").strip()
+        if sys.stdin.isatty():
+            recipe_dir = input("请输入菜谱目录路径: ").strip()
+        else:
+            recipe_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../data/C8/cook"))
     
     if not os.path.exists(recipe_dir):
         print(f"错误: 目录不存在 - {recipe_dir}")
@@ -84,12 +106,12 @@ def test_single_recipe():
     
     # 加载配置
     config = load_config()
-    api_key = config["kimi"].get("api_key")
-    if not api_key or api_key == "YOUR_OPENROUTER_API_KEY_HERE":
+    api_key = config["kimi"].get("api_key") or os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
         api_key = setup_api_key()
     
     try:
-        agent = KimiRecipeAgent(api_key)
+        agent = KimiRecipeAgent(api_key, model_name=config["kimi"].get("model"))
         recipe_info = agent.extract_recipe_info(test_recipe, "dishes/vegetable_dish/红烧茄子.md")
         
         print(f"测试成功: {recipe_info.name} ({len(recipe_info.ingredients)}个食材, {len(recipe_info.steps)}个步骤)")
@@ -113,8 +135,8 @@ def main():
     config = load_config()
     
     # 设置API密钥
-    api_key = config["kimi"].get("api_key")
-    if not api_key or api_key == "YOUR_OPENROUTER_API_KEY_HERE":
+    api_key = config["kimi"].get("api_key") or os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
         api_key = setup_api_key()
     
     # 获取菜谱目录
@@ -127,7 +149,7 @@ def main():
     print(f"- 输出格式: {config['output'].get('format', 'neo4j')}")
     print(f"- 输出目录: {config['output'].get('directory', './ai_output')}")
     
-    confirm = input("\n确认开始处理? (y/N): ").strip().lower()
+    confirm = "y" if not sys.stdin.isatty() else input("\n确认开始处理? (y/N): ").strip().lower()
     if confirm != 'y':
         print("取消处理")
         return
@@ -135,7 +157,11 @@ def main():
     try:
         # 创建AI agent
         print("\n🤖 初始化AI Agent...")
-        ai_agent = KimiRecipeAgent(api_key, config["kimi"].get("base_url", "https://openrouter.ai/api/v1"))
+        ai_agent = KimiRecipeAgent(
+            api_key,
+            config["kimi"].get("base_url", "https://openrouter.ai/api/v1"),
+            config["kimi"].get("model")
+        )
         
         # 创建知识图谱构建器
         output_dir = config["output"].get("directory", "./ai_output")
@@ -147,6 +173,11 @@ def main():
         processed, failed = builder.batch_process_recipes(recipe_dir)
         
         print(f"处理结果: 成功 {processed} 个，失败 {failed} 个")
+
+        if api_key == "offline":
+            print("离线模式下跳过 Neo4j/RF2 导出与合并步骤。")
+            print("处理完成!")
+            return
         
         # 导出数据
         output_dir = config["output"].get("directory", "./ai_output")

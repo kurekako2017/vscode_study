@@ -7,7 +7,7 @@
 - `OpenRouter / OpenAI Compatible API`
   - 负责提供大模型推理能力。
   - 主智能体和子智能体最终都依赖它来做理解、规划、总结和工具编排。
-  - 这个项目现在同时支持 `OPENAI_*` 和 `OPENROUTER_*` 两套变量名。
+  - 这个项目当前推荐只使用 `OPENROUTER_*` 这一套变量名。
 - `MySQL`
   - 负责承载结构化业务数据。
   - 在这个项目里，它相当于“原本系统里的业务数据库”，但不是系统全量数据库，而是给数据库查询子智能体用的教学型业务库。
@@ -63,8 +63,6 @@
 
 ```bash
 # 大模型
-OPENAI_BASE_URL=
-OPENAI_API_KEY=
 OPENROUTER_BASE_URL=
 OPENROUTER_API_KEY=
 LLM_QWEN_MAX=
@@ -90,7 +88,7 @@ MYSQL_SQL_MODE=
 
 建议优先策略：
 
-1. 先确认大模型 API 可用，`OPENAI_*` 和 `OPENROUTER_*` 任意一套都可以，推荐 `openai/gpt-4o-mini` 这类文本模型，并把 `LLM_MAX_COMPLETION_TOKENS` 控制在一个合理范围内。
+1. 先确认大模型 API 可用，优先使用 `OPENROUTER_*` 这一套变量名，推荐 `openai/gpt-4o-mini` 这类文本模型，并把 `LLM_MAX_COMPLETION_TOKENS` 控制在一个合理范围内。
 2. 再确认 MySQL 连接可用。
 3. 然后补 Tavily。
 4. 最后补 RAGFlow。
@@ -111,7 +109,7 @@ MYSQL_SQL_MODE=
 
 ### 外部服务
 
-- OpenRouter 或其他 OpenAI-Compatible 模型服务
+- OpenRouter 模型服务
 - MySQL 8.x
 - Tavily API
 - RAGFlow 服务
@@ -167,7 +165,7 @@ MYSQL_SQL_MODE=
 
 - 已补充环境清单文档。
 - 已增加环境校验脚本 `scripts/check_environment.py`。
-- 已兼容 `OPENAI_*` 与 `OPENROUTER_*` 两套模型环境变量。
+- 已统一使用 `OPENROUTER_*` 作为模型环境变量。
 - 已把 Tavily 和 RAGFlow 改成按需初始化，避免没有 key 时后端导入失败。
 - 已增加后端健康检查接口，前端可以直接读取后端、模型、MySQL 和外部服务状态。
 - 已安装后端 Python 依赖。

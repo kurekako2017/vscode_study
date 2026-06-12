@@ -25,7 +25,6 @@ if os.getenv("OPENROUTER_BASE_URL"):
 resolved_model_name = (
     os.getenv("LLM_QWEN_MAX")
     or os.getenv("OPENROUTER_MODEL")
-    or os.getenv("OPENAI_MODEL")
     or "openai/gpt-4o-mini"
 )
 

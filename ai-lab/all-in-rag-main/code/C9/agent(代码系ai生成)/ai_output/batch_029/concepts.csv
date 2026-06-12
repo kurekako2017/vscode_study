@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000291,Recipe,拔丝土豆,拔丝土豆 (Recipe),拔丝土豆,"[{'term': '拔丝马铃薯', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '拔丝洋芋', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '拔丝potato', 'language': 'en', 'language_code': 'en-US'}]",其他,3,,,,,,dishes/vegetable_dish/拔丝土豆/拔丝土豆.md
+201000292,Recipe,炒滑蛋,炒滑蛋 (Recipe),炒滑蛋,[],素菜,1,,,,,,dishes/vegetable_dish/炒滑蛋/炒滑蛋.md
+201000293,Recipe,芹菜拌茶树菇,芹菜拌茶树菇 (Recipe),芹菜拌茶树菇,[],其他,2,,,,,,dishes/vegetable_dish/芹菜拌茶树菇/芹菜拌茶树菇.md
+201000294,Recipe,莴笋叶煎饼,莴笋叶煎饼 (Recipe),莴笋叶煎饼,"[{'term': '莴笋叶pan-fried饼', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,2,,,,,,dishes/vegetable_dish/莴笋叶煎饼/莴笋叶煎饼.md
+201000295,Recipe,小炒藕丁,小炒藕丁 (Recipe),小炒藕丁,[],其他,3,,,,,,dishes/vegetable_dish/小炒藕丁/小炒藕丁.md
+201000296,Recipe,手撕包菜,手撕包菜 (Recipe),手撕包菜,[],其他,3,,,,,,dishes/vegetable_dish/手撕包菜/手撕包菜.md
+201000297,Recipe,菠菜炒鸡蛋,菠菜炒鸡蛋 (Recipe),菠菜炒鸡蛋,[],素菜,2,,,,,,dishes/vegetable_dish/菠菜炒鸡蛋/菠菜炒鸡蛋.md
+201000298,Recipe,糖拌西红柿,糖拌西红柿 (Recipe),糖拌西红柿,"[{'term': '糖拌tomato', 'language': 'en', 'language_code': 'en-US'}, {'term': '糖拌番茄', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,2,,,,,,dishes/vegetable_dish/糖拌西红柿/糖拌西红柿.md
+201000299,Recipe,西葫芦炒鸡蛋,西葫芦炒鸡蛋 (Recipe),西葫芦炒鸡蛋,[],素菜,2,,,,,,dishes/vegetable_dish/西葫芦炒鸡蛋/西葫芦炒鸡蛋.md
+201000300,Recipe,红烧冬瓜,红烧冬瓜 (Recipe),红烧冬瓜,"[{'term': 'braised冬瓜', 'language': 'en', 'language_code': 'en-US'}]",其他,3,,,,,,dishes/vegetable_dish/红烧冬瓜/红烧冬瓜.md

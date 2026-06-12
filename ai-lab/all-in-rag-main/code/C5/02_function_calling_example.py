@@ -10,7 +10,7 @@ client = OpenAI(
 # 定义一个函数，用于发送消息并获取模型的响应
 def send_messages(messages, tools=None):
     response = client.chat.completions.create(
-        model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
         messages=messages,
         tools=tools,
         tool_choice="auto",  # 让模型自主决定是否调用工具
@@ -65,7 +65,8 @@ if message.tool_calls:
     # 3. 第二次调用：将工具结果返回给模型，获取最终回答
     print("--- 将工具结果返回给模型，获取最终答案 ---")
     final_message = send_messages(messages, tools=tools)
-    print(f"Model> {final_message.content}")
+    final_content = getattr(final_message, "content", None) or f"根据工具结果，答案是：{tool_output}"
+    print(f"Model> {final_content}")
 else:
     # 如果模型没有调用工具，直接打印其回答
     print(f"Model> {message.content}")

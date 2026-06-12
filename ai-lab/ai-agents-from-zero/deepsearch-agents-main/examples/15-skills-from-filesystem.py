@@ -6,6 +6,7 @@ DeepAgents Skill：通过 FilesystemBackend 加载外置技能
 用户请求 -> Agent 读取 Skill 元数据 -> 按需加载 SKILL.md -> 根据技能规则生成回复
 """
 
+import os
 from pathlib import Path
 
 from deepagents import create_deep_agent
@@ -16,7 +17,7 @@ from langchain.chat_models import init_chat_model
 load_dotenv(find_dotenv())
 
 
-llm = init_chat_model(model="qwen-max", model_provider="openai")
+llm = init_chat_model(model=os.getenv("LLM_QWEN_MAX"), model_provider="openai")
 
 
 # Skill 文件需要通过 Backend 暴露给 Agent

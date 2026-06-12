@@ -14,7 +14,7 @@ from llama_index.core.evaluation.eval_utils import get_results_df
 from llama_index.core.evaluation import DatasetGenerator, QueryResponseDataset
 
 Settings.llm = OpenAILike(
-    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
     temperature=0.1,
     api_key=os.getenv("OPENROUTER_API_KEY"),
     api_base="https://openrouter.ai/api/v1",

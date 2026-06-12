@@ -5,7 +5,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableBranch
 
 llm = ChatOpenAI(
-    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
     temperature=0, 
     api_key=os.getenv("OPENROUTER_API_KEY"),
     base_url="https://openrouter.ai/api/v1"

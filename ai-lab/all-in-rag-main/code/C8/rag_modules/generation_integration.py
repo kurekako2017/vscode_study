@@ -26,7 +26,7 @@ class GenerationIntegrationModule:
             temperature: 生成温度
             max_tokens: 最大token数
         """
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest")
+        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.llm = None

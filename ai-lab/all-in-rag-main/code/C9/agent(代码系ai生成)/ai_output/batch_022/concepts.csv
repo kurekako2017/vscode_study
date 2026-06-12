@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000221,Recipe,手抓饼,手抓饼 (Recipe),手抓饼,[],其他,2,,,,,,dishes/breakfast/手抓饼.md
+201000222,Recipe,美式炒蛋,美式炒蛋 (Recipe),美式炒蛋,[],素菜,2,,,,,,dishes/breakfast/美式炒蛋.md
+201000223,Recipe,蒸水蛋,蒸水蛋 (Recipe),蒸水蛋,"[{'term': '清蒸水蛋', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'steamed水蛋', 'language': 'en', 'language_code': 'en-US'}]",素菜,2,,,,,,dishes/breakfast/蒸水蛋.md
+201000224,Recipe,水煮玉米,水煮玉米 (Recipe),水煮玉米,[],其他,2,,,,,,dishes/breakfast/水煮玉米.md
+201000225,Recipe,蒸花卷,蒸花卷 (Recipe),蒸花卷,"[{'term': '清蒸花卷', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'steamed花卷', 'language': 'en', 'language_code': 'en-US'}]",其他,2,,,,,,dishes/breakfast/蒸花卷.md
+201000226,Recipe,蛋煎糍粑,蛋煎糍粑 (Recipe),蛋煎糍粑,"[{'term': '蛋pan-fried糍粑', 'language': 'en', 'language_code': 'en-US'}]",素菜,2,,,,,,dishes/breakfast/蛋煎糍粑.md
+201000227,Recipe,完美水煮蛋,完美水煮蛋 (Recipe),完美水煮蛋,[],素菜,5,,,,,,dishes/breakfast/完美水煮蛋.md
+201000228,Recipe,鸡蛋三明治,鸡蛋三明治 (Recipe),鸡蛋三明治,[],素菜,2,,,,,,dishes/breakfast/鸡蛋三明治.md
+201000229,Recipe,溏心蛋,溏心蛋 (Recipe),溏心蛋,[],素菜,3,,,,,,dishes/breakfast/溏心蛋.md
+201000230,Recipe,空气炸锅面包片,空气炸锅面包片 (Recipe),空气炸锅面包片,"[{'term': '空气油炸锅面包片', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '空气deep-fried锅面包片', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,1,,,,,,dishes/breakfast/空气炸锅面包片.md

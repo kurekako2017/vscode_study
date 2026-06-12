@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000091,Recipe,巴基斯坦牛肉咖喱,巴基斯坦牛肉咖喱 (Recipe),巴基斯坦牛肉咖喱,[],荤菜,5,,,,,,dishes/meat_dish/巴基斯坦牛肉咖喱/巴基斯坦牛肉咖喱.md
+201000092,Recipe,荔枝肉,荔枝肉 (Recipe),荔枝肉,[],荤菜,4,,,,,,dishes/meat_dish/荔枝肉/荔枝肉.md
+201000093,Recipe,羊排焖面,羊排焖面 (Recipe),羊排焖面,"[{'term': '羊排闷面', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '羊排braised面', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,4,,,,,,dishes/meat_dish/羊排焖面/羊排焖面.md
+201000094,Recipe,牛排,牛排 (Recipe),牛排,[],其他,4,,,,,,dishes/meat_dish/牛排/牛排.md
+201000095,Recipe,台式卤肉饭,台式卤肉饭 (Recipe),台式卤肉饭,[],荤菜,5,,,,,,dishes/meat_dish/台式卤肉饭/台式卤肉饭.md
+201000096,Recipe,枝竹羊腩煲,枝竹羊腩煲 (Recipe),枝竹羊腩煲,[],其他,5,,,,,,dishes/meat_dish/枝竹羊腩煲/枝竹羊腩煲.md
+201000097,Recipe,麻婆豆腐,麻婆豆腐 (Recipe),麻婆豆腐,"[{'term': '麻婆tofu', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '麻婆老豆腐', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '麻婆嫩豆腐', 'language': 'zh', 'language_code': 'zh-CN'}]",素菜,3,,,,,,dishes/meat_dish/麻婆豆腐/麻婆豆腐.md
+201000098,Recipe,香辣鸡爪煲,香辣鸡爪煲 (Recipe),香辣鸡爪煲,[],荤菜,4,,,,,,dishes/meat_dish/香辣鸡爪煲/香辣鸡爪煲.md
+201000099,Recipe,豉汁蒸白鱔,豉汁蒸白鱔 (Recipe),豉汁蒸白鱔,"[{'term': '豉汁清蒸白鱔', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '豉汁steamed白鱔', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,3,,,,,,dishes/meat_dish/豉汁蒸白鱔/豉汁蒸白鱔食谱.md
+201000100,Recipe,徽派红烧肉,徽派红烧肉 (Recipe),徽派红烧肉,"[{'term': '徽派braised肉', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,4,,,,,,dishes/meat_dish/徽派红烧肉/徽派红烧肉.md

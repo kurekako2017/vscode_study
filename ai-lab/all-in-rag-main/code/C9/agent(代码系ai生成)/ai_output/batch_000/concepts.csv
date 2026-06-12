@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000001,Recipe,牛油火锅底料,牛油火锅底料 (Recipe),牛油火锅底料,[],其他,5,,,,,,dishes/semi-finished/牛油火锅底料.md
+201000002,Recipe,凉皮,凉皮 (Recipe),凉皮,[],其他,3,,,,,,dishes/semi-finished/凉皮.md
+201000003,Recipe,速冻馄饨,速冻馄饨 (Recipe),速冻馄饨,[],其他,2,,,,,,dishes/semi-finished/速冻馄饨.md
+201000004,Recipe,速冻水饺,速冻水饺 (Recipe),速冻水饺,[],其他,1,,,,,,dishes/semi-finished/速冻水饺.md
+201000005,Recipe,半成品意面,半成品意面 (Recipe),半成品意面,[],其他,1,,,,,,dishes/semi-finished/半成品意面.md
+201000006,Recipe,炸薯条,炸薯条 (Recipe),炸薯条,"[{'term': '油炸薯条', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'deep-fried薯条', 'language': 'en', 'language_code': 'en-US'}]",其他,2,,,,,,dishes/semi-finished/炸薯条/炸薯条.md
+201000007,Recipe,空气炸锅羊排,空气炸锅羊排 (Recipe),空气炸锅羊排,"[{'term': '空气deep-fried锅羊排', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '空气油炸锅羊排', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,3,,,,,,dishes/semi-finished/空气炸锅羊排/空气炸锅羊排.md
+201000008,Recipe,速冻汤圆,速冻汤圆 (Recipe),速冻汤圆,[],其他,1,,,,,,dishes/semi-finished/速冻汤圆/速冻汤圆.md
+201000009,Recipe,空气炸锅鸡翅中,空气炸锅鸡翅中 (Recipe),空气炸锅鸡翅中,"[{'term': '空气deep-fried锅鸡翅中', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '空气油炸锅鸡翅中', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,2,,,,,,dishes/semi-finished/空气炸锅鸡翅中/空气炸锅鸡翅中.md
+201000010,Recipe,懒人蛋挞,懒人蛋挞 (Recipe),懒人蛋挞,[],素菜,3,,,,,,dishes/semi-finished/懒人蛋挞/懒人蛋挞.md

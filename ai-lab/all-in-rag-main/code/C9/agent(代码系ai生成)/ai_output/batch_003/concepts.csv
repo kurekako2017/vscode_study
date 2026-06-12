@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000031,Recipe,耙耙柑茶,耙耙柑茶 (Recipe),耙耙柑茶,[],其他,2,,,,,,dishes/drink/耙耙柑茶/耙耙柑茶.md
+201000032,Recipe,红柚蛋糕,红柚蛋糕 (Recipe),红柚蛋糕,[],素菜,3,,,,,,dishes/dessert/红柚蛋糕/红柚蛋糕.md
+201000033,Recipe,英式司康,英式司康 (Recipe),英式司康,[],其他,3,,,,,,dishes/dessert/英式司康/英式司康.md
+201000034,Recipe,龟苓膏,龟苓膏 (Recipe),龟苓膏,[],其他,2,,,,,,dishes/dessert/龟苓膏/龟苓膏.md
+201000035,Recipe,提拉米苏,提拉米苏 (Recipe),提拉米苏,[],其他,4,,,,,,dishes/dessert/提拉米苏/提拉米苏.md
+201000036,Recipe,酸奶意式奶冻,酸奶意式奶冻 (Recipe),酸奶意式奶冻,[],其他,4,,,,,,dishes/dessert/酸奶意式奶冻/酸奶意式奶冻.md
+201000037,Recipe,烤蛋挞,烤蛋挞 (Recipe),烤蛋挞,"[{'term': '烘烤蛋挞', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'roasted蛋挞', 'language': 'en', 'language_code': 'en-US'}, {'term': 'baked蛋挞', 'language': 'en', 'language_code': 'en-US'}]",素菜,4,,,,,,dishes/dessert/烤蛋挞/烤蛋挞.md
+201000038,Recipe,炸鲜奶,炸鲜奶 (Recipe),炸鲜奶,"[{'term': 'deep-fried鲜奶', 'language': 'en', 'language_code': 'en-US'}, {'term': '油炸鲜奶', 'language': 'zh', 'language_code': 'zh-CN'}]",其他,3,,,,,,dishes/dessert/炸鲜奶/炸鲜奶.md
+201000039,Recipe,反沙芋头,反沙芋头 (Recipe),反沙芋头,[],其他,3,,,,,,dishes/dessert/反沙芋头/反沙芋头.md
+201000040,Recipe,雪花酥,雪花酥 (Recipe),雪花酥,[],其他,3,,,,,,dishes/dessert/雪花酥/雪花酥.md

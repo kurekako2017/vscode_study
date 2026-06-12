@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000041,Recipe,咖啡椰奶冻,咖啡椰奶冻 (Recipe),咖啡椰奶冻,[],其他,4,,,,,,dishes/dessert/咖啡椰奶冻/咖啡椰奶冻.md
+201000042,Recipe,戚风蛋糕,戚风蛋糕 (Recipe),戚风蛋糕,[],素菜,5,,,,,,dishes/dessert/戚风蛋糕/戚风蛋糕.md
+201000043,Recipe,玛格丽特饼干,玛格丽特饼干 (Recipe),玛格丽特饼干,[],其他,3,,,,,,dishes/dessert/玛格丽特饼干/玛格丽特饼干.md
+201000044,Recipe,奥利奥冰淇淋,奥利奥冰淇淋 (Recipe),奥利奥冰淇淋,[],其他,3,,,,,,dishes/dessert/奥利奥冰淇淋/奥利奥冰淇淋.md
+201000045,Recipe,芋泥雪媚娘,芋泥雪媚娘 (Recipe),芋泥雪媚娘,[],其他,5,,,,,,dishes/dessert/芋泥雪媚娘/芋泥雪媚娘.md
+201000046,Recipe,无厨师机蜂蜜面包,无厨师机蜂蜜面包 (Recipe),无厨师机蜂蜜面包,[],其他,5,,,,,,dishes/dessert/无厨师机蜂蜜面包/无厨师机蜂蜜面包.md
+201000047,Recipe,草莓冰淇淋,草莓冰淇淋 (Recipe),草莓冰淇淋,[],其他,2,,,,,,dishes/dessert/草莓冰淇淋/草莓冰淇淋.md
+201000048,Recipe,魔芋蛋糕,魔芋蛋糕 (Recipe),魔芋蛋糕,[],素菜,4,,,,,,dishes/dessert/魔芋蛋糕/魔芋蛋糕.md
+201000049,Recipe,意式烤鸡,意式烤鸡 (Recipe),意式烤鸡,"[{'term': '意式roasted鸡', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '意式baked鸡', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '意式烘烤鸡', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/meat_dish/意式烤鸡.md
+201000050,Recipe,虎皮肘子,虎皮肘子 (Recipe),虎皮肘子,[],其他,5,,,,,,dishes/meat_dish/虎皮肘子.md

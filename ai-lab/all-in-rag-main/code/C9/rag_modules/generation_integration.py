@@ -19,7 +19,7 @@ class GenerationIntegrationModule:
         """
         初始化生成集成模块
         """
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest")
+        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
         self.temperature = temperature
         self.max_tokens = max_tokens
         

@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000021,Recipe,奇异果菠菜特调,奇异果菠菜特调 (Recipe),奇异果菠菜特调,[],其他,1,,,,,,dishes/drink/奇异果菠菜特调/奇异果菠菜特调.md
+201000022,Recipe,冰粉,冰粉 (Recipe),冰粉,[],其他,2,,,,,,dishes/drink/冰粉/冰粉.md
+201000023,Recipe,砂糖椰子冰沙,砂糖椰子冰沙 (Recipe),砂糖椰子冰沙,[],其他,1,,,,,,dishes/drink/砂糖椰子冰沙/砂糖椰子冰沙.md
+201000024,Recipe,酒酿（醪糟）,酒酿（醪糟） (Recipe),酒酿（醪糟）,[],其他,4,,,,,,dishes/drink/酒酿醪糟/酒酿醪糟.md
+201000025,Recipe,海边落日,海边落日 (Recipe),海边落日,[],其他,3,,,,,,dishes/drink/海边落日/海边落日.md
+201000026,Recipe,柠檬水,柠檬水 (Recipe),柠檬水,[],其他,1,,,,,,dishes/drink/柠檬水/柠檬水.md
+201000027,Recipe,酸梅汤,酸梅汤 (Recipe),酸梅汤,[],其他,4,,,,,,dishes/drink/酸梅汤/酸梅汤.md
+201000028,Recipe,泰国手标红茶,泰国手标红茶 (Recipe),泰国手标红茶,[],其他,3,,,,,,dishes/drink/泰国手标红茶/泰国手标红茶.md
+201000029,Recipe,金菲士,金菲士 (Recipe),金菲士,[],其他,2,,,,,,dishes/drink/金菲士/金菲士.md
+201000030,Recipe,金汤力,金汤力 (Recipe),金汤力,[],其他,2,,,,,,dishes/drink/金汤力/金汤力.md

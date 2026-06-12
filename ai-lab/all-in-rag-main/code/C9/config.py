@@ -2,7 +2,9 @@
 基于图数据库的RAG系统配置文件
 """
 
+import os
 from dataclasses import dataclass
+from dataclasses import field
 from typing import Dict, Any
 
 @dataclass
@@ -23,7 +25,7 @@ class GraphRAGConfig:
 
     # 模型配置
     embedding_model: str = "BAAI/bge-small-zh-v1.5"
-    llm_model: str = "kimi-k2-0711-preview"
+    llm_model: str = field(default_factory=lambda: os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
 
     # 检索配置（LightRAG Round-robin策略）
     top_k: int = 5

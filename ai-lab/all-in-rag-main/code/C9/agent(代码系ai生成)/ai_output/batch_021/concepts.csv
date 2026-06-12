@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000211,Recipe,烤鱼,烤鱼 (Recipe),烤鱼,"[{'term': '烘烤鱼', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'roasted鱼', 'language': 'en', 'language_code': 'en-US'}, {'term': 'baked鱼', 'language': 'en', 'language_code': 'en-US'}]",荤菜,4,,,,,,dishes/aquatic/混合烤鱼/烤鱼.md
+201000212,Recipe,清蒸鲈鱼,清蒸鲈鱼 (Recipe),清蒸鲈鱼,"[{'term': '清清蒸鲈鱼', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '清steamed鲈鱼', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/aquatic/清蒸鲈鱼/清蒸鲈鱼.md
+201000213,Recipe,干煎阿根廷红虾,干煎阿根廷红虾 (Recipe),干煎阿根廷红虾,"[{'term': '干pan-fried阿根廷红虾', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/aquatic/干煎阿根廷红虾/干煎阿根廷红虾.md
+201000214,Recipe,蒜香黄油虾,蒜香黄油虾 (Recipe),蒜香黄油虾,[],荤菜,2,,,,,,dishes/aquatic/蒜香黄油虾/蒜香黄油虾.md
+201000215,Recipe,黄油煎虾,黄油煎虾 (Recipe),黄油煎虾,"[{'term': '黄油pan-fried虾', 'language': 'en', 'language_code': 'en-US'}]",荤菜,3,,,,,,dishes/aquatic/黄油煎虾/黄油煎虾.md
+201000216,Recipe,葱烧海参,葱烧海参 (Recipe),葱烧海参,[],其他,3,,,,,,dishes/aquatic/葱烧海参/葱烧海参.md
+201000217,Recipe,桂圆红枣粥,桂圆红枣粥 (Recipe),桂圆红枣粥,[],其他,2,,,,,,dishes/breakfast/桂圆红枣粥.md
+201000218,Recipe,吐司果酱,吐司果酱 (Recipe),吐司果酱,[],其他,1,,,,,,dishes/breakfast/吐司果酱.md
+201000219,Recipe,茶叶蛋,茶叶蛋 (Recipe),茶叶蛋,[],素菜,3,,,,,,dishes/breakfast/茶叶蛋.md
+201000220,Recipe,微波炉蛋糕,微波炉蛋糕 (Recipe),微波炉蛋糕,[],素菜,1,,,,,,dishes/breakfast/微波炉蛋糕.md

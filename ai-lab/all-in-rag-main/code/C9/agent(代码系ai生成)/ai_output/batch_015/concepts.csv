@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000151,Recipe,蛋包饭,蛋包饭 (Recipe),蛋包饭,[],素菜,3,,,,,,dishes/staple/蛋包饭.md
+201000152,Recipe,炒馍,炒馍 (Recipe),炒馍,[],其他,3,,,,,,dishes/staple/炒馍.md
+201000153,Recipe,热干面,热干面 (Recipe),热干面,[],其他,3,,,,,,dishes/staple/热干面.md
+201000154,Recipe,螺蛳粉,螺蛳粉 (Recipe),螺蛳粉,[],其他,1,,,,,,dishes/staple/螺蛳粉.md
+201000155,Recipe,蛋炒饭,蛋炒饭 (Recipe),蛋炒饭,[],素菜,3,,,,,,dishes/staple/蛋炒饭.md
+201000156,Recipe,手工水饺,手工水饺 (Recipe),手工水饺,[],其他,5,,,,,,dishes/staple/手工水饺.md
+201000157,Recipe,酸辣蕨根粉,酸辣蕨根粉 (Recipe),酸辣蕨根粉,[],其他,2,,,,,,dishes/staple/酸辣蕨根粉.md
+201000158,Recipe,麻辣减脂荞麦面,麻辣减脂荞麦面 (Recipe),麻辣减脂荞麦面,[],其他,2,,,,,,dishes/staple/麻辣减脂荞麦面.md
+201000159,Recipe,老干妈拌面,老干妈拌面 (Recipe),老干妈拌面,[],其他,1,,,,,,dishes/staple/老干妈拌面.md
+201000160,Recipe,醪糟小汤圆,醪糟小汤圆 (Recipe),醪糟小汤圆,[],其他,2,,,,,,dishes/staple/醪糟小汤圆.md

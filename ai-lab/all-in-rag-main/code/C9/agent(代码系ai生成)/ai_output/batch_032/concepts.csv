@@ -1,0 +1,3 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000321,Recipe,排骨苦瓜汤,排骨苦瓜汤 (Recipe),排骨苦瓜汤,[],其他,4,,,,,,dishes/soup/排骨苦瓜汤/排骨苦瓜汤.md
+201000322,Recipe,昂刺鱼豆腐汤,昂刺鱼豆腐汤 (Recipe),昂刺鱼豆腐汤,"[{'term': '昂刺鱼嫩豆腐汤', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '昂刺鱼tofu汤', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '昂刺鱼老豆腐汤', 'language': 'zh', 'language_code': 'zh-CN'}]",素菜,3,,,,,,dishes/soup/昂刺鱼豆腐汤/昂刺鱼豆腐汤.md

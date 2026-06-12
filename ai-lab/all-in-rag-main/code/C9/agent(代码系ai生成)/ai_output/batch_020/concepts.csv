@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000201,Recipe,蒜蓉虾,蒜蓉虾 (Recipe),蒜蓉虾,[],荤菜,2,,,,,,dishes/aquatic/蒜蓉虾/蒜蓉虾.md
+201000202,Recipe,鲤鱼炖白菜,鲤鱼炖白菜 (Recipe),鲤鱼炖白菜,"[{'term': '鲤鱼炖大白菜', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鲤鱼炖cabbage', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鲤鱼炖小白菜', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鲤鱼stewed白菜', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鲤鱼煲白菜', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,3,,,,,,dishes/aquatic/鲤鱼炖白菜/鲤鱼炖白菜.md
+201000203,Recipe,白灼虾,白灼虾 (Recipe),白灼虾,[],荤菜,2,,,,,,dishes/aquatic/白灼虾/白灼虾.md
+201000204,Recipe,小龙虾,小龙虾 (Recipe),小龙虾,[],荤菜,4,,,,,,dishes/aquatic/小龙虾/小龙虾.md
+201000205,Recipe,葱油桂鱼,葱油桂鱼 (Recipe),葱油桂鱼,[],荤菜,4,,,,,,dishes/aquatic/葱油桂鱼/葱油桂鱼.md
+201000206,Recipe,香煎翘嘴鱼,香煎翘嘴鱼 (Recipe),香煎翘嘴鱼,"[{'term': '香pan-fried翘嘴鱼', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,4,,,,,,dishes/aquatic/香煎翘嘴鱼/香煎翘嘴鱼.md
+201000207,Recipe,芥末黄油罗氏虾,芥末黄油罗氏虾 (Recipe),芥末黄油罗氏虾,[],荤菜,3,,,,,,dishes/aquatic/芥末黄油罗氏虾/芥末黄油罗氏虾.md
+201000208,Recipe,鳊鱼炖豆腐,鳊鱼炖豆腐 (Recipe),鳊鱼炖豆腐,"[{'term': '鳊鱼stewed豆腐', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鳊鱼煲豆腐', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鳊鱼炖tofu', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鳊鱼炖嫩豆腐', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '鳊鱼炖老豆腐', 'language': 'zh', 'language_code': 'zh-CN'}]",素菜,3,,,,,,dishes/aquatic/鳊鱼炖豆腐/鳊鱼炖豆腐.md
+201000209,Recipe,蛏抱蛋,蛏抱蛋 (Recipe),蛏抱蛋,[],素菜,3,,,,,,dishes/aquatic/蛏抱蛋/蛏抱蛋.md
+201000210,Recipe,油焖大虾,油焖大虾 (Recipe),油焖大虾,"[{'term': 'oil-braised大虾', 'language': 'en', 'language_code': 'en-US'}, {'term': '油braised大虾', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': '油闷大虾', 'language': 'zh', 'language_code': 'zh-CN'}]",荤菜,4,,,,,,dishes/aquatic/油焖大虾/油焖大虾.md

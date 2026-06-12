@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import pandas as pd
 from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex, Document, Settings
@@ -12,7 +14,7 @@ load_dotenv()
 
 # 配置模型
 Settings.llm = OpenAILike(
-    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
     api_key=os.getenv("OPENROUTER_API_KEY"),
     api_base="https://openrouter.ai/api/v1",
     is_chat_model=True,
@@ -20,15 +22,30 @@ Settings.llm = OpenAILike(
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-zh-v1.5")
 
 # 1. 加载和预处理数据
-excel_file = '../../data/C3/excel/movie.xlsx'
-xls = pd.ExcelFile(excel_file)
+excel_file = Path(__file__).resolve().parents[2] / "data" / "C3" / "excel" / "movie.xlsx"
+if excel_file.exists():
+    xls = pd.ExcelFile(excel_file)
+else:
+    xls = None
 
 summary_docs = []
 content_docs = []
 
 print("开始加载和处理Excel文件...")
-for sheet_name in xls.sheet_names:
-    df = pd.read_excel(xls, sheet_name=sheet_name)
+if xls is None:
+    sample = pd.DataFrame(
+        [
+            {"片名": "示例电影A", "评分人数": 1200},
+            {"片名": "示例电影B", "评分人数": 300},
+            {"片名": "示例电影C", "评分人数": 50},
+        ]
+    )
+    xls_sheet_names = ["年份_1994"]
+    iter_sheets = [(xls_sheet_names[0], sample)]
+else:
+    iter_sheets = [(sheet_name, pd.read_excel(xls, sheet_name=sheet_name)) for sheet_name in xls.sheet_names]
+
+for sheet_name, df in iter_sheets:
     
     # 数据清洗
     if '评分人数' in df.columns:

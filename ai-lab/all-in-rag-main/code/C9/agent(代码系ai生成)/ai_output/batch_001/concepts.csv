@@ -1,0 +1,11 @@
+concept_id,concept_type,name,fsn,preferred_term,synonyms,category,difficulty,cuisine_type,prep_time,cook_time,servings,tags,file_path
+201000011,Recipe,酸梅汤（半成品加工）,酸梅汤（半成品加工） (Recipe),酸梅汤（半成品加工）,[],其他,1,,,,,,dishes/drink/酸梅汤（半成品加工）.md
+201000012,Recipe,冬瓜茶,冬瓜茶 (Recipe),冬瓜茶,[],其他,2,,,,,,dishes/drink/冬瓜茶.md
+201000013,Recipe,B52轰炸机,B52轰炸机 (Recipe),B52轰炸机,"[{'term': 'B52轰油炸机', 'language': 'zh', 'language_code': 'zh-CN'}, {'term': 'B52轰deep-fried机', 'language': 'en', 'language_code': 'en-US'}]",其他,3,,,,,,dishes/drink/B52轰炸机.md
+201000014,Recipe,Mojito莫吉托,Mojito莫吉托 (Recipe),Mojito莫吉托,[],其他,3,,,,,,dishes/drink/Mojito莫吉托.md
+201000015,Recipe,可乐桶,可乐桶 (Recipe),可乐桶,[],其他,2,,,,,,dishes/drink/可乐桶.md
+201000016,Recipe,奶茶,奶茶 (Recipe),奶茶,[],其他,2,,,,,,dishes/drink/奶茶.md
+201000017,Recipe,长岛冰茶,长岛冰茶 (Recipe),长岛冰茶,[],其他,2,,,,,,dishes/drink/长岛冰茶.md
+201000018,Recipe,杨枝甘露,杨枝甘露 (Recipe),杨枝甘露,[],其他,2,,,,,,dishes/drink/杨枝甘露.md
+201000019,Recipe,百香果橙子特调,百香果橙子特调 (Recipe),百香果橙子特调,[],其他,3,,,,,,dishes/drink/百香果橙子特调/百香果橙子特调.md
+201000020,Recipe,菠萝咖啡特调,菠萝咖啡特调 (Recipe),菠萝咖啡特调,[],其他,3,,,,,,dishes/drink/菠萝咖啡特调/菠萝咖啡特调.md
