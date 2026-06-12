@@ -208,7 +208,7 @@ def run_real(
         n_results=top_k,
         include=["documents", "metadatas", "distances"],
     )
-
+    # 解析 Chroma 返回的结果，构建 SearchHit 列表。注意 Chroma 返回的是距离（distance），不是直接的相似度分数（score），这里简单转一下。
     hits: list[SearchHit] = []
     for idx, doc_id in enumerate(result["ids"][0]):
         # Chroma 返回的是距离，不是直接的相似度分数，这里简单转一下。
@@ -233,7 +233,7 @@ def run_real(
     print(f"query = {query}")
     print_hits("search hits", hits)
 
-
+#   命令行参数解析，提供一些选项让你切换模式、指定 collection 名、选择 embedding 方法等。
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="真实 Chroma 版骨架")
     parser.add_argument("query", help="要检索的问题")
@@ -250,10 +250,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     source_dir = Path(args.source_dir)
+    # 加载示例文档，真实项目里你可能会从数据库、API 或文件系统加载。
     documents = load_documents(source_dir)
     if not documents:
         raise SystemExit(f"{source_dir} 中没有找到示例文档")
-
+    # 构建 embedder，真实项目里你也可以接入其他向量化工具。
     embedder = build_embedder(args.embedding)
     # mock 和 real 共用同一套文档加载和 embedding，只是存储层不同。
     if args.mode == "mock":

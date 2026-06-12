@@ -152,7 +152,7 @@ class MemoryVectorDB:
         hits.sort(key=lambda item: item.score, reverse=True)
         return hits[:top_k]
 
-
+# 下面是两种不同风格的向量库接口，教学版不连接真实服务，而是复用上面的内存实现来表现接口差异。
 class QdrantLikeStore:
     """Qdrant 风格：collection + payload + similarity search。"""
 
@@ -215,11 +215,12 @@ def main() -> None:
     parser.add_argument("--backend", choices=["qdrant", "chroma", "memory"], default="qdrant")
     parser.add_argument("--top-k", type=int, default=3)
     args = parser.parse_args()
-
+    # 加载示例文档，真实项目里你可能会从数据库、API 或文件系统加载。
     documents = load_documents()
     if not documents:
         raise SystemExit("assets/ 里没有找到示例文档，请先确认 assets/*.md 是否存在。")
 
+    # 构建向量库，写入文档，执行查询。不同风格的向量库只是接口不同，底层数据流是一致的。         
     store = build_store(args.backend)
     print(f"backend = {args.backend}")
     print(f"collection = {store.collection_name}")
