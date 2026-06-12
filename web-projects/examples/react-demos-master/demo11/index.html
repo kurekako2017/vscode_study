@@ -23,6 +23,7 @@
 
         componentDidMount() {
           // Ajax 完成后更新用户名和链接
+          // 先发请求，拿到响应后再把结果写进 state。
           $.get(this.props.source, function(result) {
             var lastGist = result[0];
             this.setState({
@@ -36,6 +37,7 @@
           return (
             <div>
               {/* 异步数据回来之前，页面会先渲染空字符串 */}
+              {/* 这也是为什么前端要考虑 loading / 空态 / 错误态。 */}
               {this.state.username}'s last gist is <a href={this.state.lastGistUrl}>here</a>.
             </div>
           );

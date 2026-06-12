@@ -15,6 +15,7 @@
         constructor(props) {
           super(props)
           // state 是组件私有数据，改变后会触发重新渲染
+          // 初始值写在这里，后面点击按钮时再通过 setState 修改。
           this.state = {
             liked: false
           }
@@ -22,10 +23,12 @@
         }
         handleClick(event) {
           // 根据旧状态翻转 liked 值
+          // 这里用 this.state 读取当前值，再把它取反。
           this.setState({ liked: !this.state.liked });
         }
         render() {
           // 根据状态计算显示文本
+          // render 不直接改 state，而是根据 state 决定显示什么。
           var text = this.state.liked ? 'like' : 'haven\'t liked';
           return (
             <p onClick={this.handleClick}>

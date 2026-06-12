@@ -10,17 +10,19 @@
   <body>
     <div id="example"></div>
     <script type="text/babel">
-      // 定义一个类组件，render 方法负责描述界面
+      // 定义一个类组件，render 方法负责描述界面。
+      // 这里开始从“直接写 JSX”进入“把 UI 封装成可复用组件”的阶段。
       class HelloMessage extends React.Component {
         render() {
           // props 是父组件传进来的只读数据
+          // 组件内部不应该直接修改 props。
           return <h1>Hello {this.props.name}</h1>;
         }
       }
 
       // JSX 形式创建组件实例并传入属性
       ReactDOM.render(
-        <HelloMessage name="John" />,
+        <HelloMessage name="victorwu！" />,
         document.getElementById('example')
       );
     </script>

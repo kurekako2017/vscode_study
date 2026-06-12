@@ -15,6 +15,7 @@
         constructor(props) {
           super(props)
           // 初始值会直接显示在输入框和段落里
+          // 受控组件的核心就是：页面显示什么，由 state 决定。
           this.state = {
             value: 'Hello!'
           }
@@ -22,6 +23,7 @@
         }
         handleChange(event) {
           // 每次输入都把最新值同步进 state
+          // event.target.value 就是输入框当前的内容。
           this.setState({ value: event.target.value });
         }
         render() {

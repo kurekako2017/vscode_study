@@ -6,6 +6,7 @@ export default function TimerDemo() {
 
   // useEffect 用来演示副作用：
   // 组件挂载后启动定时器，卸载时清理定时器。
+  // 这类“开始一个外部动作 + 结束时收尾”的逻辑，很适合放进 useEffect。
   useEffect(() => {
     // setInterval 每 1 秒执行一次回调。
     const id = window.setInterval(() => {

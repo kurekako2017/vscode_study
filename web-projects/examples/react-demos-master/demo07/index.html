@@ -19,6 +19,7 @@
           this.handleClick = this.handleClick.bind(this)
         }
         // 点击按钮后，把光标聚焦到输入框上
+        // 这类场景就是 ref 最典型的用途：直接操作真实 DOM。
         handleClick() {
           this.myTextInput.current.focus();
         }

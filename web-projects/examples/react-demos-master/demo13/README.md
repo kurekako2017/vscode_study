@@ -1,5 +1,11 @@
 这个示例复制自 [github.com/mhart/react-server-example](https://github.com/mhart/react-server-example)，我用 JSX 语法重新整理过。
 
+你可以把它理解成一个完整的“服务端渲染 + 浏览器接管”最小案例：
+
+- 服务端先输出首屏 HTML
+- 浏览器再加载 React，接管同一份页面
+- 用户后续点击按钮时，行为就和普通 React 应用一样
+
 ## 如何运行
 
 ```bash

@@ -13,7 +13,8 @@
     <script type="text/babel">
 
       // 故意传入数字，方便观察类型校验的提示
-      var data = 123;
+      // 这里不是业务需要，而是为了让你看到 propTypes 真的会帮你发现错误。
+      var data = 1234;
 
       // static propTypes 说明组件希望收到什么类型的 props
       class MyTitle extends React.Component {
@@ -22,6 +23,7 @@
         }
         render() {
           // 这里直接读取 props.title
+          // 如果父组件传错类型，开发环境会给出警告，但不会直接阻止渲染。
           return <h1> {this.props.title} </h1>;
         }
       }

@@ -11,7 +11,10 @@
     <!-- React 负责把内容渲染到这个挂载节点里 -->
     <div id="example"></div>
     <script type="text/babel">
-      // ReactDOM.render 用 JSX 生成一个最简单的页面内容
+      // ReactDOM.render 的两个参数分别是：
+      // 1. 要渲染的 UI
+      // 2. 要挂载到哪个 DOM 节点
+      // 这个示例只放一个标题，帮助你先把“React 会把 JSX 变成页面内容”这件事看明白。
       ReactDOM.render(
         <h1>Hello, world! 第一个Demo！</h1>,
         document.getElementById('example')

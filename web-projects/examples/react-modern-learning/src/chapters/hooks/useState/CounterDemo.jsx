@@ -8,6 +8,7 @@ export default function CounterDemo() {
 
   // doubled 不是独立状态，而是由 count 推导出来的结果。
   // 这里用 useMemo 只是为了说明“派生值可以按依赖缓存”。
+  // 初学者可以先把它理解成“计算结果缓存”，而不是新的数据源。
   const doubled = useMemo(() => count * 2, [count])
 
   return (

@@ -11,7 +11,8 @@
     <!-- 所有示例都复用这个挂载点 -->
     <div id="example"></div>
     <script type="text/babel">
-      // JSX 元素本身也可以放进数组里，React 会把它们依次渲染出来
+      // JSX 元素本身也可以放进数组里，React 会把它们依次渲染出来。
+      // 这说明“数组”并不是特殊语法，React 只是在渲染时把数组展开了。
       var arr = [
         <h1 key="1">Hello world!</h1>,
         <h2 key="2">React is awesome</h2>,

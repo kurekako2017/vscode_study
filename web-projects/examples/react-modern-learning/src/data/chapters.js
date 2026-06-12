@@ -1,5 +1,6 @@
 export const chapters = [
   // 章节数据统一从这里读取，首页和导航栏都用它来生成 UI。
+  // 这样一来，新增章节时只需要改这里，不用到处复制路由和文案。
   {
     path: '/hooks',
     title: 'Hooks',

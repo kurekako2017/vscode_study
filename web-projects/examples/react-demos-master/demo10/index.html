@@ -15,6 +15,7 @@
         constructor(props) {
           super(props)
           // opacity 会在定时器里持续变化
+          // 组件每次重新渲染时，都会用这个 state 计算样式。
           this.state = {
             opacity: 1.0
           };
@@ -22,6 +23,7 @@
 
         componentDidMount() {
           // 挂载完成后开始动画
+          // componentDidMount 适合启动定时器、请求数据、订阅事件等副作用。
           this.timer = setInterval(function () {
             var opacity = this.state.opacity;
             opacity -= .05;

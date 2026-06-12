@@ -2,6 +2,7 @@ import ThemeContextDemo from './ThemeContextDemo'
 
 export default function ContextPage() {
   // 这里是 Context 章节的外层容器，实际的 Provider/Consumer 示例放在 ThemeContextDemo。
+  // 页面本身不负责实现 Context，只负责把学习说明和 demo 组合起来。
   return (
     <section className="page">
       <div className="card">

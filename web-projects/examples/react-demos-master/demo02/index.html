@@ -14,7 +14,8 @@
       // 原始数据数组，后面用 map 生成多个 React 元素
       var names = ['Alice', 'Emily', 'Kate'];
 
-      // 在 JSX 里用花括号嵌入 JavaScript 表达式
+      // 在 JSX 里用花括号嵌入 JavaScript 表达式。
+      // 只要结果是“能被渲染的内容”，React 就会把它插入到页面里。
       ReactDOM.render(
         <div>
         {

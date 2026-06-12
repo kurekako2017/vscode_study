@@ -5,6 +5,7 @@ import Counter from './Counter'
 describe('Counter', () => {
   it('increments count when clicked', () => {
     // render 会把组件渲染到测试环境里，后面才能像用户一样操作它。
+    // 测试的思路不是直接调用内部函数，而是从用户视角去点、去看、去断言。
     render(<Counter />)
 
     // fireEvent.click 模拟真实用户点击按钮。

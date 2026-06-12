@@ -15,6 +15,8 @@ export default function PostsDemo() {
   // useEffect 在组件挂载后发起请求。
   // 这里还演示了：请求完成后，如果组件卸载，要取消请求。
   useEffect(() => {
+    // 每次进入这个组件时都会创建一个新的控制器。
+    // 它的作用是：如果组件提前卸载，就能把未完成的请求取消掉。
     // AbortController 可以在请求未完成时主动取消 fetch。
     const controller = new AbortController()
 
@@ -23,7 +25,8 @@ export default function PostsDemo() {
         setLoading(true)
         setError('')
 
-        // fetch 返回 Response，需要手动判断是否成功。
+        // fetch 返回的是 Response 对象，不是直接可用的 JSON 数据。
+        // 所以我们要先检查状态码，再手动解析 JSON。
         const response = await fetch(POSTS_URL, { signal: controller.signal })
         if (!response.ok) {
           throw new Error(`请求失败: ${response.status}`)
@@ -55,10 +58,12 @@ export default function PostsDemo() {
       <span className="pill">fetch</span>
       <h3>帖子列表</h3>
       {/* 三态展示：加载中、错误、成功。 */}
+      {/* 这是前端请求数据时最常见的 UI 结构。 */}
       {loading ? <p>Loading...</p> : null}
       {!loading && error ? <p>{error}</p> : null}
       {!loading && !error ? (
         <ol>
+          {/* 数据请求成功后，把数组里的每一项渲染成一个列表节点。 */}
           {posts.map((post) => (
             <li key={post.id}>
               <strong>{post.title}</strong>

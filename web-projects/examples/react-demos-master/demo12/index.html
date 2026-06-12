@@ -24,6 +24,7 @@
 
         componentDidMount() {
           // Promise 成功和失败都要分别更新 state
+          // 这段代码把“异步结果”转换成“页面状态”。
           this.props.promise.then(
             value => this.setState({loading: false, data: value}),
             error => this.setState({loading: false, error: error}));
@@ -31,6 +32,7 @@
 
         render() {
           // 先处理加载中
+          // 再处理错误，最后才是成功数据，这个顺序很常见。
           if (this.state.loading) {
             return <span>Loading...</span>;
           }
@@ -41,6 +43,7 @@
             // 请求成功后，把仓库列表映射成 <li>
             var repos = this.state.data.items;
             var repoList = repos.map(function (repo, index) {
+              // 每个仓库都变成一个列表项，方便逐条展示搜索结果。
               return (
                 <li key={index}><a href={repo.html_url}>{repo.name}</a> ({repo.stargazers_count} stars) <br/> {repo.description}</li>
               );
