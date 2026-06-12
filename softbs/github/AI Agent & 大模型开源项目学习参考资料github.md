@@ -4,6 +4,25 @@
 >
 > 本资料基于多份前沿 AI Agent 学习路线图、GitHub 热门开源项目榜单以及 Codex 必装技能指南整理而成，目标是给后续的深入学习与项目实战提供一份更顺手的参考。
 
+## 章节连接
+
+- [1. 先怎么用这份资料](#1-先怎么用这份资料)
+- [2. AI Agent 系统化学习路线图](#2-ai-agent-系统化学习路线图)
+- [3. GitHub 核心热榜 - Skill 职业化与基建](#3-github-核心热榜---skill-职业化与基建)
+- [4. 6 大 Agent 开源项目合集推荐](#4-6-大-agent-开源项目合集推荐)
+- [5. Codex 必装十大 Skills 指南](#5-codex-必装十大-skills-指南)
+- [6. 推荐学习节奏](#6-推荐学习节奏)
+
+## 快速路线
+
+| 顺序 | 项目 | 作用 |
+| :--- | :--- | :--- |
+| 1 | [llm-cookbook](https://github.com/datawhalechina/llm-cookbook) | 先打 LLM / Prompt 基础 |
+| 2 | [llm-universe](https://github.com/datawhalechina/llm-universe) | 再做一个能跑的 LLM 应用 |
+| 3 | [All-in-RAG](https://github.com/datawhalechina/all-in-rag) | 学 RAG 全栈链路 |
+| 4 | [Hello-Agents](https://github.com/datawhalechina/hello-agents) | 学 Agent 系统与协作 |
+| 5 | [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) | 补全 Agent 全栈路线图 |
+
 ## 1. 先怎么用这份资料
 
 - 如果你刚开始学，先看 90 天路线图，建立大方向。
@@ -264,6 +283,34 @@
 - 如果你更偏工程实战：
   - 优先 `ai-agents-from-zero`
   - 但其中 RAG 基础还是建议回头补 `All-in-RAG`
+
+### 4.9 中文教程学习顺序表
+
+如果你想按“先基础、再应用、再系统路线图”的方式继续，推荐直接按下面这个顺序学。
+
+| 顺序 | 项目 | 方向 | 适合先学的原因 | 当前热度 |
+| :--- | :--- | :--- | :--- | :---: |
+| 1 | [llm-cookbook](https://github.com/datawhalechina/llm-cookbook) | LLM 入门 / Prompt | 先把大模型调用、提示词和基础概念打稳 | 23.7k ⭐ |
+| 2 | [llm-universe](https://github.com/datawhalechina/llm-universe) | LLM 应用开发入门 | 先做一个能跑的入门应用，建立整体感觉 | 13.2k ⭐ |
+| 3 | [All-in-RAG](https://github.com/datawhalechina/all-in-rag) | RAG 全栈 | 把检索增强生成的整条链路学扎实 | 8.5k ⭐ |
+| 4 | [Hello-Agents](https://github.com/datawhalechina/hello-agents) | Agent 系统教程 | 进入智能体思维、范式和系统架构 | 58.5k ⭐ |
+| 5 | [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) | Agent 综合路线图 | 用更完整的工程视角补全全栈学习地图 | 1.9k ⭐ |
+
+### 4.10 这几个项目怎么分工
+
+- `llm-cookbook`：先学基础，适合把 Prompt、LLM 调用、基础思路打通。
+- `llm-universe`：再学应用，适合把“怎么做一个大模型应用”跑明白。
+- `All-in-RAG`：再学检索，适合把 RAG 的数据处理、切块、向量库、召回、评估学完整。
+- `Hello-Agents`：再学智能体，适合把 Agent 的范式、工具调用、协作和工程架构学清楚。
+- `ai-agents-from-zero`：最后补全路线图，适合把前面知识串成更大的系统化学习路径。
+
+### 4.11 最实用的继续学习方式
+
+1. 先看 `llm-cookbook`，把基础概念和 Prompt 习惯养起来。
+2. 再看 `llm-universe`，做出第一个完整的 LLM 应用。
+3. 接着看 `All-in-RAG`，把检索链路学稳。
+4. 然后看 `Hello-Agents`，进入智能体系统设计。
+5. 最后用 `ai-agents-from-zero` 做总复盘，补齐工程实战和路线图。
 
 ## 5. Codex 必装十大 Skills 指南
 
