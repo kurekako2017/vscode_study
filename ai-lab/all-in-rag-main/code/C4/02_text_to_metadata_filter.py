@@ -1,5 +1,5 @@
 import os
-from langchain_deepseek import ChatDeepSeek 
+from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import BiliBiliLoader
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
@@ -72,10 +72,11 @@ metadata_field_info = [
 ]
 
 # 4. 创建自查询检索器
-llm = ChatDeepSeek(
-    model="deepseek-chat", 
+llm = ChatOpenAI(
+    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
     temperature=0, 
-    api_key=os.getenv("DEEPSEEK_API_KEY")
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
     )
 
 retriever = SelfQueryRetriever.from_llm(

@@ -15,6 +15,9 @@ from pathlib import Path
 
 REQUIRED_COMMANDS = ["python3", "node", "uv", "docker", "pnpm"]
 REQUIRED_ENV_VARS = [
+    "OPENROUTER_BASE_URL",
+    "OPENROUTER_API_KEY",
+    "LLM_QWEN_MAX",
     "TAVILY_API_KEY",
     "RAGFLOW_API_URL",
     "RAGFLOW_API_KEY",
@@ -68,13 +71,12 @@ def check_env_vars() -> list[tuple[str, bool, str]]:
 
 def check_llm_config() -> tuple[bool, str]:
     """Check whether the effective LLM configuration is usable."""
-    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPENROUTER_API_KEY")
-    base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENROUTER_BASE_URL")
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    base_url = os.getenv("OPENROUTER_BASE_URL")
     model_name = os.getenv("LLM_QWEN_MAX")
 
     if api_key and base_url and model_name:
-        source = "OpenAI" if os.getenv("OPENAI_API_KEY") else "OpenRouter"
-        return True, f"LLM config looks usable via {source} compatible API."
+        return True, "LLM config looks usable via OpenRouter."
 
     missing_parts = []
     if not api_key:

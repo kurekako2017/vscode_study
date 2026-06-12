@@ -20,7 +20,7 @@ def load_config():
         return {
             "kimi": {
                 "api_key": "",
-                "base_url": "https://api.moonshot.cn/v1"
+                "base_url": "https://openrouter.ai/api/v1"
             },
             "output": {
                 "format": "neo4j",
@@ -30,9 +30,9 @@ def load_config():
 
 def setup_api_key():
     """设置API密钥"""
-    api_key = os.getenv('KIMI_API_KEY')
+    api_key = os.getenv('OPENROUTER_API_KEY')
     if not api_key:
-        api_key = input("请输入Kimi API密钥: ").strip()
+        api_key = input("请输入OpenRouter API密钥: ").strip()
         if not api_key:
             print("错误: 必须提供API密钥")
             sys.exit(1)
@@ -85,7 +85,7 @@ def test_single_recipe():
     # 加载配置
     config = load_config()
     api_key = config["kimi"].get("api_key")
-    if not api_key or api_key == "YOUR_KIMI_API_KEY_HERE":
+    if not api_key or api_key == "YOUR_OPENROUTER_API_KEY_HERE":
         api_key = setup_api_key()
     
     try:
@@ -114,7 +114,7 @@ def main():
     
     # 设置API密钥
     api_key = config["kimi"].get("api_key")
-    if not api_key or api_key == "YOUR_KIMI_API_KEY_HERE":
+    if not api_key or api_key == "YOUR_OPENROUTER_API_KEY_HERE":
         api_key = setup_api_key()
     
     # 获取菜谱目录
@@ -135,7 +135,7 @@ def main():
     try:
         # 创建AI agent
         print("\n🤖 初始化AI Agent...")
-        ai_agent = KimiRecipeAgent(api_key, config["kimi"].get("base_url"))
+        ai_agent = KimiRecipeAgent(api_key, config["kimi"].get("base_url", "https://openrouter.ai/api/v1"))
         
         # 创建知识图谱构建器
         output_dir = config["output"].get("directory", "./ai_output")
@@ -184,7 +184,7 @@ def show_help():
   python run_ai_agent.py test
   
 环境变量:
-          KIMI_API_KEY - Kimi API密钥
+          OPENROUTER_API_KEY - OpenRouter API密钥
   
 配置文件:
   config.json - 详细配置选项

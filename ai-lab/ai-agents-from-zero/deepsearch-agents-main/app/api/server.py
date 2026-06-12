@@ -98,13 +98,12 @@ async def health_check():
     This endpoint is intentionally dependency-light so the UI can verify that
     the FastAPI process is alive even when external services are not configured.
     """
-    llm_api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPENROUTER_API_KEY")
-    llm_base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENROUTER_BASE_URL")
+    llm_api_key = os.getenv("OPENROUTER_API_KEY")
+    llm_base_url = os.getenv("OPENROUTER_BASE_URL")
     llm_model = (
         os.getenv("LLM_QWEN_MAX")
-        or os.getenv("OPENAI_MODEL")
         or os.getenv("OPENROUTER_MODEL")
-        or "gpt-4o-mini"
+        or "openai/gpt-4o-mini"
     )
 
     return {
@@ -112,11 +111,7 @@ async def health_check():
         "backend": "alive",
         "llm": {
             "configured": bool(llm_api_key and llm_base_url and llm_model),
-            "source": (
-                "openrouter"
-                if "openrouter.ai" in (llm_base_url or "").lower()
-                else ("openai" if os.getenv("OPENAI_API_KEY") else ("openrouter" if os.getenv("OPENROUTER_API_KEY") else "unset"))
-            ),
+            "source": "openrouter" if os.getenv("OPENROUTER_API_KEY") else "unset",
             "model": llm_model,
         },
         "mysql": {

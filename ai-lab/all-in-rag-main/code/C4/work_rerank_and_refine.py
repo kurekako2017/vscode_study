@@ -5,7 +5,7 @@ from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
-from langchain_deepseek import ChatDeepSeek
+from langchain_openai import ChatOpenAI
 
 # 导入ColBERT重排器需要的模块
 from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
@@ -134,10 +134,11 @@ hf_bge_embeddings = HuggingFaceBgeEmbeddings(
     model_name="BAAI/bge-large-zh-v1.5"
 )
 
-llm = ChatDeepSeek(
-    model="deepseek-chat", 
+llm = ChatOpenAI(
+    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
     temperature=0.1, 
-    api_key=os.getenv("DEEPSEEK_API_KEY")
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
 )
 
 # 1. 加载和处理文档

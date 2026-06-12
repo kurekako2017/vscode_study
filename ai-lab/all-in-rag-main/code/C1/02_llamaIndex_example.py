@@ -7,18 +7,18 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 load_dotenv()
 
-# 使用 AIHubmix
+# 使用 OpenRouter
 Settings.llm = OpenAILike(
-    model="glm-4.7-flash-free",
-    api_key=os.getenv("DEEPSEEK_API_KEY"),
-    api_base="https://aihubmix.com/v1",
+    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    api_base="https://openrouter.ai/api/v1",
     is_chat_model=True
 )
 
 # Settings.llm = OpenAI(
-#     model="deepseek-chat",
-#     api_key=os.getenv("DEEPSEEK_API_KEY"),
-#     api_base="https://api.deepseek.com"
+#     model="~openai/gpt-latest",
+#     api_key=os.getenv("OPENROUTER_API_KEY"),
+#     api_base="https://openrouter.ai/api/v1"
 # )
 Settings.embed_model = HuggingFaceEmbedding("BAAI/bge-small-zh-v1.5")
 

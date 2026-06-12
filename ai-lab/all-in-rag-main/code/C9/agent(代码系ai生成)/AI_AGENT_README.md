@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 方法一：设置环境变量
 ```bash
-export KIMI_API_KEY="your_api_key_here"
+export OPENROUTER_API_KEY="your_api_key_here"
 ```
 
 方法二：编辑config.json
@@ -206,7 +206,7 @@ ORDER BY matches DESC
 {
   "deepseek": {
     "api_key": "your_api_key",
-    "base_url": "https://api.deepseek.com",
+    "base_url": "https://openrouter.ai/api/v1",
     "model": "deepseek-chat",
     "max_retries": 3,
     "timeout": 30

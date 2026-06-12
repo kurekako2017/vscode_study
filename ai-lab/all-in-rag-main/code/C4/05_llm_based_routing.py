@@ -1,13 +1,14 @@
 import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_deepseek import ChatDeepSeek
+from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableBranch
 
-llm = ChatDeepSeek(
-    model="deepseek-chat", 
+llm = ChatOpenAI(
+    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
     temperature=0, 
-    api_key=os.getenv("DEEPSEEK_API_KEY")
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
     )
 
 # 1. 设置不同菜系的处理链
@@ -69,4 +70,3 @@ for i, item in enumerate(demo_questions, 1):
         print(f"回答: {result}")
     except Exception as e:
         print(f"执行错误: {e}")
-

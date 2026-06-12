@@ -59,9 +59,9 @@ class RecipeInfo:
             self.nutrition_info = {}
 
 class KimiRecipeAgent:
-    """Kimi菜谱解析AI Agent"""
+    """OpenRouter菜谱解析AI Agent"""
     
-    def __init__(self, api_key: str, base_url: str = "https://api.moonshot.cn/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1"):
         self.api_key = api_key
         self.base_url = base_url
         self.client = OpenAI(
@@ -105,7 +105,7 @@ class KimiRecipeAgent:
         for attempt in range(max_retries):
             try:
                 response = self.client.chat.completions.create(
-                    model="kimi-k2-0711-preview",
+                    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
                     messages=messages,
                     temperature=0.3,
                     max_tokens=2048,
@@ -1301,12 +1301,12 @@ def main():
     
     parser = argparse.ArgumentParser(description='使用AI智能解析菜谱生成知识图谱')
     parser.add_argument('recipe_dir', help='菜谱目录路径')
-    parser.add_argument('-k', '--api-key', required=True, help='Kimi API密钥')
+    parser.add_argument('-k', '--api-key', required=True, help='OpenRouter API密钥')
     parser.add_argument('-o', '--output', default='./ai_output', help='输出目录路径')
     parser.add_argument('--format', choices=['csv', 'neo4j'], default='neo4j', 
                        help='输出格式 (csv 或 neo4j)')
-    parser.add_argument('--base-url', default='https://api.moonshot.cn/v1', 
-                       help='Kimi API基础URL')
+    parser.add_argument('--base-url', default='https://openrouter.ai/api/v1', 
+                       help='OpenRouter API基础URL')
     
     args = parser.parse_args()
     
@@ -1316,7 +1316,7 @@ def main():
         return
     
     # 创建AI agent
-    print("初始化Kimi AI Agent...")
+    print("初始化OpenRouter AI Agent...")
     ai_agent = KimiRecipeAgent(args.api_key, args.base_url)
     
     # 创建知识图谱构建器
@@ -1340,7 +1340,7 @@ if __name__ == "__main__":
     # 测试用例
     if len(os.sys.argv) == 1:
         print("AI菜谱解析器测试模式")
-        print("请提供Kimi API密钥和菜谱目录路径")
+        print("请提供OpenRouter API密钥和菜谱目录路径")
         print("使用方法:")
         print("python recipe_ai_agent.py /path/to/recipes -k YOUR_API_KEY")
     else:

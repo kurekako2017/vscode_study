@@ -1,7 +1,7 @@
 import os
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_deepseek import ChatDeepSeek
+from langchain_openai import ChatOpenAI
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough, RunnablePassthrough
 from langchain_community.utils.math import cosine_similarity
@@ -20,10 +20,11 @@ route_prompt_embeddings = embeddings.embed_documents(route_prompts)
 print(f"已定义 {len(route_names)} 个路由: {', '.join(route_names)}")
 
 # 2. 定义不同路由的目标链
-llm = ChatDeepSeek(
-    model="deepseek-chat", 
+llm = ChatOpenAI(
+    model=os.getenv("OPENROUTER_MODEL", "~openai/gpt-latest"),
     temperature=0, 
-    api_key=os.getenv("DEEPSEEK_API_KEY")
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
     )
 
 # 定义川菜和粤菜处理链
@@ -80,4 +81,3 @@ for i, query in enumerate(demo_queries, 1):
         print(f"回答: {result}")
     except Exception as e:
         print(f"执行错误: {e}")
-
