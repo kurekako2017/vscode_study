@@ -105,7 +105,7 @@
 
 | 目录 | 主题 | 你会学到什么 | 运行命令 |
 | --- | --- | --- | --- |
-| [langchain_chain_demo](./langchain_chain_demo/README.md) | LangChain 链式编排 | Prompt 模板、Runnable 组合、输出解析 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "你想问的问题" --mock` |
+| [langchain_chain_demo](./langchain_chain_demo/README.md) | LangChain 链式编排 | Prompt 模板、Runnable 组合、输出解析、Tool / Memory / RAG 入门 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langchain_chain_demo/main.py "你想问的问题" --mock` |
 | [langgraph_workflow_demo](./langgraph_workflow_demo/README.md) | LangGraph 工作流 | State、Node、Edge、条件分支、循环 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/langgraph_workflow_demo/main.py "LangGraph 适合什么场景"` |
 | [advanced_rag_pipeline_demo](./advanced_rag_pipeline_demo/README.md) | 高级 RAG | 切分、检索、重排、引用、答案合成 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/advanced_rag_pipeline_demo/main.py "LangGraph 适合什么场景？"` |
 | [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索 | 接入层、检索层、权限层、引用层 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/agent-advanced/projects/internal_hybrid_rag_demo/main.py "远程办公和发布流程有什么要求？" --role employee` |

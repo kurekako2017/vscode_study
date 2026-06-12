@@ -2,6 +2,10 @@
 
 LangChain 风格最小链路示例。
 
+如果你想先把 LangChain 的知识补齐，再来跑这个 demo，可以先看：
+
+- [frameworks/langchain/LangChain 学习笔记](../../frameworks/langchain/LangChain学习笔记.md)
+
 这个 demo 重点练三件事：
 
 1. `ChatPromptTemplate` 组织提示词
@@ -59,6 +63,7 @@ LangChain 风格最小链路示例。
 2. 再看 `mock_llm()`
 3. 再看 `parse_response()`
 4. 最后看 `build_chain()`
+5. 如果想继续往后学，再看 `Tool Calling`、`Memory`、`Retriever`、`RAG`、`Agent`
 
 如果想理解“上面那段是原始模型输出，下面那段是重新组装后的结构化结果”，再补看一次 `--show-raw` 的输出：
 
