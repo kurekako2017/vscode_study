@@ -1,3 +1,11 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/modeling.py` 主要是 modeling，这个文件里有 2 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `EncoderOutput`：功能概述：这个类是 `EncoderOutput`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `Visualized_BGE`：功能概述：这个类是 `Visualized_BGE`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name_bge, model_weight, normlized, sentence_pooling_method, negatives_cross_device, temperature, from_pretrained，接着根据条件分支选择不同处理路径，再调用 __init__、create_eva_vision_and_transforms、nn.Linear 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `load_model`：先接收输入参数 model_weight，再调用 self.load_state_dict、torch.load 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `gradient_checkpointing_enable`：先接收输入参数 **kwargs，再调用 self.model_visual.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `encode`：先接收输入参数 image, text，接着根据条件分支选择不同处理路径，再调用 unsqueeze、self.tokenizer、self.encode_mm 等内部步骤完成主要工作，最后返回结果。 5. `get_extended_attention_mask`：先接收输入参数 attention_mask, input_shape, device, dtype，接着根据条件分支选择不同处理路径，再调用 extended_attention_mask.to、attention_mask.dim、ValueError 等内部步骤完成主要工作，最后返回结果。 6. `sentence_embedding`：先接收输入参数 hidden_state, mask，接着根据条件分支选择不同处理路径，再调用 torch.sum、float、mask.sum 等内部步骤完成主要工作，最后返回结果。 7. `encode_text`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 input_ids.size、torch.zeros、to 等内部步骤完成主要工作，最后返回结果。 8. `encode_mm`：先接收输入参数 images, texts，接着根据条件分支选择不同处理路径，再调用 self.img_token_embedding、self.visual_proj、to 等内部步骤完成主要工作，最后返回结果。 9. `compute_similarity`：先接收输入参数 q_reps, p_reps，接着根据条件分支选择不同处理路径，再调用 torch.matmul、len、p_reps.transpose 等内部步骤完成主要工作，最后返回结果。 10. `img_token_embedding`：先接收输入参数 images，接着根据条件分支选择不同处理路径，再调用 self.model_visual.encode_image、img_token_emb.contiguous 等内部步骤完成主要工作，最后返回结果。 11. `encode_image`：先接收输入参数 images，接着根据条件分支选择不同处理路径，再调用 self.tokenizer、prompts.to、self.encode_mm 等内部步骤完成主要工作，最后返回结果。 12. `forward`：先接收输入参数 mm_it_query, image_candidate, text_candidate, text_query, mm_it_candidate, task_type，接着根据条件分支选择不同处理路径，再调用 EncoderOutput、self.encode_mm、self.encode_image 等内部步骤完成主要工作，最后返回结果。 13. `compute_loss`：先接收输入参数 scores, target，再调用 self.cross_entropy 等内部步骤完成主要工作，最后返回结果。 14. `_dist_gather_tensor`：先接收输入参数 t，接着根据条件分支选择不同处理路径，再调用 t.contiguous、dist.all_gather、torch.cat 等内部步骤完成主要工作，最后返回结果。 15. `save`：先接收输入参数 output_dir，再调用 torch.save、self.state_dict、os.path.join 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+"""
+
 import os
 import logging
 from dataclasses import dataclass
@@ -17,6 +25,11 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class EncoderOutput(ModelOutput):
+    """
+    功能概述：这个类是 `EncoderOutput`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     q_reps: Optional[Tensor] = None
     c_reps: Optional[Tensor] = None
     loss: Optional[Tensor] = None
@@ -24,6 +37,25 @@ class EncoderOutput(ModelOutput):
 
 
 class Visualized_BGE(nn.Module):
+    """
+    功能概述：这个类是 `Visualized_BGE`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name_bge, model_weight, normlized, sentence_pooling_method, negatives_cross_device, temperature, from_pretrained，接着根据条件分支选择不同处理路径，再调用 __init__、create_eva_vision_and_transforms、nn.Linear 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `load_model`：先接收输入参数 model_weight，再调用 self.load_state_dict、torch.load 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `gradient_checkpointing_enable`：先接收输入参数 **kwargs，再调用 self.model_visual.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `encode`：先接收输入参数 image, text，接着根据条件分支选择不同处理路径，再调用 unsqueeze、self.tokenizer、self.encode_mm 等内部步骤完成主要工作，最后返回结果。
+    5. `get_extended_attention_mask`：先接收输入参数 attention_mask, input_shape, device, dtype，接着根据条件分支选择不同处理路径，再调用 extended_attention_mask.to、attention_mask.dim、ValueError 等内部步骤完成主要工作，最后返回结果。
+    6. `sentence_embedding`：先接收输入参数 hidden_state, mask，接着根据条件分支选择不同处理路径，再调用 torch.sum、float、mask.sum 等内部步骤完成主要工作，最后返回结果。
+    7. `encode_text`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 input_ids.size、torch.zeros、to 等内部步骤完成主要工作，最后返回结果。
+    8. `encode_mm`：先接收输入参数 images, texts，接着根据条件分支选择不同处理路径，再调用 self.img_token_embedding、self.visual_proj、to 等内部步骤完成主要工作，最后返回结果。
+    9. `compute_similarity`：先接收输入参数 q_reps, p_reps，接着根据条件分支选择不同处理路径，再调用 torch.matmul、len、p_reps.transpose 等内部步骤完成主要工作，最后返回结果。
+    10. `img_token_embedding`：先接收输入参数 images，接着根据条件分支选择不同处理路径，再调用 self.model_visual.encode_image、img_token_emb.contiguous 等内部步骤完成主要工作，最后返回结果。
+    11. `encode_image`：先接收输入参数 images，接着根据条件分支选择不同处理路径，再调用 self.tokenizer、prompts.to、self.encode_mm 等内部步骤完成主要工作，最后返回结果。
+    12. `forward`：先接收输入参数 mm_it_query, image_candidate, text_candidate, text_query, mm_it_candidate, task_type，接着根据条件分支选择不同处理路径，再调用 EncoderOutput、self.encode_mm、self.encode_image 等内部步骤完成主要工作，最后返回结果。
+    13. `compute_loss`：先接收输入参数 scores, target，再调用 self.cross_entropy 等内部步骤完成主要工作，最后返回结果。
+    14. `_dist_gather_tensor`：先接收输入参数 t，接着根据条件分支选择不同处理路径，再调用 t.contiguous、dist.all_gather、torch.cat 等内部步骤完成主要工作，最后返回结果。
+    15. `save`：先接收输入参数 output_dir，再调用 torch.save、self.state_dict、os.path.join 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     def __init__(self,
                  model_name_bge: str = None,
                  model_weight = None, # "/path/to/your/weight/file/"
@@ -32,7 +64,7 @@ class Visualized_BGE(nn.Module):
                  negatives_cross_device: bool = False,
                  temperature: float = 0.02, # 1.0
                  from_pretrained=None, # local config file and model 
-                 ):
+                 ):  # 中文名称：初始化
         super().__init__()
 
         assert 'bge' in model_name_bge
@@ -102,17 +134,17 @@ class Visualized_BGE(nn.Module):
             self.device = torch.device('cpu')
         self.dtype = next(bge.parameters()).dtype
     
-    def load_model(self, model_weight):
+    def load_model(self, model_weight):  # 中文名称：加载model
         self.load_state_dict(torch.load(model_weight, map_location='cpu'))
     
     def gradient_checkpointing_enable(self, **kwargs):
-        # self.bge_encoder.gradient_checkpointing_enable()
+        # self.bge_encoder.gradient_checkpointing_enable()  # 中文名称：gradientcheckpointingenable
         self.model_visual.set_grad_checkpointing(True)
     
     
     
     def encode(self, image=None, text=None):
-        # used for simple inference
+        # used for simple inference  # 中文名称：encode
         if image is not None:
             image = self.preprocess_val(Image.open(image)).unsqueeze(0)
 
@@ -131,7 +163,7 @@ class Visualized_BGE(nn.Module):
     
     def get_extended_attention_mask(
         self, attention_mask: Tensor, input_shape: Tuple[int], device: torch.device = None, dtype: torch.float = torch.float16
-    ) -> Tensor:
+    ) -> Tensor:  # 中文名称：获取extendedattentionmask
         """
         Makes broadcastable attention and causal masks so that future and masked tokens are ignored.
 
@@ -170,7 +202,7 @@ class Visualized_BGE(nn.Module):
         
         return extended_attention_mask
 
-    def sentence_embedding(self, hidden_state, mask):
+    def sentence_embedding(self, hidden_state, mask):  # 中文名称：句子向量化
         if self.sentence_pooling_method == 'mean':
             s = torch.sum(hidden_state * mask.unsqueeze(-1).float(), dim=1)
             d = mask.sum(axis=1, keepdim=True).float()
@@ -179,7 +211,7 @@ class Visualized_BGE(nn.Module):
             return hidden_state[:, 0]
 
     
-    def encode_text(self, texts):
+    def encode_text(self, texts):  # 中文名称：encode文本
         '''
         encode text only
         '''
@@ -221,7 +253,7 @@ class Visualized_BGE(nn.Module):
             t_reps = torch.nn.functional.normalize(t_reps, dim=-1)
         return t_reps.contiguous()
 
-    def encode_mm(self, images:torch.Tensor, texts):
+    def encode_mm(self, images:torch.Tensor, texts):  # 中文名称：encodemm
         img_token_emb = self.img_token_embedding(images) #[B, Patch_num, C]
         img_token_emb = img_token_emb[:,1:]              # img_cls is not used here
         img_token_emb = self.visual_proj(img_token_emb)
@@ -293,19 +325,19 @@ class Visualized_BGE(nn.Module):
             prompt_img_reps = torch.nn.functional.normalize(prompt_img_reps, dim=-1)
         return prompt_img_reps
 
-    def compute_similarity(self, q_reps, p_reps):
+    def compute_similarity(self, q_reps, p_reps):  # 中文名称：computesimilarity
         if len(p_reps.size()) == 2:
             return torch.matmul(q_reps, p_reps.transpose(0, 1))
         return torch.matmul(q_reps, p_reps.transpose(-2, -1))
 
-    def img_token_embedding(self, images):
+    def img_token_embedding(self, images):  # 中文名称：imgtoken向量化
         if images is None:
             return None
         img_token_emb = self.model_visual.encode_image(images, normalize=False) # return_all_features=True, [B, Patch_num, C] 
         
         return img_token_emb.contiguous()
     
-    def encode_image(self, images):
+    def encode_image(self, images):  # 中文名称：encodeimage
         if images is None:
             return None
         
@@ -318,7 +350,7 @@ class Visualized_BGE(nn.Module):
         return img_reps
     
     def forward(self, mm_it_query=None, image_candidate=None, text_candidate=None, text_query=None, mm_it_candidate=None, task_type=None):
-        ### for stage-2 training
+        ### for stage-2 training  # 中文名称：forward
         if task_type == "edit_image":
             mm_query_reps = self.encode_mm(mm_it_query[0], mm_it_query[1])
             image_candi_reps = self.encode_image(image_candidate)
@@ -358,10 +390,10 @@ class Visualized_BGE(nn.Module):
             c_reps=candi_reps,
         )
 
-    def compute_loss(self, scores, target):
+    def compute_loss(self, scores, target):  # 中文名称：computeloss
         return self.cross_entropy(scores, target)
 
-    def _dist_gather_tensor(self, t: Optional[torch.Tensor]):
+    def _dist_gather_tensor(self, t: Optional[torch.Tensor]):  # 中文名称：distgathertensor
         if t is None:
             return None
         t = t.contiguous()
@@ -374,5 +406,5 @@ class Visualized_BGE(nn.Module):
 
         return all_tensors
 
-    def save(self, output_dir: str):
+    def save(self, output_dir: str):  # 中文名称：保存
         torch.save(self.state_dict(), os.path.join(output_dir, 'Visualized_BGE.pth'))

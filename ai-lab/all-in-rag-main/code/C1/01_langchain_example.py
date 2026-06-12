@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C1/01_langchain_example.py` 主要是 01LangChain示例，这个文件里有 0 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 这个文件没有独立类或函数，主要靠模块级代码直接执行。
+"""
+
 import os
 from pathlib import Path
 # hugging face镜像设置，如果国内环境无法使用启用该设置
@@ -13,10 +20,12 @@ from langchain_community.embeddings import FakeEmbeddings
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-#
+# 加载环境变量，优先使用 .env 文件中的配置，失败则继续使用系统环境变量
 load_dotenv()
 
+# 定义示例文件路径
 ROOT = Path(__file__).resolve().parents[2]
+# 示例文件路径
 markdown_path = ROOT / "data/C1/markdown/easy-rl-chapter1.md"
 
 if not markdown_path.exists():
@@ -27,6 +36,7 @@ docs = [Document(page_content=markdown_path.read_text(encoding="utf-8"), metadat
 
 # 文本分块
 text_splitter = RecursiveCharacterTextSplitter()
+# 文本分块结果是一个 Document 对象列表，每个 Document 包含一个文本块和相关元数据（如来源文件路径）。
 chunks = text_splitter.split_documents(docs)
 
 # 中文嵌入模型，优先使用本地可用的 HuggingFace 模型，失败则降级到离线假向量
@@ -42,6 +52,7 @@ except Exception as exc:
   
 # 构建向量存储
 vectorstore = InMemoryVectorStore(embeddings)
+# 将分块结果添加到向量存储中，每个文本块会被转换成向量并存储，以便后续的相似度搜索使用。
 vectorstore.add_documents(chunks)
 
 # 提示词模板
@@ -85,7 +96,8 @@ question = "文中举了哪些例子？"
 
 # 在向量存储中查询相关文档
 retrieved_docs = vectorstore.similarity_search(question, k=3)
+# 将检索到的文档内容拼接成上下文，并调用大语言模型生成答案
 docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
-
+# 调用大语言模型生成答案
 answer = llm.invoke(prompt.format(question=question, context=docs_content))
 print(answer)

@@ -1,6 +1,10 @@
 """
-数据准备模块
+文件功能概述：`code/C8/rag_modules/data_preparation.py` 主要是 datapreparation，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `DataPreparationModule`：功能概述：这个类是 `DataPreparationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 data_path，最后把结果交给下一步或直接结束。 2. `load_documents`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，然后循环处理每一条数据，再调用 logger.info、Path、data_path_obj.rglob 等内部步骤完成主要工作，最后返回结果。 3. `_enhance_metadata`：先接收输入参数 doc，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 Path、self.CATEGORY_MAPPING.items、doc.metadata.get 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `get_supported_categories`：先接收输入参数 cls，最后返回结果。 5. `get_supported_difficulties`：先接收输入参数 cls，最后返回结果。 6. `chunk_documents`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self._markdown_header_split、enumerate 等内部步骤完成主要工作，最后返回结果。 7. `_markdown_header_split`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 MarkdownHeaderTextSplitter、logger.info、any 等内部步骤完成主要工作，最后返回结果。 8. `filter_documents_by_category`：先接收输入参数 category，再调用 doc.metadata.get 等内部步骤完成主要工作，最后返回结果。 9. `filter_documents_by_difficulty`：先接收输入参数 difficulty，再调用 doc.metadata.get 等内部步骤完成主要工作，最后返回结果。 10. `get_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 doc.metadata.get、len、categories.get 等内部步骤完成主要工作，最后返回结果。 11. `export_metadata`：先接收输入参数 output_path，然后循环处理每一条数据，再调用 logger.info、metadata_list.append、open 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 12. `get_parent_documents`：先接收输入参数 child_chunks，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 sorted、logger.info、chunk.metadata.get 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import logging
 import hashlib
@@ -14,7 +18,22 @@ import uuid
 logger = logging.getLogger(__name__)
 
 class DataPreparationModule:
-    """数据准备模块 - 负责数据加载、清洗和预处理"""
+    """
+    功能概述：这个类是 `DataPreparationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 data_path，最后把结果交给下一步或直接结束。
+    2. `load_documents`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，然后循环处理每一条数据，再调用 logger.info、Path、data_path_obj.rglob 等内部步骤完成主要工作，最后返回结果。
+    3. `_enhance_metadata`：先接收输入参数 doc，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 Path、self.CATEGORY_MAPPING.items、doc.metadata.get 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `get_supported_categories`：先接收输入参数 cls，最后返回结果。
+    5. `get_supported_difficulties`：先接收输入参数 cls，最后返回结果。
+    6. `chunk_documents`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self._markdown_header_split、enumerate 等内部步骤完成主要工作，最后返回结果。
+    7. `_markdown_header_split`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 MarkdownHeaderTextSplitter、logger.info、any 等内部步骤完成主要工作，最后返回结果。
+    8. `filter_documents_by_category`：先接收输入参数 category，再调用 doc.metadata.get 等内部步骤完成主要工作，最后返回结果。
+    9. `filter_documents_by_difficulty`：先接收输入参数 difficulty，再调用 doc.metadata.get 等内部步骤完成主要工作，最后返回结果。
+    10. `get_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 doc.metadata.get、len、categories.get 等内部步骤完成主要工作，最后返回结果。
+    11. `export_metadata`：先接收输入参数 output_path，然后循环处理每一条数据，再调用 logger.info、metadata_list.append、open 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    12. `get_parent_documents`：先接收输入参数 child_chunks，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 sorted、logger.info、chunk.metadata.get 等内部步骤完成主要工作，最后返回结果。
+    """
     # 统一维护的分类与难度配置，供外部复用，避免关键词重复定义
     CATEGORY_MAPPING = {
         'meat_dish': '荤菜',
@@ -30,7 +49,7 @@ class DataPreparationModule:
     CATEGORY_LABELS = list(set(CATEGORY_MAPPING.values()))
     DIFFICULTY_LABELS = ['非常简单', '简单', '中等', '困难', '非常困难']
     
-    def __init__(self, data_path: str):
+    def __init__(self, data_path: str):  # 中文名称：初始化
         """
         初始化数据准备模块
         
@@ -42,7 +61,7 @@ class DataPreparationModule:
         self.chunks: List[Document] = []     # 子文档（按标题分割的小块）
         self.parent_child_map: Dict[str, str] = {}  # 子块ID -> 父文档ID的映射
     
-    def load_documents(self) -> List[Document]:
+    def load_documents(self) -> List[Document]:  # 中文名称：加载文档
         """
         加载文档数据
         
@@ -91,7 +110,7 @@ class DataPreparationModule:
         logger.info(f"成功加载 {len(documents)} 个文档")
         return documents
     
-    def _enhance_metadata(self, doc: Document):
+    def _enhance_metadata(self, doc: Document):  # 中文名称：enhance元数据
         """
         增强文档元数据
         
@@ -127,16 +146,16 @@ class DataPreparationModule:
             doc.metadata['difficulty'] = '未知'
 
     @classmethod
-    def get_supported_categories(cls) -> List[str]:
+    def get_supported_categories(cls) -> List[str]:  # 中文名称：获取supportedcategories
         """对外提供支持的分类标签列表"""
         return cls.CATEGORY_LABELS
 
     @classmethod
-    def get_supported_difficulties(cls) -> List[str]:
+    def get_supported_difficulties(cls) -> List[str]:  # 中文名称：获取supporteddifficulties
         """对外提供支持的难度标签列表"""
         return cls.DIFFICULTY_LABELS
     
-    def chunk_documents(self) -> List[Document]:
+    def chunk_documents(self) -> List[Document]:  # 中文名称：分块文档
         """
         Markdown结构感知分块
 
@@ -163,7 +182,7 @@ class DataPreparationModule:
         logger.info(f"Markdown分块完成，共生成 {len(chunks)} 个chunk")
         return chunks
 
-    def _markdown_header_split(self) -> List[Document]:
+    def _markdown_header_split(self) -> List[Document]:  # 中文名称：markdownheader切分
         """
         使用Markdown标题分割器进行结构化分割
 
@@ -233,7 +252,7 @@ class DataPreparationModule:
         logger.info(f"Markdown结构分割完成，生成 {len(all_chunks)} 个结构化块")
         return all_chunks
 
-    def filter_documents_by_category(self, category: str) -> List[Document]:
+    def filter_documents_by_category(self, category: str) -> List[Document]:  # 中文名称：过滤文档bycategory
         """
         按分类过滤文档
         
@@ -245,7 +264,7 @@ class DataPreparationModule:
         """
         return [doc for doc in self.documents if doc.metadata.get('category') == category]
     
-    def filter_documents_by_difficulty(self, difficulty: str) -> List[Document]:
+    def filter_documents_by_difficulty(self, difficulty: str) -> List[Document]:  # 中文名称：过滤文档bydifficulty
         """
         按难度过滤文档
         
@@ -257,7 +276,7 @@ class DataPreparationModule:
         """
         return [doc for doc in self.documents if doc.metadata.get('difficulty') == difficulty]
     
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> Dict[str, Any]:  # 中文名称：获取statistics
         """
         获取数据统计信息
 
@@ -287,7 +306,7 @@ class DataPreparationModule:
             'avg_chunk_size': sum(chunk.metadata.get('chunk_size', 0) for chunk in self.chunks) / len(self.chunks) if self.chunks else 0
         }
     
-    def export_metadata(self, output_path: str):
+    def export_metadata(self, output_path: str):  # 中文名称：export元数据
         """
         导出元数据到JSON文件
         
@@ -311,7 +330,7 @@ class DataPreparationModule:
         
         logger.info(f"元数据已导出到: {output_path}")
 
-    def get_parent_documents(self, child_chunks: List[Document]) -> List[Document]:
+    def get_parent_documents(self, child_chunks: List[Document]) -> List[Document]:  # 中文名称：获取parent文档
         """
         根据子块获取对应的父文档（智能去重）
 

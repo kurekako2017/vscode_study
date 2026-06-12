@@ -1,6 +1,11 @@
 """
-RAG系统主程序
+文件功能概述：`code/C8/main.py` 主要是 主函数，这个文件里有 1 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `RecipeRAGSystem`：功能概述：这个类是 `RecipeRAGSystem`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 config，接着根据条件分支选择不同处理路径，再调用 exists、FileNotFoundError、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `initialize_system`：先进入当前步骤，再调用 print、DataPreparationModule、IndexConstructionModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `build_knowledge_base`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 print、self.index_module.load_index、RetrievalOptimizationModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `ask_question`：先接收输入参数 question, stream，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.generation_module.query_router、self._extract_filters_from_query 等内部步骤完成主要工作，最后返回结果。 5. `_extract_filters_from_query`：先接收输入参数 query，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 DataPreparationModule.get_supported_categories、DataPreparationModule.get_supported_difficulties、sorted 等内部步骤完成主要工作，最后返回结果。 6. `search_by_category`：先接收输入参数 category, query，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.retrieval_module.metadata_filtered_search、ValueError、doc.metadata.get 等内部步骤完成主要工作，最后返回结果。 7. `get_ingredients_list`：先接收输入参数 dish_name，接着根据条件分支选择不同处理路径，再调用 self.retrieval_module.hybrid_search、self.generation_module.generate_basic_answer、all 等内部步骤完成主要工作，最后返回结果。 8. `run_interactive`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.initialize_system、self.build_knowledge_base 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `main`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，再调用 RecipeRAGSystem、rag_system.run_interactive、logger.error 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
 """
+
 
 import os
 import sys
@@ -32,9 +37,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class RecipeRAGSystem:
-    """食谱RAG系统主类"""
+    """
+    功能概述：这个类是 `RecipeRAGSystem`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 config，接着根据条件分支选择不同处理路径，再调用 exists、FileNotFoundError、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `initialize_system`：先进入当前步骤，再调用 print、DataPreparationModule、IndexConstructionModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `build_knowledge_base`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 print、self.index_module.load_index、RetrievalOptimizationModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `ask_question`：先接收输入参数 question, stream，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.generation_module.query_router、self._extract_filters_from_query 等内部步骤完成主要工作，最后返回结果。
+    5. `_extract_filters_from_query`：先接收输入参数 query，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 DataPreparationModule.get_supported_categories、DataPreparationModule.get_supported_difficulties、sorted 等内部步骤完成主要工作，最后返回结果。
+    6. `search_by_category`：先接收输入参数 category, query，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.retrieval_module.metadata_filtered_search、ValueError、doc.metadata.get 等内部步骤完成主要工作，最后返回结果。
+    7. `get_ingredients_list`：先接收输入参数 dish_name，接着根据条件分支选择不同处理路径，再调用 self.retrieval_module.hybrid_search、self.generation_module.generate_basic_answer、all 等内部步骤完成主要工作，最后返回结果。
+    8. `run_interactive`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.initialize_system、self.build_knowledge_base 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def __init__(self, config: RAGConfig = None):
+    def __init__(self, config: RAGConfig = None):  # 中文名称：初始化
         """
         初始化RAG系统
 
@@ -55,7 +71,7 @@ class RecipeRAGSystem:
         if not os.getenv("OPENROUTER_API_KEY"):
             raise ValueError("请设置 OPENROUTER_API_KEY 环境变量")
     
-    def initialize_system(self):
+    def initialize_system(self):  # 中文名称：initialize系统
         """初始化所有模块"""
         print("🚀 正在初始化RAG系统...")
 
@@ -80,7 +96,7 @@ class RecipeRAGSystem:
 
         print("✅ 系统初始化完成！")
     
-    def build_knowledge_base(self):
+    def build_knowledge_base(self):  # 中文名称：构建知识base
         """构建知识库"""
         print("\n正在构建知识库...")
 
@@ -127,7 +143,7 @@ class RecipeRAGSystem:
 
         print("✅ 知识库构建完成！")
     
-    def ask_question(self, question: str, stream: bool = False):
+    def ask_question(self, question: str, stream: bool = False):  # 中文名称：askquestion
         """
         回答用户问题
 
@@ -237,7 +253,7 @@ class RecipeRAGSystem:
                 else:
                     return self.generation_module.generate_basic_answer(question, relevant_docs)
     
-    def _extract_filters_from_query(self, query: str) -> dict:
+    def _extract_filters_from_query(self, query: str) -> dict:  # 中文名称：extractfiltersfrom查询
         """
         从用户问题中提取元数据过滤条件
         """
@@ -258,7 +274,7 @@ class RecipeRAGSystem:
 
         return filters
     
-    def search_by_category(self, category: str, query: str = "") -> List[str]:
+    def search_by_category(self, category: str, query: str = "") -> List[str]:  # 中文名称：搜索bycategory
         """
         按分类搜索菜品
         
@@ -287,7 +303,7 @@ class RecipeRAGSystem:
         
         return dish_names
     
-    def get_ingredients_list(self, dish_name: str) -> str:
+    def get_ingredients_list(self, dish_name: str) -> str:  # 中文名称：获取ingredientslist
         """
         获取指定菜品的食材信息
 
@@ -308,7 +324,7 @@ class RecipeRAGSystem:
 
         return answer
     
-    def run_interactive(self):
+    def run_interactive(self):  # 中文名称：运行interactive
         """运行交互式问答"""
         print("=" * 60)
         print("🍽️  尝尝咸淡RAG系统 - 交互式问答  🍽️")
@@ -362,7 +378,7 @@ class RecipeRAGSystem:
 
 
 
-def main():
+def main():  # 中文名称：主函数
     """主函数"""
     try:
         # 创建RAG系统

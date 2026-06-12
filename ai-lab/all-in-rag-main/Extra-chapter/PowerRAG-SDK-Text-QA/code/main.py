@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+文件功能概述：`Extra-chapter/PowerRAG-SDK-Text-QA/code/main.py` 主要是 主函数，这个文件里有 0 个类、5 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_env`：先接收输入参数 name, default，接着根据条件分支选择不同处理路径，再调用 os.getenv、value.strip 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_require`：先接收输入参数 value, hint，接着根据条件分支选择不同处理路径，再调用 value.strip、SystemExit 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `_read_bytes`：先接收输入参数 path，再尝试执行核心处理，出错时进入异常兜底，再调用 path.read_bytes、SystemExit 等内部步骤完成主要工作，最后返回结果。
+4. 函数 `_safe_get`：先接收输入参数 obj, attr, default，再尝试执行核心处理，出错时进入异常兜底，再调用 getattr 等内部步骤完成主要工作，最后返回结果。
+5. 函数 `main`：先接收输入参数 argv，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 argparse.ArgumentParser、parser.add_argument、parser.parse_args 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -10,34 +21,34 @@ from typing import Any
 from config import DEFAULT_CONFIG
 
 
-def _env(name: str, default: str | None = None) -> str | None:
+def _env(name: str, default: str | None = None) -> str | None:  # 中文名称：env
     value = os.getenv(name)
     if value is None or value.strip() == "":
         return default
     return value.strip()
 
 
-def _require(value: str | None, hint: str) -> str:
+def _require(value: str | None, hint: str) -> str:  # 中文名称：require
     if value is None or value.strip() == "":
         raise SystemExit(hint)
     return value.strip()
 
 
-def _read_bytes(path: Path) -> bytes:
+def _read_bytes(path: Path) -> bytes:  # 中文名称：读取bytes
     try:
         return path.read_bytes()
     except FileNotFoundError:
         raise SystemExit(f"File not found: {path}")
 
 
-def _safe_get(obj: Any, attr: str, default: Any = None) -> Any:
+def _safe_get(obj: Any, attr: str, default: Any = None) -> Any:  # 中文名称：safe获取
     try:
         return getattr(obj, attr)
     except Exception:
         return default
 
 
-def main(argv: list[str]) -> int:
+def main(argv: list[str]) -> int:  # 中文名称：主函数
     parser = argparse.ArgumentParser(
         description="PowerRAG (RAGFlow) SDK demo: upload Markdown, parse, retrieve top-k chunks.",
     )

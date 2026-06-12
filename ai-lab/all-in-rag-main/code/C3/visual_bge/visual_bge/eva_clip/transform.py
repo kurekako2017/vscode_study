@@ -1,3 +1,12 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/transform.py` 主要是 transform，这个文件里有 1 个类、2 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `ResizeMaxSize`：功能概述：这个类是 `ResizeMaxSize`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 max_size, interpolation, fn, fill，接着根据条件分支选择不同处理路径，再调用 __init__、isinstance、TypeError 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 img，接着根据条件分支选择不同处理路径，再调用 isinstance、float、tuple 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_convert_to_rgb`：先接收输入参数 image，再调用 image.convert 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `image_transform`：先接收输入参数 image_size, is_train, mean, std, resize_longest_max, fill_color，接着根据条件分支选择不同处理路径，再调用 Normalize、isinstance、Compose 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from typing import Optional, Sequence, Tuple
 
 import torch
@@ -11,8 +20,14 @@ from .constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 
 
 class ResizeMaxSize(nn.Module):
+    """
+    功能概述：这个类是 `ResizeMaxSize`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 max_size, interpolation, fn, fill，接着根据条件分支选择不同处理路径，再调用 __init__、isinstance、TypeError 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 img，接着根据条件分支选择不同处理路径，再调用 isinstance、float、tuple 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def __init__(self, max_size, interpolation=InterpolationMode.BICUBIC, fn='max', fill=0):
+    def __init__(self, max_size, interpolation=InterpolationMode.BICUBIC, fn='max', fill=0):  # 中文名称：初始化
         super().__init__()
         if not isinstance(max_size, int):
             raise TypeError(f"Size should be int. Got {type(max_size)}")
@@ -21,7 +36,7 @@ class ResizeMaxSize(nn.Module):
         self.fn = min if fn == 'min' else min
         self.fill = fill
 
-    def forward(self, img):
+    def forward(self, img):  # 中文名称：forward
         if isinstance(img, torch.Tensor):
             height, width = img.shape[:2]
         else:
@@ -36,7 +51,7 @@ class ResizeMaxSize(nn.Module):
         return img
 
 
-def _convert_to_rgb(image):
+def _convert_to_rgb(image):  # 中文名称：converttorgb
     return image.convert('RGB')
 
 
@@ -64,7 +79,7 @@ def image_transform(
         std: Optional[Tuple[float, ...]] = None,
         resize_longest_max: bool = False,
         fill_color: int = 0,
-):
+):  # 中文名称：imagetransform
     mean = mean or OPENAI_DATASET_MEAN
     if not isinstance(mean, (list, tuple)):
         mean = (mean,) * 3

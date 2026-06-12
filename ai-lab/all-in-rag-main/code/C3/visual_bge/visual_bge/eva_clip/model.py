@@ -1,7 +1,20 @@
-""" CLIP Model
-
-Adapted from https://github.com/openai/CLIP. Originally MIT License, Copyright (c) 2021 OpenAI.
 """
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/model.py` 主要是 model，这个文件里有 4 个类、7 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `CLIPVisionCfg`：功能概述：这个类是 `CLIPVisionCfg`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `CLIPTextCfg`：功能概述：这个类是 `CLIPTextCfg`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+3. 函数 `get_cast_dtype`：先接收输入参数 precision，接着根据条件分支选择不同处理路径，最后返回结果。
+4. 函数 `_build_vision_tower`：先接收输入参数 embed_dim, vision_cfg, quick_gelu, cast_dtype，接着根据条件分支选择不同处理路径，再调用 isinstance、CLIPVisionCfg、EVAVisionTransformer 等内部步骤完成主要工作，最后返回结果。
+5. 函数 `_build_text_tower`：先接收输入参数 embed_dim, text_cfg, quick_gelu, cast_dtype，接着根据条件分支选择不同处理路径，再调用 isinstance、CLIPTextCfg、HFTextEncoder 等内部步骤完成主要工作，最后返回结果。
+6. 类 `CLIP`：功能概述：这个类是 `CLIP`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 embed_dim, vision_cfg, text_cfg, quick_gelu, cast_dtype，再调用 __init__、_build_vision_tower、_build_text_tower 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `lock_image_tower`：先接收输入参数 unlocked_groups, freeze_bn_stats，再调用 self.visual.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `set_grad_checkpointing`：先接收输入参数 enable，再调用 self.visual.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `no_weight_decay`：先进入当前步骤，最后返回结果。 5. `encode_image`：先接收输入参数 image, normalize，再调用 self.visual、F.normalize 等内部步骤完成主要工作，最后返回结果。 6. `encode_text`：先接收输入参数 text, normalize，再调用 self.transformer.get_cast_dtype、to、x.permute 等内部步骤完成主要工作，最后返回结果。 7. `forward`：先接收输入参数 image, text，再调用 self.encode_image、self.encode_text、self.logit_scale.exp 等内部步骤完成主要工作，最后返回结果。
+7. 类 `CustomCLIP`：功能概述：这个类是 `CustomCLIP`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 embed_dim, vision_cfg, text_cfg, quick_gelu, cast_dtype, itm_task, is_only_visual, is_only_text，接着根据条件分支选择不同处理路径，再调用 __init__、_build_vision_tower、_build_text_tower 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `lock_image_tower`：先接收输入参数 unlocked_groups, freeze_bn_stats，再调用 self.visual.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `lock_text_tower`：先接收输入参数 unlocked_layers, freeze_layer_norm，再调用 self.text.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `set_grad_checkpointing`：先接收输入参数 enable，接着根据条件分支选择不同处理路径，再调用 self.visual.set_grad_checkpointing、self.text.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `no_weight_decay`：先进入当前步骤，最后返回结果。 6. `encode_image`：先接收输入参数 image, normalize，再调用 self.visual、F.normalize 等内部步骤完成主要工作，最后返回结果。 7. `encode_text`：先接收输入参数 text, normalize，再调用 self.text、F.normalize 等内部步骤完成主要工作，最后返回结果。 8. `forward`：先接收输入参数 image, text，接着根据条件分支选择不同处理路径，再调用 self.encode_image、self.encode_text、self.logit_scale.exp 等内部步骤完成主要工作，最后返回结果。
+8. 函数 `convert_weights_to_lp`：先接收输入参数 model, dtype，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 model.apply、isinstance、l.weight.data.to 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+9. 函数 `convert_to_custom_text_state_dict`：先接收输入参数 state_dict，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 state_dict.items、any、k.startswith 等内部步骤完成主要工作，最后返回结果。
+10. 函数 `build_model_from_openai_state_dict`：先接收输入参数 state_dict, quick_gelu, cast_dtype，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 len、CLIPVisionCfg、CLIPTextCfg 等内部步骤完成主要工作，最后返回结果。
+11. 函数 `trace_model`：先接收输入参数 model, batch_size, device，再调用 torch.device、model.eval、torch.ones 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
@@ -35,6 +48,11 @@ except ImportError:
 
 @dataclass
 class CLIPVisionCfg:
+    """
+    功能概述：这个类是 `CLIPVisionCfg`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     layers: Union[Tuple[int, int, int, int], int] = 12
     width: int = 768
     head_width: int = 64
@@ -64,6 +82,11 @@ class CLIPVisionCfg:
 
 @dataclass
 class CLIPTextCfg:
+    """
+    功能概述：这个类是 `CLIPTextCfg`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     context_length: int = 77
     vocab_size: int = 49408
     width: int = 512
@@ -80,7 +103,7 @@ class CLIPTextCfg:
     xattn: bool = False
     attn_mask: bool = True
 
-def get_cast_dtype(precision: str):
+def get_cast_dtype(precision: str):  # 中文名称：获取castdtype
     cast_dtype = None
     if precision == 'bf16':
         cast_dtype = torch.bfloat16
@@ -94,7 +117,7 @@ def _build_vision_tower(
         vision_cfg: CLIPVisionCfg,
         quick_gelu: bool = False,
         cast_dtype: Optional[torch.dtype] = None
-):
+):  # 中文名称：构建visiontower
     if isinstance(vision_cfg, dict):
         vision_cfg = CLIPVisionCfg(**vision_cfg)
 
@@ -175,7 +198,7 @@ def _build_text_tower(
         text_cfg: CLIPTextCfg,
         quick_gelu: bool = False,
         cast_dtype: Optional[torch.dtype] = None,
-):
+):  # 中文名称：构建文本tower
     if isinstance(text_cfg, dict):
         text_cfg = CLIPTextCfg(**text_cfg)
 
@@ -208,6 +231,17 @@ def _build_text_tower(
     return text
 
 class CLIP(nn.Module):
+    """
+    功能概述：这个类是 `CLIP`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 embed_dim, vision_cfg, text_cfg, quick_gelu, cast_dtype，再调用 __init__、_build_vision_tower、_build_text_tower 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `lock_image_tower`：先接收输入参数 unlocked_groups, freeze_bn_stats，再调用 self.visual.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `set_grad_checkpointing`：先接收输入参数 enable，再调用 self.visual.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `no_weight_decay`：先进入当前步骤，最后返回结果。
+    5. `encode_image`：先接收输入参数 image, normalize，再调用 self.visual、F.normalize 等内部步骤完成主要工作，最后返回结果。
+    6. `encode_text`：先接收输入参数 text, normalize，再调用 self.transformer.get_cast_dtype、to、x.permute 等内部步骤完成主要工作，最后返回结果。
+    7. `forward`：先接收输入参数 image, text，再调用 self.encode_image、self.encode_text、self.logit_scale.exp 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             embed_dim: int,
@@ -215,7 +249,7 @@ class CLIP(nn.Module):
             text_cfg: CLIPTextCfg,
             quick_gelu: bool = False,
             cast_dtype: Optional[torch.dtype] = None,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.visual = _build_vision_tower(embed_dim, vision_cfg, quick_gelu, cast_dtype)
 
@@ -231,23 +265,23 @@ class CLIP(nn.Module):
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
     def lock_image_tower(self, unlocked_groups=0, freeze_bn_stats=False):
-        # lock image tower as per LiT - https://arxiv.org/abs/2111.07991
+        # lock image tower as per LiT - https://arxiv.org/abs/2111.07991  # 中文名称：lockimagetower
         self.visual.lock(unlocked_groups=unlocked_groups, freeze_bn_stats=freeze_bn_stats)
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.visual.set_grad_checkpointing(enable)
         self.transformer.grad_checkpointing = enable
     
     @torch.jit.ignore
-    def no_weight_decay(self):
+    def no_weight_decay(self):  # 中文名称：noweightdecay
         return {'logit_scale'}
 
-    def encode_image(self, image, normalize: bool = False):
+    def encode_image(self, image, normalize: bool = False):  # 中文名称：encodeimage
         features = self.visual(image)
         return F.normalize(features, dim=-1) if normalize else features
 
-    def encode_text(self, text, normalize: bool = False):
+    def encode_text(self, text, normalize: bool = False):  # 中文名称：encode文本
         cast_dtype = self.transformer.get_cast_dtype()
 
         x = self.token_embedding(text).to(cast_dtype)  # [batch_size, n_ctx, d_model]
@@ -261,13 +295,25 @@ class CLIP(nn.Module):
         x = x[torch.arange(x.shape[0]), text.argmax(dim=-1)] @ self.text_projection
         return F.normalize(x, dim=-1) if normalize else x
 
-    def forward(self, image, text):
+    def forward(self, image, text):  # 中文名称：forward
         image_features = self.encode_image(image, normalize=True)
         text_features = self.encode_text(text, normalize=True)
         return image_features, text_features, self.logit_scale.exp()
 
 
 class CustomCLIP(nn.Module):
+    """
+    功能概述：这个类是 `CustomCLIP`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 embed_dim, vision_cfg, text_cfg, quick_gelu, cast_dtype, itm_task, is_only_visual, is_only_text，接着根据条件分支选择不同处理路径，再调用 __init__、_build_vision_tower、_build_text_tower 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `lock_image_tower`：先接收输入参数 unlocked_groups, freeze_bn_stats，再调用 self.visual.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `lock_text_tower`：先接收输入参数 unlocked_layers, freeze_layer_norm，再调用 self.text.lock 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `set_grad_checkpointing`：先接收输入参数 enable，接着根据条件分支选择不同处理路径，再调用 self.visual.set_grad_checkpointing、self.text.set_grad_checkpointing 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `no_weight_decay`：先进入当前步骤，最后返回结果。
+    6. `encode_image`：先接收输入参数 image, normalize，再调用 self.visual、F.normalize 等内部步骤完成主要工作，最后返回结果。
+    7. `encode_text`：先接收输入参数 text, normalize，再调用 self.text、F.normalize 等内部步骤完成主要工作，最后返回结果。
+    8. `forward`：先接收输入参数 image, text，接着根据条件分支选择不同处理路径，再调用 self.encode_image、self.encode_text、self.logit_scale.exp 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             embed_dim: int,
@@ -278,7 +324,7 @@ class CustomCLIP(nn.Module):
             itm_task: bool = False,
             is_only_visual: bool = False,
             is_only_text: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.visual = _build_vision_tower(embed_dim, vision_cfg, quick_gelu, cast_dtype)
         self.text = _build_text_tower(embed_dim, text_cfg, quick_gelu, cast_dtype)
@@ -289,31 +335,31 @@ class CustomCLIP(nn.Module):
             self.visual = None
 
     def lock_image_tower(self, unlocked_groups=0, freeze_bn_stats=False):
-        # lock image tower as per LiT - https://arxiv.org/abs/2111.07991
+        # lock image tower as per LiT - https://arxiv.org/abs/2111.07991  # 中文名称：lockimagetower
         self.visual.lock(unlocked_groups=unlocked_groups, freeze_bn_stats=freeze_bn_stats)
 
-    def lock_text_tower(self, unlocked_layers:int=0, freeze_layer_norm:bool=True):
+    def lock_text_tower(self, unlocked_layers:int=0, freeze_layer_norm:bool=True):  # 中文名称：lock文本tower
         self.text.lock(unlocked_layers, freeze_layer_norm)
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.visual.set_grad_checkpointing(enable)
         if self.text is not None:
             self.text.set_grad_checkpointing(enable)
 
     @torch.jit.ignore
-    def no_weight_decay(self):
+    def no_weight_decay(self):  # 中文名称：noweightdecay
         return {'logit_scale'}
 
-    def encode_image(self, image, normalize: bool = False):
+    def encode_image(self, image, normalize: bool = False):  # 中文名称：encodeimage
         features = self.visual(image)
         return F.normalize(features, dim=-1) if normalize else features
 
-    def encode_text(self, text, normalize: bool = False):
+    def encode_text(self, text, normalize: bool = False):  # 中文名称：encode文本
         features = self.text(text)
         return F.normalize(features, dim=-1) if normalize else features
 
-    def forward(self, image, text):
+    def forward(self, image, text):  # 中文名称：forward
         if self.visual is not None:
             image_features = self.encode_image(image, normalize=True)
         else:
@@ -325,11 +371,11 @@ class CustomCLIP(nn.Module):
         return image_features, text_features, self.logit_scale.exp()
 
 
-def convert_weights_to_lp(model: nn.Module, dtype=torch.float16):
+def convert_weights_to_lp(model: nn.Module, dtype=torch.float16):  # 中文名称：convertweightstolp
     """Convert applicable model parameters to low-precision (bf16 or fp16)"""
 
     def _convert_weights(l):
-        
+          # 中文名称：convertweights
         if isinstance(l, (nn.Conv1d, nn.Conv2d, nn.Linear)):
             l.weight.data = l.weight.data.to(dtype)
             if l.bias is not None:
@@ -357,7 +403,7 @@ convert_weights_to_fp16 = convert_weights_to_lp  # backwards compat
 
 
 # used to maintain checkpoint compatibility
-def convert_to_custom_text_state_dict(state_dict: dict):
+def convert_to_custom_text_state_dict(state_dict: dict):  # 中文名称：converttocustom文本statedict
     if 'text_projection' in state_dict:
         # old format state_dict, move text tower -> .text
         new_state_dict = {}
@@ -380,7 +426,7 @@ def build_model_from_openai_state_dict(
         state_dict: dict,
         quick_gelu=True,
         cast_dtype=torch.float16,
-):
+):  # 中文名称：构建modelfromOpenAIstatedict
     vit = "visual.proj" in state_dict
 
     if vit:
@@ -436,7 +482,7 @@ def build_model_from_openai_state_dict(
     return model.eval()
 
 
-def trace_model(model, batch_size=256, device=torch.device('cpu')):
+def trace_model(model, batch_size=256, device=torch.device('cpu')):  # 中文名称：tracemodel
     model.eval()
     image_size = model.visual.image_size
     example_images = torch.ones((batch_size, 3, image_size, image_size), device=device)

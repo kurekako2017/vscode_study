@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C2/01_unstructured_example.py` 主要是 01非结构化示例，这个文件里有 0 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 这个文件没有独立类或函数，主要靠模块级代码直接执行。
+"""
+
 from pathlib import Path
 from collections import Counter
 
@@ -14,11 +21,17 @@ try:
 except Exception as exc:
     print(f"警告: 无法使用 unstructured 解析 PDF，改用离线占位文本: {exc}")
     class _Element:
-        def __init__(self, text, category="NarrativeText"):
+        """
+        功能概述：这个类是 `_Element`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+        调用流程：
+        1. `__init__`：先接收输入参数 text, category，最后把结果交给下一步或直接结束。
+        2. `__str__`：先进入当前步骤，最后返回结果。
+        """
+        def __init__(self, text, category="NarrativeText"):  # 中文名称：初始化
             self.text = text
             self.category = category
 
-        def __str__(self):
+        def __str__(self):  # 中文名称：字符串表示
             return self.text
 
     sample_text = "RAG 是检索增强生成。它先检索，再生成。"

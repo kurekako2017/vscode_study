@@ -1,3 +1,25 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/factory.py` 主要是 factory，这个文件里有 0 个类、16 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_natural_key`：先接收输入参数 string_，再调用 s.isdigit、int、re.split 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_rescan_model_configs`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 dict、sorted、config_path.is_file 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+3. 函数 `list_models`：先进入当前步骤，再调用 list、_MODEL_CONFIGS.keys 等内部步骤完成主要工作，最后返回结果。
+4. 函数 `add_model_config`：先接收输入参数 path，接着根据条件分支选择不同处理路径，再调用 _MODEL_CONFIG_PATHS.append、_rescan_model_configs、isinstance 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+5. 函数 `get_model_config`：先接收输入参数 model_name，接着根据条件分支选择不同处理路径，再调用 deepcopy 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `get_tokenizer`：先接收输入参数 model_name，再调用 get_model_config、HFTokenizer 等内部步骤完成主要工作，最后返回结果。
+7. 函数 `load_state_dict`：先接收输入参数 checkpoint_path, map_location, model_key, is_openai, skip_list，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 eval、model.state_dict、torch.load 等内部步骤完成主要工作，最后返回结果。
+8. 函数 `load_checkpoint`：先接收输入参数 model, checkpoint_path, model_key, strict，接着根据条件分支选择不同处理路径，再调用 load_state_dict、model.load_state_dict、logging.info 等内部步骤完成主要工作，最后返回结果。
+9. 函数 `load_clip_visual_state_dict`：先接收输入参数 checkpoint_path, map_location, is_openai, skip_list，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 load_state_dict、list、state_dict.keys 等内部步骤完成主要工作，最后返回结果。
+10. 函数 `load_clip_text_state_dict`：先接收输入参数 checkpoint_path, map_location, is_openai, skip_list，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 load_state_dict、list、state_dict.keys 等内部步骤完成主要工作，最后返回结果。
+11. 函数 `get_pretrained_tag`：先接收输入参数 pretrained_model，接着根据条件分支选择不同处理路径，再调用 pretrained_model.lower 等内部步骤完成主要工作，最后返回结果。
+12. 函数 `load_pretrained_checkpoint`：先接收输入参数 model, visual_checkpoint_path, text_checkpoint_path, strict, visual_model, text_model, model_key, skip_list，接着根据条件分支选择不同处理路径，再调用 get_pretrained_tag、logging.info、model.visual.load_state_dict 等内部步骤完成主要工作，最后返回结果。
+13. 函数 `create_model`：先接收输入参数 model_name, pretrained, precision, device, jit, force_quick_gelu, force_custom_clip, force_patch_dropout, pretrained_image, pretrained_text, pretrained_hf, pretrained_visual_model, pretrained_text_model, cache_dir, skip_list, is_only_visual, is_only_text，接着根据条件分支选择不同处理路径，再调用 model_name.replace、isinstance、torch.device 等内部步骤完成主要工作，最后返回结果。
+14. 函数 `create_model_and_transforms`：先接收输入参数 model_name, pretrained, precision, device, jit, force_quick_gelu, force_custom_clip, force_patch_dropout, pretrained_image, pretrained_text, pretrained_hf, pretrained_visual_model, pretrained_text_model, image_mean, image_std, cache_dir, skip_list，再调用 create_model、image_transform、getattr 等内部步骤完成主要工作，最后返回结果。
+15. 函数 `create_eva_vision_and_transforms`：先接收输入参数 model_name, pretrained, precision, device, jit, force_quick_gelu, force_custom_clip, force_patch_dropout, pretrained_image, pretrained_text, pretrained_hf, pretrained_visual_model, pretrained_text_model, image_mean, image_std, cache_dir, skip_list，再调用 create_model、image_transform、getattr 等内部步骤完成主要工作，最后返回结果。
+16. 函数 `create_model_from_pretrained`：先接收输入参数 model_name, pretrained, precision, device, jit, force_quick_gelu, force_custom_clip, force_patch_dropout, return_transform, image_mean, image_std, cache_dir, is_frozen，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 create_model、image_transform、RuntimeError 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import json
 import logging
 import os
@@ -22,11 +44,11 @@ _MODEL_CONFIG_PATHS = [Path(__file__).parent / f"model_configs/"]
 _MODEL_CONFIGS = {}  # directory (model_name: config) of model architecture configs
 
 
-def _natural_key(string_):
+def _natural_key(string_):  # 中文名称：naturalkey
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_.lower())]
 
 
-def _rescan_model_configs():
+def _rescan_model_configs():  # 中文名称：rescanmodelconfigs
     global _MODEL_CONFIGS
 
     config_ext = ('.json',)
@@ -50,12 +72,12 @@ def _rescan_model_configs():
 _rescan_model_configs()  # initial populate of model config registry
 
 
-def list_models():
+def list_models():  # 中文名称：listmodels
     """ enumerate available model architectures based on config files """
     return list(_MODEL_CONFIGS.keys())
 
 
-def add_model_config(path):
+def add_model_config(path):  # 中文名称：addmodel配置
     """ add model config path or file and update registry """
     if not isinstance(path, Path):
         path = Path(path)
@@ -63,21 +85,21 @@ def add_model_config(path):
     _rescan_model_configs()
 
 
-def get_model_config(model_name):
+def get_model_config(model_name):  # 中文名称：获取model配置
     if model_name in _MODEL_CONFIGS:
         return deepcopy(_MODEL_CONFIGS[model_name])
     else:
         return None
 
 
-def get_tokenizer(model_name):
+def get_tokenizer(model_name):  # 中文名称：获取tokenizer
     config = get_model_config(model_name)
     tokenizer = HFTokenizer(config['text_cfg']['hf_tokenizer_name']) if 'hf_tokenizer_name' in config['text_cfg'] else tokenize
     return tokenizer
 
 
 # loading openai CLIP weights when is_openai=True for training
-def load_state_dict(checkpoint_path: str, map_location: str='cpu', model_key: str='model|module|state_dict', is_openai: bool=False, skip_list: list=[]):
+def load_state_dict(checkpoint_path: str, map_location: str='cpu', model_key: str='model|module|state_dict', is_openai: bool=False, skip_list: list=[]):  # 中文名称：加载statedict
     if is_openai:
         model = torch.jit.load(checkpoint_path, map_location="cpu").eval()
         state_dict = model.state_dict()
@@ -107,7 +129,7 @@ def load_state_dict(checkpoint_path: str, map_location: str='cpu', model_key: st
 
 
 
-def load_checkpoint(model, checkpoint_path, model_key="model|module|state_dict", strict=True):
+def load_checkpoint(model, checkpoint_path, model_key="model|module|state_dict", strict=True):  # 中文名称：加载checkpoint
     state_dict = load_state_dict(checkpoint_path, model_key=model_key, is_openai=False)
     # detect old format and make compatible with new format
     if 'positional_embedding' in state_dict and not hasattr(model, 'positional_embedding'):
@@ -128,7 +150,7 @@ def load_checkpoint(model, checkpoint_path, model_key="model|module|state_dict",
     logging.info(f"incompatible_keys.missing_keys: {incompatible_keys.missing_keys}")
     return incompatible_keys
 
-def load_clip_visual_state_dict(checkpoint_path: str, map_location: str='cpu', is_openai: bool=False, skip_list:list=[]):
+def load_clip_visual_state_dict(checkpoint_path: str, map_location: str='cpu', is_openai: bool=False, skip_list:list=[]):  # 中文名称：加载clipvisualstatedict
     state_dict = load_state_dict(checkpoint_path, map_location=map_location, is_openai=is_openai, skip_list=skip_list)
 
     for k in list(state_dict.keys()):
@@ -141,7 +163,7 @@ def load_clip_visual_state_dict(checkpoint_path: str, map_location: str='cpu', i
             del state_dict[k]
     return state_dict
 
-def load_clip_text_state_dict(checkpoint_path: str, map_location: str='cpu', is_openai: bool=False, skip_list:list=[]):
+def load_clip_text_state_dict(checkpoint_path: str, map_location: str='cpu', is_openai: bool=False, skip_list:list=[]):  # 中文名称：加载clip文本statedict
     state_dict = load_state_dict(checkpoint_path, map_location=map_location, is_openai=is_openai, skip_list=skip_list)
 
     for k in list(state_dict.keys()):
@@ -149,7 +171,7 @@ def load_clip_text_state_dict(checkpoint_path: str, map_location: str='cpu', is_
             del state_dict[k]
     return state_dict
 
-def get_pretrained_tag(pretrained_model):
+def get_pretrained_tag(pretrained_model):  # 中文名称：获取pretrainedtag
     pretrained_model = pretrained_model.lower()
     if "laion" in pretrained_model or "open_clip" in pretrained_model:
         return "open_clip"
@@ -168,7 +190,7 @@ def load_pretrained_checkpoint(
         visual_model=None,
         text_model=None,
         model_key="model|module|state_dict",
-        skip_list=[]):
+        skip_list=[]):  # 中文名称：加载pretrainedcheckpoint
     visual_tag = get_pretrained_tag(visual_model)
     text_tag = get_pretrained_tag(text_model)
 
@@ -226,7 +248,7 @@ def create_model(
         skip_list: list  = [],
         is_only_visual: bool = False,
         is_only_text: bool = False,
-):
+):  # 中文名称：创建model
     model_name = model_name.replace('/', '-')  # for callers using old naming with / in ViT names
     if isinstance(device, str):
         device = torch.device(device)
@@ -377,7 +399,7 @@ def create_model_and_transforms(
         image_std: Optional[Tuple[float, ...]] = None,
         cache_dir: Optional[str] = None,
         skip_list: list = [],
-):
+):  # 中文名称：创建modelandtransforms
     model = create_model(
         model_name,
         pretrained,
@@ -431,7 +453,7 @@ def create_eva_vision_and_transforms(
         image_std: Optional[Tuple[float, ...]] = None,
         cache_dir: Optional[str] = None,
         skip_list: list = [],
-):
+):  # 中文名称：创建evavisionandtransforms
     model = create_model(
         model_name,
         pretrained,
@@ -482,7 +504,7 @@ def create_model_from_pretrained(
         image_std: Optional[Tuple[float, ...]] = None,
         cache_dir: Optional[str] = None,
         is_frozen: bool = False,
-):
+):  # 中文名称：创建modelfrompretrained
     if not is_pretrained_cfg(model_name, pretrained) and not os.path.exists(pretrained):
         raise RuntimeError(
             f'{pretrained} is not a valid pretrained cfg or checkpoint for {model_name}.'

@@ -1,10 +1,17 @@
+"""
+文件功能概述：`code/C2/04_semantic_chunker.py` 主要是 04语义分块器，这个文件里有 0 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `semantic_split`：先接收输入参数 text，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 chunks.append、sentence.strip、split 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from pathlib import Path
 
 from langchain_core.documents import Document
 from langchain_community.document_loaders import TextLoader
 
 
-def semantic_split(text: str):
+def semantic_split(text: str):  # 中文名称：语义切分
     sentences = [sentence.strip() for sentence in text.replace("\n", " ").split("。") if sentence.strip()]
     if not sentences:
         return [text]

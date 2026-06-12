@@ -1,3 +1,23 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/transformer.py` 主要是 变换器，这个文件里有 13 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `LayerNormFp32`：功能概述：这个类是 `LayerNormFp32`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 *args, **kwargs，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，再调用 F.layer_norm、output.type_as、x.float 等内部步骤完成主要工作，最后返回结果。
+2. 类 `LayerNorm`：功能概述：这个类是 `LayerNorm`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `forward`：先接收输入参数 x，再调用 F.layer_norm、x.to 等内部步骤完成主要工作，最后返回结果。
+3. 类 `QuickGELU`：功能概述：这个类是 `QuickGELU`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `forward`：先接收输入参数 x，再调用 torch.sigmoid 等内部步骤完成主要工作，最后返回结果。
+4. 类 `LayerScale`：功能概述：这个类是 `LayerScale`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, init_values, inplace，再调用 __init__、nn.Parameter、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，再调用 x.mul_ 等内部步骤完成主要工作，最后返回结果。
+5. 类 `PatchDropout`：功能概述：这个类是 `PatchDropout`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 prob, exclude_first_token，再调用 __init__、logging.info、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，接着根据条件分支选择不同处理路径，再调用 torch.arange、max、torch.randn 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `_in_projection_packed`：先接收输入参数 q, k, v, w, b，接着根据条件分支选择不同处理路径，再调用 q.size、w.chunk、chunk 等内部步骤完成主要工作，最后返回结果。
+7. 类 `Attention`：功能概述：这个类是 `Attention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, scaled_cosine, scale_heads, logit_scale_max, attn_drop, proj_drop, xattn, rope，接着根据条件分支选择不同处理路径，再调用 math.log、__init__、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，再调用 chunk、reshape、self.out_proj 等内部步骤完成主要工作，最后返回结果。
+8. 类 `CustomAttention`：功能概述：这个类是 `CustomAttention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, scaled_cosine, scale_heads, logit_scale_max, attn_drop, proj_drop, xattn，接着根据条件分支选择不同处理路径，再调用 math.log、__init__、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 query, key, value, attn_mask，接着根据条件分支选择不同处理路径，再调用 _in_projection_packed、reshape、self.out_proj 等内部步骤完成主要工作，最后返回结果。
+9. 类 `CustomResidualAttentionBlock`：功能概述：这个类是 `CustomResidualAttentionBlock`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 d_model, n_head, mlp_ratio, ls_init_value, act_layer, norm_layer, scale_cosine_attn, scale_heads, scale_attn, scale_fc, cross_attn, xattn，再调用 __init__、norm_layer、CustomAttention 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 q, k, v, attn_mask，再调用 self.ls_1、self.ls_2、self.ln_attn 等内部步骤完成主要工作，最后返回结果。
+10. 类 `CustomTransformer`：功能概述：这个类是 `CustomTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 width, layers, heads, mlp_ratio, ls_init_value, act_layer, norm_layer, scale_cosine_attn, scale_heads, scale_attn, scale_fc, cross_attn, xattn，再调用 __init__、nn.ModuleList、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `get_cast_dtype`：先进入当前步骤，最后返回结果。 3. `forward`：先接收输入参数 q, k, v, attn_mask，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 checkpoint、r、torch.jit.is_scripting 等内部步骤完成主要工作，最后返回结果。
+11. 类 `ResidualAttentionBlock`：功能概述：这个类是 `ResidualAttentionBlock`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 d_model, n_head, mlp_ratio, ls_init_value, act_layer, norm_layer, xattn，接着根据条件分支选择不同处理路径，再调用 __init__、norm_layer、int 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `attention`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，再调用 attn_mask.to、self.attn 等内部步骤完成主要工作，最后返回结果。 3. `forward`：先接收输入参数 x, attn_mask，再调用 self.ls_1、self.ls_2、self.attention 等内部步骤完成主要工作，最后返回结果。
+12. 类 `Transformer`：功能概述：这个类是 `Transformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 width, layers, heads, mlp_ratio, ls_init_value, act_layer, norm_layer, xattn，再调用 __init__、nn.ModuleList、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `get_cast_dtype`：先进入当前步骤，最后返回结果。 3. `forward`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 checkpoint、r、torch.jit.is_scripting 等内部步骤完成主要工作，最后返回结果。
+13. 类 `VisionTransformer`：功能概述：这个类是 `VisionTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 image_size, patch_size, width, layers, heads, mlp_ratio, ls_init_value, patch_dropout, global_average_pool, output_dim, act_layer, norm_layer, xattn，再调用 __init__、to_2tuple、nn.Conv2d 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.parameters、_unlock、isinstance 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `get_num_layers`：先进入当前步骤，最后返回结果。 4. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。 5. `no_weight_decay`：先进入当前步骤，最后返回结果。 6. `forward`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.conv1、x.reshape、x.permute 等内部步骤完成主要工作，最后返回结果。
+14. 类 `TextTransformer`：功能概述：这个类是 `TextTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 context_length, vocab_size, width, heads, layers, ls_init_value, output_dim, act_layer, norm_layer, xattn, attn_mask，接着根据条件分支选择不同处理路径，再调用 __init__、nn.Embedding、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `init_parameters`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 nn.init.normal_ 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。 4. `no_weight_decay`：先进入当前步骤，最后返回结果。 5. `get_num_layers`：先进入当前步骤，最后返回结果。 6. `build_attention_mask`：先进入当前步骤，再调用 torch.empty、mask.fill_、mask.triu_ 等内部步骤完成主要工作，最后返回结果。 7. `forward`：先接收输入参数 text, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.transformer.get_cast_dtype、to、x.permute 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 import logging
 from collections import OrderedDict
@@ -34,11 +54,16 @@ except ImportError:
     # print("Please 'pip install xformers'")
 
 class LayerNormFp32(nn.LayerNorm):
-    """Subclass torch's LayerNorm to handle fp16 (by casting to float32 and back)."""
-    def __init__(self, *args, **kwargs):
+    """
+    功能概述：这个类是 `LayerNormFp32`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 *args, **kwargs，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，再调用 F.layer_norm、output.type_as、x.float 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, *args, **kwargs):  # 中文名称：初始化
         super().__init__(*args, **kwargs)
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor):  # 中文名称：forward
         output = F.layer_norm(
             x.float(),
             self.normalized_shape,
@@ -50,41 +75,59 @@ class LayerNormFp32(nn.LayerNorm):
 
 
 class LayerNorm(nn.LayerNorm):
-    """Subclass torch's LayerNorm (with cast back to input dtype)."""
+    """
+    功能概述：这个类是 `LayerNorm`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `forward`：先接收输入参数 x，再调用 F.layer_norm、x.to 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor):  # 中文名称：forward
         orig_type = x.dtype
         x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
         return x.to(orig_type)
 
 class QuickGELU(nn.Module):
+    """
+    功能概述：这个类是 `QuickGELU`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `forward`：先接收输入参数 x，再调用 torch.sigmoid 等内部步骤完成主要工作，最后返回结果。
+    """
     # NOTE This is slower than nn.GELU or nn.SiLU and uses more GPU memory
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor):  # 中文名称：forward
         return x * torch.sigmoid(1.702 * x)
 
 
 class LayerScale(nn.Module):
-    def __init__(self, dim, init_values=1e-5, inplace=False):
+    """
+    功能概述：这个类是 `LayerScale`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, init_values, inplace，再调用 __init__、nn.Parameter、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，再调用 x.mul_ 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, dim, init_values=1e-5, inplace=False):  # 中文名称：初始化
         super().__init__()
         self.inplace = inplace
         self.gamma = nn.Parameter(init_values * torch.ones(dim))
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         return x.mul_(self.gamma) if self.inplace else x * self.gamma
 
 class PatchDropout(nn.Module):
     """
-    https://arxiv.org/abs/2212.00794
+    功能概述：这个类是 `PatchDropout`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 prob, exclude_first_token，再调用 __init__、logging.info、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，接着根据条件分支选择不同处理路径，再调用 torch.arange、max、torch.randn 等内部步骤完成主要工作，最后返回结果。
     """
 
-    def __init__(self, prob, exclude_first_token=True):
+    def __init__(self, prob, exclude_first_token=True):  # 中文名称：初始化
         super().__init__()
         assert 0 <= prob < 1.
         self.prob = prob
         self.exclude_first_token = exclude_first_token  # exclude CLS token
         logging.info(f"os.getenv('RoPE')={os.getenv('RoPE')}")
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         if not self.training or self.prob == 0.:
             return x
 
@@ -122,7 +165,7 @@ def _in_projection_packed(
     v: torch.Tensor,
     w: torch.Tensor,
     b: Optional[torch.Tensor] = None,
-    ):
+    ):  # 中文名称：inprojectionpacked
     """
     https://github.com/pytorch/pytorch/blob/db2a237763eb8693a20788be94f8c192e762baa8/torch/nn/functional.py#L4726
     """
@@ -148,6 +191,12 @@ def _in_projection_packed(
         return F.linear(q, w_q, b_q), F.linear(k, w_k, b_k), F.linear(v, w_v, b_v)
 
 class Attention(nn.Module):
+    """
+    功能概述：这个类是 `Attention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, scaled_cosine, scale_heads, logit_scale_max, attn_drop, proj_drop, xattn, rope，接着根据条件分支选择不同处理路径，再调用 math.log、__init__、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，再调用 chunk、reshape、self.out_proj 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             dim,
@@ -160,7 +209,7 @@ class Attention(nn.Module):
             proj_drop=0.,
             xattn=False,
             rope=False
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.scaled_cosine = scaled_cosine
         self.scale_heads = scale_heads
@@ -192,7 +241,7 @@ class Attention(nn.Module):
         self.xattn_drop = attn_drop
         self.rope = rope
 
-    def forward(self, x, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, x, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         L, N, C = x.shape
         q, k, v = F.linear(x, self.in_proj_weight, self.in_proj_bias).chunk(3, dim=-1)
         if self.xattn:
@@ -241,6 +290,12 @@ class Attention(nn.Module):
         return x
 
 class CustomAttention(nn.Module):
+    """
+    功能概述：这个类是 `CustomAttention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, scaled_cosine, scale_heads, logit_scale_max, attn_drop, proj_drop, xattn，接着根据条件分支选择不同处理路径，再调用 math.log、__init__、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 query, key, value, attn_mask，接着根据条件分支选择不同处理路径，再调用 _in_projection_packed、reshape、self.out_proj 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             dim,
@@ -252,7 +307,7 @@ class CustomAttention(nn.Module):
             attn_drop=0.,
             proj_drop=0.,
             xattn=False
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.scaled_cosine = scaled_cosine
         self.scale_heads = scale_heads
@@ -283,7 +338,7 @@ class CustomAttention(nn.Module):
         self.xattn = xattn
         self.xattn_drop = attn_drop
 
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         q, k, v = _in_projection_packed(query, key, value, self.in_proj_weight, self.in_proj_bias)
         N_q, B_q, C_q = q.shape
         N_k, B_k, C_k = k.shape
@@ -337,6 +392,12 @@ class CustomAttention(nn.Module):
         return x
 
 class CustomResidualAttentionBlock(nn.Module):
+    """
+    功能概述：这个类是 `CustomResidualAttentionBlock`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 d_model, n_head, mlp_ratio, ls_init_value, act_layer, norm_layer, scale_cosine_attn, scale_heads, scale_attn, scale_fc, cross_attn, xattn，再调用 __init__、norm_layer、CustomAttention 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 q, k, v, attn_mask，再调用 self.ls_1、self.ls_2、self.ln_attn 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             d_model: int,
@@ -351,7 +412,7 @@ class CustomResidualAttentionBlock(nn.Module):
             scale_fc: bool = False,
             cross_attn: bool = False,
             xattn: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
 
         self.ln_1 = norm_layer(d_model)
@@ -381,12 +442,19 @@ class CustomResidualAttentionBlock(nn.Module):
 
         self.ls_2 = LayerScale(d_model, ls_init_value) if ls_init_value is not None else nn.Identity()
 
-    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         q = q + self.ls_1(self.ln_attn(self.attn(self.ln_1(q), self.ln_1_k(k), self.ln_1_v(v), attn_mask=attn_mask)))
         q = q + self.ls_2(self.mlp(self.ln_2(q)))
         return q
 
 class CustomTransformer(nn.Module):
+    """
+    功能概述：这个类是 `CustomTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 width, layers, heads, mlp_ratio, ls_init_value, act_layer, norm_layer, scale_cosine_attn, scale_heads, scale_attn, scale_fc, cross_attn, xattn，再调用 __init__、nn.ModuleList、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `get_cast_dtype`：先进入当前步骤，最后返回结果。
+    3. `forward`：先接收输入参数 q, k, v, attn_mask，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 checkpoint、r、torch.jit.is_scripting 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             width: int,
@@ -402,7 +470,7 @@ class CustomTransformer(nn.Module):
             scale_fc: bool = False,
             cross_attn: bool = False,
             xattn: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.width = width
         self.layers = layers
@@ -426,10 +494,10 @@ class CustomTransformer(nn.Module):
             for _ in range(layers)
         ])
 
-    def get_cast_dtype(self) -> torch.dtype:
+    def get_cast_dtype(self) -> torch.dtype:  # 中文名称：获取castdtype
         return self.resblocks[0].mlp.c_fc.weight.dtype 
 
-    def forward(self, q: torch.Tensor, k: torch.Tensor = None, v: torch.Tensor = None, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, q: torch.Tensor, k: torch.Tensor = None, v: torch.Tensor = None, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         if k is None and v is None:
             k = v = q
         for r in self.resblocks:
@@ -441,6 +509,13 @@ class CustomTransformer(nn.Module):
 
 
 class ResidualAttentionBlock(nn.Module):
+    """
+    功能概述：这个类是 `ResidualAttentionBlock`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 d_model, n_head, mlp_ratio, ls_init_value, act_layer, norm_layer, xattn，接着根据条件分支选择不同处理路径，再调用 __init__、norm_layer、int 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `attention`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，再调用 attn_mask.to、self.attn 等内部步骤完成主要工作，最后返回结果。
+    3. `forward`：先接收输入参数 x, attn_mask，再调用 self.ls_1、self.ls_2、self.attention 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             d_model: int,
@@ -450,7 +525,7 @@ class ResidualAttentionBlock(nn.Module):
             act_layer: Callable = nn.GELU,
             norm_layer: Callable = LayerNorm,
             xattn: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
 
         self.ln_1 = norm_layer(d_model)
@@ -471,18 +546,25 @@ class ResidualAttentionBlock(nn.Module):
         self.ls_2 = LayerScale(d_model, ls_init_value) if ls_init_value is not None else nn.Identity()
         self.xattn = xattn
 
-    def attention(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
+    def attention(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：attention
         attn_mask = attn_mask.to(x.dtype) if attn_mask is not None else None
         if self.xattn:
             return self.attn(x, attn_mask=attn_mask)
         return self.attn(x, x, x, need_weights=False, attn_mask=attn_mask)[0]
 
-    def forward(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         x = x + self.ls_1(self.attention(self.ln_1(x), attn_mask=attn_mask))
         x = x + self.ls_2(self.mlp(self.ln_2(x)))
         return x
 
 class Transformer(nn.Module):
+    """
+    功能概述：这个类是 `Transformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 width, layers, heads, mlp_ratio, ls_init_value, act_layer, norm_layer, xattn，再调用 __init__、nn.ModuleList、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `get_cast_dtype`：先进入当前步骤，最后返回结果。
+    3. `forward`：先接收输入参数 x, attn_mask，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 checkpoint、r、torch.jit.is_scripting 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             width: int,
@@ -493,7 +575,7 @@ class Transformer(nn.Module):
             act_layer: Callable = nn.GELU,
             norm_layer: Callable = LayerNorm,
             xattn: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.width = width
         self.layers = layers
@@ -505,10 +587,10 @@ class Transformer(nn.Module):
             for _ in range(layers)
         ])
 
-    def get_cast_dtype(self) -> torch.dtype:
+    def get_cast_dtype(self) -> torch.dtype:  # 中文名称：获取castdtype
         return self.resblocks[0].mlp.c_fc.weight.dtype
 
-    def forward(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
+    def forward(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):  # 中文名称：forward
         for r in self.resblocks:
             if self.grad_checkpointing and not torch.jit.is_scripting():
                 x = checkpoint(r, x, attn_mask)
@@ -518,6 +600,16 @@ class Transformer(nn.Module):
 
 
 class VisionTransformer(nn.Module):
+    """
+    功能概述：这个类是 `VisionTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 image_size, patch_size, width, layers, heads, mlp_ratio, ls_init_value, patch_dropout, global_average_pool, output_dim, act_layer, norm_layer, xattn，再调用 __init__、to_2tuple、nn.Conv2d 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.parameters、_unlock、isinstance 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `get_num_layers`：先进入当前步骤，最后返回结果。
+    4. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。
+    5. `no_weight_decay`：先进入当前步骤，最后返回结果。
+    6. `forward`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.conv1、x.reshape、x.permute 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             image_size: int,
@@ -533,7 +625,7 @@ class VisionTransformer(nn.Module):
             act_layer: Callable = nn.GELU,
             norm_layer: Callable = LayerNorm,
             xattn: bool = False,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.image_size = to_2tuple(image_size)
         self.patch_size = to_2tuple(patch_size)
@@ -564,7 +656,7 @@ class VisionTransformer(nn.Module):
         self.ln_post = norm_layer(width)
         self.proj = nn.Parameter(scale * torch.randn(width, output_dim))
 
-    def lock(self, unlocked_groups=0, freeze_bn_stats=False):
+    def lock(self, unlocked_groups=0, freeze_bn_stats=False):  # 中文名称：lock
         for param in self.parameters():
             param.requires_grad = False
         
@@ -584,7 +676,7 @@ class VisionTransformer(nn.Module):
                 self.proj,
             ]
 
-            def _unlock(x):
+            def _unlock(x):  # 中文名称：unlock
                 if isinstance(x, Sequence):
                     for g in x:
                         _unlock(g)
@@ -597,18 +689,18 @@ class VisionTransformer(nn.Module):
 
             _unlock(groups[-unlocked_groups:])
 
-    def get_num_layers(self):
+    def get_num_layers(self):  # 中文名称：获取numlayers
         return self.transformer.layers
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.transformer.grad_checkpointing = enable
 
     @torch.jit.ignore
-    def no_weight_decay(self):
+    def no_weight_decay(self):  # 中文名称：noweightdecay
         return {'positional_embedding', 'class_embedding'}
 
-    def forward(self, x: torch.Tensor, return_all_features: bool=False):
+    def forward(self, x: torch.Tensor, return_all_features: bool=False):  # 中文名称：forward
         x = self.conv1(x)  # shape = [*, width, grid, grid]
         x = x.reshape(x.shape[0], x.shape[1], -1)  # shape = [*, width, grid ** 2]
         x = x.permute(0, 2, 1)  # shape = [*, grid ** 2, width]
@@ -640,6 +732,17 @@ class VisionTransformer(nn.Module):
 
 
 class TextTransformer(nn.Module):
+    """
+    功能概述：这个类是 `TextTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 context_length, vocab_size, width, heads, layers, ls_init_value, output_dim, act_layer, norm_layer, xattn, attn_mask，接着根据条件分支选择不同处理路径，再调用 __init__、nn.Embedding、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `init_parameters`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 nn.init.normal_ 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。
+    4. `no_weight_decay`：先进入当前步骤，最后返回结果。
+    5. `get_num_layers`：先进入当前步骤，最后返回结果。
+    6. `build_attention_mask`：先进入当前步骤，再调用 torch.empty、mask.fill_、mask.triu_ 等内部步骤完成主要工作，最后返回结果。
+    7. `forward`：先接收输入参数 text, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.transformer.get_cast_dtype、to、x.permute 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self,
             context_length: int = 77,
@@ -653,7 +756,7 @@ class TextTransformer(nn.Module):
             norm_layer: Callable = LayerNorm,
             xattn: bool= False,
             attn_mask: bool = True
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.context_length = context_length
         self.vocab_size = vocab_size
@@ -683,7 +786,7 @@ class TextTransformer(nn.Module):
 
         self.init_parameters()
 
-    def init_parameters(self):
+    def init_parameters(self):  # 中文名称：初始化parameters
         nn.init.normal_(self.token_embedding.weight, std=0.02)
         nn.init.normal_(self.positional_embedding, std=0.01)
 
@@ -700,26 +803,26 @@ class TextTransformer(nn.Module):
             nn.init.normal_(self.text_projection, std=self.transformer.width ** -0.5)
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.transformer.grad_checkpointing = enable
     
     @torch.jit.ignore
     def no_weight_decay(self):
-        # return {'positional_embedding', 'token_embedding'}
+        # return {'positional_embedding', 'token_embedding'}  # 中文名称：noweightdecay
         return {'positional_embedding'}
 
-    def get_num_layers(self):
+    def get_num_layers(self):  # 中文名称：获取numlayers
         return self.transformer.layers
 
     def build_attention_mask(self):
         # lazily create causal attention mask, with full attention between the vision tokens
-        # pytorch uses additive attention mask; fill with -inf
+        # pytorch uses additive attention mask; fill with -inf  # 中文名称：构建attentionmask
         mask = torch.empty(self.context_length, self.context_length)
         mask.fill_(float("-inf"))
         mask.triu_(1)  # zero out the lower diagonal
         return mask
 
-    def forward(self, text, return_all_features: bool=False):
+    def forward(self, text, return_all_features: bool=False):  # 中文名称：forward
         cast_dtype = self.transformer.get_cast_dtype()
         x = self.token_embedding(text).to(cast_dtype)  # [batch_size, n_ctx, d_model]
 

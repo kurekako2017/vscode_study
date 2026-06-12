@@ -1,6 +1,10 @@
 """
-生成集成模块
+文件功能概述：`code/C9/rag_modules/generation_integration.py` 主要是 generationintegration，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `GenerationIntegrationModule`：功能概述：这个类是 `GenerationIntegrationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name, temperature, max_tokens，接着根据条件分支选择不同处理路径，再调用 os.getenv、OpenAI、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `generate_adaptive_answer`：先接收输入参数 question, documents，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 join、doc.page_content.strip、self.client.chat.completions.create 等内部步骤完成主要工作，最后返回结果。 3. `generate_adaptive_answer_stream`：先接收输入参数 question, documents, max_retries，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 join、range、doc.page_content.strip 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import logging
 import os
@@ -13,9 +17,15 @@ from langchain_core.documents import Document
 logger = logging.getLogger(__name__)
 
 class GenerationIntegrationModule:
-    """生成集成模块 - 负责答案生成"""
+    """
+    功能概述：这个类是 `GenerationIntegrationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name, temperature, max_tokens，接着根据条件分支选择不同处理路径，再调用 os.getenv、OpenAI、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `generate_adaptive_answer`：先接收输入参数 question, documents，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 join、doc.page_content.strip、self.client.chat.completions.create 等内部步骤完成主要工作，最后返回结果。
+    3. `generate_adaptive_answer_stream`：先接收输入参数 question, documents, max_retries，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 join、range、doc.page_content.strip 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def __init__(self, model_name: str = None, temperature: float = 0.1, max_tokens: int = 2048):
+    def __init__(self, model_name: str = None, temperature: float = 0.1, max_tokens: int = 2048):  # 中文名称：初始化
         """
         初始化生成集成模块
         """
@@ -35,7 +45,7 @@ class GenerationIntegrationModule:
 
         logger.info(f"生成模块初始化完成，模型: {model_name}")
 
-    def generate_adaptive_answer(self, question: str, documents: List[Document]) -> str:
+    def generate_adaptive_answer(self, question: str, documents: List[Document]) -> str:  # 中文名称：generateadaptiveanswer
         """
         智能统一答案生成
         自动适应不同类型的查询，无需预先分类
@@ -88,7 +98,7 @@ class GenerationIntegrationModule:
             logger.error(f"LightRAG答案生成失败: {e}")
             return f"抱歉，生成回答时出现错误：{str(e)}"
     
-    def generate_adaptive_answer_stream(self, question: str, documents: List[Document], max_retries: int = 3):
+    def generate_adaptive_answer_stream(self, question: str, documents: List[Document], max_retries: int = 3):  # 中文名称：generateadaptiveanswerstream
         """
         LightRAG风格的流式答案生成（带重试机制）
         """

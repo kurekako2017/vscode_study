@@ -1,12 +1,11 @@
-"""Code-directory startup hooks for all-in-rag-main.
-
-This file lets `python ...` launched from `code/` automatically:
-1. Load a nearby `.env` file if present.
-2. Fall back to the repository root `.env`.
-3. Mirror `OPENROUTER_*` into OpenAI-compatible variables for libraries that
-   only understand `OPENAI_*`.
-4. Provide a safe default model name when only OpenRouter credentials are set.
 """
+文件功能概述：`code/sitecustomize.py` 主要是 sitecustomize，这个文件里有 0 个类、2 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_load_env_file`：先接收输入参数 env_path，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 splitlines、env_path.exists、raw_line.strip 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_bootstrap`：先进入当前步骤，再调用 _load_env_file、os.environ.setdefault、resolve 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+"""
+
 
 from __future__ import annotations
 
@@ -14,7 +13,7 @@ import os
 from pathlib import Path
 
 
-def _load_env_file(env_path: Path) -> None:
+def _load_env_file(env_path: Path) -> None:  # 中文名称：加载envfile
     if not env_path.exists():
         return
 
@@ -28,7 +27,7 @@ def _load_env_file(env_path: Path) -> None:
         os.environ.setdefault(key, value)
 
 
-def _bootstrap() -> None:
+def _bootstrap() -> None:  # 中文名称：bootstrap
     current_dir = Path(__file__).resolve().parent
     repo_root = current_dir.parent
     _load_env_file(current_dir / ".env")

@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-用量标准化工具 - 处理中文菜谱中的非数值用量表达
+文件功能概述：`code/C9/agent(代码系ai生成)/amount_normalizer.py` 主要是 amountnormalizer，这个文件里有 1 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `AmountNormalizer`：功能概述：这个类是 `AmountNormalizer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先进入当前步骤，最后把结果交给下一步或直接结束。 2. `normalize_amount`：先接收输入参数 amount, unit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 amount.strip、re.match、self.amount_mappings.get 等内部步骤完成主要工作，最后返回结果。 3. `parse_amount_with_unit`：先接收输入参数 amount_str，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.normalize_amount、re.search、match.group 等内部步骤完成主要工作，最后返回结果。 4. `get_comparable_value`：先接收输入参数 amount, unit，再尝试执行核心处理，出错时进入异常兜底，再调用 self.normalize_amount、float 等内部步骤完成主要工作，最后返回结果。 5. `format_for_display`：先接收输入参数 amount, unit，接着根据条件分支选择不同处理路径，再调用 self.normalize_amount 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `demo_normalization`：先进入当前步骤，再调用 AmountNormalizer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
 """
+
 
 import re
 from typing import Tuple, Optional
 
 class AmountNormalizer:
-    """用量标准化器"""
+    """
+    功能概述：这个类是 `AmountNormalizer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先进入当前步骤，最后把结果交给下一步或直接结束。
+    2. `normalize_amount`：先接收输入参数 amount, unit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 amount.strip、re.match、self.amount_mappings.get 等内部步骤完成主要工作，最后返回结果。
+    3. `parse_amount_with_unit`：先接收输入参数 amount_str，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.normalize_amount、re.search、match.group 等内部步骤完成主要工作，最后返回结果。
+    4. `get_comparable_value`：先接收输入参数 amount, unit，再尝试执行核心处理，出错时进入异常兜底，再调用 self.normalize_amount、float 等内部步骤完成主要工作，最后返回结果。
+    5. `format_for_display`：先接收输入参数 amount, unit，接着根据条件分支选择不同处理路径，再调用 self.normalize_amount 等内部步骤完成主要工作，最后返回结果。
+    """
     
     def __init__(self):
-        # 标准化映射表
+        # 标准化映射表  # 中文名称：初始化
         self.amount_mappings = {
             # 适量类
             "适量": "适量",
@@ -87,7 +100,7 @@ class AmountNormalizer:
             "几颗": 3           # 约3颗
         }
     
-    def normalize_amount(self, amount: str, unit: str = "") -> Tuple[str, Optional[float]]:
+    def normalize_amount(self, amount: str, unit: str = "") -> Tuple[str, Optional[float]]:  # 中文名称：normalizeamount
         """
         标准化用量表达
         
@@ -120,7 +133,7 @@ class AmountNormalizer:
         
         return normalized, estimated
     
-    def parse_amount_with_unit(self, amount_str: str) -> Tuple[str, str, Optional[float]]:
+    def parse_amount_with_unit(self, amount_str: str) -> Tuple[str, str, Optional[float]]:  # 中文名称：解析amountwithunit
         """
         解析包含单位的用量字符串
         
@@ -157,7 +170,7 @@ class AmountNormalizer:
         normalized, estimated = self.normalize_amount(amount_str)
         return normalized, "", estimated
     
-    def get_comparable_value(self, amount: str, unit: str = "") -> Optional[float]:
+    def get_comparable_value(self, amount: str, unit: str = "") -> Optional[float]:  # 中文名称：获取comparablevalue
         """
         获取可比较的数值（用于排序、筛选等）
         
@@ -178,7 +191,7 @@ class AmountNormalizer:
         normalized, estimated = self.normalize_amount(amount, unit)
         return estimated
     
-    def format_for_display(self, amount: str, unit: str = "") -> str:
+    def format_for_display(self, amount: str, unit: str = "") -> str:  # 中文名称：formatfordisplay
         """
         格式化用于显示的用量字符串
         
@@ -201,7 +214,7 @@ class AmountNormalizer:
             return normalized or amount
 
 # 使用示例
-def demo_normalization():
+def demo_normalization():  # 中文名称：演示normalization
     """演示标准化功能"""
     normalizer = AmountNormalizer()
     

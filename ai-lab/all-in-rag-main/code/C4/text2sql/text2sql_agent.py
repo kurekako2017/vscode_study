@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C4/text2sql/text2sql_agent.py` 主要是 文本转SQL智能体，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `SimpleText2SQLAgent`：功能概述：这个类是 `SimpleText2SQLAgent`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 milvus_uri, api_key，再调用 SimpleKnowledgeBase、SimpleSQLGenerator 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `connect_database`：先接收输入参数 db_path，再尝试执行核心处理，出错时进入异常兜底，再调用 sqlite3.connect、print、str 等内部步骤完成主要工作，最后返回结果。 3. `load_knowledge_base`：先进入当前步骤，再调用 self.knowledge_base.load_data 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `query`：先接收输入参数 user_question，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.knowledge_base.search、self.sql_generator.generate_sql 等内部步骤完成主要工作，最后返回结果。 5. `_execute_sql`：先接收输入参数 sql，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.connection.cursor、cursor.execute、startswith 等内部步骤完成主要工作，最后返回结果。 6. `add_example`：先接收输入参数 question, sql，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.dirname、os.path.exists 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 7. `get_table_info`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.connection.cursor、cursor.execute、cursor.fetchall 等内部步骤完成主要工作，最后返回结果。 8. `cleanup`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.knowledge_base.cleanup、print、self.connection.close 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+"""
+
 import sqlite3
 import os
 from typing import Dict, Any, List, Tuple
@@ -6,9 +13,20 @@ from .sql_generator import SimpleSQLGenerator
 
 
 class SimpleText2SQLAgent:
-    """Text2SQL代理"""
+    """
+    功能概述：这个类是 `SimpleText2SQLAgent`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 milvus_uri, api_key，再调用 SimpleKnowledgeBase、SimpleSQLGenerator 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `connect_database`：先接收输入参数 db_path，再尝试执行核心处理，出错时进入异常兜底，再调用 sqlite3.connect、print、str 等内部步骤完成主要工作，最后返回结果。
+    3. `load_knowledge_base`：先进入当前步骤，再调用 self.knowledge_base.load_data 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `query`：先接收输入参数 user_question，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、self.knowledge_base.search、self.sql_generator.generate_sql 等内部步骤完成主要工作，最后返回结果。
+    5. `_execute_sql`：先接收输入参数 sql，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.connection.cursor、cursor.execute、startswith 等内部步骤完成主要工作，最后返回结果。
+    6. `add_example`：先接收输入参数 question, sql，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.dirname、os.path.exists 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    7. `get_table_info`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.connection.cursor、cursor.execute、cursor.fetchall 等内部步骤完成主要工作，最后返回结果。
+    8. `cleanup`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.knowledge_base.cleanup、print、self.connection.close 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     
-    def __init__(self, milvus_uri: str = "http://localhost:19530", api_key: str = None):
+    def __init__(self, milvus_uri: str = "http://localhost:19530", api_key: str = None):  # 中文名称：初始化
         """初始化代理"""
         self.knowledge_base = SimpleKnowledgeBase(milvus_uri)
         self.sql_generator = SimpleSQLGenerator(api_key)
@@ -20,7 +38,7 @@ class SimpleText2SQLAgent:
         self.top_k_retrieval = 5
         self.max_result_rows = 100
     
-    def connect_database(self, db_path: str) -> bool:
+    def connect_database(self, db_path: str) -> bool:  # 中文名称：connectdatabase
         """连接SQLite数据库"""
         try:
             self.db_path = db_path
@@ -31,11 +49,11 @@ class SimpleText2SQLAgent:
             print(f"数据库连接失败: {str(e)}")
             return False
     
-    def load_knowledge_base(self):
+    def load_knowledge_base(self):  # 中文名称：加载知识base
         """加载知识库"""
         self.knowledge_base.load_data()
     
-    def query(self, user_question: str) -> Dict[str, Any]:
+    def query(self, user_question: str) -> Dict[str, Any]:  # 中文名称：查询
         """执行Text2SQL查询"""
         if not self.connection:
             return {
@@ -91,7 +109,7 @@ class SimpleText2SQLAgent:
             "retry_count": retry_count
         }
     
-    def _execute_sql(self, sql: str) -> Tuple[bool, Any]:
+    def _execute_sql(self, sql: str) -> Tuple[bool, Any]:  # 中文名称：executeSQL
         """执行SQL语句"""
         try:
             cursor = self.connection.cursor()
@@ -129,7 +147,7 @@ class SimpleText2SQLAgent:
         except Exception as e:
             return False, str(e)
     
-    def add_example(self, question: str, sql: str):
+    def add_example(self, question: str, sql: str):  # 中文名称：add示例
         """添加新的Q->SQL示例"""
         # 简化版本：直接保存到文件
         data_dir = os.path.join(os.path.dirname(__file__), "data")
@@ -161,7 +179,7 @@ class SimpleText2SQLAgent:
         except Exception as e:
             print(f"添加示例失败: {str(e)}")
     
-    def get_table_info(self) -> List[Dict[str, Any]]:
+    def get_table_info(self) -> List[Dict[str, Any]]:  # 中文名称：获取tableinfo
         """获取数据库表信息"""
         if not self.connection:
             return []
@@ -202,7 +220,7 @@ class SimpleText2SQLAgent:
             print(f"获取表信息失败: {str(e)}")
             return []
     
-    def cleanup(self):
+    def cleanup(self):  # 中文名称：cleanup
         """清理资源"""
         if self.connection:
             self.connection.close()

@@ -1,6 +1,10 @@
 """
-检索优化模块
+文件功能概述：`code/C8/rag_modules/retrieval_optimization.py` 主要是 检索optimization，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `RetrievalOptimizationModule`：功能概述：这个类是 `RetrievalOptimizationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 vectorstore, chunks，再调用 self.setup_retrievers 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `setup_retrievers`：先进入当前步骤，再调用 logger.info、self.vectorstore.as_retriever、BM25Retriever.from_documents 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `hybrid_search`：先接收输入参数 query, top_k，再调用 self.vector_retriever.invoke、self.bm25_retriever.invoke、self._rrf_rerank 等内部步骤完成主要工作，最后返回结果。 4. `metadata_filtered_search`：先接收输入参数 query, filters, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.hybrid_search、filters.items、filtered_docs.append 等内部步骤完成主要工作，最后返回结果。 5. `_rrf_rerank`：先接收输入参数 vector_docs, bm25_docs, k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、sorted、logger.info 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import logging
 import hashlib
@@ -13,9 +17,17 @@ from langchain_core.documents import Document
 logger = logging.getLogger(__name__)
 
 class RetrievalOptimizationModule:
-    """检索优化模块 - 负责混合检索和过滤"""
+    """
+    功能概述：这个类是 `RetrievalOptimizationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 vectorstore, chunks，再调用 self.setup_retrievers 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `setup_retrievers`：先进入当前步骤，再调用 logger.info、self.vectorstore.as_retriever、BM25Retriever.from_documents 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `hybrid_search`：先接收输入参数 query, top_k，再调用 self.vector_retriever.invoke、self.bm25_retriever.invoke、self._rrf_rerank 等内部步骤完成主要工作，最后返回结果。
+    4. `metadata_filtered_search`：先接收输入参数 query, filters, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.hybrid_search、filters.items、filtered_docs.append 等内部步骤完成主要工作，最后返回结果。
+    5. `_rrf_rerank`：先接收输入参数 vector_docs, bm25_docs, k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、sorted、logger.info 等内部步骤完成主要工作，最后返回结果。
+    """
     
-    def __init__(self, vectorstore: FAISS, chunks: List[Document]):
+    def __init__(self, vectorstore: FAISS, chunks: List[Document]):  # 中文名称：初始化
         """
         初始化检索优化模块
         
@@ -27,7 +39,7 @@ class RetrievalOptimizationModule:
         self.chunks = chunks
         self.setup_retrievers()
 
-    def setup_retrievers(self):
+    def setup_retrievers(self):  # 中文名称：setupretrievers
         """设置向量检索器和BM25检索器"""
         logger.info("正在设置检索器...")
 
@@ -47,7 +59,7 @@ class RetrievalOptimizationModule:
 
         logger.info("检索器设置完成")
     
-    def hybrid_search(self, query: str, top_k: int = 3) -> List[Document]:
+    def hybrid_search(self, query: str, top_k: int = 3) -> List[Document]:  # 中文名称：混合搜索
         """
         混合检索 - 结合向量检索和BM25检索，使用RRF重排
 
@@ -66,7 +78,7 @@ class RetrievalOptimizationModule:
         reranked_docs = self._rrf_rerank(vector_docs, bm25_docs)
         return reranked_docs[:top_k]
     
-    def metadata_filtered_search(self, query: str, filters: Dict[str, Any], top_k: int = 5) -> List[Document]:
+    def metadata_filtered_search(self, query: str, filters: Dict[str, Any], top_k: int = 5) -> List[Document]:  # 中文名称：元数据filtered搜索
         """
         带元数据过滤的检索
         
@@ -106,7 +118,7 @@ class RetrievalOptimizationModule:
         
         return filtered_docs
 
-    def _rrf_rerank(self, vector_docs: List[Document], bm25_docs: List[Document], k: int = 60) -> List[Document]:
+    def _rrf_rerank(self, vector_docs: List[Document], bm25_docs: List[Document], k: int = 60) -> List[Document]:  # 中文名称：rrfrerank
         """
         使用RRF (Reciprocal Rank Fusion) 算法重排文档
 

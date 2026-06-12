@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Unified launcher for all-in-rag-main.
-
-Run from the repository root without `cd`:
-
-    python3 run.py c1-1
-    python3 run.py c8
-    python3 run.py c9-agent test
 """
+文件功能概述：`run.py` 主要是 运行，这个文件里有 0 个类、4 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_build_parser`：先进入当前步骤，再调用 argparse.ArgumentParser、parser.add_argument 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_print_commands`：先进入当前步骤，然后循环处理每一条数据，再调用 print、sorted、join 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+3. 函数 `_run`：先接收输入参数 alias, extra_args，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、os.environ.copy、child_env.setdefault 等内部步骤完成主要工作，最后返回结果。
+4. 函数 `main`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 _build_parser、parser.parse_args、_run 等内部步骤完成主要工作，最后返回结果。
+"""
+
 
 from __future__ import annotations
 
@@ -89,7 +91,7 @@ SHORTCUTS = {
 }
 
 
-def _build_parser() -> argparse.ArgumentParser:
+def _build_parser() -> argparse.ArgumentParser:  # 中文名称：构建parser
     parser = argparse.ArgumentParser(description="Unified launcher for all-in-rag-main")
     parser.add_argument("command", nargs="?", help="Alias such as c1-1, c8, c9-agent-test, powerrag, all")
     parser.add_argument("args", nargs=argparse.REMAINDER, help="Extra args passed to the target script")
@@ -97,7 +99,7 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _print_commands() -> None:
+def _print_commands() -> None:  # 中文名称：printcommands
     print("Available commands:")
     for key in sorted(COMMANDS):
         print(f"  {key:16} {COMMANDS[key][2]}")
@@ -107,7 +109,7 @@ def _print_commands() -> None:
         print(f"  {key:16} {joined}")
 
 
-def _run(alias: str, extra_args: list[str]) -> int:
+def _run(alias: str, extra_args: list[str]) -> int:  # 中文名称：运行
     if alias not in COMMANDS:
         if alias in SHORTCUTS:
             for item in SHORTCUTS[alias]:
@@ -140,7 +142,7 @@ def _run(alias: str, extra_args: list[str]) -> int:
     return result.returncode
 
 
-def main() -> int:
+def main() -> int:  # 中文名称：主函数
     parser = _build_parser()
     ns = parser.parse_args()
 

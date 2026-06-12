@@ -1,7 +1,10 @@
-""" timm model adapter
-
-Wraps timm (https://github.com/rwightman/pytorch-image-models) models for use as a vision tower in CLIP model.
 """
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/timm_model.py` 主要是 timmmodel，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `TimmModel`：功能概述：这个类是 `TimmModel`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name, embed_dim, image_size, pool, proj, proj_bias, drop, pretrained，接着根据条件分支选择不同处理路径，再调用 __init__、to_2tuple、timm.create_model 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.trunk.parameters、self.trunk.group_matcher、group_parameters 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `set_grad_checkpointing`：先接收输入参数 enable，再尝试执行核心处理，出错时进入异常兜底，再调用 self.trunk.set_grad_checkpointing、logging.warning 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `forward`：先接收输入参数 x，再调用 self.trunk、self.head 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import logging
 from collections import OrderedDict
 
@@ -26,8 +29,13 @@ from .utils import freeze_batch_norm_2d
 
 
 class TimmModel(nn.Module):
-    """ timm model adapter
-    # FIXME this adapter is a work in progress, may change in ways that break weight compat
+    """
+    功能概述：这个类是 `TimmModel`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name, embed_dim, image_size, pool, proj, proj_bias, drop, pretrained，接着根据条件分支选择不同处理路径，再调用 __init__、to_2tuple、timm.create_model 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.trunk.parameters、self.trunk.group_matcher、group_parameters 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `set_grad_checkpointing`：先接收输入参数 enable，再尝试执行核心处理，出错时进入异常兜底，再调用 self.trunk.set_grad_checkpointing、logging.warning 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `forward`：先接收输入参数 x，再调用 self.trunk、self.head 等内部步骤完成主要工作，最后返回结果。
     """
 
     def __init__(
@@ -39,7 +47,7 @@ class TimmModel(nn.Module):
             proj='linear',
             proj_bias=False,
             drop=0.,
-            pretrained=False):
+            pretrained=False):  # 中文名称：初始化
         super().__init__()
         if timm is None:
             raise RuntimeError("Please `pip install timm` to use timm models.")
@@ -77,7 +85,7 @@ class TimmModel(nn.Module):
 
         self.head = nn.Sequential(head_layers)
 
-    def lock(self, unlocked_groups=0, freeze_bn_stats=False):
+    def lock(self, unlocked_groups=0, freeze_bn_stats=False):  # 中文名称：lock
         """ lock modules
         Args:
             unlocked_groups (int): leave last n layer groups unlocked (default: 0)
@@ -110,13 +118,13 @@ class TimmModel(nn.Module):
                 freeze_batch_norm_2d(self.trunk, gmodules)
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         try:
             self.trunk.set_grad_checkpointing(enable)
         except Exception as e:
             logging.warning('grad checkpointing not supported for this timm image tower, continuing without...')
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         x = self.trunk(x)
         x = self.head(x)
         return x

@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-基于Kimi API的智能菜谱解析AI Agent
+文件功能概述：`code/C9/agent(代码系ai生成)/recipe_ai_agent.py` 主要是 recipeai智能体，这个文件里有 5 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `IngredientInfo`：功能概述：这个类是 `IngredientInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `CookingStep`：功能概述：这个类是 `CookingStep`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+3. 类 `RecipeInfo`：功能概述：这个类是 `RecipeInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__post_init__`：先进入当前步骤，接着根据条件分支选择不同处理路径，最后把结果交给下一步或直接结束。
+4. 类 `KimiRecipeAgent`：功能概述：这个类是 `KimiRecipeAgent`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 api_key, base_url, model_name，再调用 OpenAI、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `call_kimi_api`：先接收输入参数 messages, max_retries，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 range、Exception、self.client.chat.completions.create 等内部步骤完成主要工作，最后返回结果。 3. `infer_category_from_path`：先接收输入参数 file_path，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 split、file_path.replace 等内部步骤完成主要工作，最后返回结果。 4. `extract_recipe_info`：先接收输入参数 markdown_content, file_path，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.infer_category_from_path、self.call_kimi_api、response.strip 等内部步骤完成主要工作，最后返回结果。 5. `_fallback_parse`：先接收输入参数 content，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 split、any、RecipeInfo 等内部步骤完成主要工作，最后返回结果。
+5. 类 `RecipeKnowledgeGraphBuilder`：功能概述：这个类是 `RecipeKnowledgeGraphBuilder`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 ai_agent, output_dir, batch_size，再调用 os.path.join、set、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `_init_relationship_mappings`：先进入当前步骤，最后把结果交给下一步或直接结束。 3. `_init_predefined_concepts`：先进入当前步骤，最后把结果交给下一步或直接结束。 4. `save_progress`：先接收输入参数 current_file, total_files, processed_count，再调用 list、isoformat、len 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `load_progress`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 os.path.exists、set、progress_data.get 等内部步骤完成主要工作，最后返回结果。 6. `save_batch_data`：先接收输入参数 batch_num，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.makedirs、print 等内部步骤完成主要工作，最后返回结果。 7. `merge_all_batches`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、batch_dirs.sort、os.path.join 等内部步骤完成主要工作，最后返回结果。 8. `generate_concept_id`：先进入当前步骤，再调用 str 等内部步骤完成主要工作，最后返回结果。 9. `process_recipe`：先接收输入参数 markdown_content, file_path，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.ai_agent.extract_recipe_info、self.generate_concept_id、self.concepts.append 等内部步骤完成主要工作，最后返回结果。 10. `_generate_recipe_synonyms`：先接收输入参数 name, category，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 name.endswith、cooking_method_mappings.items、ingredient_aliases.items 等内部步骤完成主要工作，最后返回结果。 11. `_categorize_synonyms_by_language`：先接收输入参数 synonyms，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._is_english、categorized.append、self._is_chinese 等内部步骤完成主要工作，最后返回结果。 12. `_is_english`：先接收输入参数 text，再调用 re.findall、len 等内部步骤完成主要工作，最后返回结果。 13. `_is_chinese`：先接收输入参数 text，再调用 re.findall、len 等内部步骤完成主要工作，最后返回结果。 14. `_format_synonyms_for_neo4j`：先接收输入参数 synonyms，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 isinstance、join、pd.isna 等内部步骤完成主要工作，最后返回结果。 15. `_generate_ingredient_synonyms`：先接收输入参数 name，再调用 ingredient_synonym_dict.get、self._categorize_synonyms_by_language 等内部步骤完成主要工作，最后返回结果。 16. `batch_process_recipes`：先接收输入参数 recipe_dir, resume，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.path.join、glob.glob、len 等内部步骤完成主要工作，最后返回结果。 17. `export_to_csv`：先接收输入参数 output_dir，再调用 os.makedirs、pd.DataFrame、concepts_df.to_csv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 18. `export_to_rf2_format`：先接收输入参数 output_dir，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.makedirs、print、list 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 19. `export_to_neo4j_csv`：先接收输入参数 output_dir, merge_batches，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.makedirs、pd.DataFrame、nodes_df.to_csv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+6. 函数 `main`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 argparse.ArgumentParser、parser.add_argument、parser.parse_args 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import os
 import json
@@ -18,7 +27,11 @@ from datetime import datetime
 
 @dataclass
 class IngredientInfo:
-    """食材信息"""
+    """
+    功能概述：这个类是 `IngredientInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     name: str
     amount: str = ""
     unit: str = ""
@@ -27,7 +40,11 @@ class IngredientInfo:
     
 @dataclass
 class CookingStep:
-    """烹饪步骤"""
+    """
+    功能概述：这个类是 `CookingStep`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     step_number: int
     description: str
     methods: List[str]  # 使用的烹饪方法
@@ -36,7 +53,11 @@ class CookingStep:
     
 @dataclass
 class RecipeInfo:
-    """菜谱信息"""
+    """
+    功能概述：这个类是 `RecipeInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__post_init__`：先进入当前步骤，接着根据条件分支选择不同处理路径，最后把结果交给下一步或直接结束。
+    """
     name: str
     difficulty: int  # 1-5星
     category: str
@@ -49,7 +70,7 @@ class RecipeInfo:
     tags: List[str] = None
     nutrition_info: Dict = None
     
-    def __post_init__(self):
+    def __post_init__(self):  # 中文名称：特殊方法 __post_init__
         if self.ingredients is None:
             self.ingredients = []
         if self.steps is None:
@@ -60,9 +81,17 @@ class RecipeInfo:
             self.nutrition_info = {}
 
 class KimiRecipeAgent:
-    """OpenRouter菜谱解析AI Agent"""
+    """
+    功能概述：这个类是 `KimiRecipeAgent`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 api_key, base_url, model_name，再调用 OpenAI、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `call_kimi_api`：先接收输入参数 messages, max_retries，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 range、Exception、self.client.chat.completions.create 等内部步骤完成主要工作，最后返回结果。
+    3. `infer_category_from_path`：先接收输入参数 file_path，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 split、file_path.replace 等内部步骤完成主要工作，最后返回结果。
+    4. `extract_recipe_info`：先接收输入参数 markdown_content, file_path，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.infer_category_from_path、self.call_kimi_api、response.strip 等内部步骤完成主要工作，最后返回结果。
+    5. `_fallback_parse`：先接收输入参数 content，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 split、any、RecipeInfo 等内部步骤完成主要工作，最后返回结果。
+    """
     
-    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1", model_name: str = None):
+    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1", model_name: str = None):  # 中文名称：初始化
         self.api_key = api_key
         self.base_url = base_url
         self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
@@ -102,7 +131,7 @@ class KimiRecipeAgent:
         # 预定义的工具
         self.cooking_tools = ["炒锅", "平底锅", "蒸锅", "刀", "案板", "筷子", "锅铲", "勺子"]
     
-    def call_kimi_api(self, messages: List[Dict], max_retries: int = 3) -> str:
+    def call_kimi_api(self, messages: List[Dict], max_retries: int = 3) -> str:  # 中文名称：callkimi接口
         """调用Kimi API"""
         for attempt in range(max_retries):
             try:
@@ -123,7 +152,7 @@ class KimiRecipeAgent:
                     
         raise Exception("Kimi API调用失败")
     
-    def infer_category_from_path(self, file_path: str) -> str:
+    def infer_category_from_path(self, file_path: str) -> str:  # 中文名称：infercategoryfrompath
         """根据文件路径推断菜谱分类"""
         path_parts = file_path.replace('\\', '/').split('/')
         
@@ -133,7 +162,7 @@ class KimiRecipeAgent:
         
         return ""  # 如果无法推断，返回空字符串
     
-    def extract_recipe_info(self, markdown_content: str, file_path: str = "") -> RecipeInfo:
+    def extract_recipe_info(self, markdown_content: str, file_path: str = "") -> RecipeInfo:  # 中文名称：extractrecipeinfo
         """使用AI提取菜谱信息"""
         
         # 根据路径推断分类
@@ -276,7 +305,7 @@ class KimiRecipeAgent:
             print(f"AI解析错误: {e}")
             return self._fallback_parse(markdown_content)
     
-    def _fallback_parse(self, content: str) -> RecipeInfo:
+    def _fallback_parse(self, content: str) -> RecipeInfo:  # 中文名称：fallback解析
         """备用解析方法（基于规则）"""
         lines = content.strip().split('\n')
         
@@ -309,9 +338,31 @@ class KimiRecipeAgent:
         )
 
 class RecipeKnowledgeGraphBuilder:
-    """菜谱知识图谱构建器 - 支持分批保存和断点续传"""
+    """
+    功能概述：这个类是 `RecipeKnowledgeGraphBuilder`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 ai_agent, output_dir, batch_size，再调用 os.path.join、set、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `_init_relationship_mappings`：先进入当前步骤，最后把结果交给下一步或直接结束。
+    3. `_init_predefined_concepts`：先进入当前步骤，最后把结果交给下一步或直接结束。
+    4. `save_progress`：先接收输入参数 current_file, total_files, processed_count，再调用 list、isoformat、len 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `load_progress`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 os.path.exists、set、progress_data.get 等内部步骤完成主要工作，最后返回结果。
+    6. `save_batch_data`：先接收输入参数 batch_num，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.makedirs、print 等内部步骤完成主要工作，最后返回结果。
+    7. `merge_all_batches`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、batch_dirs.sort、os.path.join 等内部步骤完成主要工作，最后返回结果。
+    8. `generate_concept_id`：先进入当前步骤，再调用 str 等内部步骤完成主要工作，最后返回结果。
+    9. `process_recipe`：先接收输入参数 markdown_content, file_path，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.ai_agent.extract_recipe_info、self.generate_concept_id、self.concepts.append 等内部步骤完成主要工作，最后返回结果。
+    10. `_generate_recipe_synonyms`：先接收输入参数 name, category，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 name.endswith、cooking_method_mappings.items、ingredient_aliases.items 等内部步骤完成主要工作，最后返回结果。
+    11. `_categorize_synonyms_by_language`：先接收输入参数 synonyms，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._is_english、categorized.append、self._is_chinese 等内部步骤完成主要工作，最后返回结果。
+    12. `_is_english`：先接收输入参数 text，再调用 re.findall、len 等内部步骤完成主要工作，最后返回结果。
+    13. `_is_chinese`：先接收输入参数 text，再调用 re.findall、len 等内部步骤完成主要工作，最后返回结果。
+    14. `_format_synonyms_for_neo4j`：先接收输入参数 synonyms，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 isinstance、join、pd.isna 等内部步骤完成主要工作，最后返回结果。
+    15. `_generate_ingredient_synonyms`：先接收输入参数 name，再调用 ingredient_synonym_dict.get、self._categorize_synonyms_by_language 等内部步骤完成主要工作，最后返回结果。
+    16. `batch_process_recipes`：先接收输入参数 recipe_dir, resume，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.path.join、glob.glob、len 等内部步骤完成主要工作，最后返回结果。
+    17. `export_to_csv`：先接收输入参数 output_dir，再调用 os.makedirs、pd.DataFrame、concepts_df.to_csv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    18. `export_to_rf2_format`：先接收输入参数 output_dir，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.makedirs、print、list 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    19. `export_to_neo4j_csv`：先接收输入参数 output_dir, merge_batches，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.makedirs、pd.DataFrame、nodes_df.to_csv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     
-    def __init__(self, ai_agent: KimiRecipeAgent, output_dir: str = "./ai_output", batch_size: int = 20):
+    def __init__(self, ai_agent: KimiRecipeAgent, output_dir: str = "./ai_output", batch_size: int = 20):  # 中文名称：初始化
         self.ai_agent = ai_agent
         self.concepts = []
         self.relationships = []
@@ -329,7 +380,7 @@ class RecipeKnowledgeGraphBuilder:
         self._init_predefined_concepts()
         self._init_relationship_mappings()
     
-    def _init_relationship_mappings(self):
+    def _init_relationship_mappings(self):  # 中文名称：初始化relationshipmappings
         """初始化关系类型映射"""
         self.relationship_type_mapping = {
             "has_ingredient": "801000001",
@@ -345,7 +396,7 @@ class RecipeKnowledgeGraphBuilder:
             "prep_time": "801000011"
         }
     
-    def _init_predefined_concepts(self):
+    def _init_predefined_concepts(self):  # 中文名称：初始化predefinedconcepts
         """初始化预定义概念"""
         self.predefined_concepts = [
             # 根概念
@@ -490,7 +541,7 @@ class RecipeKnowledgeGraphBuilder:
             }
         ]
     
-    def save_progress(self, current_file: str = None, total_files: int = 0, processed_count: int = 0):
+    def save_progress(self, current_file: str = None, total_files: int = 0, processed_count: int = 0):  # 中文名称：保存progress
         """保存处理进度"""
         progress_data = {
             "processed_files": list(self.processed_files),
@@ -507,7 +558,7 @@ class RecipeKnowledgeGraphBuilder:
         with open(self.progress_file, 'w', encoding='utf-8') as f:
             json.dump(progress_data, f, ensure_ascii=False, indent=2)
     
-    def load_progress(self) -> Dict:
+    def load_progress(self) -> Dict:  # 中文名称：加载progress
         """加载处理进度"""
         if os.path.exists(self.progress_file):
             try:
@@ -524,7 +575,7 @@ class RecipeKnowledgeGraphBuilder:
                 return {}
         return {}
     
-    def save_batch_data(self, batch_num: int = None):
+    def save_batch_data(self, batch_num: int = None):  # 中文名称：保存batchdata
         """保存当前批次数据"""
         if batch_num is None:
             batch_num = self.current_batch
@@ -548,7 +599,7 @@ class RecipeKnowledgeGraphBuilder:
         
         return batch_output_dir
     
-    def merge_all_batches(self):
+    def merge_all_batches(self):  # 中文名称：mergeallbatches
         """合并所有批次数据到最终输出文件"""
         print("合并批次数据...")
         
@@ -590,12 +641,12 @@ class RecipeKnowledgeGraphBuilder:
         
         return len(final_concepts) if all_concepts else 0, len(final_relationships) if all_relationships else 0
     
-    def generate_concept_id(self) -> str:
+    def generate_concept_id(self) -> str:  # 中文名称：generateconceptid
         """生成新的概念ID"""
         self.concept_id_counter += 1
         return str(self.concept_id_counter)
     
-    def process_recipe(self, markdown_content: str, file_path: str) -> Dict:
+    def process_recipe(self, markdown_content: str, file_path: str) -> Dict:  # 中文名称：处理recipe
         """处理单个菜谱"""
         # 处理菜谱
         
@@ -722,7 +773,7 @@ class RecipeKnowledgeGraphBuilder:
         
         return recipe_concept
     
-    def _generate_recipe_synonyms(self, name: str, category: str) -> List[str]:
+    def _generate_recipe_synonyms(self, name: str, category: str) -> List[str]:  # 中文名称：generaterecipesynonyms
         """生成菜谱的同义词列表"""
         synonyms = []
         
@@ -797,7 +848,7 @@ class RecipeKnowledgeGraphBuilder:
         unique_synonyms = list(set(synonyms))
         return self._categorize_synonyms_by_language(unique_synonyms)
     
-    def _categorize_synonyms_by_language(self, synonyms: List[str]) -> List[dict]:
+    def _categorize_synonyms_by_language(self, synonyms: List[str]) -> List[dict]:  # 中文名称：categorizesynonymsbylanguage
         """按语言分类同义词"""
         categorized = []
         
@@ -825,21 +876,21 @@ class RecipeKnowledgeGraphBuilder:
         
         return categorized
     
-    def _is_english(self, text: str) -> bool:
+    def _is_english(self, text: str) -> bool:  # 中文名称：isenglish
         """检测是否为英文"""
         import re
         # 检查是否主要包含英文字母和空格
         english_chars = re.findall(r'[a-zA-Z\s\-]', text)
         return len(english_chars) / len(text) > 0.7 if text else False
     
-    def _is_chinese(self, text: str) -> bool:
+    def _is_chinese(self, text: str) -> bool:  # 中文名称：ischinese
         """检测是否为中文"""
         import re
         # 检查是否包含中文字符
         chinese_chars = re.findall(r'[\u4e00-\u9fff]', text)
         return len(chinese_chars) > 0
     
-    def _format_synonyms_for_neo4j(self, synonyms) -> str:
+    def _format_synonyms_for_neo4j(self, synonyms) -> str:  # 中文名称：formatsynonymsforneo4j
         """格式化同义词用于Neo4j导出"""
         import pandas as pd
         import json
@@ -877,7 +928,7 @@ class RecipeKnowledgeGraphBuilder:
 
         return "|".join(formatted_terms)
     
-    def _generate_ingredient_synonyms(self, name: str) -> List[str]:
+    def _generate_ingredient_synonyms(self, name: str) -> List[str]:  # 中文名称：generateingredientsynonyms
         """生成食材的同义词列表"""
         ingredient_synonym_dict = {
             # 蔬菜类
@@ -908,7 +959,7 @@ class RecipeKnowledgeGraphBuilder:
         synonyms = ingredient_synonym_dict.get(name, [])
         return self._categorize_synonyms_by_language(synonyms)
     
-    def batch_process_recipes(self, recipe_dir: str, resume: bool = True) -> Tuple[int, int]:
+    def batch_process_recipes(self, recipe_dir: str, resume: bool = True) -> Tuple[int, int]:  # 中文名称：batch处理recipes
         """批量处理菜谱目录 - 支持断点续传和分批保存"""
         import glob
         
@@ -1042,7 +1093,7 @@ class RecipeKnowledgeGraphBuilder:
             
         return processed_count, failed_count
     
-    def export_to_csv(self, output_dir: str):
+    def export_to_csv(self, output_dir: str):  # 中文名称：exporttocsv
         """导出为CSV格式"""
         os.makedirs(output_dir, exist_ok=True)
         
@@ -1060,7 +1111,7 @@ class RecipeKnowledgeGraphBuilder:
         print(f"- 概念数量: {len(self.concepts)}")
         print(f"- 关系数量: {len(self.relationships)}")
     
-    def export_to_rf2_format(self, output_dir: str):
+    def export_to_rf2_format(self, output_dir: str):  # 中文名称：exporttorf2format
         """导出为RF2标准格式"""
         os.makedirs(output_dir, exist_ok=True)
         
@@ -1132,7 +1183,7 @@ class RecipeKnowledgeGraphBuilder:
         print(f"- rf2_description.txt: 包含首选术语和同义词")
         print(f"- rf2_relationship.txt: {len(self.relationships)} 个关系")
     
-    def export_to_neo4j_csv(self, output_dir: str, merge_batches: bool = True):
+    def export_to_neo4j_csv(self, output_dir: str, merge_batches: bool = True):  # 中文名称：exporttoneo4jcsv
         """导出为Neo4j导入格式的CSV - 支持合并批次数据"""
         os.makedirs(output_dir, exist_ok=True)
         
@@ -1297,7 +1348,7 @@ RETURN count(rel);
         print(f"- 节点数量: {len(nodes_data)}")
         print(f"- 关系数量: {len(relationships_data)}")
 
-def main():
+def main():  # 中文名称：主函数
     """主函数"""
     import argparse
     

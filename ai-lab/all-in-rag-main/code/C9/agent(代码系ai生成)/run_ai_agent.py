@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-简化的AI菜谱解析运行脚本
+文件功能概述：`code/C9/agent(代码系ai生成)/run_ai_agent.py` 主要是 运行ai智能体，这个文件里有 0 个类、6 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `load_config`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.getenv、os.path.exists、config.setdefault 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `setup_api_key`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.getenv、sys.stdin.isatty、strip 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `get_recipe_directory`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 len、sys.stdin.isatty、os.path.exists 等内部步骤完成主要工作，最后返回结果。
+4. 函数 `test_single_recipe`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 print、load_config、get 等内部步骤完成主要工作，最后返回结果。
+5. 函数 `main`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 print、load_config、get_recipe_directory 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `show_help`：先进入当前步骤，再调用 print 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
 """
+
 
 import os
 import json
 import sys
 from recipe_ai_agent import KimiRecipeAgent, RecipeKnowledgeGraphBuilder
 
-def load_config():
+def load_config():  # 中文名称：加载配置
     """加载配置文件"""
     config_file = "config.json"
     env_api_key = os.getenv("OPENROUTER_API_KEY", "")
@@ -44,7 +53,7 @@ def load_config():
         config["kimi"]["model"] = env_model
     return config
 
-def setup_api_key():
+def setup_api_key():  # 中文名称：setup接口key
     """设置API密钥"""
     api_key = os.getenv('OPENROUTER_API_KEY')
     if not api_key:
@@ -57,7 +66,7 @@ def setup_api_key():
             api_key = "offline"
     return api_key
 
-def get_recipe_directory():
+def get_recipe_directory():  # 中文名称：获取recipedirectory
     """获取菜谱目录"""
     if len(sys.argv) > 1:
         recipe_dir = sys.argv[1]
@@ -73,7 +82,7 @@ def get_recipe_directory():
     
     return recipe_dir
 
-def test_single_recipe():
+def test_single_recipe():  # 中文名称：testsinglerecipe
     """测试单个菜谱解析"""
     test_recipe = """# 红烧茄子的做法
 预估烹饪难度：★★★★
@@ -121,7 +130,7 @@ def test_single_recipe():
         print(f"❌ 测试失败: {str(e)}")
         return False
 
-def main():
+def main():  # 中文名称：主函数
     """主函数"""
     print("🍳 AI菜谱知识图谱生成器")
     print("=" * 50)
@@ -203,7 +212,7 @@ def main():
         print(f"\n❌ 处理过程中出现错误: {str(e)}")
         print(f"请检查API密钥、网络连接和菜谱文件格式")
 
-def show_help():
+def show_help():  # 中文名称：showhelp
     """显示帮助信息"""
     help_text = """
 🍳 AI菜谱知识图谱生成器 - 使用指南

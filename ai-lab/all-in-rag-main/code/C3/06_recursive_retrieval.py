@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C3/06_recursive_retrieval.py` 主要是 06递归检索，这个文件里有 0 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 这个文件没有独立类或函数，主要靠模块级代码直接执行。
+"""
+
 import os
 import pandas as pd
 from dotenv import load_dotenv

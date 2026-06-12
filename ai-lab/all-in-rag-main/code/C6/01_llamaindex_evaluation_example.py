@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C6/01_llamaindex_evaluation_example.py` 主要是 01LlamaIndexevaluation示例，这个文件里有 0 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `main`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 SimpleDirectoryReader、reader.load_data、os.path.exists 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 import asyncio
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
@@ -23,7 +30,7 @@ Settings.llm = OpenAILike(
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")
 
 async def main():
-    # 1. 加载文档
+    # 1. 加载文档  # 中文名称：主函数
     reader = SimpleDirectoryReader(input_files=["../../data/C3/pdf/IPCC_AR6_WGII_Chapter03.pdf"])
     documents = reader.load_data()
 
@@ -93,7 +100,7 @@ async def main():
     print("响应评估结果对比")
     print("="*60)
 
-    def calc_response_score(results, metric):
+    def calc_response_score(results, metric):  # 中文名称：calcresponsescore
         if results and results.get(metric):
             scores = results[metric]
             return sum(r.passing for r in scores) / len(scores)

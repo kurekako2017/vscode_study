@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-分批处理管理器 - 管理菜谱处理的分批保存和断点续传功能
+文件功能概述：`code/C9/agent(代码系ai生成)/batch_manager.py` 主要是 batchmanager，这个文件里有 0 个类、8 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `load_config`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.path.exists、config.setdefault、setdefault 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `show_progress_status`：先接收输入参数 output_dir，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、print 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `clean_progress`：先接收输入参数 output_dir，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、print 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+4. 函数 `clean_batches`：先接收输入参数 output_dir，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、sorted、lower 等内部步骤完成主要工作，最后返回结果。
+5. 函数 `merge_batches`：先接收输入参数 output_dir，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 load_config、get、print 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `continue_processing`：先接收输入参数 recipe_dir, output_dir，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 load_config、get、print 等内部步骤完成主要工作，最后返回结果。
+7. 函数 `show_batch_details`：先接收输入参数 output_dir, batch_num，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 batch_dirs.sort、print、os.path.join 等内部步骤完成主要工作，最后返回结果。
+8. 函数 `main`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 argparse.ArgumentParser、parser.add_subparsers、subparsers.add_parser 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import os
 import json
@@ -11,7 +22,7 @@ import argparse
 from datetime import datetime
 from recipe_ai_agent import KimiRecipeAgent, RecipeKnowledgeGraphBuilder
 
-def load_config():
+def load_config():  # 中文名称：加载配置
     """加载配置文件"""
     config_file = "config.json"
     if os.path.exists(config_file):
@@ -27,7 +38,7 @@ def load_config():
     config["kimi"].setdefault("model", os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
     return config
 
-def show_progress_status(output_dir: str):
+def show_progress_status(output_dir: str):  # 中文名称：showprogressstatus
     """显示处理进度状态"""
     progress_file = os.path.join(output_dir, "progress.json")
     
@@ -60,7 +71,7 @@ def show_progress_status(output_dir: str):
     except Exception as e:
         print(f"❌ 读取进度文件失败: {str(e)}")
 
-def clean_progress(output_dir: str):
+def clean_progress(output_dir: str):  # 中文名称：清理progress
     """清理进度文件，重新开始处理"""
     progress_file = os.path.join(output_dir, "progress.json")
     
@@ -74,7 +85,7 @@ def clean_progress(output_dir: str):
     else:
         print("📋 未找到进度文件")
 
-def clean_batches(output_dir: str):
+def clean_batches(output_dir: str):  # 中文名称：清理batches
     """清理所有批次数据"""
     batch_dirs = [d for d in os.listdir(output_dir) 
                  if d.startswith("batch_") and os.path.isdir(os.path.join(output_dir, d))]
@@ -98,7 +109,7 @@ def clean_batches(output_dir: str):
     else:
         print("取消操作")
 
-def merge_batches(output_dir: str):
+def merge_batches(output_dir: str):  # 中文名称：mergebatches
     """手动合并所有批次数据"""
     config = load_config()
     api_key = config["kimi"].get("api_key")
@@ -127,7 +138,7 @@ def merge_batches(output_dir: str):
     except Exception as e:
         print(f"❌ 合并失败: {str(e)}")
 
-def continue_processing(recipe_dir: str, output_dir: str):
+def continue_processing(recipe_dir: str, output_dir: str):  # 中文名称：continueprocessing
     """继续处理中断的任务"""
     config = load_config()
     api_key = config["kimi"].get("api_key")
@@ -153,7 +164,7 @@ def continue_processing(recipe_dir: str, output_dir: str):
     except Exception as e:
         print(f"❌ 处理失败: {str(e)}")
 
-def show_batch_details(output_dir: str, batch_num: int = None):
+def show_batch_details(output_dir: str, batch_num: int = None):  # 中文名称：showbatchdetails
     """显示批次详细信息"""
     batch_dirs = [d for d in os.listdir(output_dir) 
                  if d.startswith("batch_") and os.path.isdir(os.path.join(output_dir, d))]
@@ -201,7 +212,7 @@ def show_batch_details(output_dir: str, batch_num: int = None):
                 for rel_type, count in type_counts.items():
                     print(f"     - {rel_type}: {count}")
 
-def main():
+def main():  # 中文名称：主函数
     """主函数"""
     parser = argparse.ArgumentParser(
         description='分批处理管理器 - 管理菜谱处理的分批保存和断点续传',

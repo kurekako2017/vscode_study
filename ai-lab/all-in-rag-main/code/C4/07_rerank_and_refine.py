@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C4/07_rerank_and_refine.py` 主要是 07rerankandrefine，这个文件里有 0 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `simple_rerank`：先接收输入参数 query, docs, top_k，然后循环处理每一条数据，再调用 set、scored.sort、split 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,7 +15,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.document_loaders import TextLoader
 
 
-def simple_rerank(query: str, docs: list[Document], top_k: int = 5):
+def simple_rerank(query: str, docs: list[Document], top_k: int = 5):  # 中文名称：simplererank
     query_terms = set(query.lower().split())
     scored = []
     for doc in docs:

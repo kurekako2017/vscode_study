@@ -1,7 +1,11 @@
-""" OpenAI pretrained model functions
-
-Adapted from https://github.com/openai/CLIP. Originally MIT License, Copyright (c) 2021 OpenAI.
 """
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/openai.py` 主要是 OpenAI，这个文件里有 0 个类、2 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `list_openai_models`：先进入当前步骤，再调用 list_pretrained_models_by_tag 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `load_openai_model`：先接收输入参数 name, precision, device, jit, cache_dir，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 get_pretrained_url、torch.jit.trace、model.apply 等内部步骤完成主要工作，最后返回结果。
+"""
+
 
 import os
 import warnings
@@ -15,7 +19,7 @@ from .pretrained import get_pretrained_url, list_pretrained_models_by_tag, downl
 __all__ = ["list_openai_models", "load_openai_model"]
 
 
-def list_openai_models() -> List[str]:
+def list_openai_models() -> List[str]:  # 中文名称：listOpenAImodels
     """Returns the names of available CLIP models"""
     return list_pretrained_models_by_tag('openai')
 
@@ -26,7 +30,7 @@ def load_openai_model(
         device: Optional[Union[str, torch.device]] = None,
         jit: bool = True,
         cache_dir: Optional[str] = None,
-):
+):  # 中文名称：加载OpenAImodel
     """Load a CLIP model
 
     Parameters
@@ -94,7 +98,7 @@ def load_openai_model(
     device_holder = torch.jit.trace(lambda: torch.ones([]).to(torch.device(device)), example_inputs=[])
     device_node = [n for n in device_holder.graph.findAllNodes("prim::Constant") if "Device" in repr(n)][-1]
 
-    def patch_device(module):
+    def patch_device(module):  # 中文名称：patchdevice
         try:
             graphs = [module.graph] if hasattr(module, "graph") else []
         except RuntimeError:
@@ -118,7 +122,7 @@ def load_openai_model(
         float_input = list(float_holder.graph.findNode("aten::to").inputs())[1]
         float_node = float_input.node()
 
-        def patch_float(module):
+        def patch_float(module):  # 中文名称：patchfloat
             try:
                 graphs = [module.graph] if hasattr(module, "graph") else []
             except RuntimeError:

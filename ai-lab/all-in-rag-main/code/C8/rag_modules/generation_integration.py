@@ -1,6 +1,10 @@
 """
-生成集成模块
+文件功能概述：`code/C8/rag_modules/generation_integration.py` 主要是 generationintegration，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `GenerationIntegrationModule`：功能概述：这个类是 `GenerationIntegrationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name, temperature, max_tokens，再调用 self.setup_llm、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `setup_llm`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 logger.info、os.getenv、ChatOpenAI 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `generate_basic_answer`：先接收输入参数 query, context_docs，再调用 self._build_context、ChatPromptTemplate.from_template、chain.invoke 等内部步骤完成主要工作，最后返回结果。 4. `generate_step_by_step_answer`：先接收输入参数 query, context_docs，再调用 self._build_context、ChatPromptTemplate.from_template、chain.invoke 等内部步骤完成主要工作，最后返回结果。 5. `query_rewrite`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 PromptTemplate、strip、StrOutputParser 等内部步骤完成主要工作，最后返回结果。 6. `query_router`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 ChatPromptTemplate.from_template、lower、StrOutputParser 等内部步骤完成主要工作，最后返回结果。 7. `generate_list_answer`：先接收输入参数 query, context_docs，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 doc.metadata.get、len、dish_names.append 等内部步骤完成主要工作，最后返回结果。 8. `generate_basic_answer_stream`：先接收输入参数 query, context_docs，然后循环处理每一条数据，再调用 self._build_context、ChatPromptTemplate.from_template、chain.stream 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 9. `generate_step_by_step_answer_stream`：先接收输入参数 query, context_docs，然后循环处理每一条数据，再调用 self._build_context、ChatPromptTemplate.from_template、chain.stream 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 10. `_build_context`：先接收输入参数 docs, max_length，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、context_parts.append、len 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import os
 import logging
@@ -15,9 +19,22 @@ from langchain_openai import ChatOpenAI
 logger = logging.getLogger(__name__)
 
 class GenerationIntegrationModule:
-    """生成集成模块 - 负责LLM集成和回答生成"""
+    """
+    功能概述：这个类是 `GenerationIntegrationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name, temperature, max_tokens，再调用 self.setup_llm、os.getenv 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `setup_llm`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 logger.info、os.getenv、ChatOpenAI 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `generate_basic_answer`：先接收输入参数 query, context_docs，再调用 self._build_context、ChatPromptTemplate.from_template、chain.invoke 等内部步骤完成主要工作，最后返回结果。
+    4. `generate_step_by_step_answer`：先接收输入参数 query, context_docs，再调用 self._build_context、ChatPromptTemplate.from_template、chain.invoke 等内部步骤完成主要工作，最后返回结果。
+    5. `query_rewrite`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 PromptTemplate、strip、StrOutputParser 等内部步骤完成主要工作，最后返回结果。
+    6. `query_router`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 ChatPromptTemplate.from_template、lower、StrOutputParser 等内部步骤完成主要工作，最后返回结果。
+    7. `generate_list_answer`：先接收输入参数 query, context_docs，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 doc.metadata.get、len、dish_names.append 等内部步骤完成主要工作，最后返回结果。
+    8. `generate_basic_answer_stream`：先接收输入参数 query, context_docs，然后循环处理每一条数据，再调用 self._build_context、ChatPromptTemplate.from_template、chain.stream 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    9. `generate_step_by_step_answer_stream`：先接收输入参数 query, context_docs，然后循环处理每一条数据，再调用 self._build_context、ChatPromptTemplate.from_template、chain.stream 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    10. `_build_context`：先接收输入参数 docs, max_length，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、context_parts.append、len 等内部步骤完成主要工作，最后返回结果。
+    """
     
-    def __init__(self, model_name: str = None, temperature: float = 0.1, max_tokens: int = 2048):
+    def __init__(self, model_name: str = None, temperature: float = 0.1, max_tokens: int = 2048):  # 中文名称：初始化
         """
         初始化生成集成模块
         
@@ -32,7 +49,7 @@ class GenerationIntegrationModule:
         self.llm = None
         self.setup_llm()
     
-    def setup_llm(self):
+    def setup_llm(self):  # 中文名称：setup大模型
         """初始化大语言模型"""
         logger.info(f"正在初始化LLM: {self.model_name}")
 
@@ -50,7 +67,7 @@ class GenerationIntegrationModule:
         
         logger.info("LLM初始化完成")
     
-    def generate_basic_answer(self, query: str, context_docs: List[Document]) -> str:
+    def generate_basic_answer(self, query: str, context_docs: List[Document]) -> str:  # 中文名称：generatebasicanswer
         """
         生成基础回答
 
@@ -86,7 +103,7 @@ class GenerationIntegrationModule:
         response = chain.invoke(query)
         return response
     
-    def generate_step_by_step_answer(self, query: str, context_docs: List[Document]) -> str:
+    def generate_step_by_step_answer(self, query: str, context_docs: List[Document]) -> str:  # 中文名称：generatestepbystepanswer
         """
         生成分步骤回答
 
@@ -139,7 +156,7 @@ class GenerationIntegrationModule:
         response = chain.invoke(query)
         return response
     
-    def query_rewrite(self, query: str) -> str:
+    def query_rewrite(self, query: str) -> str:  # 中文名称：查询rewrite
         """
         智能查询重写 - 让大模型判断是否需要重写查询
 
@@ -203,7 +220,7 @@ class GenerationIntegrationModule:
 
 
 
-    def query_router(self, query: str) -> str:
+    def query_router(self, query: str) -> str:  # 中文名称：查询路由
         """
         查询路由 - 根据查询类型选择不同的处理方式
 
@@ -246,7 +263,7 @@ class GenerationIntegrationModule:
         else:
             return 'general'  # 默认类型
 
-    def generate_list_answer(self, query: str, context_docs: List[Document]) -> str:
+    def generate_list_answer(self, query: str, context_docs: List[Document]) -> str:  # 中文名称：generatelistanswer
         """
         生成列表式回答 - 适用于推荐类查询
 
@@ -275,7 +292,7 @@ class GenerationIntegrationModule:
         else:
             return f"为您推荐以下菜品：\n" + "\n".join([f"{i+1}. {name}" for i, name in enumerate(dish_names[:3])]) + f"\n\n还有其他 {len(dish_names)-3} 道菜品可供选择。"
 
-    def generate_basic_answer_stream(self, query: str, context_docs: List[Document]):
+    def generate_basic_answer_stream(self, query: str, context_docs: List[Document]):  # 中文名称：generatebasicanswerstream
         """
         生成基础回答 - 流式输出
 
@@ -310,7 +327,7 @@ class GenerationIntegrationModule:
         for chunk in chain.stream(query):
             yield chunk
 
-    def generate_step_by_step_answer_stream(self, query: str, context_docs: List[Document]):
+    def generate_step_by_step_answer_stream(self, query: str, context_docs: List[Document]):  # 中文名称：generatestepbystepanswerstream
         """
         生成详细步骤回答 - 流式输出
 
@@ -362,7 +379,7 @@ class GenerationIntegrationModule:
         for chunk in chain.stream(query):
             yield chunk
 
-    def _build_context(self, docs: List[Document], max_length: int = 2000) -> str:
+    def _build_context(self, docs: List[Document], max_length: int = 2000) -> str:  # 中文名称：构建context
         """
         构建上下文字符串
         

@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C3/07_recursive_retrieval_v2.py` 主要是 07递归检索v2，这个文件里有 0 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `query_safe_recursive`：先接收输入参数 query_str，接着根据条件分支选择不同处理路径，再调用 print、VectorIndexRetriever、summary_retriever.retrieve 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 from pathlib import Path
 
@@ -83,7 +90,7 @@ content_index = VectorStoreIndex(content_docs)
 print("摘要索引和内容索引构建完成。\n")
 
 # 3. 定义两步式查询逻辑
-def query_safe_recursive(query_str):
+def query_safe_recursive(query_str):  # 中文名称：查询safe递归
     print(f"--- 开始执行查询 ---")
     print(f"查询: {query_str}")
     

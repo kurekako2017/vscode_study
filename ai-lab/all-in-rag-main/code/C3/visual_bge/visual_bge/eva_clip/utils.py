@@ -1,3 +1,18 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/utils.py` 主要是 工具，这个文件里有 1 个类、8 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `resize_clip_pos_embed`：先接收输入参数 state_dict, model, interpolation, seq_dim，接着根据条件分支选择不同处理路径，再调用 state_dict.get、to_2tuple、logging.info 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `resize_visual_pos_embed`：先接收输入参数 state_dict, model, interpolation, seq_dim，接着根据条件分支选择不同处理路径，再调用 state_dict.get、to_2tuple、logging.info 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `resize_evaclip_pos_embed`：先接收输入参数 state_dict, model, interpolation, seq_dim，接着根据条件分支选择不同处理路径，再调用 list、state_dict.keys、int 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+4. 函数 `resize_eva_pos_embed`：先接收输入参数 state_dict, model, interpolation, seq_dim，接着根据条件分支选择不同处理路径，再调用 list、state_dict.keys、int 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+5. 函数 `resize_rel_pos_embed`：先接收输入参数 state_dict, model, interpolation, seq_dim，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 list、state_dict.keys、int 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `freeze_batch_norm_2d`：先接收输入参数 module, module_match, name，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 isinstance、FrozenBatchNorm2d、module.named_children 等内部步骤完成主要工作，最后返回结果。
+7. 函数 `_ntuple`：先接收输入参数 n，接着根据条件分支选择不同处理路径，再调用 isinstance、tuple、repeat 等内部步骤完成主要工作，最后返回结果。
+8. 函数 `is_logging`：先接收输入参数 args，再调用 is_local_master、is_global_master 等内部步骤完成主要工作，最后返回结果。
+9. 类 `AllGather`：功能概述：这个类是 `AllGather`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `forward`：先接收输入参数 ctx, tensor, rank, world_size，再调用 torch.distributed.all_gather、torch.cat、torch.empty_like 等内部步骤完成主要工作，最后返回结果。 2. `backward`：先接收输入参数 ctx, grad_output，最后返回结果。
+"""
+
 from itertools import repeat
 import collections.abc
 import logging
@@ -11,7 +26,7 @@ import torch.nn.functional as F
 
 # open CLIP
 def resize_clip_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):
-    # Rescale the grid of position embeddings when loading from state_dict
+    # Rescale the grid of position embeddings when loading from state_dict  # 中文名称：resizeclipposembed
     old_pos_embed = state_dict.get('visual.positional_embedding', None)
     if old_pos_embed is None or not hasattr(model.visual, 'grid_size'):
         return
@@ -44,7 +59,7 @@ def resize_clip_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq
 
 
 def resize_visual_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):
-    # Rescale the grid of position embeddings when loading from state_dict
+    # Rescale the grid of position embeddings when loading from state_dict  # 中文名称：resizevisualposembed
     old_pos_embed = state_dict.get('positional_embedding', None)
     if old_pos_embed is None or not hasattr(model.visual, 'grid_size'):
         return
@@ -75,7 +90,7 @@ def resize_visual_pos_embed(state_dict, model, interpolation: str = 'bicubic', s
         new_pos_embed = pos_emb_img
     state_dict['positional_embedding'] = new_pos_embed
 
-def resize_evaclip_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):
+def resize_evaclip_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):  # 中文名称：resizeevaclipposembed
     all_keys = list(state_dict.keys())
     # interpolate position embedding
     if 'visual.pos_embed' in state_dict:
@@ -106,7 +121,7 @@ def resize_evaclip_pos_embed(state_dict, model, interpolation: str = 'bicubic', 
                 patch_embed_proj.float(), size=patch_size, mode='bicubic', align_corners=False)
 
 
-def resize_eva_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):
+def resize_eva_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):  # 中文名称：resizeevaposembed
     all_keys = list(state_dict.keys())
     # interpolate position embedding
     if 'pos_embed' in state_dict:
@@ -137,7 +152,7 @@ def resize_eva_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_
                 patch_embed_proj.float(), size=patch_size, mode='bicubic', align_corners=False)
                 
 
-def resize_rel_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):
+def resize_rel_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_dim=1):  # 中文名称：resizerelposembed
     all_keys = list(state_dict.keys())
     for key in all_keys:
         if "relative_position_index" in key:
@@ -159,7 +174,7 @@ def resize_rel_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_
                 extra_tokens = rel_pos_bias[-num_extra_tokens:, :]
                 rel_pos_bias = rel_pos_bias[:-num_extra_tokens, :]
 
-                def geometric_progression(a, r, n):
+                def geometric_progression(a, r, n):  # 中文名称：geometricprogression
                     return a * (1.0 - r ** n) / (1.0 - r)
 
                 left, right = 1.01, 1.5
@@ -234,7 +249,7 @@ def resize_rel_pos_embed(state_dict, model, interpolation: str = 'bicubic', seq_
                 patch_embed_proj.float(), size=patch_size, mode='bicubic', align_corners=False)
 
 
-def freeze_batch_norm_2d(module, module_match={}, name=''):
+def freeze_batch_norm_2d(module, module_match={}, name=''):  # 中文名称：freezebatchnorm2d
     """
     Converts all `BatchNorm2d` and `SyncBatchNorm` layers of provided module into `FrozenBatchNorm2d`. If `module` is
     itself an instance of either `BatchNorm2d` or `SyncBatchNorm`, it is converted into `FrozenBatchNorm2d` and
@@ -274,8 +289,8 @@ def freeze_batch_norm_2d(module, module_match={}, name=''):
 
 
 # From PyTorch internals
-def _ntuple(n):
-    def parse(x):
+def _ntuple(n):  # 中文名称：ntuple
+    def parse(x):  # 中文名称：解析
         if isinstance(x, collections.abc.Iterable):
             return x
         return tuple(repeat(x, n))
@@ -289,26 +304,28 @@ to_4tuple = _ntuple(4)
 to_ntuple = lambda n, x: _ntuple(n)(x)
 
 
-def is_logging(args):
-    def is_global_master(args):
+def is_logging(args):  # 中文名称：是否logging
+    def is_global_master(args):  # 中文名称：是否globalmaster
         return args.rank == 0
 
-    def is_local_master(args):
+    def is_local_master(args):  # 中文名称：是否localmaster
         return args.local_rank == 0
 
-    def is_master(args, local=False):
+    def is_master(args, local=False):  # 中文名称：是否master
         return is_local_master(args) if local else is_global_master(args)
     return is_master
 
 
 class AllGather(torch.autograd.Function):
-    """An autograd function that performs allgather on a tensor.
-    Performs all_gather operation on the provided tensors.
-    *** Warning ***: torch.distributed.all_gather has no gradient.
+    """
+    功能概述：这个类是 `AllGather`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `forward`：先接收输入参数 ctx, tensor, rank, world_size，再调用 torch.distributed.all_gather、torch.cat、torch.empty_like 等内部步骤完成主要工作，最后返回结果。
+    2. `backward`：先接收输入参数 ctx, grad_output，最后返回结果。
     """
 
     @staticmethod
-    def forward(ctx, tensor, rank, world_size):
+    def forward(ctx, tensor, rank, world_size):  # 中文名称：forward
         tensors_gather = [torch.empty_like(tensor) for _ in range(world_size)]
         torch.distributed.all_gather(tensors_gather, tensor)
         ctx.rank = rank
@@ -316,7 +333,7 @@ class AllGather(torch.autograd.Function):
         return torch.cat(tensors_gather, 0)
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output):  # 中文名称：backward
         return (
             grad_output[ctx.batch_size * ctx.rank: ctx.batch_size * (ctx.rank + 1)],
             None,

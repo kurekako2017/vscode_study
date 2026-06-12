@@ -1,6 +1,10 @@
 """
-基于图数据库的RAG系统配置文件
+文件功能概述：`code/C9/config.py` 主要是 配置，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `GraphRAGConfig`：功能概述：这个类是 `GraphRAGConfig`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__post_init__`：先进入当前步骤，最后把结果交给下一步或直接结束。 2. `from_dict`：先接收输入参数 cls, config_dict，再调用 cls 等内部步骤完成主要工作，最后返回结果。 3. `to_dict`：先进入当前步骤，最后返回结果。
 """
+
 
 import os
 from dataclasses import dataclass
@@ -9,7 +13,13 @@ from typing import Dict, Any
 
 @dataclass
 class GraphRAGConfig:
-    """基于图数据库的RAG系统配置类"""
+    """
+    功能概述：这个类是 `GraphRAGConfig`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__post_init__`：先进入当前步骤，最后把结果交给下一步或直接结束。
+    2. `from_dict`：先接收输入参数 cls, config_dict，再调用 cls 等内部步骤完成主要工作，最后返回结果。
+    3. `to_dict`：先进入当前步骤，最后返回结果。
+    """
 
     # Neo4j数据库配置
     neo4j_uri: str = "bolt://localhost:7687"
@@ -44,17 +54,17 @@ class GraphRAGConfig:
     chunk_overlap: int = 50
     max_graph_depth: int = 2  # 图遍历最大深度
 
-    def __post_init__(self):
+    def __post_init__(self):  # 中文名称：特殊方法 __post_init__
         """初始化后的处理"""
         # LightRAG使用Round-robin策略，无需权重验证
         pass
     
     @classmethod
-    def from_dict(cls, config_dict: Dict[str, Any]) -> 'GraphRAGConfig':
+    def from_dict(cls, config_dict: Dict[str, Any]) -> 'GraphRAGConfig':  # 中文名称：fromdict
         """从字典创建配置对象"""
         return cls(**config_dict)
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:  # 中文名称：todict
         """转换为字典"""
         return {
             'neo4j_uri': self.neo4j_uri,

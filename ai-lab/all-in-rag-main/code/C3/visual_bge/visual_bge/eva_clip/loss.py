@@ -1,3 +1,11 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/loss.py` 主要是 loss，这个文件里有 1 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `gather_features`：先接收输入参数 image_features, text_features, local_loss, gather_with_grad, rank, world_size, use_horovod，接着根据条件分支选择不同处理路径，再调用 hvd.allgather、torch.cat、dist.all_gather 等内部步骤完成主要工作，最后返回结果。
+2. 类 `ClipLoss`：功能概述：这个类是 `ClipLoss`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 local_loss, gather_with_grad, cache_labels, rank, world_size, use_horovod, smoothing，再调用 __init__、LabelSmoothingCrossEntropy、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 image_features, text_features, logit_scale，接着根据条件分支选择不同处理路径，再调用 gather_features、torch.arange、sum 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import math
 import torch
 import torch.nn as nn
@@ -26,7 +34,7 @@ def gather_features(
         rank=0,
         world_size=1,
         use_horovod=False
-):
+):  # 中文名称：gatherfeatures
     assert has_distributed, 'torch.distributed did not import correctly, please use a PyTorch version with support.'
     if use_horovod:
         assert hvd is not None, 'Please install horovod'
@@ -68,6 +76,12 @@ def gather_features(
 
 
 class ClipLoss(nn.Module):
+    """
+    功能概述：这个类是 `ClipLoss`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 local_loss, gather_with_grad, cache_labels, rank, world_size, use_horovod, smoothing，再调用 __init__、LabelSmoothingCrossEntropy、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 image_features, text_features, logit_scale，接着根据条件分支选择不同处理路径，再调用 gather_features、torch.arange、sum 等内部步骤完成主要工作，最后返回结果。
+    """
 
     def __init__(
             self,
@@ -78,7 +92,7 @@ class ClipLoss(nn.Module):
             world_size=1,
             use_horovod=False,
             smoothing=0.,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         self.local_loss = local_loss
         self.gather_with_grad = gather_with_grad
@@ -92,7 +106,7 @@ class ClipLoss(nn.Module):
         self.prev_num_logits = 0
         self.labels = {}
 
-    def forward(self, image_features, text_features, logit_scale=1.):
+    def forward(self, image_features, text_features, logit_scale=1.):  # 中文名称：forward
         device = image_features.device
         if self.world_size > 1:
             all_image_features, all_text_features = gather_features(

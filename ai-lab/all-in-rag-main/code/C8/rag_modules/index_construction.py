@@ -1,6 +1,10 @@
 """
-索引构建模块
+文件功能概述：`code/C8/rag_modules/index_construction.py` 主要是 索引construction，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `IndexConstructionModule`：功能概述：这个类是 `IndexConstructionModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name, index_save_path，再调用 self.setup_embeddings 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `setup_embeddings`：先进入当前步骤，再调用 logger.info、HuggingFaceEmbeddings 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `build_vector_index`：先接收输入参数 chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、FAISS.from_documents、ValueError 等内部步骤完成主要工作，最后返回结果。 4. `add_documents`：先接收输入参数 new_chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、self.vectorstore.add_documents、ValueError 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `save_index`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 mkdir、self.vectorstore.save_local、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 6. `load_index`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 self.setup_embeddings、exists、logger.info 等内部步骤完成主要工作，最后返回结果。 7. `similarity_search`：先接收输入参数 query, k，接着根据条件分支选择不同处理路径，再调用 self.vectorstore.similarity_search、ValueError 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import logging
 from typing import List
@@ -13,9 +17,19 @@ from langchain_core.documents import Document
 logger = logging.getLogger(__name__)
 
 class IndexConstructionModule:
-    """索引构建模块 - 负责向量化和索引构建"""
+    """
+    功能概述：这个类是 `IndexConstructionModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name, index_save_path，再调用 self.setup_embeddings 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `setup_embeddings`：先进入当前步骤，再调用 logger.info、HuggingFaceEmbeddings 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `build_vector_index`：先接收输入参数 chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、FAISS.from_documents、ValueError 等内部步骤完成主要工作，最后返回结果。
+    4. `add_documents`：先接收输入参数 new_chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、self.vectorstore.add_documents、ValueError 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `save_index`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 mkdir、self.vectorstore.save_local、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    6. `load_index`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 self.setup_embeddings、exists、logger.info 等内部步骤完成主要工作，最后返回结果。
+    7. `similarity_search`：先接收输入参数 query, k，接着根据条件分支选择不同处理路径，再调用 self.vectorstore.similarity_search、ValueError 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def __init__(self, model_name: str = "BAAI/bge-small-zh-v1.5", index_save_path: str = "./vector_index"):
+    def __init__(self, model_name: str = "BAAI/bge-small-zh-v1.5", index_save_path: str = "./vector_index"):  # 中文名称：初始化
         """
         初始化索引构建模块
 
@@ -29,7 +43,7 @@ class IndexConstructionModule:
         self.vectorstore = None
         self.setup_embeddings()
     
-    def setup_embeddings(self):
+    def setup_embeddings(self):  # 中文名称：setup向量化
         """初始化嵌入模型"""
         logger.info(f"正在初始化嵌入模型: {self.model_name}")
         
@@ -41,7 +55,7 @@ class IndexConstructionModule:
         
         logger.info("嵌入模型初始化完成")
     
-    def build_vector_index(self, chunks: List[Document]) -> FAISS:
+    def build_vector_index(self, chunks: List[Document]) -> FAISS:  # 中文名称：构建向量索引
         """
         构建向量索引
         
@@ -65,7 +79,7 @@ class IndexConstructionModule:
         logger.info(f"向量索引构建完成，包含 {len(chunks)} 个向量")
         return self.vectorstore
     
-    def add_documents(self, new_chunks: List[Document]):
+    def add_documents(self, new_chunks: List[Document]):  # 中文名称：add文档
         """
         向现有索引添加新文档
         
@@ -79,7 +93,7 @@ class IndexConstructionModule:
         self.vectorstore.add_documents(new_chunks)
         logger.info("新文档添加完成")
 
-    def save_index(self):
+    def save_index(self):  # 中文名称：保存索引
         """
         保存向量索引到配置的路径
         """
@@ -92,7 +106,7 @@ class IndexConstructionModule:
         self.vectorstore.save_local(self.index_save_path)
         logger.info(f"向量索引已保存到: {self.index_save_path}")
     
-    def load_index(self):
+    def load_index(self):  # 中文名称：加载索引
         """
         从配置的路径加载向量索引
 
@@ -118,7 +132,7 @@ class IndexConstructionModule:
             logger.warning(f"加载向量索引失败: {e}，将构建新索引")
             return None
     
-    def similarity_search(self, query: str, k: int = 5) -> List[Document]:
+    def similarity_search(self, query: str, k: int = 5) -> List[Document]:  # 中文名称：similarity搜索
         """
         相似度搜索
         

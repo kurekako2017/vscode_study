@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C3/02_langchain_faiss.py` 主要是 02LangChainfaiss，这个文件里有 0 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 这个文件没有独立类或函数，主要靠模块级代码直接执行。
+"""
+
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.documents import Document

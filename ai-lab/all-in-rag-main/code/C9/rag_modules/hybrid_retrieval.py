@@ -1,8 +1,11 @@
 """
-混合检索模块
-基于双层检索范式：实体级 + 主题级检索
-结合 BM25（jieba 分词）、向量检索与图键值索引，使用 RRF 融合
+文件功能概述：`code/C9/rag_modules/hybrid_retrieval.py` 主要是 混合检索，这个文件里有 2 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `RetrievalResult`：功能概述：这个类是 `RetrievalResult`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `HybridRetrievalModule`：功能概述：这个类是 `HybridRetrievalModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 config, milvus_module, data_module, llm_client，再调用 GraphIndexingModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `initialize`：先接收输入参数 chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、GraphDatabase.driver、self._build_graph_index 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `_tokenize_chinese`：先接收输入参数 text，接着根据条件分支选择不同处理路径，再调用 jieba.lcut、t.strip、t.isspace 等内部步骤完成主要工作，最后返回结果。 4. `_build_graph_index`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 logger.info、self.graph_indexing.create_entity_key_values、self._extract_relationships_from_graph 等内部步骤完成主要工作，最后返回结果。 5. `_extract_relationships_from_graph`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。 6. `extract_query_keywords`：先接收输入参数 query，再尝试执行核心处理，出错时进入异常兜底，再调用 self.llm_client.chat.completions.create、json.loads、result.get 等内部步骤完成主要工作，最后返回结果。 7. `entity_level_retrieval`：先接收输入参数 entity_keywords, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 results.sort、logger.info、self.graph_indexing.get_entities_by_key 等内部步骤完成主要工作，最后返回结果。 8. `_neo4j_entity_level_search`：先接收输入参数 keywords, limit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。 9. `topic_level_retrieval`：先接收输入参数 topic_keywords, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 results.sort、logger.info、self.graph_indexing.get_relations_by_key 等内部步骤完成主要工作，最后返回结果。 10. `_neo4j_topic_level_search`：先接收输入参数 keywords, limit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。 11. `dual_level_retrieval`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self.extract_query_keywords、self.entity_level_retrieval 等内部步骤完成主要工作，最后返回结果。 12. `vector_search_enhanced`：先接收输入参数 query, top_k，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.milvus_module.similarity_search、result.get、metadata.get 等内部步骤完成主要工作，最后返回结果。 13. `_get_node_neighbors`：先接收输入参数 node_id, max_neighbors，再尝试执行核心处理，出错时进入异常兜底，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。 14. `bm25_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._tokenize_chinese、self.bm25.get_scores、logger.info 等内部步骤完成主要工作，最后返回结果。 15. `_rrf_merge`：先接收输入参数 ranked_lists, top_k, k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、sorted、sum 等内部步骤完成主要工作，最后返回结果。 16. `_build_parent_doc_map`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、d.metadata.get、str 等内部步骤完成主要工作，最后返回结果。 17. `_attach_parent_documents`：先接收输入参数 docs，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、enumerate、self._build_parent_doc_map 等内部步骤完成主要工作，最后返回结果。 18. `hybrid_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、max、self.dual_level_retrieval 等内部步骤完成主要工作，最后返回结果。 19. `close`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.driver.close、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
 """
+
 
 import json
 import logging
@@ -32,7 +35,11 @@ _RRF_K = 60
 
 @dataclass
 class RetrievalResult:
-    """检索结果数据结构"""
+    """
+    功能概述：这个类是 `RetrievalResult`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     content: str
     node_id: str
     node_type: str
@@ -42,15 +49,30 @@ class RetrievalResult:
 
 class HybridRetrievalModule:
     """
-    混合检索模块
-    核心特点：
-    1. 双层检索范式（实体级 + 主题级，基于图键值索引）
-    2. BM25 关键词检索（jieba 分词 + 停用词过滤）
-    3. 向量检索（Milvus）+ 一跳邻居扩展
-    4. RRF (Reciprocal Rank Fusion) 融合三路结果
+    功能概述：这个类是 `HybridRetrievalModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 config, milvus_module, data_module, llm_client，再调用 GraphIndexingModule 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `initialize`：先接收输入参数 chunks，接着根据条件分支选择不同处理路径，再调用 logger.info、GraphDatabase.driver、self._build_graph_index 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `_tokenize_chinese`：先接收输入参数 text，接着根据条件分支选择不同处理路径，再调用 jieba.lcut、t.strip、t.isspace 等内部步骤完成主要工作，最后返回结果。
+    4. `_build_graph_index`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 logger.info、self.graph_indexing.create_entity_key_values、self._extract_relationships_from_graph 等内部步骤完成主要工作，最后返回结果。
+    5. `_extract_relationships_from_graph`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。
+    6. `extract_query_keywords`：先接收输入参数 query，再尝试执行核心处理，出错时进入异常兜底，再调用 self.llm_client.chat.completions.create、json.loads、result.get 等内部步骤完成主要工作，最后返回结果。
+    7. `entity_level_retrieval`：先接收输入参数 entity_keywords, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 results.sort、logger.info、self.graph_indexing.get_entities_by_key 等内部步骤完成主要工作，最后返回结果。
+    8. `_neo4j_entity_level_search`：先接收输入参数 keywords, limit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。
+    9. `topic_level_retrieval`：先接收输入参数 topic_keywords, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 results.sort、logger.info、self.graph_indexing.get_relations_by_key 等内部步骤完成主要工作，最后返回结果。
+    10. `_neo4j_topic_level_search`：先接收输入参数 keywords, limit，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。
+    11. `dual_level_retrieval`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self.extract_query_keywords、self.entity_level_retrieval 等内部步骤完成主要工作，最后返回结果。
+    12. `vector_search_enhanced`：先接收输入参数 query, top_k，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.milvus_module.similarity_search、result.get、metadata.get 等内部步骤完成主要工作，最后返回结果。
+    13. `_get_node_neighbors`：先接收输入参数 node_id, max_neighbors，再尝试执行核心处理，出错时进入异常兜底，再调用 self.driver.session、session.run、logger.error 等内部步骤完成主要工作，最后返回结果。
+    14. `bm25_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._tokenize_chinese、self.bm25.get_scores、logger.info 等内部步骤完成主要工作，最后返回结果。
+    15. `_rrf_merge`：先接收输入参数 ranked_lists, top_k, k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、sorted、sum 等内部步骤完成主要工作，最后返回结果。
+    16. `_build_parent_doc_map`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、d.metadata.get、str 等内部步骤完成主要工作，最后返回结果。
+    17. `_attach_parent_documents`：先接收输入参数 docs，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、enumerate、self._build_parent_doc_map 等内部步骤完成主要工作，最后返回结果。
+    18. `hybrid_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、max、self.dual_level_retrieval 等内部步骤完成主要工作，最后返回结果。
+    19. `close`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.driver.close、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
     """
 
-    def __init__(self, config, milvus_module, data_module, llm_client):
+    def __init__(self, config, milvus_module, data_module, llm_client):  # 中文名称：初始化
         self.config = config
         self.milvus_module = milvus_module
         self.data_module = data_module
@@ -65,7 +87,7 @@ class HybridRetrievalModule:
         self.graph_indexing = GraphIndexingModule(config, llm_client)
         self.graph_indexed = False
 
-    def initialize(self, chunks: List[Document]):
+    def initialize(self, chunks: List[Document]):  # 中文名称：initialize
         """初始化检索系统"""
         logger.info("初始化混合检索模块...")
 
@@ -94,7 +116,7 @@ class HybridRetrievalModule:
         logger.info(f"父文档映射构建完成，菜谱文档数: {len(self._parent_doc_map)}")
 
     @staticmethod
-    def _tokenize_chinese(text: str) -> List[str]:
+    def _tokenize_chinese(text: str) -> List[str]:  # 中文名称：tokenizechinese
         """jieba 精确分词 + 停用词 / 空白 / 单字符过滤"""
         if not text:
             return []
@@ -104,7 +126,7 @@ class HybridRetrievalModule:
             if t.strip() and t not in _CHINESE_STOPWORDS and not t.isspace()
         ]
         
-    def _build_graph_index(self):
+    def _build_graph_index(self):  # 中文名称：构建图索引
         """构建图索引"""
         if self.graph_indexed:
             return
@@ -134,7 +156,7 @@ class HybridRetrievalModule:
         except Exception as e:
             logger.error(f"构建图索引失败: {e}")
             
-    def _extract_relationships_from_graph(self) -> List[Tuple[str, str, str]]:
+    def _extract_relationships_from_graph(self) -> List[Tuple[str, str, str]]:  # 中文名称：extractrelationshipsfrom图
         """从Neo4j图中提取关系"""
         relationships = []
         
@@ -160,7 +182,7 @@ class HybridRetrievalModule:
             
         return relationships
             
-    def extract_query_keywords(self, query: str) -> Tuple[List[str], List[str]]:
+    def extract_query_keywords(self, query: str) -> Tuple[List[str], List[str]]:  # 中文名称：extract查询keywords
         """
         提取查询关键词：实体级 + 主题级
         """
@@ -219,7 +241,7 @@ class HybridRetrievalModule:
             keywords = query.split()
             return keywords[:3], keywords[3:6] if len(keywords) > 3 else keywords
     
-    def entity_level_retrieval(self, entity_keywords: List[str], top_k: int = 5) -> List[RetrievalResult]:
+    def entity_level_retrieval(self, entity_keywords: List[str], top_k: int = 5) -> List[RetrievalResult]:  # 中文名称：entitylevel检索
         """
         实体级检索：专注于具体实体和关系
         使用图索引的键值对结构进行检索
@@ -265,7 +287,7 @@ class HybridRetrievalModule:
         logger.info(f"实体级检索完成，返回 {len(results)} 个结果")
         return results[:top_k]
     
-    def _neo4j_entity_level_search(self, keywords: List[str], limit: int) -> List[RetrievalResult]:
+    def _neo4j_entity_level_search(self, keywords: List[str], limit: int) -> List[RetrievalResult]:  # 中文名称：neo4jentitylevel搜索
         """Neo4j补充检索"""
         results = []
         
@@ -316,7 +338,7 @@ class HybridRetrievalModule:
             
         return results
     
-    def topic_level_retrieval(self, topic_keywords: List[str], top_k: int = 5) -> List[RetrievalResult]:
+    def topic_level_retrieval(self, topic_keywords: List[str], top_k: int = 5) -> List[RetrievalResult]:  # 中文名称：topiclevel检索
         """
         主题级检索：专注于广泛主题和概念
         使用图索引的关系键值对结构进行主题检索
@@ -399,7 +421,7 @@ class HybridRetrievalModule:
         logger.info(f"主题级检索完成，返回 {len(results)} 个结果")
         return results[:top_k]
     
-    def _neo4j_topic_level_search(self, keywords: List[str], limit: int) -> List[RetrievalResult]:
+    def _neo4j_topic_level_search(self, keywords: List[str], limit: int) -> List[RetrievalResult]:  # 中文名称：neo4jtopiclevel搜索
         """Neo4j主题级检索补充"""
         results = []
         
@@ -467,7 +489,7 @@ class HybridRetrievalModule:
             
         return results
         
-    def dual_level_retrieval(self, query: str, top_k: int = 5) -> List[Document]:
+    def dual_level_retrieval(self, query: str, top_k: int = 5) -> List[Document]:  # 中文名称：duallevel检索
         """
         双层检索：结合实体级和主题级检索
         """
@@ -515,7 +537,7 @@ class HybridRetrievalModule:
         logger.info(f"双层检索完成，返回 {len(documents)} 个文档")
         return documents
     
-    def vector_search_enhanced(self, query: str, top_k: int = 5) -> List[Document]:
+    def vector_search_enhanced(self, query: str, top_k: int = 5) -> List[Document]:  # 中文名称：向量搜索enhanced
         """
         增强的向量检索：结合图信息
         """
@@ -564,7 +586,7 @@ class HybridRetrievalModule:
             logger.error(f"增强向量检索失败: {e}")
             return []
     
-    def _get_node_neighbors(self, node_id: str, max_neighbors: int = 3) -> List[str]:
+    def _get_node_neighbors(self, node_id: str, max_neighbors: int = 3) -> List[str]:  # 中文名称：获取nodeneighbors
         """获取节点的邻居信息"""
         try:
             with self.driver.session() as session:
@@ -579,7 +601,7 @@ class HybridRetrievalModule:
             logger.error(f"获取邻居节点失败: {e}")
             return []
     
-    def bm25_search(self, query: str, top_k: int = 5) -> List[Document]:
+    def bm25_search(self, query: str, top_k: int = 5) -> List[Document]:  # 中文名称：bm25搜索
         """
         BM25 检索：jieba 分词后查 BM25Okapi 索引，按分数降序返回 top_k。
         分数写入 metadata["bm25_score"]，供调试与未来潜在的分数级融合使用。
@@ -631,7 +653,7 @@ class HybridRetrievalModule:
         ranked_lists: List[Tuple[str, List[Document]]],
         top_k: int,
         k: int = _RRF_K,
-    ) -> List[Document]:
+    ) -> List[Document]:  # 中文名称：rrfmerge
         """
         Reciprocal Rank Fusion: score(d) = Σ_i 1 / (k + best_rank_i(d))
 
@@ -713,7 +735,7 @@ class HybridRetrievalModule:
 
         return merged
 
-    def _build_parent_doc_map(self) -> Dict[str, Document]:
+    def _build_parent_doc_map(self) -> Dict[str, Document]:  # 中文名称：构建parentdocmap
         """{str(node_id): 整篇父菜谱 Document}，由分块前的 data_module.documents 懒建一次。"""
         docs = getattr(self.data_module, "documents", None) or []
         m: Dict[str, Document] = {}
@@ -723,7 +745,7 @@ class HybridRetrievalModule:
                 m[str(nid)] = d
         return m
 
-    def _attach_parent_documents(self, docs: List[Document]) -> List[Document]:
+    def _attach_parent_documents(self, docs: List[Document]) -> List[Document]:  # 中文名称：attachparent文档
         """RRF 去重后，前 parent_doc_top_n 条且能在映射中找到父菜谱的，
         用整篇父菜谱（超 parent_doc_max_chars 截断）替换 chunk；其余原样不变。
         不改顺序/数量/排名，不 mutate 输入（被替换的造新 Document，未替换的直接传原对象）。"""
@@ -753,7 +775,7 @@ class HybridRetrievalModule:
             out.append(Document(page_content=pc, metadata=dict(doc.metadata)))
         return out
 
-    def hybrid_search(self, query: str, top_k: int = 5) -> List[Document]:
+    def hybrid_search(self, query: str, top_k: int = 5) -> List[Document]:  # 中文名称：混合搜索
         """
         混合检索：三路召回（图键值双层 + 向量 + BM25）→ RRF 融合
         """
@@ -792,7 +814,7 @@ class HybridRetrievalModule:
         )
         return final_docs
 
-    def close(self):
+    def close(self):  # 中文名称：close
         """关闭资源连接"""
         if self.driver:
             self.driver.close()

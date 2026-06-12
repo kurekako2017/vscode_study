@@ -1,10 +1,20 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/rope.py` 主要是 rope，这个文件里有 2 个类、2 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `broadcat`：先接收输入参数 tensors, dim，再调用 len、set、list 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `rotate_half`：先接收输入参数 x，再调用 rearrange、x.unbind、torch.stack 等内部步骤完成主要工作，最后返回结果。
+3. 类 `VisionRotaryEmbedding`：功能概述：这个类是 `VisionRotaryEmbedding`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, pt_seq_len, ft_seq_len, custom_freqs, freqs_for, theta, max_freq, num_freqs，接着根据条件分支选择不同处理路径，再调用 __init__、torch.einsum、repeat 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 t, start_index，再调用 torch.cat、rotate_half 等内部步骤完成主要工作，最后返回结果。
+4. 类 `VisionRotaryEmbeddingFast`：功能概述：这个类是 `VisionRotaryEmbeddingFast`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, pt_seq_len, ft_seq_len, custom_freqs, freqs_for, theta, max_freq, num_freqs, patch_dropout，接着根据条件分支选择不同处理路径，再调用 __init__、torch.einsum、repeat 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 t, patch_indices_keep，接着根据条件分支选择不同处理路径，再调用 torch.arange、repeat、rearrange 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from math import pi
 import torch
 from torch import nn
 from einops import rearrange, repeat
 import logging
 
-def broadcat(tensors, dim = -1):
+def broadcat(tensors, dim = -1):  # 中文名称：broadcat
     num_tensors = len(tensors)
     shape_lens = set(list(map(lambda t: len(t.shape), tensors)))
     assert len(shape_lens) == 1, 'tensors must all have the same number of dimensions'
@@ -20,7 +30,7 @@ def broadcat(tensors, dim = -1):
     tensors = list(map(lambda t: t[0].expand(*t[1]), zip(tensors, expandable_shapes)))
     return torch.cat(tensors, dim = dim)
 
-def rotate_half(x):
+def rotate_half(x):  # 中文名称：rotatehalf
     x = rearrange(x, '... (d r) -> ... d r', r = 2)
     x1, x2 = x.unbind(dim = -1)
     x = torch.stack((-x2, x1), dim = -1)
@@ -28,6 +38,12 @@ def rotate_half(x):
 
 
 class VisionRotaryEmbedding(nn.Module):
+    """
+    功能概述：这个类是 `VisionRotaryEmbedding`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, pt_seq_len, ft_seq_len, custom_freqs, freqs_for, theta, max_freq, num_freqs，接着根据条件分支选择不同处理路径，再调用 __init__、torch.einsum、repeat 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 t, start_index，再调用 torch.cat、rotate_half 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
         self,
         dim,
@@ -38,7 +54,7 @@ class VisionRotaryEmbedding(nn.Module):
         theta = 10000,
         max_freq = 10,
         num_freqs = 1,
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         if custom_freqs:
             freqs = custom_freqs
@@ -67,7 +83,7 @@ class VisionRotaryEmbedding(nn.Module):
 
         logging.info(f'Shape of rope freq: {self.freqs_cos.shape}')
 
-    def forward(self, t, start_index = 0):
+    def forward(self, t, start_index = 0):  # 中文名称：forward
         rot_dim = self.freqs_cos.shape[-1]
         end_index = start_index + rot_dim
         assert rot_dim <= t.shape[-1], f'feature dimension {t.shape[-1]} is not of sufficient size to rotate in all the positions {rot_dim}'
@@ -77,6 +93,12 @@ class VisionRotaryEmbedding(nn.Module):
         return torch.cat((t_left, t, t_right), dim = -1)
 
 class VisionRotaryEmbeddingFast(nn.Module):
+    """
+    功能概述：这个类是 `VisionRotaryEmbeddingFast`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, pt_seq_len, ft_seq_len, custom_freqs, freqs_for, theta, max_freq, num_freqs, patch_dropout，接着根据条件分支选择不同处理路径，再调用 __init__、torch.einsum、repeat 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 t, patch_indices_keep，接着根据条件分支选择不同处理路径，再调用 torch.arange、repeat、rearrange 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
         self,
         dim,
@@ -88,7 +110,7 @@ class VisionRotaryEmbeddingFast(nn.Module):
         max_freq = 10,
         num_freqs = 1,
         patch_dropout = 0.
-    ):
+    ):  # 中文名称：初始化
         super().__init__()
         if custom_freqs:
             freqs = custom_freqs
@@ -118,7 +140,7 @@ class VisionRotaryEmbeddingFast(nn.Module):
 
         logging.info(f'Shape of rope freq: {self.freqs_cos.shape}')
 
-    def forward(self, t, patch_indices_keep=None):
+    def forward(self, t, patch_indices_keep=None):  # 中文名称：forward
         if patch_indices_keep is not None:
             batch = t.size()[0]
             batch_indices = torch.arange(batch)

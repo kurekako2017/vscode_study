@@ -1,7 +1,15 @@
-""" huggingface model adapter
-
-Wraps HuggingFace transformers (https://github.com/huggingface/transformers) models for use as a text tower in CLIP model.
 """
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/hf_model.py` 主要是 hfmodel，这个文件里有 4 个类、2 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_camel2snake`：先接收输入参数 s，再调用 lower、re.sub 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `register_pooler`：先接收输入参数 cls，再调用 _camel2snake 等内部步骤完成主要工作，最后返回结果。
+3. 类 `MeanPooler`：功能概述：这个类是 `MeanPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `forward`：先接收输入参数 x, attention_mask，再调用 attention_mask.unsqueeze、masked_output.sum、attention_mask.sum 等内部步骤完成主要工作，最后返回结果。
+4. 类 `MaxPooler`：功能概述：这个类是 `MaxPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `forward`：先接收输入参数 x, attention_mask，再调用 x.last_hidden_state.masked_fill、attention_mask.unsqueeze、masked_output.max 等内部步骤完成主要工作，最后返回结果。
+5. 类 `ClsPooler`：功能概述：这个类是 `ClsPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 use_pooler_output，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x, attention_mask，接着根据条件分支选择不同处理路径，再调用 isinstance 等内部步骤完成主要工作，最后返回结果。
+6. 类 `HFTextEncoder`：功能概述：这个类是 `HFTextEncoder`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name_or_path, output_dim, tokenizer_name, config, pooler_type, proj, pretrained, masked_language_modeling，接着根据条件分支选择不同处理路径，再调用 __init__、getattr、AutoTokenizer.from_pretrained 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `mask`：先接收输入参数 input_ids, vocab_size, device, targets, masked_indices, probability_matrix，接着根据条件分支选择不同处理路径，再调用 to、bool、torch.randint 等内部步骤完成主要工作，最后返回结果。 3. `forward_mlm`：先接收输入参数 input_ids, image_embeds, mlm_probability，再调用 input_ids.clone、long、to 等内部步骤完成主要工作，最后返回结果。 4. `forward`：先接收输入参数 x，再调用 long、self.transformer、self.pooler 等内部步骤完成主要工作，最后返回结果。 5. `lock`：先接收输入参数 unlocked_layers, freeze_layer_norm，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、print、self.transformer.named_parameters 等内部步骤完成主要工作，最后返回结果。 6. `set_grad_checkpointing`：先接收输入参数 enable，再调用 self.transformer.gradient_checkpointing_enable 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 7. `get_num_layers`：先进入当前步骤，再调用 getattr、len、hasattr 等内部步骤完成主要工作，最后返回结果。 8. `init_parameters`：先进入当前步骤，最后把结果交给下一步或直接结束。
+"""
+
 
 import re
 
@@ -19,22 +27,32 @@ except ImportError as e:
 
 
     class BaseModelOutput:
+        """
+        功能概述：这个类是 `BaseModelOutput`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+        调用流程：
+        1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+        """
         pass
 
 
     class PretrainedConfig:
+        """
+        功能概述：这个类是 `PretrainedConfig`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+        调用流程：
+        1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+        """
         pass
 
 from .hf_configs import arch_dict
 
 # utils
-def _camel2snake(s):
+def _camel2snake(s):  # 中文名称：camel2snake
     return re.sub(r'(?<!^)(?=[A-Z])', '_', s).lower()
 
 # TODO: ?last - for gpt-like models
 _POOLERS = {}
 
-def register_pooler(cls):
+def register_pooler(cls):  # 中文名称：registerpooler
     """Decorator registering pooler class"""
     _POOLERS[_camel2snake(cls.__name__)] = cls
     return cls
@@ -42,28 +60,41 @@ def register_pooler(cls):
 
 @register_pooler
 class MeanPooler(nn.Module):
-    """Mean pooling"""
-    def forward(self, x:BaseModelOutput, attention_mask:TensorType):
+    """
+    功能概述：这个类是 `MeanPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `forward`：先接收输入参数 x, attention_mask，再调用 attention_mask.unsqueeze、masked_output.sum、attention_mask.sum 等内部步骤完成主要工作，最后返回结果。
+    """
+    def forward(self, x:BaseModelOutput, attention_mask:TensorType):  # 中文名称：forward
         masked_output = x.last_hidden_state * attention_mask.unsqueeze(-1)
         return masked_output.sum(dim=1) / attention_mask.sum(-1, keepdim=True)
 
 @register_pooler
 class MaxPooler(nn.Module):
-    """Max pooling"""
-    def forward(self, x:BaseModelOutput, attention_mask:TensorType):
+    """
+    功能概述：这个类是 `MaxPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `forward`：先接收输入参数 x, attention_mask，再调用 x.last_hidden_state.masked_fill、attention_mask.unsqueeze、masked_output.max 等内部步骤完成主要工作，最后返回结果。
+    """
+    def forward(self, x:BaseModelOutput, attention_mask:TensorType):  # 中文名称：forward
         masked_output = x.last_hidden_state.masked_fill(attention_mask.unsqueeze(-1), -torch.inf)
         return masked_output.max(1).values
 
 @register_pooler
 class ClsPooler(nn.Module):
-    """CLS token pooling"""
-    def __init__(self, use_pooler_output=True):
+    """
+    功能概述：这个类是 `ClsPooler`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 use_pooler_output，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x, attention_mask，接着根据条件分支选择不同处理路径，再调用 isinstance 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, use_pooler_output=True):  # 中文名称：初始化
         super().__init__()
         self.cls_token_position = 0
         self.use_pooler_output = use_pooler_output
 
     def forward(self, x:BaseModelOutput, attention_mask:TensorType):
-        
+          # 中文名称：forward
         if (self.use_pooler_output and 
             isinstance(x, (BaseModelOutputWithPooling, BaseModelOutputWithPoolingAndCrossAttentions)) and
             (x.pooler_output is not None)
@@ -73,7 +104,18 @@ class ClsPooler(nn.Module):
         return x.last_hidden_state[:, self.cls_token_position, :]
 
 class HFTextEncoder(nn.Module):
-    """HuggingFace model adapter"""
+    """
+    功能概述：这个类是 `HFTextEncoder`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name_or_path, output_dim, tokenizer_name, config, pooler_type, proj, pretrained, masked_language_modeling，接着根据条件分支选择不同处理路径，再调用 __init__、getattr、AutoTokenizer.from_pretrained 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `mask`：先接收输入参数 input_ids, vocab_size, device, targets, masked_indices, probability_matrix，接着根据条件分支选择不同处理路径，再调用 to、bool、torch.randint 等内部步骤完成主要工作，最后返回结果。
+    3. `forward_mlm`：先接收输入参数 input_ids, image_embeds, mlm_probability，再调用 input_ids.clone、long、to 等内部步骤完成主要工作，最后返回结果。
+    4. `forward`：先接收输入参数 x，再调用 long、self.transformer、self.pooler 等内部步骤完成主要工作，最后返回结果。
+    5. `lock`：先接收输入参数 unlocked_layers, freeze_layer_norm，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 getattr、print、self.transformer.named_parameters 等内部步骤完成主要工作，最后返回结果。
+    6. `set_grad_checkpointing`：先接收输入参数 enable，再调用 self.transformer.gradient_checkpointing_enable 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    7. `get_num_layers`：先进入当前步骤，再调用 getattr、len、hasattr 等内部步骤完成主要工作，最后返回结果。
+    8. `init_parameters`：先进入当前步骤，最后把结果交给下一步或直接结束。
+    """
     def __init__(
             self, 
             model_name_or_path: str,
@@ -83,7 +125,7 @@ class HFTextEncoder(nn.Module):
             pooler_type: str = None,
             proj: str = None,
             pretrained: bool = True,
-            masked_language_modeling: bool = False):
+            masked_language_modeling: bool = False):  # 中文名称：初始化
         super().__init__()
 
         self.output_dim = output_dim
@@ -149,7 +191,7 @@ class HFTextEncoder(nn.Module):
 
     #     return self.itm_proj(pooled_out)
 
-    def mask(self, input_ids, vocab_size, device, targets=None, masked_indices=None, probability_matrix=None):
+    def mask(self, input_ids, vocab_size, device, targets=None, masked_indices=None, probability_matrix=None):  # 中文名称：mask
         if masked_indices is None:                                       
             masked_indices = torch.bernoulli(probability_matrix).bool()
                                                
@@ -174,7 +216,7 @@ class HFTextEncoder(nn.Module):
         else:
             return input_ids
 
-    def forward_mlm(self, input_ids, image_embeds, mlm_probability=0.25):
+    def forward_mlm(self, input_ids, image_embeds, mlm_probability=0.25):  # 中文名称：forwardmlm
         labels = input_ids.clone()
         attn_mask = (input_ids != self.config.pad_token_id).long()
         image_atts = torch.ones(image_embeds.size()[:-1],dtype=torch.long).to(input_ids.device) 
@@ -210,14 +252,14 @@ class HFTextEncoder(nn.Module):
         # return mlm_loss
 
 
-    def forward(self, x:TensorType) -> TensorType:
+    def forward(self, x:TensorType) -> TensorType:  # 中文名称：forward
         attn_mask = (x != self.config.pad_token_id).long()
         out = self.transformer(input_ids=x, attention_mask=attn_mask)
         pooled_out = self.pooler(out, attn_mask)
 
         return self.proj(pooled_out)
 
-    def lock(self, unlocked_layers:int=0, freeze_layer_norm:bool=True):
+    def lock(self, unlocked_layers:int=0, freeze_layer_norm:bool=True):  # 中文名称：lock
         if not unlocked_layers: # full freezing
              for n, p in self.transformer.named_parameters():
                  p.requires_grad = (not freeze_layer_norm) if "LayerNorm" in n.split(".") else False
@@ -236,13 +278,13 @@ class HFTextEncoder(nn.Module):
 
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.transformer.gradient_checkpointing_enable()
 
-    def get_num_layers(self):
+    def get_num_layers(self):  # 中文名称：获取numlayers
         encoder = self.transformer.encoder if hasattr(self.transformer, 'encoder') else self.transformer
         layer_list = getattr(encoder, arch_dict[self.config.model_type]["config_names"]["layer_attr"])
         return len(layer_list)
 
-    def init_parameters(self):
+    def init_parameters(self):  # 中文名称：初始化parameters
         pass

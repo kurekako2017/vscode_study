@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C4/01_hybrid_search_v2.py` 主要是 01混合搜索v2，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `OfflineSigLIPEmbeddingFunction`：功能概述：这个类是 `OfflineSigLIPEmbeddingFunction`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 device，再调用 TfidfVectorizer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `dim`：先进入当前步骤，最后返回结果。 3. `fit_sparse`：先接收输入参数 docs，再调用 self.tfidf_vectorizer.fit 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `__call__`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 isinstance、np.asarray、self.tfidf_vectorizer.transform 等内部步骤完成主要工作，最后返回结果。
+"""
+
 from __future__ import annotations
 
 import json
@@ -14,21 +21,29 @@ MILVUS_URI = "http://localhost:19530"
 
 
 class OfflineSigLIPEmbeddingFunction:
-    def __init__(self, device: str = "cpu"):
+    """
+    功能概述：这个类是 `OfflineSigLIPEmbeddingFunction`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 device，再调用 TfidfVectorizer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `dim`：先进入当前步骤，最后返回结果。
+    3. `fit_sparse`：先接收输入参数 docs，再调用 self.tfidf_vectorizer.fit 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `__call__`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 isinstance、np.asarray、self.tfidf_vectorizer.transform 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, device: str = "cpu"):  # 中文名称：初始化
         self.device = device
         self.dense_dim = 384
         self.tfidf_vectorizer = TfidfVectorizer(max_features=10000)
         self.tfidf_fitted = False
 
     @property
-    def dim(self):
+    def dim(self):  # 中文名称：dim
         return {"dense": self.dense_dim, "sparse": 10000}
 
-    def fit_sparse(self, docs):
+    def fit_sparse(self, docs):  # 中文名称：fitsparse
         self.tfidf_vectorizer.fit(docs)
         self.tfidf_fitted = True
 
-    def __call__(self, texts):
+    def __call__(self, texts):  # 中文名称：可调用执行
         if isinstance(texts, str):
             texts = [texts]
         if not self.tfidf_fitted:

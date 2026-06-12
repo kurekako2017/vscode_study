@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C4/text2sql/knowledge_base.py` 主要是 知识base，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `SimpleKnowledgeBase`：功能概述：这个类是 `SimpleKnowledgeBase`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 milvus_uri，再调用 MilvusClient、BGEM3EmbeddingFunction、self._setup_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `_setup_collection`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.client.has_collection、CollectionSchema、self.client.create_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `load_data`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、self.client.load_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `_add_ddl_data`：先接收输入参数 data，然后循环处理每一条数据，再调用 self._insert_data、contents.append、types.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `_add_qsql_data`：先接收输入参数 data，然后循环处理每一条数据，再调用 self._insert_data、contents.append、types.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 6. `_add_description_data`：先接收输入参数 data，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._insert_data、item.get、contents.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 7. `_insert_data`：先接收输入参数 contents, types，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.embedding_function、range、self.client.insert 等内部步骤完成主要工作，最后返回结果。 8. `search`：先接收输入参数 query, top_k，然后循环处理每一条数据，再调用 self.client.load_collection、self.embedding_function、self.client.search 等内部步骤完成主要工作，最后返回结果。 9. `cleanup`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，再调用 self.client.drop_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+"""
+
 import json
 import os
 from typing import List, Dict, Any
@@ -6,16 +13,28 @@ from pymilvus.model.hybrid import BGEM3EmbeddingFunction
 
 
 class SimpleKnowledgeBase:
-    """知识库"""
+    """
+    功能概述：这个类是 `SimpleKnowledgeBase`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 milvus_uri，再调用 MilvusClient、BGEM3EmbeddingFunction、self._setup_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `_setup_collection`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.client.has_collection、CollectionSchema、self.client.create_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `load_data`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、self.client.load_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `_add_ddl_data`：先接收输入参数 data，然后循环处理每一条数据，再调用 self._insert_data、contents.append、types.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `_add_qsql_data`：先接收输入参数 data，然后循环处理每一条数据，再调用 self._insert_data、contents.append、types.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    6. `_add_description_data`：先接收输入参数 data，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self._insert_data、item.get、contents.append 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    7. `_insert_data`：先接收输入参数 contents, types，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.embedding_function、range、self.client.insert 等内部步骤完成主要工作，最后返回结果。
+    8. `search`：先接收输入参数 query, top_k，然后循环处理每一条数据，再调用 self.client.load_collection、self.embedding_function、self.client.search 等内部步骤完成主要工作，最后返回结果。
+    9. `cleanup`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，再调用 self.client.drop_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     
-    def __init__(self, milvus_uri: str = "http://localhost:19530"):
+    def __init__(self, milvus_uri: str = "http://localhost:19530"):  # 中文名称：初始化
         self.milvus_uri = milvus_uri
         self.client = MilvusClient(uri=milvus_uri)
         self.embedding_function = BGEM3EmbeddingFunction(use_fp16=False, device="cpu")
         self.collection_name = "text2sql_kb"
         self._setup_collection()
     
-    def _setup_collection(self):
+    def _setup_collection(self):  # 中文名称：setupcollection
         """设置集合"""
         if self.client.has_collection(self.collection_name):
             self.client.drop_collection(self.collection_name)
@@ -50,7 +69,7 @@ class SimpleKnowledgeBase:
             index_params=index_params
         )
     
-    def load_data(self):
+    def load_data(self):  # 中文名称：加载data
         """加载所有知识库数据"""
         data_dir = os.path.join(os.path.dirname(__file__), "data")
         
@@ -79,7 +98,7 @@ class SimpleKnowledgeBase:
         self.client.load_collection(collection_name=self.collection_name)
         print("知识库数据加载完成")
     
-    def _add_ddl_data(self, data: List[Dict]):
+    def _add_ddl_data(self, data: List[Dict]):  # 中文名称：addddldata
         """添加DDL数据"""
         contents = []
         types = []
@@ -94,7 +113,7 @@ class SimpleKnowledgeBase:
         
         self._insert_data(contents, types)
     
-    def _add_qsql_data(self, data: List[Dict]):
+    def _add_qsql_data(self, data: List[Dict]):  # 中文名称：addqsqldata
         """添加Q->SQL数据"""
         contents = []
         types = []
@@ -108,7 +127,7 @@ class SimpleKnowledgeBase:
         
         self._insert_data(contents, types)
     
-    def _add_description_data(self, data: List[Dict]):
+    def _add_description_data(self, data: List[Dict]):  # 中文名称：adddescriptiondata
         """添加描述数据"""
         contents = []
         types = []
@@ -128,7 +147,7 @@ class SimpleKnowledgeBase:
         
         self._insert_data(contents, types)
     
-    def _insert_data(self, contents: List[str], types: List[str]):
+    def _insert_data(self, contents: List[str], types: List[str]):  # 中文名称：insertdata
         """插入数据"""
         if not contents:
             return
@@ -151,7 +170,7 @@ class SimpleKnowledgeBase:
             data=data_to_insert
         )
     
-    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:  # 中文名称：搜索
         """搜索相关内容"""
         self.client.load_collection(collection_name=self.collection_name)
             
@@ -178,7 +197,7 @@ class SimpleKnowledgeBase:
         
         return results
     
-    def cleanup(self):
+    def cleanup(self):  # 中文名称：cleanup
         """清理资源"""
         try:
             self.client.drop_collection(self.collection_name)

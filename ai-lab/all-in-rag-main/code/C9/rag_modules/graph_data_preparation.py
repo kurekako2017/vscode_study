@@ -1,6 +1,12 @@
 """
-图数据库数据准备模块
+文件功能概述：`code/C9/rag_modules/graph_data_preparation.py` 主要是 图datapreparation，这个文件里有 3 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `GraphNode`：功能概述：这个类是 `GraphNode`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `GraphRelation`：功能概述：这个类是 `GraphRelation`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+3. 类 `GraphDataPreparationModule`：功能概述：这个类是 `GraphDataPreparationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 uri, user, password, database，再调用 self._connect 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `_connect`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 GraphDatabase.driver、logger.info、self.driver.session 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `close`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 hasattr、self.driver.close、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 4. `load_graph_data`：先进入当前步骤，然后循环处理每一条数据，再调用 logger.info、self.driver.session、session.run 等内部步骤完成主要工作，最后返回结果。 5. `build_recipe_documents`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self.driver.session、session.run 等内部步骤完成主要工作，最后返回结果。 6. `chunk_documents`：先接收输入参数 chunk_size, chunk_overlap，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、ValueError、len 等内部步骤完成主要工作，最后返回结果。 7. `get_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 len、stats.update、doc.metadata.get 等内部步骤完成主要工作，最后返回结果。 8. `__del__`：先进入当前步骤，再调用 self.close 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
 """
+
 
 import logging
 import json
@@ -14,7 +20,11 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class GraphNode:
-    """图节点数据结构"""
+    """
+    功能概述：这个类是 `GraphNode`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     node_id: str
     labels: List[str]
     name: str
@@ -22,16 +32,31 @@ class GraphNode:
 
 @dataclass
 class GraphRelation:
-    """图关系数据结构"""
+    """
+    功能概述：这个类是 `GraphRelation`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     start_node_id: str
     end_node_id: str
     relation_type: str
     properties: Dict[str, Any]
 
 class GraphDataPreparationModule:
-    """图数据库数据准备模块 - 从Neo4j读取数据并转换为文档"""
+    """
+    功能概述：这个类是 `GraphDataPreparationModule`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 uri, user, password, database，再调用 self._connect 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `_connect`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 GraphDatabase.driver、logger.info、self.driver.session 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `close`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 hasattr、self.driver.close、logger.info 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    4. `load_graph_data`：先进入当前步骤，然后循环处理每一条数据，再调用 logger.info、self.driver.session、session.run 等内部步骤完成主要工作，最后返回结果。
+    5. `build_recipe_documents`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、self.driver.session、session.run 等内部步骤完成主要工作，最后返回结果。
+    6. `chunk_documents`：先接收输入参数 chunk_size, chunk_overlap，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 logger.info、ValueError、len 等内部步骤完成主要工作，最后返回结果。
+    7. `get_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 len、stats.update、doc.metadata.get 等内部步骤完成主要工作，最后返回结果。
+    8. `__del__`：先进入当前步骤，再调用 self.close 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     
-    def __init__(self, uri: str, user: str, password: str, database: str = "neo4j"):
+    def __init__(self, uri: str, user: str, password: str, database: str = "neo4j"):  # 中文名称：初始化
         """
         初始化图数据库连接
         
@@ -54,7 +79,7 @@ class GraphDataPreparationModule:
         
         self._connect()
     
-    def _connect(self):
+    def _connect(self):  # 中文名称：connect
         """建立Neo4j连接"""
         try:
             self.driver = GraphDatabase.driver(
@@ -75,13 +100,13 @@ class GraphDataPreparationModule:
             logger.error(f"连接Neo4j失败: {e}")
             raise
     
-    def close(self):
+    def close(self):  # 中文名称：close
         """关闭数据库连接"""
         if hasattr(self, 'driver') and self.driver:
             self.driver.close()
             logger.info("Neo4j连接已关闭")
     
-    def load_graph_data(self) -> Dict[str, Any]:
+    def load_graph_data(self) -> Dict[str, Any]:  # 中文名称：加载图data
         """
         从Neo4j加载图数据
         
@@ -176,7 +201,7 @@ class GraphDataPreparationModule:
             'cooking_steps': len(self.cooking_steps)
         }
     
-    def build_recipe_documents(self) -> List[Document]:
+    def build_recipe_documents(self) -> List[Document]:  # 中文名称：构建recipe文档
         """
         构建菜谱文档，集成相关的食材和步骤信息
         
@@ -311,7 +336,7 @@ class GraphDataPreparationModule:
         logger.info(f"成功构建 {len(documents)} 个菜谱文档")
         return documents
     
-    def chunk_documents(self, chunk_size: int = 500, chunk_overlap: int = 50) -> List[Document]:
+    def chunk_documents(self, chunk_size: int = 500, chunk_overlap: int = 50) -> List[Document]:  # 中文名称：分块文档
         """
         对文档进行分块处理
         
@@ -410,7 +435,7 @@ class GraphDataPreparationModule:
     
 
     
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> Dict[str, Any]:  # 中文名称：获取statistics
         """
         获取数据统计信息
         
@@ -453,6 +478,6 @@ class GraphDataPreparationModule:
     
 
     
-    def __del__(self):
+    def __del__(self):  # 中文名称：特殊方法 __del__
         """析构函数，确保关闭连接"""
         self.close() 

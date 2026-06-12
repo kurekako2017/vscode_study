@@ -1,3 +1,21 @@
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/pretrained.py` 主要是 pretrained，这个文件里有 0 个类、12 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `_pcfg`：先接收输入参数 url, hf_hub, filename, mean, std，再调用 dict 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `_clean_tag`：先接收输入参数 tag，再调用 replace、tag.lower 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `list_pretrained`：先接收输入参数 as_str，再调用 join、_PRETRAINED.keys、keys 等内部步骤完成主要工作，最后返回结果。
+4. 函数 `list_pretrained_models_by_tag`：先接收输入参数 tag，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 _clean_tag、_PRETRAINED.keys、models.append 等内部步骤完成主要工作，最后返回结果。
+5. 函数 `list_pretrained_tags_by_model`：先接收输入参数 model，接着根据条件分支选择不同处理路径，再调用 tags.extend、keys 等内部步骤完成主要工作，最后返回结果。
+6. 函数 `is_pretrained_cfg`：先接收输入参数 model, tag，接着根据条件分支选择不同处理路径，再调用 _clean_tag 等内部步骤完成主要工作，最后返回结果。
+7. 函数 `get_pretrained_cfg`：先接收输入参数 model, tag，接着根据条件分支选择不同处理路径，再调用 model_pretrained.get、_clean_tag 等内部步骤完成主要工作，最后返回结果。
+8. 函数 `get_pretrained_url`：先接收输入参数 model, tag，再调用 get_pretrained_cfg、cfg.get、_clean_tag 等内部步骤完成主要工作，最后返回结果。
+9. 函数 `download_pretrained_from_url`：先接收输入参数 url, cache_dir，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 os.makedirs、os.path.basename、os.path.join 等内部步骤完成主要工作，最后返回结果。
+10. 函数 `has_hf_hub`：先接收输入参数 necessary，接着根据条件分支选择不同处理路径，再调用 RuntimeError 等内部步骤完成主要工作，最后返回结果。
+11. 函数 `download_pretrained_from_hf`：先接收输入参数 model_id, filename, revision, cache_dir，再调用 has_hf_hub、hf_hub_download 等内部步骤完成主要工作，最后返回结果。
+12. 函数 `download_pretrained`：先接收输入参数 cfg, force_hf_hub, cache_dir，接着根据条件分支选择不同处理路径，再调用 cfg.get、download_pretrained_from_url、has_hf_hub 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import hashlib
 import os
 import urllib
@@ -15,7 +33,7 @@ except ImportError:
     _has_hf_hub = False
 
 
-def _pcfg(url='', hf_hub='', filename='', mean=None, std=None):
+def _pcfg(url='', hf_hub='', filename='', mean=None, std=None):  # 中文名称：pcfg
     return dict(
         url=url,
         hf_hub=hf_hub,
@@ -189,18 +207,18 @@ _PRETRAINED = {
 
 
 def _clean_tag(tag: str):
-    # normalize pretrained tags
+    # normalize pretrained tags  # 中文名称：清理tag
     return tag.lower().replace('-', '_')
 
 
-def list_pretrained(as_str: bool = False):
+def list_pretrained(as_str: bool = False):  # 中文名称：listpretrained
     """ returns list of pretrained models
     Returns a tuple (model_name, pretrain_tag) by default or 'name:tag' if as_str == True
     """
     return [':'.join([k, t]) if as_str else (k, t) for k in _PRETRAINED.keys() for t in _PRETRAINED[k].keys()]
 
 
-def list_pretrained_models_by_tag(tag: str):
+def list_pretrained_models_by_tag(tag: str):  # 中文名称：listpretrainedmodelsbytag
     """ return all models having the specified pretrain tag """
     models = []
     tag = _clean_tag(tag)
@@ -210,7 +228,7 @@ def list_pretrained_models_by_tag(tag: str):
     return models
 
 
-def list_pretrained_tags_by_model(model: str):
+def list_pretrained_tags_by_model(model: str):  # 中文名称：listpretrainedtagsbymodel
     """ return all pretrain tags for the specified model architecture """
     tags = []
     if model in _PRETRAINED:
@@ -218,20 +236,20 @@ def list_pretrained_tags_by_model(model: str):
     return tags
 
 
-def is_pretrained_cfg(model: str, tag: str):
+def is_pretrained_cfg(model: str, tag: str):  # 中文名称：是否pretrainedcfg
     if model not in _PRETRAINED:
         return False
     return _clean_tag(tag) in _PRETRAINED[model]
 
 
-def get_pretrained_cfg(model: str, tag: str):
+def get_pretrained_cfg(model: str, tag: str):  # 中文名称：获取pretrainedcfg
     if model not in _PRETRAINED:
         return {}
     model_pretrained = _PRETRAINED[model]
     return model_pretrained.get(_clean_tag(tag), {})
 
 
-def get_pretrained_url(model: str, tag: str):
+def get_pretrained_url(model: str, tag: str):  # 中文名称：获取pretrainedurl
     cfg = get_pretrained_cfg(model, _clean_tag(tag))
     return cfg.get('url', '')
 
@@ -239,7 +257,7 @@ def get_pretrained_url(model: str, tag: str):
 def download_pretrained_from_url(
         url: str,
         cache_dir: Union[str, None] = None,
-):
+):  # 中文名称：downloadpretrainedfromurl
     if not cache_dir:
         cache_dir = os.path.expanduser("~/.cache/clip")
     os.makedirs(cache_dir, exist_ok=True)
@@ -282,7 +300,7 @@ def download_pretrained_from_url(
     return download_target
 
 
-def has_hf_hub(necessary=False):
+def has_hf_hub(necessary=False):  # 中文名称：是否具有hfhub
     if not _has_hf_hub and necessary:
         # if no HF Hub module installed, and it is necessary to continue, raise error
         raise RuntimeError(
@@ -295,7 +313,7 @@ def download_pretrained_from_hf(
         filename: str = 'open_clip_pytorch_model.bin',
         revision=None,
         cache_dir: Union[str, None] = None,
-):
+):  # 中文名称：downloadpretrainedfromhf
     has_hf_hub(True)
     cached_file = hf_hub_download(model_id, filename, revision=revision, cache_dir=cache_dir)
     return cached_file
@@ -305,7 +323,7 @@ def download_pretrained(
         cfg: Dict,
         force_hf_hub: bool = False,
         cache_dir: Union[str, None] = None,
-):
+):  # 中文名称：downloadpretrained
     target = ''
     if not cfg:
         return target

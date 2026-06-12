@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C5/01_pydantic.py` 主要是 01数据模型，这个文件里有 1 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `PersonInfo`：功能概述：这个类是 `PersonInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+"""
+
 from typing import List
 import os
 from langchain_core.prompts import PromptTemplate
@@ -14,6 +21,11 @@ llm = ChatOpenAI(
 
 # 1. 定义数据结构
 class PersonInfo(BaseModel):
+    """
+    功能概述：这个类是 `PersonInfo`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     name: str = Field(description="人物姓名")
     age: int = Field(description="人物年龄")
     skills: List[str] = Field(description="技能列表")

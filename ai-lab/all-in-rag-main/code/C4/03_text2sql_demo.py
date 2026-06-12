@@ -1,3 +1,14 @@
+"""
+文件功能概述：`code/C4/03_text2sql_demo.py` 主要是 03文本转SQL演示，这个文件里有 0 个类、5 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `setup_demo`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 print、os.getenv、create_demo_database 等内部步骤完成主要工作，最后返回结果。
+2. 函数 `create_demo_database`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 os.path.exists、sqlite3.connect、conn.cursor 等内部步骤完成主要工作，最后返回结果。
+3. 函数 `run_demo_queries`：先接收输入参数 agent，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 print、enumerate、len 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+4. 函数 `cleanup`：先接收输入参数 agent, db_path，接着根据条件分支选择不同处理路径，再调用 print、os.path.exists、agent.cleanup 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+5. 函数 `main`：先进入当前步骤，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 setup_demo、run_demo_queries、cleanup 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 import sys
 import sqlite3
@@ -8,7 +19,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'text2sql'))
 from text2sql.text2sql_agent import SimpleText2SQLAgent
 
 
-def setup_demo():
+def setup_demo():  # 中文名称：setup演示
     """设置演示环境"""
     print("=== Text2SQL框架演示 ===\n")
     
@@ -44,7 +55,7 @@ def setup_demo():
     return agent, db_path
 
 
-def create_demo_database():
+def create_demo_database():  # 中文名称：创建演示database
     """创建演示数据库"""
     db_path = "text2sql_demo.db"
     
@@ -130,7 +141,7 @@ def create_demo_database():
     return db_path
 
 
-def run_demo_queries(agent):
+def run_demo_queries(agent):  # 中文名称：运行演示queries
     """运行演示查询"""
     demo_questions = [
         "查询所有用户的姓名和邮箱",
@@ -185,7 +196,7 @@ def run_demo_queries(agent):
     total_count = len(demo_questions)
 
 
-def cleanup(agent, db_path):
+def cleanup(agent, db_path):  # 中文名称：cleanup
     """清理资源"""
     print("\n清理资源...")
     
@@ -197,7 +208,7 @@ def cleanup(agent, db_path):
         print(f"已删除演示数据库: {db_path}")
 
 
-def main():
+def main():  # 中文名称：主函数
     """主函数"""
     # 设置演示环境
     setup_result = setup_demo()

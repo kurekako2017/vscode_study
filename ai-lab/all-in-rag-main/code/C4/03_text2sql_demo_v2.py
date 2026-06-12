@@ -1,3 +1,12 @@
+"""
+文件功能概述：`code/C4/03_text2sql_demo_v2.py` 主要是 03文本转SQL演示v2，这个文件里有 2 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `BGESmallEmbeddingFunction`：功能概述：这个类是 `BGESmallEmbeddingFunction`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 model_name, device，再调用 SentenceTransformer、self.model.get_sentence_embedding_dimension 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `encode_text`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 isinstance、self.model.encode 等内部步骤完成主要工作，最后返回结果。 3. `dim`：先进入当前步骤，最后返回结果。
+2. 类 `SimpleKnowledgeBase`：功能概述：这个类是 `SimpleKnowledgeBase`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 milvus_uri，再调用 BGESmallEmbeddingFunction 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `connect_milvus`：先进入当前步骤，再调用 connections.connect、MilvusClient 等内部步骤完成主要工作，最后返回结果。 3. `create_collection`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.milvus_client.has_collection、CollectionSchema、Collection 等内部步骤完成主要工作，最后返回结果。 4. `load_data`：先进入当前步骤，再调用 os.path.join、self.load_sql_examples、self.load_table_schemas 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `load_sql_examples`：先接收输入参数 data_dir，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 6. `load_table_schemas`：先接收输入参数 data_dir，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 7. `vectorize_and_store`：先进入当前步骤，然后循环处理每一条数据，再调用 self.create_collection、self.embedding_function.encode_text、enumerate 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 8. `search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.load_data、self.embedding_function.encode_text、self.collection.search 等内部步骤完成主要工作，最后返回结果。 9. `_fallback_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 query.lower、results.sort、lower 等内部步骤完成主要工作，最后返回结果。 10. `add_sql_example`：先接收输入参数 question, sql, description，接着根据条件分支选择不同处理路径，再调用 self.sql_examples.append、os.path.join、os.path.dirname 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 11. `cleanup`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.collection.release、self.milvus_client.has_collection、self.milvus_client.drop_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+3. 函数 `demo`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 BGESmallEmbeddingFunction、embedding_function.encode_text、print 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+"""
+
 import os
 import json
 import sqlite3
@@ -10,15 +19,21 @@ from pymilvus import connections, MilvusClient, FieldSchema, CollectionSchema, D
 
 
 class BGESmallEmbeddingFunction:
-    """BGE-Small中文嵌入函数，用于Text2SQL知识库向量化"""
+    """
+    功能概述：这个类是 `BGESmallEmbeddingFunction`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 model_name, device，再调用 SentenceTransformer、self.model.get_sentence_embedding_dimension 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `encode_text`：先接收输入参数 texts，接着根据条件分支选择不同处理路径，再调用 isinstance、self.model.encode 等内部步骤完成主要工作，最后返回结果。
+    3. `dim`：先进入当前步骤，最后返回结果。
+    """
     
-    def __init__(self, model_name="BAAI/bge-small-zh-v1.5", device="cpu"):
+    def __init__(self, model_name="BAAI/bge-small-zh-v1.5", device="cpu"):  # 中文名称：初始化
         self.model_name = model_name
         self.device = device
         self.model = SentenceTransformer(model_name, device=device)
         self.dense_dim = self.model.get_sentence_embedding_dimension()
     
-    def encode_text(self, texts):
+    def encode_text(self, texts):  # 中文名称：encode文本
         """编码文本为密集向量"""
         if isinstance(texts, str):
             texts = [texts]
@@ -33,15 +48,29 @@ class BGESmallEmbeddingFunction:
         return embeddings
     
     @property
-    def dim(self):
+    def dim(self):  # 中文名称：dim
         """返回向量维度"""
         return self.dense_dim
 
 
 class SimpleKnowledgeBase:
-    """简化的知识库，使用BGE-Small进行向量检索"""
+    """
+    功能概述：这个类是 `SimpleKnowledgeBase`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 milvus_uri，再调用 BGESmallEmbeddingFunction 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `connect_milvus`：先进入当前步骤，再调用 connections.connect、MilvusClient 等内部步骤完成主要工作，最后返回结果。
+    3. `create_collection`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.milvus_client.has_collection、CollectionSchema、Collection 等内部步骤完成主要工作，最后返回结果。
+    4. `load_data`：先进入当前步骤，再调用 os.path.join、self.load_sql_examples、self.load_table_schemas 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `load_sql_examples`：先接收输入参数 data_dir，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    6. `load_table_schemas`：先接收输入参数 data_dir，接着根据条件分支选择不同处理路径，再调用 os.path.join、os.path.exists、os.makedirs 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    7. `vectorize_and_store`：先进入当前步骤，然后循环处理每一条数据，再调用 self.create_collection、self.embedding_function.encode_text、enumerate 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    8. `search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.load_data、self.embedding_function.encode_text、self.collection.search 等内部步骤完成主要工作，最后返回结果。
+    9. `_fallback_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 query.lower、results.sort、lower 等内部步骤完成主要工作，最后返回结果。
+    10. `add_sql_example`：先接收输入参数 question, sql, description，接着根据条件分支选择不同处理路径，再调用 self.sql_examples.append、os.path.join、os.path.dirname 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    11. `cleanup`：先进入当前步骤，接着根据条件分支选择不同处理路径，再调用 self.collection.release、self.milvus_client.has_collection、self.milvus_client.drop_collection 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    """
     
-    def __init__(self, milvus_uri: str = "http://localhost:19530"):
+    def __init__(self, milvus_uri: str = "http://localhost:19530"):  # 中文名称：初始化
         self.milvus_uri = milvus_uri
         self.collection_name = "text2sql_knowledge_base"
         self.milvus_client = None
@@ -56,13 +85,13 @@ class SimpleKnowledgeBase:
         self.table_schemas = []
         self.data_loaded = False
     
-    def connect_milvus(self):
+    def connect_milvus(self):  # 中文名称：connectMilvus
         """连接Milvus数据库"""
         connections.connect(uri=self.milvus_uri)
         self.milvus_client = MilvusClient(uri=self.milvus_uri)
         return True
     
-    def create_collection(self):
+    def create_collection(self):  # 中文名称：创建collection
         """创建Milvus集合"""
         if not self.milvus_client:
             self.connect_milvus()
@@ -88,7 +117,7 @@ class SimpleKnowledgeBase:
         
         return True
     
-    def load_data(self):
+    def load_data(self):  # 中文名称：加载data
         """加载知识库数据"""        
         data_dir = os.path.join(os.path.dirname(__file__), "data")
         
@@ -98,7 +127,7 @@ class SimpleKnowledgeBase:
         
         self.data_loaded = True
     
-    def load_sql_examples(self, data_dir: str):
+    def load_sql_examples(self, data_dir: str):  # 中文名称：加载SQLexamples
         """加载SQL示例"""
         sql_examples_path = os.path.join(data_dir, "qsql_examples.json")
         
@@ -120,7 +149,7 @@ class SimpleKnowledgeBase:
             with open(sql_examples_path, 'w', encoding='utf-8') as f:
                 json.dump(self.sql_examples, f, ensure_ascii=False, indent=2)
     
-    def load_table_schemas(self, data_dir: str):
+    def load_table_schemas(self, data_dir: str):  # 中文名称：加载tableschemas
         """加载表结构信息"""
         schema_path = os.path.join(data_dir, "table_schemas.json")
         
@@ -172,7 +201,7 @@ class SimpleKnowledgeBase:
             with open(schema_path, 'w', encoding='utf-8') as f:
                 json.dump(self.table_schemas, f, ensure_ascii=False, indent=2)
     
-    def vectorize_and_store(self):
+    def vectorize_and_store(self):  # 中文名称：vectorizeand存储
         """向量化数据并存储到Milvus"""
         self.create_collection()
         
@@ -220,7 +249,7 @@ class SimpleKnowledgeBase:
         self.collection.flush()
         self.collection.load()
     
-    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:  # 中文名称：搜索
         """搜索相关的知识库信息"""
         if not self.data_loaded:
             self.load_data()
@@ -250,7 +279,7 @@ class SimpleKnowledgeBase:
         
         return formatted_results
     
-    def _fallback_search(self, query: str, top_k: int) -> List[Dict[str, Any]]:
+    def _fallback_search(self, query: str, top_k: int) -> List[Dict[str, Any]]:  # 中文名称：fallback搜索
         """降级搜索方法（简单文本匹配）"""
         results = []
         query_lower = query.lower()
@@ -279,7 +308,7 @@ class SimpleKnowledgeBase:
         results.sort(key=lambda x: x['score'], reverse=True)
         return results[:top_k]
     
-    def add_sql_example(self, question: str, sql: str, description: str = ""):
+    def add_sql_example(self, question: str, sql: str, description: str = ""):  # 中文名称：addSQL示例
         """添加新的SQL示例"""
         new_example = {
             "question": question,
@@ -311,7 +340,7 @@ class SimpleKnowledgeBase:
             self.collection.insert(insert_data)
             self.collection.flush()
     
-    def cleanup(self):
+    def cleanup(self):  # 中文名称：cleanup
         """清理资源"""
         if self.collection:
             self.collection.release()
@@ -320,7 +349,7 @@ class SimpleKnowledgeBase:
             self.milvus_client.drop_collection(self.collection_name)
 
 
-def demo():
+def demo():  # 中文名称：演示
     """简单演示"""
     # 模型测试
     embedding_function = BGESmallEmbeddingFunction()

@@ -1,3 +1,10 @@
+"""
+文件功能概述：`code/C4/06_embedding_based_routing.py` 主要是 06向量化basedrouting，这个文件里有 0 个类、1 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 函数 `route`：先接收输入参数 info，再调用 embeddings.embed_query、np.argmax、print 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import os
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -44,7 +51,7 @@ print("川菜和粤菜的处理链创建成功。\n")
 
 # 3. 创建路由函数
 def route(info):
-    # 对用户查询进行嵌入
+    # 对用户查询进行嵌入  # 中文名称：route
     query_embedding = embeddings.embed_query(info["query"])
     
     # 计算与各路由提示的余弦相似度

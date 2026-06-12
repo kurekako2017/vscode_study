@@ -1,9 +1,12 @@
 """
-智能查询路由器
-根据查询特点自动选择最适合的检索策略：
-- 传统混合检索：适合简单的信息查找
-- 图RAG检索：适合复杂的关系推理和知识发现
+文件功能概述：`code/C9/rag_modules/intelligent_query_router.py` 主要是 intelligent查询路由，这个文件里有 3 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `SearchStrategy`：功能概述：这个类是 `SearchStrategy`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+2. 类 `QueryAnalysis`：功能概述：这个类是 `QueryAnalysis`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+3. 类 `IntelligentQueryRouter`：功能概述：这个类是 `IntelligentQueryRouter`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 traditional_retrieval, graph_rag_retrieval, llm_client, config，最后把结果交给下一步或直接结束。 2. `analyze_query`：先接收输入参数 query，再尝试执行核心处理，出错时进入异常兜底，再调用 logger.info、self.llm_client.chat.completions.create、json.loads 等内部步骤完成主要工作，最后返回结果。 3. `_rule_based_analysis`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 QueryAnalysis、sum、len 等内部步骤完成主要工作，最后返回结果。 4. `route_query`：先接收输入参数 query, top_k，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 logger.info、self.analyze_query、self._update_route_stats 等内部步骤完成主要工作，最后返回结果。 5. `_combined_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 max、self.traditional_retrieval.hybrid_search、self.graph_rag_retrieval.graph_rag_search 等内部步骤完成主要工作，最后返回结果。 6. `_post_process_results`：先接收输入参数 documents, analysis，然后循环处理每一条数据，再调用 doc.metadata.update 等内部步骤完成主要工作，最后返回结果。 7. `_update_route_stats`：先接收输入参数 strategy，接着根据条件分支选择不同处理路径，最后把结果交给下一步或直接结束。 8. `get_route_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，最后返回结果。 9. `explain_routing_decision`：先接收输入参数 query，再调用 self.analyze_query 等内部步骤完成主要工作，最后返回结果。
 """
+
 
 import json
 import logging
@@ -17,14 +20,22 @@ from langchain_core.documents import Document
 logger = logging.getLogger(__name__)
 
 class SearchStrategy(Enum):
-    """搜索策略枚举"""
+    """
+    功能概述：这个类是 `SearchStrategy`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     HYBRID_TRADITIONAL = "hybrid_traditional"  # 传统混合检索
     GRAPH_RAG = "graph_rag"  # 图RAG检索
     COMBINED = "combined"  # 组合策略
     
 @dataclass
 class QueryAnalysis:
-    """查询分析结果"""
+    """
+    功能概述：这个类是 `QueryAnalysis`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. 这个类没有单独的方法，通常用于保存配置或做简单占位。
+    """
     query_complexity: float  # 查询复杂度 (0-1)
     relationship_intensity: float  # 关系密集度 (0-1)
     reasoning_required: bool  # 是否需要推理
@@ -35,20 +46,24 @@ class QueryAnalysis:
 
 class IntelligentQueryRouter:
     """
-    智能查询路由器
-    
-    核心能力：
-    1. 查询复杂度分析：识别简单查找 vs 复杂推理
-    2. 关系密集度评估：判断是否需要图结构优势
-    3. 策略自动选择：路由到最适合的检索引擎
-    4. 结果质量监控：基于反馈优化路由决策
+    功能概述：这个类是 `IntelligentQueryRouter`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 traditional_retrieval, graph_rag_retrieval, llm_client, config，最后把结果交给下一步或直接结束。
+    2. `analyze_query`：先接收输入参数 query，再尝试执行核心处理，出错时进入异常兜底，再调用 logger.info、self.llm_client.chat.completions.create、json.loads 等内部步骤完成主要工作，最后返回结果。
+    3. `_rule_based_analysis`：先接收输入参数 query，接着根据条件分支选择不同处理路径，再调用 QueryAnalysis、sum、len 等内部步骤完成主要工作，最后返回结果。
+    4. `route_query`：先接收输入参数 query, top_k，再尝试执行核心处理，出错时进入异常兜底，接着根据条件分支选择不同处理路径，再调用 logger.info、self.analyze_query、self._update_route_stats 等内部步骤完成主要工作，最后返回结果。
+    5. `_combined_search`：先接收输入参数 query, top_k，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 max、self.traditional_retrieval.hybrid_search、self.graph_rag_retrieval.graph_rag_search 等内部步骤完成主要工作，最后返回结果。
+    6. `_post_process_results`：先接收输入参数 documents, analysis，然后循环处理每一条数据，再调用 doc.metadata.update 等内部步骤完成主要工作，最后返回结果。
+    7. `_update_route_stats`：先接收输入参数 strategy，接着根据条件分支选择不同处理路径，最后把结果交给下一步或直接结束。
+    8. `get_route_statistics`：先进入当前步骤，接着根据条件分支选择不同处理路径，最后返回结果。
+    9. `explain_routing_decision`：先接收输入参数 query，再调用 self.analyze_query 等内部步骤完成主要工作，最后返回结果。
     """
     
     def __init__(self, 
                  traditional_retrieval,  # 传统混合检索模块
                  graph_rag_retrieval,    # 图RAG检索模块
                  llm_client,
-                 config):
+                 config):  # 中文名称：初始化
         self.traditional_retrieval = traditional_retrieval
         self.graph_rag_retrieval = graph_rag_retrieval
         self.llm_client = llm_client
@@ -62,7 +77,7 @@ class IntelligentQueryRouter:
             "total_queries": 0
         }
         
-    def analyze_query(self, query: str) -> QueryAnalysis:
+    def analyze_query(self, query: str) -> QueryAnalysis:  # 中文名称：analyze查询
         """
         深度分析查询特征，决定最佳检索策略
         """
@@ -140,7 +155,7 @@ class IntelligentQueryRouter:
             # 降级方案：基于规则的简单分析
             return self._rule_based_analysis(query)
     
-    def _rule_based_analysis(self, query: str) -> QueryAnalysis:
+    def _rule_based_analysis(self, query: str) -> QueryAnalysis:  # 中文名称：rulebasedanalysis
         """基于规则的降级分析"""
         # 简单的规则判断
         complexity_keywords = ["为什么", "如何", "关系", "影响", "原因", "比较", "区别"]
@@ -164,7 +179,7 @@ class IntelligentQueryRouter:
             reasoning="基于规则的简单分析"
         )
     
-    def route_query(self, query: str, top_k: int = 5) -> Tuple[List[Document], QueryAnalysis]:
+    def route_query(self, query: str, top_k: int = 5) -> Tuple[List[Document], QueryAnalysis]:  # 中文名称：route查询
         """
         智能路由查询到最适合的检索引擎
         """
@@ -204,7 +219,7 @@ class IntelligentQueryRouter:
             documents = self.traditional_retrieval.hybrid_search(query, top_k)
             return documents, analysis
     
-    def _combined_search(self, query: str, top_k: int) -> List[Document]:
+    def _combined_search(self, query: str, top_k: int) -> List[Document]:  # 中文名称：combined搜索
         """
         组合搜索策略：结合传统检索和图RAG的优势
         """
@@ -243,7 +258,7 @@ class IntelligentQueryRouter:
         
         return combined_docs[:top_k]
     
-    def _post_process_results(self, documents: List[Document], analysis: QueryAnalysis) -> List[Document]:
+    def _post_process_results(self, documents: List[Document], analysis: QueryAnalysis) -> List[Document]:  # 中文名称：post处理results
         """
         结果后处理：根据查询分析优化结果
         """
@@ -257,7 +272,7 @@ class IntelligentQueryRouter:
         
         return documents
     
-    def _update_route_stats(self, strategy: SearchStrategy):
+    def _update_route_stats(self, strategy: SearchStrategy):  # 中文名称：updateroutestats
         """更新路由统计"""
         self.route_stats["total_queries"] += 1
         
@@ -268,7 +283,7 @@ class IntelligentQueryRouter:
         elif strategy == SearchStrategy.COMBINED:
             self.route_stats["combined_count"] += 1
     
-    def get_route_statistics(self) -> Dict[str, Any]:
+    def get_route_statistics(self) -> Dict[str, Any]:  # 中文名称：获取routestatistics
         """获取路由统计信息"""
         total = self.route_stats["total_queries"]
         if total == 0:
@@ -281,7 +296,7 @@ class IntelligentQueryRouter:
             "combined_ratio": self.route_stats["combined_count"] / total
         }
     
-    def explain_routing_decision(self, query: str) -> str:
+    def explain_routing_decision(self, query: str) -> str:  # 中文名称：explainroutingdecision
         """解释路由决策过程"""
         analysis = self.analyze_query(query)
         

@@ -1,6 +1,20 @@
 # --------------------------------------------------------
 # Adapted from  https://github.com/microsoft/unilm/tree/master/beit
 # --------------------------------------------------------
+"""
+文件功能概述：`code/C3/visual_bge/visual_bge/eva_clip/eva_vit_model.py` 主要是 evavitmodel，这个文件里有 8 个类、0 个函数，主要用来串起当前章节的处理步骤。
+
+主要函数/类的处理流程：
+1. 类 `DropPath`：功能概述：这个类是 `DropPath`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 drop_prob，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，再调用 drop_path 等内部步骤完成主要工作，最后返回结果。 3. `extra_repr`：先进入当前步骤，再调用 format 等内部步骤完成主要工作，最后返回结果。
+2. 类 `Mlp`：功能概述：这个类是 `Mlp`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 in_features, hidden_features, out_features, act_layer, norm_layer, drop, subln，再调用 __init__、nn.Linear、act_layer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，再调用 self.fc1、self.act、self.ffn_ln 等内部步骤完成主要工作，最后返回结果。
+3. 类 `SwiGLU`：功能概述：这个类是 `SwiGLU`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 in_features, hidden_features, out_features, act_layer, drop, norm_layer, subln，再调用 __init__、nn.Linear、act_layer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x，再调用 self.w1、self.w2、self.ffn_ln 等内部步骤完成主要工作，最后返回结果。
+4. 类 `Attention`：功能概述：这个类是 `Attention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, qk_scale, attn_drop, proj_drop, window_size, attn_head_dim, xattn, rope, subln, norm_layer，接着根据条件分支选择不同处理路径，再调用 __init__、nn.Dropout、nn.Linear 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x, rel_pos_bias, attn_mask，接着根据条件分支选择不同处理路径，再调用 F.linear、permute、self.rope 等内部步骤完成主要工作，最后返回结果。
+5. 类 `Block`：功能概述：这个类是 `Block`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 dim, num_heads, mlp_ratio, qkv_bias, qk_scale, drop, attn_drop, drop_path, init_values, act_layer, norm_layer, window_size, attn_head_dim, xattn, rope, postnorm, subln, naiveswiglu，接着根据条件分支选择不同处理路径，再调用 __init__、norm_layer、Attention 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x, rel_pos_bias, attn_mask，接着根据条件分支选择不同处理路径，再调用 self.drop_path、self.norm1、self.norm2 等内部步骤完成主要工作，最后返回结果。
+6. 类 `PatchEmbed`：功能概述：这个类是 `PatchEmbed`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 img_size, patch_size, in_chans, embed_dim，再调用 __init__、to_2tuple、nn.Conv2d 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先接收输入参数 x, **kwargs，再调用 transpose、flatten、self.proj 等内部步骤完成主要工作，最后返回结果。
+7. 类 `RelativePositionBias`：功能概述：这个类是 `RelativePositionBias`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 window_size, num_heads，再调用 __init__、nn.Parameter、torch.arange 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `forward`：先进入当前步骤，再调用 view、contiguous、relative_position_bias.permute 等内部步骤完成主要工作，最后返回结果。
+8. 类 `EVAVisionTransformer`：功能概述：这个类是 `EVAVisionTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。 调用流程： 1. `__init__`：先接收输入参数 img_size, patch_size, in_chans, num_classes, embed_dim, depth, num_heads, mlp_ratio, qkv_bias, qk_scale, drop_rate, attn_drop_rate, drop_path_rate, norm_layer, init_values, patch_dropout, use_abs_pos_emb, use_rel_pos_bias, use_shared_rel_pos_bias, rope, use_mean_pooling, init_scale, grad_checkpointing, xattn, postnorm, pt_hw_seq_len, intp_freq, naiveswiglu, subln，接着根据条件分支选择不同处理路径，再调用 __init__、PatchEmbed、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 2. `fix_init_weight`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、param.div_、rescale 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 3. `get_cast_dtype`：先进入当前步骤，最后返回结果。 4. `_init_weights`：先接收输入参数 m，接着根据条件分支选择不同处理路径，再调用 isinstance、trunc_normal_、nn.init.constant_ 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 5. `get_num_layers`：先进入当前步骤，再调用 len 等内部步骤完成主要工作，最后返回结果。 6. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，然后循环处理每一条数据，再调用 self.parameters 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 7. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。 8. `no_weight_decay`：先进入当前步骤，最后返回结果。 9. `get_classifier`：先进入当前步骤，最后返回结果。 10. `reset_classifier`：先接收输入参数 num_classes, global_pool，再调用 nn.Linear、nn.Identity 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。 11. `forward_features`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.patch_embed、x.size、self.cls_token.expand 等内部步骤完成主要工作，最后返回结果。 12. `forward`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.forward_features、self.head 等内部步骤完成主要工作，最后返回结果。
+"""
+
 import math
 import os
 from functools import partial
@@ -31,20 +45,31 @@ except ImportError:
 
 
 class DropPath(nn.Module):
-    """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
     """
-    def __init__(self, drop_prob=None):
+    功能概述：这个类是 `DropPath`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 drop_prob，再调用 __init__、super 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，再调用 drop_path 等内部步骤完成主要工作，最后返回结果。
+    3. `extra_repr`：先进入当前步骤，再调用 format 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, drop_prob=None):  # 中文名称：初始化
         super(DropPath, self).__init__()
         self.drop_prob = drop_prob
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         return drop_path(x, self.drop_prob, self.training)
     
-    def extra_repr(self) -> str:
+    def extra_repr(self) -> str:  # 中文名称：extrarepr
         return 'p={}'.format(self.drop_prob)
 
 
 class Mlp(nn.Module):
+    """
+    功能概述：这个类是 `Mlp`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 in_features, hidden_features, out_features, act_layer, norm_layer, drop, subln，再调用 __init__、nn.Linear、act_layer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，再调用 self.fc1、self.act、self.ffn_ln 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
         self, 
         in_features, 
@@ -55,7 +80,7 @@ class Mlp(nn.Module):
         drop=0.,
         subln=False,
 
-        ):
+        ):  # 中文名称：初始化
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -67,7 +92,7 @@ class Mlp(nn.Module):
         self.fc2 = nn.Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         x = self.fc1(x)
         x = self.act(x)
         # x = self.drop(x)
@@ -79,8 +104,14 @@ class Mlp(nn.Module):
         return x
 
 class SwiGLU(nn.Module):
+    """
+    功能概述：这个类是 `SwiGLU`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 in_features, hidden_features, out_features, act_layer, drop, norm_layer, subln，再调用 __init__、nn.Linear、act_layer 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x，再调用 self.w1、self.w2、self.ffn_ln 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.SiLU, drop=0., 
-                norm_layer=nn.LayerNorm, subln=False):
+                norm_layer=nn.LayerNorm, subln=False):  # 中文名称：初始化
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -94,7 +125,7 @@ class SwiGLU(nn.Module):
         
         self.drop = nn.Dropout(drop)
 
-    def forward(self, x):
+    def forward(self, x):  # 中文名称：forward
         x1 = self.w1(x)
         x2 = self.w2(x)
         hidden = self.act(x1) * x2
@@ -104,9 +135,15 @@ class SwiGLU(nn.Module):
         return x
 
 class Attention(nn.Module):
+    """
+    功能概述：这个类是 `Attention`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, num_heads, qkv_bias, qk_scale, attn_drop, proj_drop, window_size, attn_head_dim, xattn, rope, subln, norm_layer，接着根据条件分支选择不同处理路径，再调用 __init__、nn.Dropout、nn.Linear 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x, rel_pos_bias, attn_mask，接着根据条件分支选择不同处理路径，再调用 F.linear、permute、self.rope 等内部步骤完成主要工作，最后返回结果。
+    """
     def __init__(
             self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0.,
-            proj_drop=0., window_size=None, attn_head_dim=None, xattn=False, rope=None, subln=False, norm_layer=nn.LayerNorm):
+            proj_drop=0., window_size=None, attn_head_dim=None, xattn=False, rope=None, subln=False, norm_layer=nn.LayerNorm):  # 中文名称：初始化
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -170,7 +207,7 @@ class Attention(nn.Module):
 
         self.rope = rope
 
-    def forward(self, x, rel_pos_bias=None, attn_mask=None):
+    def forward(self, x, rel_pos_bias=None, attn_mask=None):  # 中文名称：forward
         B, N, C = x.shape
         if self.subln: 
             q = F.linear(input=x, weight=self.q_proj.weight, bias=self.q_bias)
@@ -244,11 +281,17 @@ class Attention(nn.Module):
 
 
 class Block(nn.Module):
+    """
+    功能概述：这个类是 `Block`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 dim, num_heads, mlp_ratio, qkv_bias, qk_scale, drop, attn_drop, drop_path, init_values, act_layer, norm_layer, window_size, attn_head_dim, xattn, rope, postnorm, subln, naiveswiglu，接着根据条件分支选择不同处理路径，再调用 __init__、norm_layer、Attention 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x, rel_pos_bias, attn_mask，接着根据条件分支选择不同处理路径，再调用 self.drop_path、self.norm1、self.norm2 等内部步骤完成主要工作，最后返回结果。
+    """
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
                  drop_path=0., init_values=None, act_layer=nn.GELU, norm_layer=nn.LayerNorm,
                  window_size=None, attn_head_dim=None, xattn=False, rope=None, postnorm=False,
-                 subln=False, naiveswiglu=False):
+                 subln=False, naiveswiglu=False):  # 中文名称：初始化
         super().__init__()
         self.norm1 = norm_layer(dim)
         self.attn = Attention(
@@ -284,7 +327,7 @@ class Block(nn.Module):
 
         self.postnorm = postnorm
 
-    def forward(self, x, rel_pos_bias=None, attn_mask=None):
+    def forward(self, x, rel_pos_bias=None, attn_mask=None):  # 中文名称：forward
         if self.gamma_1 is None:
             if self.postnorm:
                 x = x + self.drop_path(self.norm1(self.attn(x, rel_pos_bias=rel_pos_bias, attn_mask=attn_mask)))
@@ -303,9 +346,13 @@ class Block(nn.Module):
 
 
 class PatchEmbed(nn.Module):
-    """ Image to Patch Embedding
     """
-    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):
+    功能概述：这个类是 `PatchEmbed`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 img_size, patch_size, in_chans, embed_dim，再调用 __init__、to_2tuple、nn.Conv2d 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先接收输入参数 x, **kwargs，再调用 transpose、flatten、self.proj 等内部步骤完成主要工作，最后返回结果。
+    """
+    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):  # 中文名称：初始化
         super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
@@ -317,7 +364,7 @@ class PatchEmbed(nn.Module):
 
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
 
-    def forward(self, x, **kwargs):
+    def forward(self, x, **kwargs):  # 中文名称：forward
         B, C, H, W = x.shape
         # FIXME look at relaxing size constraints
         assert H == self.img_size[0] and W == self.img_size[1], \
@@ -327,8 +374,14 @@ class PatchEmbed(nn.Module):
 
 
 class RelativePositionBias(nn.Module):
+    """
+    功能概述：这个类是 `RelativePositionBias`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 window_size, num_heads，再调用 __init__、nn.Parameter、torch.arange 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `forward`：先进入当前步骤，再调用 view、contiguous、relative_position_bias.permute 等内部步骤完成主要工作，最后返回结果。
+    """
 
-    def __init__(self, window_size, num_heads):
+    def __init__(self, window_size, num_heads):  # 中文名称：初始化
         super().__init__()
         self.window_size = window_size
         self.num_relative_distance = (2 * window_size[0] - 1) * (2 * window_size[1] - 1) + 3
@@ -355,7 +408,7 @@ class RelativePositionBias(nn.Module):
 
         self.register_buffer("relative_position_index", relative_position_index)
 
-    def forward(self):
+    def forward(self):  # 中文名称：forward
         relative_position_bias = \
             self.relative_position_bias_table[self.relative_position_index.view(-1)].view(
                 self.window_size[0] * self.window_size[1] + 1,
@@ -364,14 +417,28 @@ class RelativePositionBias(nn.Module):
 
 
 class EVAVisionTransformer(nn.Module):
-    """ Vision Transformer with support for patch or hybrid CNN input stage
+    """
+    功能概述：这个类是 `EVAVisionTransformer`，主要负责把一组相关步骤收拢在一起，方便外部直接创建对象并调用。
+    调用流程：
+    1. `__init__`：先接收输入参数 img_size, patch_size, in_chans, num_classes, embed_dim, depth, num_heads, mlp_ratio, qkv_bias, qk_scale, drop_rate, attn_drop_rate, drop_path_rate, norm_layer, init_values, patch_dropout, use_abs_pos_emb, use_rel_pos_bias, use_shared_rel_pos_bias, rope, use_mean_pooling, init_scale, grad_checkpointing, xattn, postnorm, pt_hw_seq_len, intp_freq, naiveswiglu, subln，接着根据条件分支选择不同处理路径，再调用 __init__、PatchEmbed、nn.Parameter 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    2. `fix_init_weight`：先进入当前步骤，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 enumerate、param.div_、rescale 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    3. `get_cast_dtype`：先进入当前步骤，最后返回结果。
+    4. `_init_weights`：先接收输入参数 m，接着根据条件分支选择不同处理路径，再调用 isinstance、trunc_normal_、nn.init.constant_ 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    5. `get_num_layers`：先进入当前步骤，再调用 len 等内部步骤完成主要工作，最后返回结果。
+    6. `lock`：先接收输入参数 unlocked_groups, freeze_bn_stats，然后循环处理每一条数据，再调用 self.parameters 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    7. `set_grad_checkpointing`：先接收输入参数 enable，最后把结果交给下一步或直接结束。
+    8. `no_weight_decay`：先进入当前步骤，最后返回结果。
+    9. `get_classifier`：先进入当前步骤，最后返回结果。
+    10. `reset_classifier`：先接收输入参数 num_classes, global_pool，再调用 nn.Linear、nn.Identity 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
+    11. `forward_features`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 self.patch_embed、x.size、self.cls_token.expand 等内部步骤完成主要工作，最后返回结果。
+    12. `forward`：先接收输入参数 x, return_all_features，接着根据条件分支选择不同处理路径，再调用 self.forward_features、self.head 等内部步骤完成主要工作，最后返回结果。
     """
     def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, depth=12,
                  num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
                  drop_path_rate=0., norm_layer=nn.LayerNorm, init_values=None, patch_dropout=0.,
                  use_abs_pos_emb=True, use_rel_pos_bias=False, use_shared_rel_pos_bias=False, rope=False,
                  use_mean_pooling=True, init_scale=0.001, grad_checkpointing=False, xattn=False, postnorm=False,
-                 pt_hw_seq_len=16, intp_freq=False, naiveswiglu=False, subln=False):
+                 pt_hw_seq_len=16, intp_freq=False, naiveswiglu=False, subln=False):  # 中文名称：初始化
         super().__init__()
         self.image_size = img_size
         self.num_classes = num_classes
@@ -440,8 +507,8 @@ class EVAVisionTransformer(nn.Module):
 
         self.grad_checkpointing = grad_checkpointing
 
-    def fix_init_weight(self):
-        def rescale(param, layer_id):
+    def fix_init_weight(self):  # 中文名称：fix初始化weight
+        def rescale(param, layer_id):  # 中文名称：rescale
             param.div_(math.sqrt(2.0 * layer_id))
 
         for layer_id, layer in enumerate(self.blocks):
@@ -451,10 +518,10 @@ class EVAVisionTransformer(nn.Module):
             else:
                 rescale(layer.mlp.fc2.weight.data, layer_id + 1)
 
-    def get_cast_dtype(self) -> torch.dtype:
+    def get_cast_dtype(self) -> torch.dtype:  # 中文名称：获取castdtype
         return self.blocks[0].mlp.fc2.weight.dtype
 
-    def _init_weights(self, m):
+    def _init_weights(self, m):  # 中文名称：初始化weights
         if isinstance(m, nn.Linear):
             trunc_normal_(m.weight, std=.02)
             if m.bias is not None:
@@ -463,31 +530,31 @@ class EVAVisionTransformer(nn.Module):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
-    def get_num_layers(self):
+    def get_num_layers(self):  # 中文名称：获取numlayers
         return len(self.blocks)
     
-    def lock(self, unlocked_groups=0, freeze_bn_stats=False):
+    def lock(self, unlocked_groups=0, freeze_bn_stats=False):  # 中文名称：lock
         assert unlocked_groups == 0, 'partial locking not currently supported for this model'
         for param in self.parameters():
             param.requires_grad = False
 
     @torch.jit.ignore
-    def set_grad_checkpointing(self, enable=True):
+    def set_grad_checkpointing(self, enable=True):  # 中文名称：设置gradcheckpointing
         self.grad_checkpointing = enable
 
     @torch.jit.ignore
-    def no_weight_decay(self):
+    def no_weight_decay(self):  # 中文名称：noweightdecay
         return {'pos_embed', 'cls_token'}
 
-    def get_classifier(self):
+    def get_classifier(self):  # 中文名称：获取classifier
         return self.head
 
-    def reset_classifier(self, num_classes, global_pool=''):
+    def reset_classifier(self, num_classes, global_pool=''):  # 中文名称：resetclassifier
         self.num_classes = num_classes
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def forward_features(self, x, return_all_features=False):
-        
+          # 中文名称：forwardfeatures
         x = self.patch_embed(x)
         batch_size, seq_len, _ = x.size()
 
@@ -524,7 +591,7 @@ class EVAVisionTransformer(nn.Module):
                 return x[:, 0]
         return x
 
-    def forward(self, x, return_all_features=True):
+    def forward(self, x, return_all_features=True):  # 中文名称：forward
         if return_all_features:
             return self.forward_features(x, return_all_features)
         x = self.forward_features(x)
