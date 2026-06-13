@@ -35,6 +35,11 @@
 ### 本地阅读
 如果您希望在本地阅读或贡献内容，请参考下方的学习指南。
 
+如果你是想直接运行代码，请先看：
+
+- [QUICKSTART.md](./QUICKSTART.md)
+- [RUNBOOK_SHORT.md](./RUNBOOK_SHORT.md)
+
 ### ✨ 你将收获什么？
 
 - 📖 <strong>Datawhale 开源免费</strong> 完全免费学习本项目所有内容，与社区共同成长

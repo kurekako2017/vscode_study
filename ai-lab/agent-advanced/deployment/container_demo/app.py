@@ -18,7 +18,7 @@ HOST = "0.0.0.0"
 # 这个 demo 默认使用 8088 端口。
 PORT = 8088
 
-
+# 定义一个 HTTP 请求处理器，继承自 BaseHTTPRequestHandler。
 class Handler(BaseHTTPRequestHandler):
     # 处理 GET 请求，返回一个健康检查 JSON。
     def do_GET(self) -> None:  # noqa: N802

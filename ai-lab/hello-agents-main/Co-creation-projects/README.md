@@ -104,9 +104,15 @@ README.md应包含以下内容：
 
 所有共创项目遵循CC BY-NC-SA 4.0 License，欢迎学习和共创。
 
+## 🚀 运行入口
+
+如果你想直接启动代码，请先看：
+
+- [QUICKSTART.md](./QUICKSTART.md)
+- [RUNBOOK_SHORT.md](./RUNBOOK_SHORT.md)
+
 ---
 
 <div align="center">
   <strong>期待看到你的精彩作品！🎉</strong>
 </div>
-

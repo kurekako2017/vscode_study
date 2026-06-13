@@ -41,6 +41,9 @@ def create_env_file():
         print("Creating .env file...")
         env_content = """# InnoCore AI Configuration
 OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_MODEL=gpt-3.5-turbo
+LLM_PROVIDER=openai
 DATABASE_URL=sqlite:///./innocore.db
 SECRET_KEY=your_secret_key_here_change_this_in_production
 DEBUG=True
