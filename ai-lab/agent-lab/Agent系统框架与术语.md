@@ -44,6 +44,113 @@ Agent 更像这样工作：
 
 所以 Agent 不是“更会聊天的模型”，而是一个把模型、工具、状态和流程组合起来的应用系统。
 
+如果你想先看一张把 RAG 讲清楚的图，直接看 [04-RAG.md](./04-RAG.md) 里的流程图；它把 `知识更新` 和 `知识检索` 分成了两条线，适合先建立整体印象。
+
+## 1.2 经典 Agent 架构图
+
+下面这张图可以直接用来理解一个典型 Agent 的组成。它表达的不是某一个固定框架，而是一种常见的学习视角：
+
+```text
+Agent = LLM + Memory + Tools + Planning + Action
+```
+
+其中：
+
+- `LLM` 是核心推理引擎
+- `Memory` 负责保存短期上下文和长期知识
+- `Tools` 负责连接日历、搜索、计算器、代码执行器等外部能力
+- `Planning` 负责拆解任务、决定下一步
+- `Action` 负责把决定真正执行出去
+- `Reflection`、`Self-critics`、`Chain of thoughts`、`Subgoal decomposition` 是常见的增强思路，不是所有 Agent 都必须同时具备
+
+```mermaid
+flowchart TD
+    S["短期记忆<br/>Short-term Memory"]
+    L["长期记忆（向量数据库）<br/>Long-term Memory / Vector DB"]
+    M["记忆<br/>Memory"]
+    A["智能体<br/>Agent"]
+    P["规划决策<br/>Planning"]
+    X["行动<br/>Action"]
+    T["工具<br/>Tools"]
+    R["反思<br/>Reflection"]
+    C["自我批评<br/>Self-critics"]
+    O["思维链<br/>Chain of thoughts"]
+    G["子目标分解<br/>Subgoal decomposition"]
+    D1["日历<br/>Calendar"]
+    D2["计算器<br/>Calculator"]
+    D3["代码解释器<br/>Code Interpreter"]
+    D4["搜索<br/>Search"]
+    D5["……"]
+
+    S --> M
+    L --> M
+    M --> S
+    M --> L
+    M --> A
+    A --> P
+    A --> T
+    A --> X
+    P --> R
+    P --> C
+    P --> O
+    P --> G
+    T --> D1
+    T --> D2
+    T --> D3
+    T --> D4
+    T --> D5
+    P -.-> M
+    T -.-> X
+    A -.-> M
+```
+
+原图也放在仓库里，方便直接对照：
+
+![Agent 经典架构原图](./assets/agent_workflow_original.png)
+
+读这张图时，建议按下面的顺序理解：
+
+1. `Agent` 先接收任务。
+2. `Planning` 决定下一步要做什么。
+3. `Tools` 把计划变成真实动作，例如搜索、计算、查日历。
+4. `Action` 执行动作后得到结果。
+5. `Memory` 把结果保存下来，供后续步骤继续使用。
+6. `Reflection` 负责检查结果是否合理，必要时重新规划。
+
+如果用“去北京旅游”来理解，可以这样对应：
+
+| 图里的部分 | 旅游场景里的作用 | 例子 |
+| --- | --- | --- |
+| `Agent` | 总协调者 | 你让系统帮你安排一次北京旅行 |
+| `Planning` | 先排路线和预算 | 先决定住哪、先去哪个景点、怎么省时间 |
+| `Memory` | 记住已确认信息 | 记住“3 天、预算 3000、想看故宫” |
+| `Tools` | 调用外部能力 | 查天气、查车次、查地图、订酒店 |
+| `Action` | 真的执行动作 | 把查到的信息写进计划，或者去下单 |
+| `Reflection` | 检查是否合理 | 发现景点安排太赶，就重新调整顺序 |
+
+如果把整个流程按顺序跑一遍，可以理解成：
+
+```text
+1. 你说“帮我安排北京旅行”
+2. Agent 先判断你要什么、有什么限制
+3. Memory 记录预算、天数、偏好
+4. Planning 生成旅行路线和执行顺序
+5. Tools 去查天气、地图、车次、酒店
+6. Action 根据工具结果更新计划或执行下单
+7. Reflection 检查是否太赶、是否超预算
+8. 如果有问题，就回到 Planning 重新调整
+```
+
+这张图和本目录的 demo 对应关系很直接：
+
+| 图中的能力 | 对应 demo / 文档 | 说明 |
+| --- | --- | --- |
+| `Tools` | [03-Tool Calling.md](./03-Tool%20Calling.md)、`projects/tool_agent_demo` | 让模型请求外部动作 |
+| `Planning` | [05-Agent工作流.md](./05-Agent工作流.md)、`projects/workflow_agent` | 把任务拆成可控步骤 |
+| `Memory` | [04-RAG.md](./04-RAG.md)、`projects/doc_qa_agent` | 用资料检索和上下文保存增强回答 |
+| `Action` | `projects/tool_agent_demo`、`projects/workflow_agent` | 让系统真正执行一步 |
+| `Reflection` | [05-Agent工作流.md](./05-Agent工作流.md) | 通过校验、重试、总结来修正过程 |
+
 对应到本目录：
 
 | 学习内容 | 对应文件 / demo |
