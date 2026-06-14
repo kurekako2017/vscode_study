@@ -167,7 +167,7 @@ class QdrantLikeStore:
     def search(self, query: str, top_k: int = 3) -> list[SearchHit]:
         return self._db.search(query, top_k=top_k)
 
-
+# 这里的“Chroma 风格”接口和“Qdrant 风格”接口在方法命名和参数上都有所不同，教学版通过复用内存实现来突出这些差异。
 class ChromaLikeStore:
     """Chroma 风格：collection + metadata + similarity search。"""
 
@@ -178,7 +178,7 @@ class ChromaLikeStore:
     def add_documents(self, documents: list[Document]) -> None:
         # Chroma 常用的是 `add_documents()` 这样的命名，所以这里保留这个接口。
         self._db.upsert(documents)
-
+# Chroma 的查询接口通常叫 `query()`，参数也不完全一样，这里也做了相应调整。
     def query(self, query: str, n_results: int = 3) -> list[SearchHit]:
         return self._db.search(query, top_k=n_results)
 

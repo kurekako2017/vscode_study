@@ -7,17 +7,24 @@
 
 from openai import OpenAI
 import os
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 # 初始化 OpenAI 客户端
+print(f"使用模型: {describe_openrouter_runtime()}")
 client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1",
+    api_key=resolve_openrouter_api_key(),
+    base_url=resolve_openrouter_base_url(),
 )
 
 # 定义一个函数，用于发送消息并获取模型的响应
 def send_messages(messages, tools=None):  # 中文名称：sendmessages
     response = client.chat.completions.create(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+    model=resolve_openrouter_model(),
         messages=messages,
         tools=tools,
         tool_choice="auto",  # 让模型自主决定是否调用工具

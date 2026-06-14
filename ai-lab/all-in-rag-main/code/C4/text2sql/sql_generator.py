@@ -8,6 +8,11 @@
 import os
 from typing import List, Dict, Any
 from langchain_openai import ChatOpenAI
+from openrouter_env import (
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 
 class SimpleSQLGenerator:
@@ -22,10 +27,10 @@ class SimpleSQLGenerator:
     
     def __init__(self, api_key: str = None):  # 中文名称：初始化
         self.llm = ChatOpenAI(
-            model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+            model=resolve_openrouter_model(),
             temperature=0,
-            api_key=api_key or os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1"
+            api_key=(api_key or resolve_openrouter_api_key()),
+            base_url=resolve_openrouter_base_url()
         )
     
     def generate_sql(self, user_query: str, knowledge_results: List[Dict[str, Any]]) -> str:  # 中文名称：generateSQL

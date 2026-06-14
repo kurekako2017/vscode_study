@@ -24,6 +24,12 @@ from dataclasses import dataclass, asdict
 import pandas as pd
 import csv
 from datetime import datetime
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 @dataclass
 class IngredientInfo:
@@ -92,13 +98,14 @@ class KimiRecipeAgent:
     """
     
     def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1", model_name: str = None):  # 中文名称：初始化
-        self.api_key = api_key
-        self.base_url = base_url
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        self.api_key = (api_key or resolve_openrouter_api_key()).strip()
+        self.base_url = (base_url or resolve_openrouter_base_url()).strip()
+        self.model_name = model_name or resolve_openrouter_model()
         self.client = OpenAI(
-            api_key=api_key,
-            base_url=base_url
+            api_key=self.api_key,
+            base_url=self.base_url
         )
+        print(f"使用模型: {describe_openrouter_runtime()}")
         
         # 目录名到分类的映射
         self.directory_category_mapping = {

@@ -43,6 +43,15 @@ Kimi2 发布第八天来尝尝咸淡，申请地址：[Kimi API官网](https://p
 
 ![API配置](./images/8_1_1.webp)
 
+如果你是直接运行第八章代码，建议在 `code/C8/` 下创建本地 `.env` 文件，并从 `code/C8/.env.example` 复制模板：
+
+```bash
+cd code/C8
+cp .env.example .env
+```
+
+然后把 `OPENROUTER_API_KEY` 填进去。`main.py` 和生成模块都会自动读取这个环境变量。
+
 ## 三、项目架构
 
 ### 3.1 项目目标

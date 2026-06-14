@@ -19,12 +19,19 @@ from llama_index.core.evaluation import (
 )
 from llama_index.core.evaluation.eval_utils import get_results_df
 from llama_index.core.evaluation import DatasetGenerator, QueryResponseDataset
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
+print(f"使用模型: {describe_openrouter_runtime()}")
 Settings.llm = OpenAILike(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+    model=resolve_openrouter_model(),
     temperature=0.1,
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    api_base="https://openrouter.ai/api/v1",
+    api_key=resolve_openrouter_api_key(),
+    api_base=resolve_openrouter_base_url(),
     is_chat_model=True,
 )
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en")

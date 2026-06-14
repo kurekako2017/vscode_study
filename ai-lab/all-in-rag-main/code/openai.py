@@ -9,11 +9,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from _compat import render_answer
+from openrouter_env import load_real_openai_class, resolve_openrouter_api_key, resolve_openrouter_base_url
+
+DEFAULT_COMPLETION_MAX_TOKENS = 800
 
 
 class _ChatCompletions:
@@ -22,7 +24,23 @@ class _ChatCompletions:
     调用流程：
     1. `create`：先接收输入参数 model, messages, tools, tool_choice, **kwargs，接着根据条件分支选择不同处理路径，然后循环处理每一条数据，再调用 join、render_answer、any 等内部步骤完成主要工作，最后返回结果。
     """
+    def __init__(self, real_client: Any = None):  # 中文名称：初始化
+        self._real_client = real_client
+
     def create(self, model: str, messages: list[dict[str, Any]], tools: Any = None, tool_choice: Any = None, **kwargs: Any):  # 中文名称：创建
+        if self._real_client is not None:
+            request_args = {
+                "model": model,
+                "messages": messages,
+                **kwargs,
+            }
+            request_args.setdefault("max_tokens", DEFAULT_COMPLETION_MAX_TOKENS)
+            if tools is not None:
+                request_args["tools"] = tools
+            if tool_choice is not None:
+                request_args["tool_choice"] = tool_choice
+            return self._real_client.chat.completions.create(**request_args)
+
         def _content(message: Any) -> str:  # 中文名称：content
             if isinstance(message, dict):
                 return str(message.get("content", ""))
@@ -55,8 +73,8 @@ class _Chat:
     调用流程：
     1. `__init__`：先进入当前步骤，再调用 _ChatCompletions 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
     """
-    def __init__(self):  # 中文名称：初始化
-        self.completions = _ChatCompletions()
+    def __init__(self, real_client: Any = None):  # 中文名称：初始化
+        self.completions = _ChatCompletions(real_client=real_client)
 
 
 class OpenAI:
@@ -66,6 +84,18 @@ class OpenAI:
     1. `__init__`：先接收输入参数 api_key, base_url，再调用 _Chat 等内部步骤完成主要工作，最后把结果交给下一步或直接结束。
     """
     def __init__(self, api_key: str | None = None, base_url: str | None = None):  # 中文名称：初始化
-        self.api_key = api_key
-        self.base_url = base_url
-        self.chat = _Chat()
+        self.api_key = (api_key or resolve_openrouter_api_key() or "").strip() or None
+        self.base_url = (base_url or resolve_openrouter_base_url()).strip()
+        self._real_client = None
+
+        real_openai = load_real_openai_class()
+        if real_openai is not None and self.api_key:
+            self._real_client = real_openai(api_key=self.api_key, base_url=self.base_url)
+
+        self.chat = _Chat(real_client=self._real_client)
+        self.models = getattr(self._real_client, "models", None)
+
+    def __getattr__(self, name: str):
+        if self._real_client is not None:
+            return getattr(self._real_client, name)
+        raise AttributeError(name)

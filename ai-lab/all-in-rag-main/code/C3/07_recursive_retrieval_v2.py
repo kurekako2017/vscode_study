@@ -16,14 +16,21 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
 from llama_index.llms.openai_like import OpenAILike
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 load_dotenv()
 
 # 配置模型
+print(f"使用模型: {describe_openrouter_runtime()}")
 Settings.llm = OpenAILike(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    api_base="https://openrouter.ai/api/v1",
+    model=resolve_openrouter_model(),
+    api_key=resolve_openrouter_api_key(),
+    api_base=resolve_openrouter_base_url(),
     is_chat_model=True,
 )
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-zh-v1.5")

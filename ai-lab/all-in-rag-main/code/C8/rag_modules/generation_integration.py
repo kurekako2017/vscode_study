@@ -10,11 +10,20 @@ import os
 import logging
 from typing import List
 
+from dotenv import find_dotenv, load_dotenv
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
+
+load_dotenv(find_dotenv())
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +52,7 @@ class GenerationIntegrationModule:
             temperature: 生成温度
             max_tokens: 最大token数
         """
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        self.model_name = model_name or resolve_openrouter_model()
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.llm = None
@@ -53,19 +62,19 @@ class GenerationIntegrationModule:
         """初始化大语言模型"""
         logger.info(f"正在初始化LLM: {self.model_name}")
 
-        api_key = os.getenv("OPENROUTER_API_KEY")
+        api_key = resolve_openrouter_api_key()
         if not api_key:
-            raise ValueError("请设置 OPENROUTER_API_KEY 环境变量")
+            raise ValueError("请设置 OPENROUTER_API_KEY，或配置 openRouter/openRouterAPI")
 
         self.llm = ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
             api_key=api_key,
-            base_url="https://openrouter.ai/api/v1"
+            base_url=resolve_openrouter_base_url()
         )
         
-        logger.info("LLM初始化完成")
+        logger.info("LLM初始化完成: %s", describe_openrouter_runtime())
     
     def generate_basic_answer(self, query: str, context_docs: List[Document]) -> str:  # 中文名称：generatebasicanswer
         """

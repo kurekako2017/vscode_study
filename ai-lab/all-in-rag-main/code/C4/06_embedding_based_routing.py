@@ -13,6 +13,12 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough, RunnablePassthrough
 from langchain_community.utils.math import cosine_similarity
 import numpy as np
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 # 1. 定义路由描述
 sichuan_route_prompt = "你是一位处理川菜的专家。用户的问题是关于麻辣、辛香、重口味的菜肴，例如水煮鱼、麻婆豆腐、鱼香肉丝、宫保鸡丁、花椒、海椒等。"
@@ -27,11 +33,12 @@ route_prompt_embeddings = embeddings.embed_documents(route_prompts)
 print(f"已定义 {len(route_names)} 个路由: {', '.join(route_names)}")
 
 # 2. 定义不同路由的目标链
+print(f"使用模型: {describe_openrouter_runtime()}")
 llm = ChatOpenAI(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+    model=resolve_openrouter_model(),
     temperature=0, 
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
+    api_key=resolve_openrouter_api_key(),
+    base_url=resolve_openrouter_base_url()
     )
 
 # 定义川菜和粤菜处理链

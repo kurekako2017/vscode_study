@@ -11,12 +11,19 @@ from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_openai import ChatOpenAI
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 # 初始化 LLM
+print(f"使用模型: {describe_openrouter_runtime()}")
 llm = ChatOpenAI(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
+    model=resolve_openrouter_model(),
+    api_key=resolve_openrouter_api_key(),
+    base_url=resolve_openrouter_base_url()
 )
 
 # 1. 定义数据结构

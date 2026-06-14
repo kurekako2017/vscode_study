@@ -13,6 +13,12 @@ from typing import List
 
 from openai import OpenAI
 from langchain_core.documents import Document
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -29,21 +35,21 @@ class GenerationIntegrationModule:
         """
         初始化生成集成模块
         """
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        self.model_name = model_name or resolve_openrouter_model()
         self.temperature = temperature
         self.max_tokens = max_tokens
         
         # 初始化OpenAI客户端（使用OpenRouter）
-        api_key = os.getenv("OPENROUTER_API_KEY")
+        api_key = resolve_openrouter_api_key()
         if not api_key:
-            raise ValueError("请设置 OPENROUTER_API_KEY 环境变量")
+            raise ValueError("请设置 OPENROUTER_API_KEY，或配置 openRouter/openRouterAPI")
         
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://openrouter.ai/api/v1"
+            base_url=resolve_openrouter_base_url()
         )
 
-        logger.info(f"生成模块初始化完成，模型: {model_name}")
+        logger.info("生成模块初始化完成: %s", describe_openrouter_runtime())
 
     def generate_adaptive_answer(self, question: str, documents: List[Document]) -> str:  # 中文名称：generateadaptiveanswer
         """

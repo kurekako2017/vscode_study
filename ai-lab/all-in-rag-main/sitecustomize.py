@@ -32,12 +32,23 @@ def _bootstrap() -> None:  # 中文名称：bootstrap
     _load_env_file(root / ".env")
     _load_env_file(root / "code" / ".env")
 
-    os.environ.setdefault("OPENROUTER_API_KEY", "offline")
-    os.environ.setdefault("OPENAI_API_KEY", os.getenv("OPENROUTER_API_KEY", "offline"))
-    os.environ.setdefault("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    os.environ.setdefault("OPENAI_BASE_URL", os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"))
-    os.environ.setdefault("OPENROUTER_MODEL", "openai/gpt-4o-mini")
-    os.environ.setdefault("LLM_QWEN_MAX", os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
+    api_key = ""
+    for name in ("OPENROUTER_API_KEY", "openRouterAPI", "openRouter"):
+        value = os.getenv(name)
+        if value and value.strip():
+            api_key = value.strip()
+            break
+
+    if api_key:
+        os.environ["OPENROUTER_API_KEY"] = api_key
+        os.environ.setdefault("OPENAI_API_KEY", api_key)
+
+    base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
+    model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini").strip()
+    os.environ["OPENROUTER_BASE_URL"] = base_url or "https://openrouter.ai/api/v1"
+    os.environ.setdefault("OPENAI_BASE_URL", os.environ["OPENROUTER_BASE_URL"])
+    os.environ["OPENROUTER_MODEL"] = model or "openai/gpt-4o-mini"
+    os.environ.setdefault("LLM_QWEN_MAX", os.environ["OPENROUTER_MODEL"])
 
 
 _bootstrap()

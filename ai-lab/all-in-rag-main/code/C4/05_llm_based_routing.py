@@ -10,12 +10,19 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableBranch
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
+print(f"使用模型: {describe_openrouter_runtime()}")
 llm = ChatOpenAI(
-    model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+    model=resolve_openrouter_model(),
     temperature=0, 
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
+    api_key=resolve_openrouter_api_key(),
+    base_url=resolve_openrouter_base_url()
     )
 
 # 1. 设置不同菜系的处理链

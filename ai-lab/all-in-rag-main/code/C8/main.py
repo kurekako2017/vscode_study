@@ -16,10 +16,11 @@ from typing import List
 # 添加模块路径
 sys.path.append(str(Path(__file__).parent))
 
-from dotenv import load_dotenv
+from dotenv import find_dotenv, load_dotenv
+from openrouter_env import describe_openrouter_runtime, resolve_openrouter_api_key
 
 # 先加载环境变量，再导入依赖配置的模块
-load_dotenv()
+load_dotenv(find_dotenv())
 
 from config import DEFAULT_CONFIG, RAGConfig
 from rag_modules import (
@@ -68,8 +69,9 @@ class RecipeRAGSystem:
             raise FileNotFoundError(f"数据路径不存在: {self.config.data_path}")
 
         # 检查API密钥
-        if not os.getenv("OPENROUTER_API_KEY"):
-            raise ValueError("请设置 OPENROUTER_API_KEY 环境变量")
+        if not resolve_openrouter_api_key():
+            raise ValueError("请设置 OPENROUTER_API_KEY，或配置 openRouter/openRouterAPI")
+        print(f"使用模型: {describe_openrouter_runtime()}")
     
     def initialize_system(self):  # 中文名称：initialize系统
         """初始化所有模块"""

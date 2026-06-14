@@ -230,11 +230,21 @@ class _QueryEngine:
         context = "\n\n".join(doc.page_content for doc in docs)
         llm = Settings.llm
         if llm and hasattr(llm, "invoke"):
-            response = llm.invoke(context + "\n\n" + query)
+            prompt = (
+                "请根据下面提供的上下文信息来回答问题。\n"
+                "请确保你的回答完全基于这些上下文。\n"
+                "如果上下文中没有足够的信息来回答问题，请直接告知无法根据提供的上下文回答。\n\n"
+                f"上下文:\n{context}\n\n问题: {query}\n\n回答:"
+            )
+            response = llm.invoke(prompt)
             return getattr(response, "content", response)
         return render_answer(context + "\n" + query)
 
     def get_prompts(self):  # 中文名称：获取prompts
+        llm = Settings.llm
+        model = getattr(llm, "model", None) if llm is not None else None
+        if model:
+            return {"system": f"query-engine(model={model})"}
         return {"system": "offline-query-engine"}
 
 

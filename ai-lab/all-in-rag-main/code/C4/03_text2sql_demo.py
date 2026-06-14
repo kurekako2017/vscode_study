@@ -12,6 +12,7 @@
 import os
 import sys
 import sqlite3
+from openrouter_env import describe_openrouter_runtime, resolve_openrouter_api_key
 
 # 添加text2sql模块路径
 sys.path.append(os.path.join(os.path.dirname(__file__), 'text2sql'))
@@ -24,10 +25,11 @@ def setup_demo():  # 中文名称：setup演示
     print("=== Text2SQL框架演示 ===\n")
     
     # 检查API密钥
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = resolve_openrouter_api_key()
     if not api_key:
-        print("先设置OPENROUTER_API_KEY环境变量")
+        print("先设置 OPENROUTER_API_KEY，或配置 openRouter/openRouterAPI")
         return None
+    print(f"使用模型: {describe_openrouter_runtime()}")
     
     # 创建演示数据库
     print("创建演示数据库...")

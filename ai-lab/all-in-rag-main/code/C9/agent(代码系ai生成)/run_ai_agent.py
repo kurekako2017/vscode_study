@@ -17,13 +17,19 @@ import os
 import json
 import sys
 from recipe_ai_agent import KimiRecipeAgent, RecipeKnowledgeGraphBuilder
+from openrouter_env import (
+    describe_openrouter_runtime,
+    resolve_openrouter_api_key,
+    resolve_openrouter_base_url,
+    resolve_openrouter_model,
+)
 
 def load_config():  # 中文名称：加载配置
     """加载配置文件"""
     config_file = "config.json"
-    env_api_key = os.getenv("OPENROUTER_API_KEY", "")
-    env_base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    env_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+    env_api_key = resolve_openrouter_api_key()
+    env_base_url = resolve_openrouter_base_url()
+    env_model = resolve_openrouter_model()
     if os.path.exists(config_file):
         with open(config_file, 'r', encoding='utf-8') as f:
             config = json.load(f)
@@ -55,7 +61,7 @@ def load_config():  # 中文名称：加载配置
 
 def setup_api_key():  # 中文名称：setup接口key
     """设置API密钥"""
-    api_key = os.getenv('OPENROUTER_API_KEY')
+    api_key = resolve_openrouter_api_key()
     if not api_key:
         if sys.stdin.isatty():
             api_key = input("请输入OpenRouter API密钥: ").strip()
@@ -63,7 +69,8 @@ def setup_api_key():  # 中文名称：setup接口key
                 print("错误: 必须提供API密钥")
                 sys.exit(1)
         else:
-            api_key = "offline"
+            print("错误: 请先设置 OPENROUTER_API_KEY，或配置 openRouter/openRouterAPI")
+            sys.exit(1)
     return api_key
 
 def get_recipe_directory():  # 中文名称：获取recipedirectory
@@ -115,7 +122,7 @@ def test_single_recipe():  # 中文名称：testsinglerecipe
     
     # 加载配置
     config = load_config()
-    api_key = config["kimi"].get("api_key") or os.getenv("OPENROUTER_API_KEY")
+    api_key = config["kimi"].get("api_key") or resolve_openrouter_api_key()
     if not api_key:
         api_key = setup_api_key()
     
@@ -144,7 +151,7 @@ def main():  # 中文名称：主函数
     config = load_config()
     
     # 设置API密钥
-    api_key = config["kimi"].get("api_key") or os.getenv("OPENROUTER_API_KEY")
+    api_key = config["kimi"].get("api_key") or resolve_openrouter_api_key()
     if not api_key:
         api_key = setup_api_key()
     
@@ -154,6 +161,7 @@ def main():  # 中文名称：主函数
     # 确认参数
     print(f"\n配置信息:")
     print(f"- API密钥: {api_key[:8]}...")
+    print(f"- 使用模型: {describe_openrouter_runtime()}")
     print(f"- 菜谱目录: {recipe_dir}")
     print(f"- 输出格式: {config['output'].get('format', 'neo4j')}")
     print(f"- 输出目录: {config['output'].get('directory', './ai_output')}")

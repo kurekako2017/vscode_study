@@ -18,9 +18,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parent
 CODE = ROOT / "code"
+if str(CODE) not in sys.path:
+    sys.path.insert(0, str(CODE))
+
+from openrouter_env import describe_openrouter_runtime, ensure_openrouter_env
 AGENT_DIR = CODE / "C9" / "agent(代码系ai生成)"
 POWERRAG_DIR = ROOT / "Extra-chapter" / "PowerRAG-SDK-Text-QA" / "code"
 
@@ -127,15 +130,11 @@ def _run(alias: str, extra_args: list[str]) -> int:  # 中文名称：运行
         print(f"Missing script for {alias}: {script}")
         return 2
 
-    print(f"[{alias}] {desc}")
+    print(f"[{alias}] {desc}", flush=True)
     cmd = [sys.executable, str(script), *extra_args]
+    ensure_openrouter_env()
     child_env = os.environ.copy()
-    child_env.setdefault("OPENROUTER_API_KEY", "offline")
-    child_env.setdefault("OPENAI_API_KEY", child_env["OPENROUTER_API_KEY"])
-    child_env.setdefault("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    child_env.setdefault("OPENAI_BASE_URL", child_env["OPENROUTER_BASE_URL"])
-    child_env.setdefault("OPENROUTER_MODEL", "openai/gpt-4o-mini")
-    child_env.setdefault("LLM_QWEN_MAX", child_env["OPENROUTER_MODEL"])
+    print(f"[llm] {describe_openrouter_runtime()}", flush=True)
     pythonpath = child_env.get("PYTHONPATH", "")
     child_env["PYTHONPATH"] = str(CODE) + (os.pathsep + pythonpath if pythonpath else "")
     result = subprocess.run(cmd, cwd=str(script.parent), env=child_env)
