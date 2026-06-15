@@ -13,11 +13,12 @@ from pathlib import Path
 from deepagents import create_deep_agent
 from langgraph.checkpoint.memory import InMemorySaver
 
-from app.agent.llm import model
+from app.agent.llm import build_llm_model, model
 from app.agent.prompts import main_agent_content
 from app.agent.subagents.database_query_agent import database_query_agent
 from app.agent.subagents.knowledge_base_agent import knowledge_base_agent
 from app.agent.subagents.network_search_agent import network_search_agent
+from app.runtime_config import resolve_llm_config
 from app.api.context import (
     reset_session_context,
     set_session_context,
@@ -30,20 +31,78 @@ from app.tools.markdown_tools import generate_markdown
 from app.tools.pdf_tools import convert_md_to_pdf
 from app.tools.upload_file_read_tool import read_file_content
 
+def build_main_agent(provider: str | None = None):
+    """Build the main DeepAgent with the requested provider."""
+    selected_model = model if provider is None else build_llm_model(provider)
+    return create_deep_agent(
+        model=selected_model,
+        system_prompt=main_agent_content["system_prompt"],
+        tools=[generate_markdown, convert_md_to_pdf, read_file_content],
+        checkpointer=InMemorySaver(),
+        subagents=[database_query_agent, network_search_agent, knowledge_base_agent],
+    )
+
+
 # 主智能体是调度中心：
 # 1. tools 只放最终交付相关的文件工具
 # 2. subagents 放网络、数据库、RAGFlow 三类信息获取助手
 # 3. checkpointer 通过 thread_id 保存同一会话中的执行上下文
-main_agent = create_deep_agent(
-    model=model,
-    system_prompt=main_agent_content["system_prompt"],
-    tools=[generate_markdown, convert_md_to_pdf, read_file_content],
-    checkpointer=InMemorySaver(),
-    subagents=[database_query_agent, network_search_agent, knowledge_base_agent],
-)
+main_agent = build_main_agent()
 
 # 当前文件位于 app/agent/main_agent.py，parents[1] 即 app 目录
 project_root_path = Path(__file__).parents[1].resolve()
+
+
+def _looks_like_openrouter_payment_error(exc: Exception) -> bool:
+    """Detect the OpenRouter 402 payment-required case."""
+    message = str(exc).lower()
+    status_code = getattr(exc, "status_code", None)
+    return (
+        status_code == 402
+        or "error code: 402" in message
+        or "payment required" in message
+        or "insufficient credits" in message
+    )
+
+
+def _payment_error_message(provider: str) -> str:
+    if provider == "nvidia":
+        return (
+            "执行主智能发生异常信息：NVIDIA 返回 402，通常表示模型不可用、凭证无效或配额不足。"
+            "请检查 NVIDIA_API_KEY 和 NVIDIA_MODEL。"
+        )
+    return (
+        "执行主智能发生异常信息：OpenRouter 返回 402，通常表示额度不足、账单未开通或该模型不可用。"
+        "如果你已经配置了 NVIDIA_API_KEY 和 NVIDIA_MODEL，可以把 LLM_PROVIDER 设为 auto 或 nvidia。"
+    )
+
+
+async def _stream_agent(agent, task_query: str, session_id: str, path_instruction: str) -> None:
+    """Stream a single agent run and forward monitor events."""
+    config = {"configurable": {"thread_id": session_id}}
+    async for chunk in agent.astream(
+        {"messages": [{"role": "user", "content": task_query + path_instruction}]},
+        config=config,
+    ):
+        for node_name, state in chunk.items():
+            if not state or "messages" not in state:
+                continue
+            messages = state["messages"]
+            if messages and isinstance(messages, list):
+                last_msg = messages[-1]
+                if node_name == "model":
+                    if last_msg.tool_calls:
+                        for tool_call in last_msg.tool_calls:
+                            if tool_call["name"] == "task":
+                                monitor.report_assistant(
+                                    tool_call["args"]["subagent_type"],
+                                    {
+                                        "description": tool_call["args"]["description"]
+                                    },
+                                )
+                    elif last_msg.content:
+                        print(f"主智能体执行结果，最终结果：{last_msg.content[:100]}")
+                        monitor.report_task_result(last_msg.content)
 
 
 async def run_deep_agent(task_query, session_id):
@@ -92,9 +151,6 @@ async def run_deep_agent(task_query, session_id):
     # 前端拿到工作目录后，可以展示本次任务生成的 Markdown/PDF 等产物
     monitor.report_session_dir(session_dir_str)
 
-    # checkpointer 依赖 thread_id 区分会话记忆；同一 session_id 会复用同一条执行上下文
-    config = {"configurable": {"thread_id": session_id}}
-
     # 工作环境指令是运行时动态补充的，约束模型只在当前会话目录读写文件
     path_instruction = f"""
     【工作环境指令】
@@ -108,46 +164,39 @@ async def run_deep_agent(task_query, session_id):
     4. 若存在上传文件，请先分析内容
     """
 
+    primary_config = resolve_llm_config()
+    primary_provider = str(primary_config.get("provider") or "openrouter")
+    fallback_to_nvidia = (
+        primary_provider == "openrouter"
+        and resolve_llm_config("nvidia").get("configured")
+    )
+
     try:
-        # astream 会持续产出模型节点、工具节点和子智能体节点的状态片段
-        async for chunk in main_agent.astream(
-            {"messages": [{"role": "user", "content": task_query + path_instruction}]},
-            config=config,
-        ):
-            # chunk 形如 {"model": {"messages": [...]}}，这里主要关心模型最新消息
-            for node_name, state in chunk.items():
-                if not state or "messages" not in state:
-                    continue
-                messages = state["messages"]
-                if messages and isinstance(messages, list):
-                    last_msg = messages[-1]
-                    if node_name == "model":
-                        if last_msg.tool_calls:
-                            # DeepAgents 调用子智能体时，本质上会产生名为 task 的工具调用
-                            for tool_call in last_msg.tool_calls:
-                                if tool_call["name"] == "task":
-                                    # 子智能体调用单独上报，前端可以展示“正在调用哪个专家助手”
-                                    monitor.report_assistant(
-                                        tool_call["args"]["subagent_type"],
-                                        {
-                                            "description": tool_call["args"][
-                                                "description"
-                                            ]
-                                        },
-                                    )
-                        elif last_msg.content:
-                            # 模型没有继续调用工具时，最新文本内容就是本轮可反馈给前端的结果
-                            print(
-                                f"主智能体执行结果，最终结果：{last_msg.content[:100]}"
-                            )
-                            monitor.report_task_result(last_msg.content)
+        try:
+            await _stream_agent(main_agent, task_query, session_id, path_instruction)
+        except Exception as first_error:
+            if not (_looks_like_openrouter_payment_error(first_error) and fallback_to_nvidia):
+                raise
+
+            print("[MainAgent] OpenRouter 返回 402，尝试切换到 NVIDIA 继续执行。")
+            fallback_agent = build_main_agent("nvidia")
+            try:
+                await _stream_agent(fallback_agent, task_query, session_id, path_instruction)
+            except Exception as second_error:
+                if _looks_like_openrouter_payment_error(second_error):
+                    raise RuntimeError(_payment_error_message("nvidia")) from second_error
+                raise
 
     except asyncio.CancelledError:
         monitor.report_task_cancelled()
         raise
     except Exception as e:
         # 异步执行异常也走 monitor，保证前端能收到明确错误事件
-        monitor._emit("error", f"执行主智能发生异常信息：{str(e)}")
+        if _looks_like_openrouter_payment_error(e):
+            provider = "nvidia" if "nvidia" in str(e).lower() else "openrouter"
+            monitor._emit("error", _payment_error_message(provider))
+        else:
+            monitor._emit("error", f"执行主智能发生异常信息：{str(e)}")
     finally:
         # 任务结束后恢复 ContextVar，避免后续请求复用到本次会话目录或 thread_id
         reset_session_context(session_dir_token, session_id_token)

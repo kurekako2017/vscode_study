@@ -121,7 +121,7 @@
 | 智能体框架     | `DeepAgents`                                     | 创建主智能体和子智能体，承接长任务、多工具、多助手调度                        |
 | 图与检查点     | `LangGraph`                                      | 提供底层运行时和 `InMemorySaver` 会话检查点                                   |
 | 模型与工具抽象 | `LangChain` / `langchain-core`                   | 封装 OpenAI 兼容模型、工具声明和 Agent 调用结构                               |
-| 大模型接入     | OpenRouter OpenAI 兼容接口                       | 通过 `.env` 中的 `OPENROUTER_BASE_URL`、`OPENROUTER_API_KEY`、`LLM_QWEN_MAX` 接入模型 |
+| 大模型接入     | OpenRouter OpenAI 兼容接口，支持 NVIDIA 兜底     | 通过 `.env` 中的 `OPENROUTER_BASE_URL`、`OPENROUTER_API_KEY`、`LLM_QWEN_MAX` 接入模型；OpenRouter 402 时可用 `NVIDIA_API_KEY`、`NVIDIA_MODEL` 兜底 |
 | 网络搜索       | `Tavily`                                         | 为网络搜索助手提供公开资料检索                                                |
 | 结构化数据     | `MySQL` / `mysql-connector-python`               | 为数据库助手提供药品、库存、销售等教学业务数据                                |
 | 私有知识库     | `RAGFlow` / `ragflow-sdk`                        | 为知识库助手提供内部文档问答能力                                              |
@@ -170,7 +170,8 @@ deepsearch-agents/
 先看这个总入口：
 
 - [`docs/docs-index.md`](docs/docs-index.md)
-- [`RUNBOOK_OPENROUTER.md`](RUNBOOK_OPENROUTER.md)
+- [`workspace-run-guide.md`](workspace-run-guide.md)
+- [`docs/openrouter-nas-mysql-final-config.md`](docs/openrouter-nas-mysql-final-config.md)
 
 这个入口里已经分好了：
 
@@ -178,6 +179,8 @@ deepsearch-agents/
 - 功能快速一览
 - 功能逐项验收
 - 通用复用模板
+
+如果你在当前这个 workspace 里没有 `uv` 或 `pnpm`，直接看 [`workspace-run-guide.md`](workspace-run-guide.md)，那里给的是可直接运行的替代命令。
 
 ### 1. 准备环境
 
@@ -188,6 +191,12 @@ deepsearch-agents/
 - 可用的大模型 API Key
 - Tavily API Key
 - RAGFlow 服务与 API Key
+
+当前这个工作区如果只想先把主链路跑通，最关键的是：
+
+- `OPENROUTER_API_KEY`
+- `MYSQL_HOST` / `MYSQL_PORT` / `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE`
+- 可选：`NVIDIA_API_KEY` / `NVIDIA_MODEL`
 
 ### 2. 克隆项目
 
@@ -235,15 +244,11 @@ MYSQL_COLLATION=utf8mb4_unicode_ci
 MYSQL_SQL_MODE=TRADITIONAL
 ```
 
-### 5. 启动 MySQL 教学库
+### 5. 连接 NAS MySQL
 
-如果你想使用仓库自带的教学库，可以让 `docker/mysql/mysql.sql` 在 MySQL 容器首次创建数据目录时自动导入药品、库存和销售记录模拟数据。
+当前这份工作区已经优先接入 NAS 上的 `JtProject` MySQL，因此你可以直接用 NAS 数据库验证“数据库查询子智能体”的链路。
 
-当前这份工作区已经优先接入 NAS 上的 `JtProject` MySQL，因此你可以先不启动本机 MySQL 容器，直接用 NAS 数据库验证“数据库查询子智能体”的链路。
-
-```bash
-docker compose -f docker/docker-compose.yaml up -d
-```
+如果你后续要切回本机 Docker MySQL，再使用 `docker/docker-compose.yaml`。
 
 ### 6. 准备 RAGFlow 知识库
 

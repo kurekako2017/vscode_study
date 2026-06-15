@@ -17,6 +17,13 @@ VITE_API_BASE_URL=http://localhost:8000
 VITE_WS_BASE_URL=ws://localhost:8000
 ```
 
+Frontend runtime does not configure the LLM or MySQL directly. Those settings
+belong in the repository root `.env`:
+
+- `OPENROUTER_*` for the default model provider
+- `NVIDIA_*` for optional fallback
+- `MYSQL_*` for the NAS database
+
 ## Backend Contract
 
 - `GET /api/health`

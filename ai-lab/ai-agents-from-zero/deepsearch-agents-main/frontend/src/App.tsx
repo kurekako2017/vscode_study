@@ -239,7 +239,11 @@ export default function App() {
               </div>
               <div className="sidebar-health-row">
                 <strong>LLM</strong>
-                <span>{health.llm.configured ? `${health.llm.source} / ${health.llm.model}` : "未配置"}</span>
+                <span>
+                  {health.llm.configured
+                    ? `${health.llm.provider} · ${health.llm.source} / ${health.llm.model}`
+                    : "未配置"}
+                </span>
               </div>
               <div className="sidebar-health-row">
                 <strong>MySQL</strong>

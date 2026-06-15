@@ -45,6 +45,7 @@ export interface HealthResponse {
   backend: string;
   llm: {
     configured: boolean;
+    provider: string;
     source: string;
     model: string;
   };

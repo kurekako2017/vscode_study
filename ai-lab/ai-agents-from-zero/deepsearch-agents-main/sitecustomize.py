@@ -16,34 +16,13 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-
-def _load_env_file(env_path: Path) -> None:
-    if not env_path.exists():
-        return
-
-    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip("'").strip('"')
-        os.environ.setdefault(key, value)
+from app.runtime_config import apply_openai_compatible_env, load_local_env_file, resolve_llm_config
 
 
 def _bootstrap() -> None:
     root = Path(__file__).resolve().parent
-    _load_env_file(root / ".env")
-
-    if os.getenv("OPENROUTER_API_KEY"):
-        os.environ.setdefault("OPENAI_API_KEY", os.getenv("OPENROUTER_API_KEY", ""))
-    if os.getenv("OPENROUTER_BASE_URL"):
-        os.environ.setdefault("OPENAI_BASE_URL", os.getenv("OPENROUTER_BASE_URL", ""))
-    if os.getenv("OPENROUTER_MODEL") and not os.getenv("LLM_QWEN_MAX"):
-        os.environ.setdefault("LLM_QWEN_MAX", os.getenv("OPENROUTER_MODEL", ""))
-    if os.getenv("OPENROUTER_API_KEY") and not os.getenv("LLM_QWEN_MAX"):
-        os.environ.setdefault("LLM_QWEN_MAX", "openai/gpt-4o-mini")
+    load_local_env_file(root)
+    apply_openai_compatible_env(resolve_llm_config())
 
 
 _bootstrap()
-

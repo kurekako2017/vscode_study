@@ -10,29 +10,31 @@ import os
 from dotenv import find_dotenv, load_dotenv
 from langchain.chat_models import init_chat_model
 
+from app.runtime_config import apply_openai_compatible_env, resolve_llm_config
+
 # find_dotenv 会从当前目录向上查找 .env，适合脚本和 Web 服务从不同入口启动的场景
 load_dotenv(find_dotenv())
 
-# 统一使用 OpenRouter 作为外部模型入口，再映射到 OpenAI 兼容环境变量，
-# 这样底层 LangChain / DeepAgents 依然可以走标准 OpenAI-compatible 接口。
-if os.getenv("OPENROUTER_API_KEY"):
-    os.environ.setdefault("OPENAI_API_KEY", os.getenv("OPENROUTER_API_KEY", ""))
+def build_llm_model(provider: str | None = None):
+    """Build an OpenAI-compatible chat model for the requested provider."""
+    llm_config = resolve_llm_config(provider)
+    apply_openai_compatible_env(llm_config, override=True)
 
-if os.getenv("OPENROUTER_BASE_URL"):
-    os.environ.setdefault("OPENAI_BASE_URL", os.getenv("OPENROUTER_BASE_URL", ""))
+    if provider is not None and not llm_config.get("configured"):
+        missing = ", ".join(llm_config.get("missing", [])) or "unknown"
+        raise ValueError(f"LLM provider {provider} config incomplete: {missing}")
 
-# 具体模型名优先读取环境变量；如果没有配置，先用一个默认值保证服务可以启动
-resolved_model_name = (
-    os.getenv("LLM_QWEN_MAX")
-    or os.getenv("OPENROUTER_MODEL")
-    or "openai/gpt-4o-mini"
-)
+    resolved_model_name = str(
+        llm_config.get("model") or os.getenv("LLM_QWEN_MAX") or "openai/gpt-4o-mini"
+    )
+    max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "1024"))
 
-max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "1024"))
+    return init_chat_model(
+        model=resolved_model_name,
+        model_provider="openai",
+        max_completion_tokens=max_completion_tokens,
+    )
 
-# 使用 OpenAI 兼容协议接入模型；具体模型名由上面的 resolved_model_name 控制
-model = init_chat_model(
-    model=resolved_model_name,
-    model_provider="openai",
-    max_completion_tokens=max_completion_tokens,
-)
+
+# 默认使用当前环境解析出的 provider 构建模型
+model = build_llm_model()

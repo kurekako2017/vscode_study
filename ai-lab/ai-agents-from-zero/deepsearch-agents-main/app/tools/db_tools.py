@@ -32,9 +32,7 @@ def get_db_config():
         "password": os.getenv("MYSQL_PASSWORD"),
         "database": os.getenv("MYSQL_DATABASE"),
         "charset": os.getenv("MYSQL_CHARSET", "utf8mb4"),
-        "collation": os.getenv("MYSQL_COLLATION", "utf8mb4_unicode_ci"),
         "autocommit": True,
-        "sql_mode": os.getenv("MYSQL_SQL_MODE", "TRADITIONAL"),
     }
 
     # 去掉未配置的可选项，避免把 None 传给 mysql.connector 造成连接参数异常
@@ -47,6 +45,16 @@ def get_db_config():
         raise ValueError(f"缺失数据库核心配置：{', '.join(missing_keys)}")
 
     return config
+
+
+def _configure_session(conn) -> None:
+    """Set connection-local MySQL session defaults."""
+    charset = os.getenv("MYSQL_CHARSET", "utf8mb4")
+    collation = os.getenv("MYSQL_COLLATION", "utf8mb4_unicode_ci")
+    sql_mode = os.getenv("MYSQL_SQL_MODE", "TRADITIONAL")
+    with conn.cursor() as cursor:
+        cursor.execute(f"SET NAMES {charset} COLLATE {collation}")
+        cursor.execute(f"SET SESSION sql_mode = '{sql_mode}'")
 
 
 @tool
@@ -76,6 +84,7 @@ def list_sql_tables() -> str:
     try:
         # 使用 with 管理连接和游标，查询结束后自动释放数据库资源
         with connect(**config) as conn:
+            _configure_session(conn)
             with conn.cursor() as cursor:
                 sql = "SHOW TABLES"
                 cursor.execute(sql)
@@ -125,6 +134,7 @@ def get_table_data(table_name) -> str:
     # 查询流程同样是：连接 -> cursor -> 执行 SQL -> 获取列信息和数据 -> 自动释放资源
     try:
         with connect(**config) as conn:
+            _configure_session(conn)
             with conn.cursor() as cursor:
                 # 教程代码直接拼接表名，重点演示 Agent 查询链路；生产环境应改为白名单校验
                 sql = f"SELECT * FROM {table_name} LIMIT 100"
@@ -189,6 +199,7 @@ def execute_sql_query(query) -> str:
     # 执行 SQL -> 读取 description 得到列名 -> fetchall 得到数据 -> 拼成 CSV 返回
     try:
         with connect(**config) as conn:
+            _configure_session(conn)
             with conn.cursor() as cursor:
                 # 当前章节依赖提示词约束模型生成只读查询；生产环境建议在工具层限制 SELECT/SHOW
                 cursor.execute(query)

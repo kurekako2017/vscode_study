@@ -32,6 +32,7 @@
 - [当前工作区运行指南](workspace-run-guide.md)
 - [环境清单](environment-checklist.md)
 - [OpenRouter + NAS MySQL 说明](local-setup-openrouter-docker-mysql.md)
+- [OpenRouter + NAS MySQL 最终可运行配置](openrouter-nas-mysql-final-config.md)
 - [测试方案与测试骨架规划](testing-strategy-and-skeleton.md)
 - [测试目录树说明页](testing-skeleton-directory-guide.md)
 

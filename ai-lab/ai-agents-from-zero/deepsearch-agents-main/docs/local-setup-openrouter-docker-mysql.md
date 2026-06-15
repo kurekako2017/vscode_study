@@ -1,8 +1,9 @@
 # 当前推荐方案：OpenRouter + NAS MySQL
 
-这个项目最适合的本地组合是：
+这个项目当前最适合的组合是：
 
 - 大模型：`OpenRouter`
+- OpenRouter 402 兜底：`NVIDIA`（可选）
 - 结构化业务库：`JtProject` 里使用的 NAS `MySQL`
 - 互联网搜索：`Tavily`
 - 私有知识库：`RAGFlow`
@@ -10,6 +11,7 @@
 ## 1. 为什么推荐这个组合
 
 - `OpenRouter` 方便统一接入多个兼容模型，不需要为不同供应商单独改代码。
+- 如果 OpenRouter 返回 `402`，并且你已经配置了 `NVIDIA_API_KEY` 和 `NVIDIA_MODEL`，主智能体会自动切到 NVIDIA 再试一次。
 - 你当前工作区已经有一套可用的 NAS MySQL，可直接复用 `JtProject` 的远端数据库配置。
 - 这套项目里，MySQL 只是业务数据源，不是核心服务本身，所以复用现成 NAS 数据库最省事。
 
@@ -17,12 +19,9 @@
 
 你需要先确保：
 
-- Docker Desktop 已安装
-- Docker Desktop 的 WSL Integration 已开启
-- 当前 WSL 发行版已经被 Docker Desktop 勾选
-
-如果这一步没开通，当前工作区里的 WSL 还是不能直接运行 `docker compose`。
-不过在当前方案里，MySQL 已经切到 NAS，不再依赖本机容器启动。
+- `OpenRouter` 的 `API Key` 可用
+- `NAS MySQL` 的 `MYSQL_*` 配置正确
+- 如果你要用自动兜底，再补 `NVIDIA_API_KEY` 和 `NVIDIA_MODEL`
 
 ## 3. `.env` 推荐填写方式
 
@@ -40,6 +39,11 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_API_KEY=你的_openrouter_api_key
 LLM_QWEN_MAX=openai/gpt-4o-mini
 LLM_MAX_COMPLETION_TOKENS=1024
+
+# NVIDIA 可选兜底
+# NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+# NVIDIA_API_KEY=你的_nvidia_api_key
+# NVIDIA_MODEL=你实际可用的_nvidia_model
 
 # Tavily
 TAVILY_API_KEY=你的_tavily_api_key
@@ -69,7 +73,7 @@ MYSQL_SQL_MODE=TRADITIONAL
 - User: `root`
 - Password: `123456`
 
-如果后续你想切回 Docker MySQL，再重新把 `MYSQL_*` 改成本机容器即可。
+如果后续你想切回 Docker MySQL，再重新把 `MYSQL_*` 改成本机容器即可，但当前工作区默认不依赖这条路径。
 
 ## 5. 验证顺序
 

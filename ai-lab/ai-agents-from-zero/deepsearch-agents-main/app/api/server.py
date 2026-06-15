@@ -30,6 +30,7 @@ from pydantic import BaseModel
 
 from app.agent.main_agent import run_deep_agent
 from app.api.monitor import manager
+from app.runtime_config import resolve_llm_config
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -98,21 +99,16 @@ async def health_check():
     This endpoint is intentionally dependency-light so the UI can verify that
     the FastAPI process is alive even when external services are not configured.
     """
-    llm_api_key = os.getenv("OPENROUTER_API_KEY")
-    llm_base_url = os.getenv("OPENROUTER_BASE_URL")
-    llm_model = (
-        os.getenv("LLM_QWEN_MAX")
-        or os.getenv("OPENROUTER_MODEL")
-        or "openai/gpt-4o-mini"
-    )
+    llm_config = resolve_llm_config()
 
     return {
         "status": "ok",
         "backend": "alive",
         "llm": {
-            "configured": bool(llm_api_key and llm_base_url and llm_model),
-            "source": "openrouter" if os.getenv("OPENROUTER_API_KEY") else "unset",
-            "model": llm_model,
+            "configured": bool(llm_config["configured"]),
+            "source": str(llm_config["source"]),
+            "provider": str(llm_config["provider"]),
+            "model": str(llm_config["model"]),
         },
         "mysql": {
             "host": os.getenv("MYSQL_HOST", ""),
