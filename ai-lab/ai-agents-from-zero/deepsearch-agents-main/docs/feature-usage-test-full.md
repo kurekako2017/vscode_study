@@ -18,7 +18,7 @@
 - `frontend-home.png`
 - `db-query-result.png`
 - `network-search-result.png`
-- `ragflow-result.png`
+- `local-kb-result.png`
 - `file-upload-result.png`
 
 ## 0.1 截图编号建议
@@ -29,7 +29,7 @@
 - 截图 2：前端健康面板
 - 截图 3：数据库查询结果
 - 截图 4：网络搜索结果
-- 截图 5：RAGFlow 结果
+- 截图 5：本地知识库结果
 - 截图 6：文件上传与读取
 - 截图 7：结果文件生成
 - 截图 8：完整联调流程
@@ -39,7 +39,7 @@
 ### 1.1 功能说明
 
 - 检查 FastAPI 后端是否存活。
-- 同时返回模型、MySQL、Tavily、RAGFlow 的配置状态。
+- 同时返回模型、MySQL、Tavily、本地知识库的配置状态。
 
 ### 1.2 测试命令
 
@@ -58,7 +58,7 @@ curl http://127.0.0.1:8000/api/health
 - `backend=alive`
 - `llm.configured=true`
 - `mysql.configured=true`
-- `services.tavily` 和 `services.ragflow` 按实际配置显示
+- `services.tavily` 和 `services.local_knowledge_base` 按实际配置显示
 
 ### 1.5 验收看点
 
@@ -187,7 +187,7 @@ npm run dev
 - 账号额度是否可用
 - 网络是否通
 
-## 5. RAGFlow 助手
+## 5. 本地知识库助手
 
 ### 5.1 功能说明
 
@@ -202,7 +202,7 @@ npm run dev
 
 ### 5.3 推荐截图
 
-- 前端事件流里出现 RAGFlow 调用的截图
+- 前端事件流里出现本地知识库调用的截图
 - 最终回答截图
 - 如果你后面接上真实知识库，可以补一张“知识库返回结果”的截图
 
@@ -214,12 +214,12 @@ npm run dev
 
 ### 5.5 验收看点
 
-- 是否真的走到 RAGFlow 工具
+- 是否真的走到本地知识库工具
 - 未配置时是否优雅降级
 
 ### 5.6 排错点
 
-- RAGFlow 服务是否在线
+- 本地知识库目录是否有文档
 - API URL 是否正确
 - API key 是否可用
 

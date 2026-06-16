@@ -218,7 +218,7 @@ export default function App() {
             </li>
             <li>
               <FileSearchOutlined aria-hidden />
-              RAGFlow 助手
+              本地知识库助手
             </li>
           </ul>
         </div>
@@ -252,8 +252,8 @@ export default function App() {
               <div className="sidebar-health-row">
                 <strong>Services</strong>
                 <span>
-                  Tavily {health.services.tavily ? "OK" : "OFF"} · RAGFlow{" "}
-                  {health.services.ragflow ? "OK" : "OFF"}
+                  Tavily {health.services.tavily ? "OK" : "OFF"} · 本地知识库{" "}
+                  {health.services.local_knowledge_base ? "OK" : "OFF"}
                 </span>
               </div>
             </>

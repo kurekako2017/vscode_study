@@ -14,9 +14,10 @@
 - `Tavily`
   - 负责互联网公开资料检索。
   - 适合新闻、行业信息、政策、网页资料等外部信息源。
-- `RAGFlow`
+- `本地知识库`
   - 负责内部非结构化知识库问答。
   - 适合 PDF、文档、企业资料库等内部知识场景。
+  - 默认使用仓库内的 `docs/knowledge_base/` 目录，不需要额外服务。
 - `FastAPI + WebSocket`
   - 负责后端任务接口、事件流、文件上传下载和前后端实时联动。
 - `React + Vite`
@@ -71,9 +72,7 @@ LLM_MAX_COMPLETION_TOKENS=
 # 互联网搜索
 TAVILY_API_KEY=
 
-# RAGFlow
-RAGFLOW_API_URL=
-RAGFLOW_API_KEY=
+# 本地知识库不需要额外环境变量
 
 # MySQL
 MYSQL_HOST=
@@ -91,7 +90,7 @@ MYSQL_SQL_MODE=
 1. 先确认大模型 API 可用，优先使用 `OPENROUTER_*` 这一套变量名，推荐 `openai/gpt-4o-mini` 这类文本模型，并把 `LLM_MAX_COMPLETION_TOKENS` 控制在一个合理范围内。
 2. 再确认 MySQL 连接可用。
 3. 然后补 Tavily。
-4. 最后补 RAGFlow。
+4. 最后补本地知识库文档。
 
 ## 5. 依赖与服务清单
 
@@ -112,7 +111,7 @@ MYSQL_SQL_MODE=
 - OpenRouter 模型服务
 - MySQL 8.x
 - Tavily API
-- RAGFlow 服务
+- 本地知识库目录
 
 ## 6. 适合当前工作区的落地顺序
 
@@ -134,10 +133,10 @@ MYSQL_SQL_MODE=
 - 再验证表名、样例数据、SQL 查询
 - 最后验证数据库查询子智能体的回答链路
 
-### 第四步：再接 Tavily 和 RAGFlow
+### 第四步：再接 Tavily 和本地知识库
 
 - 先让网络搜索能返回结果
-- 再让知识库问答能查到内部文档
+- 再把本地知识库目录接进来，验证知识库问答能查到内部文档
 
 ### 第五步：最后再接前端
 
@@ -166,7 +165,7 @@ MYSQL_SQL_MODE=
 - 已补充环境清单文档。
 - 已增加环境校验脚本 `scripts/check_environment.py`。
 - 已统一使用 `OPENROUTER_*` 作为模型环境变量。
-- 已把 Tavily 和 RAGFlow 改成按需初始化，避免没有 key 时后端导入失败。
+- 已把 Tavily 改成按需初始化，避免没有 key 时后端导入失败。
 - 已增加后端健康检查接口，前端可以直接读取后端、模型、MySQL 和外部服务状态。
 - 已安装后端 Python 依赖。
 - 已启动后端 `FastAPI` 服务。
@@ -178,8 +177,8 @@ MYSQL_SQL_MODE=
 
 - `uv` 依赖管理工具未安装。
 - `pnpm` 未安装，当前前端用 `npm` 作为临时替代。
-- `TAVILY_API_KEY`、`RAGFLOW_*` 和部分外部服务信息还没有补齐。
-- 如果后续要启用 Tavily 和 RAGFlow，还需要继续补真实的外部服务地址和 key。
+- `TAVILY_API_KEY` 和少量外部服务信息还没有补齐。
+- 如果后续要扩充知识库，只需要往 `docs/knowledge_base/` 里补充文档即可。
 
 ## 9. 结论
 

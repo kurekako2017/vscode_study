@@ -56,7 +56,7 @@ export interface HealthResponse {
   };
   services: {
     tavily: boolean;
-    ragflow: boolean;
+    local_knowledge_base: boolean;
   };
 }
 

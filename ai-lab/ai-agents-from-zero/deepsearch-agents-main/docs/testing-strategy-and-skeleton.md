@@ -49,7 +49,7 @@
 - `read_file_content`
 - `tavily_tool`
 - `db_tools`
-- `ragflow_tools`
+- `local_kb_tools`
 
 这些工具往往会接外部依赖，所以更适合做“准备输入 -> 调用工具 -> 看输出是否合理”的测试。
 
@@ -74,7 +74,7 @@
 - 输入数据库问题，返回结果并生成 Markdown
 - 上传附件后让智能体读取并总结
 - 触发网络搜索后返回摘要
-- 触发 RAGFlow 后返回知识库结果
+- 触发本地知识库后返回检索结果
 - 任务执行过程能通过 WebSocket 推送给前端
 
 这一层通常不是写很多细碎断言，而是写“场景级”测试。
@@ -354,7 +354,7 @@ tests/
 
 1. 先把纯逻辑单测跑起来，再补外部依赖测试
 2. 外部服务相关测试尽量做成可跳过
-3. 对真实 MySQL / RAGFlow / Tavily 的测试，要准备独立环境变量
+3. 对真实 MySQL / 本地知识库 / Tavily 的测试，要准备独立环境变量
 4. 前端联调不要和单元测试混在一起
 5. 真实任务链路的测试，建议保留最少几个固定场景
 
@@ -381,7 +381,7 @@ tests/
 │   ├── test_api_upload.py
 │   ├── test_api_task_smoke.py
 │   ├── test_db_tools.py
-│   └── test_ragflow_tools.py
+│   └── test_local_kb_tools.py
 ├── e2e/
 │   ├── test_db_query_flow.py
 │   ├── test_file_upload_flow.py

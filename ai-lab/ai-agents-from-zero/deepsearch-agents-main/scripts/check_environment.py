@@ -40,8 +40,6 @@ OPTIONAL_ENV_VARS = [
     "MYSQL_COLLATION",
     "MYSQL_SQL_MODE",
     "TAVILY_API_KEY",
-    "RAGFLOW_API_URL",
-    "RAGFLOW_API_KEY",
 ]
 
 
@@ -126,6 +124,14 @@ def main() -> int:
         status = "OK" if value else "EMPTY"
         detail = value if value and name in {"NVIDIA_BASE_URL", "OPENROUTER_BASE_URL"} else (value[:4] + "..." if value else "empty")
         print(f"{name:24} {status:7} {detail}")
+
+    knowledge_base_dir = ROOT / "docs" / "knowledge_base"
+    kb_files = []
+    if knowledge_base_dir.exists():
+        kb_files = [path for path in knowledge_base_dir.rglob("*") if path.is_file()]
+    print(f"{'LOCAL_KB_DIR':24} {'OK' if kb_files else 'MISSING':7} {knowledge_base_dir}")
+    if not kb_files:
+        missing += 1
 
     print_section("Summary")
     if missing:

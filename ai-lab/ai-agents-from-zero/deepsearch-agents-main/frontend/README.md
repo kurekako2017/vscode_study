@@ -5,8 +5,8 @@ React + Vite + Tailwind CSS + Ant Design frontend for the DeepSearch Agents Fast
 ## Run
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 By default the app talks to `http://localhost:8000` and `ws://localhost:8000`.
@@ -17,12 +17,13 @@ VITE_API_BASE_URL=http://localhost:8000
 VITE_WS_BASE_URL=ws://localhost:8000
 ```
 
-Frontend runtime does not configure the LLM or MySQL directly. Those settings
-belong in the repository root `.env`:
+Frontend runtime does not configure the LLM, MySQL, or local knowledge base directly.
+Those settings belong in the repository root `.env`:
 
 - `OPENROUTER_*` for the default model provider
 - `NVIDIA_*` for optional fallback
 - `MYSQL_*` for the NAS database
+- The local knowledge base is read from `docs/knowledge_base/`
 
 ## Backend Contract
 
@@ -34,4 +35,4 @@ belong in the repository root `.env`:
 - `WebSocket /ws/{thread_id}`
 
 The sidebar reads `GET /api/health` to show whether the backend, model, MySQL, Tavily,
-and RAGFlow configuration are present.
+and local knowledge base are present.

@@ -6,7 +6,7 @@
 - OpenRouter 402 兜底：`NVIDIA`（可选）
 - 结构化业务库：`JtProject` 里使用的 NAS `MySQL`
 - 互联网搜索：`Tavily`
-- 私有知识库：`RAGFlow`
+- 私有知识库：本地知识库目录
 
 ## 1. 为什么推荐这个组合
 
@@ -48,9 +48,7 @@ LLM_MAX_COMPLETION_TOKENS=1024
 # Tavily
 TAVILY_API_KEY=你的_tavily_api_key
 
-# RAGFlow
-RAGFLOW_API_URL=http://你的-ragflow-host
-RAGFLOW_API_KEY=你的_ragflow_api_key
+# 本地知识库默认使用 `docs/knowledge_base/`，不需要额外环境变量
 
 # NAS MySQL
 MYSQL_HOST=192.168.10.2

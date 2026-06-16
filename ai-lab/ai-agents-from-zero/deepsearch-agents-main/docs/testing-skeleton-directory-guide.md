@@ -31,7 +31,7 @@ tests/
 - WebSocket 推送
 - 多智能体调度
 - MySQL 查询
-- RAGFlow 查询
+- 本地知识库查询
 - 文件上传和文件生成
 
 如果把所有测试都塞在一个目录里，后面会很难维护。
@@ -65,7 +65,7 @@ tests/
 │   ├── test_api_upload.py
 │   ├── test_api_task_smoke.py
 │   ├── test_db_tools.py
-│   └── test_ragflow_tools.py
+│   └── test_local_kb_tools.py
 ├── e2e/
 │   ├── test_db_query_flow.py
 │   ├── test_file_upload_flow.py
@@ -127,7 +127,7 @@ tests/
 - 上传接口是否能保存文件
 - 任务接口是否能触发后台流程
 - MySQL 工具是否能连通
-- RAGFlow 工具是否能返回结果
+- 本地知识库工具是否能返回结果
 
 ### 4.5 `e2e/`
 
@@ -193,7 +193,7 @@ tests/
 
 - LLM 调用
 - MySQL 连接
-- RAGFlow 调用
+- 本地知识库调用
 - Tavily 搜索
 - 文件转换外部依赖
 
@@ -258,4 +258,3 @@ tests/
 - [功能使用与测试最短版](feature-usage-test-template.md)
 - [功能使用与测试完整版](feature-usage-test-full.md)
 - [测试方案与测试骨架规划](testing-strategy-and-skeleton.md)
-

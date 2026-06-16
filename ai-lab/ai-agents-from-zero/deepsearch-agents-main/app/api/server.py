@@ -31,6 +31,7 @@ from pydantic import BaseModel
 from app.agent.main_agent import run_deep_agent
 from app.api.monitor import manager
 from app.runtime_config import resolve_llm_config
+from app.knowledge_base.local_index import has_local_knowledge_base
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -117,7 +118,7 @@ async def health_check():
         },
         "services": {
             "tavily": bool(os.getenv("TAVILY_API_KEY")),
-            "ragflow": bool(os.getenv("RAGFLOW_API_URL") and os.getenv("RAGFLOW_API_KEY")),
+            "local_knowledge_base": has_local_knowledge_base(),
         },
     }
 
