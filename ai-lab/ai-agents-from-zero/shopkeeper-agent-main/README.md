@@ -30,7 +30,7 @@
 如果你想先看文档目录，建议直接从这里开始：
 
 - [文档总目录](docs/docs-index.md)
-- [启动 / 验证 / 排错最终说明](docs/workspace-run-guide.md)
+- [启动 / 验证 / 排错最终说明](docs/shopkeeper-agent-启动guide.md)
 - [环境清单](docs/environment-checklist.md)
 - [功能一览与测试指南](docs/feature-usage-test-template.md)
 - [功能使用与测试完整版](docs/feature-usage-test-full.md)
@@ -168,22 +168,22 @@ uv sync
 cp .env.example .env
 ```
 
-把 `.env` 中的 `LLM_API_KEY` 替换成真实密钥；如果你要切换 NAS MySQL、模型服务地址或前端代理，也可以直接改 `.env` 中的对应变量：
+把 `.env` 中的 `OPENROUTER_API_KEY` 和可选的 `NVIDIA_API_KEY` 替换成真实密钥；如果你要切换 NAS MySQL、模型服务地址或前端代理，也可以直接改 `.env` 中的对应变量：
 
 ```bash
-LLM_API_KEY=your_real_api_key
+LLM_PROVIDER_ORDER=openrouter,nvidia,ollama
+OPENROUTER_API_KEY=your_openrouter_api_key
+NVIDIA_API_KEY=your_nvidia_api_key
+OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
 ```
 
-默认配置使用兼容 OpenAI 接口的硅基流动服务：
+默认真实链路使用 OpenAI-Compatible 接口，并按下面顺序回退：
 
-```yaml
-llm:
-    model_name: Pro/zai-org/GLM-5.1
-    api_key: ${oc.env:LLM_API_KEY}
-    base_url: https://api.siliconflow.cn/v1
+```text
+OpenRouter -> NVIDIA NIM -> 本地 Ollama qwen2.5-coder:1.5b
 ```
 
-如需使用其他兼容 OpenAI API 的模型平台，修改 [conf/app_config.yaml](conf/app_config.yaml) 中的 `model_name` 和 `base_url`。
+如需调整优先级，修改 `.env` 中的 `LLM_PROVIDER_ORDER`。旧的 `LLM_API_KEY`、`LLM_MODEL_NAME`、`LLM_BASE_URL` 仍兼容，会在没有单独 OpenRouter 配置时映射到 OpenRouter。
 
 `shopkeeper-agent-main` 现在已经支持通过 `.env` 覆盖下面这些环境项：
 
@@ -193,8 +193,12 @@ llm:
 - `EMBEDDING_*`
 - `ES_*`
 - `LLM_*`
-- `OPENROUTER_API_KEY` 也会自动映射到 `LLM_API_KEY`
-- `MOCK_MODE=true` 可以把后端切到 mock SSE 模式，先在没有 Docker 的情况下联调前端
+- `OPENROUTER_*`
+- `NVIDIA_*`
+- `OLLAMA_*`
+- `LLM_PROVIDER_ORDER`
+- `NGC_API_KEY` 也会自动映射到 `NVIDIA_API_KEY`
+- `MOCK_MODE=true` 可以把后端切到 mock SSE 模式，先在外部服务不可用时联调前端
 - `VITE_DEV_PROXY_TARGET`
 - `VITE_API_BASE_URL`
 
@@ -213,6 +217,7 @@ VITE_API_BASE_URL=
 - [Mock 启动命令块](docs/mock-first-copy-paste.md)
 - [Mock 最短 5 行命令](docs/mock-first-5lines.md)
 - [OpenRouter + NAS MySQL 启动说明](docs/openrouter-nas-mysql-quickstart.md)
+- [LLM Provider 回退运行模式](docs/llm-provider-fallback.md)
 - [OpenRouter + NAS MySQL 命令块](docs/openrouter-nas-mysql-copy-paste.md)
 - [OpenRouter + NAS MySQL 最短 5 行命令](docs/openrouter-nas-mysql-5lines.md)
 - [功能一览与测试指南](docs/feature-overview-and-test-guide.md)

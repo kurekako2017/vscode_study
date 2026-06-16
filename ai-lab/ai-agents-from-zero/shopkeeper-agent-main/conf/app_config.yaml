@@ -39,9 +39,19 @@ es:
   index_name: ${oc.env:ES_INDEX_NAME,data_agent}
 
 llm:
-  model_name: ${oc.env:LLM_MODEL_NAME,Pro/zai-org/GLM-5.1}
+  provider_order: ${oc.env:LLM_PROVIDER_ORDER,openrouter,nvidia,ollama}
+  model_name: ${oc.env:LLM_MODEL_NAME,openai/gpt-4o-mini}
   api_key: ${oc.env:LLM_API_KEY}
-  base_url: ${oc.env:LLM_BASE_URL,https://api.siliconflow.cn/v1}
+  base_url: ${oc.env:LLM_BASE_URL,https://openrouter.ai/api/v1}
+  openrouter_model_name: ${oc.env:OPENROUTER_MODEL_NAME,openai/gpt-4o-mini}
+  openrouter_api_key: ${oc.env:OPENROUTER_API_KEY}
+  openrouter_base_url: ${oc.env:OPENROUTER_BASE_URL,https://openrouter.ai/api/v1}
+  nvidia_model_name: ${oc.env:NVIDIA_MODEL_NAME,nvidia/llama-3.3-nemotron-super-49b-v1}
+  nvidia_api_key: ${oc.env:NVIDIA_API_KEY}
+  nvidia_base_url: ${oc.env:NVIDIA_BASE_URL,https://integrate.api.nvidia.com/v1}
+  ollama_model_name: ${oc.env:OLLAMA_MODEL_NAME,qwen2.5-coder:1.5b}
+  ollama_api_key: ${oc.env:OLLAMA_API_KEY,ollama}
+  ollama_base_url: ${oc.env:OLLAMA_BASE_URL,http://127.0.0.1:11434/v1}
 
 runtime:
   mock_mode: ${oc.env:MOCK_MODE,false}

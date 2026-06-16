@@ -4,9 +4,10 @@
 
 ## 1. 这套项目里各组件的职责
 
-- `OpenRouter / OpenAI Compatible API`
+- `OpenRouter / NVIDIA NIM / 本地 Ollama`
   - 负责提供大模型推理能力。
   - 主问数链路最终都依赖它来做理解、规划、总结和结果组织。
+  - 默认优先级是 `OpenRouter -> NVIDIA -> qwen2.5-coder:1.5b`。
 - `NAS MySQL`
   - 负责承载结构化业务数据。
   - 在这个项目里，它相当于“原系统里的业务数据库”。
@@ -63,11 +64,16 @@
 
 ```bash
 # 大模型
+LLM_PROVIDER_ORDER=openrouter,nvidia,ollama
 OPENROUTER_API_KEY=
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-LLM_API_KEY=
-LLM_MODEL_NAME=openai/gpt-4o-mini
-LLM_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL_NAME=openai/gpt-4o-mini
+NVIDIA_API_KEY=
+NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+NVIDIA_MODEL_NAME=nvidia/llama-3.3-nemotron-super-49b-v1
+OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
+OLLAMA_API_KEY=ollama
 
 # 运行模式
 MOCK_MODE=false
@@ -106,10 +112,12 @@ VITE_API_BASE_URL=
 
 建议优先策略：
 
-1. 先确认大模型 API 可用，推荐 `OpenRouter`
-2. 再确认 NAS MySQL 连接可用
-3. 然后补 Qdrant / Elasticsearch / Embedding
-4. 最后决定是先跑 `Mock` 还是直接进真实模式
+1. 先确认 OpenRouter API 可用
+2. 再补 NVIDIA API Key，作为第二远端模型
+3. 确认本地 `ollama list` 里有 `qwen2.5-coder:1.5b`
+4. 再确认 NAS MySQL 连接可用
+5. 然后补 Qdrant / Elasticsearch / Embedding
+6. Mock 只作为联调兜底
 
 ## 5. 依赖与服务清单
 
@@ -126,7 +134,9 @@ VITE_API_BASE_URL=
 
 ### 外部服务
 
-- OpenRouter 或其他 OpenAI-Compatible 模型服务
+- OpenRouter
+- NVIDIA NIM OpenAI-Compatible API
+- Ollama 本地 `qwen2.5-coder:1.5b`
 - NAS MySQL
 - Qdrant
 - Elasticsearch
@@ -137,7 +147,7 @@ VITE_API_BASE_URL=
 ### 第一步：先把环境边界定清楚
 
 - 确认哪些服务要本机跑，哪些可以走远端服务。
-- 当前这台环境里，Docker 不是第一优先级，所以可以先走 Mock 或 NAS MySQL。
+- 当前这台环境里，模型链路优先走 OpenRouter / NVIDIA；远端不可用时回退本地 Ollama。
 
 ### 第二步：先让后端“能起来”
 
@@ -168,8 +178,8 @@ VITE_API_BASE_URL=
 1. 把 `.env.example` 或 `.env.nas.example` 复制成可本地使用的 `.env`，并补齐真实值或临时值。
 2. 先尝试只启动后端，确认代码层面没有依赖或配置缺口。
 3. 把数据库运行方案定下来：
-   - 方案 A：先走 `Mock`
-   - 方案 B：连接 NAS MySQL
+   - 方案 A：连接 NAS MySQL 跑真实链路
+   - 方案 B：基础服务不可用时先走 `Mock`
    - 方案 C：如果 Docker 后面修好了，再切回本机容器
 
 ## 8. 当前落地进度
@@ -178,6 +188,7 @@ VITE_API_BASE_URL=
 
 - 已补充环境清单文档。
 - 已增加后端配置加载与 `.env` 覆盖。
+- 已增加 OpenRouter / NVIDIA / Ollama provider 回退配置。
 - 已增加 `MOCK_MODE`，可在没有 Docker 的情况下先跑 mock SSE 链路。
 - 已把 `OpenRouter` 适配进 `.env` 体系。
 - 已把基础服务启动、功能测试和排错文档分层整理。

@@ -85,9 +85,19 @@ class ESConfig:
 class LLMConfig:
     """大模型调用配置"""
 
+    provider_order: str
     model_name: str
     api_key: str
     base_url: str
+    openrouter_model_name: str
+    openrouter_api_key: str
+    openrouter_base_url: str
+    nvidia_model_name: str
+    nvidia_api_key: str
+    nvidia_base_url: str
+    ollama_model_name: str
+    ollama_api_key: str
+    ollama_base_url: str
 
 
 @dataclass
@@ -175,10 +185,17 @@ config_file = project_root / "conf" / "app_config.yaml"
 # 先读取本地 .env，让 YAML 中的 ${oc.env:...} 可以解析到敏感配置
 load_dotenv(project_root / ".env")
 
-# 兼容 OpenRouter 的环境变量习惯：
-# 如果用户只设置了 OPENROUTER_API_KEY，这里会自动补到 LLM_API_KEY，避免再复制一份。
-if not os.getenv("LLM_API_KEY") and os.getenv("OPENROUTER_API_KEY"):
-    os.environ["LLM_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
+# 兼容旧版 LLM_* 写法：没有单独配置 OpenRouter 时，沿用 LLM_*。
+if not os.getenv("OPENROUTER_API_KEY") and os.getenv("LLM_API_KEY"):
+    os.environ["OPENROUTER_API_KEY"] = os.environ["LLM_API_KEY"]
+if not os.getenv("OPENROUTER_MODEL_NAME") and os.getenv("LLM_MODEL_NAME"):
+    os.environ["OPENROUTER_MODEL_NAME"] = os.environ["LLM_MODEL_NAME"]
+if not os.getenv("OPENROUTER_BASE_URL") and os.getenv("LLM_BASE_URL"):
+    os.environ["OPENROUTER_BASE_URL"] = os.environ["LLM_BASE_URL"]
+
+# NVIDIA NIM 有些环境会用 NGC_API_KEY，这里也兼容一下。
+if not os.getenv("NVIDIA_API_KEY") and os.getenv("NGC_API_KEY"):
+    os.environ["NVIDIA_API_KEY"] = os.environ["NGC_API_KEY"]
 
 # 读取 YAML 配置内容
 with config_file.open("r", encoding="utf-8") as file:

@@ -1,17 +1,21 @@
-# OpenRouter + NAS MySQL 启动说明
+# OpenRouter / NVIDIA / Ollama + NAS MySQL 启动说明
 
 > 这份说明是给“切回真实模式”的版本。
-> 目标是把项目重新接到你 NAS 上的 MySQL，并使用 OpenRouter 作为模型入口。
+> 目标是把项目重新接到你 NAS 上的 MySQL，并按 `OpenRouter -> NVIDIA -> 本地 Ollama qwen2.5-coder:1.5b` 调用模型。
 
 ## 适合什么情况
 
 - 你已经准备好了 OpenRouter API Key
+- 你可以选择再补 NVIDIA API Key
+- 你本地已经有 Ollama `qwen2.5-coder:1.5b`
 - 你希望复用 NAS 上的 MySQL，而不是在本机再起一套 MySQL 容器
 - 你想跑真实问数链路，而不是 mock 流程
 
 ## 这个模式会做什么
 
-- 后端使用 OpenRouter 调用大模型
+- 后端优先使用 OpenRouter 调用大模型
+- OpenRouter 不可用时尝试 NVIDIA
+- 远端模型都不可用时尝试本地 Ollama
 - `meta` 和 `dw` 连接 NAS MySQL
 - Qdrant、Elasticsearch、Embedding 继续由本机 Docker 提供
 - 前端仍然通过 SSE 看真实问数过程
@@ -28,6 +32,9 @@ cp .env.nas.example .env
 
 ```bash
 OPENROUTER_API_KEY=你的_openrouter_api_key
+NVIDIA_API_KEY=你的_nvidia_api_key
+OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
 DB_META_HOST=192.168.10.2
 DB_META_PORT=3306
 DB_META_USER=root
@@ -64,6 +71,22 @@ bash scripts/up_local_stack.sh up
 - `Elasticsearch` 可访问 `http://127.0.0.1:9200`
 - `Kibana` 可访问 `http://127.0.0.1:5601`
 - `Embedding` 可访问 `http://127.0.0.1:8081`
+
+### 2.1 检查本地 Ollama 回退模型
+
+```bash
+ollama list
+```
+
+预期结果：
+
+- 能看到 `qwen2.5-coder:1.5b`
+
+如果没有，执行：
+
+```bash
+ollama pull qwen2.5-coder:1.5b
+```
 
 ### 3. 构建元数据知识库
 
