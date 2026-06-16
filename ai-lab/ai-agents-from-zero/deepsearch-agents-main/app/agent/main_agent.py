@@ -35,6 +35,7 @@ from app.api.monitor import monitor
 # 文件类工具由主智能体直接掌握，负责读取上传附件和生成最终交付文档
 from app.tools.markdown_tools import generate_markdown
 from app.tools.pdf_tools import convert_md_to_pdf
+from app.tools.db_tools import get_table_data, list_sql_tables
 from app.tools.local_kb_tools import create_ask_delete, get_assistant_list
 from app.tools.upload_file_read_tool import read_file_content
 
@@ -226,6 +227,20 @@ def _is_local_kb_task(task_query: str) -> bool:
     return any(keyword in task_query for keyword in keywords)
 
 
+def _is_database_task(task_query: str) -> bool:
+    keywords = [
+        "数据库",
+        "数据表",
+        "表结构",
+        "sql",
+        "SQL",
+        "list_sql_tables",
+        "get_table_data",
+        "execute_sql_query",
+    ]
+    return any(keyword in task_query for keyword in keywords)
+
+
 def _query_local_knowledge(question: str) -> str:
     assistant_info = get_assistant_list.invoke({})
     retrieved = create_ask_delete.invoke(
@@ -238,6 +253,76 @@ def _truncate_content(content: str, limit: int = 12000) -> str:
     if len(content) <= limit:
         return content
     return content[:limit] + f"\n\n[内容过长，已截断，原始长度 {len(content)} 字符]"
+
+
+def _parse_table_names(table_list_text: str) -> list[str]:
+    prefix = "可用的表有："
+    if not table_list_text.startswith(prefix):
+        return []
+    raw_names = table_list_text[len(prefix) :].split(",")
+    return [name.strip() for name in raw_names if name.strip()]
+
+
+def _select_preview_table(task_query: str, table_names: list[str]) -> str | None:
+    lowered_query = task_query.lower()
+    for table_name in table_names:
+        if table_name.lower() in lowered_query:
+            return table_name
+    return table_names[0] if table_names else None
+
+
+def _limit_csv_rows(csv_text: str, limit: int = 5) -> str:
+    lines = [line for line in csv_text.splitlines() if line.strip()]
+    if len(lines) <= 1:
+        return csv_text.strip()
+    header = lines[0]
+    rows = lines[1 : 1 + limit]
+    return "\n".join([header, *rows]).strip()
+
+
+def _answer_database_task_sync(task_query: str) -> str:
+    table_list_text = str(list_sql_tables.invoke({})).strip()
+    table_names = _parse_table_names(table_list_text)
+    if not table_names:
+        return table_list_text or "当前数据库没有可用的表。"
+
+    preview_table = _select_preview_table(task_query, table_names)
+    preview_text = ""
+    if preview_table:
+        preview_raw = str(get_table_data.invoke({"table_name": preview_table})).strip()
+        preview_text = _limit_csv_rows(preview_raw, limit=5)
+
+    prompt = f"""
+你正在回答一个数据库查询任务。请严格基于下面的真实数据库结果回答，不要编造未查询到的信息。
+
+用户任务：
+{task_query}
+
+数据库表列表：
+{table_list_text}
+
+预览表：
+{preview_table or "无"}
+
+预览数据（最多前 5 行）：
+{preview_text or "无"}
+
+请用中文输出，并满足下面要求：
+1. 先列出当前数据库有哪些表。
+2. 再说明你选择预览了哪张表，以及为什么选它。
+3. 用 Markdown 表格或代码块展示该表前 5 行数据；如果不足 5 行，也如实说明。
+4. 如果数据库结果为空或报错，直接说明原因，不要补造数据。
+"""
+    response = model.invoke(prompt)
+    return _message_content_as_text(getattr(response, "content", "")) or str(response)
+
+
+async def _answer_database_task(task_query: str) -> str:
+    timeout_seconds = float(os.getenv("AGENT_RUN_TIMEOUT", "120"))
+    return await asyncio.wait_for(
+        asyncio.to_thread(_answer_database_task_sync, task_query),
+        timeout=timeout_seconds,
+    )
 
 
 def _analyze_uploaded_files_sync(task_query: str, uploaded_files: list[Path]) -> str:
@@ -500,6 +585,19 @@ async def run_deep_agent(task_query, session_id):
             monitor._emit("error", "本地知识库回答超时：本地模型长时间没有返回。")
         except Exception as e:
             monitor._emit("error", f"本地知识库回答失败：{str(e)}")
+        finally:
+            reset_session_context(session_dir_token, session_id_token)
+        return
+
+    if _is_database_task(task_query):
+        try:
+            monitor._emit("agent_progress", "开始查询数据库表结构与样例数据")
+            result = await _answer_database_task(task_query)
+            monitor.report_task_result(result)
+        except asyncio.TimeoutError:
+            monitor._emit("error", "数据库查询超时：本地模型长时间没有返回。")
+        except Exception as e:
+            monitor._emit("error", f"数据库查询失败：{str(e)}")
         finally:
             reset_session_context(session_dir_token, session_id_token)
         return
