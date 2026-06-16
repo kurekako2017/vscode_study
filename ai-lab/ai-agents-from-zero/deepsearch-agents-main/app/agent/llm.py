@@ -28,11 +28,15 @@ def build_llm_model(provider: str | None = None):
         llm_config.get("model") or os.getenv("LLM_QWEN_MAX") or "openai/gpt-4o-mini"
     )
     max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "1024"))
+    request_timeout = float(os.getenv("LLM_REQUEST_TIMEOUT", "45"))
+    max_retries = int(os.getenv("LLM_MAX_RETRIES", "1"))
 
     return init_chat_model(
         model=resolved_model_name,
         model_provider="openai",
         max_completion_tokens=max_completion_tokens,
+        timeout=request_timeout,
+        max_retries=max_retries,
     )
 
 

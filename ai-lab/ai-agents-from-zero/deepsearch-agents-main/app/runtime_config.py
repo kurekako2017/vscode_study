@@ -13,6 +13,8 @@ from pathlib import Path
 DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini"
 DEFAULT_NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
+DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
+DEFAULT_OLLAMA_MODEL = "qwen2.5-coder:1.5b"
 
 
 def load_local_env_file(root: Path | None = None) -> None:
@@ -34,7 +36,7 @@ def load_local_env_file(root: Path | None = None) -> None:
 
 def _pick_llm_provider() -> str:
     provider = os.getenv("LLM_PROVIDER", "openrouter").strip().lower()
-    if provider not in {"openrouter", "nvidia", "auto"}:
+    if provider not in {"openrouter", "nvidia", "ollama", "auto"}:
         return "openrouter"
     return provider
 
@@ -89,28 +91,54 @@ def _build_nvidia_config() -> dict[str, str | bool | list[str]]:
     }
 
 
+def _build_ollama_config() -> dict[str, str | bool | list[str]]:
+    api_key = os.getenv("OLLAMA_API_KEY", "ollama").strip() or "ollama"
+    base_url = os.getenv("OLLAMA_BASE_URL", DEFAULT_OLLAMA_BASE_URL).strip()
+    model = os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL).strip()
+    missing: list[str] = []
+    if not base_url:
+        missing.append("OLLAMA_BASE_URL")
+    if not model:
+        missing.append("OLLAMA_MODEL")
+
+    return {
+        "provider": "ollama",
+        "source": "ollama",
+        "api_key": api_key,
+        "base_url": base_url,
+        "model": model,
+        "configured": not missing,
+        "missing": missing,
+    }
+
+
 def resolve_llm_config(preferred_provider: str | None = None) -> dict[str, str | bool | list[str]]:
     """Resolve the effective LLM backend.
 
-    OpenRouter is the default and preferred path. NVIDIA is only used when the
-    caller explicitly selects it with ``LLM_PROVIDER=nvidia`` or when
-    ``LLM_PROVIDER=auto`` and OpenRouter is not configured.
+    OpenRouter is the default cloud path. NVIDIA and Ollama are available when
+    selected explicitly, and ``auto`` prefers configured cloud settings before
+    falling back to the local Ollama model.
     """
     provider = (preferred_provider or _pick_llm_provider()).strip().lower()
-    if provider not in {"openrouter", "nvidia", "auto"}:
+    if provider not in {"openrouter", "nvidia", "ollama", "auto"}:
         provider = _pick_llm_provider()
     openrouter = _build_openrouter_config()
     nvidia = _build_nvidia_config()
+    ollama = _build_ollama_config()
 
     if provider == "openrouter":
         return openrouter
     if provider == "nvidia":
         return nvidia
+    if provider == "ollama":
+        return ollama
 
     if openrouter["configured"]:
         return openrouter
     if nvidia["configured"]:
         return nvidia
+    if ollama["configured"]:
+        return ollama
 
     return openrouter
 
