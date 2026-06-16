@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1220" viewBox="0 0 1800 1220">
+  <defs>
+    <style>
+      .bg { fill: #07131a; }
+      .panel { fill: #0c1f29; stroke: #1f6f8b; stroke-width: 2; rx: 18; ry: 18; }
+      .box { fill: #112c38; stroke: #4cc9f0; stroke-width: 2; rx: 14; ry: 14; }
+      .runtime { fill: #17311f; stroke: #56c271; stroke-width: 2; rx: 14; ry: 14; }
+      .title { fill: #e8f7ff; font: 700 28px Arial, sans-serif; }
+      .section { fill: #7fe7ff; font: 700 20px Arial, sans-serif; }
+      .label { fill: #f4fbff; font: 600 18px Arial, sans-serif; }
+      .sub { fill: #a9c8d6; font: 500 15px Arial, sans-serif; }
+      .arrow { stroke: #77d6f5; stroke-width: 3; fill: none; marker-end: url(#m); }
+      .arrow2 { stroke: #7ce39a; stroke-width: 3; fill: none; marker-end: url(#m2); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#77d6f5"/>
+    </marker>
+    <marker id="m2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7ce39a"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1800" height="1220"/>
+  <text class="title" x="60" y="60">DeepSearch 目录结构调用图</text>
+  <text class="sub" x="60" y="92">适合从目录层面理解：前端 -> 接口层 -> 主智能体 -> 子智能体/工具 -> 运行时目录</text>
+
+  <rect class="panel" x="40" y="130" width="330" height="420"/>
+  <text class="section" x="60" y="165">frontend/ 前端</text>
+  <rect class="box" x="60" y="190" width="290" height="72"/>
+  <text class="label" x="78" y="220">src/App.tsx</text>
+  <text class="sub" x="78" y="246">页面总入口，触发 handleSubmit()</text>
+  <rect class="box" x="60" y="280" width="290" height="88"/>
+  <text class="label" x="78" y="310">src/hooks/useDeepAgentSession.ts</text>
+  <text class="sub" x="78" y="336">connect() 建立 WebSocket</text>
+  <text class="sub" x="78" y="356">submitTask() / uploadFiles() / cancelCurrentTask()</text>
+  <rect class="box" x="60" y="386" width="290" height="88"/>
+  <text class="label" x="78" y="416">src/lib/api.ts</text>
+  <text class="sub" x="78" y="442">startTask() / uploadSessionFiles()</text>
+  <text class="sub" x="78" y="462">listSessionFiles() / getDownloadUrl()</text>
+
+  <rect class="panel" x="420" y="130" width="330" height="520"/>
+  <text class="section" x="440" y="165">app/api/ 接口层</text>
+  <rect class="box" x="440" y="190" width="290" height="130"/>
+  <text class="label" x="458" y="220">api/server.py</text>
+  <text class="sub" x="458" y="246">run_task() / cancel_task()</text>
+  <text class="sub" x="458" y="266">upload_files() / list_files()</text>
+  <text class="sub" x="458" y="286">download_file() / websocket_endpoint()</text>
+  <rect class="box" x="440" y="340" width="290" height="118"/>
+  <text class="label" x="458" y="370">api/monitor.py</text>
+  <text class="sub" x="458" y="396">report_tool() / report_assistant()</text>
+  <text class="sub" x="458" y="416">report_task_result() / report_session_dir()</text>
+  <text class="sub" x="458" y="436">send_to_thread()</text>
+  <rect class="box" x="440" y="478" width="290" height="110"/>
+  <text class="label" x="458" y="508">api/context.py</text>
+  <text class="sub" x="458" y="534">set_session_context()</text>
+  <text class="sub" x="458" y="554">set_thread_context() / reset_session_context()</text>
+
+  <rect class="panel" x="800" y="130" width="420" height="560"/>
+  <text class="section" x="820" y="165">app/agent/ 智能体层</text>
+  <rect class="box" x="820" y="190" width="380" height="170"/>
+  <text class="label" x="840" y="220">agent/main_agent.py</text>
+  <text class="sub" x="840" y="246">build_main_agent()</text>
+  <text class="sub" x="840" y="266">run_deep_agent()</text>
+  <text class="sub" x="840" y="286">_stream_agent_sync()</text>
+  <text class="sub" x="840" y="306">_answer_database_task_sync()</text>
+  <text class="sub" x="840" y="326">_analyze_uploaded_files_sync()</text>
+  <text class="sub" x="840" y="346">_answer_local_kb_sync()</text>
+  <rect class="box" x="820" y="380" width="380" height="72"/>
+  <text class="label" x="840" y="410">agent/llm.py</text>
+  <text class="sub" x="840" y="436">build_llm_model()</text>
+  <rect class="box" x="820" y="470" width="380" height="88"/>
+  <text class="label" x="840" y="500">agent/prompts.py + prompt/prompts.yml</text>
+  <text class="sub" x="840" y="526">load_yaml() 读取主智能体和子智能体提示词</text>
+  <rect class="box" x="820" y="576" width="380" height="94"/>
+  <text class="label" x="840" y="606">agent/subagents/*.py</text>
+  <text class="sub" x="840" y="632">network_search_agent</text>
+  <text class="sub" x="840" y="652">database_query_agent / knowledge_base_agent</text>
+
+  <rect class="panel" x="1270" y="130" width="490" height="700"/>
+  <text class="section" x="1290" y="165">app/tools/ + knowledge_base/ + utils/</text>
+  <rect class="box" x="1290" y="190" width="450" height="82"/>
+  <text class="label" x="1310" y="220">tools/tavily_tool.py</text>
+  <text class="sub" x="1310" y="246">internet_search()</text>
+  <rect class="box" x="1290" y="286" width="450" height="108"/>
+  <text class="label" x="1310" y="316">tools/db_tools.py</text>
+  <text class="sub" x="1310" y="342">list_sql_tables() / get_table_data()</text>
+  <text class="sub" x="1310" y="362">execute_sql_query()</text>
+  <rect class="box" x="1290" y="408" width="450" height="108"/>
+  <text class="label" x="1310" y="438">tools/local_kb_tools.py</text>
+  <text class="sub" x="1310" y="464">get_assistant_list() / create_ask_delete()</text>
+  <text class="sub" x="1310" y="484">knowledge_base/local_index.py -> load_knowledge_docs(), search_knowledge_base()</text>
+  <rect class="box" x="1290" y="530" width="450" height="132"/>
+  <text class="label" x="1310" y="560">tools/upload_file_read_tool.py / markdown_tools.py / pdf_tools.py</text>
+  <text class="sub" x="1310" y="586">read_file_content() / generate_markdown()</text>
+  <text class="sub" x="1310" y="606">convert_md_to_pdf()</text>
+  <text class="sub" x="1310" y="626">utils/path_utils.py -> resolve_path()</text>
+  <text class="sub" x="1310" y="646">utils/word_converter.py -> PDF/Word 转换支撑</text>
+
+  <rect class="panel" x="820" y="760" width="940" height="220"/>
+  <text class="section" x="840" y="795">运行时目录</text>
+  <rect class="runtime" x="850" y="820" width="390" height="110"/>
+  <text class="label" x="870" y="852">app/updated/session_xxx</text>
+  <text class="sub" x="870" y="878">上传附件先暂存这里</text>
+  <text class="sub" x="870" y="898">server.py 的 upload_files() 写入</text>
+  <rect class="runtime" x="1280" y="820" width="430" height="110"/>
+  <text class="label" x="1300" y="852">app/output/session_xxx</text>
+  <text class="sub" x="1300" y="878">run_deep_agent() 创建工作目录</text>
+  <text class="sub" x="1300" y="898">Markdown / PDF / 复制后的附件都在这里</text>
+
+  <path class="arrow" d="M350 226 C390 226, 400 226, 440 226"/>
+  <path class="arrow" d="M350 324 C390 324, 400 324, 440 324"/>
+  <path class="arrow" d="M350 430 C390 430, 400 430, 440 430"/>
+  <path class="arrow" d="M730 255 C770 255, 780 255, 820 255"/>
+  <path class="arrow" d="M730 400 C770 400, 780 400, 820 400"/>
+  <path class="arrow" d="M730 520 C770 520, 780 520, 820 520"/>
+  <path class="arrow" d="M1200 260 C1235 260, 1245 230, 1290 230"/>
+  <path class="arrow" d="M1200 610 C1240 610, 1248 610, 1290 610"/>
+  <path class="arrow2" d="M1045 690 C1045 735, 1045 760, 1045 820"/>
+  <path class="arrow2" d="M1515 662 C1515 730, 1515 760, 1515 820"/>
+</svg>

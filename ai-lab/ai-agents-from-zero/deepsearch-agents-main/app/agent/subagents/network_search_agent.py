@@ -6,6 +6,12 @@ DeepAgents 可识别的字典式子智能体。主智能体后续会根据 descr
 决定是否把公开网络信息查询任务分派给它。
 """
 
+# 这里没有复杂逻辑，核心目的是把“提示词配置”和“真实工具”绑定成一个子智能体对象。
+# 主智能体后续调度时，看到这个对象就知道：
+# - 这个助手叫什么
+# - 它擅长什么任务
+# - 它到底能调用哪个工具
+
 from app.agent.prompts import sub_agents_content
 from app.tools.tavily_tool import internet_search
 

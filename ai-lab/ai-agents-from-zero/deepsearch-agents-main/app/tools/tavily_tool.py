@@ -6,6 +6,7 @@ Tavily 网络搜索工具模块
 """
 
 import os
+import logging
 from typing import Literal
 
 from dotenv import load_dotenv
@@ -13,6 +14,9 @@ from langchain_core.tools import tool
 from tavily import TavilyClient
 
 from app.api.monitor import monitor
+from app.utils.logging_utils import log_event
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -62,18 +66,36 @@ def internet_search(
             "include_raw_content": include_raw_content,
         },
     )
-
-    tavily_client = _get_tavily_client()
-    if tavily_client is None:
-        return "TAVILY_API_KEY 未配置，当前环境无法执行网络搜索。"
-
-    # Tavily 返回 query、results、title、url、content 等结构化字段，后续由子智能体阅读并汇总
-    return tavily_client.search(
+    log_event(
+        logger,
+        logging.INFO,
+        "internet_search_started",
         query=query,
         topic=topic,
         max_results=max_results,
         include_raw_content=include_raw_content,
     )
+
+    tavily_client = _get_tavily_client()
+    if tavily_client is None:
+        log_event(logger, logging.WARNING, "internet_search_missing_api_key")
+        return "TAVILY_API_KEY 未配置，当前环境无法执行网络搜索。"
+
+    # Tavily 返回 query、results、title、url、content 等结构化字段，后续由子智能体阅读并汇总
+    result = tavily_client.search(
+        query=query,
+        topic=topic,
+        max_results=max_results,
+        include_raw_content=include_raw_content,
+    )
+    log_event(
+        logger,
+        logging.INFO,
+        "internet_search_completed",
+        query=query,
+        result_count=len(result.get("results", [])) if isinstance(result, dict) else None,
+    )
+    return result
 
 
 if __name__ == "__main__":

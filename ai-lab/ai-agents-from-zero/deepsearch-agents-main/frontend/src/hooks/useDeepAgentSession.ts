@@ -1,3 +1,8 @@
+// 这是整个前端最重要的状态管理 hook。
+// 可以把它理解成“页面和后端之间的中间层”：
+// - 它负责建立 WebSocket
+// - 它负责调 HTTP 接口
+// - 它负责把后端事件整理成 React 状态
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cancelTask, listSessionFiles, startTask, uploadSessionFiles } from "../lib/api";
 import { WS_BASE_URL } from "../lib/config";
@@ -13,11 +18,13 @@ import type {
 const MAX_EVENTS = 120;
 
 function extractString(data: Record<string, unknown>, key: string): string | null {
+  // 后端 monitor_event.data 是弱类型 JSON，这里做一层最基础的安全提取。
   const value = data[key];
   return typeof value === "string" ? value : null;
 }
 
 export function useDeepAgentSession() {
+  // 下面这组 ref 主要用来保存“不需要驱动界面重渲染”的运行时对象。
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<number | undefined>(undefined);
   const heartbeatTimerRef = useRef<number | undefined>(undefined);
@@ -36,6 +43,8 @@ export function useDeepAgentSession() {
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
 
   const clearSocketTimers = useCallback(() => {
+    // WebSocket 会用到“重连定时器”和“心跳定时器”，
+    // 切换连接或页面卸载时要统一清理，避免重复连接。
     if (reconnectTimerRef.current) {
       window.clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = undefined;
@@ -47,6 +56,8 @@ export function useDeepAgentSession() {
   }, []);
 
   const resetSession = useCallback(() => {
+    // 新建会话时，前端会换一个新的 thread_id。
+    // 这会让后端在 output/session_xxx 下创建一套新的工作目录。
     const nextThreadId = createThreadId();
     storeThreadId(nextThreadId);
     setThreadId(nextThreadId);
@@ -62,6 +73,7 @@ export function useDeepAgentSession() {
   }, []);
 
   const refreshFiles = useCallback(async () => {
+    // 只有当后端已经返回 sessionPath 后，前端才知道该去哪个目录拉文件列表。
     if (!sessionPath) {
       return;
     }
@@ -74,9 +86,13 @@ export function useDeepAgentSession() {
   }, [sessionPath]);
 
   useEffect(() => {
+    // 这个 effect 专门负责 WebSocket 生命周期。
+    // threadId 一变，就会断开旧连接并连接新的 /ws/{threadId}。
     let disposed = false;
 
     function connect() {
+      // 这里是 WebSocket 真正建立连接的地方。
+      // 每次 threadId 变化，都会重新按新的 /ws/{threadId} 建连。
       clearSocketTimers();
       const hadSocket = Boolean(socketRef.current);
       socketRef.current?.close();
@@ -91,6 +107,7 @@ export function useDeepAgentSession() {
         }
         setConnectionState("connected");
         setLastError("");
+        // 心跳不是业务消息，只是为了让连接保持活跃。
         heartbeatTimerRef.current = window.setInterval(() => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send("ping");
@@ -103,6 +120,9 @@ export function useDeepAgentSession() {
           return;
         }
         try {
+          // 当前前后端协议比较简单：
+          // - pong: 心跳响应
+          // - monitor_event: 执行过程事件
           const payload = JSON.parse(event.data) as SocketMessage;
           if (payload.type === "pong") {
             setLastPongAt(new Date().toISOString());
@@ -116,6 +136,8 @@ export function useDeepAgentSession() {
           setEvents((previous) => [...previous, payload].slice(-MAX_EVENTS));
 
           if (payload.event === "session_created") {
+            // 后端第一次告诉前端“本次任务的工作目录在哪里”，
+            // 后续文件列表轮询就靠这个路径。
             const path = extractString(payload.data, "path");
             if (path) {
               setSessionPath(path);
@@ -123,6 +145,8 @@ export function useDeepAgentSession() {
           }
 
           if (payload.event === "task_result") {
+            // task_result 代表任务真正完成了，
+            // 这时要把执行状态切回 false。
             const finalResult = extractString(payload.data, "result");
             setResult(finalResult || payload.message);
             setIsRunning(false);
@@ -136,6 +160,7 @@ export function useDeepAgentSession() {
           }
 
           if (payload.event === "error") {
+            // error 事件来自后端 monitor，通常意味着这次任务已经无法继续。
             setLastError(payload.message);
             setIsRunning(false);
             setIsCancelling(false);
@@ -161,6 +186,7 @@ export function useDeepAgentSession() {
           return;
         }
         setConnectionState("reconnecting");
+        // 当前连接断开后，2 秒后自动重连。
         reconnectTimerRef.current = window.setTimeout(connect, 2000);
       };
     }
@@ -179,6 +205,8 @@ export function useDeepAgentSession() {
       return;
     }
 
+    // 文件列表不是靠 WebSocket 逐条推送，而是前端定时轮询。
+    // 运行中轮询更频繁；任务结束后轮询频率降低。
     refreshFiles().catch((error: unknown) => {
       setLastError(error instanceof Error ? error.message : "文件列表刷新失败");
     });
@@ -194,11 +222,15 @@ export function useDeepAgentSession() {
 
   const submitTask = useCallback(
     async (query: string) => {
+      // 这里不会等最终答案，只会等到 /api/task 返回“started”。
+      // 真正的过程和结果后续还是靠 WebSocket 回来。
       const cleanQuery = query.trim();
       if (!cleanQuery) {
         throw new Error("请输入研搜任务");
       }
 
+      // 发送新任务前先清空上一次任务的主要展示区，
+      // 让用户看到的是“本次任务”的事件流和结果。
       setIsRunning(true);
       setIsCancelling(false);
       setEvents([]);
@@ -225,6 +257,8 @@ export function useDeepAgentSession() {
       throw new Error("当前没有正在执行的任务");
     }
 
+    // cancel 按钮点下去后，前端先进入“取消中”状态，
+    // 最终是否真的结束，要以后端响应和 monitor 事件为准。
     setIsCancelling(true);
     setLastError("");
     try {
@@ -243,6 +277,8 @@ export function useDeepAgentSession() {
 
   const uploadFiles = useCallback(
     async (items: UploadedItem[]) => {
+      // 同名文件这里会做一层前端去重，
+      // 避免同一个会话重复上传一样名字的文件。
       if (items.length === 0) {
         throw new Error("请选择要上传的文件");
       }
@@ -264,6 +300,7 @@ export function useDeepAgentSession() {
           threadId
         );
         setUploadedItems((previous) => {
+          // 这里再做一次状态级去重，避免异步情况下重复插入同名文件。
           const names = new Set(previous.map((item) => item.name));
           const next = [...previous];
           nextItems.forEach((item) => {
@@ -284,6 +321,7 @@ export function useDeepAgentSession() {
   );
 
   const stats = useMemo(() => {
+    // 这里把原始事件数组再汇总成适合界面展示的小指标。
     const toolEvents = events.filter((event) => event.event === "tool_start").length;
     const assistantEvents = events.filter((event) => event.event === "assistant_call").length;
     const errorEvents = events.filter((event) => event.event === "error").length;
@@ -297,6 +335,8 @@ export function useDeepAgentSession() {
   }, [events, files.length]);
 
   return {
+    // hook 最终对外暴露的是“页面真正需要的会话能力”。
+    // App.tsx 基本不关心内部是 WebSocket 还是 HTTP，只关心这些状态和动作。
     connectionState,
     events,
     files,

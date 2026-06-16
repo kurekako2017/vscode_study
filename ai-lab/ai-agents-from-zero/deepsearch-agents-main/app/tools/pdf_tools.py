@@ -19,6 +19,9 @@ from app.api.context import get_session_context
 from app.api.monitor import monitor
 from app.utils.path_utils import resolve_path
 from app.utils.word_converter import convert_md_to_pdf as convert_md_to_pdf_via_word
+from app.utils.logging_utils import log_event
+
+logger = logging.getLogger(__name__)
 
 
 @tool
@@ -36,14 +39,17 @@ def convert_md_to_pdf(
     :return: 转换结果说明
     """
     monitor.report_tool("Markdown转PDF工具")
+    log_event(logger, logging.INFO, "pdf_convert_started", md_filename=md_filename, pdf_filename=pdf_filename)
 
     try:
         # 输入路径必须先落到当前会话目录，避免模型传入任意系统路径
         session_dir = get_session_context()
         md_path = Path(md_filename).with_suffix(".md")
         md_abs_path = Path(resolve_path(str(md_path), session_dir))
+        log_event(logger, logging.DEBUG, "pdf_convert_md_path_resolved", session_dir=session_dir, md_abs_path=str(md_abs_path))
 
         if not md_abs_path.exists():
+            log_event(logger, logging.WARNING, "pdf_convert_missing_markdown", md_abs_path=str(md_abs_path))
             return f"错误：文件不存在 {md_abs_path}"
 
         # 未指定 PDF 文件名时，默认与源 Markdown 同目录同名
@@ -54,10 +60,14 @@ def convert_md_to_pdf(
             pdf_abs_path = md_abs_path.with_suffix(".pdf")
 
         # PDF 版式、中文字体和 Markdown 解析细节都封装在底层转换模块中
-        return convert_md_to_pdf_via_word(md_abs_path, pdf_abs_path)
+        log_event(logger, logging.INFO, "pdf_convert_output_path_ready", pdf_abs_path=str(pdf_abs_path))
+        result = convert_md_to_pdf_via_word(md_abs_path, pdf_abs_path)
+        log_event(logger, logging.INFO, "pdf_convert_completed", md_abs_path=str(md_abs_path), pdf_abs_path=str(pdf_abs_path))
+        return result
 
     except Exception as e:
-        logging.error(f"转换失败: {e}", exc_info=True)
+        logger.error("转换失败", exc_info=True)
+        log_event(logger, logging.ERROR, "pdf_convert_failed", md_filename=md_filename, pdf_filename=pdf_filename, error=str(e))
         return f"转换失败: {str(e)}"
 
 

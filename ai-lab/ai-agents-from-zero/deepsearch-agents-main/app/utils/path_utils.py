@@ -5,6 +5,12 @@
 后续文件读取、Markdown 生成和 PDF 转换工具都可以复用这里的解析规则
 """
 
+# 这个文件解决的是“模型给了一个文件名/路径，项目到底该去哪里找真实文件”的问题。
+# 初学者读文件工具时，如果不先理解这里，后面会很容易搞混：
+# - 用户上传文件在哪
+# - 任务输出文件在哪
+# - 为什么模型只传相对路径，系统却能拿到绝对路径
+
 import os
 from pathlib import Path
 from typing import Optional
@@ -18,12 +24,15 @@ def resolve_path(filename: str, session_dir: Optional[str] = None) -> str:
     :param session_dir: 当前任务的会话目录
     :return: 解析后的绝对路径
     """
+    # Path 对象方便我们统一处理 Windows/Unix 风格路径。
     path = Path(filename)
     path_str = filename.replace("\\", "/")
 
     # 大模型常返回 /workspace、/mnt/data 这类沙箱路径，本地项目需要先剥离虚拟前缀
     for prefix in ["/workspace", "/mnt/data", "/home/user"]:
         if path_str.startswith(prefix):
+            # 例如模型可能返回 /workspace/output/report.md，
+            # 但本地项目实际并没有这个前缀，所以要先去掉虚拟沙箱前缀。
             cleaned = path_str[len(prefix) :].lstrip("/")
             path = Path(cleaned)
             path_str = str(path).replace("\\", "/")
@@ -36,6 +45,7 @@ def resolve_path(filename: str, session_dir: Optional[str] = None) -> str:
         return str(Path(relative_part).resolve())
 
     if not session_dir:
+        # 没有 session_dir 时，就退化成普通绝对路径解析。
         return str(path.resolve())
 
     session_path = Path(session_dir).resolve()
@@ -51,6 +61,7 @@ def resolve_path(filename: str, session_dir: Optional[str] = None) -> str:
 
         try:
             if session_path in full_path.parents or full_path == session_path:
+                # 如果路径其实已经在当前 session_dir 里面，再做一次“重复 session 目录”修正。
                 return _fix_nested_session_path(full_path, session_path, session_name)
         except Exception:
             pass
@@ -62,6 +73,7 @@ def resolve_path(filename: str, session_dir: Optional[str] = None) -> str:
 
     # 避免模型把 session 名或 output 前缀重复拼到当前会话目录里
     if session_name in parts:
+        # 避免 session_xxx/session_xxx/report.md 这种重复嵌套。
         return str(session_path / path.name)
 
     if parts and parts[0] == "output":

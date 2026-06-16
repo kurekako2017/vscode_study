@@ -5,6 +5,12 @@ Markdown 转 PDF 工具
 该方案不依赖 Microsoft Word、浏览器或系统级 PDF 工具，可在 macOS、Windows 和 Linux 上运行
 """
 
+# 这个文件属于“纯底层排版转换”。
+# 上层工具只需要给它两个绝对路径：
+# 1. Markdown 输入文件
+# 2. PDF 输出文件
+# 它会把 Markdown 拆成标题、段落、表格、代码块，再交给 ReportLab 渲染。
+
 import html
 import logging
 import re
@@ -52,6 +58,7 @@ def convert_md_to_pdf(md_abs_path: Path, pdf_abs_path: Path) -> str:
         return "缺少依赖库，请安装 reportlab"
 
     try:
+        # 先把 Markdown 文件完整读入内存，后面逐行解析。
         with open(md_abs_path, "r", encoding="utf-8") as f:
             md_content = f.read()
 
@@ -68,6 +75,7 @@ def convert_md_to_pdf(md_abs_path: Path, pdf_abs_path: Path) -> str:
             title=md_abs_path.stem,
         )
         styles = _build_styles()
+        # story 可以理解成“PDF 页面要渲染的组件列表”。
         story = _markdown_to_story(md_content, styles)
         doc.build(story)
 
@@ -94,6 +102,7 @@ def _build_styles() -> dict[str, ParagraphStyle]:
     """
     构建 PDF 文档样式
     """
+    # body / h1 / h2 / h3 / code 这些名字会在解析 Markdown 时被复用。
     base_font = "STSong-Light"
     code_font = "Courier"
 
@@ -148,6 +157,7 @@ def _markdown_to_story(
     """
     将常见 Markdown 结构转换为 ReportLab story
     """
+    # story 是最终交给 ReportLab build() 的内容列表。
     story = []
     lines = md_content.splitlines()
     index = 0
@@ -155,6 +165,7 @@ def _markdown_to_story(
 
     def flush_paragraph() -> None:
         if paragraph_lines:
+            # 普通段落合并为一个 Paragraph，避免 Markdown 多行被拆成太多块。
             text = " ".join(line.strip() for line in paragraph_lines)
             story.append(Paragraph(_format_inline(text), styles["body"]))
             paragraph_lines.clear()
@@ -176,6 +187,7 @@ def _markdown_to_story(
             while index < len(lines) and not lines[index].strip().startswith("```"):
                 code_lines.append(lines[index])
                 index += 1
+            # 代码块需要保留原始缩进，所以使用 Preformatted。
             story.append(Preformatted("\n".join(code_lines), styles["code"]))
             index += 1
             continue
@@ -183,6 +195,7 @@ def _markdown_to_story(
         if _is_table_start(lines, index):
             flush_paragraph()
             table_rows, index = _collect_table(lines, index)
+            # Markdown 表格不能直接当普通文本，需要单独构造成 Table 组件。
             story.append(_build_table(table_rows, styles))
             story.append(Spacer(1, 8))
             continue

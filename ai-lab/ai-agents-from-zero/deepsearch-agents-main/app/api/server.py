@@ -32,6 +32,9 @@ from app.agent.main_agent import run_deep_agent
 from app.api.monitor import manager
 from app.runtime_config import resolve_llm_config
 from app.knowledge_base.local_index import has_local_knowledge_base
+from app.utils.logging_utils import get_logger, log_event
+
+logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -43,7 +46,7 @@ async def lifespan(_app: FastAPI):
     """
     loop = asyncio.get_running_loop()
     manager.set_loop(loop)
-    print(f"[Server] WebSocket Manager bound to loop: {id(loop)}")
+    log_event(logger, 20, "server_lifespan_started", loop_id=id(loop))
     yield
 
 
@@ -95,12 +98,23 @@ def _forget_task(thread_id: str, task: asyncio.Task) -> None:
 @app.get("/api/health")
 async def health_check():
     """
-    Minimal health endpoint for frontend/backend connectivity checks.
+    最轻量的健康检查接口。
 
-    This endpoint is intentionally dependency-light so the UI can verify that
-    the FastAPI process is alive even when external services are not configured.
+    这个接口的设计目标不是“验证所有依赖都完全可用”，而是先回答两个最基础问题：
+    1. FastAPI 进程本身是否活着
+    2. 当前读取到了哪些运行配置
+
+    所以前端加载页面时，可以先打这个接口，快速判断是“后端没起来”，
+    还是“后端起来了，但外部能力还没配置完整”。
     """
     llm_config = resolve_llm_config()
+    log_event(
+        logger,
+        10,
+        "health_check_requested",
+        llm_provider=llm_config["provider"],
+        mysql_host=os.getenv("MYSQL_HOST", ""),
+    )
 
     return {
         "status": "ok",
@@ -132,16 +146,26 @@ async def run_task(request: TaskRequest):
     答案都会由 monitor 通过 `/ws/{thread_id}` 推送给同一会话的前端。
     """
     thread_id = request.thread_id or str(uuid.uuid4())
+    log_event(
+        logger,
+        20,
+        "task_start_requested",
+        thread_id=thread_id,
+        query=request.query,
+        query_length=len(request.query or ""),
+    )
 
     # 同一个 thread_id 只保留一个活跃任务，新任务会先取消旧任务，避免并发写同一会话目录
     old_task = active_tasks.get(thread_id)
     if old_task and not old_task.done():
+        log_event(logger, 30, "task_replaced_existing_active_task", thread_id=thread_id)
         old_task.cancel()
 
     # create_task 把长耗时 Agent 执行交给事件循环，接口本身不用等待最终结果
     task = asyncio.create_task(run_deep_agent(request.query, thread_id))
     active_tasks[thread_id] = task
     task.add_done_callback(lambda finished_task: _forget_task(thread_id, finished_task))
+    log_event(logger, 20, "task_started", thread_id=thread_id, active_task_count=len(active_tasks))
 
     return {"status": "started", "thread_id": thread_id}
 
@@ -155,8 +179,10 @@ async def cancel_task(thread_id: str):
     的同步阻塞调用，任务可能需要等该调用返回后才会真正结束。
     """
     task = active_tasks.get(thread_id)
+    log_event(logger, 20, "task_cancel_requested", thread_id=thread_id, task_found=bool(task))
     if not task or task.done():
         active_tasks.pop(thread_id, None)
+        log_event(logger, 30, "task_cancel_missing_or_finished", thread_id=thread_id)
         raise HTTPException(status_code=404, detail="任务不存在或已结束")
 
     # 先发出取消信号，再短暂等待协程响应；若底层阻塞中，则返回 cancelling 给前端继续展示状态
@@ -165,14 +191,18 @@ async def cancel_task(thread_id: str):
         await asyncio.wait_for(task, timeout=1.0)
     except asyncio.CancelledError:
         _forget_task(thread_id, task)
+        log_event(logger, 20, "task_cancelled", thread_id=thread_id)
         return {"status": "cancelled", "thread_id": thread_id}
     except asyncio.TimeoutError:
+        log_event(logger, 30, "task_cancellation_pending", thread_id=thread_id)
         return {"status": "cancelling", "thread_id": thread_id}
     except Exception as e:
         _forget_task(thread_id, task)
+        log_event(logger, 40, "task_cancellation_exception", thread_id=thread_id, error=str(e))
         return {"status": "cancelled", "thread_id": thread_id, "message": str(e)}
 
     _forget_task(thread_id, task)
+    log_event(logger, 20, "task_cancelled_after_wait", thread_id=thread_id)
     return {"status": "cancelled", "thread_id": thread_id}
 
 
@@ -191,8 +221,21 @@ async def upload_files(files: List[UploadFile] = File(...), thread_id: str = For
         thread_id (str): 关联的任务会话 ID。
     """
     # 上传文件先按会话隔离保存，避免不同任务读取到彼此的附件
+    # 注意这里先写到 updated/session_xxx，而不是直接写到 output/session_xxx。
+    # 这样做的好处是：
+    # 1. 用户可能先上传文件，稍后再发任务
+    # 2. 真正执行任务时，再由 run_deep_agent 统一复制到工作目录
+    # 3. output 目录就只放“本次任务真正使用过的工作区”
     target_dir = updated_dir / f"session_{thread_id}"
     target_dir.mkdir(parents=True, exist_ok=True)
+    log_event(
+        logger,
+        20,
+        "upload_started",
+        thread_id=thread_id,
+        file_count=len(files),
+        target_dir=str(target_dir),
+    )
 
     saved_files = []
     for file in files:
@@ -201,6 +244,14 @@ async def upload_files(files: List[UploadFile] = File(...), thread_id: str = For
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         saved_files.append(file.filename)
+        log_event(
+            logger,
+            20,
+            "upload_saved_file",
+            thread_id=thread_id,
+            filename=file.filename,
+            path=str(file_path),
+        )
 
     return {"status": "uploaded", "files": saved_files}
 
@@ -222,14 +273,19 @@ async def download_file(path: str):
         abs_path = Path(path).resolve()
         output_abs = output_dir.resolve()
 
+        # 下载接口只允许访问 output 目录，是为了避免把服务器任意文件暴露给前端。
         if not abs_path.is_relative_to(output_abs):
+            log_event(logger, 40, "download_rejected_outside_output_dir", path=path, resolved_path=str(abs_path))
             return {"error": "拒绝访问: 只能下载输出目录下的文件"}
     except Exception:
+        log_event(logger, 40, "download_invalid_path", path=path)
         return {"error": "无效的路径参数"}
 
     if not abs_path.exists():
+        log_event(logger, 30, "download_missing_file", path=path, resolved_path=str(abs_path))
         return {"error": "文件不存在"}
 
+    log_event(logger, 20, "download_started", path=path, resolved_path=str(abs_path))
     # FileResponse 会以流式响应返回文件内容，并让浏览器使用原文件名下载
     return FileResponse(abs_path, filename=abs_path.name)
 
@@ -247,7 +303,7 @@ async def list_files(path: str):
     Args:
         path (str): 目标目录的绝对路径 (必须在 output 目录下)。
     """
-    print(f"[DEBUG] 请求文件列表: {path}")
+    log_event(logger, 10, "list_files_requested", path=path)
 
     try:
         # 和下载接口保持同一条安全边界：前端只能查看 output 目录内部内容
@@ -255,16 +311,19 @@ async def list_files(path: str):
         output_abs = output_dir.resolve()
 
         if not abs_path.is_relative_to(output_abs):
-            print(f"[ERROR] 拒绝访问: {abs_path} 不在 {output_abs} 目录下")
+            log_event(logger, 40, "list_files_rejected_outside_output_dir", path=path, resolved_path=str(abs_path))
             return {"error": "拒绝访问: 只能访问输出目录下的文件"}
 
     except Exception as e:
-        print(f"[ERROR] 路径解析失败: {e}")
+        log_event(logger, 40, "list_files_path_parse_failed", path=path, error=str(e))
         return {"error": f"路径无效: {e}"}
 
     if not abs_path.exists():
+        log_event(logger, 30, "list_files_directory_missing", path=path, resolved_path=str(abs_path))
         return {"error": "目录不存在"}
 
+    # 返回给前端的不是树形目录，而是一个扁平文件列表。
+    # 这样页面实现更简单，用户也更容易快速看到最终产物。
     files = []
     try:
         # 递归返回文件元数据，前端据此渲染文件列表并发起下载请求
@@ -282,12 +341,12 @@ async def list_files(path: str):
                 )
 
     except Exception as e:
-        print(f"[ERROR] 遍历文件失败: {e}")
+        log_event(logger, 40, "list_files_walk_failed", path=path, error=str(e))
         return {"error": str(e)}
 
     # 最新生成的文件排在前面，方便用户优先看到本次任务产物
     files.sort(key=lambda x: x.get("mtime", 0), reverse=True)
-    print(f"[DEBUG] 找到 {len(files)} 个文件")
+    log_event(logger, 20, "list_files_completed", path=path, file_count=len(files))
     return {"files": files}
 
 
@@ -300,7 +359,7 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     发送事件时只需要按 thread_id 查找连接，就能把进度推给对应页面。循环中的
     receive_text 用于接收前端心跳，避免连接空闲断开。
     """
-    print(f"会话向我们发起了请求，要求建立连接：{thread_id} 对应：{websocket}")
+    log_event(logger, 20, "websocket_connect_requested", thread_id=thread_id, client=str(websocket.client))
 
     # 连接建立后立即按 thread_id 注册，monitor 后续才能把事件定向推给当前页面
     await manager.connect(websocket, thread_id)
@@ -308,7 +367,10 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     try:
         while True:
             # 前端通常发送 ping 心跳；服务端回复 pong，顺便维持连接活跃
+            # 当前项目里前端主要发送 ping 心跳，不走复杂指令协议。
+            # 如果你后续想扩展“前端主动订阅更多事件”，这里就是协议入口。
             data = await websocket.receive_text()
+            log_event(logger, 10, "websocket_message_received", thread_id=thread_id, message=data)
             await websocket.send_json(
                 {"type": "pong", "message": f"服务端已收到: {data}"}
             )
@@ -316,10 +378,10 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     except WebSocketDisconnect:
         # 只移除当前 WebSocket 实例，避免旧连接断开时误删同 thread_id 的新连接
         manager.disconnect(websocket, thread_id)
-        print(f"[WebSocket] 客户端已断开: {thread_id}")
+        log_event(logger, 20, "websocket_disconnected", thread_id=thread_id)
 
     except Exception as e:
-        print(f"[WebSocket] 连接异常: {e}")
+        log_event(logger, 40, "websocket_exception", thread_id=thread_id, error=str(e))
         manager.disconnect(websocket, thread_id)
 
 

@@ -5,6 +5,10 @@ code such as ``sitecustomize.py`` and from scripts before the full project
 dependencies are loaded.
 """
 
+# 这个文件负责解决“模型配置到底从哪里来”的问题。
+# 初学者可以把它理解成：后端启动时，先在这里决定到底使用 OpenRouter、
+# NVIDIA 还是 Ollama，然后再把结果交给真正的模型初始化代码。
+
 from __future__ import annotations
 
 import os
@@ -35,6 +39,7 @@ def load_local_env_file(root: Path | None = None) -> None:
 
 
 def _pick_llm_provider() -> str:
+    # 统一把环境变量里的 provider 读出来，并做一次白名单校验。
     provider = os.getenv("LLM_PROVIDER", "openrouter").strip().lower()
     if provider not in {"openrouter", "nvidia", "ollama", "auto"}:
         return "openrouter"
@@ -118,6 +123,10 @@ def resolve_llm_config(preferred_provider: str | None = None) -> dict[str, str |
     OpenRouter is the default cloud path. NVIDIA and Ollama are available when
     selected explicitly, and ``auto`` prefers configured cloud settings before
     falling back to the local Ollama model.
+
+    初学者理解：
+    1. 如果你明确传了 provider，就优先用它
+    2. 如果设置的是 auto，就按 OpenRouter -> NVIDIA -> Ollama 的顺序兜底
     """
     provider = (preferred_provider or _pick_llm_provider()).strip().lower()
     if provider not in {"openrouter", "nvidia", "ollama", "auto"}:
@@ -149,6 +158,8 @@ def apply_openai_compatible_env(
     override: bool = False,
 ) -> None:
     """Map the resolved backend into OpenAI-compatible environment variables."""
+    # 项目最终统一走 OpenAI 兼容接口，
+    # 所以这里把不同供应商的配置重新映射到 OPENAI_API_KEY / OPENAI_BASE_URL。
     api_key = str(config.get("api_key") or "")
     base_url = str(config.get("base_url") or "")
     model = str(config.get("model") or "")

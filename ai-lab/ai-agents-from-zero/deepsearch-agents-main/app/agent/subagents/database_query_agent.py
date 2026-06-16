@@ -6,6 +6,9 @@ DeepAgents 可识别的字典式子智能体。主智能体后续会根据 descr
 决定是否把企业内部结构化数据查询任务分派给它。
 """
 
+# 数据库子智能体只是“配置壳”，真正执行数据库操作的是 db_tools.py 里的工具函数。
+# 这样拆开以后，学习时可以先看路由，再看具体工具。
+
 from app.agent.prompts import sub_agents_content
 from app.tools.db_tools import execute_sql_query, get_table_data, list_sql_tables
 

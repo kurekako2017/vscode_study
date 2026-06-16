@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1400" viewBox="0 0 1800 1400">
+  <defs>
+    <style>
+      .bg { fill: #07131a; }
+      .title { fill: #e8f7ff; font: 700 28px Arial, sans-serif; }
+      .sub { fill: #a9c8d6; font: 500 15px Arial, sans-serif; }
+      .panel { fill: #0c1f29; stroke: #1f6f8b; stroke-width: 2; rx: 18; ry: 18; }
+      .box { fill: #112c38; stroke: #4cc9f0; stroke-width: 2; rx: 12; ry: 12; }
+      .text { fill: #f4fbff; font: 600 16px Arial, sans-serif; }
+      .head { fill: #7fe7ff; font: 700 20px Arial, sans-serif; }
+      .arrow { stroke: #77d6f5; stroke-width: 3; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#77d6f5"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1800" height="1400"/>
+  <text class="title" x="50" y="58">DeepSearch 函数跳转地图</text>
+  <text class="sub" x="50" y="90">适合按函数入口学习：每个阶段先读哪个函数，一路往下追</text>
+
+  <rect class="panel" x="40" y="130" width="520" height="320"/>
+  <text class="head" x="60" y="165">阶段 1：前端发任务</text>
+  <rect class="box" x="60" y="190" width="480" height="62"/><text class="text" x="80" y="228">App.tsx -> App(), handleSubmit()</text>
+  <rect class="box" x="60" y="266" width="480" height="82"/><text class="text" x="80" y="304">useDeepAgentSession.ts -> useDeepAgentSession(), connect()</text><text class="text" x="80" y="330">submitTask(), cancelCurrentTask(), uploadFiles()</text>
+  <rect class="box" x="60" y="362" width="480" height="62"/><text class="text" x="80" y="400">frontend/lib/api.ts -> startTask(), cancelTask(), uploadSessionFiles()</text>
+
+  <rect class="panel" x="620" y="130" width="520" height="360"/>
+  <text class="head" x="640" y="165">阶段 2：后端接住请求</text>
+  <rect class="box" x="640" y="190" width="480" height="82"/><text class="text" x="660" y="228">app/api/server.py -> run_task(), _forget_task()</text><text class="text" x="660" y="254">cancel_task(), upload_files(), list_files(), download_file()</text>
+  <rect class="box" x="640" y="286" width="480" height="82"/><text class="text" x="660" y="324">app/api/server.py -> websocket_endpoint()</text><text class="text" x="660" y="350">WebSocket 绑定 thread_id</text>
+  <rect class="box" x="640" y="382" width="480" height="82"/><text class="text" x="660" y="420">app/api/context.py -> set_session_context()</text><text class="text" x="660" y="446">set_thread_context(), reset_session_context()</text>
+
+  <rect class="panel" x="1200" y="130" width="560" height="420"/>
+  <text class="head" x="1220" y="165">阶段 3：主智能体执行</text>
+  <rect class="box" x="1220" y="190" width="520" height="62"/><text class="text" x="1240" y="228">app/agent/llm.py -> build_llm_model()</text>
+  <rect class="box" x="1220" y="266" width="520" height="62"/><text class="text" x="1240" y="304">app/agent/prompts.py -> load_yaml()</text>
+  <rect class="box" x="1220" y="342" width="520" height="96"/><text class="text" x="1240" y="380">app/agent/main_agent.py -> build_main_agent()</text><text class="text" x="1240" y="406">run_deep_agent(), _run_agent_with_timeout()</text>
+  <rect class="box" x="1220" y="452" width="520" height="82"/><text class="text" x="1240" y="490">app/agent/main_agent.py -> _stream_agent_sync()</text><text class="text" x="1240" y="516">_execute_text_tool_call()</text>
+
+  <rect class="panel" x="40" y="560" width="560" height="330"/>
+  <text class="head" x="60" y="595">阶段 4：任务分支</text>
+  <rect class="box" x="60" y="620" width="520" height="72"/><text class="text" x="80" y="658">数据库直达 -> _answer_database_task_sync()</text>
+  <rect class="box" x="60" y="706" width="520" height="72"/><text class="text" x="80" y="744">上传文件直达 -> _analyze_uploaded_files_sync()</text>
+  <rect class="box" x="60" y="792" width="520" height="72"/><text class="text" x="80" y="830">本地知识库直达 -> _answer_local_kb_sync()</text>
+
+  <rect class="panel" x="660" y="560" width="520" height="430"/>
+  <text class="head" x="680" y="595">阶段 5：子智能体 / 工具</text>
+  <rect class="box" x="680" y="620" width="480" height="72"/><text class="text" x="700" y="658">网络搜索 -> internet_search()</text>
+  <rect class="box" x="680" y="706" width="480" height="96"/><text class="text" x="700" y="744">数据库 -> list_sql_tables()</text><text class="text" x="700" y="770">get_table_data(), execute_sql_query()</text>
+  <rect class="box" x="680" y="816" width="480" height="96"/><text class="text" x="700" y="854">知识库 -> get_assistant_list()</text><text class="text" x="700" y="880">create_ask_delete(), search_knowledge_base()</text>
+  <rect class="box" x="680" y="926" width="480" height="72"/><text class="text" x="700" y="964">文件 -> read_file_content(), generate_markdown(), convert_md_to_pdf()</text>
+
+  <rect class="panel" x="1240" y="620" width="520" height="320"/>
+  <text class="head" x="1260" y="655">阶段 6：事件回流前端</text>
+  <rect class="box" x="1260" y="680" width="480" height="82"/><text class="text" x="1280" y="718">app/api/monitor.py -> report_tool(), report_assistant()</text><text class="text" x="1280" y="744">report_task_result(), report_session_dir()</text>
+  <rect class="box" x="1260" y="776" width="480" height="72"/><text class="text" x="1280" y="814">send_to_thread() -> websocket_endpoint()</text>
+  <rect class="box" x="1260" y="862" width="480" height="62"/><text class="text" x="1280" y="900">前端 useDeepAgentSession.ts 更新 events / result / files</text>
+
+  <path class="arrow" d="M560 292 C590 292, 600 292, 640 292"/>
+  <path class="arrow" d="M1140 342 C1170 342, 1180 342, 1220 342"/>
+  <path class="arrow" d="M1480 550 C1480 585, 1440 585, 1440 680"/>
+  <path class="arrow" d="M1220 500 C1120 560, 1000 585, 920 620"/>
+  <path class="arrow" d="M1220 500 C1020 560, 400 585, 320 620"/>
+  <path class="arrow" d="M1160 962 C1200 962, 1210 900, 1260 900"/>
+
+  <rect class="panel" x="40" y="1030" width="1720" height="250"/>
+  <text class="head" x="60" y="1065">最推荐的阅读顺序</text>
+  <text class="text" x="60" y="1108">1. App() -> handleSubmit() -> useDeepAgentSession() -> startTask()</text>
+  <text class="text" x="60" y="1148">2. run_task() -> run_deep_agent() -> _stream_agent_sync()</text>
+  <text class="text" x="60" y="1188">3. 再按任务类型分别读：_answer_database_task_sync() / _analyze_uploaded_files_sync() / _answer_local_kb_sync()</text>
+  <text class="text" x="60" y="1228">4. 最后读 report_tool() / report_task_result() / send_to_thread()，理解为什么前端能实时展示过程</text>
+</svg>

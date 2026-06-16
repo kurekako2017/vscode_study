@@ -1,3 +1,5 @@
+// EventStream 用来原样展示后端 monitor 推回来的事件。
+// 如果你在学习调用链，这个组件非常重要，因为它几乎就是“后端执行轨迹的前端镜像”。
 import {
   BranchesOutlined,
   CheckCircleOutlined,
@@ -77,6 +79,7 @@ export function EventStream({ events }: EventStreamProps) {
                 </div>
                 <p>{event.message}</p>
                 {Object.keys(event.data).length > 0 ? (
+                  // data 里通常放工具参数、工作目录、结果摘要等结构化信息。
                   <pre>{JSON.stringify(event.data, null, 2)}</pre>
                 ) : null}
               </div>

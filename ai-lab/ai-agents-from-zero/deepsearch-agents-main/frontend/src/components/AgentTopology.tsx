@@ -1,3 +1,5 @@
+// AgentTopology 是一个静态说明组件。
+// 它不是实时数据源，而是告诉初学者“这个系统里有哪些助手、各自负责什么”。
 import { CloudServerOutlined, DatabaseOutlined, FileSearchOutlined } from "@ant-design/icons";
 
 const agents = [

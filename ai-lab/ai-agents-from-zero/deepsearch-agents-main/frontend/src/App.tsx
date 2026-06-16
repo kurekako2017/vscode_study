@@ -1,3 +1,7 @@
+// App 是整个页面的总控组件：
+// 1. 拉健康检查
+// 2. 管理当前输入框和对话 turns
+// 3. 把 useDeepAgentSession 返回的状态拼到界面上
 import {
   ApiOutlined,
   BranchesOutlined,
@@ -29,6 +33,8 @@ function connectionLabel(state: ConnectionState): string {
 }
 
 function createTurn(content: string): ChatTurn {
+  // 每次用户点击发送时，前端会先创建一个“占位中的对话轮次”，
+  // 等后端事件回来后，再把这个 turn 填完整。
   return {
     id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`,
     content,
@@ -51,6 +57,8 @@ export default function App() {
   const session = useDeepAgentSession();
 
   useEffect(() => {
+    // 页面刚打开时先打一次健康检查，
+    // 让用户立刻看到 Backend / LLM / MySQL 是否可用。
     let cancelled = false;
 
     getHealthStatus()
@@ -72,6 +80,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // turns 的最后一项始终代表“当前正在执行的那轮对话”。
+    // 所以后端新推来的 events/result/files 只需要覆盖最后一条即可。
     setTurns((previous) => {
       if (previous.length === 0) {
         return previous;
@@ -91,6 +101,8 @@ export default function App() {
   }, [session.events, session.files, session.isRunning, session.result]);
 
   useEffect(() => {
+    // 每次 turns 变化后，把对话区域滚动到底部，
+    // 这样用户能直接看到最新事件和结果。
     const streamNode = streamRef.current;
     if (!streamNode) {
       return;
@@ -105,6 +117,10 @@ export default function App() {
   }, [turns]);
 
   async function handleSubmit() {
+    // 发送任务的顺序：
+    // 1. 先做前端输入校验
+    // 2. 先把用户消息插入对话区
+    // 3. 再真正请求后端启动任务
     const cleanQuery = query.trim();
     if (!cleanQuery) {
       message.warning("请输入研搜任务");
@@ -154,6 +170,7 @@ export default function App() {
   }
 
   function handleNewSession() {
+    // 新会话不只是清空输入框，还要重置 thread_id 和会话状态。
     session.resetSession();
     setTurns([]);
     setQuery("");

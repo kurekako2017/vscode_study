@@ -11,6 +11,7 @@
 - `实战项目-深度研搜/8-项目总览与工程初始化.md`
 - `实战项目-深度研搜/13-主智能体搭建与异步执行.md`
 - `实战项目-深度研搜/14-FastAPI接口与项目闭环.md`
+- [代码学习路线](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/CODE_READING_ROUTE.md:1)
 
 ---
 
@@ -29,6 +30,12 @@
 ---
 
 ## 2. 目录结构调用图
+
+独立 SVG 图片：
+
+- [目录结构调用图 SVG](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/docs/images/deepsearch-call-flow-overview.svg)
+- [任务时序图 SVG](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/docs/images/deepsearch-call-flow-sequence.svg)
+- [函数跳转地图 SVG](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/docs/images/deepsearch-call-flow-functions.svg)
 
 ```mermaid
 flowchart LR
@@ -173,7 +180,88 @@ sequenceDiagram
 
 ---
 
-## 4. 按代码阅读的推荐顺序
+## 4. 函数名跳转版
+
+这一节专门服务“顺着函数跳代码”。
+
+### 4.1 前端入口
+
+| 节点 | 文件 | 先看函数 |
+| --- | --- | --- |
+| 页面总入口 | [App.tsx](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/App.tsx:43) | `App()` |
+| 点击发送任务 | [App.tsx](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/App.tsx:107) | `handleSubmit()` |
+| 会话状态总控 | [useDeepAgentSession.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/hooks/useDeepAgentSession.ts:20) | `useDeepAgentSession()` |
+| 建立 WebSocket | [useDeepAgentSession.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/hooks/useDeepAgentSession.ts:79) | `connect()` |
+| 发起任务 | [useDeepAgentSession.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/hooks/useDeepAgentSession.ts:195) | `submitTask()` |
+| 取消任务 | [useDeepAgentSession.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/hooks/useDeepAgentSession.ts:223) | `cancelCurrentTask()` |
+| 上传文件 | [useDeepAgentSession.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/hooks/useDeepAgentSession.ts:244) | `uploadFiles()` |
+| 调任务接口 | [frontend/src/lib/api.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/lib/api.ts:32) | `startTask()` |
+| 调取消接口 | [frontend/src/lib/api.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/lib/api.ts:45) | `cancelTask()` |
+| 调上传接口 | [frontend/src/lib/api.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/lib/api.ts:51) | `uploadSessionFiles()` |
+| 查输出文件 | [frontend/src/lib/api.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/lib/api.ts:69) | `listSessionFiles()` |
+| 生成下载地址 | [frontend/src/lib/api.ts](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/frontend/src/lib/api.ts:75) | `getDownloadUrl()` |
+
+### 4.2 后端接口层
+
+| 节点 | 文件 | 先看函数 |
+| --- | --- | --- |
+| 健康检查 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:96) | `health_check()` |
+| 启动后台任务 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:127) | `run_task()` |
+| 清理旧任务登记 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:84) | `_forget_task()` |
+| 取消任务 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:150) | `cancel_task()` |
+| 上传附件 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:180) | `upload_files()` |
+| 下载文件 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:209) | `download_file()` |
+| 列出输出文件 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:238) | `list_files()` |
+| WebSocket 入口 | [app/api/server.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/server.py:295) | `websocket_endpoint()` |
+
+### 4.3 监控与上下文层
+
+| 节点 | 文件 | 先看函数 |
+| --- | --- | --- |
+| 工具事件上报 | [app/api/monitor.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/monitor.py:102) | `report_tool()` |
+| 助手事件上报 | [app/api/monitor.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/monitor.py:114) | `report_assistant()` |
+| 最终结果上报 | [app/api/monitor.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/monitor.py:126) | `report_task_result()` |
+| 工作目录上报 | [app/api/monitor.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/monitor.py:134) | `report_session_dir()` |
+| 定向推送给 thread | [app/api/monitor.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/monitor.py:178) | `send_to_thread()` |
+| 写入 session_dir | [app/api/context.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/context.py:23) | `set_session_context()` |
+| 写入 thread_id | [app/api/context.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/context.py:42) | `set_thread_context()` |
+| 清理上下文 | [app/api/context.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/api/context.py:61) | `reset_session_context()` |
+
+### 4.4 主智能体层
+
+| 节点 | 文件 | 先看函数 |
+| --- | --- | --- |
+| 组装主智能体 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:54) | `build_main_agent()` |
+| 任务总入口 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:504) | `run_deep_agent()` |
+| 常规流式执行 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:400) | `_stream_agent_sync()` |
+| 超时控制包装 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:464) | `_run_agent_with_timeout()` |
+| 文本工具调用兼容 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:182) | `_execute_text_tool_call()` |
+| 数据库直达回答 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:283) | `_answer_database_task_sync()` |
+| 上传文件直达回答 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:328) | `_analyze_uploaded_files_sync()` |
+| 本地知识库直达回答 | [app/agent/main_agent.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/main_agent.py:370) | `_answer_local_kb_sync()` |
+| 模型构建 | [app/agent/llm.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/llm.py:18) | `build_llm_model()` |
+| 提示词加载 | [app/agent/prompts.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/agent/prompts.py:14) | `load_yaml()` |
+
+### 4.5 子智能体与工具层
+
+| 能力 | 文件 | 先看函数 |
+| --- | --- | --- |
+| 网络搜索工具 | [app/tools/tavily_tool.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/tavily_tool.py:38) | `internet_search()` |
+| 数据库列出表 | [app/tools/db_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/db_tools.py:61) | `list_sql_tables()` |
+| 数据库预览表 | [app/tools/db_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/db_tools.py:105) | `get_table_data()` |
+| 数据库执行 SQL | [app/tools/db_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/db_tools.py:173) | `execute_sql_query()` |
+| 知识库助手列表 | [app/tools/local_kb_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/local_kb_tools.py:19) | `get_assistant_list()` |
+| 知识库问答 | [app/tools/local_kb_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/local_kb_tools.py:36) | `create_ask_delete()` |
+| 上传文件读取 | [app/tools/upload_file_read_tool.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/upload_file_read_tool.py:36) | `read_file_content()` |
+| 生成 Markdown | [app/tools/markdown_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/markdown_tools.py:22) | `generate_markdown()` |
+| 生成 PDF | [app/tools/pdf_tools.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/tools/pdf_tools.py:25) | `convert_md_to_pdf()` |
+| 路径归一化 | [app/utils/path_utils.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/utils/path_utils.py:13) | `resolve_path()` |
+| 加载知识库文档 | [app/knowledge_base/local_index.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/knowledge_base/local_index.py:113) | `load_knowledge_docs()` |
+| 检索知识库 | [app/knowledge_base/local_index.py](/home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/deepsearch-agents-main/app/knowledge_base/local_index.py:148) | `search_knowledge_base()` |
+
+---
+
+## 5. 按代码阅读的推荐顺序
 
 如果你是为了“跟调用过程学代码”，推荐按这个顺序打开。
 
@@ -280,7 +368,7 @@ sequenceDiagram
 
 ---
 
-## 5. 每个目录在整条链路里的职责
+## 6. 每个目录在整条链路里的职责
 
 | 目录 | 作用 | 学习时关注什么 |
 | --- | --- | --- |
@@ -296,7 +384,7 @@ sequenceDiagram
 
 ---
 
-## 6. 最适合“跟调用链看代码”的三条路径
+## 7. 最适合“跟调用链看代码”的三条路径
 
 ### 路径 A：从页面发任务开始
 
@@ -337,7 +425,7 @@ app/tools/*.py / app/agent/main_agent.py
 
 ---
 
-## 7. 学习建议
+## 8. 学习建议
 
 如果你要高效读这个项目，建议不要一上来就把所有文件从头看到尾。
 

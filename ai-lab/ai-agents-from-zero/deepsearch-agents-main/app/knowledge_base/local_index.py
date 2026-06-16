@@ -8,6 +8,12 @@ similarity, which is enough for small teaching corpora and keeps the runtime
 dependency-free.
 """
 
+# 这个模块实现的是“项目内自带的轻量知识库检索”。
+# 初学者可以把它看成一个很小的本地 RAG：
+# 1. 先从 docs/knowledge_base/ 读取文档
+# 2. 再把文档切成 token 统计表示
+# 3. 查询时按相似度排序，返回最相关的几段内容
+
 from __future__ import annotations
 
 from collections import Counter
@@ -25,6 +31,7 @@ SUPPORTED_EXTENSIONS = {".md", ".txt", ".pdf", ".docx"}
 
 @dataclass(frozen=True)
 class KnowledgeDoc:
+    # 一个 KnowledgeDoc 就代表知识库中的一篇文档及其检索特征。
     path: Path
     relative_path: str
     title: str
@@ -37,6 +44,7 @@ class KnowledgeDoc:
 
 
 def _iter_documents(root: Path) -> Iterable[Path]:
+    # 递归扫描知识库目录，只保留当前项目支持的文件类型。
     if not root.exists():
         return []
     return sorted(
@@ -75,6 +83,7 @@ def _read_docx_file(path: Path) -> str:
 
 
 def _extract_text(path: Path) -> str:
+    # 根据不同后缀选择不同读取方式。
     suffix = path.suffix.lower()
     if suffix in {".md", ".txt"}:
         return _read_text_file(path)
@@ -86,7 +95,10 @@ def _extract_text(path: Path) -> str:
 
 
 def _tokenize(text: str) -> Counter[str]:
-    # Preserve both Latin words and Chinese character n-grams for small corpora.
+    # 这里没有引入复杂 embedding，而是做了一个轻量 token 方案：
+    # - 英文按单词切
+    # - 中文按 2 字滑窗切
+    # 对教学项目来说，这样已经足够演示“检索 -> 排序 -> 返回片段”的流程。
     normalized = text.lower()
     word_tokens = re.findall(r"[a-z0-9]+", normalized)
     cjk_chunks = re.findall(r"[\u4e00-\u9fff]{2,}", text)
@@ -100,6 +112,7 @@ def _tokenize(text: str) -> Counter[str]:
 
 
 def _build_title(path: Path, content: str) -> str:
+    # 优先使用文件名作为标题；如果没有，就退化到正文第一行。
     if path.stem:
         return path.stem
     for line in content.splitlines():
@@ -111,6 +124,7 @@ def _build_title(path: Path, content: str) -> str:
 
 @lru_cache(maxsize=1)
 def load_knowledge_docs() -> tuple[KnowledgeDoc, ...]:
+    # lru_cache 让知识库索引只构建一次，避免每次查询都重复扫描整目录。
     docs: list[KnowledgeDoc] = []
     for path in _iter_documents(KB_ROOT):
         content = _extract_text(path).strip()
@@ -129,6 +143,7 @@ def load_knowledge_docs() -> tuple[KnowledgeDoc, ...]:
 
 
 def clear_knowledge_cache() -> None:
+    # 如果知识库目录里的文档更新了，可以清缓存后重新加载。
     load_knowledge_docs.cache_clear()
 
 
@@ -146,6 +161,8 @@ def cosine_similarity(left: Counter[str], right: Counter[str]) -> float:
 
 
 def search_knowledge_base(query: str, top_k: int = 3) -> list[dict[str, object]]:
+    # 对外暴露的核心查询入口：
+    # 输入一个问题，返回若干条最相关文档片段。
     docs = load_knowledge_docs()
     if not docs:
         return []
@@ -174,6 +191,7 @@ def search_knowledge_base(query: str, top_k: int = 3) -> list[dict[str, object]]
 
 
 def _build_snippet(content: str, query_tokens: Counter[str], max_length: int = 260) -> str:
+    # 返回给模型或前端时，不需要整篇文档，只给一个局部摘录更高效。
     if not content:
         return ""
 
@@ -190,5 +208,5 @@ def _build_snippet(content: str, query_tokens: Counter[str], max_length: int = 2
 
 
 def has_local_knowledge_base() -> bool:
+    # 这是健康检查和工具层判断“当前有没有知识库可用”的最简单入口。
     return len(load_knowledge_docs()) > 0
-

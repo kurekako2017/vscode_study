@@ -7,12 +7,16 @@ execute_sql_query 用于在确认结构后执行自定义查询。
 """
 
 import os
+import logging
 
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from mysql.connector import Error, connect
 
 from app.api.monitor import monitor
+from app.utils.logging_utils import log_event
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -44,6 +48,15 @@ def get_db_config():
     if missing_keys:
         raise ValueError(f"缺失数据库核心配置：{', '.join(missing_keys)}")
 
+    log_event(
+        logger,
+        logging.DEBUG,
+        "db_config_loaded",
+        host=config.get("host"),
+        port=config.get("port"),
+        database=config.get("database"),
+        user=config.get("user"),
+    )
     return config
 
 
@@ -73,6 +86,7 @@ def list_sql_tables() -> str:
 
     # 加载数据库连接信息
     config = get_db_config()
+    log_event(logger, logging.INFO, "db_list_tables_started", host=config.get("host"), database=config.get("database"))
 
     # MySQL 查询的固定步骤：
     # 1. 创建连接
@@ -92,12 +106,15 @@ def list_sql_tables() -> str:
                 # SHOW TABLES 返回形如：[("drugs",), ("inventory",), ("sales_records",)]
                 tables = cursor.fetchall()
                 if not tables:
+                    log_event(logger, logging.WARNING, "db_list_tables_empty")
                     return "没有可用的表"
 
                 # 取每个元组的第一个元素，拼成模型容易阅读的表名列表
                 table_names = [table[0] for table in tables]
+                log_event(logger, logging.INFO, "db_list_tables_completed", table_count=len(table_names), tables=table_names)
                 return f"可用的表有：{', '.join(table_names)}"
     except Error as e:
+        log_event(logger, logging.ERROR, "db_list_tables_failed", error=str(e))
         return f"查询出现异常：{str(e)}"
 
 
@@ -130,6 +147,7 @@ def get_table_data(table_name) -> str:
 
     # 获取数据库参数
     config = get_db_config()
+    log_event(logger, logging.INFO, "db_get_table_data_started", table_name=table_name, database=config.get("database"))
 
     # 查询流程同样是：连接 -> cursor -> 执行 SQL -> 获取列信息和数据 -> 自动释放资源
     try:
@@ -145,6 +163,7 @@ def get_table_data(table_name) -> str:
                 # 如果 SQL 没有结果集，description 可能为 None
                 description = cursor.description
                 if not description:
+                    log_event(logger, logging.WARNING, "db_get_table_data_no_description", table_name=table_name)
                     return f"数据表 {table_name} 暂无数据。"
 
                 # 只取每个列信息元组的第一个元素，也就是列名
@@ -164,8 +183,10 @@ def get_table_data(table_name) -> str:
                 # 1,张三,18
                 header_str = ",".join(columns)
                 data_str = "\n".join(results)
+                log_event(logger, logging.INFO, "db_get_table_data_completed", table_name=table_name, row_count=len(rows), column_count=len(columns))
                 return f"{header_str}\n{data_str}"
     except Error as e:
+        log_event(logger, logging.ERROR, "db_get_table_data_failed", table_name=table_name, error=str(e))
         return f"查询出现异常：{str(e)}"
 
 
@@ -194,6 +215,7 @@ def execute_sql_query(query) -> str:
 
     # 获取数据库参数
     config = get_db_config()
+    log_event(logger, logging.INFO, "db_execute_sql_started", query=query, database=config.get("database"))
 
     # 自定义查询和 get_table_data 的结果处理逻辑一致：
     # 执行 SQL -> 读取 description 得到列名 -> fetchall 得到数据 -> 拼成 CSV 返回
@@ -207,6 +229,7 @@ def execute_sql_query(query) -> str:
                 # 非查询类 SQL 没有结果集描述，这里统一返回提示，避免工具调用直接抛错给模型
                 description = cursor.description
                 if not description:
+                    log_event(logger, logging.WARNING, "db_execute_sql_no_result_set", query=query)
                     return f"执行自定义 SQL 语句没有查询结果，SQL 为：{query}"
                 # description => [("列1", ...), ("列2", ...)]
                 columns = [desc[0] for desc in description]
@@ -220,8 +243,10 @@ def execute_sql_query(query) -> str:
                 # 第一行是列名，后续是查询数据
                 header_str = ",".join(columns)
                 data_str = "\n".join(results)
+                log_event(logger, logging.INFO, "db_execute_sql_completed", row_count=len(rows), column_count=len(columns))
                 return f"{header_str}\n{data_str}"
     except Error as e:
+        log_event(logger, logging.ERROR, "db_execute_sql_failed", query=query, error=str(e))
         return f"查询出现异常：{str(e)}"
 
 

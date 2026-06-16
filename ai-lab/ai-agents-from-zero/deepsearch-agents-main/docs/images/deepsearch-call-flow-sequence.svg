@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1260" viewBox="0 0 1900 1260">
+  <defs>
+    <style>
+      .bg { fill: #07131a; }
+      .title { fill: #e8f7ff; font: 700 28px Arial, sans-serif; }
+      .sub { fill: #a9c8d6; font: 500 15px Arial, sans-serif; }
+      .actor { fill: #10242e; stroke: #49c5e8; stroke-width: 2; rx: 12; ry: 12; }
+      .actext { fill: #f4fbff; font: 700 18px Arial, sans-serif; }
+      .lane { stroke: #30586b; stroke-width: 2; stroke-dasharray: 8 8; }
+      .msg { stroke: #79daf7; stroke-width: 3; fill: none; marker-end: url(#m); }
+      .ret { stroke: #87e8a7; stroke-width: 3; fill: none; marker-end: url(#m2); }
+      .step { fill: #0f2530; stroke: #1c6e89; stroke-width: 2; rx: 12; ry: 12; }
+      .stext { fill: #f5fbff; font: 600 16px Arial, sans-serif; }
+      .note { fill: #17311f; stroke: #56c271; stroke-width: 2; rx: 12; ry: 12; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#79daf7"/>
+    </marker>
+    <marker id="m2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#87e8a7"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1900" height="1260"/>
+  <text class="title" x="50" y="58">DeepSearch 一次任务的真实时序图</text>
+  <text class="sub" x="50" y="90">适合顺着一次请求追：前端发送 -> FastAPI 启动后台任务 -> 主智能体执行 -> monitor 回推前端</text>
+
+  <rect class="actor" x="40" y="120" width="140" height="48"/><text class="actext" x="78" y="150">用户</text>
+  <rect class="actor" x="220" y="120" width="160" height="48"/><text class="actext" x="278" y="150">App.tsx</text>
+  <rect class="actor" x="430" y="120" width="240" height="48"/><text class="actext" x="464" y="150">useDeepAgentSession.ts</text>
+  <rect class="actor" x="730" y="120" width="180" height="48"/><text class="actext" x="774" y="150">frontend/api.ts</text>
+  <rect class="actor" x="980" y="120" width="160" height="48"/><text class="actext" x="1016" y="150">server.py</text>
+  <rect class="actor" x="1190" y="120" width="220" height="48"/><text class="actext" x="1248" y="150">run_deep_agent()</text>
+  <rect class="actor" x="1470" y="120" width="190" height="48"/><text class="actext" x="1510" y="150">main_agent</text>
+  <rect class="actor" x="1710" y="120" width="150" height="48"/><text class="actext" x="1730" y="150">monitor</text>
+
+  <line class="lane" x1="110" y1="180" x2="110" y2="1180"/>
+  <line class="lane" x1="300" y1="180" x2="300" y2="1180"/>
+  <line class="lane" x1="550" y1="180" x2="550" y2="1180"/>
+  <line class="lane" x1="820" y1="180" x2="820" y2="1180"/>
+  <line class="lane" x1="1060" y1="180" x2="1060" y2="1180"/>
+  <line class="lane" x1="1300" y1="180" x2="1300" y2="1180"/>
+  <line class="lane" x1="1565" y1="180" x2="1565" y2="1180"/>
+  <line class="lane" x1="1785" y1="180" x2="1785" y2="1180"/>
+
+  <path class="msg" d="M110 230 L300 230"/><text class="stext" x="150" y="220">输入任务 / 上传文件 / 点击发送</text>
+  <path class="msg" d="M300 280 L550 280"/><text class="stext" x="340" y="270">handleSubmit()</text>
+  <path class="msg" d="M550 330 L820 330"/><text class="stext" x="610" y="320">startTask(query, threadId)</text>
+  <path class="msg" d="M820 380 L1060 380"/><text class="stext" x="870" y="370">POST /api/task -> run_task()</text>
+  <path class="msg" d="M1060 430 L1300 430"/><text class="stext" x="1095" y="420">asyncio.create_task(run_deep_agent)</text>
+  <path class="ret" d="M1060 480 L820 480"/><text class="stext" x="860" y="470">{status: started, thread_id}</text>
+  <path class="ret" d="M820 530 L550 530"/><text class="stext" x="660" y="520">返回 started</text>
+
+  <rect class="step" x="1180" y="565" width="240" height="110"/>
+  <text class="stext" x="1200" y="595">run_deep_agent()</text>
+  <text class="stext" x="1200" y="623">1. 创建 output/session_xxx</text>
+  <text class="stext" x="1200" y="649">2. 复制 updated/session_xxx</text>
+  <path class="msg" d="M1300 700 L1785 700"/><text class="stext" x="1385" y="690">report_session_dir()</text>
+  <path class="ret" d="M1785 740 L550 740"/><text class="stext" x="1040" y="730">WebSocket monitor_event: session_created</text>
+
+  <path class="msg" d="M1300 790 L1565 790"/><text class="stext" x="1365" y="780">main_agent.stream()</text>
+  <rect class="step" x="1435" y="820" width="260" height="170"/>
+  <text class="stext" x="1455" y="850">根据任务分支执行</text>
+  <text class="stext" x="1455" y="878">A. 文件直达：read_file_content()</text>
+  <text class="stext" x="1455" y="904">B. 知识库直达：get_assistant_list()</text>
+  <text class="stext" x="1455" y="930">C. 数据库直达：list_sql_tables()</text>
+  <text class="stext" x="1455" y="956">D. 常规多智能体：调子智能体 + 文件工具</text>
+  <path class="msg" d="M1565 1015 L1785 1015"/><text class="stext" x="1600" y="1005">report_tool() / report_assistant()</text>
+  <path class="ret" d="M1785 1055 L550 1055"/><text class="stext" x="1045" y="1045">WebSocket monitor_event: tool_start / assistant_call</text>
+  <path class="msg" d="M1565 1105 L1785 1105"/><text class="stext" x="1600" y="1095">report_task_result()</text>
+  <path class="ret" d="M1785 1145 L550 1145"/><text class="stext" x="1060" y="1135">WebSocket monitor_event: task_result</text>
+  <path class="ret" d="M550 1180 L300 1180"/><text class="stext" x="390" y="1170">更新 events / result / files</text>
+
+  <rect class="note" x="60" y="1000" width="500" height="110"/>
+  <text class="stext" x="80" y="1032">关键理解</text>
+  <text class="stext" x="80" y="1060">1. /api/task 只负责启动后台任务</text>
+  <text class="stext" x="80" y="1086">2. 最终过程和结果都靠 WebSocket 回来</text>
+</svg>

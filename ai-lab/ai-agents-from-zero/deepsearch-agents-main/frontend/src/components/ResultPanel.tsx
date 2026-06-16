@@ -1,3 +1,5 @@
+// ResultPanel 负责显示最终回复。
+// 注意：这里只有“最后结果”，不显示中间执行过程；过程在 EventStream / ConversationThread 里看。
 import { CheckCircleOutlined, CopyOutlined } from "@ant-design/icons";
 import { Button, Empty, Tooltip } from "antd";
 

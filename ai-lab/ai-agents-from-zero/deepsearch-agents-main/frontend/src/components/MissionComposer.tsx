@@ -1,3 +1,5 @@
+// MissionComposer 是较早版本风格的任务输入组件。
+// 它通过“预设模板 + 大文本框 + 启动按钮”帮助初学者快速发起任务。
 import { PlayCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 
@@ -44,6 +46,7 @@ export function MissionComposer({
 
       <div className="preset-grid" aria-label="任务模板">
         {presets.map((preset) => (
+          // 点击模板不会直接发送，只是把模板文本填入输入框，方便再修改。
           <button
             className="preset-chip"
             type="button"

@@ -1,3 +1,5 @@
+// FileDock 用来展示当前会话目录下已经生成的文件，
+// 例如 Markdown、PDF，或者后端复制进 output/session_xxx 的附件。
 import {
   DownloadOutlined,
   FileMarkdownOutlined,
@@ -20,6 +22,7 @@ function formatBytes(value: number): string {
 }
 
 function formatMtime(value: number): string {
+  // 后端返回的是 Unix 时间戳（秒），前端要先乘 1000 再转 Date。
   const date = new Date(value * 1000);
   if (Number.isNaN(date.getTime())) {
     return "未知时间";

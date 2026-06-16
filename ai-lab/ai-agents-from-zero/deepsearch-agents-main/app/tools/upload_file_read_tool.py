@@ -8,12 +8,16 @@ Word、PDF 和 Excel 等常见格式。
 
 from pathlib import Path
 from typing import Annotated
+import logging
 
 from langchain_core.tools import tool
 
 from app.api.context import get_session_context
 from app.api.monitor import monitor
 from app.utils.path_utils import resolve_path
+from app.utils.logging_utils import log_event
+
+logger = logging.getLogger(__name__)
 
 # 文档解析依赖按需导入：缺少某类依赖时，只影响对应文件格式，不影响工具整体注册
 try:
@@ -56,8 +60,17 @@ def read_file_content(
     # 解析路径时优先约束在当前 session_dir 内，避免模型传入绝对路径导致越界读取
     session_dir = get_session_context()
     file_path = Path(resolve_path(filename, session_dir))
+    log_event(
+        logger,
+        logging.INFO,
+        "file_read_started",
+        filename=filename,
+        instruction=instruction,
+        resolved_path=str(file_path),
+    )
 
     if not file_path.exists():
+        log_event(logger, logging.WARNING, "file_read_missing_file", filename=filename, resolved_path=str(file_path))
         return f"错误：文件 '{filename}' 不存在 (解析路径: {file_path})。"
 
     # 根据文件后缀选择解析方式；未知后缀会先按 UTF-8 文本兜底读取
@@ -65,6 +78,7 @@ def read_file_content(
 
     try:
         if ext in [".md", ".txt"]:
+            log_event(logger, logging.INFO, "file_read_text_completed", filename=filename, ext=ext)
             return file_path.read_text(encoding="utf-8")
 
         elif ext == ".docx":
@@ -73,6 +87,7 @@ def read_file_content(
             # python-docx 读取段落文本，适合课程中的普通 Word 附件
             doc = docx.Document(str(file_path))
             full_text = [para.text for para in doc.paragraphs]
+            log_event(logger, logging.INFO, "file_read_docx_completed", filename=filename, paragraph_count=len(full_text))
             return "\n".join(full_text)
 
         elif ext == ".pdf":
@@ -81,6 +96,7 @@ def read_file_content(
             # pypdf 按页提取文本，扫描件或图片型 PDF 可能无法提取有效文字
             reader = pypdf.PdfReader(str(file_path))
             text = "\n".join([page.extract_text() or "" for page in reader.pages])
+            log_event(logger, logging.INFO, "file_read_pdf_completed", filename=filename, page_count=len(reader.pages), text_length=len(text))
             return text
 
         elif ext in [".xlsx", ".xls"]:
@@ -102,15 +118,19 @@ def read_file_content(
                 "\n[统计描述]:",
                 df.describe().to_string(),
             ]
+            log_event(logger, logging.INFO, "file_read_excel_completed", filename=filename, row_count=len(df), column_count=len(df.columns))
             return "\n".join(result)
 
         else:
             try:
+                log_event(logger, logging.INFO, "file_read_fallback_text_completed", filename=filename, ext=ext)
                 return file_path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
+                log_event(logger, logging.ERROR, "file_read_unsupported_binary", filename=filename, ext=ext)
                 return f"错误：不支持的文件格式 '{ext}'，且无法作为文本读取。"
 
     except Exception as e:
+        log_event(logger, logging.ERROR, "file_read_failed", filename=filename, resolved_path=str(file_path), error=str(e))
         return f"读取文件出错: {str(e)}"
 
 

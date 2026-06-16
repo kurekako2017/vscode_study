@@ -6,6 +6,12 @@ DeepAgents 可识别的字典式子智能体。主智能体后续会根据 descr
 决定是否把企业内部非结构化文档查询任务分派给它。
 """
 
+# 这个子智能体和数据库子智能体类似，本身只负责声明：
+# - 路由描述
+# - 系统提示词
+# - 可调用工具
+# 真正查文档索引的逻辑在 local_kb_tools.py 和 local_index.py。
+
 from app.agent.prompts import sub_agents_content
 from app.tools.local_kb_tools import create_ask_delete, get_assistant_list
 

@@ -1,3 +1,5 @@
+// ChatComposer 是当前主页面底部的输入区。
+// 它负责三件事：输入任务、选择附件、发送或取消任务。
 import {
   PaperClipOutlined,
   PlusOutlined,
@@ -24,6 +26,8 @@ interface ChatComposerProps {
 }
 
 function toUploadedItem(file: UploadFile): UploadedItem | null {
+  // Ant Design Upload 返回的是 UploadFile；
+  // 这里把它转成项目内部统一使用的 UploadedItem。
   if (!file.originFileObj) {
     return null;
   }
@@ -37,6 +41,7 @@ function toUploadedItem(file: UploadFile): UploadedItem | null {
 }
 
 function uniqueUploadedItems(items: UploadedItem[]): UploadedItem[] {
+  // 用文件名做一次轻量去重，避免同一批次里重复显示同名附件。
   const names = new Set<string>();
   return items.filter((item) => {
     if (names.has(item.name)) {
@@ -65,6 +70,8 @@ export function ChatComposer({
   const canSubmit = query.trim().length > 0;
 
   function handleAttachmentChange(fileList: UploadFile[]) {
+    // 这个组件选择完文件后会立即触发上传，
+    // 所以 stagedItems 更像“上传前的一瞬间缓存”。
     const nextItems = uniqueUploadedItems(
       fileList
         .map(toUploadedItem)
@@ -112,6 +119,7 @@ export function ChatComposer({
           disabled={isRunning}
           onChange={(event) => onQueryChange(event.target.value)}
           onKeyDown={(event) => {
+            // Enter 直接发送；Shift + Enter 才换行。
             if (event.key === "Enter" && !event.shiftKey) {
               event.preventDefault();
               onSubmit();
@@ -137,6 +145,8 @@ export function ChatComposer({
               fileList={[]}
               multiple
               onChange={(info) => {
+                // antd 在只选一个文件时，info.fileList 可能为空，
+                // 所以这里补一个 [info.file] 的兜底。
                 handleAttachmentChange(info.fileList.length > 0 ? info.fileList : [info.file]);
               }}
               showUploadList={false}

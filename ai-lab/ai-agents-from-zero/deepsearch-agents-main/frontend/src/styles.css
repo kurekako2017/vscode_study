@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* 统一颜色变量，后续组件样式尽量只引用变量，方便整体换肤。 */
   color-scheme: dark;
   --bg: #05070b;
   --surface: rgba(10, 15, 24, 0.88);
@@ -26,6 +27,7 @@ html {
 }
 
 body {
+  /* 页面底色叠加了扫描线和网格，目的是做出“控制台/作战台”氛围。 */
   margin: 0;
   min-width: 320px;
   color: var(--text);
@@ -43,6 +45,7 @@ textarea {
   font: inherit;
 }
 
+/* 整体三栏工作台骨架 */
 .app-shell {
   position: relative;
   overflow-x: hidden;
@@ -50,6 +53,7 @@ textarea {
 }
 
 .app-shell::before {
+  /* 固定在视口上的装饰层，不参与点击。 */
   pointer-events: none;
   content: "";
   position: fixed;
@@ -60,6 +64,7 @@ textarea {
   opacity: 0.8;
 }
 
+/* 顶部标题区 */
 .command-header {
   position: relative;
   z-index: 1;
@@ -135,6 +140,7 @@ textarea {
   margin: 0 auto 16px;
 }
 
+/* 主体三栏：左侧控制，中间对话，右侧监控/产物 */
 .workspace-grid {
   position: relative;
   z-index: 1;
@@ -153,6 +159,7 @@ textarea {
   align-content: start;
 }
 
+/* 所有“控制台卡片”共用的基础外观 */
 .console-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -190,6 +197,7 @@ textarea {
   color: var(--cyan) !important;
 }
 
+/* 顶部状态摘要条 */
 .status-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

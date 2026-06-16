@@ -1,3 +1,5 @@
+// UploadPanel 是另一种“上传附件”的面板式入口。
+// 它和 ChatComposer 的小图标上传作用类似，只是交互形式更显眼。
 import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Upload } from "antd";
 import type { UploadFile } from "antd";
@@ -42,6 +44,8 @@ export function UploadPanel({ isUploading, onUpload, uploadedItems }: UploadPane
         beforeUpload={() => false}
         className="upload-dropzone"
         onChange={(info) => {
+          // 这里只是把文件先放进 stagedItems，
+          // 真正上传要等用户点击下面的按钮。
           setStagedItems(
             info.fileList
               .map(toUploadedItem)

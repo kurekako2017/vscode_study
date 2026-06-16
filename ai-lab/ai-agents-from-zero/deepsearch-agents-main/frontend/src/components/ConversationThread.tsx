@@ -1,3 +1,5 @@
+// ConversationThread 是当前版本里最重要的“对话展示组件”。
+// 它把每一轮用户输入和对应的 AI 执行过程、最终结果、输出文件组合在一起展示。
 import {
   BranchesOutlined,
   CheckCircleOutlined,
@@ -20,6 +22,7 @@ import { MarkdownRenderer } from "./MarkdownRenderer";
 import type { MonitorMessage, OutputFile } from "../types";
 
 export interface ChatTurn {
+  // 一个 ChatTurn 代表“用户发出的一次任务 + 系统对这次任务的执行结果”。
   id: string;
   content: string;
   events: MonitorMessage[];
@@ -132,6 +135,7 @@ function getThinkingDuration(
   isRunning: boolean,
   now: number,
 ): string {
+  // 这个函数不是靠后端直接返回耗时，而是根据事件时间戳自己推算。
   const startedAt =
     (events[0] ? parseTime(events[0].timestamp) : null) ??
     parseTime(fallbackStart) ??
@@ -179,6 +183,7 @@ function ThinkingTimeline({ events }: { events: MonitorMessage[] }) {
   const timelineRef = useRef<HTMLOListElement | null>(null);
 
   useEffect(() => {
+    // 有新事件进来后，自动滚动到底部，保证用户能看到最新执行步骤。
     const timelineNode = timelineRef.current;
     if (!timelineNode) {
       return;
@@ -300,6 +305,8 @@ function AssistantMessage({
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
+    // 任务运行中每秒刷新一次“已思考 xx:xx”，
+    // 任务结束后就不再继续计时。
     if (!isRunning) {
       return;
     }
@@ -377,6 +384,7 @@ export function ConversationThread({
   turns,
 }: ConversationThreadProps) {
   if (turns.length === 0) {
+    // 空状态不只是“没消息”，还承担“给用户提供示例任务入口”的作用。
     return (
       <div className="conversation-empty">
         <div className="empty-examples">

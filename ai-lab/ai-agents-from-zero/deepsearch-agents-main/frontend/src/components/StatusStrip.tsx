@@ -1,3 +1,5 @@
+// StatusStrip 是顶部/侧边的任务摘要条，
+// 适合快速观察当前连接、任务态、工具调用次数、异常次数。
 import {
   ApiOutlined,
   BranchesOutlined,
