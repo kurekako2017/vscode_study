@@ -140,14 +140,14 @@ def _extract_json_objects(text: str) -> list[dict[str, object]]:
             objects.append(parsed)
     return objects
 
-
+# 下面的工具调用执行函数负责解析模型回复中的工具调用意图，并调用对应工具获取结果。
 def _normalize_text_tool_call(payload: dict[str, object]) -> tuple[str, dict[str, object]] | None:
     raw_name = payload.get("name") or payload.get("function")
     if isinstance(raw_name, dict):
         raw_name = raw_name.get("name")
     if not isinstance(raw_name, str):
         return None
-
+    # 通过 TOOL_NAME_ALIASES 把模型可能使用的工具名称映射到我们实际定义的工具函数，避免模型因为小差错调用失败
     tool_name = TOOL_NAME_ALIASES.get(raw_name)
     if not tool_name:
         return None
