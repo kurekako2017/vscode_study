@@ -434,9 +434,6 @@
 | Human-in-the-loop | ヒューマン イン ザ ループ |
 | Tool Calling | ツールコーリング |
 | Function Calling | ファンクションコーリング |
-| SQL 検証 | エスキューエル ケンショウ |
-| SQL 修正 | エスキューエル シュウセイ |
-| SQL 実行 | エスキューエル ジッコウ |
 | API 連携 | エーピーアイ レンケイ |
 | 非同期処理 | ヒドウキ ショリ |
 | 外部 API | ガイブ エーピーアイ |
@@ -447,6 +444,7 @@
 | RAG | ラグ |
 | LangGraph | ランググラフ |
 | LangChain | ラングチェーン |
+| LangSmith | 
 | DeepAgents | ディープエージェンツ |
 | OpenAI-Compatible API | オープンエーアイ コンパチブル エーピーアイ |
 | OpenRouter | オープンルーター |
