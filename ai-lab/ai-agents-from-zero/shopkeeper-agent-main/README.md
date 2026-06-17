@@ -210,8 +210,7 @@ VITE_API_BASE_URL=
 如果你想先按“最小可运行版本”启动，优先看：
 
 - [新手总指南](docs/guide.md)
-- [LLM Provider 回退运行模式](docs/llm-provider-fallback.md)
-- [功能检查清单](docs/feature-checklist.md)
+- [OpenRouter + NAS MySQL 本地方案](docs/openrouter-nas-mysql-setup.md)
 
 ### 5. 准备 Embedding 模型
 

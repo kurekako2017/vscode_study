@@ -13,10 +13,7 @@
 - [当前项目功能使用与测试最短版](feature-usage-test-template.md)
 - [当前项目功能使用与测试完整版](feature-usage-test-full.md)
 - [通用功能使用与测试模板](feature-usage-template-generic.md)
-- [功能检查清单](feature-checklist.md)
-- [复制即启动](quick-start-copy.md)
-- [LLM Provider 回退运行模式](llm-provider-fallback.md)
-- [OpenRouter + NAS MySQL 说明](local-setup-openrouter-docker-mysql.md)
+- [OpenRouter + NAS MySQL 说明](openrouter-nas-mysql-setup.md)
 
 ## 说明
 

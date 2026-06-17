@@ -7,6 +7,6 @@
 现在优先看：
 
 1. [新手总指南](guide.md)
-2. [功能检查清单](feature-checklist.md)
+2. [OpenRouter + NAS MySQL 说明](openrouter-nas-mysql-setup.md)
 
 保留这个文件只为兼容旧链接，避免 README 或外部引用失效。
