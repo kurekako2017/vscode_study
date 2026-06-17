@@ -201,6 +201,7 @@
 | Polymarket agents | https://github.com/polymarket-share/polymarket-agents | Polymarket 预测市场交易智能体 | 对冲、套利、预测市场 |
 | AutoHedge | https://github.com/autohedge/AutoHedge | 自主对冲基金系统 | 群体智能、自动化执行 |
 | TradingGym | https://github.com/tradinggym/TradingGym | 交易 Agent 强化学习与回测沙盒 | RL 微调、仿真环境、策略验证 |
+| AI-Hedge-Fund | https://github.com/virattt/ai-hedge-fund | AI 投资管理与 ML 策略系统 | 机器学习分析市场数据、风险预测、投资策略制定 |
 
 ### 注意
 
@@ -363,6 +364,16 @@
      - 基于 Shell 语言开发的 AI 智能体技能开发底座框架。
      - 提供标准技能扩充方法论和任务流组合机制。
 
+7. **browserAct**
+   - GitHub 地址：[https://github.com/shanyisun/browseract](https://github.com/shanyisun/browseract)
+   - 功能描述：
+     - 自然语言驱动的浏览器自动化工具，支持通过对话操控网页。
+
+8. **ponytail**
+   - GitHub 地址：[https://github.com/itsthisjustin/ponytail](https://github.com/itsthisjustin/ponytail)
+   - 功能描述：
+     - 轻量级 AI 浏览器助手，专注于提升网页浏览与信息提取效率。
+
 ### 17.2 打破信息茧房：AI 爆款信息源与研究智能体
 
 1. **last30days (last30days-skill)**
@@ -382,6 +393,11 @@
    - 功能描述：
      - 面向中文互联网环境优化的实时热点与选题雷达。
      - 可捕获国内主流社交平台的上升期爆款话题，作为知识库或自媒体选题弹药库。
+
+4. **anysearch**
+   - GitHub 地址：[https://github.com/rashadphz/anysearch](https://github.com/rashadphz/anysearch)
+   - 功能描述：
+     - 高性能 AI 聚合搜索引擎，支持语义化检索与实时结果整合。
 
 ### 17.3 开源替代 SaaS：独立开发者“部署即变现”项目
 
@@ -452,6 +468,12 @@
      - 结合图数据库的 Graph RAG 框架。
      - 适合处理复杂企业知识、跨章节关联和长问题检索。
 
+5. **RAGFlow**
+   - GitHub 地址：[https://github.com/infiniflow/ragflow](https://github.com/infiniflow/ragflow)
+   - 功能描述：
+     - 开源 RAG 引擎平台，支持深度文档理解。
+     - 帮助用户评估和优化 AI 模型性能，提供模型反馈与识别建议。
+
 ### 17.5 AI 内容营销与特定用途自动化
 
 1. **Aitoearn (AIEarn)**
@@ -520,6 +542,3 @@
    - 基础通用自动化正在变红海。
    - 更有机会的是“特定垂直产业 + 特定繁琐流程”的深度定制。
    - 可以把开源替代 SaaS 改造成细分场景产品，卡位蓝海市场。
-
-#待整理
-RAG FLOW  ：RAG FLOW 是一个用于评估和优化 AI 模型的工具。它可以帮助用户快速识别和   优化模型的性能，并提供反馈和建议。RAG引擎平台
