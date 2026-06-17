@@ -1,282 +1,529 @@
-# 启动 / 验证 / 排错 最终版说明页
+# shopkeeper-agent 当前机器启动指南
 
-> 这份说明专门写给当前 `shopkeeper-agent-main` 工作区。  
-> 当前推荐运行组合是：真实模式默认 `OpenRouter -> NVIDIA -> 本地 Ollama qwen2.5-coder:1.5b`，数据库接 `NAS MySQL`；`Mock` 只作为前后端联调兜底。
+> 这份文档只写当前 `shopkeeper-agent-main` 工作区里真实可执行的命令。  
+> 默认先走真实链路：`OpenRouter -> NVIDIA -> 本地 Ollama qwen2.5-coder:1.5b`。  
+> 不一上来启动 Mock。Mock 只能在真实链路处理不了时最后兜底，并且必须明确标记为 Mock。
 
-## 1. 先看结论
+## 1. 当前结论
 
-如果你只是想快速把项目跑起来，顺序就是：
+当前机器的实际情况：
 
-1. 配置 `.env`
-2. 启动后端
-3. 启动前端
-4. 打开问数页面确认状态
-5. 再发起问数任务
+- 后端不要用 `uv sync` / `uv run`：当前机器没有 `uv`
+- 前端不要用 `pnpm`：当前机器没有 `pnpm`
+- 后端可以直接复用仓库里的 `.venv`
+- 前端可以直接用 `npm`
+- 本机 `ollama` 已经有 `qwen2.5-coder:1.5b`
+- 后端真实模式进程可以启动
+- 完整真实问数链路还依赖 `NAS MySQL + Qdrant + Elasticsearch + Embedding`
 
-如果你只想记住一句话，就记这个：
+## 2. 一条整体启动命令
+
+在普通 WSL 终端里执行这一段。它启动的是真实模式，不是 Mock。
+
+这条命令已经验证过：
+
+- 后端返回 `backend_http=200`
+- 前端返回 `frontend_http=200`
+- 前端 `/api/query` 能通过 Vite 代理打到后端
+- 当前真实查询返回的错误是 Elasticsearch `localhost:9200` 没启动，不是前后端没连上
+
+这里故意使用 `8010` 和 `5188`，避免你机器上已有的 `8000` / `5173` 残留进程干扰验证。
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
+
+export MOCK_MODE=false
+export LLM_PROVIDER_ORDER=openrouter,nvidia,ollama
+export OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+export OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
+export OLLAMA_API_KEY=ollama
+
+export BACKEND_PORT=8010
+export FRONTEND_PORT=5188
+
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port "$BACKEND_PORT" > /tmp/shopkeeper-backend-"$BACKEND_PORT".log 2>&1 &
+BACKEND_PID=$!
+
+sleep 5
+echo "backend_http=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' http://127.0.0.1:${BACKEND_PORT}/docs)"
+
+cd frontend
+VITE_DEV_PROXY_TARGET=http://127.0.0.1:${BACKEND_PORT} npm run dev -- --host 127.0.0.1 --port "$FRONTEND_PORT" --strictPort > /tmp/shopkeeper-frontend-"$FRONTEND_PORT".log 2>&1 &
+FRONTEND_PID=$!
+trap 'kill "$FRONTEND_PID" "$BACKEND_PID" 2>/dev/null' EXIT
+
+sleep 5
+echo "frontend_http=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' http://127.0.0.1:${FRONTEND_PORT})"
+
+echo "query_output:"
+curl -N --max-time 25 -sS \
+  -X POST http://127.0.0.1:${FRONTEND_PORT}/api/query \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: text/event-stream' \
+  -d '{"query":"统计华北地区销售额"}'
+
+echo
+echo "backend_log=/tmp/shopkeeper-backend-${BACKEND_PORT}.log"
+echo "frontend_log=/tmp/shopkeeper-frontend-${FRONTEND_PORT}.log"
+echo "frontend_url=http://127.0.0.1:${FRONTEND_PORT}"
+echo "backend_url=http://127.0.0.1:${BACKEND_PORT}"
+
+wait "$FRONTEND_PID"
+kill "$BACKEND_PID"
+```
+
+打开：
 
 ```text
-先配 .env，再启动后端，再启动前端，再用问数接口和页面验证，最后遇到问题就按排错清单逐项缩小范围。
+http://127.0.0.1:5188
 ```
 
-## 2. 两种运行模式
+说明：
 
-### 2.1 真实模式
+- 后端地址：`http://127.0.0.1:8010`
+- 前端地址：`http://127.0.0.1:5188`
+- 前端通过 Vite 代理访问后端 `/api`
+- 这条命令没有设置 `MOCK_MODE=true`
+- 如果 `frontend_http` 不是 `200`，看 `/tmp/shopkeeper-frontend-5188.log`
+- 如果 `backend_http` 不是 `200`，看 `/tmp/shopkeeper-backend-8010.log`
+- 如果看到 `Cannot connect to host localhost:9200`，说明 Elasticsearch 没启动
 
-适合：
+如果你希望后端日志和前端日志分开看，用两个终端启动。
 
-- 你已经准备好 OpenRouter 或 NVIDIA API Key
-- 你已经有本地 Ollama 的 `qwen2.5-coder:1.5b`
-- 你想跑完整真实问数链路
-
-特点：
-
-- 后端优先接 OpenRouter
-- OpenRouter 失败后尝试 NVIDIA
-- 远端模型都不可用时回退本地 Ollama
-- `meta` / `dw` 接 NAS MySQL
-- Qdrant / Elasticsearch / Embedding 走本机基础服务
-- 前端展示真实问数过程
-
-### 2.2 Mock 模式
-
-适合：
-
-- Docker 或 NAS MySQL 暂时不可用
-- 你想先把前后端联调跑起来
-- 你想先看 SSE 流和页面展示效果
-
-特点：
-
-- 不依赖 MySQL、Qdrant、Elasticsearch、Embedding、OpenRouter、NVIDIA 或 Ollama
-- `/api/query` 直接返回模拟结果
-- 前端可以正常展示进度和结果
-
-## 2.3 当前实现状态
-
-### 已完成并可用
-
-- 后端 FastAPI 服务可以启动，并按 `MOCK_MODE` 在 mock / 真实模式之间切换
-- 后端已经提供 `POST /api/query` SSE 接口
-- Mock 模式可直接返回完整的模拟进度流和示例结果
-- 真实模式已经接好 LangGraph 主链路：
-  `抽取关键词 -> 三路召回 -> 合并召回 -> 过滤表/指标 -> 补充上下文 -> 生成 SQL -> 校验 SQL -> 校正 SQL -> 执行 SQL`
-- 真实模式已经接好依赖装配：
-  Meta MySQL、DW MySQL、Qdrant、Elasticsearch、Embedding、LLM
-- LLM 已支持回退顺序：
-  `OpenRouter -> NVIDIA -> 本地 Ollama qwen2.5-coder:1.5b`
-- 元数据知识库构建脚本已经可用：
-  `python3 -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml`
-- 前端页面已经可用，支持：
-  输入问题、点击样例问题、展示 SSE 进度、展示结构化结果表、复制结果、停止当前请求、清空当前会话
-
-### 当前不能用或暂未实现
-
-- 当前后端只有一个业务接口：
-  `POST /api/query`
-  没有健康检查、历史记录、会话管理、用户管理、配置管理等额外 API
-- 前端没有多轮上下文能力：
-  每次提问都会单独发起一次新查询，历史消息只保存在当前页面内存里
-- 前端没有会话持久化：
-  刷新页面后历史消息会丢失
-- 前端没有结果导出能力：
-  目前只能复制结果文本，没有导出 CSV / Excel / JSON 文件的入口
-- 前端没有单独的 SQL 展示面板：
-  Mock 结果里会带示例 SQL，但真实模式当前只返回查询结果行，不会额外返回 SQL 文本
-- 当前没有数据写回类能力：
-  不支持新增、修改、删除业务数据，也没有审批流
-- 当前没有独立的知识库管理页面：
-  元数据构建只能通过脚本触发，不是页面化操作
-- 当前不是通用数据库 Agent：
-  代码和配置是围绕当前电商教学数仓、MySQL、Qdrant、Elasticsearch 这套组合写的
-- 当前没有鉴权和权限隔离：
-  这是本地开发 / 演示形态，不是可直接上线的多租户系统
-
-## 3. 先选模式
-
-### 推荐：真实链路，OpenRouter / NVIDIA / Ollama + NAS MySQL
+终端 1，后端：
 
 ```bash
 cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
-cp .env.nas.example .env
-bash scripts/up_local_stack.sh up
-python3 -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml
-python3 -m uvicorn main:app --host 127.0.0.1 --port 8000
+
+export MOCK_MODE=false
+export LLM_PROVIDER_ORDER=openrouter,nvidia,ollama
+export OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+export OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
+export OLLAMA_API_KEY=ollama
+
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8010
 ```
 
-另开一个终端启动前端：
+终端 2，前端：
 
 ```bash
 cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main/frontend
-pnpm install
-pnpm dev
+VITE_DEV_PROXY_TARGET=http://127.0.0.1:8010 npm run dev -- --host 127.0.0.1 --port 5188 --strictPort
 ```
 
-### 兜底：Mock 联调
+## 3. 启动后测试内容
 
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
-cp .env.mock.example .env
-MOCK_MODE=true python3 -m uvicorn main:app --host 127.0.0.1 --port 8000
-```
+启动后不要先盲等页面回答。按下面顺序测，每一步都写了输入和预想输出。
 
-另开一个终端启动前端：
-
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main/frontend
-pnpm install
-pnpm dev
-```
-
-## 4. 怎么验证是否启动成功
-
-### 4.1 配置是否能读
-
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
-python3 -m app.conf.app_config
-```
-
-预期：
-
-- 不报配置错误
-- 能输出配置内容
-
-### 4.2 Mock 接口是否通
-
-```bash
-curl -N -sS -X POST http://127.0.0.1:8000/api/query -H 'Content-Type: application/json' -d '{"query":"统计华北地区销售额"}'
-```
-
-预期：
-
-- 先看到多段 `progress`
-- 最后看到 `result`
-
-### 4.3 前端页面是否通
+### 测试 1：后端进程是否真的在线
 
 输入：
 
-```text
-统计华北地区销售额
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8010/docs
 ```
 
-预期：
+预想输出：
 
-- 页面显示问数过程
-- 页面显示结构化结果表
-- Mock 模式下结果对象里会带示例 SQL
-- 真实模式下当前主要展示查询结果，不单独展示 SQL
+```text
+200
+```
 
-### 4.4 真实模式基础服务是否通
+如果不是 `200`，说明后端没起来，先回到后端终端看 `uvicorn` 日志。
+
+### 测试 2：前端进程是否真的在线
+
+输入：
 
 ```bash
-curl -s http://127.0.0.1:6333
-curl -s http://127.0.0.1:9200
-curl -s http://127.0.0.1:8081
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5188
 ```
 
-预期：
+预想输出：
 
-- Qdrant 返回版本信息
-- Elasticsearch 返回节点信息
-- Embedding 返回响应
+```text
+200
+```
 
-### 4.5 NAS MySQL 是否通
+如果不是 `200`，说明前端没起来，先回到前端终端看 `npm run dev` 日志。
+
+### 测试 3：本地 Ollama 回退模型是否存在
+
+输入：
+
+```bash
+ollama list
+```
+
+预想输出里必须能看到：
+
+```text
+qwen2.5-coder:1.5b
+```
+
+如果看不到，先执行：
+
+```bash
+ollama pull qwen2.5-coder:1.5b
+```
+
+### 测试 4：真实链路基础服务是否在线
+
+输入：
+
+```bash
+curl -s --max-time 5 http://127.0.0.1:6333
+curl -s --max-time 5 http://127.0.0.1:9200
+curl -s --max-time 5 http://127.0.0.1:8081
+```
+
+预想输出：
+
+- `6333` 应该返回 Qdrant 的 JSON 信息
+- `9200` 应该返回 Elasticsearch 的 JSON 信息
+- `8081` 应该返回 Embedding 服务响应，至少不能连接失败
+
+当前机器如果输出类似下面内容，表示真实问数链路还不能完成：
+
+```text
+Failed to connect
+Connection refused
+Operation timed out
+```
+
+原因是当前机器没有 `docker`，所以不能通过 `bash scripts/up_local_stack.sh up` 拉起 `Qdrant + Elasticsearch + Embedding`。
+
+### 测试 5：NAS MySQL 是否能连通
+
+输入：
 
 ```bash
 mysql -h 192.168.10.2 -P 3306 -u root -p
 ```
 
-预期：
+预想输出：
 
-- 能登录
-- 能看到 `meta` 和 `dw`
+```text
+能进入 mysql> 命令行
+能看到 meta / dw 两个库
+```
 
-### 4.6 元数据知识库是否构建成功
+当前机器如果看到下面错误，表示真实问数链路还不能完成：
+
+```text
+Can't connect to MySQL server on '192.168.10.2' ([Errno 1] Operation not permitted)
+```
+
+这不是模型问题，是 NAS MySQL 网络访问没有打通。
+
+### 测试 6：真实问数接口测试
+
+只有测试 3、4、5 都通过后，再测 `/api/query`。不要在基础服务没通时一直等页面回答。
+
+这里先走前端代理地址 `5188/api/query`，因为这和浏览器页面的请求路径一致。
+
+输入：
+
+```bash
+curl -N --max-time 180 -sS \
+  -X POST http://127.0.0.1:5188/api/query \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: text/event-stream' \
+  -d '{"query":"统计华北地区销售额"}'
+```
+
+如果要绕过前端代理，直接测后端，把地址改成：
+
+```text
+http://127.0.0.1:8010/api/query
+```
+
+真实链路成功时，预想输出应该是 SSE 流，先出现多条 `progress`，最后出现 `result`：
+
+```text
+data: {"type":"progress","step":"抽取关键词","status":"running"}
+data: {"type":"progress","step":"抽取关键词","status":"success"}
+...
+data: {"type":"result","data":[...]}
+```
+
+如果输出类似下面内容，表示后端捕获到了真实链路错误：
+
+```text
+data: {"type":"error","message":"..."}
+```
+
+当前这台机器已验证的实际输出是：
+
+```text
+data: {"type": "progress", "step": "抽取关键词", "status": "running"}
+data: {"type": "progress", "step": "抽取关键词", "status": "success"}
+data: {"type": "progress", "step": "召回字段信息", "status": "running"}
+data: {"type": "progress", "step": "召回指标信息", "status": "running"}
+data: {"type": "progress", "step": "召回字段取值", "status": "running"}
+data: {"type": "progress", "step": "召回字段取值", "status": "error"}
+data: {"type": "error","message":"Cannot connect to host localhost:9200 ..."}
+```
+
+结论：前端代理和后端接口是通的；当前等不到真实答案，是因为 Elasticsearch `9200` 没启动。
+
+如果 180 秒内一直没有 `result`，通常卡在这些位置之一：
+
+- OpenRouter / NVIDIA 网络请求没有返回
+- 本地 Ollama 生成太慢或模型服务没有响应
+- Embedding 服务没有响应
+- Qdrant / Elasticsearch 没有响应
+- NAS MySQL 没有响应
+
+这时先看后端终端日志里最后一个 `step`：
+
+- 停在 `召回字段信息` / `召回指标信息`：优先查 Embedding 和 Qdrant
+- 停在 `召回字段取值`：优先查 Elasticsearch
+- 停在 `合并召回信息` / `添加额外上下文`：优先查 NAS MySQL
+- 停在 `生成SQL` / `校正SQL`：优先查 OpenRouter、NVIDIA、Ollama
+- 停在 `执行SQL`：优先查 NAS MySQL 的 `dw` 库
+
+### 测试 7：前端页面输入测试
+
+输入页面地址：
+
+```text
+http://127.0.0.1:5188
+```
+
+页面输入：
+
+```text
+统计华北地区销售额
+```
+
+真实链路成功时，预想输出：
+
+- 页面出现执行进度节点
+- 节点按顺序推进到 `执行SQL`
+- 最后出现结果表
+- 结果来自 NAS MySQL，不是 Mock
+
+如果页面一直转，没有回答：
+
+- 先不要切 Mock
+- 先执行“测试 6：真实问数接口测试”
+- 再根据后端日志最后一个 `step` 判断卡在哪个外部依赖
+
+如果页面显示：
+
+```text
+接口请求失败：HTTP xxx
+```
+
+这说明浏览器请求 `/api/query` 得到的是非 2xx HTTP 状态码，优先按下面顺序查：
+
+1. `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8010/docs`
+2. `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5188`
+3. `curl -N --max-time 25 -sS -X POST http://127.0.0.1:5188/api/query -H 'Content-Type: application/json' -H 'Accept: text/event-stream' -d '{"query":"统计华北地区销售额"}'`
+
+如果第 1 步不是 `200`，后端没起来。  
+如果第 2 步不是 `200`，前端没起来。  
+如果第 1、2 步都是 `200`，但第 3 步报 HTTP 错误，看 `/tmp/shopkeeper-frontend-5188.log` 里的 Vite proxy 错误。
+
+## 4. 模型优先顺序
+
+真实链路的模型优先顺序是：
+
+```text
+OpenRouter -> NVIDIA -> 本地 Ollama qwen2.5-coder:1.5b
+```
+
+对应环境变量：
+
+```bash
+LLM_PROVIDER_ORDER=openrouter,nvidia,ollama
+OPENROUTER_API_KEY=你的_openrouter_api_key
+NVIDIA_API_KEY=你的_nvidia_api_key
+OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+OLLAMA_MODEL_NAME=qwen2.5-coder:1.5b
+OLLAMA_API_KEY=ollama
+```
+
+如果 `OPENROUTER_API_KEY` 为空，代码会跳过 OpenRouter。  
+如果 `NVIDIA_API_KEY` 为空，代码会跳过 NVIDIA。  
+如果前两个都不可用，代码会回退到本地 Ollama。
+
+## 5. 当前已验证的命令状态
+
+后端依赖：
 
 ```bash
 cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
-python3 -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml
+.venv/bin/python -c "import uvicorn, fastapi; print('backend_venv_ok')"
 ```
 
-预期：
+已验证：可用。
 
-- 构建过程结束
-- `meta` 库里有表、字段、指标
-- Qdrant 里有字段和指标集合
-- Elasticsearch 里有字段值索引
+后端启动：
 
-## 5. 排错顺序
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8010
+```
 
-### 5.1 如果后端起不来
+已验证：后端进程可以启动。
 
-先看：
+前端启动命令：
 
-1. `.env` 有没有放到项目根目录
-2. `MOCK_MODE` 有没有写对
-3. 配置文件是否能读
-4. 当前 Python 环境是否缺包
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main/frontend
+VITE_DEV_PROXY_TARGET=http://127.0.0.1:8010 npm run dev -- --host 127.0.0.1 --port 5188 --strictPort
+```
 
-### 5.2 如果 mock 接口没有 SSE
+已验证：可启动，Vite 返回 `http://127.0.0.1:5188/`。
 
-先看：
+Ollama：
 
-1. `main.py` 是否真的挂了 `mock_query_router`
-2. `app/api/lifespan.py` 是否在 mock 模式下跳过了外部依赖
-3. 终端里有没有启动成功日志
+```bash
+ollama list
+```
 
-### 5.3 如果真实模式不通
+已验证：本机有 `qwen2.5-coder:1.5b`。
 
-先看：
+## 6. 当前不要用的错误命令
 
-1. NAS MySQL 是否连得上
-2. `meta` / `dw` 是否已创建并导入
-3. Qdrant / Elasticsearch / Embedding 是否已启动
-4. `build_meta_knowledge` 是否成功
-5. OpenRouter 或 NVIDIA Key 是否已设置
-6. `ollama list` 是否能看到 `qwen2.5-coder:1.5b`
+不要用：
 
-### 5.4 如果 Docker CLI 在 WSL 不可用
+```bash
+uv sync
+uv run fastapi dev main.py
+uv run python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
 
-先确认是否能走 NAS MySQL + 本地 Ollama；如果基础服务也不可用，再走 Mock 模式继续开发和联调。
+原因：
 
-这不是项目逻辑坏了，而是本机 Docker Desktop / WSL 互通链路的问题。
+```text
+uv: command not found
+```
 
-## 6. 最短判断法
+不要用：
 
-### Mock 成功
+```bash
+pnpm install
+pnpm dev
+```
 
-满足下面两条就算成功：
+原因：
 
-- 后端 `/api/query` 返回 SSE
-- 前端能看到进度和结果
+```text
+pnpm: command not found
+```
 
-### 真实成功
+不要把下面这段作为真实模式启动命令：
 
-满足下面这几条就算成功：
+```bash
+MOCK_MODE=true .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
 
-- NAS MySQL 可连通
-- `meta` / `dw` 已导入
-- Qdrant / Elasticsearch / Embedding 在线
-- `build_meta_knowledge` 跑完
-- 模型链路至少有 OpenRouter、NVIDIA 或本地 Ollama 一个可用
-- `/api/query` 返回真实结果
-- 前端页面显示真实问数链路
+原因：
 
-## 7. 当前最值得记住的边界
+```text
+这是 Mock 模式，不是真实链路。
+```
 
-- 这套代码已经能跑“单轮电商问数”主链路
-- 这套代码还不是“带后台、带权限、带历史会话”的完整产品
-- Mock 适合联调
-- 真实模式适合验证当前教学数仓上的问数闭环
+## 7. 真实链路还需要哪些外部服务
 
-## 8. 常用入口
+后端真实模式进程能启动，不等于完整问数链路已经成功。
 
-- [Mock 优先启动说明](mock-first-quickstart.md)
-- [Mock 启动命令块](mock-first-copy-paste.md)
-- [Mock 最短 5 行命令](mock-first-5lines.md)
-- [OpenRouter + NAS MySQL 说明](local-setup-openrouter-docker-mysql.md)
-- [LLM Provider 回退运行模式](llm-provider-fallback.md)
-- [功能一览与测试指南](feature-overview-and-test-guide.md)
-- [功能检查清单](feature-checklist.md)
+完整真实问数还需要：
+
+- `NAS MySQL`：`meta` / `dw`
+- `Qdrant`：字段和指标向量召回
+- `Elasticsearch`：字段取值检索
+- `Embedding(TEI)`：文本向量
+- `OpenRouter`、`NVIDIA` 或本地 `Ollama` 至少一个模型可用
+
+当前已知阻塞：
+
+```text
+docker: command not found
+```
+
+所以当前机器不能用 `bash scripts/up_local_stack.sh up` 拉起 `Qdrant + Elasticsearch + Embedding`。
+
+当前访问 NAS MySQL 的报错是：
+
+```text
+Can't connect to MySQL server on '192.168.10.2' ([Errno 1] Operation not permitted)
+```
+
+所以当前只能确认：
+
+- 后端真实模式进程可以启动
+- 前端启动命令是 `npm run dev`
+- 本地 Ollama 回退模型存在
+- 完整真实问数链路还没有打通
+
+## 8. 真实链路验证命令
+
+后端和前端启动后，先验证基础服务。
+
+Qdrant：
+
+```bash
+curl -s http://127.0.0.1:6333
+```
+
+Elasticsearch：
+
+```bash
+curl -s http://127.0.0.1:9200
+```
+
+Embedding：
+
+```bash
+curl -s http://127.0.0.1:8081
+```
+
+NAS MySQL：
+
+```bash
+mysql -h 192.168.10.2 -P 3306 -u root -p
+```
+
+Ollama：
+
+```bash
+ollama list
+```
+
+只有这些都通了，再构建元数据知识库：
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
+.venv/bin/python -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml
+```
+
+然后再通过页面发起真实问数。
+
+## 9. 最后兜底：Mock 模式
+
+只有在真实链路确认处理不了时，才用 Mock。
+
+Mock 后端命令：
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
+MOCK_MODE=true .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+Mock 前端命令：
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main/frontend
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+必须明确标记：
+
+- 这是 Mock 模式
+- `/api/query` 返回的是 Mock 数据
+- 页面上看到的进度、SQL、结果表都不是 NAS MySQL 的真实查询结果
+- 测试记录里不能把 Mock 写成真实链路成功
