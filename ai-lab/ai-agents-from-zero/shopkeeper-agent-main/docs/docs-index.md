@@ -7,6 +7,8 @@
 ```text
 想启动和排错
   -> 看 shopkeeper-agent-启动guide.md
+想按代码调用关系快速找文件
+  -> 看 shopkeeper-agent-目录结构调用流程图.md
 想先确认环境要准备什么
   -> 看 environment-checklist.md
 想快速知道功能有哪些、怎么测
@@ -29,6 +31,7 @@
 
 - 总入口：[`README.md`](../README.md)
 - 启动 / 验证 / 排错：[`当前工作区运行指南`](shopkeeper-agent-启动guide.md)
+- 代码找图：[`目录结构调用流程图`](shopkeeper-agent-目录结构调用流程图.md)
 - 环境清单：[`environment-checklist.md`](environment-checklist.md)
 - 功能快速一览：[`当前项目功能使用与测试最短版`](feature-usage-test-template.md)
 - 功能逐项验收：[`当前项目功能使用与测试完整版`](feature-usage-test-full.md)
@@ -40,6 +43,7 @@
 ## 2. 运行相关
 
 - [当前工作区运行指南](shopkeeper-agent-启动guide.md)
+- [目录结构调用流程图](shopkeeper-agent-目录结构调用流程图.md)
 - [环境清单](environment-checklist.md)
 - [OpenRouter + NAS MySQL 说明](local-setup-openrouter-docker-mysql.md)
 - [LLM Provider 回退运行模式](llm-provider-fallback.md)

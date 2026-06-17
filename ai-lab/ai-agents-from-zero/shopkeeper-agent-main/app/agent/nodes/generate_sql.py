@@ -13,6 +13,7 @@ from langgraph.runtime import Runtime
 from app.agent.context import DataAgentContext
 from app.agent.llm import llm
 from app.agent.state import DataAgentState
+from app.agent.sql_utils import normalize_sql
 from app.core.log import logger
 from app.prompt.prompt_loader import load_prompt
 
@@ -60,9 +61,10 @@ async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
                 "query": query,
             }
         )
-        logger.info(f"生成的SQL：{result}")
+        normalized_result = normalize_sql(result)
+        logger.info(f"生成的SQL：{normalized_result}")
         writer({"type": "progress", "step": step, "status": "success"})
-        return {"sql": result}
+        return {"sql": normalized_result}
 
     except Exception as e:
         logger.error(f"{step} failed: {e}")

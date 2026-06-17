@@ -312,53 +312,203 @@
 4. 然后看 `Hello-Agents`，进入智能体系统设计。
 5. 最后用 `ai-agents-from-zero` 做总复盘，补齐工程实战和路线图。
 
-## 5. Codex 必装十大 Skills 指南
+# AI Agent 学习路线（推荐顺序）
 
-这部分是给编码智能体补上工程能力、流程能力和上下文管理能力的，适合做成自己的“技能包清单”。
+## 一、什么是 AI Agent？
 
-1. **Superpowers**
-   - 类型：Skills Framework
-   - 一句话描述：强制 coding agent 走 TDD + 代码审查流程，避免偷懒。
-   - 直链：[features/superpowers](https://github.com/features/superpowers)
+AI Agent（智能代理）本质上是：
 
-2. **SuperClaude Framework**
-   - 类型：Skills 命令框架
-   - 一句话描述：提供 30 条斜杠命令，用于精准指挥 coding agent。
+```text
+LLM（大模型）
++
+工具调用（Tool Calling）
++
+记忆（Memory）
++
+工作流（Workflow）
++
+自动执行能力
+```
 
-3. **MiniMax Skills**
-   - 类型：Skills 集合包
-   - 一句话描述：提供 10 个工业级流程卡，覆盖前端全栈及移动端模版。
+Agent 不只是聊天机器人。
 
-4. **Anthropic Official Skills**
-   - 类型：官方 Skills
-   - 一句话描述：Anthropic 官方 skills 参考实现，`skill-creator` 开发者可重点看。
+真正强大的地方：
 
-5. **Vercel Agent Skills**
-   - 类型：Skills 集合包
-   - 一句话描述：Vercel 官方出品，针对 React/Web 架构设计，带有严格审查与性能规则。
+- 自动读取文件
+- 自动修改代码
+- 自动操作浏览器
+- 自动执行命令
+- 自动完成工作流
 
-6. **Planning with Files**
-   - 类型：专项 Skill
-   - 一句话描述：用 Markdown 文件给 coding agent 当长期记忆库和多步规划本。
+---
 
-7. **Context Engineering Skills**
-   - 类型：Skills 集合包
-   - 一句话描述：教 coding agent 智能管理上下文，避免 Token 溢出和长文本失忆。
+# 二、推荐学习顺序（非常重要）
 
-8. **Composio Skills**
-   - 类型：Skills + MCP 联动
-   - 一句话描述：让 coding agent 动态调用外部 SaaS 与本地服务。
-   - 直链：[ComposioHQ/composio](https://github.com/ComposioHQ/composio)
+正确路线：
 
-9. **Antfu Skills**
-   - 类型：个人最佳实践 Skills
-   - 一句话描述：Anthony Fu 的个人 Skill 配置，属于前端高手的规则样本。
-   - 直链：[antfu/dotfiles](https://github.com/antfu/dotfiles)
+```text
+单 Agent
+↓
+Tool Calling
+↓
+Workflow
+↓
+状态管理
+↓
+多 Agent
+↓
+长期记忆
+↓
+RAG
+↓
+生产部署
+```
 
-10. **Awesome Agent Skills**
-    - 类型：Skills 索引百科
-    - 一句话描述：收录 500+ 各大厂及开源社区优质 Skills 的超级索引目录。
-    - 直链：[awesome-agent-skills](https://github.com/indexing/awesome-agent-skills)
+---
+
+# 三、最推荐的 GitHub 学习项目
+
+## 1. ai-agents-from-zero（中文最佳）
+
+GitHub：
+https://github.com/didilili/ai-agents-from-zero
+
+特点：
+
+- 中文
+- 从零开始
+- 完整教程
+- 有代码
+- 有路线图
+
+---
+
+## 2. Microsoft AI Agents for Beginners
+
+GitHub：
+https://github.com/microsoft/ai-agents-for-beginners
+
+特点：
+
+- 微软官方
+- 适合初学者
+- 有图
+- 有练习
+
+---
+
+## 3. LangGraph（当前主流）
+
+GitHub：
+https://github.com/langchain-ai/langgraph
+
+中文文档：
+https://github.com/jurnea/LangGraph-Chinese
+
+特点：
+
+- 当前主流 Agent Workflow
+- 状态管理强
+- 企业级
+
+---
+
+## 4. CrewAI（最容易做 AI 团队）
+
+GitHub：
+https://github.com/crewAIInc/crewAI
+
+案例：
+https://github.com/crewAIInc/crewAI-examples
+
+特点：
+
+- 多 Agent
+- AI 团队协作
+
+---
+
+## 5. GenAI_Agents（案例库）
+
+GitHub：
+https://github.com/NirDiamant/GenAI_Agents
+
+特点：
+
+- 50+ Agent 案例
+- Notebook
+- Tool Calling
+
+---
+
+# 四、推荐学习技术栈
+
+| 技术 | 推荐度 |
+|---|---|
+| Python | ⭐⭐⭐⭐⭐ |
+| OpenAI API | ⭐⭐⭐⭐⭐ |
+| LangGraph | ⭐⭐⭐⭐⭐ |
+| Tool Calling | ⭐⭐⭐⭐⭐ |
+| FastAPI | ⭐⭐⭐⭐ |
+| MCP | ⭐⭐⭐⭐ |
+
+---
+
+# 五、推荐开发环境
+
+```text
+Windows
+↓
+WSL2 Ubuntu
+↓
+VSCode Remote WSL
+↓
+Python venv
+↓
+Codex CLI
+```
+
+---
+
+# 六、最适合练习的 Agent 项目
+
+## 1. 文件总结 Agent
+
+学习：
+
+- 文件读取
+- Tool Calling
+
+---
+
+## 2. Coding Agent
+
+学习：
+
+- 自动修复代码
+- Workflow
+
+---
+
+## 3. Browser Agent
+
+学习：
+
+- Playwright
+- MCP
+
+---
+
+## 4. Multi-Agent 系统
+
+学习：
+
+- CrewAI
+- 多 Agent 协作
+
+---
+
+
 
 ## 6. 推荐学习节奏
 

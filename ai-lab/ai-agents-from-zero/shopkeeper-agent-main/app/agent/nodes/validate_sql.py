@@ -9,6 +9,11 @@ from langgraph.runtime import Runtime
 
 from app.agent.context import DataAgentContext
 from app.agent.state import DataAgentState
+from app.agent.sql_utils import (
+    enrich_sql_with_missing_joins,
+    normalize_sql,
+    repair_sql_with_schema,
+)
 from app.core.log import logger
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 
@@ -22,7 +27,10 @@ async def validate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
 
     try:
         # 读取 generate_sql 或 correct_sql 写入状态的候选 SQL
-        sql = state["sql"]
+        sql = enrich_sql_with_missing_joins(
+            normalize_sql(state["sql"]), state["table_infos"]
+        )
+        sql = repair_sql_with_schema(sql, state["table_infos"])
 
         # SQL 可用性必须交给真实数仓判断，这里从运行时上下文取 DW Repository
         dw_mysql_repository: DWMySQLRepository = runtime.context["dw_mysql_repository"]
@@ -32,12 +40,12 @@ async def validate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
             await dw_mysql_repository.validate(sql)
             writer({"type": "progress", "step": step, "status": "success"})
             logger.info("SQL语法正确")
-            return {"error": None}
+            return {"sql": sql, "error": None}
         except Exception as e:
             # 不抛出异常中断图执行，而是把错误写入状态，供条件分支进入 correct_sql
             logger.info(f"SQL语法错误：{str(e)}")
             writer({"type": "progress", "step": step, "status": "success"})
-            return {"error": str(e)}
+            return {"sql": sql, "error": str(e)}
 
     except Exception as e:
         logger.error(f"{step} failed: {e}")

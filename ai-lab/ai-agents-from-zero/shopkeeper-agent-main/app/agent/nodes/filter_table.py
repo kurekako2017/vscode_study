@@ -27,6 +27,7 @@ async def filter_table(state: DataAgentState, runtime: Runtime[DataAgentContext]
     try:
         query = state["query"]
         table_infos: list[TableInfoState] = state["table_infos"]
+        retrieved_value_infos = state["retrieved_value_infos"]
 
         # table_infos 是嵌套结构，转成 YAML 后更适合放进提示词，也保留中文字段说明
         prompt = PromptTemplate(
@@ -46,6 +47,14 @@ async def filter_table(state: DataAgentState, runtime: Runtime[DataAgentContext]
                 ),
             }
         )
+
+        # 值域召回已经证明某些表字段和问题直接相关，这类表不能再被模型误删。
+        for value_info in retrieved_value_infos:
+            table_name, column_name = value_info.column_id.split(".", 1)
+            result.setdefault(table_name, [])
+            if column_name not in result[table_name]:
+                result[table_name].append(column_name)
+
         # 模型只负责选择，程序根据选择结果从原始 TableInfoState 中裁剪，避免模型重写复杂结构出错
         filtered_table_infos: list[TableInfoState] = []
         for table_info in table_infos:

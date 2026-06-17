@@ -267,3 +267,51 @@
 - 第三阶段：Voice-Pro、AutoGPT、browser-use、Claude Code 文档，建立 AI 应用与 AI 编程协作的基本链路。
 - 第四阶段：GitHub Actions、Docker、DevOps 文档、Triton、NeMo、Riva，理解部署和工程化。
 - 第五阶段：金融量化、代码知识图谱、编译器和底层工具，按兴趣做专题深入。
+
+## 5. Codex 必装十大 Skills 指南
+
+这部分是给编码智能体补上工程能力、流程能力和上下文管理能力的，适合做成自己的“技能包清单”。
+
+1. **Superpowers**
+   - 类型：Skills Framework
+   - 一句话描述：强制 coding agent 走 TDD + 代码审查流程，避免偷懒。
+   - 直链：[features/superpowers](https://github.com/features/superpowers)
+
+2. **SuperClaude Framework**
+   - 类型：Skills 命令框架
+   - 一句话描述：提供 30 条斜杠命令，用于精准指挥 coding agent。
+
+3. **MiniMax Skills**
+   - 类型：Skills 集合包
+   - 一句话描述：提供 10 个工业级流程卡，覆盖前端全栈及移动端模版。
+
+4. **Anthropic Official Skills**
+   - 类型：官方 Skills
+   - 一句话描述：Anthropic 官方 skills 参考实现，`skill-creator` 开发者可重点看。
+
+5. **Vercel Agent Skills**
+   - 类型：Skills 集合包
+   - 一句话描述：Vercel 官方出品，针对 React/Web 架构设计，带有严格审查与性能规则。
+
+6. **Planning with Files**
+   - 类型：专项 Skill
+   - 一句话描述：用 Markdown 文件给 coding agent 当长期记忆库和多步规划本。
+
+7. **Context Engineering Skills**
+   - 类型：Skills 集合包
+   - 一句话描述：教 coding agent 智能管理上下文，避免 Token 溢出和长文本失忆。
+
+8. **Composio Skills**
+   - 类型：Skills + MCP 联动
+   - 一句话描述：让 coding agent 动态调用外部 SaaS 与本地服务。
+   - 直链：[ComposioHQ/composio](https://github.com/ComposioHQ/composio)
+
+9. **Antfu Skills**
+   - 类型：个人最佳实践 Skills
+   - 一句话描述：Anthony Fu 的个人 Skill 配置，属于前端高手的规则样本。
+   - 直链：[antfu/dotfiles](https://github.com/antfu/dotfiles)
+
+10. **Awesome Agent Skills**
+    - 类型：Skills 索引百科
+    - 一句话描述：收录 500+ 各大厂及开源社区优质 Skills 的超级索引目录。
+    - 直链：[awesome-agent-skills](https://github.com/indexing/awesome-agent-skills)

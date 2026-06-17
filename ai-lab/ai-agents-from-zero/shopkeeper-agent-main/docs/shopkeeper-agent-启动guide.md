@@ -13,8 +13,10 @@
 - 后端可以直接复用仓库里的 `.venv`
 - 前端可以直接用 `npm`
 - 本机 `ollama` 已经有 `qwen2.5-coder:1.5b`
-- 后端真实模式进程可以启动
-- 完整真实问数链路还依赖 `NAS MySQL + Qdrant + Elasticsearch + Embedding`
+- Docker Desktop 已打开 WSL Integration，当前 WSL 里可以访问 Docker 容器服务
+- 后端真实模式进程可以启动，并已验证能连接 `NAS MySQL + Qdrant + Elasticsearch + Embedding`
+- 当前真实链路默认走 `.env`：`NAS MySQL 192.168.10.2 + 本机 Docker Qdrant/ES/Embedding + 本地 Ollama`
+- 已验证真实查询 `统计华北地区销售额` 能返回 `销售额 = 41099.5`
 
 ## 2. 一条整体启动命令
 
@@ -25,7 +27,7 @@
 - 后端返回 `backend_http=200`
 - 前端返回 `frontend_http=200`
 - 前端 `/api/query` 能通过 Vite 代理打到后端
-- 当前真实查询返回的错误是 Elasticsearch `localhost:9200` 没启动，不是前后端没连上
+- 当前真实查询 `统计华北地区销售额` 可以跑到 `执行SQL success` 并返回结果
 
 这里故意使用 `8010` 和 `5188`，避免你机器上已有的 `8000` / `5173` 残留进程干扰验证。
 
@@ -86,7 +88,7 @@ http://127.0.0.1:5188
 - 这条命令没有设置 `MOCK_MODE=true`
 - 如果 `frontend_http` 不是 `200`，看 `/tmp/shopkeeper-frontend-5188.log`
 - 如果 `backend_http` 不是 `200`，看 `/tmp/shopkeeper-backend-8010.log`
-- 如果看到 `Cannot connect to host localhost:9200`，说明 Elasticsearch 没启动
+- 如果看到 `Cannot connect to host localhost:9200`，说明当前后端还没有连上 Elasticsearch，先检查 Docker 容器
 
 如果你希望后端日志和前端日志分开看，用两个终端启动。
 
@@ -183,7 +185,7 @@ curl -s --max-time 5 http://127.0.0.1:8081
 - `9200` 应该返回 Elasticsearch 的 JSON 信息
 - `8081` 应该返回 Embedding 服务响应，至少不能连接失败
 
-当前机器如果输出类似下面内容，表示真实问数链路还不能完成：
+如果输出类似下面内容，表示真实问数链路还不能完成：
 
 ```text
 Failed to connect
@@ -191,7 +193,7 @@ Connection refused
 Operation timed out
 ```
 
-原因是当前机器没有 `docker`，所以不能通过 `bash scripts/up_local_stack.sh up` 拉起 `Qdrant + Elasticsearch + Embedding`。
+当前机器 Docker 已经可用；如果这里仍然连接失败，优先检查 Docker Desktop 是否正在运行，以及 `docker ps` 里是否有 `qdrant`、`elasticsearch`、`embedding`。
 
 ### 测试 5：NAS MySQL 是否能连通
 
@@ -208,13 +210,13 @@ mysql -h 192.168.10.2 -P 3306 -u root -p
 能看到 meta / dw 两个库
 ```
 
-当前机器如果看到下面错误，表示真实问数链路还不能完成：
+如果看到下面错误，表示真实问数链路还不能完成：
 
 ```text
 Can't connect to MySQL server on '192.168.10.2' ([Errno 1] Operation not permitted)
 ```
 
-这不是模型问题，是 NAS MySQL 网络访问没有打通。
+这不是模型问题，是 NAS MySQL 网络访问没有打通，或后端仍在读取旧配置。
 
 ### 测试 6：真实问数接口测试
 
@@ -261,11 +263,16 @@ data: {"type": "progress", "step": "抽取关键词", "status": "success"}
 data: {"type": "progress", "step": "召回字段信息", "status": "running"}
 data: {"type": "progress", "step": "召回指标信息", "status": "running"}
 data: {"type": "progress", "step": "召回字段取值", "status": "running"}
-data: {"type": "progress", "step": "召回字段取值", "status": "error"}
-data: {"type": "error","message":"Cannot connect to host localhost:9200 ..."}
+data: {"type": "progress", "step": "召回字段取值", "status": "success"}
+data: {"type": "progress", "step": "召回字段信息", "status": "success"}
+data: {"type": "progress", "step": "召回指标信息", "status": "success"}
+data: {"type": "progress", "step": "合并召回信息", "status": "success"}
+...
+data: {"type": "progress", "step": "执行SQL", "status": "success"}
+data: {"type": "result", "data": [{"销售额": 41099.5}]}
 ```
 
-结论：前端代理和后端接口是通的；当前等不到真实答案，是因为 Elasticsearch `9200` 没启动。
+结论：前端代理、后端接口、三路召回、合并召回、SQL 生成和真实查询都已打通。
 
 如果 180 秒内一直没有 `result`，通常卡在这些位置之一：
 
@@ -326,7 +333,224 @@ http://127.0.0.1:5188
 如果第 2 步不是 `200`，前端没起来。  
 如果第 1、2 步都是 `200`，但第 3 步报 HTTP 错误，看 `/tmp/shopkeeper-frontend-5188.log` 里的 Vite proxy 错误。
 
-## 4. 模型优先顺序
+## 4. 业务逻辑测试点
+
+这一节用于验证“真实业务链路是否正确”，不是只看服务有没有启动。每个用例都建议同时观察前端节点、后端日志和最终结果。
+
+通用成功路径应该依次出现这些节点：
+
+```text
+抽取关键词 -> 召回字段信息 / 召回指标信息 / 召回字段取值 -> 合并召回信息 -> 过滤指标信息 / 过滤表信息 -> 添加额外上下文 -> 生成SQL -> 校验SQL -> 执行SQL -> result
+```
+
+如果某一步变红，先按节点定位：
+
+- `召回字段信息` / `召回指标信息`：查 `Embedding 8081` 和 `Qdrant 6333`
+- `召回字段取值`：查 `Elasticsearch 9200`
+- `合并召回信息`：查 `NAS MySQL meta`，尤其是 `DB_META_HOST` 是否仍误指向 `localhost`
+- `添加额外上下文` / `执行SQL`：查 `NAS MySQL dw`
+- `生成SQL` / `校正SQL`：查模型，当前本机默认是 `qwen2.5-coder:1.5b`
+
+### 用例 1：华北地区销售额
+
+输入：
+
+```text
+统计华北地区销售额
+```
+
+测试目的：
+
+- 验证字段取值召回能命中 `dim_region.region_name = 华北`
+- 验证指标召回能命中 `GMV` 或销售额相关指标
+- 验证合并节点能补齐 `fact_order.region_id` 与 `dim_region.region_id`
+- 验证 SQL 生成能正确 JOIN 地区维表
+
+预想中间结果：
+
+```text
+抽取关键词：包含 华北地区 / 销售额
+召回字段取值：dim_region.region_name.华北
+召回指标信息：GMV
+合并召回信息：包含 fact_order、dim_region
+过滤表信息：保留 fact_order、dim_region
+```
+
+预想 SQL 形态：
+
+```sql
+SELECT SUM(fact_order.order_amount) AS 销售额
+FROM fact_order
+JOIN dim_region ON fact_order.region_id = dim_region.region_id
+WHERE dim_region.region_name = '华北'
+```
+
+预想出力：
+
+```text
+销售额 = 41099.5
+```
+
+### 用例 2：各大区 GMV 排序
+
+输入：
+
+```text
+统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序
+```
+
+测试目的：
+
+- 验证时间语义能使用 `dim_date.year = 2025` 和 `dim_date.quarter = Q1`
+- 验证大区维度能使用 `dim_region.region_name`
+- 验证 GMV 指标能聚合 `fact_order.order_amount`
+- 验证排序逻辑 `ORDER BY GMV DESC`
+
+预想 SQL 形态：
+
+```sql
+SELECT dim_region.region_name, SUM(fact_order.order_amount) AS GMV
+FROM fact_order
+JOIN dim_region ON fact_order.region_id = dim_region.region_id
+JOIN dim_date ON fact_order.date_id = dim_date.date_id
+WHERE dim_date.year = 2025 AND dim_date.quarter = 'Q1'
+GROUP BY dim_region.region_name
+ORDER BY GMV DESC
+```
+
+预想出力：
+
+```text
+华东 107373.0
+华南 70202.0
+华北 41099.5
+西南 31528.0
+华中 28957.0
+```
+
+### 用例 3：2025 年 3 月各商品品类销量和销售额
+
+输入：
+
+```text
+统计 2025 年 3 月各商品品类的销量和销售额
+```
+
+测试目的：
+
+- 验证商品品类召回与 `dim_product.category`
+- 验证销量使用 `SUM(fact_order.order_quantity)`
+- 验证销售额使用 `SUM(fact_order.order_amount)`
+- 验证月份过滤使用 `dim_date.year = 2025` 和 `dim_date.month = 3`
+
+预想出力：
+
+```text
+手机数码 销量 10 销售额 62190.0
+家用电器 销量 6 销售额 19196.0
+鞋靴 销量 4 销售额 4396.0
+服饰 销量 7 销售额 2593.0
+食品饮料 销量 139 销售额 1115.0
+休闲零食 销量 156 销售额 630.0
+```
+
+说明：
+
+如果排序字段没有在问题中明确指定，返回顺序可以不同；重点看每个品类的数值是否一致。
+
+### 用例 4：会员等级订单数和销售额
+
+输入：
+
+```text
+按会员等级统计 2025 年第一季度的订单数和销售额
+```
+
+测试目的：
+
+- 验证客户维表 `dim_customer.member_level`
+- 验证订单数使用 `COUNT(fact_order.order_id)`
+- 验证销售额使用 `SUM(fact_order.order_amount)`
+- 验证 `fact_order.customer_id = dim_customer.customer_id`
+
+预想出力：
+
+```text
+黄金 订单数 34 销售额 100178.5
+白银 订单数 30 销售额 71094.0
+铂金 订单数 25 销售额 57679.0
+青铜 订单数 26 销售额 50208.0
+```
+
+### 用例 5：华东地区销售额最高的前 5 个商品
+
+输入：
+
+```text
+查询华东地区 2025 年第一季度销售额最高的前 5 个商品
+```
+
+测试目的：
+
+- 验证地区取值召回 `dim_region.region_name = 华东`
+- 验证商品名称维度 `dim_product.product_name`
+- 验证多表 JOIN：`fact_order + dim_region + dim_product + dim_date`
+- 验证 Top N 排序和 `LIMIT 5`
+
+预想出力：
+
+```text
+Galaxy S24 Ultra 28497.0
+Mate 60 Pro 27996.0
+iPhone 15 Pro 17998.0
+戴森 V15 吸尘器 10998.0
+美的空调 KFR-35GW 6400.0
+```
+
+### 用例 6：合并召回信息专项检查
+
+输入：
+
+```text
+统计华北地区销售额
+```
+
+如果页面红在：
+
+```text
+合并召回信息
+```
+
+先看后端日志，常见错误和含义如下：
+
+```text
+Can't connect to MySQL server on 'localhost'
+```
+
+含义：
+
+```text
+后端仍在连接本机 MySQL，不是在连接 NAS MySQL。
+通常是旧后端进程没停，或 .env 没被当前进程读取。
+```
+
+处理：
+
+```bash
+ps -ef | grep 'uvicorn main:app'
+kill 旧后端PID
+cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper-agent-main
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+预想修复后：
+
+```text
+合并召回信息 success
+后续进入 过滤指标信息 / 过滤表信息
+```
+
+## 5. 模型优先顺序
 
 真实链路的模型优先顺序是：
 
@@ -349,7 +573,7 @@ OLLAMA_API_KEY=ollama
 如果 `NVIDIA_API_KEY` 为空，代码会跳过 NVIDIA。  
 如果前两个都不可用，代码会回退到本地 Ollama。
 
-## 5. 当前已验证的命令状态
+## 6. 当前已验证的命令状态
 
 后端依赖：
 
@@ -386,7 +610,7 @@ ollama list
 
 已验证：本机有 `qwen2.5-coder:1.5b`。
 
-## 6. 当前不要用的错误命令
+## 7. 当前不要用的错误命令
 
 不要用：
 
@@ -427,7 +651,7 @@ MOCK_MODE=true .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
 这是 Mock 模式，不是真实链路。
 ```
 
-## 7. 真实链路还需要哪些外部服务
+## 8. 真实链路还需要哪些外部服务
 
 后端真实模式进程能启动，不等于完整问数链路已经成功。
 
@@ -439,28 +663,16 @@ MOCK_MODE=true .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
 - `Embedding(TEI)`：文本向量
 - `OpenRouter`、`NVIDIA` 或本地 `Ollama` 至少一个模型可用
 
-当前已知阻塞：
+当前已验证：
 
-```text
-docker: command not found
-```
+- Docker Desktop WSL Integration 已可用
+- `Qdrant 6333` 可访问
+- `Elasticsearch 9200` 可访问
+- `Embedding 8081` 容器已启动
+- `NAS MySQL 192.168.10.2:3306` 可访问
+- 真实链路已跑通 `统计华北地区销售额`
 
-所以当前机器不能用 `bash scripts/up_local_stack.sh up` 拉起 `Qdrant + Elasticsearch + Embedding`。
-
-当前访问 NAS MySQL 的报错是：
-
-```text
-Can't connect to MySQL server on '192.168.10.2' ([Errno 1] Operation not permitted)
-```
-
-所以当前只能确认：
-
-- 后端真实模式进程可以启动
-- 前端启动命令是 `npm run dev`
-- 本地 Ollama 回退模型存在
-- 完整真实问数链路还没有打通
-
-## 8. 真实链路验证命令
+## 9. 真实链路验证命令
 
 后端和前端启动后，先验证基础服务。
 
@@ -503,7 +715,7 @@ cd /home/victorkure/workspace/vscode_study/ai-lab/ai-agents-from-zero/shopkeeper
 
 然后再通过页面发起真实问数。
 
-## 9. 最后兜底：Mock 模式
+## 10. 最后兜底：Mock 模式
 
 只有在真实链路确认处理不了时，才用 Mock。
 

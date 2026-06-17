@@ -9,6 +9,11 @@ from langgraph.runtime import Runtime
 
 from app.agent.context import DataAgentContext
 from app.agent.state import DataAgentState
+from app.agent.sql_utils import (
+    enrich_sql_with_missing_joins,
+    normalize_sql,
+    repair_sql_with_schema,
+)
 from app.core.log import logger
 
 
@@ -21,7 +26,10 @@ async def run_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]):
 
     try:
         # 这里拿到的可能是 generate_sql 直接通过校验的 SQL，也可能是 correct_sql 覆盖后的 SQL
-        sql = state["sql"]
+        sql = enrich_sql_with_missing_joins(
+            normalize_sql(state["sql"]), state["table_infos"]
+        )
+        sql = repair_sql_with_schema(sql, state["table_infos"])
         dw_mysql_repository = runtime.context["dw_mysql_repository"]
 
         # 真实数据库访问统一封装在仓储层，节点只负责从状态取 SQL 并触发执行
