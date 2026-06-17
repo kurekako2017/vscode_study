@@ -4,22 +4,24 @@
 >
 > 使用建议：
 > - 先看“快速选型表”，按目标找工具。
-> - 再看对应分类，了解它解决什么问题。
-> - 最后结合项目 README、目录结构和启动方式做二次筛选。
+> - 再看对应分类，确认它解决什么问题、适合学哪一层。
+> - 最后结合 README、目录结构和启动方式做二次筛选。
+
+章节跳转：[第 17.1 节：AI 智能体与本地桌面工作区](#171-ai-智能体与本地桌面工作区)
 
 ## 1. 快速选型表
 
 | 学习目标 | 优先查看 | 重点理解 |
 | --- | --- | --- |
 | AI Agent 入门 | AutoGPT、browser-use、UI-TARS、Hermes Agent、DeerFlow 2.0 | 任务规划、工具调用、浏览器控制、多智能体协作 |
-| AI 编程助手 | Claude Code 文档、AI-Coding-Guide-Zh、gpt-codex、OpenCode、Cursor | Prompt、上下文管理、代码修改流程、验证流程 |
+| AI 编程助手 | Claude Code 官方文档、AI-Coding-Guide-Zh、gpt-codex、OpenCode、Cursor | Prompt、上下文管理、代码修改流程、验证流程 |
 | 语音/视频/字幕处理 | Voice-Pro、Clypra、Toonflow、AI Video Translator、NeMo、Riva | ASR、翻译、TTS、字幕生成、模型推理 |
 | 网页抓取与自动化 | Scrapling、browser-use、Public APIs | 爬虫、浏览器自动化、数据源整理 |
 | 开源 UI 组件与界面灵感 | Galaxy、Figma、GitHub Pages、Vercel、Netlify | 组件复用、页面布局、设计系统、作品集展示 |
 | 模型部署 | Triton Inference Server、NGC、NeMo | 模型服务、GPU 推理、容器化部署 |
 | 前端和作品集 | GitHub Pages、Vercel、Netlify、Figma | 静态站点、Next.js 部署、UI 原型 |
 | DevOps | GitHub Actions、Docker、Kubernetes 示例项目 | CI/CD、镜像构建、部署、日志监控 |
-| 资源检索 | awesome、Awesome-AI、awesome-chinese-ai-agents | 用索引型仓库找到更多项目 |
+| 资源检索 | awesome、Awesome-AI、awesome-chinese-ai-agents | 用索引型仓库快速找到更多项目 |
 
 ## 2. AI 编程助手与智能体开发框架
 
@@ -230,45 +232,7 @@
 | MAIC Chat | https://open.maic.chat/ | AI 学习和大纲生成工具，可辅助整理学习路线 |
 | OpenRelay | 待确认 | 目前可能对应多个不同项目或服务，不建议在工具目录中写死，确认仓库后再补充 |
 
-## 13. 判断一个 GitHub 工具值不值得学
-
-| 判断点 | 怎么看 |
-| --- | --- |
-| README | 是否说清楚“是什么、怎么安装、怎么运行、有什么示例” |
-| 项目结构 | 是否能看出前端、后端、模型、配置、测试、部署目录 |
-| 最近维护 | 是否仍有 commit、release、issue 回复 |
-| License | 是否允许学习、修改、商用 |
-| 最小运行成本 | 是否能在本机、WSL、Docker 或 Codespaces 中跑起来 |
-| 学习价值 | 是否能帮助你理解某个框架、系统流程或真实项目结构 |
-
-不要只按 star 数收藏项目。star 多只能说明关注度高，不代表适合当前学习阶段；对你来说，能跑起来、能读懂、能迁移到自己的项目里更重要。
-
-## 14. 工具记录模板
-
-以后追加新工具时，建议统一使用下面格式：
-
-```md
-### 工具名
-
-- 链接：
-- 是什么：
-- 核心作用：
-- 适合学习：
-- 适合直接使用：
-- 技术关键词：
-- 项目入口文件或核心目录：
-- 注意事项：
-```
-
-## 15. 一个实用的学习顺序
-
-- 第一阶段：Git、GitHub、Markdown、README、Issue、PR。
-- 第二阶段：React / Vue / Next.js + TypeScript，再结合 Scrapling、browser-use 学网页数据获取与自动化。
-- 第三阶段：Voice-Pro、AutoGPT、browser-use、Claude Code 文档，建立 AI 应用与 AI 编程协作的基本链路。
-- 第四阶段：GitHub Actions、Docker、DevOps 文档、Triton、NeMo、Riva，理解部署和工程化。
-- 第五阶段：金融量化、代码知识图谱、编译器和底层工具，按兴趣做专题深入。
-
-## 5. Codex 必装十大 Skills 指南
+## 13. Codex 必装十大 Skills 指南
 
 这部分是给编码智能体补上工程能力、流程能力和上下文管理能力的，适合做成自己的“技能包清单”。
 
@@ -283,7 +247,7 @@
 
 3. **MiniMax Skills**
    - 类型：Skills 集合包
-   - 一句话描述：提供 10 个工业级流程卡，覆盖前端全栈及移动端模版。
+   - 一句话描述：提供 10 个工业级流程卡，覆盖前端全栈及移动端模板。
 
 4. **Anthropic Official Skills**
    - 类型：官方 Skills
@@ -315,3 +279,247 @@
     - 类型：Skills 索引百科
     - 一句话描述：收录 500+ 各大厂及开源社区优质 Skills 的超级索引目录。
     - 直链：[awesome-agent-skills](https://github.com/indexing/awesome-agent-skills)
+
+## 14. 判断一个 GitHub 工具值不值得学
+
+| 判断点 | 怎么看 |
+| --- | --- |
+| README | 是否说清楚“是什么、怎么安装、怎么运行、有什么示例” |
+| 项目结构 | 是否能看出前端、后端、模型、配置、测试、部署目录 |
+| 最近维护 | 是否仍有 commit、release、issue 回复 |
+| License | 是否允许学习、修改、商用 |
+| 最小运行成本 | 是否能在本机、WSL、Docker 或 Codespaces 中跑起来 |
+| 学习价值 | 是否能帮助你理解某个框架、系统流程或真实项目结构 |
+
+不要只按 star 数收藏项目。star 多只能说明关注度高，不代表适合当前学习阶段；对你来说，能跑起来、能读懂、能迁移到自己的项目里更重要。
+
+## 15. 工具记录模板
+
+以后追加新工具时，建议统一使用下面格式：
+
+```md
+### 工具名
+
+- 链接：
+- 是什么：
+- 核心作用：
+- 适合学习：
+- 适合直接使用：
+- 技术关键词：
+- 项目入口文件或核心目录：
+- 注意事项：
+```
+
+## 16. 一个实用的学习顺序
+
+- 第一阶段：Git、GitHub、Markdown、README、Issue、PR。
+- 第二阶段：React / Vue / Next.js + TypeScript，再结合 Scrapling、browser-use 学网页数据获取与自动化。
+- 第三阶段：Voice-Pro、AutoGPT、browser-use、Claude Code 文档，建立 AI 应用与 AI 编程协作的基本链路。
+- 第四阶段：GitHub Actions、Docker、DevOps 文档、Triton、NeMo、Riva，理解部署和工程化。
+- 第五阶段：金融量化、代码知识图谱、编译器和底层工具，按兴趣做专题深入。
+
+## 17. AI 与开源神器全景总结补充
+
+> 以下内容来自 `AI_Tools_Comprehensive_Summary.md`，作为对现有工具地图的补充整理。
+
+### 17.1 AI 智能体与本地桌面工作区
+
+1. **Odysseus**
+   - GitHub 地址：[https://github.com/pewdiepie-archdaemon/odysseus](https://github.com/pewdiepie-archdaemon/odysseus)
+   - 功能描述：
+     - 面向本地 / 私有化环境设计的自托管 AI 桌面工作区。
+     - 深度整合本地 LLM、AI Agent 流、MCP、模型上下文协议、多模态文件管理和长期记忆。
+     - 内置硬件自动扫描推荐机制，会根据 PC 配置自动匹配适合的开源大模型。
+
+2. **OpenHands（原 OpenDevin 演进）**
+   - GitHub 地址：[https://github.com/All-Hands-AI/OpenHands](https://github.com/All-Hands-AI/OpenHands)
+   - 功能描述：
+     - 行业领先的 AI 自动化软件开发平台。
+     - 提供软件智能体 SDK，可用 Python 编写自定义 Agent，并支持本地或云端扩展协同。
+     - 提供类似 Claude Code 的 CLI 控制台，以及类似 Devin 的网页 GUI。
+
+3. **Hermes Agent (Hermes Desktop)**
+   - GitHub 地址：[https://github.com/haseany/hermes-agent](https://github.com/haseany/hermes-agent)
+   - 功能描述：
+     - 跨平台交互式代码生成与任务调度智能体。
+     - 支持桌面 GUI、CLI、TUI 和 Web 仪表盘共享同一套核心能力。
+     - 支持项目看板拆解、历史会话复元、Skills 和记忆持久化。
+
+4. **OpenClaw（原名 Claudebot 演进）**
+   - GitHub 地址：[https://github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)
+   - 功能描述：
+     - 自托管、永久免费的 AI 智能体网关平台。
+     - 可部署在本地或私有服务器，通过 WhatsApp、Telegram、Slack、企业微信等工具远程操纵 GitHub、自动化本地文件和轻量级开发任务。
+
+5. **page-agent.js (Page Agent)**
+   - GitHub 地址：[https://github.com/alibaba/page-agent](https://github.com/alibaba/page-agent)
+   - 功能描述：
+     - 阿里巴巴开源的纯 JavaScript / TypeScript 浏览器 GUI 智能体。
+     - 无需复杂后端或浏览器扩展，直接通过网页控制和操纵 Web 应用。
+
+6. **superpowers**
+   - GitHub 地址：[https://github.com/obra/superpowers](https://github.com/obra/superpowers)
+   - 功能描述：
+     - 基于 Shell 语言开发的 AI 智能体技能开发底座框架。
+     - 提供标准技能扩充方法论和任务流组合机制。
+
+### 17.2 打破信息茧房：AI 爆款信息源与研究智能体
+
+1. **last30days (last30days-skill)**
+   - GitHub 地址：[https://github.com/mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill)
+   - 功能描述：
+     - 跨平台情报分析技能插件。
+     - 可检索并解析过去 30 天内 Reddit、X、YouTube、Hacker News、Polymarket 上的讨论，输出选题摘要和行业分析报告。
+
+2. **Agent-Reach（零 API 费全网搜索）**
+   - GitHub 地址：[https://github.com/Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach)
+   - 功能描述：
+     - 解决 AI 大模型的信息孤岛问题。
+     - 为 Agent 提供零 API 费用的全网实时数据检索与底层内容抓取能力。
+
+3. **AiHot（中文 AI 爆款雷达）**
+   - GitHub 地址：[https://github.com/tangly1024/AiHot](https://github.com/tangly1024/AiHot)
+   - 功能描述：
+     - 面向中文互联网环境优化的实时热点与选题雷达。
+     - 可捕获国内主流社交平台的上升期爆款话题，作为知识库或自媒体选题弹药库。
+
+### 17.3 开源替代 SaaS：独立开发者“部署即变现”项目
+
+> 这类项目是成熟商业 SaaS 的高完成度开源替代品，适合私有化部署和垂直场景改造。
+
+```text
+[ 用户付费 / 订阅 ] -> [ 独立开发者自建平台 (基于开源 SaaS) ] -> [ 极低成本部署与高毛利变现 ]
+```
+
+1. **uptime-kuma**
+   - GitHub 地址：[https://github.com/louislam/uptime-kuma](https://github.com/louislam/uptime-kuma)
+   - 项目热度：86K ⭐
+   - 功能描述：
+     - 自托管网站与服务状态监控工具。
+     - 支持 HTTP(s)、Ping、TCP、DNS 监控和多种告警渠道。
+
+2. **gotenberg**
+   - GitHub 地址：[https://github.com/gotenberg/gotenberg](https://github.com/gotenberg/gotenberg)
+   - 项目热度：12K ⭐
+   - 功能描述：
+     - 基于 Docker 的无状态文档转 PDF 微服务 API。
+     - 可用于合同、电子发票、财务报表等输出链路。
+
+3. **OpenSign**
+   - GitHub 地址：[https://github.com/OpenSignLabs/OpenSign](https://github.com/OpenSignLabs/OpenSign)
+   - 项目热度：6.3K ⭐
+   - 功能描述：
+     - DocuSign 和 Adobe Sign 的开源替代品。
+     - 支持电子签名、数字认证、文档流转跟踪和合同生命周期管理。
+
+4. **vikunja**
+   - GitHub 地址：[https://github.com/go-vikunja/vikunja](https://github.com/go-vikunja/vikunja)
+   - 项目热度：4.2K ⭐
+   - 功能描述：
+     - 任务管理与团队协作平台。
+     - 提供看板、甘特图、列表、日历等视图。
+
+5. **ace-step-ui (Ace UI 系列)**
+   - GitHub 地址：[https://github.com/ace-element/ace-step-ui](https://github.com/ace-element/ace-step-ui)
+   - 项目热度：3.3K ⭐
+   - 功能描述：
+     - 高颜值的步骤条和业务流程控制组件库。
+     - 适合注册引导、多步付费配置和审批工作流。
+
+### 17.4 大模型基础设施优化与向量检索
+
+1. **headroom (Token 零损压缩)**
+   - GitHub 地址：[https://github.com/the-headroom/headroom](https://github.com/the-headroom/headroom)
+   - 功能描述：
+     - AI 输入 Token 压缩器。
+     - 通过算法将长文本输入压缩 60% 到 90%，并尽量保持输出质量。
+
+2. **TurboVec（基于谷歌 TurboQuant 技术）**
+   - GitHub 地址：[https://github.com/google/turboquant](https://github.com/google/turboquant)
+   - 功能描述：
+     - 谷歌开源的大模型向量量化与检索工具。
+     - 可大幅压缩向量数据体积，降低显存和内存占用。
+
+3. **FreeLLMAPI**
+   - GitHub 地址：[https://github.com/sunsky89757/freellmapi](https://github.com/sunsky89757/freellmapi)
+   - 功能描述：
+     - 免费大模型 API 网关聚合分发工具。
+     - 统一整合 Gemini、Groq、Cerebras、NVIDIA、Mistral、OpenRouter 免费档、GitHub Models、Cohere、Ollama 等渠道，并支持 Fallback 和 Token 预算管理。
+
+4. **G-RAG**
+   - GitHub 地址：[https://github.com/geekan/G-RAG](https://github.com/geekan/G-RAG)
+   - 功能描述：
+     - 结合图数据库的 Graph RAG 框架。
+     - 适合处理复杂企业知识、跨章节关联和长问题检索。
+
+### 17.5 AI 内容营销与特定用途自动化
+
+1. **Aitoearn (AIEarn)**
+   - GitHub 地址：[https://github.com/aitoearn/aitoearn](https://github.com/aitoearn/aitoearn)
+   - 功能描述：
+     - 面向 OPC 和跨境自媒体的全自动营销内容平台。
+     - 具备内容生成、自动分发、评论互动和变现转化闭环能力。
+
+2. **MoneyPrinterTurbo**
+   - GitHub 地址：[https://github.com/harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)
+   - 项目热度：85K+ ⭐
+   - 功能描述：
+     - AI 一键生成短视频系统。
+     - 可自动完成文案、配音、素材搜集、字幕和特效转场。
+
+3. **InfiniteTalk**
+   - GitHub 地址：[https://github.com/deepbeepmeep/InfiniteTalk](https://github.com/deepbeepmeep/InfiniteTalk)
+   - 功能描述：
+     - 无限时长 AI 视频对嘴型与面部克隆工具。
+     - 支持稀疏帧视频配音和身份保留。
+
+4. **ComfyUI-Video-Post-Processing**
+   - GitHub 地址：[https://github.com/ZHO-ZHO-ZHO/ComfyUI-Video-Post-Processing](https://github.com/ZHO-ZHO-ZHO/ComfyUI-Video-Post-Processing)
+   - 功能描述：
+     - ComfyUI 专属视频后处理增强插件。
+     - 提供色彩校正、超分、补帧和去噪点工作流。
+
+5. **awesome-cursor-rules**
+   - GitHub 地址：[https://github.com/get-cursor/awesome-cursor-rules](https://github.com/get-cursor/awesome-cursor-rules)
+   - 功能描述：
+     - Cursor 的 `.cursorrules` 指令模板合集。
+     - 汇聚各语言和框架下的 AI 提示词规范。
+
+6. **PaddleOCR**
+   - GitHub 地址：[https://github.com/PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+   - 功能描述：
+     - 百度开源的高性能 OCR 工具箱。
+     - 支持多语言文字检测、方向分类和高精度识别。
+
+7. **yt-dlp**
+   - GitHub 地址：[https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
+   - 功能描述：
+     - 开源命令行音视频下载器。
+     - 支持全球数千个流媒体网站的高画质抽取。
+
+### 17.6 四大 AI 编程/代码智能体核心特征矩阵
+
+| 评测维度 | Codex (OpenAI) | Claude Code (Anthropic) | OpenClaw (开源自托管) | Hermes Agent (全功能交互) |
+| :--- | :--- | :--- | :--- | :--- |
+| 核心开发定位 | 工业级代码生成、多语言深层 Debug 与大型重构 | 超长项目全局架构梳理、全库漏洞审计与代码结构精查 | 轻量级自动化脚本开发、前端单页面或组件构建 | 对话式快速原型开发，中文代码注释与原理解析能力强 |
+| 上下文窗口 | 中等窗口，巨量源码需切片或分块处理 | 超长窗口（100K+），可一次性处理复杂企业级项目库 | 极小窗口，适合简短代码片段或单个函数修复 | 中等窗口，支持多轮对话与上下文自适应 |
+| 技术文档理解 | 极强的 API 官方文档理解与代码映射能力 | 顶尖的 PDF、架构说明书与非结构化研报解析能力 | 仅支持基础纯文本解析，大型文档容易幻觉 | 对初学者友好，适合通俗资料解析 |
+| 多模态能力 | 仅限纯文本交互 | 支持截图、UI 设计图等多模态输入 | 无多模态能力 | 部分版本支持图像输入与前端 UI 还原设计 |
+| 部署与交付 | 闭源商业云端 API，不支持本地化部署 | 商业订阅 / 企业云端托管 | 完全开源，可本地或私有云部署 | 开源基础模型微调版 + 云端/桌面端混合交付 |
+| 费用成本 | 按 Token 计费，大型项目成本较高 | 订阅制 + Token 梯度计费 | 永久免费，硬件成本自理 | 基础功能免费，高阶插件或算力收费 |
+
+### 17.7 2026 年 AI 自动化浪潮的市场商业洞察
+
+1. **AI Integration 人才供不应求**
+   - “AI Integration（AI 系统集成）”的外包需求暴涨，说明会把开源 AI 工具、MCP、向量知识库编排进业务流的人正在变成稀缺能力。
+
+2. **中小企业自动化成为必然趋势**
+   - 小微企业接入 AI 智能体自动化会成为常态，且渗透率会持续提升。
+
+3. **独立开发者的变现黄金律**
+   - 基础通用自动化正在变红海。
+   - 更有机会的是“特定垂直产业 + 特定繁琐流程”的深度定制。
+   - 可以把开源替代 SaaS 改造成细分场景产品，卡位蓝海市场。
+
+#待整理
+RAG FLOW  ：RAG FLOW 是一个用于评估和优化 AI 模型的工具。它可以帮助用户快速识别和   优化模型的性能，并提供反馈和建议。RAG引擎平台

@@ -10,6 +10,7 @@ from typing import Iterable
 from app.agent.state import TableInfoState
 
 _CODE_BLOCK_PATTERN = re.compile(r"^```(?:sql)?\s*|\s*```$", re.IGNORECASE)
+# 这些正则分别用于识别 SQL 里出现的表名、JOIN 片段和字段引用。
 _REFERENCED_TABLE_PATTERN = re.compile(r"\b([A-Za-z_][\w]*)\.")
 _FROM_OR_JOIN_PATTERN = re.compile(r"\b(?:FROM|JOIN)\s+([A-Za-z_][\w]*)\b", re.IGNORECASE)
 _CLAUSE_PATTERN = re.compile(
@@ -31,6 +32,7 @@ _TIME_FUNCTION_REPLACEMENTS = {
 def normalize_sql(raw_sql: str) -> str:
     """移除模型常见的 Markdown 包装，返回可执行 SQL。"""
 
+    # 大模型很喜欢把 SQL 包进 ```sql ... ```，这里先把外层包装清掉。
     sql = raw_sql.strip()
     sql = _CODE_BLOCK_PATTERN.sub("", sql).strip()
     return sql.rstrip(";").strip()
@@ -39,6 +41,7 @@ def normalize_sql(raw_sql: str) -> str:
 def enrich_sql_with_missing_joins(sql: str, table_infos: Iterable[TableInfoState]) -> str:
     """当 SQL 引用了候选表字段但遗漏 JOIN 时，按主外键名称补齐最小 JOIN。"""
 
+    # 先找出 SQL 已经提到的表，再找出“引用了字段但没有真正 JOIN 进来”的表。
     referenced_tables = set(_REFERENCED_TABLE_PATTERN.findall(sql))
     present_tables = _FROM_OR_JOIN_PATTERN.findall(sql)
     if not referenced_tables or not present_tables:
@@ -53,6 +56,7 @@ def enrich_sql_with_missing_joins(sql: str, table_infos: Iterable[TableInfoState
     ]
 
     for missing_table in missing_tables:
+        # 选出能把缺失表接回来的最小 JOIN 条件。
         join_condition = _find_join_condition(
             missing_table=missing_table,
             present_tables=ordered_present_tables,

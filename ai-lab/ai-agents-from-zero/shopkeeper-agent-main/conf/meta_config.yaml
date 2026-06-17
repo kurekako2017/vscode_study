@@ -1,4 +1,5 @@
 tables:
+  # 维度表和事实表先以配置形式描述，后续构建脚本会把它们同步到元数据库和检索索引。
   - name: dim_region
     role: dim
     description: 地区维度表，用于描述订单发生的地理区域信息。
@@ -164,6 +165,7 @@ tables:
         sync: false
 
 metrics:
+  # 指标独立配置，便于后续单独入库和独立召回。
   - name: GMV
     description: 全称Gross Merchandise Value，表示所有订单的成交金额总和。
     relevant_columns:

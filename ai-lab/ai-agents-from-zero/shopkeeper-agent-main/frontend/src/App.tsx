@@ -26,13 +26,16 @@ const examples = [
   "按会员等级统计 2025 年第一季度的订单数和销售额",
 ];
 
+// 这里给一个兜底文案，方便在本地通过 Vite 代理或自定义 API 地址访问后端。
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "Vite /api proxy";
 
 function makeId() {
+  // 前端消息和后端事件都需要一个稳定的唯一 id，便于 React 列表渲染和状态更新。
   return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function upsertStep(steps: StepState[] = [], event: Extract<AgentEvent, { type: "progress" }>) {
+  // 同一个 step 可能多次上报状态，这里用 step 名称去重后再覆盖最新状态。
   const next = steps.filter((item) => item.step !== event.step);
   next.push({
     step: event.step,
@@ -43,12 +46,17 @@ function upsertStep(steps: StepState[] = [], event: Extract<AgentEvent, { type: 
 }
 
 export default function App() {
+  // messages 保存完整聊天记录，包括用户问题、助手流式状态和最终查询结果。
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // draft 是输入框当前内容，用户输入时先放在这里，点击发送后再清空。
   const [draft, setDraft] = useState("");
+  // activeController 用来取消当前正在进行的流式请求。
   const [activeController, setActiveController] = useState<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  // 只要当前存在 AbortController，就说明查询还在流式进行中。
   const isStreaming = Boolean(activeController);
+  // 输入框不能为空，而且流式请求进行中时不能重复提交。
   const canSubmit = draft.trim().length > 0 && !isStreaming;
 
   const completedCount = useMemo(
@@ -57,6 +65,7 @@ export default function App() {
   );
 
   useEffect(() => {
+    // 每次消息变化后，把滚动条自动滚到最底部，方便查看最新输出。
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth",
@@ -67,6 +76,7 @@ export default function App() {
     const query = rawQuery.trim();
     if (!query || isStreaming) return;
 
+    // 先把用户消息写入列表，再插入一条“正在连接”的助手消息。
     const userMessage: ChatMessage = {
       id: makeId(),
       role: "user",
@@ -90,6 +100,7 @@ export default function App() {
     setMessages((current) => [...current, userMessage, assistantMessage]);
 
     const onEvent = (event: AgentEvent) => {
+      // SSE 的每条消息都会回到这里，再根据事件类型更新同一条助手消息。
       setMessages((current) =>
         current.map((message) => {
           if (message.id !== assistantId) return message;
@@ -122,15 +133,17 @@ export default function App() {
     };
 
     try {
+      // streamQuery 会持续读取后端 SSE，并通过 onEvent 回调把进度事件送回来。
       await streamQuery(query, { signal: controller.signal, onEvent });
       setMessages((current) =>
         current.map((message) =>
           message.id === assistantId && message.status === "streaming"
             ? { ...message, status: "done", content: "流程已结束，后端未返回查询结果。" }
-            : message,
+              : message,
         ),
       );
     } catch (error) {
+      // AbortError 表示用户主动点击了停止，不算真正的系统错误。
       const isAbort = error instanceof DOMException && error.name === "AbortError";
       setMessages((current) =>
         current.map((message) =>
@@ -150,11 +163,13 @@ export default function App() {
   };
 
   const stopQuery = () => {
+    // 通过 AbortController 中断 fetch 请求和后续流读取。
     activeController?.abort();
   };
 
   const clearConversation = () => {
     if (isStreaming) return;
+    // 只有在没有查询进行时才允许清空，避免把正在展示的流式结果直接抹掉。
     setMessages([]);
     setDraft("");
   };
@@ -233,6 +248,7 @@ export default function App() {
         <main className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <header className="flex h-16 shrink-0 items-center justify-between border-b border-ink/10 bg-parchment/88 px-4 backdrop-blur lg:px-6">
             <div className="flex min-w-0 items-center gap-3">
+              {/* 小屏幕上显示一个简化 logo，避免侧边栏被隐藏后页面失去识别度。 */}
               <div className="grid h-9 w-9 shrink-0 place-items-center bg-moss text-white lg:hidden">
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />
               </div>
@@ -257,8 +273,10 @@ export default function App() {
 
           <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             {messages.length === 0 ? (
+              // 首次进入页面时展示引导区，帮助用户知道可以怎么提问。
               <EmptyState examples={examples} onUseExample={(example) => setDraft(example)} />
             ) : (
+              // 有聊天内容后，切换为消息列表视图。
               <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 lg:px-8">
                 {messages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
@@ -270,6 +288,7 @@ export default function App() {
           <div className="border-t border-ink/10 bg-[#efe6d8]/45 px-4 py-2 text-center text-xs text-ink/45">
             <span className="inline-flex items-center gap-2">
               <Leaf className="h-3.5 w-3.5 text-moss" aria-hidden="true" />
+              {/* 给用户一个简单的在线状态反馈。 */}
               {isStreaming ? "运行中" : "就绪"}
             </span>
           </div>

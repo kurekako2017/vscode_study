@@ -1,8 +1,8 @@
 # AI Agent & 大模型开源项目学习参考资料
 
-> 这是一份偏“学习路线 + 训练手册”的资料，适合和 [GitHub 网站工具与热门项目学习地图](github网站工具推荐.md) 配套使用。
+> 这是一份偏“学习路线 + 训练手册”的资料，适合和 [GitHub 网站工具与热门项目学习地图](../softbs/github/github网站工具推荐.md) 配套使用。
 >
-> 本资料基于多份前沿 AI Agent 学习路线图、GitHub 热门开源项目榜单以及 Codex 必装技能指南整理而成，目标是给后续的深入学习与项目实战提供一份更顺手的参考。
+> 目标很直接：先帮你建立学习顺序，再帮你筛出值得动手的项目，最后把 Codex / Skills / 工程化流程补齐。
 
 ## 章节连接
 
@@ -10,28 +10,59 @@
 - [2. AI Agent 系统化学习路线图](#2-ai-agent-系统化学习路线图)
 - [3. GitHub 核心热榜 - Skill 职业化与基建](#3-github-核心热榜---skill-职业化与基建)
 - [4. 6 大 Agent 开源项目合集推荐](#4-6-大-agent-开源项目合集推荐)
-- [5. Codex 必装十大 Skills 指南](#5-codex-必装十大-skills-指南)
-- [6. 推荐学习节奏](#6-推荐学习节奏)
-
-## 快速路线
-
-| 顺序 | 项目 | 作用 |
-| :--- | :--- | :--- |
-| 1 | [llm-cookbook](https://github.com/datawhalechina/llm-cookbook) | 先打 LLM / Prompt 基础 |
-| 2 | [llm-universe](https://github.com/datawhalechina/llm-universe) | 再做一个能跑的 LLM 应用 |
-| 3 | [All-in-RAG](https://github.com/datawhalechina/all-in-rag) | 学 RAG 全栈链路 |
-| 4 | [Hello-Agents](https://github.com/datawhalechina/hello-agents) | 学 Agent 系统与协作 |
-| 5 | [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) | 补全 Agent 全栈路线图 |
+- [5. 推荐学习节奏](#5-推荐学习节奏)
 
 ## 1. 先怎么用这份资料
 
-- 如果你刚开始学，先看 90 天路线图，建立大方向。
-- 如果你想找项目练手，先看 GitHub 热榜和 6 大 Agent 项目合集。
-- 如果你已经在写代码，直接看 Codex Skills，补齐工程化流程。
+- 刚入门：先看第 2 章，建立 AI Agent、RAG、Prompt、部署的整体认知。
+- 想找项目练手：先看第 3 章和第 4 章，优先挑能跑起来的仓库。
+- 已经在写代码：直接看第 5 章，把 Codex Skills、上下文管理和验证流程补上。
 
 ## 2. AI Agent 系统化学习路线图
 
-按照「核心基础 → 关键技术 → 框架应用 → 高级协同 → 工程落地」的顺序推进，可以形成比较稳定的沉浸式学习回路。
+AI Agent 的核心不是“会聊天”，而是把大模型、工具调用、记忆、工作流和自动执行串成一个可落地系统。
+
+### 2.1 什么是 AI Agent
+
+```text
+LLM（大模型）
++ 工具调用（Tool Calling）
++ 记忆（Memory）
++ 工作流（Workflow）
++ 自动执行能力
+```
+
+真正有价值的能力通常包括：
+
+- 自动读取文件
+- 自动修改代码
+- 自动操作浏览器
+- 自动执行命令
+- 自动完成工作流
+
+### 2.2 推荐学习顺序
+
+```text
+单 Agent
+↓
+Tool Calling
+↓
+Workflow
+↓
+状态管理
+↓
+多 Agent
+↓
+长期记忆
+↓
+RAG
+↓
+生产部署
+```
+
+### 2.3 90 天路线图
+
+按照「核心基础 -> 关键技术 -> 框架应用 -> 高级协同 -> 工程落地」推进，会更稳。
 
 | 阶段 | 核心主题 | 推荐学习内容与 B 站 / 在线资源参考 |
 | :--- | :--- | :--- |
@@ -52,16 +83,52 @@
 | **DAY 48** | **Agent 工程化与监控** | B站：`《AI 应用工程化落地》` |
 | **DAY 90** | **全流程项目实战带学** | 李沐：`AI 实战营` |
 
+### 2.4 中文教程学习顺序表
+
+如果你想按“先基础、再应用、再系统路线图”的方式继续，建议直接按下面这个顺序学。
+
+| 顺序 | 项目 | 方向 | 适合先学的原因 | 当前热度 |
+| :--- | :--- | :--- | :--- | :---: |
+| 1 | [llm-cookbook](https://github.com/datawhalechina/llm-cookbook) | LLM 入门 / Prompt | 先把大模型调用、提示词和基础概念打稳 | 23.7k ⭐ |
+| 2 | [llm-universe](https://github.com/datawhalechina/llm-universe) | LLM 应用开发入门 | 先做一个能跑的入门应用，建立整体感觉 | 13.2k ⭐ |
+| 3 | [All-in-RAG](https://github.com/datawhalechina/all-in-rag) | RAG 全栈 | 把检索增强生成的整条链路学扎实 | 8.5k ⭐ |
+| 4 | [Hello-Agents](https://github.com/datawhalechina/hello-agents) | Agent 系统教程 | 进入智能体思维、范式和系统架构 | 58.5k ⭐ |
+| 5 | [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) | Agent 综合路线图 | 用更完整的工程视角补全全栈学习地图 | 1.9k ⭐ |
+
+### 2.5 这几个项目怎么分工
+
+- `llm-cookbook`：先学基础，适合把 Prompt、LLM 调用、基础思路打通。
+- `llm-universe`：再学应用，适合把“怎么做一个大模型应用”跑明白。
+- `All-in-RAG`：再学检索，适合把 RAG 的数据处理、切块、向量库、召回、评估学完整。
+- `Hello-Agents`：再学智能体，适合把 Agent 的范式、工具调用、协作和工程架构学清楚。
+- `ai-agents-from-zero`：最后补全路线图，适合把前面知识串成更大的系统化学习路径。
+
+### 2.6 最实用的学习策略
+
+- 如果你的时间有限：
+  - 先把 `All-in-RAG` 学通
+  - 再挑 `Hello-Agents` 看核心章节
+  - `ai-agents-from-zero` 当总参考，不用一次性全刷完
+
+- 如果你想走“完整路线”：
+  - `All-in-RAG` 打基础
+  - `Hello-Agents` 学 Agent 核心
+  - `ai-agents-from-zero` 当总路线图和项目库
+
+- 如果你更偏工程实战：
+  - 优先 `ai-agents-from-zero`
+  - 但其中 RAG 基础还是建议回头补 `All-in-RAG`
+
 ## 3. GitHub 核心热榜 - Skill 职业化与基建
 
-结合“程序员 Raigor”与“星探 AI”两套热榜，AI 内容生产已经卷到“端到端”，LLM 基建和具象化 Skill 工具也逐渐成为硬需求。下面把原始热榜重新整理成更适合学习的版本。
+结合“程序员 Raigor”与“星探 AI”两套热榜，AI 内容生产已经卷到端到端，LLM 基建和具象化 Skill 工具也逐渐成为硬需求。下面把原始热榜整理成更适合学习的版本。
 
 ### 3.1 10 大核心项目
 
 1. **MoneyPrinterTurbo**
    - 排名与数据：Raigor 榜 TOP 1 / 星探榜 #1（周增 +18,553 Star，累计 7.8 万 Star）
    - 定位：全自动短视频端到端生成工具。
-   - 特点：输入关键词即可全自动生成视频脚本、混剪素材、配音、字幕并直接输出成片，适合做自媒体批量产出。
+   - 特点：输入关键词即可自动生成视频脚本、混剪素材、配音、字幕并输出成片，适合自媒体批量产出。
    - 开源地址：[harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)
 
 2. **markitdown**
@@ -117,9 +184,9 @@
 
 ### 3.2 这组项目怎么理解
 
-- 一类偏“内容生产”，比如视频生成、文档转换、文案润色。
-- 一类偏“基础设施”，比如上下文压缩、Token 聚合、质量监控。
-- 一类偏“工程实践”，比如把 LLM 能力真正嵌进业务流里。
+- 一类偏内容生产，比如视频生成、文档转换、文案润色。
+- 一类偏基础设施，比如上下文压缩、Token 聚合、质量监控。
+- 一类偏工程实践，比如把 LLM 能力真正嵌进业务流里。
 
 ## 4. 6 大 Agent 开源项目合集推荐
 
@@ -134,11 +201,11 @@
 
 ### 4.1 我建议你重点学的 2 个项目
 
-如果你现在主要精力放在 `Hello-Agents` 和 `All-in-RAG`，我建议把它们当成两条主线来学，而不是混着啃。
+如果你现在主要精力放在 `Hello-Agents` 和 `All-in-RAG`，建议把它们当成两条主线，而不是混着啃。
 
 #### 1）Hello-Agents
 
-- 核心定位：**智能体入门到进阶的系统教程**
+- 核心定位：智能体入门到进阶的系统教程
 - 适合学习的内容：
   - 智能体到底是什么
   - Agent 的经典范式怎么做
@@ -146,8 +213,8 @@
   - 记忆、协议、多 Agent 协作怎么串起来
   - 如何从“会用大模型”过渡到“会搭智能体系统”
 - 这个项目的特点：
-  - 更偏 **Agent 思维**
-  - 更偏 **系统架构**
+  - 更偏 Agent 思维
+  - 更偏系统架构
   - 更适合建立“智能体系统”的整体认知
   - 你会看到很多“为什么这么设计”的内容，而不只是代码片段
 - 适合的学习方式：
@@ -157,7 +224,7 @@
 
 #### 2）All-in-RAG
 
-- 核心定位：**RAG 技术全栈教程**
+- 核心定位：RAG 技术全栈教程
 - 适合学习的内容：
   - 文档怎么加载和清洗
   - 文本怎么切块
@@ -166,8 +233,8 @@
   - 检索怎么优化
   - 生成和评估怎么接起来
 - 这个项目的特点：
-  - 更偏 **RAG 工程**
-  - 更偏 **检索链路**
+  - 更偏 RAG 工程
+  - 更偏检索链路
   - 更适合打基础，理解知识库问答是怎么做出来的
   - 从“数据 -> 向量 -> 检索 -> 生成 -> 评估”这条链路非常完整
 - 适合的学习方式：
@@ -216,9 +283,9 @@
 
 ### 4.5 再加一个 `ai-agents-from-zero` 怎么看
 
-如果把 `ai-agents-from-zero` 也放进来对比，它和前面两个项目的关系会更像“总路线图”：
+如果把 `ai-agents-from-zero` 也放进来对比，它更像“总路线图”。
 
-- 核心定位：**从零到企业级落地的 AI 智能体系统教程**
+- 核心定位：从零到企业级落地的 AI 智能体系统教程
 - 适合学习的内容：
   - 大模型基础
   - Agent / 多 Agent
@@ -227,12 +294,12 @@
   - RAG 与记忆
   - 部署、实战项目、面试题库
 - 这个项目的特点：
-  - 更偏 **大而全的学习地图**
-  - 更偏 **工程落地和长期更新**
+  - 更偏大而全的学习地图
+  - 更偏工程落地和长期更新
   - 覆盖面比 `Hello-Agents` 更宽，也比 `All-in-RAG` 更综合
   - 你会看到“教程 + 案例 + 面试题库 + 项目实战”一整套内容
 - 适合的学习方式：
-  - 先当成“总索引”看目录
+  - 先当成总索引看目录
   - 结合章节总索引挑你缺的部分补
   - 不建议一上来硬啃全部内容，容易信息量过大
 
@@ -252,51 +319,7 @@
    - 负责把前面的知识串成更完整的学习路线图
    - 适合当总纲和进阶路线，解决“怎么把 RAG、Agent、LangChain、LangGraph、MCP、项目实战连起来”的问题
 
-### 4.7 推荐学习顺序（更新版）
-
-如果你现在是初学者，我建议这样排：
-
-1. **先学 `All-in-RAG`**
-   - 先把 RAG 的底层流程学稳
-   - 先知道知识如何进入系统、如何被检索出来
-
-2. **再学 `Hello-Agents`**
-   - 重点看 Agent 的思维方式、范式和协作
-   - 把“会检索”升级成“会规划、会调用工具、会协作”
-
-3. **最后系统看 `ai-agents-from-zero`**
-   - 用它补全更大的全栈视角
-   - 重点补 LangChain、LangGraph、MCP、实战项目和面试准备
-
-### 4.8 适合你的实际学习策略
-
-- 如果你的时间有限：
-  - 先把 `All-in-RAG` 学通
-  - 再挑 `Hello-Agents` 看核心章节
-  - `ai-agents-from-zero` 当总参考，不用一次性全刷完
-
-- 如果你想走“完整路线”：
-  - `All-in-RAG` 打基础
-  - `Hello-Agents` 学 Agent 核心
-  - `ai-agents-from-zero` 当总路线图和项目库
-
-- 如果你更偏工程实战：
-  - 优先 `ai-agents-from-zero`
-  - 但其中 RAG 基础还是建议回头补 `All-in-RAG`
-
-### 4.9 中文教程学习顺序表
-
-如果你想按“先基础、再应用、再系统路线图”的方式继续，推荐直接按下面这个顺序学。
-
-| 顺序 | 项目 | 方向 | 适合先学的原因 | 当前热度 |
-| :--- | :--- | :--- | :--- | :---: |
-| 1 | [llm-cookbook](https://github.com/datawhalechina/llm-cookbook) | LLM 入门 / Prompt | 先把大模型调用、提示词和基础概念打稳 | 23.7k ⭐ |
-| 2 | [llm-universe](https://github.com/datawhalechina/llm-universe) | LLM 应用开发入门 | 先做一个能跑的入门应用，建立整体感觉 | 13.2k ⭐ |
-| 3 | [All-in-RAG](https://github.com/datawhalechina/all-in-rag) | RAG 全栈 | 把检索增强生成的整条链路学扎实 | 8.5k ⭐ |
-| 4 | [Hello-Agents](https://github.com/datawhalechina/hello-agents) | Agent 系统教程 | 进入智能体思维、范式和系统架构 | 58.5k ⭐ |
-| 5 | [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) | Agent 综合路线图 | 用更完整的工程视角补全全栈学习地图 | 1.9k ⭐ |
-
-### 4.10 这几个项目怎么分工
+### 4.7 中文教程学习顺序的补充理解
 
 - `llm-cookbook`：先学基础，适合把 Prompt、LLM 调用、基础思路打通。
 - `llm-universe`：再学应用，适合把“怎么做一个大模型应用”跑明白。
@@ -304,215 +327,9 @@
 - `Hello-Agents`：再学智能体，适合把 Agent 的范式、工具调用、协作和工程架构学清楚。
 - `ai-agents-from-zero`：最后补全路线图，适合把前面知识串成更大的系统化学习路径。
 
-### 4.11 最实用的继续学习方式
-
-1. 先看 `llm-cookbook`，把基础概念和 Prompt 习惯养起来。
-2. 再看 `llm-universe`，做出第一个完整的 LLM 应用。
-3. 接着看 `All-in-RAG`，把检索链路学稳。
-4. 然后看 `Hello-Agents`，进入智能体系统设计。
-5. 最后用 `ai-agents-from-zero` 做总复盘，补齐工程实战和路线图。
-
-# AI Agent 学习路线（推荐顺序）
-
-## 一、什么是 AI Agent？
-
-AI Agent（智能代理）本质上是：
-
-```text
-LLM（大模型）
-+
-工具调用（Tool Calling）
-+
-记忆（Memory）
-+
-工作流（Workflow）
-+
-自动执行能力
-```
-
-Agent 不只是聊天机器人。
-
-真正强大的地方：
-
-- 自动读取文件
-- 自动修改代码
-- 自动操作浏览器
-- 自动执行命令
-- 自动完成工作流
-
----
-
-# 二、推荐学习顺序（非常重要）
-
-正确路线：
-
-```text
-单 Agent
-↓
-Tool Calling
-↓
-Workflow
-↓
-状态管理
-↓
-多 Agent
-↓
-长期记忆
-↓
-RAG
-↓
-生产部署
-```
-
----
-
-# 三、最推荐的 GitHub 学习项目
-
-## 1. ai-agents-from-zero（中文最佳）
-
-GitHub：
-https://github.com/didilili/ai-agents-from-zero
-
-特点：
-
-- 中文
-- 从零开始
-- 完整教程
-- 有代码
-- 有路线图
-
----
-
-## 2. Microsoft AI Agents for Beginners
-
-GitHub：
-https://github.com/microsoft/ai-agents-for-beginners
-
-特点：
-
-- 微软官方
-- 适合初学者
-- 有图
-- 有练习
-
----
-
-## 3. LangGraph（当前主流）
-
-GitHub：
-https://github.com/langchain-ai/langgraph
-
-中文文档：
-https://github.com/jurnea/LangGraph-Chinese
-
-特点：
-
-- 当前主流 Agent Workflow
-- 状态管理强
-- 企业级
-
----
-
-## 4. CrewAI（最容易做 AI 团队）
-
-GitHub：
-https://github.com/crewAIInc/crewAI
-
-案例：
-https://github.com/crewAIInc/crewAI-examples
-
-特点：
-
-- 多 Agent
-- AI 团队协作
-
----
-
-## 5. GenAI_Agents（案例库）
-
-GitHub：
-https://github.com/NirDiamant/GenAI_Agents
-
-特点：
-
-- 50+ Agent 案例
-- Notebook
-- Tool Calling
-
----
-
-# 四、推荐学习技术栈
-
-| 技术 | 推荐度 |
-|---|---|
-| Python | ⭐⭐⭐⭐⭐ |
-| OpenAI API | ⭐⭐⭐⭐⭐ |
-| LangGraph | ⭐⭐⭐⭐⭐ |
-| Tool Calling | ⭐⭐⭐⭐⭐ |
-| FastAPI | ⭐⭐⭐⭐ |
-| MCP | ⭐⭐⭐⭐ |
-
----
-
-# 五、推荐开发环境
-
-```text
-Windows
-↓
-WSL2 Ubuntu
-↓
-VSCode Remote WSL
-↓
-Python venv
-↓
-Codex CLI
-```
-
----
-
-# 六、最适合练习的 Agent 项目
-
-## 1. 文件总结 Agent
-
-学习：
-
-- 文件读取
-- Tool Calling
-
----
-
-## 2. Coding Agent
-
-学习：
-
-- 自动修复代码
-- Workflow
-
----
-
-## 3. Browser Agent
-
-学习：
-
-- Playwright
-- MCP
-
----
-
-## 4. Multi-Agent 系统
-
-学习：
-
-- CrewAI
-- 多 Agent 协作
-
----
-
-
-
-## 6. 推荐学习节奏
+## 5. 推荐学习节奏
 
 - 第一轮：先过 90 天路线图，建立 Agent、RAG、Prompt、部署的整体认知。
 - 第二轮：挑 1 个 Agent 框架和 1 个工具链项目跑起来。
 - 第三轮：把 Codex Skills、Prompt 质量、上下文管理和测试验证流程融进自己的日常工作流。
-- 第四轮：结合 [GitHub 网站工具与热门项目学习地图](github网站工具推荐.md)，把学习范围从 Agent 扩展到多媒体、量化、部署和工程化。
+- 第四轮：结合 [GitHub 网站工具与热门项目学习地图](../softbs/github/github网站工具推荐.md)，把学习范围从 Agent 扩展到多媒体、量化、部署和工程化。

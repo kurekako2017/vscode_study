@@ -12,6 +12,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
   const copy = async () => {
+    // 优先复制结构化结果；如果没有结果，就复制气泡里的自然语言总结。
     const text = message.result ? toClipboardText(message.result) : message.content;
     await navigator.clipboard.writeText(text);
   };
@@ -36,6 +37,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           <div className="flex items-start justify-between gap-3">
             <p className="whitespace-pre-wrap text-[15px] leading-7">{message.content}</p>
             {!isUser && message.status !== "streaming" && (
+              // 只有在助手消息已经稳定下来后，才允许复制，避免复制到半截流式内容。
               <button
                 type="button"
                 onClick={copy}

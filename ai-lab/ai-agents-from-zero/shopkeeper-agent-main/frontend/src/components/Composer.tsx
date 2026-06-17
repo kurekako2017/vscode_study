@@ -26,11 +26,13 @@ export function Composer({
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const submit = (event: FormEvent) => {
+        // 阻止表单默认刷新页面的行为，由 React 接管提交逻辑。
         event.preventDefault();
         if (!disabled) onSubmit();
     };
 
     const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+        // Enter 直接发送，Shift+Enter 允许换行输入更长的问题。
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             if (!disabled) onSubmit();
@@ -69,11 +71,13 @@ export function Composer({
                     aria-label={isStreaming ? "停止" : "发送"}
                 >
                     {isStreaming ? (
+                        // 流式过程中按钮变成停止图标，表示当前操作可以被中断。
                         <Square
                             className="h-4 w-4 fill-current"
                             aria-hidden="true"
                         />
                     ) : (
+                        // 非流式状态下显示发送箭头。
                         <ArrowUp className="h-5 w-5" aria-hidden="true" />
                     )}
                 </button>

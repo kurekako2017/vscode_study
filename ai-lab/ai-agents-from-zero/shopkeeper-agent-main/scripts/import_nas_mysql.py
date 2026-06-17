@@ -14,12 +14,15 @@ DW_URL = "mysql+asyncmy://root:123456@192.168.10.2:3306/dw?charset=utf8mb4"
 
 
 def split_sql(path: Path) -> list[str]:
+    """把一个 SQL 文件拆成独立语句，避免一次性执行整份脚本时失控。"""
+
     raw = path.read_text(encoding="utf-8")
     parts: list[str] = []
     current: list[str] = []
     in_single = False
     in_double = False
     for ch in raw:
+        # 这里需要手动跟踪单引号/双引号，避免字符串内部的分号被误判成语句结束。
         if ch == "'" and not in_double:
             in_single = not in_single
         elif ch == '"' and not in_single:
@@ -38,6 +41,9 @@ def split_sql(path: Path) -> list[str]:
 
 
 def filter_statements(statements: list[str]) -> list[str]:
+    """过滤掉导入到目标库时不需要再次执行的初始化语句。"""
+
+    # 这类语句通常只适用于原始导出环境，在 NAS 目标库中重复执行没有意义。
     skip_prefixes = (
         "SET NAMES",
         "CREATE DATABASE",
@@ -48,6 +54,7 @@ def filter_statements(statements: list[str]) -> list[str]:
 
 
 async def main() -> None:
+    # 先连接系统库 mysql，确保目标数据库存在，再分别导入 meta 和 dw。
     root_engine = create_async_engine(ROOT_URL, pool_pre_ping=True)
     async with root_engine.connect() as conn:
         await conn.exec_driver_sql(
@@ -63,6 +70,7 @@ async def main() -> None:
         (META_URL, Path("docker/mysql/meta.sql")),
         (DW_URL, Path("docker/mysql/dw.sql")),
     ]:
+        # 每个数据库单独建立一个 engine，导入结束后立刻释放连接。
         engine = create_async_engine(url, pool_pre_ping=True)
         statements = filter_statements(split_sql(path))
         async with engine.connect() as conn:

@@ -19,6 +19,7 @@ export function EmptyState({ examples, onUseExample }: EmptyStateProps) {
   return (
     <div className="mx-auto flex min-h-full max-w-5xl flex-col justify-center px-4 py-12">
       <div className="mb-10 max-w-3xl">
+        {/* 这里先给出产品名和一句大标题，帮助用户快速确认当前页面用途。 */}
         <div className="mb-5 inline-flex items-center gap-2 border border-moss/25 bg-moss/10 px-3 py-1.5 text-sm font-semibold text-moss">
           <Sparkles className="h-4 w-4" aria-hidden="true" />
           Shopkeeper Agent
@@ -33,6 +34,7 @@ export function EmptyState({ examples, onUseExample }: EmptyStateProps) {
           const Icon = item.icon;
           return (
             <div key={item.label} className="border border-ink/10 bg-white/55 px-4 py-4">
+              {/* 每个高亮卡片都在说明系统能力，属于“先告诉用户能做什么”的引导。 */}
               <Icon className="mb-5 h-5 w-5 text-brass" aria-hidden="true" />
               <div className="text-sm font-semibold text-ink">{item.label}</div>
             </div>

@@ -1,4 +1,5 @@
 logging:
+  # 日志同时支持文件和控制台输出，便于本地调试和容器环境收集。
   file:
     enable: true
     level: INFO
@@ -10,6 +11,7 @@ logging:
     level: INFO
 
 db_meta:
+  # 元数据库保存表、字段、指标和关系信息。
   host: ${oc.env:DB_META_HOST,localhost}
   port: ${oc.env:DB_META_PORT,3306}
   user: ${oc.env:DB_META_USER,didilili}
@@ -17,6 +19,7 @@ db_meta:
   database: ${oc.env:DB_META_DATABASE,meta}
 
 db_dw:
+  # 数仓库用于读取真实字段类型、样例值以及执行 SQL。
   host: ${oc.env:DB_DW_HOST,localhost}
   port: ${oc.env:DB_DW_PORT,3306}
   user: ${oc.env:DB_DW_USER,didilili}
@@ -24,21 +27,25 @@ db_dw:
   database: ${oc.env:DB_DW_DATABASE,dw}
 
 qdrant:
+  # Qdrant 的向量维度必须和 Embedding 模型输出保持一致。
   host: ${oc.env:QDRANT_HOST,localhost}
   port: ${oc.env:QDRANT_PORT,6333}
   embedding_size: ${oc.env:QDRANT_EMBEDDING_SIZE,1024}
 
 embedding:
+  # TEI / Embedding 服务地址和模型名称。
   host: ${oc.env:EMBEDDING_HOST,localhost}
   port: ${oc.env:EMBEDDING_PORT,8081}
   model: ${oc.env:EMBEDDING_MODEL,BAAI/bge-large-zh-v1.5}
 
 es:
+  # Elasticsearch 负责字段真实值的全文检索。
   host: ${oc.env:ES_HOST,localhost}
   port: ${oc.env:ES_PORT,9200}
   index_name: ${oc.env:ES_INDEX_NAME,data_agent}
 
 llm:
+  # LLM 配置支持多个 provider 轮询回退，保证单个模型失败时还有备用方案。
   provider_order: ${oc.env:LLM_PROVIDER_ORDER,openrouter,nvidia,ollama}
   model_name: ${oc.env:LLM_MODEL_NAME,openai/gpt-4o-mini}
   api_key: ${oc.env:LLM_API_KEY}
@@ -54,4 +61,5 @@ llm:
   ollama_base_url: ${oc.env:OLLAMA_BASE_URL,http://127.0.0.1:11434/v1}
 
 runtime:
+  # mock_mode=true 时，后端会切换成不依赖外部基础设施的模拟接口。
   mock_mode: ${oc.env:MOCK_MODE,false}

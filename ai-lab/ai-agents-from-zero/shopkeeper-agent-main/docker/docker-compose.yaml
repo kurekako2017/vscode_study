@@ -1,5 +1,7 @@
 services:
   mysql:
+    # 原始完整本地栈会同时启动 MySQL、ES、Kibana、Qdrant 和 Embedding。
+    # 这个 compose 文件主要用于“全量本地环境”调试。
     image: mysql:8.0
     container_name: mysql
     restart: unless-stopped
@@ -16,6 +18,7 @@ services:
       --collation-server=utf8mb4_general_ci
 
   elasticsearch:
+    # Elasticsearch 用来做字段真实取值的全文检索。
     build: ./elasticsearch
     container_name: elasticsearch
     restart: unless-stopped
@@ -27,6 +30,7 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
   kibana:
+    # Kibana 只是一个可视化管理界面，方便观察 ES 数据。
     image: kibana:8.19.10
     container_name: kibana
     restart: unless-stopped
@@ -38,6 +42,7 @@ services:
       - elasticsearch
 
   qdrant:
+    # Qdrant 保存字段和指标的向量索引，支撑语义召回。
     image: qdrant/qdrant:v1.16
     container_name: qdrant
     restart: unless-stopped
@@ -48,6 +53,7 @@ services:
       - qdrant_data:/qdrant/storage
 
   embedding:
+    # TEI 容器负责把文本转成向量，给 Qdrant 检索使用。
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     platform: linux/amd64
     container_name: embedding

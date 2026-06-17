@@ -16,6 +16,7 @@ type FlowNode = {
 };
 
 const nodes: FlowNode[] = [
+  // 节点坐标和文案要和后端 LangGraph 的步骤名称保持一致。
   { step: "抽取关键词", x: 410, y: 20 },
   { step: "召回字段信息", x: 150, y: 112 },
   { step: "召回指标信息", x: 410, y: 112 },
@@ -54,6 +55,7 @@ const branchLabels = [
 ];
 
 function getStatusMap(steps: StepState[]) {
+  // 先转成 map，后面查单个节点状态时就不用反复遍历数组。
   return steps.reduce<Record<string, StepState>>((map, item) => {
     map[item.step] = item;
     return map;
@@ -117,6 +119,7 @@ function FlowNodeCard({ node, status }: { node: FlowNode; status: FlowStatus }) 
 export function StepRail({ steps = [] }: { steps?: StepState[] }) {
   if (steps.length === 0) return null;
 
+  // 先统一整理出每个 step 的最新状态，再驱动图上的节点渲染。
   const statusMap = getStatusMap(steps);
 
   return (

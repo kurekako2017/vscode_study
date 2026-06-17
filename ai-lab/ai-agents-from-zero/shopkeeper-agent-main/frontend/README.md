@@ -7,6 +7,8 @@
 
 匹配后端 `shopkeeper-agent` 的问数聊天前端，技术栈为 React + Vite + Tailwind CSS + pnpm。
 
+> 这个前端只负责展示和流式消费 `/api/query`，核心智能体逻辑仍然在后端。
+
 ## 启动
 
 ```bash

@@ -5,6 +5,7 @@
 import { Database, FileJson } from "lucide-react";
 
 function normalizeRows(data: unknown): Array<Record<string, unknown>> {
+  // 后端返回的数据可能是数组、单个对象或标量，这里先统一成“行”的概念。
   if (Array.isArray(data)) {
     return data.map((item, index) =>
       item && typeof item === "object" && !Array.isArray(item)
@@ -21,6 +22,7 @@ function normalizeRows(data: unknown): Array<Record<string, unknown>> {
 }
 
 function formatCell(value: unknown) {
+  // 表格单元格尽量展示成字符串，复杂对象再转成 JSON。
   if (value === null || value === undefined) return "-";
   if (typeof value === "object") return JSON.stringify(value);
   return String(value);

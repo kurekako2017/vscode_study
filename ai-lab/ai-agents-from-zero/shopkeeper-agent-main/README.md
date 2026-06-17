@@ -27,17 +27,13 @@
 
 ## 📚 文档入口
 
-如果你想先看文档目录，建议直接从这里开始：
+如果你只想先看一份文档，直接从这里开始：
 
+- [新手总指南](docs/guide.md)
 - [文档总目录](docs/docs-index.md)
-- [启动 / 验证 / 排错最终说明](docs/shopkeeper-agent-启动guide.md)
-- [环境清单](docs/environment-checklist.md)
-- [功能一览与测试指南](docs/feature-usage-test-template.md)
-- [功能使用与测试完整版](docs/feature-usage-test-full.md)
-- [功能使用与测试通用模板](docs/feature-usage-template-generic.md)
-- [功能检查清单](docs/feature-checklist.md)
-- [OpenRouter + NAS MySQL 说明](docs/local-setup-openrouter-docker-mysql.md)
-- [复制即启动](docs/quick-start-copy.md)
+- [代码结构调用流程图](docs/shopkeeper-agent-目录结构调用流程图.md)
+
+其余功能模板类文档还保留在 `docs/`，但启动、排错、环境和功能说明已经统一收敛到 `docs/guide.md`。
 
 ## 📖 项目介绍
 
@@ -135,9 +131,9 @@ shopkeeper-agent/
 
 当前仓库已经包含一套可直接启动的本地开发环境，你可以按照以下顺序启动项目。
 
-如果你想先看“当前已经做到哪一步、还差什么”，可以先读这份推进记录：
+如果你想先看当前应该怎么启动和验证，优先读：
 
-- [本地环境推进记录](docs/local-environment-progress.md)
+- [新手总指南](docs/guide.md)
 - [OpenRouter + NAS MySQL 本地方案](docs/openrouter-nas-mysql-setup.md)
 
 ### 1. 准备环境
@@ -211,18 +207,11 @@ VITE_API_BASE_URL=
 
 这样后端会走 mock `/api/query`，前端仍然可以正常展示 SSE 流程和结果卡片。
 
-如果你想先按“最小可运行版本”启动，可以直接看这份说明：
+如果你想先按“最小可运行版本”启动，优先看：
 
-- [Mock 优先启动说明](docs/mock-first-quickstart.md)
-- [Mock 启动命令块](docs/mock-first-copy-paste.md)
-- [Mock 最短 5 行命令](docs/mock-first-5lines.md)
-- [OpenRouter + NAS MySQL 启动说明](docs/openrouter-nas-mysql-quickstart.md)
+- [新手总指南](docs/guide.md)
 - [LLM Provider 回退运行模式](docs/llm-provider-fallback.md)
-- [OpenRouter + NAS MySQL 命令块](docs/openrouter-nas-mysql-copy-paste.md)
-- [OpenRouter + NAS MySQL 最短 5 行命令](docs/openrouter-nas-mysql-5lines.md)
-- [功能一览与测试指南](docs/feature-overview-and-test-guide.md)
 - [功能检查清单](docs/feature-checklist.md)
-- [启动 / 验证 / 排错最终说明](docs/start-verify-troubleshoot-final.md)
 
 ### 5. 准备 Embedding 模型
 

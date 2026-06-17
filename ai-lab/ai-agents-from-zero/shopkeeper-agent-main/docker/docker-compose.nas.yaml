@@ -1,5 +1,6 @@
 services:
   elasticsearch:
+    # NAS 场景下不再启动 MySQL，只保留检索相关基础设施。
     build: ./elasticsearch
     container_name: elasticsearch
     restart: unless-stopped
@@ -12,6 +13,7 @@ services:
       - es_data:/usr/share/elasticsearch/data
 
   kibana:
+    # Kibana 仍然保留，便于排查 ES 数据和索引状态。
     image: kibana:8.19.10
     container_name: kibana
     restart: unless-stopped
@@ -23,6 +25,7 @@ services:
       - elasticsearch
 
   qdrant:
+    # 字段/指标向量集合都依赖这个服务。
     image: qdrant/qdrant:v1.16
     container_name: qdrant
     restart: unless-stopped
@@ -33,6 +36,7 @@ services:
       - qdrant_data:/qdrant/storage
 
   embedding:
+    # TEI 使用挂载的本地模型目录，避免每次启动重新下载模型。
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     platform: linux/amd64
     container_name: embedding
