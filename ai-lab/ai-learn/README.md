@@ -1,5 +1,16 @@
 # AI Learn
 
+## 模型调用回退顺序
+
+所有会调用 LLM 的 Python 示例共用 `llm_runtime.py`，默认顺序为：
+
+1. OpenRouter（`OPENROUTER_API_KEY`，兼容旧变量名 `openRouter`）
+2. NVIDIA NIM（`NVIDIA_API_KEY`）
+3. 本地 Ollama（`qwen2.5-coder:1.5b`）
+4. Mock（仅前三项全部调用失败时使用）
+
+模型、地址和超时可参考 `.env.example` 覆盖。真实密钥只能放在 WSL 环境变量或被 Git 忽略的 `.env` 中，不能写入代码、README 或 `.env.example`。
+
 `ai-learn/` 统一承载三条递进学习线：
 
 ```text

@@ -27,12 +27,19 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 from typing import Any
 
 try:
     from openai import OpenAI
 except ImportError:  # pragma: no cover - used only when dependency is missing
     OpenAI = None
+
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client, has_real_provider
 
 
 DEFAULT_MODEL = "gpt-5"
@@ -86,7 +93,7 @@ def parse_args() -> argparse.Namespace:
 # - 基础设施层：负责客户端构建与外部依赖读取     （构建客户端并返回实例）       
 def _has_real_credentials() -> bool:
     # 优先支持 OpenRouter，再兼容 OpenAI 官方接口。
-    return bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY"))
+    return has_real_provider()
 
 
 def _build_openai_client() -> Any:
@@ -95,18 +102,7 @@ def _build_openai_client() -> Any:
         print("ERROR: openai package is not installed. Run: pip install -r requirements.txt", file=sys.stderr)
         sys.exit(1)
 
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("ERROR: OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
-        sys.exit(1)
-
-    client_kwargs: dict[str, Any] = {"api_key": api_key}
-    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
-        client_kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
-    elif os.getenv("OPENAI_BASE_URL"):
-        client_kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
-
-    return OpenAI(**client_kwargs)
+    return build_fallback_client()
 
 
 def build_client(use_mock: bool) -> Any:

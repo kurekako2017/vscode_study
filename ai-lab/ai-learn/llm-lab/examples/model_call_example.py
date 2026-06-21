@@ -11,6 +11,7 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 from typing import Optional
 
 # 尝试导入 OpenAI SDK。
@@ -20,6 +21,12 @@ try:
     from openai import OpenAI
 except Exception:  # pragma: no cover - graceful fallback if package missing
     OpenAI = None
+
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client, has_real_provider
 
 
 # 默认模型名。真实调用时可通过 --model 覆盖。
@@ -44,8 +51,8 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 
     # 用户显式传 --real 时，必须提前检查真实调用需要的条件。
     if force_real:
-        if not os.getenv("OPENAI_API_KEY"):
-            print("ERROR: --real requested but OPENAI_API_KEY is not set.", file=sys.stderr)
+        if not has_real_provider():
+            print("ERROR: no real provider is configured.", file=sys.stderr)
             sys.exit(1)
         if OpenAI is None:
             print("ERROR: openai package is not installed. Run: pip install openai", file=sys.stderr)
@@ -53,8 +60,8 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
         return "real"
 
     # 自动模式：没有 API Key 就自动降级为 mock，保证初学者也能运行。
-    if not os.getenv("OPENAI_API_KEY"):
-        print("INFO: OPENAI_API_KEY not set, auto-switching to MOCK mode.", file=sys.stderr)
+    if not has_real_provider():
+        print("INFO: no real provider available, auto-switching to MOCK mode.", file=sys.stderr)
         return "mock"
 
     # 有 API Key 但没安装 SDK，也自动降级为 mock。
@@ -68,15 +75,11 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 def build_client() -> Optional[OpenAI]:
     """构建 OpenAI 客户端。真实模式才会调用此函数。"""
     # API Key 从环境变量读取，避免写死在代码里。
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("ERROR: OPENAI_API_KEY is not set.", file=sys.stderr)
-        sys.exit(1)
     if OpenAI is None:
         print("ERROR: openai package is not installed. Run: pip install openai", file=sys.stderr)
         sys.exit(1)
     # 返回 SDK 客户端，后续由 ask_once() 使用。
-    return OpenAI(api_key=api_key)
+    return build_fallback_client()
 
 
 def build_mock_answer(prompt: str) -> str:

@@ -14,10 +14,18 @@ import argparse
 import json
 import os
 import re
+import sys
+from pathlib import Path
 from typing import Any
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
+
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client
 
 # 默认模型名。
 # 这里优先读取环境变量，方便以后切换供应商或模型。
@@ -109,43 +117,34 @@ def mock_llm(prompt_value: Any) -> AIMessage:
 
 # 构建真实模型客户端，供 real 模式使用。
 def build_real_llm():
-    # 真实模式才需要导入 langchain_openai。
-    try:
-        from langchain_openai import ChatOpenAI
-    except ImportError as exc:  # pragma: no cover - 依赖缺失时使用
-        # 如果没装依赖，就直接报出明确错误。
-        raise RuntimeError("缺少 langchain-openai，无法进入真实模式") from exc
+    client = build_fallback_client()
 
-    # 真实模式支持多个供应商的 API Key。
-    api_key = (
-        os.getenv("OPENROUTER_API_KEY")
-        or os.getenv("DEEPSEEK_API_KEY")
-        or os.getenv("OPENAI_API_KEY")
-    )
-    # 如果一个 Key 都没有，就不能继续走真实模式。
-    if not api_key:
-        raise RuntimeError("未配置可用 API Key，无法进入真实模式")
+    def invoke(prompt_value: Any) -> AIMessage:
+        messages = prompt_value.to_messages()
+        instructions = str(messages[0].content) if len(messages) > 1 else None
+        prompt = str(messages[-1].content)
+        response = client.responses.create(
+            model=DEFAULT_MODEL,
+            instructions=instructions,
+            input=prompt,
+        )
+        return AIMessage(content=response.output_text)
 
-    # base_url 也做成环境变量，方便切换不同兼容服务。
-    base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    # 返回 OpenAI 兼容客户端。
-    return ChatOpenAI(
-        model=DEFAULT_MODEL,
-        api_key=api_key,
-        base_url=base_url,
-        temperature=0,
-    )
+    return RunnableLambda(invoke)
 
 
 # 把模型输出解析成结构化字典。
 def parse_response(message: AIMessage) -> dict[str, Any]:
     # 尝试把模型输出当作 JSON 解析。
+    content = str(message.content).strip()
+    if content.startswith("```"):
+        content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
     try:
-        return json.loads(message.content)
+        return json.loads(content)
     except json.JSONDecodeError:
         # 如果模型没有严格输出 JSON，就退回为纯文本结构。
         return {
-            "summary": message.content.strip(),
+            "summary": content,
             "steps": [],
             "keywords": [],
         }

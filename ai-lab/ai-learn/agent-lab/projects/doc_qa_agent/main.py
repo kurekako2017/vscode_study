@@ -30,6 +30,12 @@ from pathlib import Path
 
 from openai import OpenAI
 
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client, has_real_provider
+
 # 默认模型名，可用 `--model` 覆盖。
 DEFAULT_MODEL = "gpt-5"
 # OpenRouter 兼容服务默认基址。
@@ -91,25 +97,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def _has_real_credentials() -> bool:
-    return bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY"))
+    return has_real_provider()
 
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理环境依赖 （层次: 基础设施层 — 构建 OpenAI 客户端并处理环境依赖）
     """从 OpenRouter 或 OpenAI 兼容环境变量创建 OpenAI 客户端。"""
     # 从环境变量中获取 API Key
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        # 打印错误信息
-        print("ERROR: OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
-        sys.exit(1)
-    kwargs: dict[str, str] = {"api_key": api_key}
-    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
-    elif os.getenv("OPENAI_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
-    # 返回 OpenAI 客户端
-    return OpenAI(**kwargs)
+    return build_fallback_client()
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:

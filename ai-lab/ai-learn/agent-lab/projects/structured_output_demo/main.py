@@ -23,10 +23,17 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 from typing import Literal
 
 from openai import OpenAI
 from pydantic import BaseModel, Field
+
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client, has_real_provider
 
 #   默认模型名，可用 `--model` 覆盖。
 DEFAULT_MODEL = "gpt-4o"
@@ -79,7 +86,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def _has_real_credentials() -> bool:
-    return bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY"))
+    return has_real_provider()
 
 
 def build_client() -> OpenAI:
@@ -88,16 +95,7 @@ def build_client() -> OpenAI:
 
     说明：在 mock 模式下不会调用此函数；在真实模式下，如果没有 API Key，程序会提示错误并退出。
     """
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("ERROR: OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
-        sys.exit(1)
-    kwargs: dict[str, str] = {"api_key": api_key}
-    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
-    elif os.getenv("OPENAI_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
-    return OpenAI(**kwargs)
+    return build_fallback_client()
 
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:

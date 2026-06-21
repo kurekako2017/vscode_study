@@ -25,6 +25,7 @@
 
 import os
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,6 +34,12 @@ from fastapi.middleware.cors import CORSMiddleware  # 跨域中间件
 from openai import OpenAI
 from pydantic import BaseModel, Field  # 请求和响应模型校验
 from pypdf import PdfReader
+
+for _parent in Path(__file__).resolve().parents:
+    if (_parent / "llm_runtime.py").exists():
+        sys.path.insert(0, str(_parent))
+        break
+from llm_runtime import build_fallback_client
 
 # 默认模型名。
 DEFAULT_MODEL = "gpt-5"
@@ -112,16 +119,7 @@ class ReloadResponse(BaseModel):
 def build_client() -> OpenAI:
     """根据环境变量创建 OpenAI 兼容客户端，缺失时抛出异常。"""
 
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY or OPENAI_API_KEY is not set.")
-
-    kwargs: dict[str, str] = {"api_key": api_key}
-    if os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL)
-    elif os.getenv("OPENAI_BASE_URL"):
-        kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
-    return OpenAI(**kwargs)
+    return build_fallback_client()
 
 
 def resolve_mode() -> str:
@@ -129,7 +127,7 @@ def resolve_mode() -> str:
 
     if os.getenv("RAG_API_MOCK") == "1":
         return "mock"
-    return "real" if (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")) else "mock"
+    return "real"
 
 
 def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
