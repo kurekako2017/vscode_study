@@ -13,11 +13,11 @@ Doc QA Agent — 学习说明与快速上手
 快速运行
 1. Mock 模式（无需 API Key）:
    ```bash
-   RAG_API_MOCK=1 python3 main.py --question "项目简介是什么"
+   python3 main.py "项目简介是什么" --docs . --mock
    ```
-2. Real 模式（需 `OPENAI_API_KEY`）:
+2. Real 模式（需 `OPENROUTER_API_KEY` 或 `OPENAI_API_KEY`）:
    ```bash
-   OPENAI_API_KEY=sk... python3 main.py --question "如何部署"
+   OPENROUTER_API_KEY=your_api_key python3 main.py "如何部署" --docs . --real
    ```
 
 关键函数

@@ -90,7 +90,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 # 层次划分说明：环境检查、模式决策、客户端构建、单次调用封装、输出格式化、交互循环等功能被划分为不同层次，便于理解和练习程序结构。
-# - 基础设施层：负责客户端构建与外部依赖读取     （构建客户端并返回实例）       
+# - 基础设施层：负责客户端构建与外部依赖读取     （构建客户端并返回实例）
 def _has_real_credentials() -> bool:
     # 优先支持 OpenRouter，再兼容 OpenAI 官方接口。
     return has_real_provider()
@@ -230,7 +230,7 @@ def run_interactive(client: Any, model: str, use_mock: bool, max_chars: int | No
         try:
             # 从标准输入读取用户的问题
             # 从标准输入读取用户的问题     （从标准输入读取用户的问题）
-            user_input = input("\nYou> ").strip()
+            user_input = input(prompt="\nYou> ").strip()
         except (EOFError, KeyboardInterrupt):
             # 当用户按 Ctrl+C 或 Ctrl+D 时优雅退出
             # 当用户按 Ctrl+C 或 Ctrl+D 时优雅退出     （当用户按 Ctrl+C 或 Ctrl+D 时优雅退出）

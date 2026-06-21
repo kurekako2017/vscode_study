@@ -41,13 +41,13 @@ flowchart LR
 
 - 路径：`chat_cli/main.py`
 - 学习目标：参数解析、模式切换、输出格式化
-- 补充代码例子：`chat_cli/README_LEARN.md`、`chat_cli/STAGE2_MAX_CHARS_GUIDE.md`
+- 补充代码例子：`chat_cli/README.md`
 
 速查：
 
 - 你先学什么：命令行参数怎么进到程序里。
 - 为什么先学：这是最小 LLM 闭环，后面所有 Agent 都从这里出发。
-- 看哪份文档：`chat_cli/README_LEARN.md`、`chat_cli/STAGE2_MAX_CHARS_GUIDE.md`。
+- 看哪份文档：`chat_cli/README.md`。
 
 ### 快速运行
 
@@ -258,7 +258,7 @@ curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{
 
 | 章节 | 主入口 | 适合一起看的代码例子 |
 |---|---|---|
-| `chat_cli` | `chat_cli/main.py` | `chat_cli/README_LEARN.md`、`chat_cli/STAGE2_MAX_CHARS_GUIDE.md` |
+| `chat_cli` | `chat_cli/main.py` | `chat_cli/README.md` |
 | `structured_output_demo` | `structured_output_demo/main.py` | `structured_output_demo/README_LEARN.md` |
 | `workflow_agent` | `workflow_agent/main.py` | `workflow_agent/README_LEARN.md` |
 | `tool_agent_demo` | `tool_agent_demo/main.py` | `tool_agent_demo/README_LEARN.md` |

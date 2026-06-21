@@ -106,7 +106,7 @@ graph TD
 ## 2. 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip install -r ai-learn/agent-lab/projects/tool_agent_demo/requirements.txt
 ```
 
 ## 3. 配置环境变量
@@ -131,32 +131,32 @@ export OPENAI_API_KEY="your_api_key"
 
 ## 4. 运行方式
 
-在当前目录工作练习：
-```练习列目录：
-python3 main.py "帮我列出当前目录的文件"
+在 `ai-lab/` 根目录执行时，请把 `--workdir` 指向这个项目目录：
+```bash
+python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py "帮我列出当前目录的文件" --workdir ai-learn/agent-lab/projects/tool_agent_demo
 ```
-```练习读文件： 
-python3 main.py "读取 README 内容"
+```bash
+python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py "读取 README 内容" --workdir ai-learn/agent-lab/projects/tool_agent_demo
 ```
-```练习搜索： 
-python3 main.py "搜索包含 README 的地方"
+```bash
+python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py "搜索包含 README 的地方" --workdir ai-learn/agent-lab/projects/tool_agent_demo
 ```
 
-默认会在当前目录工作：
+默认会在当前目录工作；如果你在 `ai-lab/` 根目录执行，就需要显式传 `--workdir`：
 ```bash
-python3 main.py "帮我看看这个目录里有哪些 markdown 文件，并总结 README 重点"
+python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py "帮我看看这个目录里有哪些 markdown 文件，并总结 README 重点" --workdir ai-learn/agent-lab/projects/tool_agent_demo
 ```
 
 指定工作目录：
 
 ```bash
-python3 main.py --workdir ~/workspace/vscode_study/ai-learn/agent-lab "列出文件并读取 README"
+python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py --workdir ai-learn/agent-lab/projects/tool_agent_demo "列出文件并读取 README"
 ```
 
 指定模型：
 
 ```bash
-python3 main.py --model gpt-5 --workdir ~/workspace/vscode_study/java-lab "帮我找数据库相关文档"
+OPENROUTER_API_KEY=your_api_key python3 ai-learn/agent-lab/projects/tool_agent_demo/main.py --real --model gpt-5 --workdir ai-learn/agent-lab/projects/tool_agent_demo "帮我找数据库相关文档"
 ```
 
 ## 5. 内置工具

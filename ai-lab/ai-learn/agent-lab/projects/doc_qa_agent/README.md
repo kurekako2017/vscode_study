@@ -41,7 +41,7 @@
 ## 2. 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip install -r ai-learn/agent-lab/projects/doc_qa_agent/requirements.txt
 ```
 
 ## 3. 配置环境变量
@@ -66,22 +66,22 @@ export OPENAI_API_KEY="your_api_key"
 
 ## 4. 运行方式
 
-默认会读取当前目录下的 `md` / `txt` 文件：
+在 `ai-lab/` 根目录执行时，请显式传入文档目录：
 
 ```bash
-python main.py "这个目录里数据库相关内容主要讲了什么？"
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py "这个目录里数据库相关内容主要讲了什么？" --docs ai-learn/agent-lab/projects/doc_qa_agent
 ```
 
 指定文档目录：
 
 ```bash
-python main.py --docs d:/dev/source_code/vscode_study/java-lab "对日项目里的 RDS 和 Aurora 有什么区别？"
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --docs ai-learn/agent-lab/projects/doc_qa_agent "对日项目里的 RDS 和 Aurora 有什么区别？"
 ```
 
 指定模型：
 
 ```bash
-python main.py --model gpt-5 --docs d:/dev/source_code/vscode_study/java-lab "总结数据库移行的重点"
+OPENROUTER_API_KEY=your_api_key python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --real --docs ai-learn/agent-lab/projects/doc_qa_agent "总结数据库移行的重点"
 ```
 
 ## 5. 这个 demo 的实现范围

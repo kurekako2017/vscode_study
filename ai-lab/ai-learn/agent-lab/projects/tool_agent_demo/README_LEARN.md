@@ -27,7 +27,11 @@ Tool Agent Demo — 学习说明与快速上手
 快速运行
 1. Mock 模式：
    ```bash
-   RAG_API_MOCK=1 python3 main.py --task "查找关键字"
+   python3 main.py --mock "查找关键字" --workdir .
+   ```
+2. Real 模式：
+   ```bash
+   OPENROUTER_API_KEY=your_api_key python3 main.py --real "查找关键字" --workdir .
    ```
 
 关键函数

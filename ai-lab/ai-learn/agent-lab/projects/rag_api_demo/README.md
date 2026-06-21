@@ -34,7 +34,7 @@
 
 - `main.py` 既是程序入口，也是服务端应用代码
 - 它对外提供的是 HTTP 接口，不是给人直接点开的 GUI 程序
-- 当你运行 `uvicorn main:app` 时，`main.py` 里的 `app` 就变成了可访问的服务
+- 当你在 `ai-lab/` 根目录进入项目目录后运行 `uvicorn main:app` 时，`main.py` 里的 `app` 就变成了可访问的服务
 
 ## 2. 再看整体流程
 
@@ -216,7 +216,7 @@ curl http://127.0.0.1:8000/health
 这个 demo 真正的启动命令是：
 
 ```bash
-uvicorn main:app
+cd ai-learn/agent-lab/projects/rag_api_demo && uvicorn main:app
 ```
 
 这里的含义是：
@@ -311,7 +311,7 @@ cd ai-learn/agent-lab/projects/rag_api_demo
 1. 创建虚拟环境
 2. 安装依赖
 3. 设置 `RAG_API_MOCK=1`
-4. 启动 `uvicorn main:app --reload --port 8000 --host 127.0.0.1`
+4. 启动 `cd ai-learn/agent-lab/projects/rag_api_demo && uvicorn main:app --reload --port 8000 --host 127.0.0.1`
 
 如果机器不能创建虚拟环境，它会复用当前 Python 环境。
 
@@ -320,8 +320,7 @@ cd ai-learn/agent-lab/projects/rag_api_demo
 如果你想自己控制启动过程，可以直接执行:
 
 ```bash
-cd ai-learn/agent-lab/projects/rag_api_demo
-RAG_API_MOCK=1 uvicorn main:app --reload --port 8000 --host 127.0.0.1
+cd ai-learn/agent-lab/projects/rag_api_demo && RAG_API_MOCK=1 uvicorn main:app --reload --port 8000 --host 127.0.0.1
 ```
 
 如果要连真实模型:
