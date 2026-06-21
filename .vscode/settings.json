@@ -1,9 +1,118 @@
 {
+    // This workspace is opened in WSL. Keep Python tooling and paths on Linux.
     "python.defaultInterpreterPath": "/usr/bin/python3",
-    "python.terminal.activateEnvironment": false,
+    "python.terminal.activateEnvironment": true,
     "python.analysis.extraPaths": [
         "/home/victorkure/.local/lib/python3.12/site-packages"
     ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.inlayHints.callArgumentNames": "partial",
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.autoTestDiscoverOnSaveEnabled": false,
+
+    // PyCharm-like editing: autosave, visible structure, strong navigation.
+    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.tree.indent": 16,
+    "workbench.tree.renderIndentGuides": "always",
+    "workbench.editor.highlightModifiedTabs": true,
+    "explorer.compactFolders": false,
+    "explorer.confirmDragAndDrop": false,
+    "breadcrumbs.enabled": true,
+    "editor.fontFamily": "'JetBrains Mono', 'Cascadia Code', Consolas, monospace",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 14,
+    "editor.lineHeight": 22,
+    "editor.rulers": [
+        88,
+        120
+    ],
+    "editor.minimap.enabled": false,
+    "editor.stickyScroll.enabled": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.guides.indentation": true,
+    "editor.renderWhitespace": "boundary",
+    "editor.suggestSelection": "first",
+    "editor.acceptSuggestionOnCommitCharacter": true,
+    "editor.linkedEditing": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "problems.showCurrentInStatus": true,
+    "scm.diffDecorations": "all",
+
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": "explicit",
+            "source.fixAll.ruff": "explicit"
+        },
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.semanticHighlighting.enabled": true
+    },
+    "black-formatter.args": [
+        "--line-length",
+        "88"
+    ],
+    "ruff.lineLength": 88,
+    "ruff.organizeImports": true,
+    "errorLens.enabled": true,
+    "errorLens.delay": 250,
+
+    // Keep this large multi-project workspace responsive and searchable.
+    "search.exclude": {
+        "**/.git": true,
+        "**/.venv": true,
+        "**/venv": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.next": true,
+        "**/target": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.venv/**": true,
+        "**/venv/**": true,
+        "**/__pycache__/**": true,
+        "**/node_modules/**": true,
+        "**/.next/**": true,
+        "**/target/**": true
+    },
+    "files.associations": {
+        ".env.*": "dotenv",
+        "*.prompt": "markdown"
+    },
+
+    // Darcula-inspired surfaces without replacing VS Code's maintained theme.
+    "workbench.colorCustomizations": {
+        "editor.background": "#2B2B2B",
+        "sideBar.background": "#313335",
+        "activityBar.background": "#2B2B2B",
+        "panel.background": "#2B2B2B",
+        "terminal.background": "#2B2B2B",
+        "editorLineNumber.foreground": "#606366",
+        "editorLineNumber.activeForeground": "#A4A3A3",
+        "editor.selectionBackground": "#214283",
+        "editor.lineHighlightBackground": "#323232",
+        "editorIndentGuide.background1": "#414141",
+        "editorIndentGuide.activeBackground1": "#6A6A6A"
+    },
     "terminal.integrated.fontFamily": "'Sarasa Fixed SC', 'Sarasa Mono SC', 'Noto Sans Mono CJK SC', 'Microsoft YaHei Mono', 'Cascadia Mono', Consolas, monospace",
     "terminal.integrated.fontSize": 14,
     "terminal.integrated.lineHeight": 1.15,

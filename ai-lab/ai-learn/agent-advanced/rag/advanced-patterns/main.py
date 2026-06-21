@@ -12,7 +12,7 @@ class Child:
     parent_id: str
     text: str
 
-
+#   父文档集合
 PARENTS = {
     "p1": "差旅规定：新干线费用可报销。超过三万日元必须由部门经理审批。申请单需附发票。",
     "p2": "远程办公：每周最多三天。海外远程办公需要信息安全部门事前审批。",
@@ -41,14 +41,14 @@ def hyde(query: str) -> str:
     """构造假设答案；真实 HyDE 通常由 LLM 生成，本例只用固定模板。"""
     return f"与问题相关的制度答案可能包含审批、费用、权限、来源等条件：{query}"
 
-
+# 这个函数模拟了一个非常基础的 RAG 检索和纠正流程，适合教学和对比实验。
 def retrieve(query: str, use_hyde: bool = True) -> list[tuple[Child, float]]:
     """按 token 交集数给 child chunk 排序，分数越高表示重叠越多。"""
     query_tokens = tokens(query + (" " + hyde(query) if use_hyde else ""))
     ranked = [(child, len(query_tokens & tokens(child.text))) for child in children()]
     return sorted(ranked, key=lambda item: item[1], reverse=True)
 
-
+#   
 def compress(query: str, text: str) -> str:
     """只保留父文档中与问题有词语交集的句子，模拟上下文压缩。"""
     q = tokens(query)
