@@ -27,7 +27,7 @@ python3 client.py x --limit 99                  # 参数错误路径
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户查询] --> B[MCP Client]
     B --> C[连接 Server]
     C --> D[Initialize]

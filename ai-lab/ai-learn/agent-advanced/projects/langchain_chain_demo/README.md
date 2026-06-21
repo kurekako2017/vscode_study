@@ -82,7 +82,7 @@ LangChain 风格最小链路示例。
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户问题] --> B[ChatPromptTemplate]
     B --> C{运行模式}
     C -- Real --> D[真实模型]

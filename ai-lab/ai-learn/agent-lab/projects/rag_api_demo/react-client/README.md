@@ -73,7 +73,7 @@ http://127.0.0.1:8000
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户填写问题和模型] --> B[React 状态管理]
     B --> C[fetch POST ask]
     C --> D[FastAPI RAG 后端]

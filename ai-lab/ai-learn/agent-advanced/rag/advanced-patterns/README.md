@@ -20,7 +20,7 @@ python3 main.py "远程办公规定" --baseline
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户问题] --> B[HyDE 查询扩展]
     B --> C[检索 Child Chunk]
     C --> D[回查 Parent 文档]

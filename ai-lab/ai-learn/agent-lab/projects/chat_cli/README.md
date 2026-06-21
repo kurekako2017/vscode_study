@@ -178,7 +178,7 @@ python3 main.py --mock --max-chars 80 "请用较长内容解释 agent、tool cal
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[命令行问题] --> B[argparse 参数解析]
     B --> C[判断 Real 或 Mock]
     C -- Mock --> D[本地 Mock 回答]

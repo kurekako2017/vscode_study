@@ -63,7 +63,7 @@ Agent の処理を「分析 -> 計画 -> 最終出力」の固定ワークフロ
 ### 北京旅游版流程图
 
 ```mermaid
-flowchart TD
+graph TD
     U["用户<br/>帮我安排北京 3 天游"] --> A["Analyze<br/>先分析需求"]
     A --> S["analysis<br/>记住天数、预算、偏好"]
     S --> P["Plan<br/>制定固定行程"]
@@ -148,7 +148,7 @@ python main.py --model gpt-5 "帮我规划一个带 RAG 的知识库助手"
 ## 7. 数据流
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户任务] --> B[Analyze 阶段]
     B --> C[analysis 文本状态]
     C --> D[Plan 阶段]
@@ -221,7 +221,7 @@ flowchart TD
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[任务描述] --> B[Analyze 阶段]
     B --> C[分析结果]
     C --> D[Plan 阶段]

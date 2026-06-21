@@ -20,7 +20,7 @@ curl -N -X POST http://127.0.0.1:8000/runs/stream -H 'Content-Type: application/
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[客户端 POST 消息] --> B[FastAPI 接收请求]
     B --> C[创建异步事件生成器]
     C --> D[发送 status]

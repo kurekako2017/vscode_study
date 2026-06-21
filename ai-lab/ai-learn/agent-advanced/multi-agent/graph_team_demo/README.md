@@ -19,7 +19,7 @@ python3 main.py "预算终止演示" --budget 2
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[复杂任务] --> B[Supervisor]
     B --> C{检查共享状态}
     C -- 无计划 --> D[Planner]

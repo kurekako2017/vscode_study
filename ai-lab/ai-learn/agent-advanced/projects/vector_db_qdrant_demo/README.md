@@ -103,7 +103,7 @@ vector_db_qdrant_demo/
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[文档] --> B[Embedding]
     B --> C{存储模式}
     C -- Mock --> D[内存 Qdrant Like]

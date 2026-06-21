@@ -117,7 +117,7 @@ python3 main.py --model gpt-4o "帮我做一个带搜索功能的知识库 agent
 ## 8. 数据流
 
 ```mermaid
-flowchart TD
+graph TD
     A[自然语言需求] --> B[AgentPlan schema]
     B --> C[generate_plan / responses.parse]
     C --> D[output_parsed]
@@ -168,7 +168,7 @@ flowchart TD
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户需求] --> B[系统提示词]
     B --> C{Real 或 Mock}
     C -- Real --> D[模型生成 JSON]

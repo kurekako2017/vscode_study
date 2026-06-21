@@ -9,7 +9,6 @@
 """
 
 import argparse
-import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -27,7 +26,6 @@ for _parent in Path(__file__).resolve().parents:
         sys.path.insert(0, str(_parent))
         break
 from llm_runtime import build_fallback_client, has_real_provider
-
 
 # 默认模型名。真实调用时可通过 --model 覆盖。
 DEFAULT_MODEL = "gpt-5"
@@ -55,18 +53,27 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
             print("ERROR: no real provider is configured.", file=sys.stderr)
             sys.exit(1)
         if OpenAI is None:
-            print("ERROR: openai package is not installed. Run: pip install openai", file=sys.stderr)
+            print(
+                "ERROR: openai package is not installed. Run: pip install openai",
+                file=sys.stderr,
+            )
             sys.exit(1)
         return "real"
 
     # 自动模式：没有 API Key 就自动降级为 mock，保证初学者也能运行。
     if not has_real_provider():
-        print("INFO: no real provider available, auto-switching to MOCK mode.", file=sys.stderr)
+        print(
+            "INFO: no real provider available, auto-switching to MOCK mode.",
+            file=sys.stderr,
+        )
         return "mock"
 
     # 有 API Key 但没安装 SDK，也自动降级为 mock。
     if OpenAI is None:
-        print("INFO: openai package not installed, auto-switching to MOCK mode.", file=sys.stderr)
+        print(
+            "INFO: openai package not installed, auto-switching to MOCK mode.",
+            file=sys.stderr,
+        )
         return "mock"
 
     return "real"
@@ -76,7 +83,10 @@ def build_client() -> Optional[OpenAI]:
     """构建 OpenAI 客户端。真实模式才会调用此函数。"""
     # API Key 从环境变量读取，避免写死在代码里。
     if OpenAI is None:
-        print("ERROR: openai package is not installed. Run: pip install openai", file=sys.stderr)
+        print(
+            "ERROR: openai package is not installed. Run: pip install openai",
+            file=sys.stderr,
+        )
         sys.exit(1)
     # 返回 SDK 客户端，后续由 ask_once() 使用。
     return build_fallback_client()
@@ -122,13 +132,21 @@ def main():
     #   python3 model_call_example.py --real --model gpt-5 "你好"
     parser = argparse.ArgumentParser(description="Minimal model call example")
     # prompt 是位置参数；不传时使用默认问题。
-    parser.add_argument("prompt", nargs="?", default="Hello, explain agents in one line")
+    parser.add_argument(
+        "prompt", nargs="?", default="Hello, explain agents in one line"
+    )
     # --model 用于真实调用时切换模型。
     parser.add_argument("--model", default=DEFAULT_MODEL)
     # 互斥参数组：--mock 和 --real 不能同时出现。
     mode_group = parser.add_mutually_exclusive_group()
-    mode_group.add_argument("--mock", action="store_true", help="Force mock mode (no API key required)")
-    mode_group.add_argument("--real", action="store_true", help="Force real API mode (requires OPENAI_API_KEY)")
+    mode_group.add_argument(
+        "--mock", action="store_true", help="Force mock mode (no API key required)"
+    )
+    mode_group.add_argument(
+        "--real",
+        action="store_true",
+        help="Force real API mode (requires OPENAI_API_KEY)",
+    )
     args = parser.parse_args()
 
     # 先决定运行模式，再决定是否需要构建真实客户端。

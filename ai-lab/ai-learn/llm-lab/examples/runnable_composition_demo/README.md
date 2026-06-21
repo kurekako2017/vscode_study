@@ -19,7 +19,7 @@ python3 main.py "RAG 如何重排" --stream
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[问题字典] --> B[Passthrough Assign]
     B --> C[计算 Intent]
     B --> D[计算 Length]

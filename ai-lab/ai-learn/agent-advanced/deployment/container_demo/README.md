@@ -33,7 +33,7 @@ python3 app.py
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[构建 Docker 镜像] --> B[启动容器]
     B --> C[读取环境变量]
     C --> D[HTTPServer 监听端口]

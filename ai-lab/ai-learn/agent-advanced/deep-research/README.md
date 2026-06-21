@@ -19,7 +19,7 @@ python3 main.py "LangGraph MCP Agent 如何保证安全"
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[研究问题] --> B[生成检索计划]
     B --> C[搜索证据]
     C --> D[按来源去重]

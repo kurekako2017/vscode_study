@@ -60,7 +60,7 @@ LangGraph 风格最小状态图示例。
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户任务] --> B[意图分类]
     B --> C[Research 节点]
     C --> D[Draft 节点]

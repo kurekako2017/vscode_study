@@ -31,7 +31,7 @@ python3 eval_rag.py
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[加载评估样本] --> B[执行或读取 RAG 预测]
     B --> C[计算检索覆盖率]
     B --> D[计算答案关键词精度]

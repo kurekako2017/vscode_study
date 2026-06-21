@@ -53,7 +53,7 @@
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[复杂任务] --> B[Planner]
     B --> C[Researcher]
     C --> D[Writer]

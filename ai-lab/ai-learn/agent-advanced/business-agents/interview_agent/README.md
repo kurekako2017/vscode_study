@@ -18,7 +18,7 @@ python3 main.py "situation task action result metric reflection"
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[面试回答] --> B[标准化文本]
     B --> C[逐项匹配 STAR Rubric]
     C --> D[累计分数]

@@ -44,7 +44,7 @@ Tool Agent 用于让模型在受控范围内读取资料或执行操作。示例
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户任务] --> B[模型选择工具]
     B --> C[参数和路径校验]
     C --> D[执行允许的工具]

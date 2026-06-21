@@ -19,7 +19,7 @@ python3 main.py "+ value = parse(data)"
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[Git Diff] --> B[本地安全规则扫描]
     B --> C{是否发现高风险}
     C -- 是 --> D[标记 blocked]

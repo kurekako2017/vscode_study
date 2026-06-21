@@ -36,7 +36,7 @@ Doc QA Agent — 学习说明与快速上手
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[文档目录] --> B[读取和切分]
     B --> C[本地检索]
     D[用户问题] --> C

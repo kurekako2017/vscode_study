@@ -92,7 +92,7 @@ curl -X POST http://127.0.0.1:8088/client/reload
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[企业 Java 调用方] --> B[Spring Controller]
     B --> C[RagApiClientService]
     C --> D[RestTemplate]

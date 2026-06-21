@@ -133,7 +133,7 @@ python main.py --model gpt-5 --docs d:/dev/source_code/vscode_study/java-lab "�
 ## 9. 数据流
 
 ```mermaid
-flowchart TD
+graph TD
     A["输入层<br/>命令行: 用户问题"]
     B["入口层<br/>文件: main.py<br/>函数: parse_args()<br/>读取 question / --docs / --model"]
     C["文档读取层 Loader<br/>文件: main.py<br/>函数: iter_text_files()<br/>扫描 .md / .txt"]
@@ -216,7 +216,7 @@ flowchart TD
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[Markdown 和文本文件] --> B[读取并切分 Chunk]
     B --> C[建立本地索引]
     D[用户问题] --> E[检索 Top K]

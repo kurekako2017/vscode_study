@@ -94,7 +94,7 @@ internal_hybrid_rag_demo/
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[文件服务器] --> C[加载统一文档]
     B[企业 Wiki] --> C
     D[用户角色] --> E[ACL 权限过滤]

@@ -565,7 +565,7 @@ curl -X POST http://127.0.0.1:8000/reload
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[React 或 Spring 客户端] --> B[POST ask]
     B --> C[FastAPI 校验请求]
     C --> D[检索本地文档]

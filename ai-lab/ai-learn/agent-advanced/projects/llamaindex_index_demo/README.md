@@ -52,7 +52,7 @@
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[本地文档] --> B[切分为 Node]
     B --> C[建立倒排索引]
     D[用户问题] --> E[查询扩展]

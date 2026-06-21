@@ -30,7 +30,7 @@ Structured Output Demo — 学习说明与快速上手
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[业务需求] --> B[提示词和 Schema]
     B --> C[模型或 Mock]
     C --> D[JSON 文本]

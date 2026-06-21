@@ -63,7 +63,7 @@
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[原始文档] --> B[切分 Chunk]
     C[用户问题] --> D[查询改写和扩展]
     B --> E[多路召回]

@@ -19,7 +19,7 @@ python3 main.py create_draft "会议纪要"
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户任务] --> B[选择 Office 工具]
     B --> C{工具是否在允许列表}
     C -- 否 --> D[拒绝执行]

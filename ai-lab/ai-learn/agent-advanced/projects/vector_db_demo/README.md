@@ -95,7 +95,7 @@ vector_db_demo/
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[文档文本] --> B[Embedding]
     B --> C[写入 Collection]
     D[用户查询] --> E[查询 Embedding]

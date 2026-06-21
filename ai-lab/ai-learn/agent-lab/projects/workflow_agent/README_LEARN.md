@@ -42,7 +42,7 @@ Workflow Agent Demo — 学习说明与快速上手
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[任务输入] --> B[Analyze]
     B --> C[分析状态]
     C --> D[Plan]

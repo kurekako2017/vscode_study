@@ -55,7 +55,7 @@ chat_ui_demo/
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[用户输入问题] --> B[React 表单提交]
     B --> C[写入用户消息]
     C --> D[Mock Answer 生成]

@@ -20,7 +20,7 @@ python3 main.py "退款" --tenant unknown
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[客户问题和租户] --> B{租户是否合法}
     B -- 否 --> C[拒绝请求]
     B -- 是 --> D[检索租户知识库]

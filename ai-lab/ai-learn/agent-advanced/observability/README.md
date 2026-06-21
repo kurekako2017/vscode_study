@@ -20,7 +20,7 @@ python3 main.py --fail
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[Agent 请求] --> B[创建 trace_id]
     B --> C[agent.run Span]
     C --> D[retriever.search Span]

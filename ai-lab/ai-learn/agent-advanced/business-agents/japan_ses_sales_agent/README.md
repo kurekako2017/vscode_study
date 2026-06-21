@@ -18,7 +18,7 @@ python3 main.py --skills python,rag --japanese 2 --max-rate 85
 ## 整体流程图
 
 ```mermaid
-flowchart TD
+graph TD
     A[案件条件] --> B[读取工程师资料]
     B --> C[过滤可用状态]
     C --> D[过滤日语和单价]
