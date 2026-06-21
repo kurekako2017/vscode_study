@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Agent Architect"
+  short_description: "Design production enterprise agent systems"
+  default_prompt: "Use $ai-agent-architect to design a production enterprise agent system."

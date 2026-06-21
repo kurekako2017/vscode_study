@@ -1,0 +1,4 @@
+interface:
+  display_name: "LangGraph Teacher"
+  short_description: "Learn LangGraph 1.x with runnable Python"
+  default_prompt: "Use $langgraph-teacher to teach me a runnable LangGraph 1.x StateGraph workflow."

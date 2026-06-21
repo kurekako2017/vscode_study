@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP Teacher"
+  short_description: "Learn MCP with runnable Python examples"
+  default_prompt: "Use $mcp-teacher to build and explain a runnable Python MCP client and server."

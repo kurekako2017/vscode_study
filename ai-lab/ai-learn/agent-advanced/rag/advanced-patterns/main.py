@@ -1,4 +1,5 @@
 """高级 RAG 标准模式的离线、可比较实现。"""
+
 from __future__ import annotations
 
 import argparse
@@ -9,8 +10,10 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Child:
     """用于检索的小片段，同时保留其父文档 id。"""
+
     parent_id: str
     text: str
+
 
 #   父文档集合
 PARENTS = {
@@ -25,7 +28,9 @@ def tokens(text: str) -> set[str]:
     lowered = text.lower()
     result = set(re.findall(r"[a-z0-9]+", lowered))
     for block in re.findall(r"[\u4e00-\u9fff]+", lowered):
-        result.update(block[index:index + 2] for index in range(max(1, len(block) - 1)))
+        result.update(
+            block[index : index + 2] for index in range(max(1, len(block) - 1))
+        )
     return result
 
 
@@ -33,13 +38,16 @@ def children() -> list[Child]:
     """把每篇父文档按句号拆成 child chunk。"""
     result: list[Child] = []
     for pid, parent in PARENTS.items():
-        result.extend(Child(pid, sentence) for sentence in parent.split("。") if sentence)
+        result.extend(
+            Child(pid, sentence) for sentence in parent.split("。") if sentence
+        )
     return result
 
 
 def hyde(query: str) -> str:
     """构造假设答案；真实 HyDE 通常由 LLM 生成，本例只用固定模板。"""
     return f"与问题相关的制度答案可能包含审批、费用、权限、来源等条件：{query}"
+
 
 # 这个函数模拟了一个非常基础的 RAG 检索和纠正流程，适合教学和对比实验。
 def retrieve(query: str, use_hyde: bool = True) -> list[tuple[Child, float]]:
@@ -48,7 +56,8 @@ def retrieve(query: str, use_hyde: bool = True) -> list[tuple[Child, float]]:
     ranked = [(child, len(query_tokens & tokens(child.text))) for child in children()]
     return sorted(ranked, key=lambda item: item[1], reverse=True)
 
-#   
+
+#   这个函数模拟了 CRAG 中的纠正和回查流程，基于检索结果和一个简单的相关性基线来决定走哪条路由。
 def compress(query: str, text: str) -> str:
     """只保留父文档中与问题有词语交集的句子，模拟上下文压缩。"""
     q = tokens(query)
@@ -63,7 +72,11 @@ def corrective_rag(query: str) -> dict:
     baseline_score = retrieve(query, use_hyde=False)[0][1]
     # 不用 HyDE 也完全无命中时，模板扩展得到的命中不应被当成可靠证据。
     if baseline_score == 0:
-        return {"route": "fallback", "answer": "知识库证据不足，转人工或外部检索。", "sources": []}
+        return {
+            "route": "fallback",
+            "answer": "知识库证据不足，转人工或外部检索。",
+            "sources": [],
+        }
     parent = PARENTS[best.parent_id]
     context = compress(query, parent) or parent
     return {
@@ -79,11 +92,16 @@ def corrective_rag(query: str) -> dict:
 def main() -> None:
     """选择标准 CRAG 流程或无 HyDE 基线，并打印便于比较的结果。"""
     print("MODEL: provider=local model=none mode=local-rag")
+    # 这里的查询和是否使用 HyDE 基线都可以通过命令行参数控制，方便对比实验。
     parser = argparse.ArgumentParser()
     parser.add_argument("query", nargs="?", default="新干线超过三万日元怎么审批")
     parser.add_argument("--baseline", action="store_true", help="关闭 HyDE")
     args = parser.parse_args()
-    result = corrective_rag(args.query) if not args.baseline else retrieve(args.query, False)[0]
+    result = (
+        corrective_rag(args.query)
+        if not args.baseline
+        else retrieve(args.query, False)[0]
+    )
     print(result)
 
 

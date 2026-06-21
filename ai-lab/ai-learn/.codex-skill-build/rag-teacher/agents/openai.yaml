@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAG Teacher"
+  short_description: "Design and learn modern RAG pipelines"
+  default_prompt: "Use $rag-teacher to design and explain a modern RAG pipeline in Python."
