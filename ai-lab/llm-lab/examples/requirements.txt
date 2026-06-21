@@ -1,5 +1,0 @@
-openai
-pydantic
-httpx
-fastapi
-uvicorn

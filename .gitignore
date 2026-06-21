@@ -20,3 +20,6 @@ node_modules/
 # Logs
 *.log
 .aider*
+
+# Local-only ATBIO site copy
+web-projects/docs/atbio/atmbio.com/

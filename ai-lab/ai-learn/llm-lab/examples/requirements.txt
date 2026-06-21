@@ -1,0 +1,6 @@
+openai
+pydantic
+httpx
+fastapi
+uvicorn
+langchain-core>=1.2,<2

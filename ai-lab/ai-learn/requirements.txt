@@ -1,0 +1,12 @@
+# 快速学习所需的基础依赖；覆盖默认离线/Mock 示例。
+openai>=1.68,<3
+pydantic>=2.10,<3
+httpx>=0.27,<1
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+pypdf>=5,<7
+langchain-core>=1.2,<2
+langchain-openai>=1.1,<2
+langchain-text-splitters>=1.0,<2
+langgraph>=1.0,<2
+mcp>=1.27,<2

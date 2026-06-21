@@ -1,0 +1,4 @@
+# 仅真实向量数据库示例需要；首次学习不必安装。
+qdrant-client>=1.11,<2
+chromadb>=0.5,<2
+sentence-transformers>=3,<6
