@@ -15,7 +15,7 @@
     "python.testing.autoTestDiscoverOnSaveEnabled": false,
 
     // PyCharm-like editing: autosave, visible structure, strong navigation.
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Dark Modern",
     "workbench.iconTheme": "material-icon-theme",
     "workbench.tree.indent": 16,
     "workbench.tree.renderIndentGuides": "always",
