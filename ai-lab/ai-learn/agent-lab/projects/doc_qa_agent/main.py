@@ -109,11 +109,11 @@ def build_client() -> OpenAI:
 
 def resolve_mode(force_mock: bool, force_real: bool) -> str:
     # 决定运行模式：'mock' | 'real'。
-    # 如果 force_mock 为 True，则返回 "mock"     
+    # 如果 force_mock 为 True，则返回 "mock"
     if force_mock:
         # 返回 "mock"
         return "mock"
-    # 如果 force_real 为 True，则返回 "real"     
+    # 如果 force_real 为 True，则返回 "real"
     if force_real:
         if not _has_real_credentials():
             # 打印错误信息
@@ -121,7 +121,7 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
             sys.exit(1)
         # 返回 "real"
         return "real"
-    # 如果设置了可用 key，则返回 "real"     
+    # 如果设置了可用 key，则返回 "real"
     return "real" if _has_real_credentials() else "mock"
 
 
@@ -138,7 +138,7 @@ def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
 def iter_text_files(base_dir: Path) -> list[Path]:
     # 层次: IO/索引层 — 负责查找与列出可检索的文件路径
     """递归查找支持的文本文件并返回排序后的列表。"""
-    # 查找支持的文本文件并返回排序后的列表     
+    # 查找支持的文本文件并返回排序后的列表
     files = []
     for path in base_dir.rglob("*"):
         if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
@@ -148,52 +148,52 @@ def iter_text_files(base_dir: Path) -> list[Path]:
 
 def chunk_text(text: str) -> list[str]:
     # 层次: 索引构建层 — 文本切分为可检索的 chunk
-    """把长文本切分为带重叠的 chunk，用于保留跨块上下文信息。""" 
+    """把长文本切分为带重叠的 chunk，用于保留跨块上下文信息。"""
     # 标准化文本
     normalized = text.replace("\r\n", "\n").strip()
     if not normalized:
         return []
 
-    # 初始化 chunk 列表    
+    # 初始化 chunk 列表
     chunks = []
-    # 初始化 start 为 0    
+    # 初始化 start 为 0
     start = 0
-    # 循环切分文本为 chunk，直到处理完整个文本    
+    # 循环切分文本为 chunk，直到处理完整个文本
     while start < len(normalized):
         # 计算 end     （计算 end）
         end = min(len(normalized), start + CHUNK_SIZE)
         # 添加 chunk     （添加 chunk）
         chunks.append(normalized[start:end])
-        # 如果 end 大于等于 normalized 的长度，则退出循环    
+        # 如果 end 大于等于 normalized 的长度，则退出循环
         if end >= len(normalized):
-            # 退出循环     
+            # 退出循环
             break
-        # 计算 start     
+        # 计算 start
         start = end - CHUNK_OVERLAP
-    # 返回 chunk 列表     
+    # 返回 chunk 列表
     return chunks
 
 
 def build_chunks(base_dir: Path) -> list[Chunk]:
     # 层次: 索引构建层 — 从文件生成带标签的 chunk 列表
     """读取目录下文件并把文件切分为带标签的 `Chunk` 列表。"""
-    # 初始化 chunk 列表    
+    # 初始化 chunk 列表
     chunks: list[Chunk] = []
     # 遍历文件路径     （
     for file_path in iter_text_files(base_dir):
         try:
-            # 读取文件文本     
+            # 读取文件文本
             text = file_path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
-            # 继续下一个文件     
+            # 继续下一个文件
             continue
 
         relative = file_path.relative_to(base_dir)
-        # 遍历 chunk   
+        # 遍历 chunk
         for index, part in enumerate(chunk_text(text), start=1):
-            # 计算 label     
+            # 计算 label
             label = f"{relative}#chunk{index}"
-            # 添加 chunk    
+            # 添加 chunk
             chunks.append(Chunk(source_label=str(label), content=part))
     return chunks
 
@@ -228,7 +228,7 @@ def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
 
 def build_context(top_chunks: list[Chunk]) -> str:
     # 层次: 上下文构建层 — 将检索结果封装为模型的上下文字符串
-    """把 top-k chunks 拼接为模型可读的检索上下文。""" 
+    """把 top-k chunks 拼接为模型可读的检索上下文。"""
     if not top_chunks:
         return "No relevant local document chunks were retrieved."
 
@@ -284,7 +284,7 @@ def main() -> None:
         print("ERROR: no readable .md or .txt files were found.", file=sys.stderr)
         sys.exit(1)
 
-    # The retrieval step happens before the model call so only the most relevant chunks are sent.
+    # 检索阶段：根据用户问题从 chunks 中找出 top-k 匹配的片段。
     top_chunks = retrieve(args.question, chunks)
     # 构建上下文
     context = build_context(top_chunks)
@@ -308,12 +308,12 @@ def main() -> None:
     print("=== Answer ===")
     print(answer)
 
-    print("\n=== Sources ===")  
+    print("\n=== Sources ===")
     if not top_chunks:
         print("No matching chunks found.")
         return
 
-    # 遍历 chunk   
+    # 遍历 chunk
     for chunk in top_chunks:
         print(f"- {chunk.source_label} (score={chunk.score})")
 

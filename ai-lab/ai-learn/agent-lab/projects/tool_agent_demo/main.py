@@ -21,7 +21,6 @@
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -33,7 +32,6 @@ for _parent in Path(__file__).resolve().parents:
         sys.path.insert(0, str(_parent))
         break
 from llm_runtime import build_fallback_client, has_real_provider
-
 
 DEFAULT_MODEL = "gpt-5"
 MAX_TOOL_ROUNDS = 8
@@ -50,10 +48,10 @@ def parse_args() -> argparse.Namespace:
     # 层次: 输入层 — 解析用户任务、模型与工作目录范围（支持 mock/real）
     """解析命令行参数：用户任务、模型名与允许访问的工作目录。"""
     parser = argparse.ArgumentParser(
-        description="Minimal tool-calling agent demo for listing files, reading files, and searching text."
+        description="用于列出文件、读取文件和搜索文本的极简工具调用代理演示."
     )
     # 用户任务 ：用户任务说明
-    parser.add_argument("prompt", help="Task request for the tool agent.")
+    parser.add_argument("prompt", help="工具代理的任务请求.")
     # 模型名 ：使用的模型名
     parser.add_argument(
         "--model",
@@ -67,9 +65,15 @@ def parse_args() -> argparse.Namespace:
         help="Working directory the tools can access. Default: current directory.",
     )
     # 模式选择 ：互斥组，分别强制 mock 或强制 real
-    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument(
+        "--mock", action="store_true", help="Run in offline mock mode (no API calls)."
+    )
     # 模式选择 ：互斥组，分别强制 mock 或强制 real
-    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).")
+    parser.add_argument(
+        "--real",
+        action="store_true",
+        help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).",
+    )
     return parser.parse_args()
 
 
@@ -97,7 +101,10 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
         return "mock"
     if force_real:
         if not _has_real_credentials():
-            print("ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
+            print(
+                "ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.",
+                file=sys.stderr,
+            )
             sys.exit(1)
         return "real"
     return "real" if _has_real_credentials() else "mock"
@@ -137,7 +144,9 @@ def list_files(base_dir: Path, path: str = ".") -> dict[str, Any]:
         return {"ok": False, "error": "Path is not a directory."}
 
     entries = []
-    for item in sorted(target.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())):
+    for item in sorted(
+        target.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())
+    ):
         entries.append(
             {
                 "name": item.name,
@@ -180,8 +189,10 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
         return {"ok": False, "error": "Path does not exist."}
     # 如果目标是一个文件，则直接搜索该文件，否则搜索该目录下的所有文件  （递归搜索）
     matches = []
-    files = [target] if target.is_file() else [p for p in target.rglob("*") if p.is_file()]
-    # 遍历所有文件，搜索关键词  （不区分大小写）    
+    files = (
+        [target] if target.is_file() else [p for p in target.rglob("*") if p.is_file()]
+    )
+    # 遍历所有文件，搜索关键词  （不区分大小写）
     for file_path in files:
         try:
             lines = file_path.read_text(encoding="utf-8").splitlines()
@@ -190,14 +201,21 @@ def search_text(base_dir: Path, query: str, path: str = ".") -> dict[str, Any]:
         # 遍历所有行，搜索关键词  （不区分大小写）                  （如果匹配到了关键词，则添加到 matches 列表中，如果 matches 列表长度大于 50，则返回结果，否则继续搜索下一个文件）
         for line_number, line in enumerate(lines, start=1):
             if query.lower() in line.lower():
-                matches.append({
-                    "file": str(file_path),
-                    "line": line_number,
-                    "text": line.strip(),
-                })
+                matches.append(
+                    {
+                        "file": str(file_path),
+                        "line": line_number,
+                        "text": line.strip(),
+                    }
+                )
                 if len(matches) >= 50:
-                    return {"ok": True, "query": query, "matches": matches, "truncated": True}
-    # 如果 matches 列表长度小于 50，则返回结果，否则返回截断标志（True），表示结果被截断了。            
+                    return {
+                        "ok": True,
+                        "query": query,
+                        "matches": matches,
+                        "truncated": True,
+                    }
+    # 如果 matches 列表长度小于 50，则返回结果，否则返回截断标志（True），表示结果被截断了。
     return {"ok": True, "query": query, "matches": matches, "truncated": False}
 
 
@@ -210,7 +228,7 @@ def call_tool(base_dir: Path, name: str, args: dict[str, Any]) -> dict[str, Any]
     # 根据工具名称调用对应函数，任何未识别的工具都会返回错误信息。
     if name == "list_files":
         return list_files(base_dir, path=args.get("path", "."))
-    #   这里的工具调用接口非常简单，直接根据工具名称分发到对应函数。实际应用中可以添加更多工具并在此处进行分发。    if name == "read_file":
+        #   这里的工具调用接口非常简单，直接根据工具名称分发到对应函数。实际应用中可以添加更多工具并在此处进行分发。    if name == "read_file":
         return read_file(base_dir, path=args["path"])
     #  search_text 工具需要 query 参数，path 参数可选（默认为当前目录），调用时会返回匹配行的文件名、行号和文本内容。
     if name == "search_text":
@@ -281,7 +299,9 @@ def build_tools() -> list[dict[str, Any]]:
     ]
 
 
-def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mode: str) -> str:
+def run_agent(
+    client: OpenAI | None, model: str, base_dir: Path, prompt: str, mode: str
+) -> str:
     # 层次: Agent 控制层 — 驱动模型与工具交互的主循环
     """运行一个最小的 agent 控制循环：
 
@@ -294,7 +314,7 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
     # 改进：在 Mock 模式下模拟简单的工具调用逻辑，以便用户练习
     if mode == "mock":
         print(f"\n[MOCK MODE] 模拟 AI 思考中... 任务: {prompt}")
-        
+
         # 简单的规则引擎：根据关键词模拟模型决定调用哪个工具，如果关键词包含“列出”、“list”、“目录”，则调用 list_files 工具，如果关键词包含“读取”、“read”，则调用 read_file 工具，如果关键词包含“搜索”、“search”，则调用 search_text 工具
         mock_tool_name = None
         mock_args = {}
@@ -304,7 +324,7 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
             mock_args = {"path": "."}
         elif "读取" in prompt or "read" in prompt.lower():
             mock_tool_name = "read_file"
-            mock_args = {"path": "README.md"} # 默认读取 README
+            mock_args = {"path": "README.md"}  # 默认读取 README
         elif "搜索" in prompt or "search" in prompt.lower():
             mock_tool_name = "search_text"
             mock_args = {"query": "README", "path": "."}
@@ -313,15 +333,14 @@ def run_agent(client: OpenAI | None, model: str, base_dir: Path, prompt: str, mo
             print(f"[MOCK CALL] 模型决定调用工具: {mock_tool_name} 参数: {mock_args}")
             result = call_tool(base_dir, mock_tool_name, mock_args)
             return f"[MOCK RESULT] 工具返回结果: {json.dumps(result, ensure_ascii=False, indent=2)}\n\n(这是模拟运行，设置 API Key 后可体验完整推理)"
-        
+
         return build_mock_agent_response(prompt)
 
     input_items: list[dict[str, Any]] = [
         {
             "role": "user",
             "content": (
-                f"Working directory: {base_dir.resolve()}\n"
-                f"User task: {prompt}"
+                f"Working directory: {base_dir.resolve()}\n" f"User task: {prompt}"
             ),
         }
     ]
