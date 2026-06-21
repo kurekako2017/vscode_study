@@ -206,6 +206,9 @@ def main() -> None:
     """主流程：执行 analyze -> plan -> finalize 三阶段，并逐段输出结果。"""
     args = parse_args()
     mode = resolve_mode(args.mock, args.real)
+    # 先把运行方式说清楚；真实模式会在每次请求成功后打印实际 provider/model。
+    if mode == "mock":
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     client = None
     # 如果 mode 为 "real"，则构建客户端     （如果 mode 为 "real"，则构建客户端）
     if mode == "real":

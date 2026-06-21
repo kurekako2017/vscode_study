@@ -21,6 +21,8 @@ class User(BaseModel):
 
 
 def main() -> None:
+    """演示 Pydantic 的正常校验、序列化和失败分支。"""
+    print("MODEL: provider=local model=none mode=pydantic-validation")
     # 正确的数据会通过验证并被转换为模型实例
     # 注意：payload 是普通 dict，User(**payload) 会做类型校验。
     payload = {"id": 1, "name": "Bob", "score": 4.5}

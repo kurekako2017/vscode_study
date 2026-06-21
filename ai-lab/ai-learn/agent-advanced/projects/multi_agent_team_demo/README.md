@@ -42,3 +42,24 @@
 3. `writer_agent()` 看结果怎么组织
 4. `critic_agent()` 看反馈怎么做
 5. `supervisor()` 看总调度怎么收口
+
+## 业务场景（完整说明）
+
+- **使用者**：需要角色分工完成复杂知识任务的 Agent 开发者。
+- **要解决的问题**：让 Planner、Researcher、Writer、Critic 分别产出结果，再由 Supervisor 汇总收口。
+- **输入与输出**：输入复杂任务；输出计划、研究材料、草稿、批评意见和最终方案。
+- **生产环境差距**：需要真实模型、共享上下文控制、预算、并行执行、角色权限和失败恢复。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[复杂任务] --> B[Planner]
+    B --> C[Researcher]
+    C --> D[Writer]
+    D --> E[Critic]
+    E --> F{是否需要修改}
+    F -- 是 --> D
+    F -- 否 --> G[Supervisor 汇总]
+    G --> H[最终方案]
+```

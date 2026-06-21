@@ -290,6 +290,9 @@ def main() -> None:
     context = build_context(top_chunks)
     # 决定运行模式
     mode = resolve_mode(args.mock, args.real)
+    # Mock 回答来自本地模板；真实模式由统一运行时打印最终选中的模型。
+    if mode == "mock":
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
 
     client = None
     if mode == "real":

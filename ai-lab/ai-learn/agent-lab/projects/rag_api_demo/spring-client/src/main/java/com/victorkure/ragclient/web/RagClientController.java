@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/client")
 public class RagClientController {
 
+    // Controller 暴露给浏览器或调用方，再把具体后端访问委托给 Service。
+
     private final RagApiClientService ragApiClientService;
     private final String baseUrl;
 
@@ -32,6 +34,7 @@ public class RagClientController {
 
     @GetMapping
     public Map<String, Object> info() {
+        // 这个接口只说明客户端自身信息，不会访问 Python 后端。
         return Map.of(
             "client", "rag-api-demo-spring-client",
             "backend_base_url", baseUrl,
@@ -51,6 +54,7 @@ public class RagClientController {
 
     @PostMapping("/ask")
     public AskResponse ask(@RequestBody AskRequest request) {
+        // 请求中的 model 会原样传给 FastAPI；客户端不自行调用模型。
         return ragApiClientService.ask(request);
     }
 

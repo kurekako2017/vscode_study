@@ -62,6 +62,7 @@ def precision(gold_sources: list[str], retrieved_sources: list[str]) -> float:
 
 # 程序入口，逐条样本输出评估报表。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=offline-eval")
     # 加载所有样本。
     samples = load_samples()
     # 累计覆盖率。

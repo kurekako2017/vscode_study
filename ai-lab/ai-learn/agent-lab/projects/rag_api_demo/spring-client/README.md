@@ -81,3 +81,24 @@ curl -X POST http://127.0.0.1:8088/client/reload
 - 它是一个 Java / Spring Boot 版的 API 客户端
 - 它不是替代后端，而是作为上游调用者
 - 适合学习企业里常见的“Java 服务调 AI 服务”的方式
+
+## 业务场景（完整说明）
+
+- **使用者**：已有 Spring Boot 系统的 Java 团队和企业集成开发者。
+- **要解决的问题**：由 Java 服务作为中间客户端调用 Python RAG API，并向现有业务系统暴露统一接口。
+- **输入与输出**：输入 Java DTO 请求；输出映射后的健康信息、回答、来源和重载结果。
+- **生产环境差距**：需要认证头、连接池、超时重试、熔断、DTO 校验、日志追踪和服务发现。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[企业 Java 调用方] --> B[Spring Controller]
+    B --> C[RagApiClientService]
+    C --> D[RestTemplate]
+    D --> E[Python FastAPI]
+    E --> F[RAG 检索和模型]
+    F --> G[JSON Response]
+    G --> H[Java Record DTO]
+    H --> A
+```

@@ -30,6 +30,7 @@ def factorial(n: int) -> int:
 
 
 if __name__ == "__main__":
+    print("MODEL: provider=local model=none mode=python-basics")
     # 只有直接运行这个文件时，下面代码才会执行。
     # 如果这个文件被其他文件 import，下面代码不会自动跑。
 

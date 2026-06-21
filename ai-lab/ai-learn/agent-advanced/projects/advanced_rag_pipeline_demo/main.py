@@ -236,6 +236,7 @@ def format_results(results: list[ChunkScore], show_excerpt: bool) -> list[str]:
 
 # 程序入口，串起加载、切分、检索、重排和输出。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=local-rag")
     # 解析参数。
     args = parse_args()
     # 加载原始文档。

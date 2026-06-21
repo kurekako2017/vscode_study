@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react'
 
+// 这个 UI 完全在浏览器内生成 Mock 回答，不会向任何模型服务发送请求。
+const MODEL_INFO = 'provider=local model=mock mode=mock-ui'
+console.info(`MODEL: ${MODEL_INFO}`)
+
 type Message = {
+  // role 决定消息显示在用户侧还是助手侧。
   role: 'user' | 'assistant'
   content: string
 }
@@ -17,6 +22,7 @@ const MOCK_SOURCES: Source[] = [
 ]
 
 function buildMockAnswer(question: string): { answer: string; sources: Source[] } {
+  // 返回值故意模仿 RAG API 的“答案 + 来源”结构，之后可直接替换为 fetch。
   return {
     answer: `我先根据本地资料模拟回答“${question}”。你可以把这里替换成真实 RAG API 的返回结果。`,
     sources: MOCK_SOURCES,
@@ -24,6 +30,7 @@ function buildMockAnswer(question: string): { answer: string; sources: Source[] 
 }
 
 export default function App() {
+  // input 是输入框草稿；messages/sources 是提交问题后的页面状态。
   const [input, setInput] = useState('远程办公和发布流程有什么要求？')
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: '这里是一个最小的社内知识问答前端壳子。' },
@@ -31,11 +38,13 @@ export default function App() {
   const [sources, setSources] = useState<Source[]>(MOCK_SOURCES)
 
   const latestAnswer = useMemo(
+    // 只有 messages 改变时才重新寻找最后一条助手消息。
     () => messages.filter((message) => message.role === 'assistant').at(-1)?.content ?? '',
     [messages],
   )
 
   function sendMessage(event: React.FormEvent<HTMLFormElement>) {
+    // 阻止表单刷新页面，改由 React 更新局部状态。
     event.preventDefault()
     const question = input.trim()
     if (!question) return
@@ -53,6 +62,7 @@ export default function App() {
         <header className="header">
           <h1>Agent Advanced Chat UI Demo</h1>
           <p>先把消息流、来源引用和问答布局跑通，再接真实后端。</p>
+          <p>MODEL: {MODEL_INFO}</p>
         </header>
 
         <form className="composer" onSubmit={sendMessage}>

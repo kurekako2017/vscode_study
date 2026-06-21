@@ -4,11 +4,16 @@ const DEFAULT_BASE_URL = import.meta.env.VITE_RAG_API_BASE_URL || 'http://127.0.
 const DEFAULT_MODEL = 'gpt-5'
 const DEFAULT_QUESTION = '请总结文档重点，并列出最重要的来源。'
 
+// 浏览器只是客户端；真正使用的 provider/model 由 FastAPI 后端决定。
+console.info(`MODEL: provider=backend model=${DEFAULT_MODEL} mode=selected-by-api`)
+
 function normalizeBaseUrl(value) {
+  // 去掉末尾斜杠，避免拼接接口路径时出现 //health。
   return value.replace(/\/+$/, '')
 }
 
 function formatSourceLabel(source) {
+  // 把后端来源对象转换成页面上容易阅读的一行文字。
   if (!source) {
     return 'unknown'
   }
@@ -16,10 +21,12 @@ function formatSourceLabel(source) {
 }
 
 function createEntryId(prefix) {
+  // 优先使用浏览器 UUID；旧环境没有该 API 时退回时间戳和随机数。
   return `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`}`
 }
 
 export default function App() {
+  // 连接配置、问答结果和页面操作状态分别保存，便于初学者逐项观察变化。
   const [baseUrl, setBaseUrl] = useState(DEFAULT_BASE_URL)
   const [question, setQuestion] = useState(DEFAULT_QUESTION)
   const [model, setModel] = useState(DEFAULT_MODEL)
@@ -35,6 +42,7 @@ export default function App() {
   const endpoint = normalizeBaseUrl(baseUrl)
 
   async function requestJson(url, options) {
+    // 所有 HTTP 请求共用这里的 JSON 解析和错误处理。
     const response = await fetch(url, options)
     const payload = await response.json().catch(() => null)
     if (!response.ok) {
@@ -106,6 +114,7 @@ export default function App() {
       },
     ])
     try {
+      // model 是用户选择的请求模型；后端仍可能按回退策略改用其他 provider。
       const data = await requestJson(`${endpoint}/ask`, {
         method: 'POST',
         headers: {
@@ -115,6 +124,7 @@ export default function App() {
         body: JSON.stringify({ question, model }),
       })
       setAnswer(data)
+      console.info(`MODEL: provider=backend model=${data.model} mode=api-response`)
       setHistory((current) => [
         ...current,
         {

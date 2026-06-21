@@ -71,3 +71,24 @@ LangChain 风格最小链路示例。
 - `raw_message.content` 是模型直接吐出来的原始内容
 - `parse_response()` 是把原始内容重新解析成字典
 - `print(json.dumps(...))` 打印的是解析后的最终结果
+
+## 业务场景（完整说明）
+
+- **使用者**：需要快速组合提示词、模型和输出解析器的 LLM 应用开发者。
+- **要解决的问题**：把自由文本问题稳定转换为包含 summary、steps、keywords 的结构化结果。
+- **输入与输出**：输入用户问题；输出解析后的 Python 字典或原始模型文本。
+- **生产环境差距**：需要 schema 校验重试、模型超时、提示词版本管理、缓存和质量评估。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[用户问题] --> B[ChatPromptTemplate]
+    B --> C{运行模式}
+    C -- Real --> D[真实模型]
+    C -- Mock --> E[本地 Mock LLM]
+    D --> F[AIMessage]
+    E --> F
+    F --> G[JSON 解析器]
+    G --> H[Python Dict]
+```

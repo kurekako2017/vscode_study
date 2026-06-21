@@ -116,7 +116,7 @@ def mock_llm(prompt_value: Any) -> AIMessage:
 
 
 # 构建真实模型客户端，供 real 模式使用。
-def build_real_llm():
+def build_real_llm(model: str):
     client = build_fallback_client()
 
     def invoke(prompt_value: Any) -> AIMessage:
@@ -124,7 +124,7 @@ def build_real_llm():
         instructions = str(messages[0].content) if len(messages) > 1 else None
         prompt = str(messages[-1].content)
         response = client.responses.create(
-            model=DEFAULT_MODEL,
+            model=model,
             instructions=instructions,
             input=prompt,
         )
@@ -151,21 +151,21 @@ def parse_response(message: AIMessage) -> dict[str, Any]:
 
 
 # 组合 prompt、LLM 和解析器，形成一条链。
-def build_chain(use_mock: bool):
+def build_chain(use_mock: bool, model: str = DEFAULT_MODEL):
     # 先构造 prompt。
     prompt = build_prompt()
     # 根据开关决定使用 mock 还是真实模型。
-    llm = RunnableLambda(mock_llm) if use_mock else build_real_llm()
+    llm = RunnableLambda(mock_llm) if use_mock else build_real_llm(model)
     # prompt -> llm -> parse_response
     return prompt | llm | RunnableLambda(parse_response)
 
 
 # 只构造 prompt -> llm，用于查看原始模型输出。
-def build_generation_chain(use_mock: bool):
+def build_generation_chain(use_mock: bool, model: str = DEFAULT_MODEL):
     # 先构造 prompt。
     prompt = build_prompt()
     # 根据开关决定使用 mock 还是真实模型。
-    llm = RunnableLambda(mock_llm) if use_mock else build_real_llm()
+    llm = RunnableLambda(mock_llm) if use_mock else build_real_llm(model)
     # prompt -> llm
     return prompt | llm
 
@@ -179,18 +179,19 @@ def main() -> None:
     if args.mock:
         print("=== 模式 ===")
         print("mock（强制本地模拟）")
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
         # 用户明确要求 mock，就跳过真实模型。
-        chain = build_chain(True)
+        chain = build_chain(True, args.model)
     else:
         print("=== 模式 ===")
         print("real（优先尝试真实模型，失败后回退到 mock）")
         # 默认先尝试真实链路，不可用时再回退到 mock。
         try:
-            chain = build_chain(False)
+            chain = build_chain(False, args.model)
         except Exception as exc:
             # 真实模式失败时，自动回退到 mock，保证演示可继续。
             print(f"真实模式不可用，回退到 mock：{exc}")
-            chain = build_chain(True)
+            chain = build_chain(True, args.model)
 
     # 打印 Mermaid 图，方便学习链路结构。
     print("=== LangChain 风格链路（Mermaid） ===")
@@ -198,7 +199,7 @@ def main() -> None:
 
     # 如果用户想看原始模型输出，就先打印原始内容，再打印解析结果。
     if args.show_raw:
-        generation_chain = build_generation_chain(args.mock)
+        generation_chain = build_generation_chain(args.mock, args.model)
         raw_message = generation_chain.invoke({"question": args.question})
         print("=== 原始结果 ===")
         print(raw_message.content)

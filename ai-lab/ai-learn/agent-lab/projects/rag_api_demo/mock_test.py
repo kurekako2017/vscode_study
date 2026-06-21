@@ -26,6 +26,7 @@ def build_mock_answer(question: str, top_chunks: list) -> str:
 
 def main():
     """入口：构造 mock 响应并以 JSON 形式输出到终端。"""
+    print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     # 在真实服务中 top_chunks 会来自检索流程，这里留空以保持脚本轻量     （在真实服务中 top_chunks 会来自检索流程，这里留空以保持脚本轻量）
     top_chunks = []
     # 构建 mock 回答文本     （构建 mock 回答文本）

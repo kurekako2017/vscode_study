@@ -183,6 +183,7 @@ def supervisor(topic: str) -> TeamState:
 
 # 程序入口，执行监督者协作流程并输出最终答案。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=multi-agent-simulation")
     # 读取参数。
     args = parse_args()
     # 运行监督者流程。

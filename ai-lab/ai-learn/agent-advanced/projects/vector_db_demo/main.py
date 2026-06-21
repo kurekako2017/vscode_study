@@ -210,6 +210,7 @@ def build_store(backend: str) -> Any:
 
 
 def main() -> None:
+    print("MODEL: provider=local model=none mode=vector-search")
     parser = argparse.ArgumentParser(description="向量数据库最小教学版 demo")
     parser.add_argument("query", help="要检索的问题")
     parser.add_argument("--backend", choices=["qdrant", "chroma", "memory"], default="qdrant")

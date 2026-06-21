@@ -167,3 +167,24 @@ python3 main.py --mock --max-chars 80 "请用较长内容解释 agent、tool cal
 4. **build_mock_answer**：生成 mock 数据（无 API Key 也能跑通流程）。
 5. **核心业务**：`ask_once()` 发起调用，`format_output()` 可选截断，`run_interactive()` 处理交互循环。
 6. **main**：总流程入口，串起参数解析、模式决策、调用与输出。
+
+## 业务场景（完整说明）
+
+- **使用者**：LLM 应用初学者和需要命令行助手的开发者。
+- **要解决的问题**：用最小界面验证提示词、模型连接、Mock/Real 切换和连续问答。
+- **输入与输出**：输入命令行问题或交互消息；输出模型回答及实际使用的模型信息。
+- **生产环境差距**：需要会话持久化、token 裁剪、流式输出、鉴权、限流和内容安全。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[命令行问题] --> B[argparse 参数解析]
+    B --> C[判断 Real 或 Mock]
+    C -- Mock --> D[本地 Mock 回答]
+    C -- Real --> E[Provider 回退运行时]
+    E --> F[实际模型]
+    D --> G[格式化和截断]
+    F --> G
+    G --> H[终端输出]
+```

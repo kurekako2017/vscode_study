@@ -157,3 +157,24 @@ flowchart TD
 4. **build_mock_plan**：生成 mock 数据（结构化计划）。
 5. **generate_plan**：核心业务（`responses.parse` 解析为 `AgentPlan`）。
 6. **main**：总流程入口，串起参数、模式、调用与 JSON 输出。
+
+## 业务场景（完整说明）
+
+- **使用者**：需要把模型结果交给数据库、工作流或 API 的开发者。
+- **要解决的问题**：避免后续程序解析不稳定的自然语言，要求模型输出符合 Pydantic Schema。
+- **输入与输出**：输入产品或任务描述；输出经过校验的 AgentPlan JSON。
+- **生产环境差距**：需要 schema 版本、校验失败重试、业务规则校验、模型评估和降级策略。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[用户需求] --> B[系统提示词]
+    B --> C{Real 或 Mock}
+    C -- Real --> D[模型生成 JSON]
+    C -- Mock --> E[本地构造对象]
+    D --> F[Pydantic Schema 校验]
+    E --> F
+    F --> G[AgentPlan 对象]
+    G --> H[Pretty JSON 和 Raw JSON]
+```

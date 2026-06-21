@@ -355,6 +355,7 @@ def print_section(title: str) -> None:
 
 # 程序入口，串起加载、过滤、检索、重排和输出。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=local-rag")
     # 解析参数。
     args = parse_args()
     # 加载所有文档。

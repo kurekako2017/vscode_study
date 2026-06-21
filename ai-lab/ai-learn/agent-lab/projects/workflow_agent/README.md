@@ -210,3 +210,23 @@ flowchart TD
 4. **build_mock_analysis / build_mock_plan / build_mock_final**：生成 mock 数据（三阶段离线输出）。
 5. **核心业务**：`analyze_task()` -> `plan_task()` -> `finalize_task()` 串起三阶段流程。
 6. **main**：总流程入口，按阶段执行并输出结果。
+
+## 业务场景（完整说明）
+
+- **使用者**：需要稳定执行分析、计划和总结三阶段任务的开发者。
+- **要解决的问题**：把一次复杂提示拆成可观察、可测试的固定工作流，并让中间结果成为下一阶段输入。
+- **输入与输出**：输入任务描述；输出分析文本、结构化计划和最终总结。
+- **生产环境差距**：需要 checkpoint、阶段重试、人工审批、并行节点、成本预算和状态持久化。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[任务描述] --> B[Analyze 阶段]
+    B --> C[分析结果]
+    C --> D[Plan 阶段]
+    D --> E[Pydantic 计划]
+    E --> F[Finalize 阶段]
+    F --> G[最终总结]
+    G --> H[分阶段输出]
+```

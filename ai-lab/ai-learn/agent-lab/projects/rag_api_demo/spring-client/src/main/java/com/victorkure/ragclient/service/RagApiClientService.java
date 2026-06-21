@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class RagApiClientService {
 
+    // Service 层只负责访问后端，不包含 Controller 的 HTTP 入参处理逻辑。
+
     private final RestTemplate restTemplate;
     private final RagApiClientProperties properties;
 
@@ -24,6 +26,7 @@ public class RagApiClientService {
     }
 
     public RootResponse getRoot() {
+        // getForObject 会发送 GET，并把 JSON 映射为指定的 record。
         return restTemplate.getForObject(properties.baseUrl() + "/", RootResponse.class);
     }
 
@@ -32,6 +35,7 @@ public class RagApiClientService {
     }
 
     public AskResponse ask(AskRequest request) {
+        // /ask 需要 JSON body，因此显式设置 Content-Type 并包装 HttpEntity。
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<AskRequest> entity = new HttpEntity<>(request, headers);

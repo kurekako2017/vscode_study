@@ -85,3 +85,25 @@ vector_db_chroma_demo/
 2. 再看 `run_mock()`，理解入库和查询流程
 3. 再看 `run_real()`，理解真实 Chroma 的接口
 4. 最后对比 `vector_db_demo/` 和 `vector_db_qdrant_demo/`
+
+## 业务场景（完整说明）
+
+- **使用者**：需要本地持久化向量检索原型的 RAG 开发者。
+- **要解决的问题**：在 Mock 与真实 Chroma 间切换，理解 collection、document、metadata 和 query。
+- **输入与输出**：输入文档、查询及模式；输出 Chroma Top K 命中、分数和来源。
+- **生产环境差距**：需要 embedding 版本管理、持久目录治理、并发写入、备份和服务化部署。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[文档] --> B[Embedding]
+    B --> C{存储模式}
+    C -- Mock --> D[内存 Chroma Like]
+    C -- Real --> E[Chroma Collection]
+    F[查询] --> G[查询向量]
+    G --> D
+    G --> E
+    D --> H[Top K]
+    E --> H
+```

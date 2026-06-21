@@ -368,6 +368,9 @@ def main() -> None:
     args = parse_args()
     # 解析运行模式（mock/real）并根据模式构建客户端（仅 real 模式需要）
     mode = resolve_mode(args.mock, args.real)
+    # Mock 使用下方的关键词规则模拟工具选择，不执行模型推理。
+    if mode == "mock":
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     # 在 real 模式下构建 OpenAI 客户端，mock 模式下保持 None 以避免 SDK 调用
     client = None
     if mode == "real":

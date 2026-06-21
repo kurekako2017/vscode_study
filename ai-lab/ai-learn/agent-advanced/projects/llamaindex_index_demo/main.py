@@ -167,6 +167,7 @@ def synthesize_answer(query: str, results: list[QueryResult]) -> str:
 
 # 程序入口，串联文档加载、索引和回答生成。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=local-index")
     # 读取命令行参数。
     args = parse_args()
     # 加载文档。

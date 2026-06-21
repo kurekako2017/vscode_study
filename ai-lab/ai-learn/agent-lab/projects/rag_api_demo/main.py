@@ -324,6 +324,8 @@ def load_state() -> None:
         app.state.client = build_client()  # 创建真实客户端。
     else:
         app.state.client = None  # 创建模拟客户端。
+        # 服务启动时明确说明 Mock 不会调用大模型。
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
 
     app.state.docs_dir = docs_dir  # 文档目录。
     app.state.chunks = chunks  # 片段列表。

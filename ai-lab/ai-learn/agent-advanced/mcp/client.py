@@ -14,7 +14,9 @@ from mcp.client.streamable_http import streamable_http_client
 
 @asynccontextmanager
 async def connect(transport: str, url: str):
+    """建立 MCP 会话；stdio 启动子进程，remote 连接已运行的 HTTP server。"""
     if transport == "stdio":
+        # sys.executable 保证 server 使用与 client 相同的 Python 环境。
         params = StdioServerParameters(command=sys.executable, args=["server.py"])
         async with stdio_client(params) as streams:
             async with ClientSession(*streams) as session:
@@ -26,11 +28,13 @@ async def connect(transport: str, url: str):
 
 
 async def run(args: argparse.Namespace) -> None:
+    """初始化协议、发现工具，再调用 search_documents。"""
     print(f"connecting: transport={args.transport}", flush=True)
     async with connect(args.transport, args.url) as session:
         print("connected; initializing", flush=True)
         await session.initialize()
         tools = await session.list_tools()
+        # 先发现工具而不是假设 server 一定提供某个工具，是 MCP 的核心步骤之一。
         print("tools:", [tool.name for tool in tools.tools])
         result = await asyncio.wait_for(
             session.call_tool("search_documents", {"query": args.query, "limit": args.limit}),
@@ -40,6 +44,8 @@ async def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    """解析连接参数，并用 asyncio.run 启动异步 MCP 客户端。"""
+    print("MODEL: provider=local model=none mode=mcp-client")
     parser = argparse.ArgumentParser()
     parser.add_argument("query", nargs="?", default="审批")
     parser.add_argument("--limit", type=int, default=3)

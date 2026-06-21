@@ -49,6 +49,7 @@ class Handler(BaseHTTPRequestHandler):
 
 # 程序入口，启动一个最小 HTTP 服务。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=http-service")
     # 创建 HTTPServer 实例。
     server = HTTPServer((HOST, PORT), Handler)
     # 打印启动信息。

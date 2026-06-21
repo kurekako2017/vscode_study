@@ -76,3 +76,22 @@ python3 model_call_example.py --real "一句话解释什么是 agent"  # 需要 
 ## Runnable 组合模式
 
 [runnable_composition_demo](./runnable_composition_demo/README.md) 覆盖 LCEL Parallel、Branch、Passthrough、batch 和 stream。
+
+## 业务场景（完整说明）
+
+这一组示例对应 LLM 应用开发前最常见的数据准备工作：用 Python 数据结构表达业务对象、用 Pydantic 校验模型输出、读写 JSON/CSV、切分长文本，并完成第一次 Real/Mock 模型调用。使用者是刚进入 AI 应用开发的 Python 初学者；生产项目还需要测试、日志、异常分类和数据隐私控制。
+
+## 整体学习流程图
+
+```mermaid
+flowchart TD
+    A[Python 基础类型] --> B[Dataclass 业务对象]
+    B --> C[Pydantic 数据校验]
+    C --> D[JSON 和 CSV 持久化]
+    D --> E[长文本切分]
+    E --> F{模型调用模式}
+    F -- Mock --> G[本地示例回答]
+    F -- Real --> H[Provider 回退模型]
+    G --> I[观察输出结构]
+    H --> I
+```

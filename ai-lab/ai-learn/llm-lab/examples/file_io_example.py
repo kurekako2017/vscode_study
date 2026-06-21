@@ -55,6 +55,7 @@ def read_csv() -> None:
 
 
 if __name__ == "__main__":
+    print("MODEL: provider=local model=none mode=file-io")
     # 按“先写后读”的顺序演示 JSON 和 CSV。
     # 运行后会在当前目录生成 sample.json 和 sample.csv。
     write_json()

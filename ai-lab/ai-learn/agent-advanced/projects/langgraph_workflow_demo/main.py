@@ -205,6 +205,7 @@ def build_app():
 
 # 程序入口，执行完整工作流并打印结果。
 def main() -> None:
+    print("MODEL: provider=local model=none mode=graph-demo")
     # 解析命令行主题。
     args = parse_args()
     # 构建并编译工作流。

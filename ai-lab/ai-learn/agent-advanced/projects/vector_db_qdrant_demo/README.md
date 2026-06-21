@@ -92,3 +92,25 @@ vector_db_qdrant_demo/
 2. 再看 `run_mock()`，理解入库和检索流程
 3. 再看 `run_real()`，理解真实 Qdrant Client 的接口
 4. 最后对比 `vector_db_demo/`，看教学版和真实版的差别
+
+## 业务场景（完整说明）
+
+- **使用者**：准备把 RAG 向量存储部署到独立服务的开发者。
+- **要解决的问题**：在相同检索流程下切换 Mock 和真实 Qdrant，理解 collection、point、payload 和 search。
+- **输入与输出**：输入文档、查询及模式；输出 Qdrant Top K 命中、分数和 metadata。
+- **生产环境差距**：需要认证、TLS、collection 迁移、批量写入、备份、监控和多租户隔离。
+
+## 整体流程图
+
+```mermaid
+flowchart TD
+    A[文档] --> B[Embedding]
+    B --> C{存储模式}
+    C -- Mock --> D[内存 Qdrant Like]
+    C -- Real --> E[Qdrant Collection]
+    F[查询] --> G[查询向量]
+    G --> D
+    G --> E
+    D --> H[Top K]
+    E --> H
+```

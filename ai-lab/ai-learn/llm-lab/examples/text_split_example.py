@@ -34,6 +34,7 @@ def sliding_window_split(text: str, chunk_size: int = 200, overlap: int = 50) ->
 
 
 if __name__ == "__main__":
+    print("MODEL: provider=local model=none mode=text-splitting")
     # 构造一段较长文本，模拟文档内容。
     sample = "这是一个用于演示文本切分的示例文本。" * 20
     # chunk_size=60 表示每块最多 60 个字符。

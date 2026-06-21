@@ -115,6 +115,7 @@ def ask_once(client: Optional[OpenAI], model: str, prompt: str, mode: str) -> st
 
 
 def main():
+    """解析模式和问题，执行一次模型或 Mock 调用。"""
     # argparse 负责命令行参数解析。
     # 示例：
     #   python3 model_call_example.py --mock "你好"
@@ -133,6 +134,9 @@ def main():
     # 先决定运行模式，再决定是否需要构建真实客户端。
     mode = resolve_mode(args.mock, args.real)
     client = build_client() if mode == "real" else None
+    # Mock 不是大模型。显式打印可避免初学者把固定示例回答误认为真实推理结果。
+    if mode == "mock":
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     # 执行一次问答，并把结果打印到终端。
     print(ask_once(client, args.model, args.prompt, mode))
 

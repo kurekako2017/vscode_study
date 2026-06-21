@@ -25,6 +25,8 @@ class Document:
 
 
 def main() -> None:
+    """创建 dataclass 实例，并演示属性读取和字典转换。"""
+    print("MODEL: provider=local model=none mode=python-dataclass")
     # 创建一个 Document 实例。
     # dataclass 会自动生成 __init__，所以可以直接传字段名。
     doc = Document(id=1, title="示例文档", content="这是一段示例内容。")

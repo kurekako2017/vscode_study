@@ -266,6 +266,9 @@ def main() -> None:
     args = parse_args()
     # 模式决策。先根据参数和环境决定是否使用 mock，再构建客户端，减少分支散落。
     use_mock = resolve_mode(args.mock, args.real)
+    # 真实模式的最终 provider/model 由统一运行时在请求成功后打印。
+    if use_mock:
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     # 以下是与客户端交互的设置，后续调用 ask_once 时会根据 use_mock 决定是否发起真实请求。
     client = build_client(use_mock)
 

@@ -159,6 +159,9 @@ def main() -> None:
     args = parse_args()
     # 模式决策。先根据参数和环境决定是否使用 mock，再构建客户端，减少分支散落。
     mode = resolve_mode(args.mock, args.real)
+    # Mock 只构造本地示例对象，并没有调用任何大模型。
+    if mode == "mock":
+        print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
     # 以下是与客户端交互的设置，后续调用 generate_plan 时会根据 mode 决定是否发起真实请求。
     client = None
     # 只有在 real 模式下才构建客户端，mock 模式下直接使用本地生成的示例数据，避免不必要的环境依赖。

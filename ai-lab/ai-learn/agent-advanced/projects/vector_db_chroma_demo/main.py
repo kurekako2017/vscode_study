@@ -248,6 +248,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    print("MODEL: provider=local model=none mode=vector-search")
     args = parse_args()
     source_dir = Path(args.source_dir)
     # 加载示例文档，真实项目里你可能会从数据库、API 或文件系统加载。

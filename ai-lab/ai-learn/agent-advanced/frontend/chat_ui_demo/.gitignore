@@ -1,0 +1,8 @@
+# npm 安装目录和前端构建产物可随时重新生成，不提交到仓库。
+node_modules/
+dist/
+*.tsbuildinfo
+
+# `tsc -b` 会根据 vite.config.ts 生成这些文件。
+vite.config.js
+vite.config.d.ts
