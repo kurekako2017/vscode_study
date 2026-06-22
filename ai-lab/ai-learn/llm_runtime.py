@@ -11,7 +11,7 @@ import os
 import sys
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, get_args, get_origin, Literal
+from typing import Any, Literal, get_args, get_origin
 
 from openai import OpenAI
 
@@ -19,6 +19,7 @@ from openai import OpenAI
 @dataclass(frozen=True)
 class Provider:
     """一次模型连接所需的提供商名称、凭据、地址和实际模型名。"""
+
     name: str
     api_key: str
     base_url: str
@@ -33,14 +34,18 @@ def providers() -> list[Provider]:
     """读取环境变量，并按固定回退顺序返回可尝试的提供商。"""
     result: list[Provider] = []
     # 云端 provider 只有配置 Key 后才加入列表，避免发送必然失败的请求。
-    openrouter_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("openRouter") or "").strip()
+    openrouter_key = (
+        os.getenv("OPENROUTER_API_KEY") or os.getenv("openRouter") or ""
+    ).strip()
     if openrouter_key:
-        result.append(Provider(
-            "openrouter",
-            openrouter_key,
-            os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
-            os.getenv("OPENROUTER_MODEL", "openrouter/free"),
-        ))
+        result.append(
+            Provider(
+                "openrouter",
+                openrouter_key,
+                os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+                os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+            )
+        )
 
     nvidia_key = (
         os.getenv("NVIDIA_API_KEY")
@@ -49,12 +54,14 @@ def providers() -> list[Provider]:
         or ""
     ).strip()
     if nvidia_key:
-        result.append(Provider(
-            "nvidia",
-            nvidia_key,
-            os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
-            os.getenv("NVIDIA_MODEL", "qwen/qwen2.5-coder-32b-instruct"),
-        ))
+        result.append(
+            Provider(
+                "nvidia",
+                nvidia_key,
+                os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+                os.getenv("NVIDIA_MODEL", "qwen/qwen2.5-coder-32b-instruct"),
+            )
+        )
 
     ollama_base_url = (
         os.getenv("OLLAMA_BASE_URL")
@@ -64,12 +71,14 @@ def providers() -> list[Provider]:
     if not ollama_base_url.endswith("/v1"):
         # OpenAI SDK 需要兼容接口的 /v1 路径。
         ollama_base_url += "/v1"
-    result.append(Provider(
-        "ollama",
-        os.getenv("OLLAMA_API_KEY", "ollama"),
-        ollama_base_url,
-        os.getenv("OLLAMA_MODEL", "qwen2.5-coder:1.5b"),
-    ))
+    result.append(
+        Provider(
+            "ollama",
+            os.getenv("OLLAMA_API_KEY", "ollama"),
+            ollama_base_url,
+            os.getenv("OLLAMA_MODEL", "qwen2.5-coder:1.5b"),
+        )
+    )
     return result
 
 
@@ -91,7 +100,11 @@ def _chat_tools(tools: list[dict[str, Any]] | None) -> list[dict[str, Any]] | No
     for tool in tools:
         # 已经包含 function 的工具无需再次包装。
         if tool.get("type") == "function" and "function" not in tool:
-            function = {key: value for key, value in tool.items() if key not in {"type", "strict"}}
+            function = {
+                key: value
+                for key, value in tool.items()
+                if key not in {"type", "strict"}
+            }
             if "strict" in tool:
                 function["strict"] = tool["strict"]
             converted.append({"type": "function", "function": function})
@@ -112,11 +125,13 @@ def _messages(instructions: str | None, input_value: Any) -> list[dict[str, Any]
     for item in input_value:
         if item.get("type") == "function_call_output":
             # 工具执行结果必须带原 call_id，模型才能对应到之前的工具请求。
-            messages.append({
-                "role": "tool",
-                "tool_call_id": item["call_id"],
-                "content": item["output"],
-            })
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": item["call_id"],
+                    "content": item["output"],
+                }
+            )
         elif item.get("role"):
             messages.append({"role": item["role"], "content": item.get("content", "")})
     return messages
@@ -128,7 +143,7 @@ def _extract_json(text: str) -> str:
     if stripped.startswith("```"):
         stripped = stripped.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
     start, end = stripped.find("{"), stripped.rfind("}")
-    return stripped[start:end + 1] if start >= 0 and end > start else stripped
+    return stripped[start : end + 1] if start >= 0 and end > start else stripped
 
 
 class _ResponsesAdapter:
@@ -137,27 +152,46 @@ class _ResponsesAdapter:
     def __init__(self, owner: "FallbackOpenAI") -> None:
         self.owner = owner
 
-    def create(self, *, model: str | None = None, instructions: str | None = None,
-               input: Any, tools: list[dict[str, Any]] | None = None, **_: Any) -> Any:
+    def create(
+        self,
+        *,
+        model: str | None = None,
+        instructions: str | None = None,
+        input: Any,
+        tools: list[dict[str, Any]] | None = None,
+        **_: Any,
+    ) -> Any:
         """把普通文本请求交给统一的 provider 回退逻辑。"""
         return self.owner._create(model, instructions, input, tools)
 
-    def parse(self, *, model: str | None = None, instructions: str | None = None,
-              input: Any, text_format: Any, **_: Any) -> Any:
+    def parse(
+        self,
+        *,
+        model: str | None = None,
+        instructions: str | None = None,
+        input: Any,
+        text_format: Any,
+        **_: Any,
+    ) -> Any:
         """要求模型返回指定 Pydantic schema，并把 JSON 校验为对象。"""
         schema = json.dumps(text_format.model_json_schema(), ensure_ascii=False)
         extra = (
-            "\nReturn only valid JSON matching this JSON Schema; no markdown fences:\n" + schema
+            "\nReturn only valid JSON matching this JSON Schema; no markdown fences:\n"
+            + schema
         )
         response = self.owner._create(model, (instructions or "") + extra, input, None)
         try:
-            parsed = text_format.model_validate_json(_extract_json(response.output_text))
+            parsed = text_format.model_validate_json(
+                _extract_json(response.output_text)
+            )
         except Exception:
             # 教学环境中的最终 Mock 可能没有合法 JSON，因此构造类型正确的占位值。
-            parsed = text_format(**{
-                name: _mock_value(field.annotation, name)
-                for name, field in text_format.model_fields.items()
-            })
+            parsed = text_format(
+                **{
+                    name: _mock_value(field.annotation, name)
+                    for name, field in text_format.model_fields.items()
+                }
+            )
         response.output_parsed = parsed
         return response
 
@@ -170,8 +204,13 @@ class FallbackOpenAI:
         self.responses = _ResponsesAdapter(self)
         self._pending_assistant_message: dict[str, Any] | None = None
 
-    def _create(self, requested_model: str | None, instructions: str | None,
-                input_value: Any, tools: list[dict[str, Any]] | None) -> Any:
+    def _create(
+        self,
+        requested_model: str | None,
+        instructions: str | None,
+        input_value: Any,
+        tools: list[dict[str, Any]] | None,
+    ) -> Any:
         """逐个尝试 provider；成功立即返回，全部失败才生成 Mock 响应。"""
         # requested_model 是上层展示的逻辑模型名；实际模型由每个 provider 的环境变量决定。
         errors: list[str] = []
@@ -184,9 +223,15 @@ class FallbackOpenAI:
                     max_retries=0,
                 )
                 messages = _messages(instructions, input_value)
-                if self._pending_assistant_message and any(m["role"] == "tool" for m in messages):
+                if self._pending_assistant_message and any(
+                    m["role"] == "tool" for m in messages
+                ):
                     # 第二轮工具调用必须补回模型上一轮发出的 assistant tool_call 消息。
-                    tool_index = next(i for i, message in enumerate(messages) if message["role"] == "tool")
+                    tool_index = next(
+                        i
+                        for i, message in enumerate(messages)
+                        if message["role"] == "tool"
+                    )
                     messages.insert(tool_index, self._pending_assistant_message)
                 kwargs: dict[str, Any] = {
                     "model": provider.model,
@@ -195,20 +240,27 @@ class FallbackOpenAI:
                 converted_tools = _chat_tools(tools)
                 if converted_tools:
                     kwargs["tools"] = converted_tools
-                print(f"INFO: trying provider={provider.name} model={provider.model}", file=sys.stderr)
+                print(
+                    f"INFO: trying provider={provider.name} model={provider.model}",
+                    file=sys.stderr,
+                )
                 completion = client.chat.completions.create(**kwargs)
                 message = completion.choices[0].message
                 output = []
                 for call in message.tool_calls or []:
                     # SimpleNamespace 模拟上层示例读取的 Responses function_call 属性。
-                    output.append(SimpleNamespace(
-                        type="function_call",
-                        name=call.function.name,
-                        arguments=call.function.arguments,
-                        call_id=call.id,
-                    ))
+                    output.append(
+                        SimpleNamespace(
+                            type="function_call",
+                            name=call.function.name,
+                            arguments=call.function.arguments,
+                            call_id=call.id,
+                        )
+                    )
                 if message.tool_calls:
-                    self._pending_assistant_message = message.model_dump(exclude_none=True)
+                    self._pending_assistant_message = message.model_dump(
+                        exclude_none=True
+                    )
                 else:
                     self._pending_assistant_message = None
                 # “trying” 只表示尝试过；这一行明确告诉学习者最终真正使用了哪个模型。
@@ -226,7 +278,10 @@ class FallbackOpenAI:
                     "trying next provider",
                     file=sys.stderr,
                 )
-        print("WARNING: all real providers failed; using final mock fallback", file=sys.stderr)
+        print(
+            "WARNING: all real providers failed; using final mock fallback",
+            file=sys.stderr,
+        )
         print("MODEL: provider=local model=mock mode=mock", file=sys.stderr)
         return SimpleNamespace(
             output_text="[MOCK MODE] All cloud and local model providers were unavailable.",
@@ -235,6 +290,7 @@ class FallbackOpenAI:
         )
 
 
+# 通用函数：获取指定类型的值，如果不存在则返回默认值
 def build_fallback_client() -> FallbackOpenAI:
     """创建供各示例复用的轻量客户端。"""
     return FallbackOpenAI()

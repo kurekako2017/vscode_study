@@ -22,7 +22,6 @@
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Literal
@@ -35,7 +34,6 @@ for _parent in Path(__file__).resolve().parents:
         sys.path.insert(0, str(_parent))
         break
 from llm_runtime import build_fallback_client, has_real_provider
-
 
 DEFAULT_MODEL = "gpt-5"
 # OpenRouter 兼容服务默认基址。
@@ -55,6 +53,7 @@ FINALIZE_INSTRUCTIONS = (
 
 class WorkflowPlan(BaseModel):
     """Pydantic 定义的计划 schema，用于在计划阶段验证模型输出结构。"""
+
     # This schema keeps the planning step stable enough for the next workflow stage.
     goal: str = Field(description="The main goal of the task.")
     priority: Literal["low", "medium", "high"] = Field(
@@ -69,19 +68,27 @@ def parse_args() -> argparse.Namespace:
     # 层次: 输入层 — 解析用户任务与模型配置
     """解析命令行参数：用户任务与可选模型名（支持 mock/real）。"""
     parser = argparse.ArgumentParser(
-        description="Minimal workflow agent demo with staged OpenAI Responses API calls."
+        description="包含分阶段 OpenAI Responses API 调用的最小工作流代理演示."
     )
-    parser.add_argument("prompt", help="User task for the workflow agent.")
+    #   解析用户任务参数     （解析用户任务参数）
+    parser.add_argument("prompt", help="工作流代理的用户任务.")
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
-        help=f"Model name to use. Default: {DEFAULT_MODEL}",
+        help=f"要使用的模型名称。默认值: {DEFAULT_MODEL}",
     )
-    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
-    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).")
+    parser.add_argument(
+        "--mock", action="store_true", help="Run in offline mock mode (no API calls)."
+    )
+    parser.add_argument(
+        "--real",
+        action="store_true",
+        help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).",
+    )
     return parser.parse_args()
 
 
+# 从命令行参数中获取模型名称和
 def _has_real_credentials() -> bool:
     return has_real_provider()
 
@@ -104,7 +111,10 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
         # 如果 OPENAI_API_KEY 未设置，则打印错误信息并退出     （如果 OPENAI_API_KEY 未设置，则打印错误信息并退出）
         if not _has_real_credentials():
             # 退出程序     （退出程序）
-            print("ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
+            print(
+                "ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.",
+                file=sys.stderr,
+            )
             sys.exit(1)
         # 返回 "real"     （返回 "real"）
         return "real"
@@ -115,7 +125,9 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
 def build_mock_analysis(prompt: str) -> str:
     """生成离线用的分析文本示例，便于学习流程。"""
     # 返回一个符合分析文本示例的文本     （返回一个符合分析文本示例的文本）
-    return f"[MOCK MODE] Analysis for: {prompt}\n- goals: mock goal\n- constraints: none"
+    return (
+        f"[MOCK MODE] Analysis for: {prompt}\n- goals: mock goal\n- constraints: none"
+    )
 
 
 def build_mock_plan(prompt: str) -> WorkflowPlan:
@@ -155,7 +167,9 @@ def analyze_task(client: OpenAI | None, model: str, prompt: str, mode: str) -> s
     return response.output_text
 
 
-def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> WorkflowPlan:
+def plan_task(
+    client: OpenAI | None, model: str, analysis: str, mode: str
+) -> WorkflowPlan:
     """计划阶段：基于分析文本生成结构化的 `WorkflowPlan`（Pydantic 验证）。
 
     - 在真实模式下使用 SDK 的 `parse` 功能把模型输出直接映射为 `WorkflowPlan`，以便下一阶段可靠消费。
@@ -175,7 +189,9 @@ def plan_task(client: OpenAI | None, model: str, analysis: str, mode: str) -> Wo
     return response.output_parsed
 
 
-def finalize_task(client: OpenAI | None, model: str, analysis: str, plan: WorkflowPlan, mode: str) -> str:
+def finalize_task(
+    client: OpenAI | None, model: str, analysis: str, plan: WorkflowPlan, mode: str
+) -> str:
     """总结阶段：基于分析与计划生成最终简短建议。
 
     - 该阶段会把前两阶段的输出拼接为模型输入，提醒模型只基于已验证的信息生成最终建议，减少幻觉风险。

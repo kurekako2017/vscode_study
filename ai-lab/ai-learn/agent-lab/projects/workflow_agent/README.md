@@ -2,7 +2,7 @@
 
 最小可运行的工作流 Agent 示例。
 
-这个 demo 是什么：
+## 1. 这个 demo 是什么
 
 ```text
 一个把 Agent 任务拆成“分析 -> 计划 -> 总结”三个固定阶段的工作流示例。
@@ -26,7 +26,7 @@ Agent の処理を「分析 -> 計画 -> 最終出力」の固定ワークフロ
 - 多阶段模型调用如何串起来
 - 为什么很多现场 Agent 实际上先是“固定工作流”
 
-## 业务场景说明
+## 2. 业务场景说明
 
 - 谁会用：需要按固定步骤处理复杂任务的开发人员，例如需求整理、项目计划、上线准备和报告编写。
 - 现实中的问题：项目经理提出“为公司做一个文档问答系统”，如果直接要求模型一次给出最终方案，模型可能还没弄清目标和限制就开始写计划，容易漏掉预算、时间和交付物。
@@ -34,7 +34,7 @@ Agent の処理を「分析 -> 計画 -> 最終出力」の固定ワークフロ
 - 现实例子：公司准备做一个四周的 RAG PoC，程序先分析需要哪些资料和人员，再生成每周任务、风险和交付物，最后输出给项目负责人阅读的总结。
 - 初学者重点：工作流不是让多个模型随意讨论，而是让程序按照预先规定的顺序执行每一步。
 
-## 业务例子：去北京旅游时怎么理解工作流
+## 3. 业务例子：去北京旅游时怎么理解工作流
 
 如果把这个 demo 放到“去北京旅游”的场景里，可以这样理解：
 
@@ -80,19 +80,19 @@ graph TD
 - 中间状态要保留
 - 最后把结果整理成可以直接执行的方案
 
-## 1. 前置条件
+## 4. 前置条件
 
 - Python 3.10+
 - 已安装依赖
-- 已配置 `OPENAI_API_KEY`
+- 已配置 `OPENROUTER_API_KEY` 或 `OPENAI_API_KEY`
 
-## 2. 安装依赖
+## 5. 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 3. 运行方式
+## 6. 运行方式
 
 ```bash
 python main.py "做一个社内文档问答 PoC"
@@ -104,7 +104,41 @@ python main.py "做一个社内文档问答 PoC"
 python main.py --model gpt-5 "帮我规划一个带 RAG 的知识库助手"
 ```
 
-## 4. 工作流步骤
+### 6.1 快速运行
+
+```bash
+python3 main.py --mock "请给出一个三步工作流计划"
+```
+
+```bash
+OPENAI_API_KEY=your_api_key python3 main.py --real "请给出一个三步工作流计划"
+```
+
+如果没有可用 API Key，默认会走 `mock` 模式。
+
+## 7. 推荐测试清单
+
+下面命令都假设你在仓库根目录执行，也就是包含 `ai-lab/` 目录的那一层。
+
+### Mock 命令
+
+| 场景 | 命令 | 预期 |
+| --- | --- | --- |
+| 自动模式一次性提问 | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py "帮我制定一个三步执行计划"` | 没有 Key 时自动降级为 `mock` |
+| 强制 Mock 一次性提问 | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py --mock "帮我制定一个三步执行计划"` | 始终使用本地 `mock` |
+| 指定模型的 Mock 测试 | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py --mock --model gpt-5 "帮我制定一个三步执行计划"` | 模型参数生效 |
+| 输出三阶段结果 | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py --mock "帮我制定一个三步执行计划"` | 输出 `Analysis`、`Plan`、`Final Summary` 三段 |
+| 复杂任务输入 | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py --mock "请规划一个四周的 RAG PoC"` | 计划内容仍保持结构化 |
+
+### Real 命令
+
+| 场景 | 命令 | 预期 |
+| --- | --- | --- |
+| 强制真实 API 一次性提问 | `OPENAI_API_KEY=... python3 ai-learn/agent-lab/projects/workflow_agent/main.py --real "帮我制定一个三步执行计划"` | 真实调用成功 |
+| 真实模式缺少 Key | `python3 ai-learn/agent-lab/projects/workflow_agent/main.py --real "帮我制定一个三步执行计划"` | 报错并退出 |
+| 指定模型的 Real 测试 | `OPENAI_API_KEY=... python3 ai-learn/agent-lab/projects/workflow_agent/main.py --real --model gpt-5 "帮我制定一个三步执行计划"` | 真实模型参数生效 |
+
+## 8. 工作流步骤
 
 ### Step 1. Analyze
 
@@ -120,14 +154,14 @@ python main.py --model gpt-5 "帮我规划一个带 RAG 的知识库助手"
 
 - 基于前两步结果输出简洁结论
 
-## 5. 代码说明
+## 9. 代码说明
 
 - 使用官方 `Responses API`
 - 用固定阶段代替复杂自治
 - 用状态对象保存中间结果
 - 用结构化 schema 保证计划阶段结果稳定
 
-## 6. 代码分层导读
+## 10. 代码分层导读
 
 | 文件 / 类 / 函数 | 层次 | 作用 | 学习重点 |
 | --- | --- | --- | --- |
@@ -145,16 +179,16 @@ python main.py --model gpt-5 "帮我规划一个带 RAG 的知识库助手"
 
 说明：此图比数据流更详细地展示 `parse_args()`、`resolve_mode()`、`build_client()`、`analyze_task()`、`plan_task()`、`finalize_task()` 与异常处理逻辑。
 
-## 7. 数据流
+## 11. 流程总览
 
 ```mermaid
 graph TD
-    A[用户任务] --> B[Analyze 阶段]
+    A[任务输入] --> B[Analyze]
     B --> C[analysis 文本状态]
-    C --> D[Plan 阶段]
+    C --> D[Plan]
     D --> E[WorkflowPlan 结构化状态]
-    E --> F[Finalize 阶段]
-    F --> G[最终建议]
+    E --> F[Finalize]
+    F --> G[最终总结]
 ```
 
 这个 demo 的重点是：
@@ -163,7 +197,14 @@ graph TD
 - 中间结果要保留下来。
 - 结构化阶段用 schema 稳定输出。
 
-## 8. 关键名词理解
+## 12. 建议测试顺序
+
+1. 先跑 `python3 main.py --mock "..."`，确认三阶段输出格式。
+2. 再跑 `python3 main.py --mock --model gpt-5 "..."`，确认模型参数透传。
+3. 再跑 `python3 main.py "..."`，确认无 Key 时能自动降级。
+4. 最后切到 `--real`，验证真实调用链路。
+
+## 13. 关键名词理解
 
 | 名词 | 日语 | 是什么 | 核心作用 |
 | --- | --- | --- | --- |
@@ -173,7 +214,7 @@ graph TD
 | Finalizer | 最終出力生成 | 负责生成最终输出的角色 | 基于前面状态给最终建议 |
 | Termination | 終了条件 | 判断流程何时结束的规则 | 三个阶段执行完就结束 |
 
-## 8.1 中文 / 日语现场对照
+### 13.1 中文 / 日语现场对照
 
 | 中文 | 日语 | 日本项目现场常见表达 |
 | --- | --- | --- |
@@ -183,7 +224,7 @@ graph TD
 | 中间状态 | 中間状態 | 前ステップの結果を次ステップに渡します |
 | 最终输出 | 最終出力 | 分析結果と計画に基づいて最終回答を生成します |
 
-## 9. 日本现场里的意义
+## 14. 日本现场里的意义
 
 这个样例更接近现实中的“固定工作流型 Agent”，而不是一开始就做完全自治系统。
 
@@ -193,7 +234,7 @@ graph TD
 - 步骤可控
 - 输出可解释
 
-## 10. 下一步建议
+## 15. 下一步建议
 
 这个样例跑通后，下一步最适合继续做：
 
@@ -202,31 +243,18 @@ graph TD
 3. 增加步骤日志
 4. 再考虑多 Agent
 
-## 11. Python 处理流程（速查）
+## 16. Python 处理流程（速查）
 
-1. **parse_args**：处理命令行输入（任务、--model、--mock/--real）。
+1. **parse_args**：处理命令行输入（任务、--model、--mock、--real）。
 2. **resolve_mode**：判断运行模式（自动 / mock / real）。
 3. **build_client**：准备外部服务（真实模式创建 OpenAI 客户端）。
 4. **build_mock_analysis / build_mock_plan / build_mock_final**：生成 mock 数据（三阶段离线输出）。
 5. **核心业务**：`analyze_task()` -> `plan_task()` -> `finalize_task()` 串起三阶段流程。
 6. **main**：总流程入口，按阶段执行并输出结果。
 
-## 业务场景（完整说明）
+## 17. 业务场景（完整说明）
 
 - **使用者**：需要稳定执行分析、计划和总结三阶段任务的开发者。
 - **要解决的问题**：把一次复杂提示拆成可观察、可测试的固定工作流，并让中间结果成为下一阶段输入。
 - **输入与输出**：输入任务描述；输出分析文本、结构化计划和最终总结。
 - **生产环境差距**：需要 checkpoint、阶段重试、人工审批、并行节点、成本预算和状态持久化。
-
-## 整体流程图
-
-```mermaid
-graph TD
-    A[任务描述] --> B[Analyze 阶段]
-    B --> C[分析结果]
-    C --> D[Plan 阶段]
-    D --> E[Pydantic 计划]
-    E --> F[Finalize 阶段]
-    F --> G[最终总结]
-    G --> H[分阶段输出]
-```
