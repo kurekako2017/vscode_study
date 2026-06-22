@@ -17,6 +17,28 @@ python3 client.py x --limit 99                  # 参数错误路径
 
 依赖：`mcp>=1.0`。当前 Remote 示例绑定 `127.0.0.1`，不对公网暴露。
 
+## 图片式模板解释
+
+输入：`python3 client.py "审批"`；处理前数据是查询、transport 配置和 Server 暴露的 Tool Schema。
+
+```text
+用户查询 -> MCP Client -> initialize
+│
+▼
+list_tools()：发现 Server 工具
+│
+▼
+选择命名空间工具 -> call_tool()
+├── stdio -> 自动启动本地 Server
+├── remote -> Streamable HTTP Server
+└── multi -> Router 在多个 Server 间选择
+    │
+    ▼
+参数校验 -> 工具执行 -> 结构化结果 / 协议错误
+```
+
+节点对应：Client 管理协议，Server 提供工具，Router 解决多服务路由和同名冲突。最小输出包含工具目录、被调用工具和结构化结果。
+
 ## 业务场景（完整说明）
 
 - **使用者**：Agent 平台开发者、工具服务开发者和企业集成团队。

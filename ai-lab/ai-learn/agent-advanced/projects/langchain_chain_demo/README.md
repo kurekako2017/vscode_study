@@ -14,6 +14,27 @@ LangChain 风格最小链路示例。
 
 默认会先尝试真实模型；如果没配 API Key，会自动回退到 mock。
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "客户登录后看不到订单"`；处理前数据是问题和要求返回的 JSON 字段。
+
+```text
+用户问题 -> build_prompt()：ChatPromptTemplate 填充变量
+│
+▼
+LCEL 管道符 |
+├── Real -> build_real_llm() -> AIMessage
+└── Mock -> mock_llm() -> AIMessage
+    │
+    ▼
+parse_response()：JSON 文本 -> Python Dict
+│
+▼
+输出 summary、steps、keywords
+```
+
+节点对应：Prompt 管输入，Runnable 管组合，模型生成，Parser 建立结构化边界。最小输出是包含三个固定字段的字典。
+
 ## 业务场景说明
 
 - 谁会用：需要重复执行“整理输入、调用模型、解析结果”这类固定步骤的开发人员，例如客服摘要、邮件分类和学习计划生成。

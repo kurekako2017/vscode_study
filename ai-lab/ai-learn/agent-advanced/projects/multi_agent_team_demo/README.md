@@ -10,6 +10,30 @@
 - Writer
 - Critic
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "公司如何导入 RAG"`；处理前数据是任务和各角色共享的工作结果。
+
+```text
+任务 -> supervisor()
+│
+▼
+planner_agent()：生成章节计划
+│
+▼
+researcher_agent()：整理证据和技术要点
+│
+▼
+writer_agent()：根据计划和证据写草稿
+│
+▼
+critic_agent()：检查缺项
+├── 有问题 -> writer_agent() 修订
+└── 通过 -> supervisor() 输出最终结果
+```
+
+节点对应：Supervisor 编排，Planner 拆分，Researcher 取证，Writer 生成，Critic 质检。最小输出包含计划、研究资料、草稿和审校意见。
+
 ## 业务场景说明
 
 - 谁会用：需要把规划、资料整理、写作和检查分开处理的开发人员，例如调研报告、方案书和内容生产流程。

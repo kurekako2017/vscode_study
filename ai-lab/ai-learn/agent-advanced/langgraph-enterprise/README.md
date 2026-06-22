@@ -21,6 +21,21 @@ python3 demos/enterprise_graph.py "删除客户记录" --decision no --thread re
 
 Checkpoint 保存“某个线程运行到哪里”；短期 Memory 是该线程状态；Store 保存可跨线程读取的长期事实。HITL 必须在有 checkpointer 的图上使用，否则进程恢复后无法可靠续跑。
 
+## 图片式模板解释
+
+输入：运行示例并提交一条客户请求；处理前数据是请求、Graph State、Checkpoint 和持久化 Store。
+
+```text
+客户请求 -> Preparation 子图 -> 标准化输入 -> 执行草稿
+│
+▼
+interrupt()：保存 Checkpoint 并暂停
+├── 人工拒绝 -> 生成拒绝结果 -> END
+└── 人工批准 -> 恢复 Graph -> 执行动作 -> 写入 Store -> END
+```
+
+节点对应：子图封装阶段，Checkpoint 支持暂停恢复，Interrupt 建立人工审批，Store 保存跨运行数据。最小输出是批准后的执行结果或拒绝结果。
+
 ## 业务场景（完整说明）
 
 - **使用者**：需要审批、恢复执行和长期记忆的企业 Agent 平台团队。

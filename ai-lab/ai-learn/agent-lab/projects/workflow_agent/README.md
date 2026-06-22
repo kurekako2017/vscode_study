@@ -26,6 +26,43 @@ Agent の処理を「分析 -> 計画 -> 最終出力」の固定ワークフロ
 - 多阶段模型调用如何串起来
 - 为什么很多现场 Agent 实际上先是“固定工作流”
 
+## 图片式模板解释
+
+最小输入：`python3 main.py "为文档问答系统制定一周开发计划" --mock`
+
+处理前的数据：一条任务文本会依次产生 `analysis`、`WorkflowPlan` 和最终总结。
+
+```text
+用户任务
+│
+▼
+parse_args()：读取任务、模型和运行模式
+│
+▼
+analyze_task()：提取目标、限制和交付物
+│
+▼
+analysis -> plan_task()
+│
+▼
+responses.parse + WorkflowPlan：生成并校验计划
+│
+▼
+analysis + plan -> finalize_task()
+│
+▼
+输出分析、计划和最终建议
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 分析 | `analyze_task()` | 任务 -> analysis | 统一理解任务 |
+| 计划 | `plan_task()` | analysis -> `WorkflowPlan` | 形成稳定步骤 |
+| 总结 | `finalize_task()` | analysis + plan -> 建议 | 生成交付内容 |
+| 编排 | `main()` | 三阶段 -> 顺序执行 | 便于测试和追踪 |
+
+最小输出：依次打印任务分析、结构化执行计划和最终建议。
+
 ## 2. 业务场景说明
 
 - 谁会用：需要按固定步骤处理复杂任务的开发人员，例如需求整理、项目计划、上线准备和报告编写。

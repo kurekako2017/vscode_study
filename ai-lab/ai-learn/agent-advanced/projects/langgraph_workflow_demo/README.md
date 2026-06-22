@@ -10,6 +10,25 @@ LangGraph 风格最小状态图示例。
 4. `conditional edges`
 5. `loop / revision`
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "生成一份故障复盘报告"`；处理前数据是任务和共享 `State`。
+
+```text
+任务 -> build_app() -> StateGraph.compile() -> graph.invoke()
+│
+▼
+classify_intent -> research -> draft -> review
+│
+▼
+route_after_review()
+├── pass -> finalize -> END
+└── revise -> 更新 State -> 回到 review
+    └── 达到终止条件后结束
+```
+
+节点对应：State 保存中间结果，Node 修改 State，Conditional Edge 选择分支，循环负责修订。最小输出是通过审阅的最终报告和状态轨迹。
+
 ## 业务场景说明
 
 - 谁会用：需要让任务根据中间结果选择不同步骤的开发人员，例如内容审查、客服分流、报告修改和审批流程。

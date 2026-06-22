@@ -12,6 +12,39 @@
 
 如果你暂时没有 API Key，先用 `--mock` 把流程跑通，再切换到 `--real`。
 
+## 图片式模板解释
+
+最小输入：`python3 main.py "请用三句话解释 RAG" --mock`
+
+处理前的数据：命令行把问题保存为 `prompt`，把 `--mock` 保存为运行模式。
+
+```text
+用户命令
+│
+▼
+main.py -> parse_args()：读取 prompt、model、模式和输出长度
+│
+▼
+resolve_mode()：选择 Mock 或 Real
+├── Mock -> build_mock_answer()：本地生成教学回答
+└── Real -> build_client() -> ask_once()：调用模型 API
+    │
+    ▼
+format_output()：按 max_chars 截断
+│
+▼
+终端打印最终回答
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 参数入口 | `parse_args()` | 命令行 -> 参数对象 | 统一一次提问和交互模式 |
+| 模式选择 | `resolve_mode()` | Key 和参数 -> Mock/Real | 没有 Key 也能学习 |
+| 模型调用 | `ask_once()` | prompt -> 文本 | 完成核心问答 |
+| 输出保护 | `format_output()` | 长文本 -> 限长文本 | 避免终端输出失控 |
+
+最小输出：终端显示一段不超过指定长度的回答；Mock 内容是教学示意。
+
 ## 业务场景说明
 
 - 谁会用：第一次练习大模型 API 的开发者、需要快速验证模型连通性的测试人员。

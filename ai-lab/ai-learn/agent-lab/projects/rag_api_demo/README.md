@@ -6,6 +6,44 @@
 
 如果你之前不明白“是谁给谁提供服务、谁是客户端、流程怎么走、怎么部署和访问”，这份文档就是按这个顺序写的。
 
+## 图片式模板解释
+
+最小输入与资料：`docs/报销制度.md` 包含“出租车费用需满足加班或交通中断条件”。
+
+```bash
+curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question":"出租车费何时可以报销？"}'
+```
+
+```text
+客户端 JSON 请求
+│
+▼
+FastAPI POST /ask -> AskRequest：校验 question 和 model
+│
+▼
+load_state() -> build_chunks() / chunk_text()：准备文档片段
+│
+▼
+retrieve()：检索并选择 Top-K
+├── 无证据 -> 返回受控的无资料回答
+└── 有证据 -> build_context()：拼接内容和来源
+    │
+    ▼
+Mock 或模型 Provider：生成答案
+│
+▼
+AskResponse -> JSON：返回 answer 和 sources
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| HTTP 入口 | FastAPI `/ask` | JSON -> `AskRequest` | 给客户端统一入口 |
+| 检索 | `retrieve()` | question -> Top-K | 找到回答依据 |
+| 上下文 | `build_context()` | chunks -> context | 控制模型资料范围 |
+| 响应合同 | `AskResponse` | 答案和来源 -> JSON | 让前端稳定解析 |
+
+最小输出：`{"answer":"...","sources":["报销制度.md..."]}`；字段固定，内容可能变化。
+
 ## 业务场景说明
 
 - 谁会用：需要把文档问答功能提供给网页、手机应用、Java 系统或其他服务的后端开发人员。

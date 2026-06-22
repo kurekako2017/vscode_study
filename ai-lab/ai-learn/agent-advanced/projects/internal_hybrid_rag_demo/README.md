@@ -12,6 +12,24 @@
 3. 权限层：按角色过滤不可见文档
 4. 引用层：输出带来源的答案
 
+## 图片式模板解释
+
+输入：`python3 main.py "事故处理流程怎么查？" --role it_admin`；处理前数据来自 `server_docs/`、`wiki_docs/` 和角色权限。
+
+```text
+文件服务器 + Wiki -> load_documents()：统一 Document
+用户 role -> filter_by_role()：过滤不可见资料
+用户问题 -> retrieve()：多来源召回
+│
+▼
+rerank()：重排允许访问的候选 -> Top-K
+│
+▼
+synthesize_answer()：整理答案、来源和资料类型
+```
+
+节点对应：Loader 统一来源，ACL 在检索前隔离权限，Retriever 与 Reranker 负责相关度。最小输出只引用当前角色有权查看的资料。
+
 ## 业务场景说明
 
 - 谁会用：资料分散在共享文件夹和公司 Wiki，并且员工、经理、IT 管理员拥有不同查看权限的企业团队。

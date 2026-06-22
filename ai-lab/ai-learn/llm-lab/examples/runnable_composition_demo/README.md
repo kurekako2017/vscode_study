@@ -9,6 +9,41 @@ python3 main.py "RAG 如何重排" --stream
 
 验收：默认一次批处理两个问题并进入不同分支；`--stream` 能逐块输出。依赖：`langchain-core>=1.2,<2`。
 
+## 图片式模板解释
+
+最小输入：`python3 main.py "RAG 如何重排" --stream`
+
+处理前的数据：问题先包装成字典，再由 Runnable 并行补充 `intent` 和 `length`。
+
+```text
+问题字典
+│
+▼
+RunnablePassthrough.assign：保留问题并计算派生字段
+├── intent Runnable
+└── length Runnable
+    │
+    ▼
+RunnableParallel：汇总并行结果
+│
+▼
+RunnableBranch：根据 intent 选择路线
+├── RAG -> RAG 学习路线
+└── Agent -> Agent 学习路线
+    │
+    ▼
+invoke / batch / stream 返回结果
+```
+
+| 节点 | 框架组件 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 字段补充 | `RunnablePassthrough.assign` | 问题 -> 扩展字典 | 保留并增加信息 |
+| 并行处理 | `RunnableParallel` | 同一输入 -> 多个结果 | 表达独立计算 |
+| 条件路由 | `RunnableBranch` | intent -> 链路 | 选择处理路线 |
+| 执行方式 | `batch` / `stream` | 链路 -> 结果 | 对比调用模式 |
+
+最小输出：问题被识别为 RAG，并以普通文本或流式块返回对应学习路线。
+
 ## 业务场景（完整说明）
 
 - **使用者**：需要组合多个预处理、并行计算和条件路由步骤的 LangChain 开发者。

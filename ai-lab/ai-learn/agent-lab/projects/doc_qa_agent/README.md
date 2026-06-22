@@ -24,6 +24,52 @@
 
 它是这条学习线里很关键的一个样例，因为按日本 IT 现场和派遣案件来看，`RAG / 社内検索` 往往比复杂 Agent 更优先落地。
 
+## 图片式模板解释
+
+最小输入与资料：
+
+```text
+test_docs/
+├── 项目简介.md      # 项目使用 FastAPI
+└── 测试观点.md      # 回答必须显示来源
+```
+
+`python3 main.py "这个项目使用什么框架？" --docs test_docs`
+
+```text
+test_docs 文档目录
+│
+▼
+iter_text_files()：发现 .md / .txt 文件
+│
+▼
+build_chunks() -> chunk_text()：读取并切分为 Chunk
+│
+▼
+用户问题 -> tokenize() -> retrieve()：计算相关度
+├── 无命中 -> 返回没有足够资料
+└── 有命中 -> 选择 Top-K，并保留 source_label
+    │
+    ▼
+build_context()：拼接命中片段
+│
+▼
+answer_question()：让 LLM 仅根据 context 回答
+│
+▼
+输出 Answer + Sources
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 文档加载 | `iter_text_files()` | 目录 -> 文件列表 | 找到可检索资料 |
+| 文档切分 | `build_chunks()` | 文件 -> `list[Chunk]` | 形成可比较片段 |
+| 检索排序 | `retrieve()` | 问题和 chunks -> Top-K | 只取相关证据 |
+| 上下文组装 | `build_context()` | Top-K -> context | 给模型可控依据 |
+| 回答生成 | `answer_question()` | 问题和 context -> 答案 | 组织回答和来源 |
+
+最小输出：回答“项目使用 FastAPI”，并列出命中的文件和 chunk 来源。
+
 ## 业务场景说明
 
 - 谁会用：需要查询公司制度、项目资料、操作手册或 FAQ 的员工，例如人事、客服、运维和新入职成员。

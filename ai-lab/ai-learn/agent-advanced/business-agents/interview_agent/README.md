@@ -8,6 +8,23 @@ python3 main.py "situation task action result metric reflection"
 
 验收：满要素为 10 分；缺失项出现在 `missing`；结果包含审计记录。简历表述：实现结构化面试训练、rubric 评分与可解释反馈。
 
+## 图片式模板解释
+
+输入：`python3 main.py "situation task action result metric reflection"`；处理前数据是一段面试回答和固定 Rubric。
+
+```text
+面试回答 -> main() -> coach()
+│
+├── 逐项匹配 Situation / Task / Action / Result / Metric / Reflection
+├── 累计 score
+└── 收集 missing
+    │
+    ▼
+coach() -> 输出评分、缺项、追问和审计记录
+```
+
+节点对应：标准化统一文本，Rubric 提供确定性评分，追问针对缺项生成。最小完整输入输出 10 分；缺项输入会列出 `missing`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：求职者、面试教练和企业培训人员。

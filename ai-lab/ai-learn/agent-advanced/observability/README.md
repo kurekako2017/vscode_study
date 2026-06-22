@@ -10,6 +10,25 @@ python3 main.py --fail
 
 验收：成功路径写入三个 `ok` span；失败路径同时记录子 span 和父 span 的错误原因。生产环境不得把 prompt、客户资料或密钥直接写入 trace。
 
+## 图片式模板解释
+
+输入：在 `tracing_demo` 运行 `python3 main.py` 或 `python3 main.py --fail`；处理前数据是一次请求和 Trace 配置。
+
+```text
+Agent 请求 -> 创建 trace_id -> agent.run Span
+│
+▼
+retriever.search 子 Span -> tool.execute 子 Span
+│
+├── 成功 -> status=ok + token + cost
+└── 失败 -> 子 Span 和父 Span 写入 error
+    │
+    ▼
+结束各 Span -> 追加 JSONL
+```
+
+节点对应：Trace 串起一次请求，Span 表示步骤，父子 ID 还原调用树，JSONL 便于后续采集。最小输出是三个成功 Span 或带错误原因的失败链路。
+
 ## 业务场景（完整说明）
 
 - **使用者**：Agent 开发、SRE、平台运维和成本管理人员。

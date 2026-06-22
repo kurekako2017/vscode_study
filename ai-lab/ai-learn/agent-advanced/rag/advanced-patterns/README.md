@@ -10,6 +10,24 @@ python3 main.py "远程办公规定" --baseline
 
 验收：制度问题返回父文档来源；无关问题走 `fallback`；`--baseline` 可与 HyDE 路径对比。这里的词法检索用于稳定离线演示，生产环境应替换为向量召回和 cross-encoder reranker。
 
+## 图片式模板解释
+
+输入：`python3 main.py "新干线超过三万日元怎么审批"`；处理前数据是 Parent 文档、Child Chunk 和问题。
+
+```text
+问题 -> HyDE 查询扩展 -> 检索 Child Chunk
+│
+▼
+回查 Parent 文档 -> Contextual Compression：保留相关句子
+│
+▼
+Corrective RAG：判断证据质量
+├── 足够 -> 生成带来源回答
+└── 不足 -> fallback，不编造答案
+```
+
+节点对应：Child 提高召回精度，Parent 补足上下文，压缩降低噪声，CRAG 决定是否回退。最小输出为带父文档来源的回答或 `fallback`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：企业知识问答开发者和 RAG 效果优化人员。

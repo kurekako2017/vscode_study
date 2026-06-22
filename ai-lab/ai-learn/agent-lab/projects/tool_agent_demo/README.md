@@ -35,6 +35,41 @@
 - 再做有限工具调用
 - 最后才逐步走向 Agent 化
 
+## 图片式模板解释
+
+最小输入：`python3 main.py "列出工作目录里的 Markdown 文件" --workdir test_workspace`
+
+处理前的数据：任务是文本；`build_tools()` 把 `list_files`、`read_file`、`search_text` 转成 Tool Schema。
+
+```text
+用户任务 + workdir
+│
+▼
+parse_args() -> resolve_path()：解析参数并建立安全根目录
+│
+▼
+build_tools()：向模型声明工具和参数
+│
+▼
+run_agent()：调用模型判断下一步
+├── 信息足够 -> 生成最终回答
+└── function_call -> call_tool()：校验并执行本地函数
+    │
+    ▼
+function_call_output：把工具结果回填模型
+│
+└── 回到 run_agent()，直到回答或达到轮数限制
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 工具声明 | `build_tools()` | Python 能力 -> Schema | 告诉模型能做什么 |
+| 安全边界 | `resolve_path()` | 相对路径 -> 安全路径 | 阻止越权访问 |
+| 工具路由 | `call_tool()` | 名称和参数 -> 结果 | 把模型意图变成动作 |
+| 调用循环 | `run_agent()` | 消息和观察 -> 回答 | 根据工具结果继续判断 |
+
+最小输出：模型总结文件列表，真实工具结果作为 Observation 参与回答。
+
 ## 业务场景说明
 
 - 谁会用：需要让模型读取真实项目文件的开发人员，例如代码调查、文档搜索和项目交接场景。

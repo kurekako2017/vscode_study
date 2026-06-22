@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560">
   <style>
-    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
-    .schema { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
-    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
-    .small { font-size:13px; fill:#334155; }
+    .canvas { fill:#f1f5f9; }
+    .box { fill:#ffffff; stroke:#334155; stroke-width:2.2; rx:8; }
+    .schema { fill:#dbeafe; stroke:#1d4ed8; stroke-width:2.4; rx:8; }
+    .text { font-family:"Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; font-weight:500; }
     .title { font-weight:700; font-size:20px; }
-    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+    .arrow { stroke:#334155; stroke-width:2.4; fill:none; marker-end:url(#arrowhead); }
   </style>
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155" />
     </marker>
   </defs>
+
+  <rect width="980" height="560" class="canvas" />
 
   <text x="40" y="36" class="text title">structured_output_demo - main.py 详细处理流程</text>
 

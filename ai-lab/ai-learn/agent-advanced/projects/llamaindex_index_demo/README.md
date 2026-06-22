@@ -10,6 +10,26 @@
 - QueryEngine
 - ResponseSynthesizer
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "谁可以执行批量导入"`；处理前数据是多个 `Document`。
+
+```text
+Document -> split_into_nodes() -> Node 集合
+│
+▼
+build_inverted_index()：词语 -> Node ID
+用户问题 -> expand_query() -> 查询词
+│
+▼
+retrieve()：定位 Node -> 按分数排序
+│
+▼
+synthesize_answer()：合成答案和来源
+```
+
+节点对应：Document 保存原文，Node 是检索单位，Index 加速定位，Synthesizer 组织答案。最小输出为答案、命中 Node 和来源文档。
+
 ## 业务场景说明
 
 - 谁会用：想理解 LlamaIndex 如何组织文档、片段、索引和查询过程的初学者，以及准备制作文档知识库的开发人员。

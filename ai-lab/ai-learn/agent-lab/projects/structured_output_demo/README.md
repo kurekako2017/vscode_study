@@ -21,6 +21,39 @@
 - 稳定任务清单
 - 能接后端 API 的结构化数据
 
+## 图片式模板解释
+
+最小输入：`python3 main.py "设计一个三步学习 RAG 的计划" --mock`
+
+处理前的数据：自然语言需求是字符串，目标输出由 `AgentPlan` Pydantic Schema 约束。
+
+```text
+自然语言需求
+│
+▼
+parse_args()：读取需求、模型和 Mock/Real 模式
+│
+▼
+generate_plan()：要求输出 AgentPlan
+├── Real -> responses.parse() -> output_parsed
+└── Mock -> 本地构造 AgentPlan
+    │
+    ▼
+Pydantic：校验字段和类型
+│
+▼
+model_dump() -> Pretty JSON / Raw JSON
+```
+
+| 节点 | 文件/函数 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 数据合同 | `AgentPlan` | 字段定义 -> Schema | 固定下游数据结构 |
+| 结构化生成 | `generate_plan()` | 需求 -> `AgentPlan` | 把自由文本变成对象 |
+| 数据校验 | Pydantic | 模型结果 -> 类型安全对象 | 发现缺字段和错类型 |
+| 序列化 | `model_dump()` | 对象 -> JSON | 交给 API 或数据库 |
+
+最小输出：包含目标、步骤等固定字段的 JSON；字段值会随输入变化。
+
 ## 业务场景说明
 
 - 谁会用：需要把模型结果交给其他程序继续处理的后端开发人员，例如工单、审批和任务管理系统的开发人员。

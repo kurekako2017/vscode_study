@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720">
   <style>
-    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:1.6; rx:8; }
-    .data { fill:#eef6ff; stroke:#1d4ed8; stroke-width:1.6; rx:8; }
-    .text { font-family: Arial, Helvetica, sans-serif; font-size:15px; fill:#0f172a; }
-    .small { font-size:13px; fill:#334155; }
-    .title { font-weight:700; font-size:20px; }
-    .arrow { stroke:#0f172a; stroke-width:1.7; fill:none; marker-end:url(#arrowhead); }
+    .canvas { fill:#f1f5f9; }
+    .box { fill:#ffffff; stroke:#334155; stroke-width:2.2; rx:8; }
+    .data { fill:#dbeafe; stroke:#1d4ed8; stroke-width:2.4; rx:8; }
+    .text { font-family:"Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif; font-size:15px; fill:#0f172a; }
+    .small { font-size:13px; fill:#334155; font-weight:500; }
+    .title { font-weight:700; font-size:20px; fill:#0f172a; }
+    .arrow { stroke:#334155; stroke-width:2.4; fill:none; marker-end:url(#arrowhead); }
+    .hint { fill:#1e3a5f; font-weight:600; }
   </style>
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155" />
     </marker>
   </defs>
+
+  <rect width="1120" height="720" class="canvas" />
 
   <text x="40" y="36" class="text title">doc_qa_agent - main.py 详细处理流程</text>
 
@@ -66,5 +70,5 @@
   <path d="M745 460 L745 500 L470 500 L470 530" class="arrow" />
   <path d="M470 610 L470 650 L800 650 L800 610" class="arrow" />
 
-  <text x="40" y="680" class="small">提示：RAG 顺序是先读取和检索，再把少量相关上下文送给模型回答。</text>
+  <text x="40" y="680" class="small hint">提示：RAG 顺序是先读取和检索，再把少量相关上下文送给模型回答。</text>
 </svg>

@@ -8,6 +8,25 @@ python3 main.py --skills python,rag --japanese 2 --max-rate 85
 
 验收：只返回 `available` 且满足日语/单价条件的人员；每个结果带匹配技能与分数；状态为 `proposal`。简历表述：实现 SES 案件—人材匹配、解释性评分与人工审批边界。
 
+## 图片式模板解释
+
+输入：`python3 main.py --skills python,rag --japanese 2 --max-rate 85`；处理前数据是案件条件和工程师列表。
+
+```text
+案件条件 -> main() -> match() 读取工程师资料
+│
+▼
+硬过滤：available -> 日语等级 -> 单价上限
+│
+▼
+match()：计算技能交集和解释性分数
+│
+▼
+排序 -> proposal -> SES 营业人工审批
+```
+
+节点对应：硬过滤保证不可妥协条件，技能评分负责排序，人工审批阻止自动发送履历。最小输出是带命中技能和分数的候选提案。
+
 ## 业务场景（完整说明）
 
 - **使用者**：日本 SES 营业、人员协调员和项目负责人。

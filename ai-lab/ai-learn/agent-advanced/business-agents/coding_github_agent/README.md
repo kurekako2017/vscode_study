@@ -9,6 +9,22 @@ python3 main.py "+ value = parse(data)"
 
 验收：疑似密钥返回 `blocked/high`；普通 diff 返回 `proposal`；两者都要求审批。简历表述：实现 diff 风险检测、分级门禁和人工审批式 GitHub 工作流。
 
+## 图片式模板解释
+
+输入：`python3 main.py "+ password = 'demo'"`；处理前数据是一段 Git Diff。
+
+```text
+Git Diff -> main() -> review()：逐条执行安全规则
+│
+├── 命中密钥等高危规则 -> blocked/high -> 等待人工审批
+└── 普通改动 -> review() 生成 proposal -> 等待人工审批
+    │
+    ▼
+输出风险、问题列表和审计记录；不修改、不 push、不 merge
+```
+
+节点对应：`review()` 负责规则检测和提案生成，风险门禁负责阻断，Proposal 只生成审查草稿。最小输出为 `blocked/high` 或待审批 `proposal`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：开发人员、代码审查者和安全负责人。

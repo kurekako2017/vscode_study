@@ -9,6 +9,25 @@
 - 企业知识库检索
 - FAQ / 工单 / 制度文档检索
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "出差需要什么凭证" --mode mock`；处理前数据是文档、向量、payload 和 Qdrant collection。
+
+```text
+文档 -> embedding -> Point(vector + payload)
+│
+▼
+模式选择
+├── Mock -> 内存 Qdrant-like collection
+└── Real -> QdrantClient -> create_collection() -> upsert()
+用户问题 -> 查询向量 -> search/query_points() -> Top-K
+│
+▼
+返回 payload、相似度分数和来源
+```
+
+节点对应：Point 绑定向量和业务数据，Collection 定义向量空间，Upsert 写入，Search 召回。最小输出是按相似度排序的 payload。
+
 ## 业务场景说明
 
 - 谁会用：已经看懂向量检索原理，准备连接真实 Qdrant 服务并保存、查询文档向量的开发人员。

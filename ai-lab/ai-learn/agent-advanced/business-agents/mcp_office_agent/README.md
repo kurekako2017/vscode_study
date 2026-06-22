@@ -9,6 +9,20 @@ python3 main.py create_draft "会议纪要"
 
 验收：查询直接完成；创建内容只返回 `draft` 且要求审批；allowlist 外工具无法进入执行函数。简历表述：实现 MCP 工具权限、草稿审批和调用审计。
 
+## 图片式模板解释
+
+输入：`python3 main.py create_draft "会议纪要"`；处理前数据是工具名、参数和 Tool Allowlist。
+
+```text
+Office 任务 -> main() -> office() 检查 allowlist
+├── 未授权工具 -> rejected + 审计记录
+└── 已授权工具 -> office() 路由本地 adapter
+    ├── search_documents -> 返回匹配资料
+    └── create_draft -> 生成 draft -> 等待人工审批
+```
+
+节点对应：Allowlist 控制能力边界，路由器选择 adapter，草稿状态阻止自动发送或覆盖。最小输出为检索结果或待审批 `draft`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：行政、销售、项目助理和内部自动化平台。

@@ -10,6 +10,23 @@
 - 相似度检索
 - 返回 top-k 结果
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "出差花的钱如何申请"`；处理前数据是文档文本、metadata 和 collection 名称。
+
+```text
+文档 -> embed_text() -> 文档向量 -> upsert collection
+用户问题 -> embed_text() -> 查询向量
+│
+▼
+cosine_similarity()：与所有文档向量比较
+│
+▼
+按分数排序 -> Top-K -> 返回文本、metadata 和分数
+```
+
+节点对应：Embedding 把文本变成数字，Collection 管理记录，相似度衡量接近程度，Top-K 控制返回数量。最小输出是按分数排序的相关文档。
+
 ## 业务场景说明
 
 - 谁会用：第一次学习向量、collection、metadata 和相似度搜索的开发人员。

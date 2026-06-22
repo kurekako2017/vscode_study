@@ -4,6 +4,24 @@
 
 它的定位是“Java 服务如何作为客户端去调用另一个 agent / RAG 服务”。
 
+## 图片式模板解释
+
+输入：Java 调用方向 Spring Controller 提交问题；处理前数据是请求 DTO、后端地址和超时配置。
+
+```text
+Java HTTP 请求 -> Spring Controller -> Request Record 校验
+│
+▼
+RagApiClientService -> RestTemplate：POST Python /ask
+├── 成功 -> JSON -> Response Record DTO
+└── 超时/错误 -> 统一异常响应
+    │
+    ▼
+Controller 把答案和来源返回 Java 调用方
+```
+
+节点对应：Controller 提供 Java 接口，Service 隔离远程调用，RestTemplate 传输 JSON，Record 固定数据合同。最小输出是包含答案和来源的 Java DTO。
+
 ## 业务场景说明
 
 - 谁会用：公司现有系统主要使用 Java 或 Spring Boot，而 AI 和 RAG 部分使用 Python 的开发团队。

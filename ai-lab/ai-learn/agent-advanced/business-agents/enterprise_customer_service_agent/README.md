@@ -10,6 +10,20 @@ python3 main.py "退款" --tenant unknown
 
 验收：已知问题返回 `source`；未知问题为 `handoff`；非法租户为 `rejected`。简历表述：实现租户隔离、知识引用和低置信人工转接。
 
+## 图片式模板解释
+
+输入：`python3 main.py "退款需要几天" --tenant acme`；处理前数据是租户、问题和租户知识库。
+
+```text
+客户问题 + tenant -> main() -> answer()
+├── 非法租户 -> rejected
+└── 合法租户 -> answer() 检索当前租户知识
+    ├── 有证据 -> answer + source
+    └── 证据不足 -> handoff -> 人工客服
+```
+
+节点对应：租户校验保证隔离，检索只读取当前租户资料，证据判断阻止编造。最小输出为带 `source` 的回答、`handoff` 或 `rejected`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：企业客户、客服人员和知识库运营人员。

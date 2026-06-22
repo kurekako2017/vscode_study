@@ -2,6 +2,28 @@
 
 这个 demo 演示一个最小可容器化的 Python 服务。
 
+## 图片式模板解释
+
+输入：`python3 app.py` 或 `docker compose up --build`；处理前数据是应用代码、依赖、环境变量和端口配置。
+
+```text
+app.py + requirements + 环境变量
+│
+▼
+Dockerfile：选择基础镜像 -> 安装依赖 -> 复制代码
+│
+▼
+docker build：生成 Image
+│
+▼
+docker compose：注入配置并启动 Container
+│
+▼
+HTTP 请求 -> Python 服务 -> HTTP 响应 / 健康检查
+```
+
+节点对应：Dockerfile 固化运行环境，Image 是不可变产物，Container 是运行实例，Compose 负责启动配置。最小输出是服务成功启动并返回健康响应。
+
 ## 业务场景说明
 
 - 适用场景：想把 Python 服务放进统一运行环境，避免本地和线上机器差异带来的问题。

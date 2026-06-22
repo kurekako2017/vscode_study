@@ -10,6 +10,37 @@ curl -N -X POST http://127.0.0.1:8000/runs/stream -H 'Content-Type: application/
 
 验收：正常路径以 `done` 结束；异常路径发送结构化 `error` 且不再发送 `done`；反向代理禁用缓冲。依赖：`fastapi`、`uvicorn`。
 
+## 图片式模板解释
+
+最小输入：启动服务后用 `curl -N` 向 `/runs/stream` 发送 `{"message":"解释 Tool Calling"}`。
+
+处理前的数据：FastAPI 把 JSON 转成请求对象，服务端用 SSE 事件逐条返回状态和文本。
+
+```text
+客户端 POST /runs/stream
+│
+▼
+FastAPI：校验 JSON 请求
+│
+▼
+异步事件生成器
+├── 发送 status
+├── 正常 -> 多个 token -> done -> 关闭流
+└── 异常 -> error -> 关闭流，不再发送 done
+    │
+    ▼
+客户端按事件类型更新界面
+```
+
+| 节点 | 代码/协议 | 输入 -> 输出 | 作用 |
+| --- | --- | --- | --- |
+| 请求入口 | FastAPI route | JSON -> message | 建立流式任务 |
+| 事件生成 | async generator | message -> 多个事件 | 边生成边发送 |
+| 事件协议 | SSE | 四类事件 -> 文本流 | 客户端区分状态 |
+| 终止控制 | `done` / `error` | 活动流 -> 关闭 | 避免悬挂连接 |
+
+最小输出：`status -> token... -> done`；错误输入走 `status -> error`。
+
 ## 业务场景（完整说明）
 
 - **使用者**：聊天 UI、长任务控制台和 Agent API 开发者。

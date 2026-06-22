@@ -4,6 +4,25 @@
 
 它和 Qdrant 版的区别是：这里更偏本地持久化和快速原型，适合先把 embedding + collection + query 这条链路跑通。
 
+## 图片式模板解释
+
+输入：运行 `python3 main.py "远程办公怎么申请" --mode mock`；处理前数据是文档、metadata、embedding 和 Chroma collection。
+
+```text
+文档 -> embedding
+│
+▼
+模式选择
+├── Mock -> 内存 Chroma-like collection
+└── Real -> Chroma PersistentClient -> collection.upsert()
+用户问题 -> 查询 embedding -> collection.query() -> Top-K
+│
+▼
+返回 documents + metadatas + distances
+```
+
+节点对应：PersistentClient 管本地持久化，Collection 隔离数据，Upsert 写入，Query 召回。最小输出是相关文档及距离；Mock 不代表真实 Chroma 效果。
+
 ## 业务场景说明
 
 - 谁会用：希望在自己的电脑上快速制作向量检索原型，又暂时不想部署独立数据库服务的开发人员。
