@@ -66,23 +66,23 @@ export OPENAI_API_KEY="your_api_key"
 
 ## 4. 运行方式
 
-在 `ai-lab/` 根目录执行时，请显式传入文档目录：
+以下命令都在 `ai-lab/` 根目录执行。
+`--docs` 需要传入 `doc_qa_agent` 项目的目录，而不是 `ai-lab/` 根目录。
+`--real` 会按 `OpenRouter -> NVIDIA -> Ollama(qwen2.5-coder:1.5b) -> mock` 的顺序回退，`--mock` 只是在你想强制离线时直接走本地 mock。
+
+### 4.1 Mock 执行
 
 ```bash
-python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py "这个目录里数据库相关内容主要讲了什么？" --docs ai-learn/agent-lab/projects/doc_qa_agent
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --mock --docs ai-learn/agent-lab/projects/doc_qa_agent "这个目录里数据库相关内容主要讲了什么？"
 ```
 
-指定文档目录：
+### 4.2 真实模型执行
 
 ```bash
-python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --docs ai-learn/agent-lab/projects/doc_qa_agent "对日项目里的 RDS 和 Aurora 有什么区别？"
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --real --docs ai-learn/agent-lab/projects/doc_qa_agent "总结数据库移行的重点"
 ```
 
-指定模型：
-
-```bash
-OPENROUTER_API_KEY=your_api_key python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --model gpt-5 --real --docs ai-learn/agent-lab/projects/doc_qa_agent "总结数据库移行的重点"
-```
+真实模式默认会先尝试 OpenRouter，然后 NVIDIA，再尝试本地 Ollama。若三者都不可用，才会退到最终 mock。
 
 ## 5. 这个 demo 的实现范围
 
@@ -90,10 +90,35 @@ OPENROUTER_API_KEY=your_api_key python3 ai-learn/agent-lab/projects/doc_qa_agent
 
 - 文档类型：`md`、`txt`
 - 检索方式：本地关键词检索
-- 切分方式：按固定大小切分文本
+- 切分方式：按固定字符长度切分文本，默认 `CHUNK_SIZE = 1200`，重叠 `CHUNK_OVERLAP = 200`
 - 结果生成：把 Top-K 片段交给模型总结
 
 它还不是完整企业版 `RAG`，但足够先把这条主线跑通。
+
+### 5.1 chunk 是什么，chunk 前后分别是什么
+
+当前代码里的 `chunk` 不是独立参数名，而是“文档切分后的片段”。
+
+- chunk 前：文件原文，来自 `iter_text_files()` 读取的 UTF-8 文本
+- 预处理：`chunk_text()` 会先把换行统一成 `\n`，再 `strip()`
+- chunk 方式：按字符切片，`start=0`，`end=start+CHUNK_SIZE`
+- chunk 重叠：下一段从 `end-CHUNK_OVERLAP` 开始，也就是默认重叠 `200` 个字符
+- chunk 后：`chunk_text()` 返回 `list[str]`，`build_chunks()` 再把它包装成 `Chunk(source_label, content, score)` 对象
+
+`source_label` 的格式是：
+
+```text
+相对路径#chunkN
+```
+
+例如：
+
+```text
+docs/guide.md#chunk1
+docs/guide.md#chunk2
+```
+
+这意味着你在 `Sources` 里看到的不是“原文件名”，而是“文件名 + 第几个切片”。
 
 ## 6. 输出内容
 
@@ -115,8 +140,8 @@ OPENROUTER_API_KEY=your_api_key python3 ai-learn/agent-lab/projects/doc_qa_agent
 | --- | --- | --- | --- |
 | `Chunk` | 数据模型层 | 表示一个可检索的文档片段 | 片段内容、来源、分数 |
 | `iter_text_files()` | 文档读取层 | 找到目录下的 `.md` / `.txt` 文件 | 资料入口在哪里 |
-| `chunk_text()` | 文本处理层 | 把长文档切成带重叠的小块 | 为什么不能整篇塞给模型 |
-| `build_chunks()` | 数据准备层 | 给每个片段附加来源标签 | 来源追踪 |
+| `chunk_text()` | 文本处理层 | 把长文档切成带重叠的小块 | `CHUNK_SIZE`、`CHUNK_OVERLAP`、切分前后 |
+| `build_chunks()` | 数据准备层 | 给每个片段附加来源标签 | 来源追踪、`#chunkN` 命名 |
 | `tokenize()` | 检索准备层 | 把问题和片段转成可比较的词 | 最小关键词检索 |
 | `retrieve()` | 检索层 | 计算重合度并选出 Top-K | 检索质量决定回答质量 |
 | `build_context()` | Prompt 组装层 | 把命中的片段拼成上下文 | 模型只能看到你送进去的资料 |
@@ -153,8 +178,8 @@ graph TD
 | --- | --- | --- | --- |
 | 1 | Controller / 输入层 | `main.py` -> `parse_args()` | 接收问题和文档目录 |
 | 2 | Document Loader 层 | `main.py` -> `iter_text_files()` | 扫描可读取文件 |
-| 3 | Text Splitter 层 | `main.py` -> `chunk_text()` | 把文档切成片段 |
-| 4 | Data Model 层 | `Chunk` + `build_chunks()` | 保存片段内容和来源 |
+| 3 | Text Splitter 层 | `main.py` -> `chunk_text()` | 把文档按固定长度和重叠切成片段 |
+| 4 | Data Model 层 | `Chunk` + `build_chunks()` | 保存片段内容、来源和分数 |
 | 5 | Retrieval 层 | `tokenize()` + `retrieve()` | 检索相关片段 |
 | 6 | Prompt / Context 层 | `build_context()` | 组织模型输入上下文 |
 | 7 | LLM Service 层 | `answer_question()` | 调用模型生成回答 |
@@ -185,7 +210,7 @@ graph TD
 
 1. 先看输出里的 `Sources`，不要只看最终回答。
 2. 再修改 `TOP_K`，观察给模型的资料变多或变少后有什么变化。
-3. 再修改 `CHUNK_SIZE`，观察片段太大或太小时的影响。
+3. 再修改 `CHUNK_SIZE` 和 `CHUNK_OVERLAP`，观察片段太大、太小或重叠不足时的影响。
 4. 最后再考虑把关键词检索换成向量检索。
 
 ## 12. 下一步建议

@@ -1,46 +1,49 @@
-Doc QA Agent — 学习说明与快速上手
+# doc_qa_agent 学习导读
 
-目的
-- 本地文档问答（RAG PoC）：从本地目录读取文档、切分 chunk、基于关键词检索并构造上下文回答。
+本文件只保留学习顺序和阅读重点，避免和主文档重复。完整说明请先看 [README.md](/home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-lab/projects/doc_qa_agent/README.md)。
 
-业务场景说明
-- 谁会用：想做公司内部知识问答或项目文档搜索的学习者和开发人员。
-- 现实中的问题：资料就在本地文件里，但用户不知道答案在哪一份文件、哪一段文字中。
-- 这个例子怎么解决：先扫描文件并切分内容，再用问题检索相关片段，把片段作为上下文交给模型。
-- 现实例子：把请假制度和远程办公规定放入目录，询问“连续远程办公需要谁批准”，程序根据命中的制度片段回答并列出来源。
-- 初学者重点：按 `build_chunks()`、`retrieve()`、`build_context()`、`answer_question()` 的顺序阅读，就能看懂最小 RAG。
+所有执行命令都默认在 `ai-lab/` 根目录运行。
+`--docs` 需要传入 `doc_qa_agent` 项目的目录，而不是 `ai-lab/` 根目录。
 
-快速运行
-1. Mock 模式（无需 API Key）:
-   ```bash
-   python3 main.py "项目简介是什么" --docs . --mock
-   ```
-2. Real 模式（需 `OPENROUTER_API_KEY` 或 `OPENAI_API_KEY`）:
-   ```bash
-   OPENROUTER_API_KEY=your_api_key python3 main.py "如何部署" --docs . --real
-   ```
+## 1. 推荐阅读顺序
 
-关键函数
-- `build_chunks()`：从文件构建带来源的 chunk 列表。
-- `retrieve()`：基于关键词重合度检索 top-k。
-- `answer_question()`：将检索上下文发送给模型并返回答案（或 mock）。
+1. 先看 `README.md` 里的“chunk 是什么，chunk 前后分别是什么”
+2. 再看 `main.py` 的 `chunk_text()`、`build_chunks()`、`retrieve()`、`build_context()`、`answer_question()`
+3. 最后看 `[简单测试用例表.md](/home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-lab/projects/doc_qa_agent/简单测试用例表.md)`，把 chunk 规则和输出结果对应起来
 
-学习建议
-- 用小数据集尝试不同 `CHUNK_SIZE`，观察检索效果变化。
-- 将关键词检索替换为 embeddings + 向量检索作为扩展练习。
+## 2. 这个项目里 chunk 的关键点
 
-## 业务场景补充
+- chunk 前是原始文件内容
+- chunk 方式是按字符切片，不是按段落，也不是按 token
+- 默认参数是 `CHUNK_SIZE = 1200`、`CHUNK_OVERLAP = 200`
+- chunk 后会得到 `list[str]`，再包装成 `Chunk` 对象
+- 每个片段的来源格式是 `相对路径#chunkN`
 
-该示例对应企业制度、项目文档和个人知识库问答。输入是文档目录与问题，输出必须同时包含答案和来源；生产环境还要补 ACL、增量索引与答案评估。
+## 3. 命令写法
 
-## 整体流程图
+- Mock 执行：
 
-```mermaid
-graph TD
-    A[文档目录] --> B[读取和切分]
-    B --> C[本地检索]
-    D[用户问题] --> C
-    C --> E[构建 Context]
-    E --> F[模型或 Mock]
-    F --> G[答案和来源]
+```bash
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --mock --docs ai-learn/agent-lab/projects/doc_qa_agent "项目简介是什么"
 ```
+
+- 真实模型执行：
+
+```bash
+python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --real --docs ai-learn/agent-lab/projects/doc_qa_agent "项目简介是什么"
+```
+
+- 真实模式回退顺序：`OpenRouter -> NVIDIA -> Ollama(qwen2.5-coder:1.5b) -> mock`
+
+## 4. 学习建议
+
+- 先用小文档验证 `CHUNK_SIZE` 和 `CHUNK_OVERLAP`
+- 再看 `TOP_K = 4` 对最终 `Sources` 的影响
+- 如果要做扩展练习，优先把 `TOP_K` 参数化，再考虑向量检索
+
+## 5. 这份导读不重复的内容
+
+- 不重复介绍业务场景
+- 不重复展开流程图
+- 不重复解释安装和运行命令
+- 不重复列完整设计说明

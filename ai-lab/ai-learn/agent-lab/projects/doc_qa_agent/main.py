@@ -17,12 +17,11 @@
     - 输出：答案正文 + sources（chunk 标签及分数）
 - 改造练习点：
     - 将关键词检索替换为向量检索
-    - 增加 --top-k 参数并接入 retrieve
+    - 将 TOP_K 参数化，并接入 retrieve 的命令行配置
     - 在输出中加入每条来源的摘要片段
 """
 
 import argparse
-import os
 import re
 import sys
 from dataclasses import dataclass
@@ -34,7 +33,7 @@ for _parent in Path(__file__).resolve().parents:
     if (_parent / "llm_runtime.py").exists():
         sys.path.insert(0, str(_parent))
         break
-from llm_runtime import build_fallback_client, has_real_provider
+from llm_runtime import build_fallback_client
 
 # 默认模型名，可用 `--model` 覆盖。
 DEFAULT_MODEL = "gpt-5"
@@ -92,18 +91,13 @@ def parse_args() -> argparse.Namespace:
     # 添加 mock 模式参数
     parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
     # 添加 real 模式参数
-    parser.add_argument("--real", action="store_true", help="Force real API mode (requires OPENROUTER_API_KEY or OPENAI_API_KEY).")
+    parser.add_argument("--real", action="store_true", help="Use real provider chain: OpenRouter -> NVIDIA -> Ollama -> mock fallback.")
     return parser.parse_args()
-
-
-def _has_real_credentials() -> bool:
-    return has_real_provider()
 
 
 def build_client() -> OpenAI:
     # 层次: 基础设施层 — 构建 OpenAI 客户端并处理环境依赖 （层次: 基础设施层 — 构建 OpenAI 客户端并处理环境依赖）
-    """从 OpenRouter 或 OpenAI 兼容环境变量创建 OpenAI 客户端。"""
-    # 从环境变量中获取 API Key
+    """创建支持 provider fallback 的统一客户端。"""
     return build_fallback_client()
 
 
@@ -115,14 +109,10 @@ def resolve_mode(force_mock: bool, force_real: bool) -> str:
         return "mock"
     # 如果 force_real 为 True，则返回 "real"
     if force_real:
-        if not _has_real_credentials():
-            # 打印错误信息
-            print("ERROR: --real requested but OPENROUTER_API_KEY or OPENAI_API_KEY is not set.", file=sys.stderr)
-            sys.exit(1)
         # 返回 "real"
         return "real"
-    # 如果设置了可用 key，则返回 "real"
-    return "real" if _has_real_credentials() else "mock"
+    # 默认走 real provider chain，只有显式 --mock 才强制离线 mock。
+    return "real"
 
 
 def build_mock_answer(question: str, top_chunks: list[Chunk]) -> str:
@@ -285,7 +275,7 @@ def main() -> None:
         sys.exit(1)
 
     # 检索阶段：根据用户问题从 chunks 中找出 top-k 匹配的片段。
-    top_chunks = retrieve(args.question, chunks)
+    top_chunks = retrieve(question=args.question, chunks=chunks)
     # 构建上下文
     context = build_context(top_chunks)
     # 决定运行模式
