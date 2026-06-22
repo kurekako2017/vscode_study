@@ -10,6 +10,11 @@
 - 相似度检索
 - 返回 top-k 结果
 
+## 项目目标
+
+把“文本如何变成向量、如何写入 collection、如何做相似度检索”这条主线讲清楚。
+这个 demo 适合先理解原理，再去看真实 Qdrant / Chroma 版骨架。
+
 ## 图片式模板解释
 
 输入：运行 `python3 main.py "出差花的钱如何申请"`；处理前数据是文档文本、metadata 和 collection 名称。
@@ -68,7 +73,46 @@ cosine_similarity()：与所有文档向量比较
 /usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "远程办公怎么申请？" --backend chroma --top-k 2
 ```
 
-## 目录结构
+## Mock Mode运行
+
+这个 demo 的默认用法就是 Mock / 教学模式。
+你可以直接用 `memory` 后端看完整流程，不依赖外部服务：
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "怎么申请出差报销？" --backend memory --top-k 3
+```
+
+## Real Mode运行
+
+这个 demo 本身不连接真实 Qdrant / Chroma 服务，所以这里没有独立的真实模式。
+如果你要看真实接入，请参考：
+
+- [真实 Qdrant 版骨架](../vector_db_qdrant_demo/README.md)
+- [真实 Chroma 版骨架](../vector_db_chroma_demo/README.md)
+
+## 测试清单
+
+### 本地测试
+
+运行一个最小 smoke test，确认样本文档可以被加载、向量化并返回 Top-K 结果：
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "怎么申请出差报销？" --backend memory --top-k 3
+```
+
+### Qdrant 风格测试
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "怎么申请出差报销？" --backend qdrant --top-k 3
+```
+
+### Chroma 风格测试
+
+```bash
+/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "远程办公怎么申请？" --backend chroma --top-k 2
+```
+
+## 项目结构
 
 ```text
 vector_db_demo/
@@ -80,14 +124,14 @@ vector_db_demo/
 └── README.md
 ```
 
-## 你会学到什么
+## 学习重点
 
 1. 向量数据库为什么比关键词检索更适合语义搜索
 2. collection / 文档 / 向量 / metadata 的关系
 3. 相似度搜索是怎么工作的
 4. Qdrant 风格和 Chroma 风格的数据组织差别
 
-## 常见报错
+## 常见问题
 
 - 如果结果很乱，通常是样本太少，换一个更接近内容的 query。
 - 如果输出为空，先确认你是在 demo 目录下运行，且 `assets/` 没被删。
