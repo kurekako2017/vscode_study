@@ -8,8 +8,9 @@
 ## 1. 推荐阅读顺序
 
 1. 先看 `README.md` 里的“chunk 是什么，chunk 前后分别是什么”
-2. 再看 `main.py` 的 `chunk_text()`、`build_chunks()`、`retrieve()`、`build_context()`、`answer_question()`
-3. 最后看 `[简单测试用例表.md](/home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-lab/projects/doc_qa_agent/简单测试用例表.md)`，把 chunk 规则和输出结果对应起来
+2. 再看 `README.md` 新增的“业务流程图（展开版）”，把 `docs -> build_chunks() -> chunks -> retrieve() -> build_context() -> LLM` 这条链路先记住
+3. 再看 `main.py` 的 `chunk_text()`、`build_chunks()`、`retrieve()`、`build_context()`、`answer_question()`
+4. 最后看 `[简单测试用例表.md](/home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-lab/projects/doc_qa_agent/简单测试用例表.md)`，把 chunk 规则和输出结果对应起来
 
 ## 2. 这个项目里 chunk 的关键点
 
@@ -44,6 +45,14 @@ python3 ai-learn/agent-lab/projects/doc_qa_agent/main.py --real --docs ai-learn/
 ## 5. 这份导读不重复的内容
 
 - 不重复介绍业务场景
-- 不重复展开流程图
+- 不重复展开流程图的完整版本，但会提示你先看 README 的展开版
 - 不重复解释安装和运行命令
 - 不重复列完整设计说明
+
+## 6. 这类流程图的统一理解方式
+
+以后你在 `ai-learn` 里看到类似的 `RAG` 示例，都可以先按这条顺序理解：
+
+`文档目录 -> 文档切分 -> chunk 集合 -> 用户提问 -> 检索 -> Top-K -> 上下文拼接 -> LLM -> 输出答案`
+
+如果某个示例还包含 `索引构建`、`重排`、`向量库`、`权限过滤` 或 `多阶段生成`，就把它们插到这条主链路中间，再展开成对应的节点说明即可。

@@ -32,6 +32,45 @@
 - 现实例子：把公司的《出差报销规定》放进文档目录后，员工询问住宿费上限。程序检索到包含金额规定的片段，生成回答，并标出答案来自哪个文件。
 - 初学者重点：RAG 的关键不是先调用模型，而是“先从资料中找到依据，再把依据交给模型组织答案”。
 
+## 业务流程图（展开版）
+
+这张图对应你给出的那种“先有 docs 目录，再切 chunk，再检索，再拼 context，最后交给 LLM”的展开方式。它适合放在所有 `RAG` / 文档问答示例里，帮助读者把数据流看成一条完整链路。
+
+```mermaid
+graph TD
+    A["docs 目录<br/>langchain.md / rag.md / agent.md"]
+    B["build_chunks()<br/>读取文档并切分"]
+    C["chunks<br/>chunk1 / chunk2 / chunk3"]
+    D["用户提问<br/>例如：RAG 流程是什么"]
+    E["retrieve()<br/>计算相关度"]
+    F["选 Top-K"]
+    G["rag.md#chunk1<br/>命中的来源片段"]
+    H["build_context()<br/>把命中文档拼成上下文"]
+    I["context"]
+    J["LLM"]
+    K["最终答案"]
+
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K
+```
+
+这张图里的节点，可以直接对应到代码和数据结构：
+
+| 图中节点 | 代码 / 概念 | 说明 |
+| --- | --- | --- |
+| `docs 目录` | `--docs` + `iter_text_files()` | 指定要扫描的文档目录 |
+| `build_chunks()` | `chunk_text()` + `build_chunks()` | 读取文件并切成可检索片段 |
+| `chunks` | `list[Chunk]` | 切分后的片段集合 |
+| `用户提问` | CLI 输入 `question` | 用户实际提出的问题 |
+| `retrieve()` | `tokenize()` + `retrieve()` | 计算问题与片段的相关度 |
+| `选 Top-K` | `TOP_K` | 只保留最相关的几个片段 |
+| `rag.md#chunk1` | `source_label` | 命中的来源标签 |
+| `build_context()` | `build_context()` | 把命中的片段拼成上下文 |
+| `context` | prompt 上下文 | 交给模型的资料内容 |
+| `LLM` | `answer_question()` | 基于上下文生成回答 |
+| `最终答案` | stdout 输出 | 最终返回给用户的结果 |
+
+示例里的相关度分数只是说明检索方向，像 `chunk1 score=0`、`chunk2 score=2`、`chunk3 score=0` 这种写法，重点是帮助读者理解“为什么最后选中了某个 chunk”，不是要求每次都固定成同一个数。
+
 ## 1. 前置条件
 
 - Python 3.10+
@@ -119,6 +158,10 @@ docs/guide.md#chunk2
 ```
 
 这意味着你在 `Sources` 里看到的不是“原文件名”，而是“文件名 + 第几个切片”。
+
+如果你把它画成流程图，最稳妥的展开顺序就是：
+
+`docs 目录 -> build_chunks() -> chunks -> 用户提问 -> retrieve() -> Top-K -> 命中来源 -> build_context() -> context -> LLM -> 最终答案`
 
 ## 6. 输出内容
 
