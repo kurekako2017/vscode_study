@@ -3,6 +3,8 @@
 > 适合已经完成 LangChain 基础（Loader、RAG、Retriever、Tool、Agent）的开发者。
 >
 > 目标：进入 LangGraph、MCP、Multi-Agent、Deep Research Agent 企业实战。
+>
+> 说明：本文是资源索引，不是完成度清单。当前可运行实现与阶段验收，请以 [2026补齐实施状态.md](./2026补齐实施状态.md) 为准。
 
 ---
 
@@ -21,6 +23,8 @@
 原因：
 
 2026 企业项目已全面转向 LangGraph。
+
+这里的“过时”指学习重心迁移，不等于相关概念或历史资料失效。
 
 ---
 

@@ -1,7 +1,8 @@
 # AI-Lab 排除三仓后的 2026 覆盖盘点与补齐规划
 
-> 盘点日期：2026-06-21  
-> 目标：只使用适合作为长期学习体系的主目录核对 2026 能力目标，并规划缺失文档与可运行示例的新增位置。
+> 盘点日期：2026-06-22
+>
+> 说明：本稿是 2026-06-21 第一轮补齐完成后的复核版。当前完成度以 [2026/2026补齐实施状态.md](./2026补齐实施状态.md) 为准；本文只负责说明在排除三仓后，`ai-lab` 主学习体系的覆盖情况、仍需补强的工程化短板，以及后续目录归位原则。
 
 ## 一、范围与判定规则
 
@@ -22,25 +23,25 @@
 | `ai-learn/llm-lab/` | Python、模型调用、结构化输出、基础 RAG、FastAPI、评估与岗位准备 |
 | `ai-learn/agent-lab/` | Tool Calling、固定工作流、RAG 工具化、基础 Agent 产品化 |
 | `ai-learn/agent-advanced/` | LangChain、LangGraph、高级 RAG、Multi-Agent、前端、评估与部署 |
-| `2026/` | 目标能力清单和规划文档，不作为“已实现”的证据 |
+| `2026/` | 目标能力清单、盘点与实施状态，不作为“已实现”证据 |
 
 ### 覆盖等级
 
 | 等级 | 判定标准 |
 | --- | --- |
 | A 完整覆盖 | 有学习文档、可运行示例、运行说明和基本验收方式 |
-| B 基础覆盖 | 有文档和示例，但只覆盖最小概念，缺高级能力或工程化 |
-| C 文档覆盖 | 有说明，没有对应可运行示例 |
+| B 基础覆盖 / MVP | 有文档和示例，且已经可以演示，但距离生产级仍有差距 |
+| C 文档覆盖 | 有说明，没有对应可运行示例或只作为规划存在 |
 | D 示例覆盖 | 有代码，但缺系统学习文档、任务和验收标准 |
 | E 缺失 | 主学习目录中没有明确文档和示例 |
 
 说明：代码中出现关键词不等于覆盖；纯 Python 的概念模拟也不能替代真实协议、框架或外部组件接入。
 
-## 二、独立盘点结论
+## 二、当前总判断
 
-排除三个素材仓库后，当前主学习体系可以稳定支撑“LLM 应用基础 → 基础 Agent → RAG/工作流工程入门”，但还不能完整支撑 2026 目标中的“LangGraph 企业能力 → MCP → Multi-Agent 工程化 → Deep Research → 企业作品集”。
+排除三个素材仓库后，`ai-lab` 现在已经不再是“缺主线”，而是“主线已成型，剩余问题集中在生产化和真实外部集成”。
 
-当前三层结构本身合理，不建议再建新的平行学习根目录。缺少的内容应按难度归位：
+当前三层结构保持合理，不需要再新增新的平行学习根目录。能力归位仍然遵循：
 
 ```text
 llm-lab
@@ -53,15 +54,17 @@ agent-advanced
   LangGraph、MCP、高级 RAG、Multi-Agent、Deep Research、工程交付
 ```
 
-截至盘点日，三个目录约有 117 份 Markdown、24 个非缓存 Python 文件，但自动化测试文件极少。数量不小，主要缺口是专题深度、组合项目和可验收性，而不是基础资料数量。
+### 当前已形成的覆盖面
 
-### 总体判断
+- 基础 LLM、结构化输出、基础 RAG、FastAPI、React / Spring 接入已经形成闭环。
+- Runnable / LCEL、Tool Calling、Streaming Agent API、LangGraph 企业能力、MCP、真实 Multi-Agent、Deep Research、Tracing、五个业务 Agent 已经落地为文档加示例或 MVP。
+- `ai-learn/agent-advanced/` 已经成为 2026 主线的承接目录，不再只是“规划中的目标目录”。
 
-- 已形成强覆盖：模型调用、结构化输出、基础 RAG、FastAPI API、Tool Calling、固定 Workflow、基础向量库、混合检索、来源引用、权限过滤、Docker 入门。
-- 已形成基础覆盖：LCEL、LangGraph State/Node/Edge/Conditional Edge/Loop、角色型 Multi-Agent、RAG 本地评估、React 客户端。
-- 明显不足：Runnable 组合模式、高级 RAG 标准模式、LangGraph Checkpoint/Memory/HITL/Subgraph/Streaming、真实 Multi-Agent 图编排、Tracing、系统化测试、CI/CD。
-- 完全缺失：MCP Client/Server/Remote/Multi-MCP、Deep Research 主线项目。
-- 业务作品集缺口：日本 SES 营业 Agent、面试 Agent、MCP Office Agent、企业客服 Agent、Coding/GitHub Agent 尚未形成完整项目。
+### 当前仍需补强的部分
+
+- 生产级持久化、真实 reranker、真实搜索抓取、事实核验、Remote MCP 的认证与 TLS。
+- 统一测试模板、覆盖率门槛、CI/CD 质量门禁。
+- 业务项目从 MVP 进一步提升到 API、UI、持久化、Docker、回归测试完整交付。
 
 ## 三、2026 目标覆盖矩阵
 
@@ -69,78 +72,79 @@ agent-advanced
 
 | 2026 目标 | 等级 | 当前证据 | 主要缺口 |
 | --- | --- | --- | --- |
-| Python 面向 LLM 开发 | A | `ai-learn/llm-lab/00-Python学习范围（面向LLM应用开发）.md`、`ai-learn/llm-lab/examples/` | 可增加阶段练习答案与单元测试 |
-| 模型调用与供应商切换 | A | `ai-learn/llm-lab/02-模型调用基础.md`、`chat_cli`、`API配置与兼容策略.md` | 缺统一 timeout/retry/rate-limit 示例 |
-| 结构化输出与 Pydantic | A | `ai-learn/llm-lab/03-结构化输出.md`、`structured_output_demo` | 缺复杂嵌套 schema 和失败自动修复 |
-| Prompt / Message | B | LangChain 笔记、`langchain_chain_demo` | 缺独立 Prompt 测试、版本和注入防护练习 |
-| LCEL 基础 | B | `langchain_chain_demo` 的 `prompt | llm | parser` | 缺 Parallel、Branch、Passthrough、batch、stream |
-| Tool Calling | A | `ai-learn/agent-lab/03-Tool Calling.md`、`tool_agent_demo` | 可补并行调用、审批与幂等性 |
-| FastAPI 服务化 | A | `ai-learn/llm-lab/05-FastAPI与企业集成.md`、`rag_api_demo` | 缺统一 SSE 流式接口模板 |
-| React / Java 接入 | B | `rag_api_demo/react-client`、`spring-client`、`chat_ui_demo` | 缺与高级 Agent 的流式联调 |
+| Python 面向 LLM 开发 | A | `ai-learn/llm-lab/00-Python学习范围（面向LLM应用开发）.md`、`ai-learn/llm-lab/examples/` | 可继续补阶段练习题 |
+| 模型调用与供应商切换 | A | `ai-learn/llm-lab/02-模型调用基础.md`、`ai-learn/agent-lab/projects/chat_cli/`、`API配置与兼容策略.md` | 可继续补统一 timeout / retry / rate-limit 示例 |
+| 结构化输出与 Pydantic | A | `ai-learn/llm-lab/03-结构化输出.md`、`ai-learn/agent-lab/projects/structured_output_demo/` | 可继续补复杂嵌套 schema 和失败修复 |
+| Prompt / Message | B | `ai-learn/agent-advanced/projects/langchain_chain_demo/`、相关课程笔记 | 缺独立 Prompt 测试与注入防护专题 |
+| LCEL / Runnable | A | `ai-learn/llm-lab/examples/runnable_composition_demo/`、`ai-learn/agent-advanced/projects/langchain_chain_demo/` | 可继续补更完整的 batch / stream 对照 |
+| Tool Calling | A | `ai-learn/agent-lab/03-Tool Calling.md`、`ai-learn/agent-lab/projects/tool_agent_demo/` | 可继续补并行调用、审批、幂等性 |
+| FastAPI 服务化 | A | `ai-learn/llm-lab/05-FastAPI与企业集成.md`、`ai-learn/agent-lab/projects/rag_api_demo/` | 可继续补统一 SSE 流式模板 |
+| React / Java 接入 | B | `ai-learn/agent-lab/projects/rag_api_demo/react-client/`、`spring-client/`、`ai-learn/agent-advanced/frontend/chat_ui_demo/` | 缺与高级 Agent 的完整联调 |
 
 ### 2. RAG 2.0 与企业知识库
 
 | 2026 目标 | 等级 | 当前证据 | 主要缺口 |
 | --- | --- | --- | --- |
-| 基础文档 RAG | A | `ai-learn/llm-lab/04-RAG.md`、`doc_qa_agent` | 已足够作为入门 |
-| 向量库与 metadata | A | `vector_db_demo`、Qdrant/Chroma demo | 缺统一选型与迁移练习 |
-| Query Rewrite / Multi Query | B | `advanced_rag_pipeline_demo` 有本地 query variants | 不是框架 Retriever，也缺召回对比实验 |
-| Rerank | B | `advanced_rag_pipeline_demo` 有规则重排 | 缺真实 cross-encoder/reranker 接入 |
-| Hybrid Search | A | `internal_hybrid_rag_demo` | 当前是教学型本地实现，可再接真实检索后端 |
-| 来源引用与权限过滤 | A | `internal_hybrid_rag_demo` | 缺租户隔离和越权测试 |
-| Parent Document Retriever | E | 无 | 缺文档和示例 |
-| Contextual Compression | E | 无 | 缺文档和示例 |
-| HyDE | E | 无 | 缺文档和示例 |
-| Self-RAG / Corrective RAG | E | 无 | 缺路由图、检索判断和回退示例 |
-| GraphRAG | E | 无 | 可列为选修，不应先于核心能力 |
-| RAG 评估 | B | `ai-learn/llm-lab/06-评估与运维.md`、`rag_eval_demo` | 缺数据集规范、检索指标和 CI 回归门槛 |
+| 基础文档 RAG | A | `ai-learn/llm-lab/04-RAG.md`、`ai-learn/agent-lab/projects/doc_qa_agent/` | 已足够作为入门 |
+| 向量库与 metadata | A | `ai-learn/agent-advanced/projects/vector_db_demo/`、`vector_db_qdrant_demo/`、`vector_db_chroma_demo/` | 可继续补统一选型说明 |
+| Query Rewrite / Multi Query | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 仍以教学实现为主，缺真实召回对比实验 |
+| Rerank | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 缺真实 cross-encoder / reranker 接入 |
+| Hybrid Search | A | `ai-learn/agent-advanced/projects/internal_hybrid_rag_demo/`、`ai-learn/agent-advanced/rag/社内文件与Wiki混合检索RAG.md` | 可再接真实检索后端 |
+| 来源引用与权限过滤 | A | `ai-learn/agent-advanced/projects/internal_hybrid_rag_demo/` | 可继续补租户隔离和越权测试 |
+| Parent Document Retriever | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 仍是简化教学实现，缺更大规模数据集 |
+| Contextual Compression | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 缺与真实压缩组件的对比 |
+| HyDE | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 缺更完整评估集 |
+| Self-RAG / Corrective RAG | B | `ai-learn/agent-advanced/rag/advanced-patterns/` | 缺更强的路由/回退评估 |
+| GraphRAG | C | 仍以规划和外部资料为主 | 可列为选修，不抢核心路线优先级 |
+| RAG 评估 | B | `ai-learn/llm-lab/06-评估与运维.md`、`ai-learn/agent-advanced/eval/rag_eval_demo/` | 缺统一数据集规范和 CI 回归门槛 |
 
 ### 3. LangGraph 与 Multi-Agent
 
 | 2026 目标 | 等级 | 当前证据 | 主要缺口 |
 | --- | --- | --- | --- |
-| State / Node / Edge | A | `frameworks/langgraph/README.md`、`langgraph_workflow_demo` | 已适合作为入门 |
-| Conditional Edge / Loop | A | `langgraph_workflow_demo` | 缺最大步数和异常分支示例 |
-| Reducer / MessagesState | E | 无明确专题 | 缺状态合并与消息状态示例 |
-| ToolNode | E | 无 | 缺 LangGraph 工具节点示例 |
-| Checkpoint / Thread | E | 无 | 缺 SQLite/Postgres 持久化示例 |
-| 短期/长期 Memory | E | 无 | 缺与 checkpoint、store 的边界说明 |
-| Human In The Loop | E | 无 | 缺 interrupt、审批和恢复运行示例 |
-| Subgraph | E | 无 | 缺模块化子图示例 |
-| Streaming | E | 无 LangGraph 前后端闭环 | 缺 graph stream → SSE → React 展示 |
-| Time Travel / Replay | E | 无 | P2 选修 |
-| Multi-Agent 角色认知 | B | `multi_agent_team_demo` | 当前是纯 Python 顺序调用，不是真实 Agent 编排 |
-| Supervisor / Handoff | C | `multi-agent/README.md` 有概念 | 缺 LangGraph supervisor/handoff 示例 |
-| 失败恢复、预算与终止 | C | 文档中有提示 | 缺可执行 guardrail 和测试 |
+| State / Node / Edge | A | `ai-learn/agent-advanced/projects/langgraph_workflow_demo/`、`ai-learn/agent-advanced/frameworks/langgraph/README.md` | 已适合作为入门 |
+| Conditional Edge / Loop | A | `ai-learn/agent-advanced/projects/langgraph_workflow_demo/` | 可继续补最大步数和异常分支 |
+| Reducer / MessagesState | B | `ai-learn/agent-advanced/langgraph-enterprise/` | 教学闭环已成型，仍可补更多状态合并案例 |
+| ToolNode | B | `ai-learn/agent-advanced/langgraph-enterprise/` | 可继续补与真实工具链的对照 |
+| Checkpoint / Thread | A | `ai-learn/agent-advanced/langgraph-enterprise/` | 生产级 Postgres 持久化仍可增强 |
+| 短期 / 长期 Memory | A | `ai-learn/agent-advanced/langgraph-enterprise/` | 可继续补 store 边界说明 |
+| Human In The Loop | A | `ai-learn/agent-advanced/langgraph-enterprise/` | 可继续补更复杂审批流 |
+| Subgraph | A | `ai-learn/agent-advanced/langgraph-enterprise/` | 可继续补跨子图共享状态 |
+| Streaming | B | `ai-learn/agent-advanced/langgraph-enterprise/`、`ai-learn/agent-advanced/frontend/chat_ui_demo/` | 仍可继续增强前后端联动 |
+| Time Travel / Replay | C | 作为选修保留 | 不作为当前主线优先项 |
+| Multi-Agent 角色认知 | A | `ai-learn/agent-advanced/multi-agent/graph_team_demo/` | 后续可接更严格质量/成本评估 |
+| Supervisor / Handoff | B | `ai-learn/agent-advanced/multi-agent/README.md`、`graph_team_demo` | 仍可补更复杂的图路由 |
+| 失败恢复、预算与终止 | B | `ai-learn/agent-advanced/multi-agent/README.md`、`deep-research` | 可继续补可执行 guardrail |
 
 ### 4. MCP、Deep Research 与业务项目
 
 | 2026 目标 | 等级 | 当前证据 | 主要缺口 |
 | --- | --- | --- | --- |
-| MCP 概念与安全边界 | E | 无 | 需新建专题入口 |
-| MCP Server / FastMCP | E | 无 | 需最小 stdio server |
-| MCP Client | E | 无 | 需工具发现、调用与错误处理 |
-| Remote MCP | E | 无 | 需远程 transport、认证、超时说明 |
-| Multi-MCP Router | E | 无 | 需多 server 路由与冲突处理 |
-| LangGraph + MCP | E | 无 | 需组合项目 |
-| Deep Research | E | 无 | 需规划、搜索、证据、写作、审校闭环 |
-| 企业知识库 Agent | B | 多个 RAG demo 可组合 | 缺统一 API、评估、观测和部署成品 |
-| 日本 SES 营业 Agent | E | 只有岗位/业务背景文档 | 缺需求、数据模型、匹配算法和 UI/API |
-| 面试准备 Agent | E | 只有作品集和面试准备文档 | 缺可运行项目 |
-| MCP Office Agent | E | 无 | 应在 MCP 基础完成后实施 |
-| 企业客服 Agent | E | 无完整项目 | 可复用 RAG 与 HITL，但尚未组合 |
+| MCP 概念与安全边界 | A | `ai-learn/agent-advanced/mcp/README.md` | 可继续补协议级安全讲解 |
+| MCP Server / FastMCP | A | `ai-learn/agent-advanced/mcp/server.py` | 可继续补更明确的运行说明 |
+| MCP Client | A | `ai-learn/agent-advanced/mcp/client.py` | 可继续补工具发现与错误处理细化 |
+| Remote MCP | B | 已有设计与目录位 | 仍需生产级认证、TLS 与部署说明 |
+| Multi-MCP Router | A | `ai-learn/agent-advanced/mcp/multi_router.py` | 可继续补冲突处理与审计 |
+| LangGraph + MCP | B | 已进入主线规划与目录链路 | 可继续补真实组合示例 |
+| Deep Research | B | `ai-learn/agent-advanced/deep-research/` | 仍需真实搜索、抓取和事实评估强化 |
+| 企业知识库 Agent | B | `ai-learn/agent-advanced/projects/internal_hybrid_rag_demo/` 可承接 | 还未收敛成单一成品 |
+| 日本 SES 营业 Agent | B | `ai-learn/agent-advanced/business-agents/japan_ses_sales_agent/` | 还需 API / UI / 持久化 / 测试 / Docker |
+| 面试 Agent | B | `ai-learn/agent-advanced/business-agents/interview_agent/` | 还需会话历史和 rubric 校准 |
+| MCP Office Agent | B | `ai-learn/agent-advanced/business-agents/mcp_office_agent/` | 还需真实 Office MCP 适配 |
+| 企业客服 Agent | B | `ai-learn/agent-advanced/business-agents/enterprise_customer_service_agent/` | 还需高级 RAG、HITL API 和评估 |
+| Coding / GitHub Agent | B | `ai-learn/agent-advanced/business-agents/coding_github_agent/` | 还需 GitHub App、sandbox 和 PR 工作流 |
 
 ### 5. 工程化与交付
 
 | 2026 目标 | 等级 | 当前证据 | 主要缺口 |
 | --- | --- | --- | --- |
-| Docker / 健康检查 | A | `deployment/container_demo`、`rag_api_demo` | 可补 Compose 多服务 |
-| 测试与 smoke check | B | `rag_api_demo/mock_test.py`、脚本与测试观点 | 缺统一 pytest、fixture、覆盖率和回归规范 |
-| 日志 / Tracing / 可观测 | C | 多份文档有说明 | 缺实际 trace、结构化日志和指标示例 |
-| 安全 / 权限 | B | 工具 workdir 边界、RAG ACL | 缺 prompt injection、密钥、审计和租户测试 |
-| 成本 / 限流 / 重试 | C | 文档覆盖 | 缺统一中间件和可运行示例 |
-| CI/CD | C | 部署文档提到 | 缺实际 workflow 和质量门禁模板 |
-| 交付清单 | A | `开发测试部署流程.md`、`交付前检查清单.md` | 应转成每个项目共用模板 |
+| Docker / 健康检查 | A | `ai-learn/agent-advanced/deployment/container_demo/`、`ai-learn/agent-lab/projects/rag_api_demo/` | 可继续补 Compose 多服务 |
+| 测试与 smoke check | B | `ai-learn/agent-lab/projects/rag_api_demo/mock_test.py`、`smoke_check.sh` 等 | 缺统一 pytest / fixture / 覆盖率门槛 |
+| 日志 / Tracing / 可观测 | B | `ai-learn/agent-advanced/observability/tracing_demo/` | 可继续接真实 tracing 后端 |
+| 安全 / 权限 | B | 工具边界、RAG ACL、MCP allowlist、业务 agent 限制 | 可继续补 prompt injection 与审计测试 |
+| 成本 / 限流 / 重试 | C | 文档中已有说明 | 仍缺统一中间件和标准示例 |
+| CI/CD | C | 规划中 | 仍缺实际 workflow 和质量门禁模板 |
+| 交付清单 | A | `ai-learn/agent-advanced/交付前检查清单.md`、`开发测试部署流程.md` | 可继续转成项目通用模板 |
 
 ## 四、补齐内容的目录归位原则
 
@@ -151,126 +155,44 @@ agent-advanced
 5. 优先扩展现有目录，不复制三个排除仓库的章节或代码。
 6. 默认提供离线/mock 路径；涉及真实协议或数据库时，同时保留真实运行路径。
 
-## 五、建议新增目录与文件
+## 五、现状下的实施优先级
 
-```text
-ai-learn/llm-lab/
-├── 11-可靠模型调用与Prompt安全.md
-└── examples/
-    ├── retry_timeout_example.py
-    └── structured_output_repair_example.py
+### P0：补齐工程化底座
 
-ai-learn/agent-lab/
-├── 07-Agent执行安全与可靠性.md
-└── projects/
-    └── streaming_agent_api_demo/
-        ├── README.md
-        ├── main.py
-        ├── test_main.py
-        └── requirements.txt
-
-ai-learn/agent-advanced/
-├── langgraph-enterprise/
-│   ├── README.md
-│   ├── 01-state-reducer-messages.md
-│   ├── 02-toolnode-routing.md
-│   ├── 03-checkpoint-memory.md
-│   ├── 04-human-in-the-loop.md
-│   ├── 05-subgraph-streaming.md
-│   └── demos/
-│       ├── checkpoint_memory_demo/
-│       ├── hitl_approval_demo/
-│       └── streaming_subgraph_demo/
-├── mcp/
-│   ├── README.md
-│   ├── 01-协议与安全边界.md
-│   ├── server_fastmcp_demo/
-│   ├── client_stdio_demo/
-│   ├── remote_mcp_demo/
-│   └── multi_mcp_router_demo/
-├── rag/advanced-patterns/
-│   ├── README.md
-│   ├── parent_document_demo/
-│   ├── contextual_compression_demo/
-│   ├── hyde_demo/
-│   └── corrective_rag_graph_demo/
-├── deep-research/
-│   ├── README.md
-│   ├── 需求与评估标准.md
-│   └── deep_research_demo/
-├── observability/
-│   ├── README.md
-│   └── tracing_cost_demo/
-├── platform-template/
-│   ├── README.md
-│   ├── tests/
-│   ├── docker-compose.yml
-│   └── .github/workflows/ci.yml
-└── business-agents/
-    ├── README.md
-    ├── enterprise_knowledge_agent/
-    ├── japan_ses_matching_agent/
-    ├── interview_coach_agent/
-    └── mcp_office_agent/
-```
-
-`GraphRAG`、Time Travel、企业客服和 Coding Agent 暂不抢占第一批目录；先完成可复用底座，再以项目形式增加。
-
-## 六、实施优先级
-
-### P0：补齐主线断层
-
-| 顺序 | 新增内容 | 目标落点 | 最小验收 |
+| 顺序 | 内容 | 目标落点 | 最小验收 |
 | --- | --- | --- | --- |
-| 1 | 2026 主路线索引 | `2026/README.md` | 只指向三条主学习线和本报告，阶段、产物、验收一致 |
-| 2 | LangGraph 企业基础 | `ai-learn/agent-advanced/langgraph-enterprise/` | checkpoint 可恢复；HITL 可中断/批准/继续；有测试 |
-| 3 | MCP 基础闭环 | `ai-learn/agent-advanced/mcp/` | client 可发现并调用 server 工具；非法参数有明确错误 |
-| 4 | LangGraph + MCP 组合示例 | `ai-learn/agent-advanced/mcp/langgraph_mcp_agent_demo/` | 图节点可调用 MCP；有超时、失败分支与调用日志 |
-| 5 | 测试模板 | `ai-learn/agent-advanced/platform-template/` | `pytest` 一条命令通过；覆盖正常、异常、权限路径 |
+| 1 | 统一 pytest / fixture / coverage 模板 | `ai-learn/agent-advanced/` 下的通用模板或现有项目公共测试规范 | 一条命令跑通核心 demo 的 happy path、异常路径、权限路径 |
+| 2 | CI/CD 质量门禁 | `.github/workflows/` 或统一模板 | 至少覆盖测试、lint、基础构建 |
+| 3 | 业务项目的共用交付模板 | `ai-learn/agent-advanced/business-agents/` | README、需求概要、基本设计、测试观点、用例表统一 |
 
-### P1：补齐 2026 核心深度
+### P1：补强真实外部集成
 
-| 顺序 | 新增内容 | 目标落点 | 最小验收 |
+| 顺序 | 内容 | 目标落点 | 最小验收 |
 | --- | --- | --- | --- |
-| 6 | 高级 RAG 模式 | `ai-learn/agent-advanced/rag/advanced-patterns/` | 每种模式有基线对比和固定评估集 |
-| 7 | 流式 Agent API | `ai-learn/agent-lab/projects/streaming_agent_api_demo/` | 后端 SSE、取消/异常事件、前端消费说明完整 |
-| 8 | Deep Research | `ai-learn/agent-advanced/deep-research/` | 计划、检索、去重、引用、审校闭环；限制最大步骤和预算 |
-| 9 | 可观测与成本 | `ai-learn/agent-advanced/observability/` | 单次运行可查看 trace、耗时、token/成本和失败原因 |
-| 10 | 企业知识库成品 | `business-agents/enterprise_knowledge_agent/` | API、权限、引用、评估、测试、Docker 全部可验收 |
+| 4 | Remote MCP 生产化 | `ai-learn/agent-advanced/mcp/` | 认证、TLS、超时、错误路径说明完整 |
+| 5 | 高级 RAG 的真实后端 | `ai-learn/agent-advanced/rag/advanced-patterns/` | 至少一个真实 reranker 或真实检索后端接入 |
+| 6 | Deep Research 的真实搜索与事实核验 | `ai-learn/agent-advanced/deep-research/` | 计划、检索、去重、引用、审校闭环可验收 |
 
-### P2：形成岗位向作品集
+### P2：业务作品集收口
 
-| 顺序 | 项目 | 前置依赖 |
+| 顺序 | 项目 | 后续动作 |
 | --- | --- | --- |
-| 11 | 日本 SES 营业 Agent | 结构化输出、RAG、LangGraph、评估 |
-| 12 | 面试准备 Agent | RAG、HITL、流式 UI |
-| 13 | MCP Office Agent | MCP、权限审计、HITL |
-| 14 | 企业客服 Agent | 企业知识库、HITL、可观测 |
-| 15 | GraphRAG / Coding Agent 选修 | 核心路线完成后再立项 |
+| 7 | 日本 SES 营业 Agent | 补 API / UI / 持久化 / 测试 / Docker |
+| 8 | 面试 Agent | 补会话历史、rubric 校准与前端展示 |
+| 9 | MCP Office Agent | 接真实 Office MCP 服务并补审计 |
+| 10 | 企业客服 Agent | 统一 RAG、HITL、评估与观测 |
+| 11 | Coding / GitHub Agent | 进一步补 GitHub App、sandbox 和 PR 工作流 |
 
-## 七、建议的 24 周执行路线
-
-| 周期 | 学习与建设内容 | 主要交付物 |
-| --- | --- | --- |
-| 第 1-3 周 | 复核 `llm-lab` 基础；补可靠调用、结构化修复 | 2 份基础示例和测试 |
-| 第 4-5 周 | LCEL 组合、batch、stream、错误处理 | 扩展 `langchain_chain_demo` 或新增组合 demo |
-| 第 6-8 周 | 高级 RAG 模式与评估 | 4 个小模式 demo、固定评估集、对比报告 |
-| 第 9-12 周 | LangGraph checkpoint、memory、HITL、subgraph、streaming | 3 个可恢复工作流 demo |
-| 第 13-15 周 | MCP Server、Client、Remote、Multi-MCP | MCP 基础闭环和安全说明 |
-| 第 16-18 周 | LangGraph + MCP、真实 Multi-Agent、Deep Research | 2 个组合项目 |
-| 第 19-21 周 | pytest、Tracing、成本、Docker Compose、CI | 可复用平台模板 |
-| 第 22-24 周 | 企业知识库 + 一个岗位向项目 | 2 个可演示、可测试、可部署作品集 |
-
-## 八、统一交付标准
+## 六、统一交付标准
 
 以后新增的每份示例至少满足：
 
 - `README.md`：目标、前置知识、架构、运行命令、输入输出、限制。
 - 可运行入口：默认离线/mock 可跑，真实模式的依赖和配置明确。
 - `requirements.txt` 或统一依赖声明：避免隐式依赖。
-- 自动化测试：至少包含 happy path、异常路径、边界/权限路径。
+- 自动化测试：至少包含 happy path、异常路径、边界 / 权限路径。
 - 示例数据：小、固定、可重复，不能依赖排除目录。
-- 观测信息：关键步骤、耗时、失败原因可见；高级项目补 token/成本。
+- 观测信息：关键步骤、耗时、失败原因可见；高级项目补 token / 成本。
 - 安全边界：目录访问、工具权限、密钥、远程调用和审批点明确。
 - 验收标准：不能只写“运行成功”，需定义结果质量和失败行为。
 
@@ -280,35 +202,24 @@ ai-learn/agent-advanced/
 - `基本设计.md`
 - `测试观点.md`
 - `简单测试用例表.md`
-- 架构/数据流图
+- 架构 / 数据流图
 - Docker 与一键启动方式
 - 简历说明和面试讲解要点
 
-## 九、推荐先执行的最小批次
-
-第一批不要同时铺开全部目录。建议只实施以下 5 项：
-
-1. 新增 `2026/README.md`，确定唯一主路线。
-2. 新增 `ai-learn/agent-advanced/langgraph-enterprise/README.md` 和 `checkpoint_memory_demo/`。
-3. 新增 `ai-learn/agent-advanced/langgraph-enterprise/hitl_approval_demo/`。
-4. 新增 `ai-learn/agent-advanced/mcp/README.md`、最小 server 和 client。
-5. 建立统一 `pytest` 项目模板，并把上述三个 demo 纳入测试。
-
-完成后再进入高级 RAG、Deep Research 和业务 Agent。这样能够先打通 2026 路线最大的两个结构性断点：LangGraph 企业能力和 MCP，同时避免再次形成只有目录与说明、没有可验收代码的资料堆积。
-
-## 十、最终目录职责
+## 七、最终目录职责
 
 ```text
-2026/          目标、阶段计划、覆盖盘点、验收总纲
-ai-learn/llm-lab/       LLM 应用基础和单能力练习
-ai-learn/agent-lab/     基础 Agent、工具、工作流和服务化过渡
-ai-learn/agent-advanced/高级框架、协议、组合系统、工程模板和作品集
+2026/                 目标、阶段计划、覆盖盘点、实施状态、验收总纲
+ai-learn/llm-lab/     LLM 应用基础和单能力练习
+ai-learn/agent-lab/   基础 Agent、工具、工作流和服务化过渡
+ai-learn/agent-advanced/
+                      高级框架、协议、组合系统、工程模板和作品集
 ```
 
 本规划的所有新增文档和示例都限定在上述四个目录内；三个排除目录继续保持独立，不作为主学习路线依赖。
 
-## 十一、实施更新（2026-06-21）
+## 八、与实施状态的关系
 
-本规划的第一轮补齐已经实施。Runnable、LangGraph 企业能力、MCP 全链路和真实 Multi-Agent 图编排达到教学闭环；高级 RAG、Tracing、Deep Research 与五个业务作品集达到可演示 MVP。统一测试和 CI/CD 按本轮范围延后。
+本文件不再承担“实时完成度登记”的职责。凡是已经落地的内容，统一以 [2026/2026补齐实施状态.md](./2026补齐实施状态.md) 为准；凡是后续新补的内容，先更新实施状态，再回写本文的覆盖矩阵和优先级。
 
-逐项完成等级、实现位置与剩余差距见 [2026补齐实施状态.md](./2026补齐实施状态.md)。该状态表是后续更新完成标记的唯一入口，避免规划正文与实际代码再次失同步。
+这样可以避免规划正文和实际代码再次失同步。
