@@ -18,10 +18,15 @@ from .templates import QUERY_TEMPLATES
 
 
 class RetailDataWarehouse:
-    """SQLite-backed local warehouse with explicit read-only query templates."""
+    """SQLite-backed local warehouse with explicit read-only query templates.
+
+    教学版把 CSV 装进内存 SQLite，让 SQL 聚合结果可重复、可测试。
+    生产版可以把这个类替换成只读 DWH adapter，而上层 workflow 不需要改。
+    """
 
     def __init__(self, data_dir: Path = DATA_DIR) -> None:
         self.data_dir = data_dir
+        # 使用 :memory: 保证示例离线运行；每个实例启动时都从 CSV 重建小型仓库。
         self.connection = sqlite3.connect(":memory:")
         self.connection.row_factory = sqlite3.Row
         self._load()
@@ -29,6 +34,7 @@ class RetailDataWarehouse:
     def _load(self) -> None:
         """Create demo tables and load CSV fixtures."""
         cur = self.connection.cursor()
+        # sales 表模拟销售事实表：日期、区域、门店、品类、销售额、粗利、客数。
         cur.execute(
             """
             CREATE TABLE sales (
@@ -44,6 +50,7 @@ class RetailDataWarehouse:
             )
             """
         )
+        # inventory 表模拟库存事实表：库存、日销、补货点、供应商提前期。
         cur.execute(
             """
             CREATE TABLE inventory (
@@ -72,6 +79,7 @@ class RetailDataWarehouse:
             return
         columns = list(rows[0].keys())
         placeholders = ",".join("?" for _ in columns)
+        # 表名来自内部调用，不来自用户输入；列名来自项目内 CSV 表头。
         sql = f"INSERT INTO {table} ({','.join(columns)}) VALUES ({placeholders})"
         values = [[row[column] for column in columns] for row in rows]
         self.connection.executemany(sql, values)

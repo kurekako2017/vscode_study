@@ -19,7 +19,11 @@ from ..orchestration.orchestrator import RetailAnalysisOrchestrator
 
 
 class TaskService:
-    """Application service for task lifecycle and background execution."""
+    """Application service for task lifecycle and background execution.
+
+    初学者可以把它理解成“一个业务用例”：HTTP 层告诉它要分析一个问题，
+    它负责排队、执行、持久化、发事件和统计 metrics。
+    """
 
     def __init__(
         self,
@@ -43,12 +47,15 @@ class TaskService:
         return task_id
 
     def get_task(self, task_id: str) -> dict | None:
+        """Return one task row, or None when the id does not exist."""
         return self.repository.get(task_id)
 
     def list_tasks(self, limit: int = 20) -> list[dict]:
+        """Return recent tasks for a history view."""
         return self.repository.list(limit)
 
     def get_events(self, task_id: str) -> list[dict]:
+        """Return persisted events, used by detail pages and refresh recovery."""
         return self.repository.events(task_id)
 
     async def run_task(self, task_id: str, question: str, mode: str) -> None:
@@ -66,6 +73,7 @@ class TaskService:
 
         async def record_event_async(event_type: str, message: str, payload: dict | None = None) -> None:
             # Async path: used when already running inside the FastAPI event loop.
+            # 顺序很重要：先写 repository，再 publish。这样页面断线后仍能从 DB 读回事件。
             event = RunEvent(task_id=task_id, type=event_type, message=message, payload=payload or {})
             self.repository.save_event(task_id, asdict(event))
             self.metrics.count_event(event_type)
@@ -73,6 +81,8 @@ class TaskService:
 
         def record_event_from_worker(event_type: str, message: str, payload: dict | None = None) -> None:
             # Worker-thread path: persist event synchronously, then hand off publication to the event loop.
+            # LangGraph 在 asyncio.to_thread 里执行，不能直接 await event_bus.publish。
+            # 所以这里用 call_soon_threadsafe 把发布动作交回 FastAPI 所在的 event loop。
             event = RunEvent(task_id=task_id, type=event_type, message=message, payload=payload or {})
             self.repository.save_event(task_id, asdict(event))
             self.metrics.count_event(event_type)
@@ -84,6 +94,7 @@ class TaskService:
 
             def run_orchestrator():
                 # The SQLite-backed warehouse must be created and used in the same worker thread.
+                # 如果在主线程创建连接、工作线程使用，sqlite3 默认会抛线程错误。
                 orchestrator = RetailAnalysisOrchestrator(event_callback=record_event_from_worker)
                 return orchestrator.run(question, mode, task_id=task_id)
 
@@ -101,6 +112,8 @@ class TaskService:
                 },
             )
         except Exception as exc:
+            # 对外只暴露失败事件，不让异常把后台任务静默吞掉。
+            # 生产系统还会记录结构化日志、trace_id，并按错误类型决定是否重试。
             self.repository.update_status(task_id, "failed")
             self.metrics.count_task_failed()
             await record_event_async("failed", "Task failed", {"error": f"{type(exc).__name__}: {exc}"})

@@ -16,14 +16,22 @@ RunMode = Literal["auto", "data", "research", "hybrid"]
 
 
 class CreateTaskRequest(BaseModel):
-    """Request body for creating an analysis task."""
+    """Request body for creating an analysis task.
+
+    `question` 是业务用户输入；`mode` 决定走 data/research/hybrid，
+    auto 则交给 Orchestrator 的规则路由。
+    """
 
     question: str = Field(..., min_length=1)
     mode: RunMode = "auto"
 
 
 class CreateTaskResponse(BaseModel):
-    """Response returned immediately after task creation."""
+    """Response returned immediately after task creation.
+
+    后端不会等报告完成才返回。前端拿到 task_id 后，通过 sse_url 或
+    websocket_url 继续订阅执行进度。
+    """
 
     task_id: str
     status: str
@@ -32,7 +40,10 @@ class CreateTaskResponse(BaseModel):
 
 
 class TaskSummary(BaseModel):
-    """Short task record for list endpoints."""
+    """Short task record for list endpoints.
+
+    只包含列表页需要的字段，避免历史列表一次性传回大段 Markdown 报告。
+    """
 
     task_id: str
     question: str

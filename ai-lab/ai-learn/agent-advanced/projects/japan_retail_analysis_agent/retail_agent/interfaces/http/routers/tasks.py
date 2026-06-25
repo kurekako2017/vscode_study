@@ -26,6 +26,7 @@ async def create_task(
 ) -> CreateTaskResponse:
     """Create a task and start background execution."""
     task_id = service.create_task(request.question, request.mode)
+    # FastAPI 先返回 task_id，再让后台协程执行长任务；前端通过 SSE 继续看进度。
     asyncio.create_task(service.run_task(task_id, request.question, request.mode))
     return CreateTaskResponse(
         task_id=task_id,
@@ -46,5 +47,6 @@ async def get_task(task_id: str, service: TaskService = Depends(get_task_service
     """Return task detail, events, and final report."""
     row = service.get_task(task_id)
     if not row:
+        # HTTP 层负责把“查不到任务”翻译成 404；service/repository 不直接依赖 HTTP。
         raise HTTPException(status_code=404, detail="task not found")
     return TaskDetail(**row, events=service.get_events(task_id))

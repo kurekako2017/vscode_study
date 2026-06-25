@@ -31,14 +31,17 @@ async def sse_events(
         raise HTTPException(status_code=404, detail="task not found")
 
     async def stream():
+        # 每个浏览器连接获得一个独立 queue；EventBus 会把同一 task 的事件广播给所有 queue。
         queue = await event_bus.subscribe(task_id)
         try:
             while True:
                 event = await queue.get()
+                # SSE 格式必须包含 event/data，并用空行结束一条消息。
                 yield f"event: {event.type}\ndata: {event.to_json()}\n\n"
                 if event.type in {"completed", "failed"}:
                     break
         finally:
+            # 客户端刷新、关闭页面或任务结束时都要退订，避免内存里残留 queue。
             await event_bus.unsubscribe(task_id, queue)
 
     return StreamingResponse(stream(), media_type="text/event-stream")
@@ -50,6 +53,7 @@ async def websocket_events(websocket: WebSocket, task_id: str) -> None:
     service: TaskService = websocket.app.state.task_service
     event_bus: EventBus = websocket.app.state.event_bus
     if not service.get_task(task_id):
+        # 1008 表示 policy violation，这里用于拒绝不存在的 task id。
         await websocket.close(code=1008)
         return
     await websocket.accept()
@@ -61,6 +65,7 @@ async def websocket_events(websocket: WebSocket, task_id: str) -> None:
             if event.type in {"completed", "failed"}:
                 break
     except WebSocketDisconnect:
+        # 浏览器主动断开不算后端错误。
         pass
     finally:
         await event_bus.unsubscribe(task_id, queue)

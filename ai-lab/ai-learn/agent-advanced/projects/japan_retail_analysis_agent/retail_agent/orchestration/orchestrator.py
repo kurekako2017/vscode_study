@@ -26,7 +26,11 @@ from ..workflows.business import FixedBusinessWorkflow
 
 
 class RetailAnalysisOrchestrator:
-    """Coordinates deterministic data workflow and autonomous research workflow."""
+    """Coordinates deterministic data workflow and autonomous research workflow.
+
+    这一层不写 SQL、不读 Markdown、不拼报告细节，只决定节点顺序和状态流转。
+    这能把“编排”和“具体能力实现”分开，方便以后替换节点。
+    """
 
     def __init__(
         self,
@@ -48,6 +52,7 @@ class RetailAnalysisOrchestrator:
         """
 
         effective_mode = self._route(question) if mode == "auto" else mode
+        # AnalysisState 是整个图的业务状态。后续节点只追加证据、风险、审计和报告。
         state = AnalysisState(question=question, mode=effective_mode)
         state.audit.append(AuditEvent("orchestrator.route", "orchestrator", f"mode={effective_mode}"))
         app = self._build_graph()
@@ -69,6 +74,7 @@ class RetailAnalysisOrchestrator:
         """
 
         graph = StateGraph(dict)
+        # 每个 node 都接收 graph_state，并返回新的 graph_state 片段。
         graph.add_node("route", self._route_node)
         graph.add_node("data_workflow", self._data_node)
         graph.add_node("research_agent", self._research_node)
@@ -78,6 +84,8 @@ class RetailAnalysisOrchestrator:
             "route",
             self._after_route,
             {
+                # data 模式只跑固定经营问数；research 模式只跑研究 Agent。
+                # hybrid 先跑 data，再通过 _after_data 继续跑 research。
                 "data": "data_workflow",
                 "research": "research_agent",
                 "hybrid": "data_workflow",
@@ -105,6 +113,8 @@ class RetailAnalysisOrchestrator:
 
         runtime_dir = PROJECT_DIR / "runtime"
         runtime_dir.mkdir(parents=True, exist_ok=True)
+        # SqliteSaver 是 LangGraph 的 checkpoint。这里用 task_id 作为 thread_id，
+        # 所以同一个 task 的图执行记录可以被追踪和恢复。
         self._checkpointer_context = SqliteSaver.from_conn_string(str(runtime_dir / "langgraph.sqlite3"))
         return self._checkpointer_context.__enter__()
 
@@ -147,11 +157,17 @@ class RetailAnalysisOrchestrator:
         return "research" if graph_state["analysis"].mode == "hybrid" else "report"
 
     def _emit(self, event_type: str, message: str, payload: dict) -> None:
+        """Emit progress without coupling LangGraph nodes to FastAPI or SSE."""
         if self.event_callback:
             self.event_callback(event_type, message, payload)
 
     @staticmethod
     def _route(question: str) -> AnalysisMode:
+        """Rule-based intent routing for the teaching demo.
+
+        初级版用关键词说明路由思想；真实项目可替换成分类模型、路由 prompt、
+        或更稳定的业务规则引擎，但仍要保留可解释的 fallback。
+        """
         has_data = any(key in question for key in ["売上", "粗利", "在庫", "欠品", "カテゴリ", "商品", "KPI"])
         has_research = any(key in question for key in ["市場", "トレンド", "競合", "報告", "会議", "リスク", "施策"])
         if has_data and has_research:

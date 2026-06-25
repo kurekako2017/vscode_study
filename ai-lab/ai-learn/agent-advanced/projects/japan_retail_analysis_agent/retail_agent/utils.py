@@ -6,6 +6,7 @@ from .models import EvidenceBlock
 
 
 def format_table(rows: list[dict[str, Any]]) -> str:
+    """Render query rows as a Markdown table for reports and CLI output."""
     if not rows:
         return "_no rows_"
     headers = list(rows[0].keys())
@@ -19,8 +20,10 @@ def format_table(rows: list[dict[str, Any]]) -> str:
 
 
 def extract_section(markdown: str, heading: str) -> str:
+    """Extract one `## heading` section from a local research snapshot."""
     marker = f"## {heading}"
     if marker not in markdown:
+        # 找不到标题时返回全文，保证工具仍能产出可读内容。
         return markdown.strip()
     after = markdown.split(marker, 1)[1]
     next_heading = after.find("\n## ")
@@ -29,6 +32,10 @@ def extract_section(markdown: str, heading: str) -> str:
 
 
 def render_blocks(blocks: list[EvidenceBlock]) -> list[str]:
+    """Render EvidenceBlock objects into report sections.
+
+    ReportComposer 只需要调用这个函数，不需要知道 evidence 来自 SQL 还是研究工具。
+    """
     lines: list[str] = []
     for block in blocks:
         lines.extend(
@@ -51,4 +58,3 @@ def render_blocks(blocks: list[EvidenceBlock]) -> list[str]:
             )
         lines.append("")
     return lines
-

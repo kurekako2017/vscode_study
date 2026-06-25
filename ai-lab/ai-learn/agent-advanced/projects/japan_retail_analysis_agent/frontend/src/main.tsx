@@ -29,6 +29,7 @@ const exampleQuestion =
 
 function App() {
   // React state 对应后端任务生命周期：输入 -> 创建任务 -> 接收事件 -> 展示报告。
+  // 这里没有把 report/events 放进全局状态，是因为教学项目只有一个运行面板。
   const [question, setQuestion] = React.useState(exampleQuestion);
   const [mode, setMode] = React.useState<RunMode>('hybrid');
   const [taskId, setTaskId] = React.useState('');
@@ -51,6 +52,7 @@ function App() {
       body: JSON.stringify({ question, mode })
     });
     if (!response.ok) {
+      // 创建任务失败通常是请求校验、后端未启动或 proxy 配置问题。
       setStatus('failed');
       setError(`HTTP ${response.status}`);
       return;
@@ -86,6 +88,7 @@ function App() {
     };
     eventTypes.forEach((eventType) => source.addEventListener(eventType, listener));
     source.onerror = () => {
+      // 这里不直接标记任务 failed，因为 SSE 断线不等于后端任务失败。
       setError('SSE connection interrupted. The task may still be running.');
       source.close();
     };
@@ -104,6 +107,7 @@ function App() {
   }
 
   const fixedEvents = events.filter((event) => event.type.includes('workflow') || event.type === 'route');
+  // researchEvents 和 fixedEvents 是同一条 timeline 的不同视角，用来帮助读者理解职责边界。
   const researchEvents = events.filter((event) => event.type.includes('research'));
 
   return (

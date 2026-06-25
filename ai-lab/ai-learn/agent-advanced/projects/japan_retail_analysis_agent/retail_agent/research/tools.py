@@ -16,10 +16,15 @@ from ..utils import extract_section
 
 
 class LocalResearchTools:
-    """Offline tools that stand in for search, competitor intelligence, and wiki tools."""
+    """Offline tools that stand in for search, competitor intelligence, and wiki tools.
+
+    工具层只负责“拿资料并包装成 EvidenceBlock”，不负责决定是否该调用。
+    是否调用由 ResearchAgent.plan 决定。
+    """
 
     def __init__(self, notes_path: Path = DATA_DIR / "research_notes.md") -> None:
         self.notes_path = notes_path
+        # 一次性读入本地快照，模拟外部搜索结果或企业 Wiki 的缓存内容。
         self.notes = notes_path.read_text(encoding="utf-8")
 
     def market_trend_search(self, _: str) -> EvidenceBlock:
@@ -39,6 +44,7 @@ class LocalResearchTools:
 
     def _research_block(self, title: str, content: str, locator: str) -> EvidenceBlock:
         """Normalize research output into an EvidenceBlock."""
+        # 统一 sources 是关键：没有来源的 Agent 报告很难审计，也很难让业务用户信任。
         return EvidenceBlock(
             title=title,
             content=content,
