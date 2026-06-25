@@ -18,6 +18,7 @@
 | `internal_hybrid_rag_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `llamaindex_index_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
 | `multi_agent_team_demo/` | 无第三方依赖 | 仅使用 Python 标准库 |
+| `japan_retail_analysis_agent/` | `fastapi`、`uvicorn`、`pydantic`、`websockets`、`langgraph`、`langgraph-checkpoint-sqlite`、React/Vite 前端依赖 | 前后台分离的日本小売经营分析组合项目 |
 | `vector_db_demo/` | 无第三方依赖 | 仅使用 Python 标准库，教学版向量数据库风格模拟 |
 | `vector_db_qdrant_demo/` | `qdrant-client`、`sentence-transformers` | 真实 Qdrant 版骨架，包含 collection、payload、upsert、search |
 | `vector_db_chroma_demo/` | `chromadb`、`sentence-transformers` | 真实 Chroma 版骨架，包含 collection、metadata、upsert、query |
@@ -66,7 +67,19 @@
 - 说明：
   - 用标准库模拟 Planner / Researcher / Writer / Critic / Supervisor 的协作流程
 
-### 7. `deployment/container_demo`
+### 7. `japan_retail_analysis_agent`
+
+- 后端依赖：`fastapi`、`uvicorn`、`pydantic`、`websockets`、`langgraph`、`langgraph-checkpoint-sqlite`
+- 前端依赖：见 `frontend/package.json`
+- 说明：
+  - 用 SQLite 和 CSV 提供可验证经营数据
+  - 用白名单 SQL 模板和固定图说明受控工作流
+  - 用本地 Markdown 资料模拟市场、竞品和社内资料调查 Agent
+  - 用 FastAPI 提供 REST、SSE、WebSocket
+  - 用 SQLite checkpoint 持久化 task、event 和 report
+  - 用 React/Vite 前端展示运行控制、事件流和 Markdown 报告
+
+### 8. `deployment/container_demo`
 
 - 默认无第三方依赖
 - 可选依赖：`uvicorn`
@@ -74,26 +87,26 @@
   - `python main.py` 可直接运行
   - 如果你想用 ASGI 方式启动或集成其他服务，再装 `uvicorn`
 
-### 8. `eval/rag_eval_demo`
+### 9. `eval/rag_eval_demo`
 
 - 无第三方依赖
 - 说明：
   - 用标准库做最小 RAG 评估
 
-### 9. `vector_db_demo`
+### 10. `vector_db_demo`
 
 - 无第三方依赖
 - 说明：
   - 用标准库模拟 Qdrant / Chroma / Memory 风格的 collection、向量写入和相似度检索
 
-### 10. `vector_db_qdrant_demo`
+### 11. `vector_db_qdrant_demo`
 
 - 主依赖：`qdrant-client`、`sentence-transformers`
 - 作用：
   - 用真实 Qdrant Client 演示 collection、payload、upsert、search
   - 适合后面接企业知识库、FAQ、工单库
 
-### 11. `vector_db_chroma_demo`
+### 12. `vector_db_chroma_demo`
 
 - 主依赖：`chromadb`、`sentence-transformers`
 - 作用：

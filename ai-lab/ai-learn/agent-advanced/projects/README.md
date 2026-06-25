@@ -37,8 +37,9 @@
 4. 然后看 `internal_hybrid_rag_demo/`
 5. 再看 `llamaindex_index_demo/`
 6. 最后看 `multi_agent_team_demo/`
-7. 向量库相关先看 `vector_db_demo/`
-8. 想接真实服务，再看 `vector_db_qdrant_demo/` 和 `vector_db_chroma_demo/`
+7. 做作品集时看 `japan_retail_analysis_agent/`
+8. 向量库相关先看 `vector_db_demo/`
+9. 想接真实服务，再看 `vector_db_qdrant_demo/` 和 `vector_db_chroma_demo/`
 
 ### 按目标选择
 
@@ -52,6 +53,7 @@
 | 想做企业内部知识库 | `internal_hybrid_rag_demo/` | 适合看多来源资料、权限过滤、引用输出 |
 | 想理解 LlamaIndex 的概念 | `llamaindex_index_demo/` | 适合先建立 Document / Node / Index 的心智模型 |
 | 想做多 Agent 协作 | `multi_agent_team_demo/` | 适合看 Planner / Researcher / Writer / Critic 的协作 |
+| 想准备日本现场作品集 | `japan_retail_analysis_agent/` | 适合讲固定图、受控 SQL、自主 Agent、报告和审计边界 |
 | 想先理解向量检索 | `vector_db_demo/` | 适合先看最小向量库原理，不依赖外部服务 |
 | 想接真实 Qdrant | `vector_db_qdrant_demo/` | 适合本机 Docker 或远端 Qdrant 接入 |
 | 想接真实 Chroma | `vector_db_chroma_demo/` | 适合本地持久化原型和快速实验 |
@@ -80,6 +82,7 @@
 1. `advanced_rag_pipeline_demo/`
 2. `internal_hybrid_rag_demo/`
 3. `multi_agent_team_demo/`
+4. `japan_retail_analysis_agent/`
 
 它们更接近完整业务流程，适合做成可演示、可扩展的项目。
 
@@ -98,8 +101,10 @@
 2. `vector_db_demo/`
 3. `langgraph_workflow_demo/`
 4. `advanced_rag_pipeline_demo/`
-5. `vector_db_qdrant_demo/`
-6. `vector_db_chroma_demo/`
+5. `multi_agent_team_demo/`
+6. `japan_retail_analysis_agent/`
+7. `vector_db_qdrant_demo/`
+8. `vector_db_chroma_demo/`
 
 ## 现有示例
 
@@ -111,6 +116,7 @@
 | [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 社内文件 + Wiki 混合检索 | 接入层、检索层、权限层、引用层 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/internal_hybrid_rag_demo/main.py "远程办公和发布流程有什么要求？" --role employee` |
 | [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex 概念版索引 | Document、Node、Index、QueryEngine | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/llamaindex_index_demo/main.py "LlamaIndex 和 LangChain 有什么区别？"` |
 | [multi_agent_team_demo](./multi_agent_team_demo/README.md) | 多 Agent 协作 | Planner、Researcher、Writer、Critic、Supervisor | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/multi_agent_team_demo/main.py "如何学习 LangGraph 和高级 RAG"` |
+| [japan_retail_analysis_agent](./japan_retail_analysis_agent/README.md) | 日本小売经营分析 Agent | FastAPI、SSE、WebSocket、SQLite checkpoint、React 前端、固定问数工作流、自主研究 Agent、日文报告 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/japan_retail_analysis_agent/server.py` |
 | [vector_db_demo](./vector_db_demo/README.md) | 向量数据库最小教学版 | 文本向量化、collection、相似度检索、top-k 召回 | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_demo/main.py "怎么申请出差报销？"` |
 | [vector_db_qdrant_demo](./vector_db_qdrant_demo/README.md) | 真实 Qdrant 版骨架 | Qdrant Client、collection、payload、upsert、search | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_qdrant_demo/main.py "怎么申请出差报销？"` |
 | [vector_db_chroma_demo](./vector_db_chroma_demo/README.md) | 真实 Chroma 版骨架 | Chroma Client、collection、metadata、upsert、query | `/usr/bin/python3 /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/agent-advanced/projects/vector_db_chroma_demo/main.py "怎么申请出差报销？"` |
@@ -133,12 +139,13 @@
 4. `internal_hybrid_rag_demo/`
 5. `llamaindex_index_demo/`
 6. `multi_agent_team_demo/`
-7. `vector_db_demo/`
-8. `vector_db_qdrant_demo/`
-9. `vector_db_chroma_demo/`
-10. `../frontend/chat_ui_demo/`
-11. `../eval/rag_eval_demo/`
-12. `../deployment/container_demo/`
+7. `japan_retail_analysis_agent/`
+8. `vector_db_demo/`
+9. `vector_db_qdrant_demo/`
+10. `vector_db_chroma_demo/`
+11. `../frontend/chat_ui_demo/`
+12. `../eval/rag_eval_demo/`
+13. `../deployment/container_demo/`
 
 每个目录里的 `README.md` 都只讲这一小段代码，不会把所有概念混在一起。
 

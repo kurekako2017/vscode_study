@@ -558,3 +558,67 @@ print_hits() / 打印命中结果
 - Qdrant 版更像远端服务接入模板。
 - Chroma 版更像本地原型和持久化模板。
 - 两个版本都先做 embedding，再入库，再检索。
+
+## 11. 日本小売经营分析 Agent
+
+文件：`japan_retail_analysis_agent/main.py`、`japan_retail_analysis_agent/server.py`、`japan_retail_analysis_agent/frontend/src/main.tsx`
+
+CLI 调用流程：
+
+`main.py` -> `retail_agent.cli.main()（解析问题、模式和输出路径）` -> `RetailAnalysisOrchestrator.run()（路由 data/research/hybrid）` -> `FixedBusinessWorkflow.run()（固定经营数据工作流）` / `ResearchAgent.run()（自主研究 Agent）` -> `RetailDataWarehouse.query_template()（白名单 SQL 查询）` / `ResearchAgent.plan() + tool（选择市场、竞品、社内资料工具）` -> `ReportComposer.run()（合成日文报告）` -> `print()` / `write_text()`（输出 Markdown）
+
+后端调用流程：
+
+`server.py` -> `create_app()` -> `interfaces/http/routers/tasks.py` -> `TaskService.create_task()` -> `TaskRepository.create()` -> `TaskService.run_task()` 后台执行 -> `RetailAnalysisOrchestrator.run()` -> `StateGraph(route/data/research/report)` -> `SqliteSaver` 保存 LangGraph checkpoint -> `EventBus.publish()` 推送 SSE/WebSocket -> `TaskRepository.save_state()` 保存最终报告 -> `GET /api/tasks/{task_id}` 查询结果
+
+前端调用流程：
+
+`frontend/src/main.tsx` -> `fetch('/api/tasks')` 创建任务 -> `EventSource('/api/tasks/{task_id}/events')` 订阅 SSE -> React state 更新固定工作流面板、研究 Agent 面板、执行时间线和 Markdown 报告
+
+关键名词：
+
+- `Orchestrator / 编排器`：根据问题决定走结构化数据、调查 Agent，还是两者组合。
+- `FixedBusinessWorkflow / 固定工作流`：只允许白名单 SQL 模板，适合売上、粗利、在庫、欠品等 KPI。
+- `ResearchAgent / 研究 Agent`：根据问题选择市场趋势、竞争情报、社内资料工具。
+- `EvidenceBlock / 证据块`：统一承载表格、调查内容、来源、图表类型和选择理由。
+- `AuditEvent / 审计事件`：记录路由、SQL、工具调用和报告生成步骤。
+- `human_confirmation / 人工确认`：记录价格、仕入、补货规则等需要人工审批的事项。
+- `SQLiteCheckpointStore / checkpoint`：持久化任务、事件和最终报告。
+- `LangGraph SqliteSaver / 图 checkpoint`：按 task id 保存 StateGraph 执行检查点。
+- `EventBus / 事件总线`：把同一套任务事件分发给 SSE 和 WebSocket。
+- `SSE / WebSocket`：浏览器和其他客户端实时观察任务执行过程。
+
+理解要点：
+
+- 可验证经营数据不交给自主 Agent 任意生成 SQL，而是走固定模板和 SELECT-only guard。
+- 月次売上、地域別売上、在庫风险适合固定图，因为它们是重复出现的经营 KPI。
+- 市场趋势、竞争情报、社内资料调查适合 Agent，因为来源和步骤会随问题变化。
+- 最终报告同时保留数据库来源、调查来源、风险提示、人工确认和审计日志，方便日本现场说明治理边界。
+
+工作流小图：
+
+```text
+业务问题 / Business question
+   |
+   v
+FastAPI / CLI / Frontend
+   |
+   v
+RetailAnalysisOrchestrator.run() / 路由 data-research-hybrid
+   |
+   +--> FixedBusinessWorkflow.run() / 固定经营数据工作流
+   |       |
+   |       v
+   |    RetailDataWarehouse.query_template() / 白名单 SQL
+   |
+   +--> ResearchAgent.run() / 自主研究 Agent
+           |
+           v
+        plan() + tools / 市场・竞品・社内资料
+   |
+   v
+ReportComposer.run() / 日文报告、风险、HITL、审计
+   |
+   v
+SQLiteCheckpointStore + SSE + WebSocket
+```
