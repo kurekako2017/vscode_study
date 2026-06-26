@@ -49,13 +49,25 @@
 
 ## 运行
 
-从 `ai-lab/` 目录执行：
+先切到仓库根目录 `ai-lab/`，也就是：
+
+```bash
+cd /home/victorkure/workspace/vscode_study/ai-lab
+```
+
+这个项目文档里的命令大多使用相对路径 `ai-learn/...`，所以必须在这个根目录下执行。
+
+### 1. 先跑 CLI，确认核心逻辑能执行
 
 ```bash
 python3 ai-learn/agent-advanced/projects/japan_retail_analysis_agent/main.py
 ```
 
-启动后端：
+这个命令会直接运行一次分析并把报告打印到终端，不依赖前端。
+
+### 2. 启动后端
+
+进入项目目录后启动 FastAPI / Uvicorn：
 
 ```bash
 cd ai-learn/agent-advanced/projects/japan_retail_analysis_agent
@@ -68,7 +80,9 @@ python3 server.py
 http://127.0.0.1:8020
 ```
 
-启动前端：
+### 3. 启动前端
+
+另开一个终端，进入前端目录：
 
 ```bash
 cd ai-learn/agent-advanced/projects/japan_retail_analysis_agent/frontend
@@ -80,6 +94,17 @@ npm run dev
 
 ```text
 http://127.0.0.1:5178
+```
+
+### 4. 完整启动顺序
+
+如果你要看前后端联动，按这个顺序执行即可：
+
+```text
+1. cd /home/victorkure/workspace/vscode_study/ai-lab
+2. python3 ai-learn/agent-advanced/projects/japan_retail_analysis_agent/main.py
+3. cd ai-learn/agent-advanced/projects/japan_retail_analysis_agent && python3 server.py
+4. cd ai-learn/agent-advanced/projects/japan_retail_analysis_agent/frontend && npm install && npm run dev
 ```
 
 指定问题：
