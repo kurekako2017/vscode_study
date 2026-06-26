@@ -26,3 +26,7 @@ llm-lab → agent-lab → agent-advanced
 - [术语速查表](./术语速查表.md)：三条学习线共用术语。
 
 所有总览文档中的命令默认在仓库根目录 `ai-lab/` 执行。
+
+## 学习教材入口
+
+- [2026 企业级 AI Agent 开发学习笔记（完整版）](./2026企业级AI-Agent开发学习笔记_完整版.md)：按 Python + FastAPI、RAG、LangChain、LangGraph、MCP、企业级完整项目六卷整理的系统化教材。

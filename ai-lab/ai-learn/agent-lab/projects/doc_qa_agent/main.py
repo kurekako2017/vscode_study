@@ -59,6 +59,7 @@ SYSTEM_INSTRUCTIONS = (
 @dataclass
 class Chunk:
     """表示一个文档切分后的小片段（chunk）。"""
+
     # 来源标签
     source_label: str
     # 内容
@@ -89,9 +90,15 @@ def parse_args() -> argparse.Namespace:
         help=f"Model name to use. Default: {DEFAULT_MODEL}",
     )
     # 添加 mock 模式参数
-    parser.add_argument("--mock", action="store_true", help="Run in offline mock mode (no API calls).")
+    parser.add_argument(
+        "--mock", action="store_true", help="Run in offline mock mode (no API calls)."
+    )
     # 添加 real 模式参数
-    parser.add_argument("--real", action="store_true", help="Use real provider chain: OpenRouter -> NVIDIA -> Ollama -> mock fallback.")
+    parser.add_argument(
+        "--real",
+        action="store_true",
+        help="Use real provider chain: OpenRouter -> NVIDIA -> Ollama -> mock fallback.",
+    )
     return parser.parse_args()
 
 
@@ -229,7 +236,9 @@ def build_context(top_chunks: list[Chunk]) -> str:
     return "\n\n".join(parts)
 
 
-def answer_question(client: OpenAI | None, model: str, question: str, context: str, mode: str) -> str:
+def answer_question(
+    client: OpenAI | None, model: str, question: str, context: str, mode: str
+) -> str:
     # 层次: 调用层 — 将构建好的 prompt 传给模型并返回答案（支持 mock）
     """调用模型回答，支持 mock 模式返回教学用文本。
 
@@ -305,7 +314,9 @@ def main() -> None:
 
     # 遍历 chunk
     for chunk in top_chunks:
+        # 打印每个匹配的 chunk 的信息
         print(f"- {chunk.source_label} (score={chunk.score})")
+
 
 if __name__ == "__main__":
     main()

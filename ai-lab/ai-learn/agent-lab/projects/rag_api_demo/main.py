@@ -30,11 +30,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware  # 跨域中间件    
+from fastapi.middleware.cors import CORSMiddleware  # 跨域中间件
 from openai import OpenAI
 from pydantic import BaseModel, Field  # 请求和响应模型校验
 from pypdf import PdfReader
 
+# 确保 llm_runtime.py 在 sys.path 中，方便在本地学习时直接导入。
 for _parent in Path(__file__).resolve().parents:
     if (_parent / "llm_runtime.py").exists():
         sys.path.insert(0, str(_parent))
@@ -77,12 +78,13 @@ DEFAULT_CORS_ORIGINS = {
 @dataclass
 class Chunk:
     """文档切分后的片段对象，包含来源标签、内容与得分。"""
+
     # 来源标签，用于标识片段来自哪个文档。
     source_label: str
     # 片段内容。
     content: str
     # 得分，用于排序。
-    score: int = 0  
+    score: int = 0
 
 
 class AskRequest(BaseModel):
@@ -178,19 +180,21 @@ def read_document_text(file_path: Path) -> str:
         # 普通文本直接读取。
         return file_path.read_text(encoding="utf-8")  # 读取文件文本。
     raise ValueError(f"不支持的文件类型：{suffix}")  # 抛出异常。
+
+
 # 层次: 索引构建层 — 文本切分为可检索的 chunk
 def chunk_text(text: str) -> list[str]:
     """把文本切分为带重叠的 chunk，保留跨块上下文。"""
 
     # 统一换行并清理首尾空白。
     normalized = text.replace("\r\n", "\n").strip()
-    if not normalized:  # 如果文本为空，则返回空列表。  
+    if not normalized:  # 如果文本为空，则返回空列表。
         return []  # 返回空列表。
 
     # 使用滑动窗口切块。
     chunks = []  # 初始化片段列表。
     start = 0  # 初始化 start 为 0。
-    while start < len(normalized):  # 遍历文本。    
+    while start < len(normalized):  # 遍历文本。
         end = min(len(normalized), start + CHUNK_SIZE)  # 计算 end。
         chunks.append(normalized[start:end])  # 添加到片段列表。
         if end >= len(normalized):  # 如果 end 大于等于 normalized 的长度，则退出循环。
@@ -208,11 +212,13 @@ def build_chunks(base_dir: Path) -> list[Chunk]:
         try:
             text = read_document_text(file_path)  # 读取文件文本。
         except (UnicodeDecodeError, ValueError):
-            continue  # 继续下一个文件。    
+            continue  # 继续下一个文件。
 
         relative = file_path.relative_to(base_dir)  # 计算文件相对路径。
         for index, part in enumerate(chunk_text(text), start=1):  # 遍历切分后的文本。
-            chunks.append(Chunk(source_label=f"{relative}#chunk{index}", content=part))  # 添加到片段列表。
+            chunks.append(
+                Chunk(source_label=f"{relative}#chunk{index}", content=part)
+            )  # 添加到片段列表。
     return chunks  # 返回片段列表。
 
 
@@ -220,7 +226,9 @@ def tokenize(text: str) -> set[str]:
     """简单分词函数，支持英文、数字和部分中日韩字符。"""
 
     # 把文本切成可用于匹配的记号集合。
-    return set(re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower()))  # 返回记号集合。
+    return set(
+        re.findall(r"[A-Za-z0-9_\-\u4e00-\u9fff\u3040-\u30ff]+", text.lower())
+    )  # 返回记号集合。
 
 
 def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
@@ -230,13 +238,17 @@ def retrieve(question: str, chunks: list[Chunk]) -> list[Chunk]:
     question_tokens = tokenize(question)
     ranked: list[Chunk] = []
 
-    for chunk in chunks:  # 遍历片段列表。  
+    for chunk in chunks:  # 遍历片段列表。
         chunk_tokens = tokenize(chunk.content)
         score = len(question_tokens & chunk_tokens)  # 计算关键词重合度。
         if score > 0:  # 如果关键词重合度大于0，则添加到片段列表。
-            ranked.append(Chunk(chunk.source_label, chunk.content, score))  # 添加到片段列表。
+            ranked.append(
+                Chunk(chunk.source_label, chunk.content, score)
+            )  # 添加到片段列表。
 
-    ranked.sort(key=lambda item: (-item.score, item.source_label))  # 按得分和来源标签排序。
+    ranked.sort(
+        key=lambda item: (-item.score, item.source_label)
+    )  # 按得分和来源标签排序。
     return ranked[:TOP_K]  # 返回前TOP_K个片段。
 
 
@@ -280,7 +292,7 @@ def answer_question(
         instructions=SYSTEM_INSTRUCTIONS,  # 系统提示词。
         input=prompt,  # 输入。
     )
-    return response.output_text  # 输出文本。   
+    return response.output_text  # 输出文本。
 
 
 app = FastAPI(title="rag_api_demo", version="0.1.0")  # 创建 FastAPI 应用。
@@ -291,7 +303,7 @@ cors_origins = [
     for origin in os.getenv("RAG_API_CORS_ORIGINS", "").split(",")
     if origin.strip()
 ]
-if not cors_origins:  # 如果允许访问的来源为空，则使用默认允许访问的来源。  
+if not cors_origins:  # 如果允许访问的来源为空，则使用默认允许访问的来源。
     cors_origins = sorted(DEFAULT_CORS_ORIGINS)  # 默认允许访问的来源。
 
 # 注册跨域中间件，方便前端联调。
@@ -315,11 +327,13 @@ def load_state() -> None:
     # 先加载文档目录并生成分块。
     docs_dir = get_docs_dir()
     chunks = build_chunks(docs_dir)  # 构建片段列表。
-    if not chunks:  # 如果片段列表为空，则抛出异常。    
-        raise RuntimeError("文档目录中没有可读取的 .md、.txt 或 .pdf 文件。")  # 文档目录中没有可读取的 .md、.txt 或 .pdf 文件。
+    if not chunks:  # 如果片段列表为空，则抛出异常。
+        raise RuntimeError(
+            "文档目录中没有可读取的 .md、.txt 或 .pdf 文件。"
+        )  # 文档目录中没有可读取的 .md、.txt 或 .pdf 文件。
 
     # 根据运行模式决定是否创建真实客户端。
-    mode = resolve_mode()  # 运行模式。 
+    mode = resolve_mode()  # 运行模式。
     if mode == "real":
         app.state.client = build_client()  # 创建真实客户端。
     else:
@@ -335,8 +349,11 @@ def ensure_state_loaded() -> None:
     """按需初始化服务状态，避免启动时就预热索引。"""
 
     # 分块列表或文档目录为空时才加载。
-    if getattr(app.state, "chunks", None) is None or getattr(app.state, "docs_dir", None) is None:
-        load_state()  # 加载服务状态。  
+    if (
+        getattr(app.state, "chunks", None) is None
+        or getattr(app.state, "docs_dir", None) is None
+    ):
+        load_state()  # 加载服务状态。
 
 
 @app.get("/")
@@ -383,6 +400,8 @@ def reload_docs() -> ReloadResponse:
     )
 
     # 对外 API：接收问题、检索文档并返回模型回答与来源信息。
+
+
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest) -> AskResponse:
     """对外 API：接收问题、检索文档并返回模型回答与来源信息。"""
