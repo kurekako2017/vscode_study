@@ -74,7 +74,9 @@ export function subscribeToTask(
   source.addEventListener("done", receive as EventListener);
   source.addEventListener("error", receive as EventListener);
   // 浏览器也用 onerror 表示传输层异常；只在连接确实关闭时提示用户。
-  source.onerror = () => {
+  source.onerror = (event) => {
+    // Backend 的业务 error 是 MessageEvent；不要把它误判成网络断线。
+    if (event instanceof MessageEvent) return;
     if (source.readyState === EventSource.CLOSED) {
       handlers.onTransportError();
     }

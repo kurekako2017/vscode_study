@@ -1,8 +1,32 @@
 # Retail Insight AI
 
-Retail Insight AI 是一个可运行的 Level 1 首个纵向切片：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行固定 KPI 与 Mock Research，SSE 实时返回进度，最终展示 Markdown 报告。它尚未满足 Roadmap 中 Level 1 的全部完成门禁。
+## 快速启动
 
-当前版本只使用固定样例数据、Memory Repository 和 Mock Research Provider，不调用真实 LLM，也不需要 API Key。它用于验证系统边界与端到端契约，不能用于真实经营决策。
+在 VS Code 的 WSL Ubuntu 终端中进入 `retail-insight-ai`，执行：
+
+```bash
+chmod +x scripts/*.sh
+./scripts/check_env.sh
+./scripts/start_backend.sh
+```
+
+另开一个终端：
+
+```bash
+./scripts/start_frontend.sh
+```
+
+浏览器打开：
+
+```text
+http://127.0.0.1:5173
+```
+
+详细的 Backend、Frontend、API、SSE、Report 自测和排障步骤见 [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md)。
+
+Retail Insight AI 是一个可部署的 Level 1 本地 Demo：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行确定性 KPI 与 Static Research，SSE 实时返回进度，最终展示 Markdown 报告。
+
+核心 API、TaskService、Workflow、SSE、Report Generator 和 Frontend 都是真实实现。当前部署配置使用本地固定业务数据、`StaticResearchProvider` 和 `InMemoryRepository`，不调用真实 LLM，也不需要 API Key；进程重启后任务数据会丢失，因此仍不能用于真实经营决策。
 
 ## 1. 示例目标
 
@@ -13,7 +37,7 @@ Retail Insight AI 是一个可运行的 Level 1 首个纵向切片：用户从 R
 当前角色边界：
 
 - `FixedKPIWorkflow` 负责确定性 KPI，不允许模型改写公式。
-- `ResearchAgent` 负责调查型结论，当前只调用 `MockResearchProvider`。
+- `ResearchAgent` 负责调查型结论，当前调用本地 `StaticResearchProvider`。
 - `AnalysisWorkflow` 负责 State、Node、Edge 和条件路由。
 - `TaskService` 负责任务生命周期、事件发布、报告保存和失败收敛。
 - React 前端只持有页面状态，Backend 是任务和报告的事实来源。
@@ -27,7 +51,7 @@ Retail Insight AI 是一个可运行的 Level 1 首个纵向切片：用户从 R
 - LangGraph 1.x 编排 `route / kpi / research / report` Node。
 - React 展示任务表单、Workflow 时间线、失败信息和报告。
 - JSON 结构化日志记录 request_id、task_id、关键事件、错误码与耗时。
-- Memory Repository 保存 Task、Event、Report；进程重启后数据丢失。
+- InMemory Repository 保存 Task、Event、Report；进程重启后数据丢失。
 - FastAPI `BackgroundTasks` 在 API 进程内执行任务；尚无队列、幂等消费或跨实例恢复。
 - 无登录、RBAC、租户隔离、真实数据、真实 LLM、Checkpoint 或人工审批。
 
@@ -43,7 +67,8 @@ retail-insight-ai/
 │   │   ├── kpi/                 # 确定性 KPI 计算
 │   │   ├── agents/              # Research Agent 与 Provider 接口
 │   │   ├── reports/             # Markdown 报告生成
-│   │   ├── repositories/        # Repository Protocol 与 Memory 实现
+│   │   ├── repositories/        # Repository Protocol 与 InMemory 实现
+│   │   ├── errors/              # 应用异常、错误码与统一 Handler
 │   │   ├── events/              # 事件发布与 SSE 编码
 │   │   ├── observability/       # JSON 日志、request_id 上下文与安全字段
 │   │   ├── models/              # 领域模型
@@ -61,6 +86,8 @@ retail-insight-ai/
 │   ├── Dockerfile
 │   ├── nginx.conf               # 静态页面与 Backend 反向代理
 │   └── package.json
+├── scripts/                     # 环境检查、启动与测试脚本
+├── RUNBOOK_LOCAL.md             # VS Code + WSL 本地运行手册
 └── docker-compose.yml
 ```
 
@@ -81,10 +108,10 @@ curl -s -X POST http://127.0.0.1:8000/api/tasks \
   -d '{"question":"売上と在庫の状況を分析し、市場トレンドと競合も確認してください","mode":"hybrid"}'
 ```
 
-失败路径可用以下环境变量验证：
+失败路径可用以下本地故障注入配置验证：
 
 ```bash
-MOCK_FAIL_RESEARCH=true uvicorn app.main:app --host 127.0.0.1 --port 8000
+STATIC_RESEARCH_FAIL=true uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 此时 `hybrid` 和 `research` 任务会进入 `failed`，SSE 返回 `error`；`kpi` 模式不经过 Research，仍可完成。
@@ -124,13 +151,13 @@ App.submit()
 ▼
 FastAPI create_task()
 Pydantic 校验 question 长度与 mode
-├── 失败 -> HTTP 422 -> 前端 Error Panel
+├── 失败 -> HTTP 422 统一 error envelope -> 前端 Error Panel
 └── 成功
     │
     ▼
 TaskService.create_task()
-创建 Task(status=queued) -> MemoryTaskRepository
-发布 status: queued -> MemoryEventRepository
+创建 Task(status=queued) -> InMemoryTaskRepository
+发布 status: queued -> InMemoryEventRepository
 │
 ▼
 FastAPI BackgroundTasks -> TaskService.run_task()
@@ -154,7 +181,7 @@ FixedKPIWorkflow.run() -> 写入 kpi_result
     │
     ▼
 research Node: _research_node()
-ResearchAgent.run() -> MockResearchProvider.research()
+ResearchAgent.run() -> StaticResearchProvider.research()
 ├── 失败 -> TaskService 捕获异常 -> failed + SSE error
 └── 成功 -> 写入 research_result
     │
@@ -199,8 +226,13 @@ flowchart TD
 
 ```json
 {
-  "task_id": "每次生成的 UUID",
-  "status": "queued"
+  "success": true,
+  "request_id": "请求关联 ID",
+  "data": {
+    "task_id": "每次生成的 UUID",
+    "status": "queued"
+  },
+  "error": null
 }
 ```
 
@@ -218,10 +250,10 @@ flowchart TD
 市場では価格だけでなく、在庫回転と会員向け施策を組み合わせた運用が重要です。
 
 ## 出典
-- mock://market-trend/2026-06
+- static://market-trend/2026-06
 ```
 
-`task_id` 和时间戳每次变化；销售额会随问题字符数小幅变化。其它 KPI、Research 文本、来源、数据版本和规则版本在当前 Mock 实现中是确定值。
+`task_id`、`request_id` 和时间戳每次变化；销售额会随问题字符数小幅变化。其它 KPI、Research 文本、来源、数据版本和规则版本在当前 Static Provider 中是确定值。
 
 | 流程节点 | 文件 / 函数 / 类 | 输入 | State / 输出更新 | 为什么需要 |
 | --- | --- | --- | --- | --- |
@@ -242,11 +274,11 @@ flowchart TD
 Backend：
 
 ```bash
-cd retail-insight-ai
+cd retail-insight-ai/backend
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r backend/requirements.txt
-cd backend
+python -m pip install -r requirements.txt
+cp ../.env.example ../.env
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -280,18 +312,18 @@ Frontend 镜像由 Node 构建静态文件，再由 Nginx 提供页面并代理 
 | 真实模型 / 真实服务命令 | 纯 Mock / 本地命令 |
 | --- | --- |
 | 不适用（Backend 不调用真实 LLM 或真实服务） | `cd retail-insight-ai/backend && python -m unittest discover -s tests -v` |
-| 不适用（Frontend 使用 Mock HTTP 与 EventSource） | `cd retail-insight-ai/frontend && npm test` |
+| 不适用（Frontend 测试使用 HTTP 与 EventSource 测试替身） | `cd retail-insight-ai/frontend && npm test` |
 | 不适用（生产 Provider 尚未实现） | `cd retail-insight-ai/frontend && npm run build` |
-| 不适用（当前只启动本地 Mock 全栈） | `cd retail-insight-ai && docker compose up --build` |
+| 不适用（当前启动本地 Static Provider 全栈） | `cd retail-insight-ai && docker compose up --build` |
 
-Backend 测试覆盖 Health、任务创建、状态查询、报告生成、结构化日志字段，以及 SSE 的 `status / done / error`。Frontend 测试覆盖任务提交、SSE 消费、报告加载和请求失败展示。
+Backend 测试覆盖 Health、统一成功/失败响应、任务和报告不存在、配置校验、Repository 边界、结构化日志，以及 SSE 的 `status / done / error`。Frontend 测试覆盖 API envelope、任务提交、SSE 消费与错误展示、报告加载和请求失败展示。
 
 ## 10. 下一步理解与企业级演进
 
 当前实现的本质映射：
 
 ```text
-MemoryTaskRepository / MemoryEventRepository / MemoryReportRepository
+InMemoryTaskRepository / InMemoryEventRepository / InMemoryReportRepository
 =
 任务、事件、报告的数据访问契约，不是持久化能力
 
@@ -299,7 +331,7 @@ FixedKPIWorkflow.run()
 =
 受版本控制、可审计的确定性业务规则边界
 
-MockResearchProvider.research()
+StaticResearchProvider.research()
 =
 真实模型网关与受控调查工具的 Provider 接口
 
@@ -311,17 +343,17 @@ FastAPI BackgroundTasks
 =
 单进程异步执行的教学替身，不是可靠任务队列
 
-EventSource + MemoryEventRepository
+EventSource + InMemoryEventRepository
 =
 实时进度协议的最小实现，不具备跨进程断线恢复
 ```
 
 下一步不是在业务层直接连接更多基础设施，而是保持现有 Protocol 和 API 契约，逐层替换：
 
-- `Memory*Repository` -> PostgreSQL Repository；Task 与 Report 是事实来源，Event 需要保留策略。
+- `InMemory*Repository` -> PostgreSQL Repository；新增实现并在 `config/container.py` 替换组合关系，TaskService 不需要修改。
 - `BackgroundTasks` -> RabbitMQ + Worker；以 `task_id` 作为幂等键，有限重试后进入 DLQ。
-- `MemoryEventRepository` 高频读取 -> PostgreSQL 事实记录 + Redis 短期事件缓存。
-- `MockResearchProvider` -> 模型网关 + Tool Service；增加超时、重试、来源校验和预算。
+- `InMemoryEventRepository` 高频读取 -> PostgreSQL 事实记录 + Redis 短期事件缓存。
+- `StaticResearchProvider` -> 模型网关 + Tool Service；增加超时、重试、来源校验和预算。
 - 未持久化的 `StateGraph` -> Checkpointer；高影响报告在 `Interrupt` 后等待人工审批。
 - 页面内断线提示 -> 保存最后 `event_id`，重连后使用 `after` 继续消费。
 - 固定样例数据 -> 经过 Schema、质量校验和版本控制的 POS、库存、会员、促销数据。
@@ -391,13 +423,13 @@ OpenTelemetry Trace + 结构化日志 + Metrics + Audit
 | --- | --- | --- |
 | 角色 | KPI、Research、Report 边界已分离 | Owner、审批责任和职责冲突规则明确 |
 | 状态 | TypedDict State，进程内执行 | Checkpoint、State 版本迁移、失败恢复 |
-| 工具 | Mock Provider，无外部副作用 | Tool Schema、认证、授权、超时、重试、审计 |
+| 工具 | Static Provider，无外部副作用 | Tool Schema、认证、授权、超时、重试、审计 |
 | 记忆 | 仅任务执行 State | 业务事实与会话上下文分离，保留和删除策略明确 |
 | 权限 | 无登录 | SSO、RBAC、部门 / 门店 Scope、默认拒绝 |
 | 失败处理 | 异常收敛为 failed + SSE error | 幂等、有限重试、DLQ、Fallback、人工升级 |
 | 评价 | API / UI 自动测试 | KPI 回归、Research 来源质量、报告验收、红队测试 |
 | 监控 | 无集中 Observability | task_id / trace_id 关联，SLO、告警、Runbook |
-| 成本 | Mock，调用成本为零 | Token、Provider、任务、租户或部门成本归属 |
+| 成本 | Static Provider，调用成本为零 | Token、Provider、任务、租户或部门成本归属 |
 
 具体升级等级、部署边界和架构决策见：
 
@@ -419,7 +451,7 @@ OpenTelemetry Trace + 结构化日志 + Metrics + Audit
 6. `backend/app/kpi/workflow.py` 与 `backend/app/agents/research_agent.py`：比较确定性 KPI 和可替换 Research Provider 的职责差异。
 7. `backend/app/reports/generator.py`：查看三种 mode 如何通过可选结果生成同一份报告合同。
 8. `backend/app/events/publisher.py`、`events/sse.py`：最后阅读进度事件如何保存、编号、编码和发送。
-9. `backend/app/repositories/interfaces/` 与 `repositories/memory/`：比较 Protocol 合同和当前内存实现。
+9. `backend/app/repositories/interfaces/` 与 `repositories/implementations/in_memory/`：比较 Protocol 合同和当前本地实现。
 
 阅读 `TaskService` 时重点追踪两个不同状态边界：`Task` 的 queued/running/completed/failed 由 Service 管理；`AnalysisState` 的 route/kpi_result/research_result/report_markdown 由 LangGraph Node 管理。二者分开可以避免 Workflow 同时承担任务持久化和业务计算。
 
@@ -504,3 +536,106 @@ jq -c 'select(.task_id == "<实际 task_id>") | {timestamp,event,status,node,dur
 典型成功顺序是 `task_created -> task_queued -> task_running -> kpi_started/completed -> research_started/completed -> report_generation_started/completed -> task_completed -> sse_event_sent`。失败时先查 `task_failed` 的 `error_code`，再按相同 `task_id` 查看最后一个成功 Node。
 
 日志代码只接受白名单元数据字段。禁止记录 API Key、Secret、完整 Prompt、会员数据和内部资料正文；需要诊断内容质量时应使用受权限与保留策略控制的独立评估数据，不应扩大普通运行日志范围。
+
+## 当前实现边界
+
+当前核心链路不是业务 Mock：
+
+- FastAPI 真实执行请求校验、统一响应、异常转换和 request_id 关联。
+- `TaskService` 真实管理 queued、running、completed、failed 生命周期。
+- LangGraph 真实执行 State、Node、Edge 和条件路由。
+- `FixedKPIWorkflow` 真实执行确定性本地规则。
+- SSE 真实建立 HTTP 流、按 sequence 发送 status/done/error，并在终态结束。
+- React Frontend 真实提交任务、消费 SSE、显示结构化错误并读取报告。
+
+外部能力仍使用本地适配层：`RESEARCH_PROVIDER=static` 不访问真实 LLM 或搜索服务，`DATA_PROVIDER=static` 表示 KPI 使用本地固定业务数据。`InMemoryTaskRepository`、`InMemoryReportRepository` 和 `InMemoryEventRepository` 是 Repository 接口的本地运行实现，不是业务流程替身，但不提供进程重启后的持久化。
+
+未来替换 PostgreSQL 时，应在 `repositories/implementations/postgres/` 新增实现，并只修改 `config/container.py` 的组合关系。`TaskService` 继续依赖 `TaskRepository` 和 `ReportRepository` Protocol，API 不直接访问具体实现。
+
+## Mock 使用原则
+
+Mock / Fake 只允许出现在以下边界：
+
+- LLM Provider 或真实模型网关的测试替身。
+- POS、ERP、会员系统等外部 Adapter 的测试替身。
+- 自动测试中的 HTTP、EventSource 或故障替身，例如 `FakeEventSource`。
+
+TaskService、Workflow、KPI、SSE、Report Generator、Repository 接口和 Frontend 业务组件不得使用 Mock 命名。当前默认适配器使用 `StaticResearchProvider`，本地存储使用 `InMemory*Repository`，名称直接说明能力和限制。
+
+## 错误处理说明
+
+普通 JSON API 统一返回 envelope。成功示例：
+
+```json
+{
+  "success": true,
+  "request_id": "2ea7...",
+  "data": {
+    "task_id": "14d0...",
+    "status": "queued"
+  },
+  "error": null
+}
+```
+
+失败示例：
+
+```json
+{
+  "success": false,
+  "request_id": "2ea7...",
+  "data": null,
+  "error": {
+    "code": "TASK_NOT_FOUND",
+    "message": "Task not found",
+    "detail": {
+      "task_id": "missing-task"
+    }
+  }
+}
+```
+
+`error.code` 是前端和运维使用的稳定分类；`message` 用于显示；`detail` 只放安全的诊断字段。请求可以传入 `X-Request-ID`，否则 Backend 自动生成，并在响应头、响应 body 和日志中返回同一 ID。
+
+SSE 不使用普通 API envelope。标准 error event 的 data 为：
+
+```json
+{
+  "task_id": "14d0...",
+  "sequence": 4,
+  "event": "error",
+  "status": "failed",
+  "message": "Research provider failed",
+  "request_id": "2ea7...",
+  "error_code": "RESEARCH_PROVIDER_ERROR",
+  "node": null,
+  "report_path": null,
+  "created_at": "2026-06-27T00:00:00Z"
+}
+```
+
+Workflow 失败只发布 error，不发布 done。Frontend 以 `[error_code] message` 显示错误，不解析后端异常文本。
+
+## 配置说明
+
+Backend 使用 `pydantic-settings` 校验环境变量。首次运行：
+
+```bash
+cd retail-insight-ai
+cp .env.example .env
+```
+
+主要配置：
+
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `APP_NAME` | `Retail Insight AI` | OpenAPI 和应用显示名称 |
+| `APP_ENV` | `local` | `local/development/test/staging/production` |
+| `LOG_LEVEL` | `INFO` | 结构化日志级别 |
+| `SERVICE_NAME` | `retail-insight-ai` | 日志中的 service 字段 |
+| `TASK_EXECUTION_MODE` | `background` | 当前可部署 Demo 的进程内后台执行模式 |
+| `RESEARCH_PROVIDER` | `static` | 当前本地 Research Provider |
+| `DATA_PROVIDER` | `static` | 当前本地业务数据来源 |
+| `CORS_ORIGINS` | `["http://127.0.0.1:5173","http://localhost:5173"]` | JSON 数组格式的允许本地来源 |
+
+`.env.example` 不包含真实 Key。真实 Secret 不应提交到仓库，也不应放入普通日志。
