@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      APP_ENV: local
+      MOCK_STEP_DELAY_SECONDS: "0.05"
+      MOCK_FAIL_RESEARCH: "false"
+    ports:
+      - "8000:8000"
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
