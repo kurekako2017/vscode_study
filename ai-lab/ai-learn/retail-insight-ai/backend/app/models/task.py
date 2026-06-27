@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import StrEnum
 
+from app.errors.exceptions import InvalidTaskStateException
+
 
 def utc_now() -> datetime:
     """统一生成带时区 UTC 时间，避免服务器本地时区造成排序歧义。"""
@@ -37,7 +39,7 @@ class Task:
 
         terminal = {TaskStatus.COMPLETED, TaskStatus.FAILED}
         if self.status in terminal and status != self.status:
-            raise ValueError(f"Cannot transition terminal task from {self.status} to {status}")
+            raise InvalidTaskStateException(self.task_id, self.status.value, status.value)
         self.status = status
         self.error = error
         self.updated_at = utc_now()

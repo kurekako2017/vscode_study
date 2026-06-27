@@ -1,3 +1,5 @@
+"""TaskRepository 的单进程内存实现。"""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -6,8 +8,8 @@ from threading import RLock
 from app.models.task import Task
 
 
-class MemoryTaskRepository:
-    """线程安全的内存任务仓库，模拟未来持久化 Repository 的合同。"""
+class InMemoryTaskRepository:
+    """线程安全的本地任务仓库，实现真实 Repository 合同但不提供持久化。"""
 
     def __init__(self) -> None:
         """初始化任务映射和保护并发访问的进程内锁。"""

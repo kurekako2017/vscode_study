@@ -12,7 +12,7 @@ class KPIResult:
     inventory_turnover: float
     active_members: int
     promotion_lift_rate: float
-    data_version: str = "mock-pos-2026-06"
+    data_version: str = "local-static-2026-06"
     rule_version: str = "kpi-v1"
 
 
@@ -22,4 +22,4 @@ class ResearchResult:
 
     summary: str
     sources: list[str] = field(default_factory=list)
-    provider: str = "mock"
+    provider: str = "static"

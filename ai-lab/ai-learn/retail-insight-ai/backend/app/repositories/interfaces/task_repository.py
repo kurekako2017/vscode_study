@@ -1,8 +1,9 @@
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from app.models.task import Task
 
 
+@runtime_checkable
 class TaskRepository(Protocol):
     """定义 Task 聚合的创建、读取与保存合同。"""
 

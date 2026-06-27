@@ -5,11 +5,13 @@ from uuid import uuid4
 
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
+from app.errors.handlers import register_exception_handlers
 from app.observability.logging import (
     bind_request_id,
     configure_logging,
@@ -24,12 +26,12 @@ logger = get_logger(__name__)
 def create_app(settings: Settings | None = None) -> FastAPI:
     """组装 FastAPI、依赖容器、路由和请求日志上下文。
 
-    使用工厂函数而不是直接堆叠全局对象，测试可以为每个用例创建隔离的 Memory
+    使用工厂函数而不是直接堆叠全局对象，测试可以为每个用例创建隔离的 InMemory
     Repository，同时生产部署仍然能使用模块末尾的 ``app`` 入口。
     """
 
     container = build_container(settings)
-    configure_logging(container.settings.app_name, container.settings.log_level)
+    configure_logging(container.settings.service_name, container.settings.log_level)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -42,8 +44,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(
         title=container.settings.app_name,
         version="0.1.0",
-        description="Retail Insight AI mock backend",
+        description="Retail Insight AI deployable local backend",
         lifespan=lifespan,
+    )
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=container.settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @application.middleware("http")
@@ -61,6 +70,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # 容器放在 app.state 中，让 Depends 只负责取依赖，不负责重复创建依赖。
     application.state.container = container
+    register_exception_handlers(application)
     application.include_router(health_router)
     application.include_router(tasks_router)
     return application

@@ -4,8 +4,14 @@ services:
       context: ./backend
     environment:
       APP_ENV: local
-      MOCK_STEP_DELAY_SECONDS: "0.05"
-      MOCK_FAIL_RESEARCH: "false"
+      LOG_LEVEL: INFO
+      SERVICE_NAME: retail-insight-ai
+      TASK_EXECUTION_MODE: background
+      RESEARCH_PROVIDER: static
+      DATA_PROVIDER: static
+      CORS_ORIGINS: '["http://127.0.0.1:5173"]'
+      WORKFLOW_STEP_DELAY_SECONDS: "0.05"
+      STATIC_RESEARCH_FAIL: "false"
     ports:
       - "8000:8000"
   frontend:

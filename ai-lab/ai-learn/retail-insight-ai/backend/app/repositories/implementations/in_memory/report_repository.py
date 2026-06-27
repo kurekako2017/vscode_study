@@ -1,3 +1,5 @@
+"""ReportRepository 的单进程内存实现。"""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -6,8 +8,8 @@ from threading import RLock
 from app.models.report import Report
 
 
-class MemoryReportRepository:
-    """线程安全的内存报告仓库，每个任务只保留一份最终报告。"""
+class InMemoryReportRepository:
+    """线程安全的本地报告仓库，每个任务只保留一份最终报告。"""
 
     def __init__(self) -> None:
         """初始化报告映射和保护并发访问的进程内锁。"""

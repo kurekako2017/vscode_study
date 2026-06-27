@@ -1,8 +1,9 @@
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from app.models.report import Report
 
 
+@runtime_checkable
 class ReportRepository(Protocol):
     """定义报告写入和按任务读取合同。"""
 

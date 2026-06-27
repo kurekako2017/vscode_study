@@ -36,7 +36,7 @@ async def stream_task_events(
                 "SSE task event sent",
                 task_id=task_id,
                 status=str(event.data.get("status", "unknown")),
-                error_code="TASK_EXECUTION_FAILED" if event.event_type == "error" else None,
+                error_code=event.data.get("error_code") if event.event_type == "error" else None,
                 sequence=event.sequence,
             )
             # SSE 使用空行分隔事件；id 让客户端能记录最后成功接收的位置。

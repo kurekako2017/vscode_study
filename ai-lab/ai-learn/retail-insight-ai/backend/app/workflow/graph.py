@@ -8,6 +8,12 @@ from typing import Any
 from langgraph.graph import END, START, StateGraph
 
 from app.agents.research_agent import ResearchAgent
+from app.errors.base import AppException
+from app.errors.exceptions import (
+    ReportGenerationException,
+    ResearchProviderException,
+    WorkflowExecutionException,
+)
 from app.kpi.workflow import FixedKPIWorkflow
 from app.observability.logging import get_logger, log_event
 from app.reports.generator import ReportGenerator
@@ -128,7 +134,15 @@ class AnalysisWorkflow:
             node="research",
         )
         await self._delay()
-        result = await self._research_agent.run(state["question"])
+        try:
+            result = await self._research_agent.run(state["question"])
+        except ResearchProviderException as exc:
+            raise ResearchProviderException(
+                task_id=task_id,
+                provider=exc.detail.get("provider"),
+            ) from exc
+        except Exception as exc:
+            raise ResearchProviderException(task_id=task_id) from exc
         log_event(
             logger,
             "info",
@@ -156,11 +170,14 @@ class AnalysisWorkflow:
             node="report",
         )
         await self._delay()
-        report_markdown = self._report_generator.generate(
-            question=state["question"],
-            kpi_result=state.get("kpi_result"),
-            research_result=state.get("research_result"),
-        )
+        try:
+            report_markdown = self._report_generator.generate(
+                question=state["question"],
+                kpi_result=state.get("kpi_result"),
+                research_result=state.get("research_result"),
+            )
+        except Exception as exc:
+            raise ReportGenerationException(task_id=task_id) from exc
         log_event(
             logger,
             "info",
@@ -178,7 +195,15 @@ class AnalysisWorkflow:
 
         current_state: AnalysisState = dict(initial_state)
         # updates 模式只返回 Node patch，适合发布逐节点进度，避免重复传输整个 State。
-        async for update in self._graph.astream(initial_state, stream_mode="updates"):
-            for node_name, patch in update.items():
-                current_state.update(patch)
-                yield node_name, dict(current_state)
+        try:
+            async for update in self._graph.astream(initial_state, stream_mode="updates"):
+                for node_name, patch in update.items():
+                    current_state.update(patch)
+                    yield node_name, dict(current_state)
+        except AppException:
+            raise
+        except Exception as exc:
+            raise WorkflowExecutionException(
+                str(initial_state.get("task_id", "-")),
+                detail={"exception_type": type(exc).__name__},
+            ) from exc

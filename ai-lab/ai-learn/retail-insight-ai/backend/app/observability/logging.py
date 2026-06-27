@@ -84,6 +84,12 @@ def reset_request_id(token: Token[str]) -> None:
     _request_id_context.reset(token)
 
 
+def get_request_id() -> str:
+    """读取当前请求 ID；没有 HTTP 上下文时返回预留值 ``-``。"""
+
+    return _request_id_context.get()
+
+
 def log_event(
     logger: logging.Logger,
     level: Literal["debug", "info", "warning", "error"],

@@ -1,3 +1,5 @@
+"""EventRepository 的单进程内存实现。"""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -7,8 +9,8 @@ from typing import Any
 from app.models.event import TaskEvent
 
 
-class MemoryEventRepository:
-    """线程安全的内存事件仓库，用于教学与测试而非进程间共享。"""
+class InMemoryEventRepository:
+    """线程安全的本地事件仓库，按任务保存有序 SSE 事件。"""
 
     def __init__(self) -> None:
         """初始化按 task_id 分组的事件集合和进程内互斥锁。"""

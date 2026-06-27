@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
-import { createTask, getReport, subscribeToTask } from "./api";
-import type { AnalysisMode, ReportResponse, TaskEvent, TaskStatus } from "./types";
+import { ApiClientError, createTask, getReport, subscribeToTask } from "./api";
+import type { AnalysisMode, DisplayError, ReportResponse, TaskEvent, TaskStatus } from "./types";
 
 const defaultQuestion = "売上と在庫の状況を分析し、市場トレンドと競合も確認してください";
 
@@ -24,7 +24,7 @@ export default function App() {
   const [status, setStatus] = useState<TaskStatus | "idle">("idle");
   const [events, setEvents] = useState<TaskEvent[]>([]);
   const [report, setReport] = useState<ReportResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DisplayError | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // EventSource 是浏览器外部资源；组件卸载时必须关闭，避免页面离开后仍接收事件。
@@ -35,7 +35,11 @@ export default function App() {
     try {
       setReport(await getReport(id));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "レポート取得に失敗しました");
+      setError(
+        reason instanceof ApiClientError
+          ? { code: reason.code, message: reason.message }
+          : { code: "REPORT_LOAD_ERROR", message: "レポート取得に失敗しました" },
+      );
     }
   }
 
@@ -58,7 +62,7 @@ export default function App() {
         onEvent: (taskEvent) => {
           // 使用函数式 setState，确保连续到达的 SSE 不会覆盖前一个事件。
           setEvents((current) => [...current, taskEvent]);
-          if (taskEvent.data.status) setStatus(taskEvent.data.status);
+          setStatus(taskEvent.status);
           if (taskEvent.event === "done") {
             unsubscribeRef.current?.();
             // 事件回调不是 async；void 明确表示这里启动异步加载但不阻塞回调。
@@ -66,14 +70,24 @@ export default function App() {
           }
           if (taskEvent.event === "error") {
             unsubscribeRef.current?.();
-            setError(taskEvent.data.error ?? taskEvent.message);
+            setError({
+              code: taskEvent.error_code ?? "TASK_EXECUTION_ERROR",
+              message: taskEvent.message,
+            });
           }
         },
-        onTransportError: () => setError("進捗ストリームが切断されました"),
+        onTransportError: () => setError({
+          code: "SSE_CONNECTION_ERROR",
+          message: "進捗ストリームが切断されました",
+        }),
       });
     } catch (reason) {
       setStatus("idle");
-      setError(reason instanceof Error ? reason.message : "タスク作成に失敗しました");
+      setError(
+        reason instanceof ApiClientError
+          ? { code: reason.code, message: reason.message }
+          : { code: "TASK_CREATE_ERROR", message: "タスク作成に失敗しました" },
+      );
     }
   }
 
@@ -82,7 +96,7 @@ export default function App() {
   return (
     <main className="shell">
       <header className="hero">
-        <p className="eyebrow">RETAIL OPERATIONS / MOCK ENVIRONMENT</p>
+        <p className="eyebrow">RETAIL OPERATIONS / LOCAL STATIC ENVIRONMENT</p>
         <h1>Retail Insight AI</h1>
         <p className="lead">KPI の確定計算と調査結果を、監査可能な一つの分析レポートへ。</p>
       </header>
@@ -123,7 +137,7 @@ export default function App() {
           <button type="submit" disabled={busy || question.trim().length === 0}>
             {busy ? "分析実行中…" : "分析を開始"}
           </button>
-          <p className="boundary">固定 Mock データを使用。実際の経営判断には使用できません。</p>
+          <p className="boundary">ローカル固定データを使用。実際の経営判断には使用できません。</p>
         </form>
 
         {/* TaskTimeline：aria-live 让辅助技术感知异步状态变化。 */}
@@ -146,14 +160,14 @@ export default function App() {
                   <span>{String(item.sequence).padStart(2, "0")}</span>
                   <div>
                     <strong>{item.message}</strong>
-                    <small>{item.data.node ?? item.event}</small>
+                    <small>{item.node ?? item.event}</small>
                   </div>
                 </li>
               ))}
             </ol>
           )}
           {/* ErrorPanel：role=alert 让错误不仅依赖颜色表达。 */}
-          {error && <div className="error" role="alert">{error}</div>}
+          {error && <div className="error" role="alert">[{error.code}] {error.message}</div>}
         </section>
       </section>
 

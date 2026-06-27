@@ -1,8 +1,9 @@
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 from app.models.event import TaskEvent
 
 
+@runtime_checkable
 class EventRepository(Protocol):
     """定义任务事件的追加和按序读取合同。"""
 

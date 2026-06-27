@@ -3,6 +3,12 @@ from __future__ import annotations
 from time import perf_counter
 from uuid import uuid4
 
+from app.errors.base import AppException
+from app.errors.exceptions import (
+    ReportNotFoundException,
+    TaskNotFoundException,
+    WorkflowExecutionException,
+)
 from app.events.publisher import EventPublisher
 from app.models.report import Report
 from app.models.task import Task, TaskStatus
@@ -13,14 +19,6 @@ from app.workflow.graph import AnalysisWorkflow
 from app.workflow.state import AnalysisState
 
 logger = get_logger(__name__)
-
-
-class TaskNotFoundError(KeyError):
-    """表示业务层找不到指定任务，由 API 层转换为 404。"""
-
-
-class ReportNotReadyError(RuntimeError):
-    """表示任务存在但报告尚未生成，由 API 层转换为 409。"""
 
 
 class TaskService:
@@ -36,9 +34,9 @@ class TaskService:
         report_repository: ReportRepository,
         event_publisher: EventPublisher,
         workflow: AnalysisWorkflow,
-        provider_name: str = "mock",
+        provider_name: str = "static",
     ) -> None:
-        """注入接口依赖，使 Service 不绑定 Memory Repository 的具体实现。"""
+        """注入接口依赖，使 Service 不绑定 InMemory Repository 的具体实现。"""
 
         self._task_repository = task_repository
         self._report_repository = report_repository
@@ -75,7 +73,7 @@ class TaskService:
 
         task = self._task_repository.get(task_id)
         if task is None:
-            raise TaskNotFoundError(task_id)
+            raise TaskNotFoundException(task_id)
         return task
 
     def get_report(self, task_id: str) -> Report:
@@ -84,7 +82,7 @@ class TaskService:
         self.get_task(task_id)
         report = self._report_repository.get(task_id)
         if report is None:
-            raise ReportNotReadyError(task_id)
+            raise ReportNotFoundException(task_id)
         return report
 
     async def run_task(self, task_id: str) -> None:
@@ -160,8 +158,16 @@ class TaskService:
             )
         except Exception as exc:
             # 所有异常在此收敛为 failed，避免任务永远停留在 running。
+            failure = (
+                exc
+                if isinstance(exc, AppException)
+                else WorkflowExecutionException(
+                    task_id,
+                    detail={"exception_type": type(exc).__name__},
+                )
+            )
             task = self.get_task(task_id)
-            task.transition(TaskStatus.FAILED, error=str(exc))
+            task.transition(TaskStatus.FAILED, error=failure.message)
             self._task_repository.save(task)
             log_event(
                 logger,
@@ -170,12 +176,15 @@ class TaskService:
                 "Task execution failed",
                 task_id=task_id,
                 status=task.status.value,
-                error_code="TASK_EXECUTION_FAILED",
+                error_code=failure.error_code.value,
                 duration_ms=(perf_counter() - started_at) * 1000,
             )
             self._event_publisher.publish(
                 task_id,
                 "error",
-                "Task failed",
-                {"status": "failed", "error": str(exc)},
+                failure.message,
+                {
+                    "status": "failed",
+                    "error_code": failure.error_code.value,
+                },
             )

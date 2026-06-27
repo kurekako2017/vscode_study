@@ -1,3 +1,3 @@
-from app.agents.providers.mock_research import MockResearchProvider
+from app.agents.providers.static_research import StaticResearchProvider
 
-__all__ = ["MockResearchProvider"]
+__all__ = ["StaticResearchProvider"]

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.dependencies import get_container
 from app.config.container import AppContainer
-from app.observability.logging import get_logger, log_event
+from app.observability.logging import get_logger, get_request_id, log_event
 from app.schemas.health import HealthResponse
 
 router = APIRouter(tags=["health"])
@@ -16,6 +16,7 @@ async def health(container: AppContainer = Depends(get_container)) -> HealthResp
     log_event(logger, "info", "health_check", "Health check completed", status="ok")
     return HealthResponse(
         status="ok",
-        service=container.settings.app_name,
-        provider=container.settings.mock_provider,
+        service=container.settings.service_name,
+        provider=container.settings.research_provider,
+        request_id=get_request_id(),
     )

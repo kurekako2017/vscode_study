@@ -6,7 +6,7 @@ from app.models.analysis import ResearchResult
 
 
 class ResearchProvider(Protocol):
-    """定义 Research Provider 最小合同，便于 Mock 与未来真实实现互换。"""
+    """定义 Research Provider 最小合同，便于本地与未来外部实现互换。"""
 
     name: str
 
@@ -20,7 +20,7 @@ class ResearchAgent:
     """封装调查能力，让 Workflow 不依赖具体模型或外部服务。"""
 
     def __init__(self, provider: ResearchProvider) -> None:
-        """注入 Provider；测试因此可以使用完全离线的 Mock。"""
+        """注入 Provider；核心 Workflow 因此不依赖外部系统实现。"""
 
         self._provider = provider
 
