@@ -1,3 +1,14 @@
+"""本地确定性回答生成器。
+
+文件职责：根据 Workflow State 和检索文档拼装带引用的日文正式报告。
+谁调用它：Workflow ``answer_generated`` Node；它读取 Document 和 WorkflowState。
+输入：问题状态与文档片段；输出：Markdown 字符串报告。
+为什么需要这一层：把回答格式与 Workflow 路由拆开，当前不依赖任何真实 LLM。
+初学者重点：批准路径与低风险路径只影响“确定方法”，引用来自 Retriever 结果。
+日本现场面试：可称为 Static Answer Provider，用确定性输出验证审批闭环。
+企业级替换：实现 AnswerGenerator Interface 后接受控 LLM，必须保留 Citation、ACL 和拒答规则。
+"""
+
 from app.rag.documents import Document
 from app.workflow.state import WorkflowState
 

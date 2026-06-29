@@ -1,3 +1,14 @@
+/**
+ * 页面职责：承载问题提交、SSE 时间线、人工审批列表和最终报告四个视图。
+ * 谁调用它：main.tsx 把 App 挂载到浏览器 DOM；用户操作再调用 api.ts。
+ * 它调用谁：HTTP API、EventSource SSE，以及 React 的 state/effect hooks。
+ * 输入：表单、导航和 Approve/Reject 点击；输出：可见状态、错误提示和报告。
+ * 为什么需要这一层：把用户交互状态集中在一个教学页面，便于沿完整业务链阅读。
+ * 初学者重点：view 控制画面，status/events 表示进度，watch 管理 SSE 生命周期。
+ * 日本现场面试：可说明 UI 不是事实来源；刷新后仍应通过 Backend 状态与事件恢复。
+ * 企业级替换：拆为 feature 组件并引入路由/查询缓存，但审批权限必须由 Backend 校验。
+ */
+
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiClientError, createQuestion, decideApproval, getReport, listApprovals, subscribeQuestion } from "./api";
@@ -8,6 +19,7 @@ type View = "submit" | "status" | "approvals" | "result";
 const defaultQuestion = "個人情報を含む障害ログの共有手順を確認したい";
 
 export default function App() {
+  // 页面状态按职责分组理解：导航、问题标识、Workflow 状态、事件、审批、报告和错误。
   const [view, setView] = useState<View>("submit");
   const [question, setQuestion] = useState(defaultQuestion);
   const [questionId, setQuestionId] = useState<string | null>(null);
@@ -18,9 +30,11 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const unsubscribe = useRef<(() => void) | null>(null);
 
+  // 组件卸载时关闭 EventSource，避免离开页面后仍保留网络连接和回调。
   useEffect(() => () => unsubscribe.current?.(), []);
 
   async function refreshApprovals() {
+    // 审批列表是 Backend 的持久事实；进入审批页或点击更新时重新查询。
     try {
       setApprovals(await listApprovals());
     } catch (reason) {
@@ -33,10 +47,12 @@ export default function App() {
   }, [view]);
 
   function showError(reason: unknown) {
+    // 已知 API 错误显示稳定 error code；未知异常不暴露内部堆栈或敏感信息。
     setError(reason instanceof ApiClientError ? `[${reason.code}] ${reason.message}` : "[UNEXPECTED_ERROR] 処理に失敗しました");
   }
 
   function watch(id: string) {
+    // 同一时间只保留一个 SSE 订阅。返回 completed/rejected/error 后主动关闭连接。
     unsubscribe.current?.();
     unsubscribe.current = subscribeQuestion(
       id,
@@ -45,14 +61,17 @@ export default function App() {
         setEvents((current) => [...current, item]);
         setStatus(item.status);
         if (item.event === "approval_required") {
+          // 高风险问题暂停在审批页；Backend 状态而不是前端关键词决定是否审批。
           setView("approvals");
         } else if (item.event === "completed") {
+          // completed 只表示报告已持久化，再通过独立 Report API 获取正式内容。
           unsubscribe.current?.();
           void getReport(id).then((value) => {
             setReport(value);
             setView("result");
           }).catch(showError);
         } else if (item.event === "rejected" || item.event === "error") {
+          // rejected 是业务决定，error 是执行失败；二者都是当前 SSE 的终止事件。
           unsubscribe.current?.();
           if (item.event === "rejected") setView("status");
           else setError(`[${item.error_code ?? "WORKFLOW_ERROR"}] ${item.message}`);
@@ -63,6 +82,7 @@ export default function App() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    // 提交流程：清理旧页面状态 → POST Question → 切换状态页 → 订阅该问题的 SSE。
     event.preventDefault();
     setError(null);
     setEvents([]);
@@ -81,6 +101,7 @@ export default function App() {
   }
 
   async function decide(item: Approval, decision: "approve" | "reject") {
+    // 决定流程：先订阅恢复事件，再 POST 审批，避免漏掉执行很快的 approved/completed。
     setError(null);
     setQuestionId(item.question_id);
     setStatus(decision === "approve" ? "approved" : "rejected");

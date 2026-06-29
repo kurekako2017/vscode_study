@@ -1,3 +1,15 @@
+"""Question 应用服务：连接 API、Workflow、Repository、SSE Event 与日志。
+
+文件职责：管理问题完整生命周期，并把每个 LangGraph Node Patch 落库、发布事件。
+谁调用它：Question Route、ApprovalService；它调用 Repository 与 KnowledgeApprovalWorkflow。
+输入：问题文本、ID、审批决定和 request_id；输出：业务 dict 或异步流程完成。
+为什么需要这一层：Workflow 只描述计算/路由，数据库和事件副作用由应用服务统一协调。
+初学者重点：按 ``create_question → run_initial → _run_graph → _apply_node`` 阅读主链路。
+日本现场面试：可说明 question_id 关联业务事实，request_id 关联一次 HTTP 调用；失败统一
+收敛到 failed + error，之后不会再发布 completed。
+企业级替换：依赖 Repository/EventPublisher Interface，加入事务 Outbox、幂等、重试和审计。
+"""
+
 from __future__ import annotations
 
 from time import perf_counter
@@ -14,7 +26,10 @@ logger = get_logger(__name__)
 
 
 class QuestionService:
-    """协调 Question 生命周期、LangGraph、审批、事件和 SQLite。"""
+    """协调 Question 生命周期、LangGraph、审批、事件和 SQLite。
+
+    当前直接依赖 SQLiteRepository 是 V1 教学边界；生产版本由 Container 注入抽象接口。
+    """
 
     def __init__(self, repository: SQLiteRepository, workflow: KnowledgeApprovalWorkflow) -> None:
         self._repository = repository
@@ -77,6 +92,8 @@ class QuestionService:
         return approval
 
     async def run_initial(self, question_id: str, request_id: str) -> None:
+        """从持久 Question 构造首次 Workflow State，并执行到完成或等待审批。"""
+
         item = self.get_question(question_id)
         state: WorkflowState = {
             "question_id": question_id,
@@ -87,6 +104,8 @@ class QuestionService:
         await self._run_graph(state, request_id)
 
     async def resume_after_decision(self, approval_id: str, request_id: str) -> None:
+        """从持久审批和问题重建恢复 State，避免把等待中的图常驻内存。"""
+
         approval = self._repository.get_approval(approval_id)
         if approval is None:
             raise KeyError(approval_id)
@@ -101,6 +120,8 @@ class QuestionService:
         await self._run_graph(state, request_id)
 
     async def _run_graph(self, state: WorkflowState, request_id: str) -> None:
+        """消费 Node Patch；成功记录耗时，异常只发布 error 终态并停止执行。"""
+
         started = perf_counter()
         question_id = state["question_id"]
         try:
@@ -149,6 +170,8 @@ class QuestionService:
         state: WorkflowState,
         request_id: str,
     ) -> None:
+        """把 Node 语义翻译为数据库状态和前端可观察的 SSE Event。"""
+
         if node_name == "risk_classifier":
             self._transition(
                 question_id,
@@ -238,6 +261,8 @@ class QuestionService:
         error_code: str | None = None,
         node: str | None = None,
     ) -> None:
+        """持久化状态快照并记录 from/to 状态；不把问题正文写入日志。"""
+
         previous = self.get_question(question_id)["status"]
         self._repository.update_question(
             question_id,
@@ -271,6 +296,8 @@ class QuestionService:
         node: str | None,
         **data: Any,
     ) -> None:
+        """先持久化事件，再写结构化运行日志，供 SSE 按 sequence 读取。"""
+
         event = self._repository.append_event(
             question_id,
             event_type,

@@ -1,3 +1,15 @@
+"""FastAPI 应用入口与 HTTP 横切能力。
+
+文件职责：创建应用、装配依赖、配置 CORS、请求追踪和统一异常响应。
+谁调用它：Uvicorn 导入模块末尾的 ``app``；Backend 测试也可调用 ``create_app``。
+它调用谁：配置容器、API Router、结构化日志以及 Repository 的冲突异常。
+输入：环境配置和 HTTP Request；输出：FastAPI 应用或统一 JSON Response。
+为什么需要这一层：业务 Service 不应重复处理 HTTP、request_id 和异常格式。
+初学者重点：先看 ``create_app``，再沿 ``include_router`` 进入具体 API。
+日本现场面试：可说明这里是 Composition Root 的 Web 入口，统一处理可观测性与错误合同。
+企业级替换：可增加认证、Trace、限流和安全 Header，但业务规则仍留在 Service/Workflow。
+"""
+
 from __future__ import annotations
 
 from contextlib import asynccontextmanager

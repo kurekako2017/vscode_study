@@ -1,6 +1,17 @@
-"""结构化 JSON 日志。
+"""结构化 JSON 运行日志。
 
 日志只接受白名单字段，避免把员工问题或报告正文误写进日志平台。
+
+文件职责：配置 JSON Formatter、维护 request_id 上下文并提供统一 ``log_event``。
+谁调用它：Main、Service 和 SSE Publisher；它调用 Python 标准 logging。
+输入：事件名、级别和允许的结构化字段；输出：单行 JSON 运行日志。
+为什么需要这一层：让请求和业务状态可追踪，同时阻止任意正文进入日志。
+初学者重点：``ContextVar`` 隔离并发请求；``_SAFE_FIELDS`` 是额外字段白名单。
+日本现场面试：可说明运行日志用于诊断，不等同不可篡改的业务 Audit Record。
+企业级替换：接 OpenTelemetry/集中日志平台，并加入 trace_id 与脱敏策略。
+
+固定字段用途：request_id 追踪 HTTP 请求，question_id 追踪业务问题，event 说明发生了
+什么，status 表示当前状态，error_code 用于错误分类，duration_ms 用于性能分析。
 """
 
 from __future__ import annotations

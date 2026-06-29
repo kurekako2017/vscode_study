@@ -1,3 +1,16 @@
+"""Question、Approval、Event 的 SQLite Repository。
+
+文件职责：建表，并以短事务保存问题、审批决定和可恢复 SSE 事件。
+谁调用它：QuestionService、SSE Generator 和依赖容器；它调用 Python sqlite3。
+输入：领域 ID、状态和事件数据；输出：普通 dict/list，或 KeyError/ConflictError。
+为什么需要这一层：把 SQL 和事务边界从 Service/Workflow 隔离出来。
+初学者重点：questions 是当前快照，events 是有序历史；审批更新带 pending 条件防止重复决定。
+日本现场面试：可说明 WAL 支持本地读写并行，BEGIN IMMEDIATE 保证事件序号唯一。
+当前实现：单进程 SQLite 具体类；Service 目前直接依赖它，适合 V1 本地基线。
+企业级替换：抽取 Repository Interface/Unit of Work，并在 Container 绑定 PostgreSQL + Alembic；
+同时增加审批版本、幂等键、不可覆盖 Audit Store 和多实例事务策略。
+"""
+
 from __future__ import annotations
 
 import json
@@ -20,6 +33,9 @@ class SQLiteRepository:
 
     每个方法打开短连接，便于初学者看到明确事务边界；WAL 允许 SSE 读取和
     Workflow 写入并行。生产多实例需迁移 PostgreSQL，不共享 SQLite 文件。
+
+    输入是已由 API/Service 校验的领域字段，输出使用 dict 保持教学代码直观；这里不做
+    风险分类或 Workflow 路由，因为 Repository 只负责持久化。
     """
 
     def __init__(self, database_path: Path) -> None:

@@ -1,3 +1,14 @@
+"""人工审批 HTTP 接口。
+
+文件职责：查询待审批项，并接收 Approve/Reject 操作。
+谁调用它：React API Client；它通过 FastAPI Depends 调用 ``ApprovalService``。
+输入：question_id 和审批动作；输出：统一包装的 ``ApprovalResponse``。
+为什么需要这一层：Route 只做 HTTP 转换，审批有效性与 Workflow 恢复交给 Service。
+初学者重点：观察 URL 中使用 question_id，而 Service 再定位 approval_id。
+日本现场面试：可说明高风险操作由显式 Endpoint 进入并保留 409 冲突语义。
+企业级替换：增加登录用户、RBAC、审批意见和幂等键，不能绕过 Service 直接写表。
+"""
+
 from typing import Any
 
 from fastapi import APIRouter, Depends

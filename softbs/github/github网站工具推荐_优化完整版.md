@@ -1,6 +1,6 @@
 # GitHub 网站工具与热门项目学习地图
 
-> 合并整理自 `github网站工具推荐.md` 与 `GitHub_AI_Tools_Comprehensive_Material.md`，目标是把零散收藏整理成一份可直接检索、可直接学习、可直接复用的 GitHub 工具地图。
+> 合并整理自 `github网站工具推荐.md`、`GitHub_AI_Tools_Comprehensive_Material.md` 与 `GitHub_AI_工具收藏库_v2.0.md`，目标是把零散收藏整理成一份可直接检索、可直接学习、可直接复用的 GitHub 工具地图。
 >
 > 使用建议：
 > - 先看“快速选型表”，按目标找工具。
@@ -19,6 +19,9 @@
 | 网页抓取与自动化 | Scrapling、browser-use、Public APIs | 爬虫、浏览器自动化、数据源整理 |
 | 开源 UI 组件与界面灵感 | Galaxy、Figma、GitHub Pages、Vercel、Netlify | 组件复用、页面布局、设计系统、作品集展示 |
 | 模型部署 | Triton Inference Server、NGC、NeMo | 模型服务、GPU 推理、容器化部署 |
+| 本地与分布式 LLM | llama.cpp、Exo | 量化推理、跨设备并行、本地私有化 |
+| 工作流自动化 | n8n-workflows、Paperclip | 低代码流程复用、Agent 任务调度与治理 |
+| Agent 记忆与代码理解 | Cognee、codebase-memory-mcp、GitNexus | 知识图谱、语义检索、代码关系分析 |
 | 前端和作品集 | GitHub Pages、Vercel、Netlify、Figma | 静态站点、Next.js 部署、UI 原型 |
 | DevOps | GitHub Actions、Docker、Kubernetes 示例项目 | CI/CD、镜像构建、部署、日志监控 |
 | 资源检索 | awesome、Awesome-AI、awesome-chinese-ai-agents | 用索引型仓库快速找到更多项目 |
@@ -47,6 +50,7 @@
 | Zeroclaw | https://github.com/zeroclaw-labs/zeroclaw | 本地 AI 助手基础设施 | 本地助手、工具接入、跨平台运行 |
 | Agentic Design Patterns 中文翻译 | https://github.com/xindoo/Agentic-Design-Patterns-CN | 智能体设计模式中文百科指南 | 路由、规划、协作、记忆管理、知识检索 |
 | oh-my-pi | https://github.com/can1357/oh-my-pi | 面向终端的 AI 编码与跨语言补全工具 | LSP 集成、深度浏览、子代理控制 |
+| Paperclip | https://github.com/paperclipai/paperclip | 开源的多 Agent 工作管理与编排平台 | Agent 组织架构、任务调度、预算管理、审批与回滚 |
 
 ### 学习时重点看这些层
 
@@ -83,6 +87,7 @@
 | Open-Lovable | https://github.com/firecrawl/open-lovable | AI 应用生成和辅助开发相关项目 | 从需求到界面的 AI 开发流程 |
 | Awesome LLM Apps | https://github.com/theunwindai/awesome-llm-apps | AI 应用落地实战案例与教程合集 | LLM、RAG、AI Agents、Voice Agents 实战 |
 | ai-engineering-from-scratch | https://github.com/rohitg00/ai-engineering-from-scratch | 从零构建 AI 工程项目的实战指南 | 从底层原理到企业级 AI 应用交付 |
+| AI Website Cloner Template | https://github.com/JCodesMore/ai-website-cloner-template | 用 AI 编码 Agent 将网页反向整理为 Next.js 代码库的模板 | 网页结构分析、Design Token 提取、组件化、视觉差异验证 |
 
 ### 代码学习心得
 
@@ -102,7 +107,8 @@
 | Toonflow | https://github.com/tooflow-ai/toonflow | AI 漫剧与短剧自动化制作工具 | 分镜、渲染、合成一体化 | Node.js、Electron、Docker、自动化短剧制作 |
 | html-video | https://github.com/nesa-io/html-video | 基于 HTML 渲染的视频生成引擎 | 让 HTML 变成视频，支持模板和多 Agent 后端 | 模板化视频、渲染引擎、自动化生成 |
 | AI Video Translator | https://github.com/video-parallel-translator/video-translator | 智能视频搬运翻译工具 | 下载、转写、翻译、声音克隆、音轨替换 | 视频出海、跨语种处理、音视频链路 |
-| NVIDIA NeMo | https://github.com/NVIDIA/NeMo | NVIDIA AI 模型训练与推理工具包 | 语音、NLP、LLM 相关模型训练和推理 | ASR、TTS、模型微调、深度学习工程结构 |
+| OpenMontage | https://github.com/calesthio/OpenMontage | 开源的 Agentic 视频制作系统 | 把调研、脚本、素材、剪辑和合成组织成可复用流水线 | Agent 技能编排、视频生产管线、Remotion、人工审批节点 |
+| Voicebox | https://github.com/jamiepine/voicebox | 开源本地 AI 语音工作室 | 语音克隆、听写、语音合成并通过 MCP 接入 Agent | TTS、Whisper、FastAPI、Tauri、MCP 语音工具 |
 | NVIDIA Riva | https://developer.nvidia.com/riva | NVIDIA 语音和语言 AI 服务平台 | 把 ASR、TTS、NLP 部署成实时服务 | 语音服务化、GPU 推理、生产级部署 |
 
 ### Voice-Pro 学习定位
@@ -124,7 +130,6 @@
 | 工具 / 项目 | 链接 | 是什么 | 适合学习 |
 | --- | --- | --- | --- |
 | Scrapling | https://github.com/D4Vinci/Scrapling | 自适应 Web 抓取框架 | 爬虫、反爬适配、HTML 解析、批量采集 |
-| browser-use | https://github.com/browser-use/browser-use | AI 浏览器自动化工具 | 自动访问网页、点击、读取页面、执行任务 |
 | Public APIs | https://github.com/public-apis/public-apis | 公共 API 目录 | 找数据源、练习 API 调用、做 Demo 项目 |
 
 ### 学习重点
@@ -135,13 +140,15 @@
 - Storage 层：怎么保存 CSV、JSON、数据库数据。
 - Browser 层：动态网页需要浏览器自动化工具参与。
 
-## 7. 模型部署、GPU 与平台工具
+## 7. 本地模型、分布式推理、GPU 与平台工具
 
 | 工具 / 平台 | 链接 | 是什么 | 适合学习 |
 | --- | --- | --- | --- |
 | Triton Inference Server | https://github.com/triton-inference-server/server | NVIDIA 高性能模型推理服务器 | 模型服务、HTTP/gRPC 推理、多模型部署、GPU 批处理 |
 | NGC Catalog | https://catalog.ngc.nvidia.com/ | NVIDIA 模型、容器、镜像目录 | 查找官方优化容器和预训练模型 |
 | NeMo | https://github.com/NVIDIA/NeMo | 模型训练与推理工具包 | 从训练、微调到部署的工程流程 |
+| llama.cpp | https://github.com/ggml-org/llama.cpp | 使用 C/C++ 在多种硬件上运行 LLM 的高性能推理引擎 | GGUF、模型量化、CPU/GPU 混合推理、本地 API 服务 |
+| Exo | https://github.com/exo-explore/exo | 将多台本地设备组成 AI 推理集群 | 设备自动发现、模型分片、张量并行、MLX 分布式推理 |
 
 ### 学习重点
 
@@ -163,6 +170,14 @@
 | Warp | https://www.warp.dev/ | 现代终端工具 | 命令管理、终端工作流、AI 辅助命令 |
 | GitNexus | https://github.com/abhigyanpatwari/GitNexus | 项目知识图谱工具 | 理解代码仓库结构、项目关系和知识管理 |
 | CodeGraph | https://github.com/colbymchenry/codegraph | 本地预索引代码知识图谱工具 | 代码结构索引、符号关系、调用链分析、AI 编程工具集成 |
+| Penpot | https://github.com/penpot/penpot | 支持自托管的开源 UI/UX 设计与原型协作平台 | SVG/CSS 开放标准、Design Token、设计与代码协作、MCP |
+
+### 8.1 代码理解与 Agent 记忆
+
+| 工具 / 项目 | 链接 | 是什么 | 适合学习 |
+| --- | --- | --- | --- |
+| codebase-memory-mcp | https://github.com/DeusData/codebase-memory-mcp | 为 AI 编程助手建立持久化代码图谱的 MCP 服务 | 仓库索引、符号与调用关系、跨仓库分析、MCP 工具设计 |
+| Cognee | https://github.com/topoteretes/cognee | 融合向量检索与知识图谱的 Agent 记忆控制层 | 多源数据摄取、GraphRAG、跨 Agent 知识共享、持久记忆 |
 
 ### 建议用法
 
@@ -202,6 +217,7 @@
 | AutoHedge | https://github.com/autohedge/AutoHedge | 自主对冲基金系统 | 群体智能、自动化执行 |
 | TradingGym | https://github.com/tradinggym/TradingGym | 交易 Agent 强化学习与回测沙盒 | RL 微调、仿真环境、策略验证 |
 | AI-Hedge-Fund | https://github.com/virattt/ai-hedge-fund | AI 投资管理与 ML 策略系统 | 机器学习分析市场数据、风险预测、投资策略制定 |
+| daily_stock_analysis | https://github.com/ZhuLinsen/daily_stock_analysis | 基于 LLM 的 A 股、港股与美股定时分析和推送系统 | 多行情数据源、技术面与舆情分析、GitHub Actions 定时任务、Docker |
 
 ### 注意
 
@@ -215,7 +231,6 @@
 | FreeLLMAPI | https://github.com/tashfeenahmed/freellmapi | 免费顶级大模型 Token 聚合工具 | API 路由、免费额度整合、本地开发测试 |
 | ECC | https://github.com/affaan-m/ECC | 面向 Claude Code、Codex、OpenCode、Cursor 的性能优化底座 | Agent 性能优化、运行时加速 |
 | taste-skill | https://github.com/Leonxlnx/taste-skill | 提升 AI 审美、减少机械感的 Prompt 质量库 | 文案、代码注释、技术表达优化 |
-| markitdown | https://github.com/microsoft/markitdown | 微软官方文档转 Markdown 工具 | Office 文档、PDF、图像到 Markdown |
 | Anthropic-Cybersecurity-Skills | https://github.com/mukul975/Anthropic-Cybersecurity-Skills | 为 AI Agent 构建的结构化网络安全技能库 | 安全护栏、网络安全技能 |
 | stop-slop | https://github.com/hardikpandya/stop-slop | 自动去除 AI 味的 NLP 净化插件 | 让输出更自然、更像真人 |
 | headroom | https://github.com/headroom-project/headroom | 长文本上下文与 Token 压缩框架 | 长上下文剪裁、Token 控制 |
@@ -223,6 +238,7 @@
 | Agent-Monitor-SDK | 待补充 | 防止 Agent 线上跑偏的监控守卫 | 幻觉拦截、输出质量监控 |
 | Awesome-Vibe-Coding-Tools | 待补充 | AI 时代原生设计的全栈快速交付模版 | 一句话出成品、独立开发脚手架 |
 | English-level-up-tips | https://github.com/byoungd/English-level-up-tips | 英语进阶指南（含 AI 辅助章节） | 语言习得、提示词框架 |
+| n8n-workflows | https://github.com/Zie619/n8n-workflows | 分类收录可导入 n8n 的自动化工作流并提供搜索界面 | 低代码自动化、多服务集成、工作流 JSON、流程可视化 |
 
 ## 12. 其他工具与待确认条目
 
