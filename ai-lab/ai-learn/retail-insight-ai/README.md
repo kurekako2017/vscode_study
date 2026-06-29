@@ -1,5 +1,16 @@
 # Retail Insight AI
 
+## 明天先做什么
+
+1. 运行 `check_env`
+2. 启动 Backend
+3. 启动 Frontend
+4. 创建一个任务
+5. 观察日志
+6. 打开 [CODE_STUDY_GUIDE.md](./CODE_STUDY_GUIDE.md) 按顺序读代码
+
+最小运行验证见 [VERIFY_CHECKLIST.md](./VERIFY_CHECKLIST.md)。
+
 ## 快速启动
 
 在 VS Code 的 WSL Ubuntu 终端中进入 `retail-insight-ai`，执行：
