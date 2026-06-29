@@ -23,3 +23,24 @@ node_modules/
 
 # Local-only ATBIO site copy
 web-projects/docs/atbio/atmbio.com/
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+
+credentials.json
+secrets.json
+
+apikey*
+token*
+secret*
+
+# Local Only
+private/
+local-only/
+
+# Workspace Rules
+不上传GitHub文件清单.md
