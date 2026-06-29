@@ -31,4 +31,9 @@
 ### 2026-06-29
 
 - 初始化 Backlog
+### 2026-06-29 Governance V2
+
+- [x] 升级到 AI-LAB Project Governance V2
+- [x] 建立 Roadmap、Architecture 和 ADR 文档
+- [ ] 根据真实代码和项目状态细化 Roadmap 与 Architecture
 

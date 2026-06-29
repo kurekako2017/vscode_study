@@ -343,3 +343,35 @@ docs/
 必须采用追加或保留历史的更新方式。
 
 保留项目历史。
+
+# AI-LAB Project Governance V2
+
+AI-LAB 下所有正式项目统一采用 V2 结构：
+
+```text
+project/
+├── AGENTS.md
+├── README.md
+├── TASK.md
+├── ROADMAP.md
+└── docs/
+    ├── PROJECT_BACKLOG.md
+    ├── CHANGELOG.md
+    ├── ARCHITECTURE.md
+    └── DECISIONS.md
+```
+
+其中：
+
+- `ROADMAP.md` 记录当前阶段、下一阶段和长期规划。
+- `docs/ARCHITECTURE.md` 记录技术架构、系统架构、Agent、RAG 和 MCP 流程。
+- `docs/DECISIONS.md` 保存 ADR，记录决策、原因、备选方案和影响。
+
+开发前必须依次读取：
+
+1. 当前项目的 `AGENTS.md`
+2. 当前项目的 `ROADMAP.md`
+3. 当前项目的 `docs/PROJECT_BACKLOG.md`
+4. 当前项目的 `TASK.md`
+
+开发结束后必须同步更新 TASK、Backlog 和 CHANGELOG；发生架构变化或重要技术决策时，还必须更新 ARCHITECTURE 和 DECISIONS。

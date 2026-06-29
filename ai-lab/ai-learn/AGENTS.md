@@ -30,7 +30,6 @@ ai-learn/
     ├── mcp-teacher/
     └── rag-teacher/
 ```
-
 Codex 在回答、修改代码、补全文档、生成 README、解释示例、设计项目结构时，必须根据任务主题自动参考对应 Teacher Skill，不需要用户每次手动输入“使用某某 teacher”。
 
 ---
@@ -538,3 +537,20 @@ RAG / 文档问答 / 社内知识库项目必须解释：
 测试结果:
 学习文档是否同步:
 ```
+
+# AI-LAB Project Governance V2
+
+本项目继承 AI-LAB V2 全局治理规则。
+
+开发前必须阅读：
+
+1. `AGENTS.md`
+2. `ROADMAP.md`
+3. `docs/PROJECT_BACKLOG.md`
+4. `TASK.md`
+
+开发前还必须确认当前阶段、最高优先级任务、技术债和已知问题。
+
+架构变化必须更新 `docs/ARCHITECTURE.md`；重要决策必须追加到 `docs/DECISIONS.md`。
+
+开发完成后必须更新 `TASK.md`、`docs/PROJECT_BACKLOG.md` 和 `docs/CHANGELOG.md`，并保留全部历史记录。

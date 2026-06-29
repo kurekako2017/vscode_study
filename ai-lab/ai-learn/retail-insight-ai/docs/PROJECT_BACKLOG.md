@@ -170,3 +170,8 @@ Open
 - 建立永久任务清单机制
 - 在 AGENTS.md 追加中文“项目永久任务清单规则”，统一所有 AI 开发工具的开工与完工流程
 - 建立 AI-LAB 全局规则、项目规则、Backlog、TASK 和 CHANGELOG 两层治理链路
+### 2026-06-29 Governance V2
+
+- [x] 升级到 AI-LAB Project Governance V2
+- [x] 建立 Roadmap、Architecture 和 ADR 文档
+- [ ] 根据真实代码和项目状态细化 Roadmap 与 Architecture

@@ -25,3 +25,10 @@ Phase 2: Internal Knowledge Approval Agent
 ## 下一步建议
 
 优先完成 Epic 1 项目结构、Docker 环境、.gitignore 检查，再进入 Document Upload 流程确认。
+## Governance V2 升级记录
+
+- [x] 创建 `ROADMAP.md`
+- [x] 创建 `docs/ARCHITECTURE.md`
+- [x] 创建 `docs/DECISIONS.md`
+- [x] 更新项目 `AGENTS.md` 的开发前读取顺序
+- [ ] 根据项目实际状态完善 Roadmap 与 Architecture
