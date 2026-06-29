@@ -1,18 +1,31 @@
 # GitHub 文档导航
 
-本目录整理 GitHub、Codespaces、GitHub Pages、学生版 DevOps 相关资料。
+本目录整理 GitHub、AI 工具、Codespaces、GitHub Pages 和学生版 DevOps 相关资料。根目录只保留总导航、结构优化方案和迁移执行报告；知识内容统一从 01–07 分类入口进入。
 
-推荐阅读：
+## 分类入口
 
-- [GitHub 网站工具与热门项目学习地图.md](github网站工具推荐.md)
-- [AI Agent & 大模型开源项目学习参考资料github.md](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md)
-- [AI编码白嫖与节流方案.md](AI编码白嫖与节流方案.md)（本地 Ollama / OpenRouter 桥接 / 免费插件选型）
-- [Windows_Git_Bash_开发实战教程_Java_Python_LLM.md](Windows_Git_Bash_开发实战教程_Java_Python_LLM.md)
-- [GitHub学生版学习与DevOps实践教程.md](GitHub学生版学习与DevOps实践教程.md)
-- [GitHub学生版14天DevOps学习打卡计划.md](GitHub学生版14天DevOps学习打卡计划.md)
-- [Codespaces学习要点.md](Codespaces学习要点.md)
+1. [01 学习路线](./01_学习路线/README.md)
+2. [02 工具知识库](./02_工具知识库/README.md)
+3. [03 工具实战](./03_工具实战/README.md)
+4. [04 AI-Learn 集成](./04_AI-Learn集成/README.md)
+5. [05 学习进度](./05_学习进度/README.md)
+6. [06 决策记录](./06_决策记录/README.md)
+7. [07 项目案例](./07_项目案例/README.md)
 
-其余文档：
+## 核心入口
 
-- `github_pages_website_tutorial.md`
-- `vscode_github_tutorial.md`
+- [GitHub 网站工具与热门项目学习地图](./02_工具知识库/github网站工具推荐_优化完整版.md)
+- [GitHub AI 工具学习体系](./02_工具知识库/GitHub_AI_工具学习体系.md)
+- [Codex 可实践工具筛选报告](./02_工具知识库/Codex可实践工具筛选报告.md)
+- [AI-Learn 集成路线图](./04_AI-Learn集成/AI-Learn集成路线图.md)
+- [学习进度与状态看板](./05_学习进度/README.md)
+- [AI 工具决策记录](./06_决策记录/AI工具决策记录.md)
+
+## 治理与迁移记录
+
+- [GitHub 目录结构优化方案](./github目录结构优化方案.md)
+- [迁移执行报告](./迁移执行报告.md)
+
+## 兼容入口
+
+旧的 `学习路线图/`、`学习进度/` 和 `工具实战/` 目录暂时保留，用于兼容既有链接。其中五个工具实战目录按用户要求保持原位，并通过 [工具实战导航](./03_工具实战/工具实战导航.md)统一访问。

@@ -291,6 +291,6 @@ jobs:
 
 ## 11. 执行版打卡计划（14 天）
 
-- 入口文档：`softbs/github/GitHub学生版14天DevOps学习打卡计划.md`
+- 入口文档：`softbs/github/01_学习路线/GitHub学生版14天DevOps学习打卡计划.md`
 - 建议每天投入：30~60 分钟
 - 建议执行方式：每天一个最小可交付（Issue/PR/页面更新/工作流通过）

@@ -3,12 +3,12 @@
 本文档说明如何使用 GitHub Actions 自动将本仓库中的 `student-pages-demo` 示例发布到 GitHub Pages。
 
 ## 概要
-- 目标：把 `softbs/github/student-pages-demo` 下的静态文件发布到 `gh-pages` 分支，并通过 GitHub Pages 提供站点访问。
+- 目标：把 `softbs/github/07_项目案例/student-pages-demo` 下的静态文件发布到 `gh-pages` 分支，并通过 GitHub Pages 提供站点访问。
 - 优点：自动化部署、可回滚、与 CI 集成。
 
 ## 先决条件
 - 仓库已推送到 GitHub，并且你对仓库有写权限。
-- 示例目录：`softbs/github/student-pages-demo`（包含 `index.html`、`styles.css` 等）。
+- 示例目录：`softbs/github/07_项目案例/student-pages-demo`（包含 `index.html`、`styles.css` 等）。
 
 ## 操作流程概览
 1. 在仓库中添加一个 GitHub Actions workflow 文件：`.github/workflows/deploy-student-pages.yml`。
@@ -37,7 +37,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./softbs/github/student-pages-demo
+          publish_dir: ./softbs/github/07_项目案例/student-pages-demo
           publish_branch: gh-pages
 ```
 
@@ -55,7 +55,7 @@ jobs:
 在本地预览静态页面：
 
 ```bash
-cd softbs/github/student-pages-demo
+cd softbs/github/07_项目案例/student-pages-demo
 python -m http.server 8000
 # 然后访问 http://localhost:8000
 ```

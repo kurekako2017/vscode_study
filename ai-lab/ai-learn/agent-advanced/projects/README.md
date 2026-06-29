@@ -156,3 +156,61 @@
 ## 依赖总表
 
 - [项目依赖总表](./DEPENDENCIES.md) - 按 demo 统一整理第三方依赖和安装方式
+
+## 结构整理补充
+
+### 1. 目录作用
+
+`projects/` 保存自包含、可运行、可验证的 demo 和完整项目。框架理论、横切专题和企业能力说明由上级专题目录维护，本 README 负责把项目反向关联到那些学习入口。
+
+### 2. 适合学习内容
+
+- 从最小 Chain、Workflow、Index 和向量检索开始运行代码。
+- 学习完整 RAG、Multi-Agent 和企业知识库流程。
+- 比较教学 mock、真实框架依赖、真实向量后端和完整业务项目。
+- 练习运行、测试、评估、前端和部署的完整闭环。
+
+### 3. 子目录与主题归属
+
+| 项目目录 | 主要归属 | 学习文档入口 | 类型与边界 |
+| --- | --- | --- | --- |
+| [langchain_chain_demo](./langchain_chain_demo/README.md) | LangChain | [LangChain](../frameworks/langchain/README.md) | 真实 LangChain 基础 demo，支持 mock 模型 |
+| [langgraph_workflow_demo](./langgraph_workflow_demo/README.md) | LangGraph | [LangGraph](../frameworks/langgraph/README.md) | 真实 StateGraph 基础 demo |
+| [llamaindex_index_demo](./llamaindex_index_demo/README.md) | LlamaIndex | [LlamaIndex](../frameworks/llamaindex/README.md) | 概念教学版，未直接导入真实 SDK |
+| [advanced_rag_pipeline_demo](./advanced_rag_pipeline_demo/README.md) | RAG + LangChain | [RAG](../rag/README.md)、[LangChain](../frameworks/langchain/README.md) | 使用 LangChain 文档与切分组件 |
+| [internal_hybrid_rag_demo](./internal_hybrid_rag_demo/README.md) | 企业 RAG | [RAG](../rag/README.md) | 多来源、ACL、引用的本地教学实现 |
+| [multi_agent_team_demo](./multi_agent_team_demo/README.md) | Multi-Agent | [Multi-Agent](../multi-agent/README.md) | 轻量角色协作概念版 |
+| [vector_db_demo](./vector_db_demo/README.md) | 向量检索 | [RAG](../rag/README.md) | 不依赖外部服务的原理版 |
+| [vector_db_qdrant_demo](./vector_db_qdrant_demo/README.md) | 向量检索 | [RAG](../rag/README.md) | Qdrant 接入骨架 |
+| [vector_db_chroma_demo](./vector_db_chroma_demo/README.md) | 向量检索 | [RAG](../rag/README.md) | Chroma 接入骨架 |
+| [japan_retail_analysis_agent](./japan_retail_analysis_agent/README.md) | 企业级综合项目 | [LangGraph](../frameworks/langgraph/README.md)、[Observability](../observability/README.md)、[Deployment](../deployment/README.md) | API、前端、状态、报告、测试和运行数据齐全 |
+
+### 4. 推荐学习顺序
+
+继续使用前文“最快上手 → 想做项目 → 接真实服务”的路线。第一次学习时推荐：
+
+1. `langchain_chain_demo`
+2. `vector_db_demo`
+3. `langgraph_workflow_demo`
+4. `advanced_rag_pipeline_demo`
+5. `internal_hybrid_rag_demo`
+6. `multi_agent_team_demo`
+7. `japan_retail_analysis_agent`
+
+### 5. 相关实战与专题入口
+
+- [Agent Advanced 总索引](../INDEX.md)
+- [Frameworks](../frameworks/README.md)
+- [RAG](../rag/README.md)
+- [MCP](../mcp/README.md)
+- [Multi-Agent](../multi-agent/README.md)
+- [Evaluation](../eval/README.md)
+- [Observability](../observability/README.md)
+- [Deployment](../deployment/README.md)
+
+### 6. 注意事项
+
+- 不要把项目移动进 `frameworks/`；项目的 assets、requirements、Docker、测试和命令依赖当前路径。
+- `node_modules`、`__pycache__`、`dist`、SQLite runtime 不属于学习入口，不加入索引。
+- “概念教学版”和“真实 SDK/服务接入”必须在 README 中明确区分。
+- 新增项目时先写归属主题、前置知识、运行方式和验证方式，再更新本表与对应关联页。

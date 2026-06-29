@@ -1,6 +1,6 @@
 # AI 编码白嫖与节流方案（整理版）
 
-> 整理自：社区开源桥接方案、 [GitHub 网站工具与热门项目学习地图](github网站工具推荐.md)、[AI Agent & 大模型开源项目学习参考资料](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md)，并结合本仓库已有 WSL / Ollama 实战文档。  
+> 整理自：社区开源桥接方案、[GitHub 网站工具与热门项目学习地图](../02_工具知识库/github网站工具推荐_优化完整版.md)、[GitHub AI 工具学习体系](../02_工具知识库/GitHub_AI_工具学习体系.md)，并结合本仓库已有 WSL / Ollama 实战文档。
 > **目标**：不花钱或尽量少花钱，也能练习 **大模型上下文管理、Prompt 工程、Agent 式改码流程**。
 
 ---
@@ -89,7 +89,7 @@ Continue 配置 `~/.continue/config.yaml` 指向 `http://localhost:11434`。
 
 **详细教程**（含 Prompt 模板、快捷键）：
 
-- [../vscode/WSL_Continue_Ollama_安装使用教程.md](../vscode/WSL_Continue_Ollama_安装使用教程.md)
+- [../../vscode/WSL_Continue_Ollama_安装使用教程.md](../../vscode/WSL_Continue_Ollama_安装使用教程.md)
 
 **优点**：最稳定、最省钱、最适合本地模型、数据不出机器。  
 **缺点**：3B 模型能力有限；CPU 推理比云端慢；复杂 Agent 不如大模型。
@@ -145,7 +145,7 @@ Continue 配置 `~/.continue/config.yaml` 指向 `http://localhost:11434`。
 | 费用 | 软件 0 元；自托管则只花机器成本 |
 | 适合 | 想理解 Agent 架构、私有化部署 |
 
-见 [github网站工具推荐.md](github网站工具推荐.md) 第 2 节。
+见 [GitHub 网站工具与热门项目学习地图](../02_工具知识库/github网站工具推荐_优化完整版.md)第 2 节。
 
 ---
 
@@ -246,7 +246,7 @@ claude
 
 | 工具 | 说明 |
 | --- | --- |
-| **OpenClaw / Molili** | 通用 Agent 框架，可接本地或国内模型，见 [github网站工具推荐.md](github网站工具推荐.md) |
+| **OpenClaw / Molili** | 通用 Agent 框架，可接本地或国内模型，见 [GitHub 工具学习地图](../02_工具知识库/github网站工具推荐_优化完整版.md) |
 | **Claude-CLI 非官方** | https://github.com/kiliczsh/claude-cmd ，终端调用 Claude 的第三方工具 |
 | **gpt-codex** | https://github.com/xianyu110/gpt-codex ，编码辅助与脚本自动化参考 |
 
@@ -333,7 +333,7 @@ claude
 | **headroom** | https://github.com/headroom-project/headroom | 长上下文压缩，省 Token |
 | **ECC** | https://github.com/affaan-m/ECC | Agent 性能优化（Claude Code / Codex / Cursor 等） |
 
-来自 [github网站工具推荐.md](github网站工具推荐.md) 第 11 节、[AI Agent 学习参考资料](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md) 第 3 节。
+来自 [GitHub 工具学习地图](../02_工具知识库/github网站工具推荐_优化完整版.md)第 11 节、[GitHub AI 工具学习体系](../02_工具知识库/GitHub_AI_工具学习体系.md)第 3 节。
 
 **节流用法**：
 
@@ -361,7 +361,7 @@ claude
 
 ### 7.2 与 90 天 Agent 学习路线配合
 
-见 [AI Agent 学习参考资料](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md)：
+见 [GitHub AI 工具学习体系](../02_工具知识库/GitHub_AI_工具学习体系.md)：
 
 - **DAY 7 Prompt** → 用 Continue 练固定 Prompt 模板（见 WSL Continue 教程 7.9 节）  
 - **DAY 24 Agent 架构** → 用 Roo Code / Cline / Claude Code 观察 Planner + Tool  
@@ -386,7 +386,7 @@ VS Code Remote - WSL
 
 WSL `.wslconfig` 建议 `memory=20GB`。教程：
 
-- [../vscode/WSL_Continue_Ollama_安装使用教程.md](../vscode/WSL_Continue_Ollama_安装使用教程.md)
+- [../../vscode/WSL_Continue_Ollama_安装使用教程.md](../../vscode/WSL_Continue_Ollama_安装使用教程.md)
 
 ### 8.2 需要更强模型时（仍尽量不花钱）
 
@@ -418,7 +418,7 @@ WSL `.wslconfig` 建议 `memory=20GB`。教程：
 | AI-Coding-Guide-Zh | https://github.com/KimYx0207/AI-Coding-Guide-Zh | 中文编码工作流 |
 | Hello-Agents | https://github.com/datawhalechina/hello-agents | 系统学 Agent |
 
-完整清单见 [github网站工具推荐.md](github网站工具推荐.md) 第 2、4 节。
+完整清单见 [GitHub 工具学习地图](../02_工具知识库/github网站工具推荐_优化完整版.md)第 2、4 节。
 
 ### 9.2 学生 / GitHub 相关节流
 
@@ -437,7 +437,7 @@ WSL `.wslconfig` 建议 `memory=20GB`。教程：
 | Planning with Files | 用 Markdown 当 Agent 长期记忆 |
 | Context Engineering Skills | 控制 Token、防失忆 |
 
-见 [AI Agent 学习参考资料](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md) 第 5 节 Codex Skills。
+见 [GitHub AI 工具学习体系](../02_工具知识库/GitHub_AI_工具学习体系.md)及工具学习地图中的 Codex Skills 章节。
 
 ---
 
@@ -462,12 +462,12 @@ WSL `.wslconfig` 建议 `memory=20GB`。教程：
 
 | 文档 | 路径 |
 | --- | --- |
-| **Continue + Ollama 实操（UM890）** | [../vscode/WSL_Continue_Ollama_安装使用教程.md](../vscode/WSL_Continue_Ollama_安装使用教程.md) |
+| **Continue + Ollama 实操（UM890）** | [../../vscode/WSL_Continue_Ollama_安装使用教程.md](../../vscode/WSL_Continue_Ollama_安装使用教程.md) |
 | Aider + Ollama | `softbs/aider/` 目录 |
 | AI 编程插件对比 | `softbs/aider/ai编程插件.md` |
-| GitHub 工具地图 | [github网站工具推荐.md](github网站工具推荐.md) |
-| Agent 学习路线 | [AI Agent & 大模型开源项目学习参考资料github.md](AI%20Agent%20%26%20大模型开源项目学习参考资料github.md) |
-| WSL 开发入门 | [../vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md](../vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md) |
+| GitHub 工具地图 | [github网站工具推荐_优化完整版.md](../02_工具知识库/github网站工具推荐_优化完整版.md) |
+| Agent 学习路线 | [GitHub_AI_工具学习体系.md](../02_工具知识库/GitHub_AI_工具学习体系.md) |
+| WSL 开发入门 | [../../vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md](../../vscode/Win11_WSL_VSCode_Java_Python_快速开发指南.md) |
 
 ---
 
@@ -477,7 +477,7 @@ WSL `.wslconfig` 建议 `memory=20GB`。教程：
 
 1. WSL 安装 Ollama → `ollama pull qwen2.5-coder:3b`  
 2. VS Code WSL 安装 **Continue**  
-3. 配置 `~/.continue/config.yaml` → 按 [WSL Continue 教程](../vscode/WSL_Continue_Ollama_安装使用教程.md)  
+3. 配置 `~/.continue/config.yaml` → 按 [WSL Continue 教程](../../vscode/WSL_Continue_Ollama_安装使用教程.md)  
 4. 选中代码 → `Ctrl+L` → 用「只返回最终代码」Prompt 模板  
 
 **路径 B（云端免费 Agent）：**
