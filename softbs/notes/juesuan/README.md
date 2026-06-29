@@ -76,7 +76,7 @@
 | --- | --- |
 | 法人税・消费税 | [別表一](docs/examples/tax/別表一_实例.md)・[別表四](docs/examples/tax/別表四_实例.md)・[別表五（一）](docs/examples/tax/別表五一_实例.md)・[別表五（二）](docs/examples/tax/別表五二_实例.md)・[消費税申告](docs/examples/tax/消費税申告_实例.md) |
 | 社会保险・工资税务 | [算定基礎届](docs/examples/social/算定基礎届_实例.md)・[年末調整](docs/examples/social/年末調整_实例.md)・[住民税](docs/examples/social/住民税_实例.md)・[源泉所得税](docs/examples/social/源泉所得税_实例.md) |
-| freee Mock 占位 | [役員借入金](docs/examples/freee/役員借入金_实例.md)・[未払消費税](docs/examples/freee/未払消費税_实例.md)・[給与処理](docs/examples/freee/給与処理_实例.md) |
+| freee 实务案例 | [役員借入金](docs/examples/freee/役員借入金_实例.md)・[未払消費税](docs/examples/freee/未払消費税_实例.md)・[給与処理](docs/examples/freee/給与処理_实例.md) |
 
 ## 企业级知识库目录树
 
@@ -126,7 +126,7 @@ juesuan/
 - `docs/social/`：社会保险及工资年度手续。
 - `docs/checklist/`：可以直接执行的月次、年次清单。
 - `docs/glossary/`：勘定科目与仕訳查询入口。
-- `docs/examples/`：使用虚构数据说明填写步骤和表间联动；不能直接提交。
+- `docs/examples/`：使用统一的一人法人案例数据说明填写步骤和表间联动；正式提交前必须替换为实际账簿数据。
 - `docs/screenshots/`：只保存完成脱敏的操作截图。
 - `archive/`：保留不再作为主入口的历史资料。
 - `updates/`：记录知识库结构和内容变更。
@@ -168,6 +168,6 @@ juesuan/
 - 将历史总稿拆分为 9 份专题手册。
 - 增加手册导航、历史资料入口和推荐使用顺序。
 - 第二阶段建立 `docs/` 企业级分类结构并修复相对链接。
-- 新增 `docs/examples/` 与 9 份 Mock 实例导航。
+- 新增 `docs/examples/` 与 9 份初始实例导航。
 - 第三阶段新增截图分区、archive、CHANGELOG、examples分类和三类术语库。
 - 将 `docs/freee/freee主手册.md` 扩充为完整实战版，加入 13 类核心操作流程、日中双语说明、验证标准和官方画面参考。

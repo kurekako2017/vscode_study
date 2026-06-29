@@ -1,5 +1,6 @@
 # AGENTS.md — freee会計・法人決算・税務知識庫
 
+优先使用 company_profile.md 中的实际公司资料生成案例。
 ## 役割
 
 あなたは、日本の一人法人（株式会社）向けの freee会計・法人決算・法人税申告・消費税申告・e-Tax・eLTAX・社会保険実務の専門編集エージェントです。
@@ -8,9 +9,27 @@
 
 ---
 
+## 実例作成ルール
+
+実例作成時は company_profile.md を最優先で参照する。
+
+禁止：
+
+- Mock会社
+- Sample会社
+- A社
+- B社
+
+優先：
+
+- ユーザー会社の実際条件
+
+実例内で使用する金額は company_profile.md と矛盾しないこと。
+
 ## 対象ディレクトリ
 
 対象：
 
 ```text
 softbs/notes/juesuan/
+
