@@ -12,38 +12,39 @@ freee会計・法人決算・税務・社会保険知識庫
 
 ### 知識庫基礎架構
 
-* AGENTS.md
-* README.md
-* roadmap.md
-* task.md
+- [x] AGENTS.md
+- [x] README.md
+- [x] roadmap.md
+- [x] task.md
+- [x] backlog.md
 
 ### 手冊
 
-* freee手冊
-* eTax手冊
-* eLTAX手冊
-* 算定基礎届手冊
-* 年末調整手冊
-* 消費税手冊
+- [x] freee手冊
+- [x] eTax手冊
+- [ ] eLTAX手冊完整实战版
+- [x] 算定基礎届手冊
+- [x] 年末調整手冊
+- [x] 消費税手冊基础版
 
 ### 辭典
 
-* 勘定科目辭典
-* 法人税辭典
-* 消費税辭典
-* 社會保險辭典
+- [x] 勘定科目辭典
+- [x] 法人税辭典
+- [x] 消費税辭典
+- [x] 社會保險辭典
 
 ### 範例
 
-* 別表一
-* 別表四
-* 別表五（一）
-* 別表五（二）
-* 消費税申告
-* 算定基礎届
-* 年末調整
-* 源泉所得税
-* 住民税
+- [x] 別表一
+- [x] 別表四
+- [x] 別表五（一）
+- [x] 別表五（二）
+- [x] 消費税申告
+- [x] 算定基礎届
+- [x] 年末調整
+- [x] 源泉所得税
+- [x] 住民税
 
 ---
 
@@ -54,6 +55,8 @@ freee会計・法人決算・税務・社会保険知識庫
 ---
 
 ## P1
+
+状态：`[x] 已完成`
 
 eTax手冊完善
 
@@ -80,6 +83,8 @@ docs/tax/eTax手冊.md
 
 ## P2
 
+状态：`[ ] 未完成`
+
 eLTAX手冊完善
 
 檔案：
@@ -96,6 +101,8 @@ docs/tax/eLTAX手冊.md
 ---
 
 ## P3
+
+状态：`[x] 已完成`
 
 算定基礎届手冊完善
 
@@ -119,6 +126,8 @@ docs/social/算定基礎届手冊.md
 
 ## P4
 
+状态：`[x] 已完成`
+
 年末調整手冊完善
 
 檔案：
@@ -137,6 +146,8 @@ docs/social/年末調整手冊.md
 
 ## P5
 
+状态：`[ ] 未完成`（分类目录已建立，截图内容尚未补充）
+
 freee截圖操作指南
 
 要求：
@@ -151,12 +162,13 @@ docs/screenshots
 
 # Editing Rules
 
-1. 必須先讀取：
+1. 必须先按顺序读取：
 
+* backlog.md
+* task.md
 * AGENTS.md
 * README.md
 * roadmap.md
-* task.md
 
 2. 不刪除歷史內容。
 
@@ -177,12 +189,36 @@ docs/screenshots
 
 ---
 
+## Private Data Rule
+
+以后所有真实公司数据都放在：
+
+private/
+
+不再放在 juesuan 根目录。
+
+生成真实案例时优先读取 private/。
+
+禁止将 private/ 内容复制到公开文档中。
+只能提取必要摘要。
+
 # Completion Rules
 
 每次完成後：
 
-1. 更新目標文件更新履歷。
-2. 更新 updates/CHANGELOG.md。
-3. 匯報修改內容。
-4. 不 commit。
-5. 不 push。
+1. 更新目标文件更新履历。
+2. 更新 `backlog.md`，已完成任务改为 `[x]`，不删除历史任务。
+3. 更新 `task.md`。
+4. 更新 `updates/CHANGELOG.md`。
+5. 汇报修改内容。
+6. 不 commit。
+7. 不 push。
+
+## 2026-06-29 状态同步
+
+- [x] 创建 `backlog.md`。
+- [x] 增加开工时优先检查 backlog、task 的规则。
+- [x] 增加完工后同步更新 backlog、task、CHANGELOG 的规则。
+- [x] 按现有成果校准 P1、P3、P4 为已完成。
+- [ ] P2：完善 eLTAX 手册。
+- [ ] P5：补充脱敏截图内容。

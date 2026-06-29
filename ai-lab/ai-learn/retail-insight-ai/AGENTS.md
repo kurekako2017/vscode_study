@@ -213,3 +213,91 @@ VERIFY_CHECKLIST.md
 5. 再考虑生产组件
 
 不要过早接入 LLM、PostgreSQL、Redis、RabbitMQ。
+
+## Permanent Backlog Rule
+
+Every work session must start by reading:
+
+1. AGENTS.md
+2. docs/PROJECT_BACKLOG.md
+3. TASK.md if it exists
+
+Before coding, always check unfinished tasks and technical debt.
+
+After completing work, always update docs/PROJECT_BACKLOG.md:
+
+- mark completed tasks with [x]
+- update current status
+- add completion log
+- add new discovered tasks if needed
+
+Do not start coding directly without checking the backlog first.
+
+# 项目永久任务清单规则
+
+每次开始工作前必须执行：
+
+1. 阅读 AGENTS.md
+2. 阅读 docs/PROJECT_BACKLOG.md
+3. 阅读 TASK.md（如果存在）
+
+开始编码前必须：
+
+- 查看未完成任务
+- 查看当前阶段
+- 查看技术债
+- 选择最高优先级任务
+
+禁止直接开始编码。
+
+工作完成后必须更新：
+
+`docs/PROJECT_BACKLOG.md`
+
+包括：
+
+- 已完成任务改为 [x]
+- 更新任务状态
+- 更新最后更新时间
+- 增加完成记录
+- 增加新发现任务
+- 增加发现的问题
+
+如果发现新的需求：
+
+先加入 `PROJECT_BACKLOG.md`，再开始开发。
+
+# retail-insight-ai 项目规则
+
+本项目继承 AI-LAB 全局规则。
+
+每次开发前必须阅读：
+
+1. AGENTS.md
+2. docs/PROJECT_BACKLOG.md
+3. TASK.md
+
+本项目当前重点：
+
+Phase 2: Internal Knowledge Approval Agent
+
+优先级顺序：
+
+1. 项目结构确认
+2. Docker 环境确认
+3. .gitignore 敏感文件保护确认
+4. Document Upload 流程确认
+5. Chunk Pipeline
+6. Embedding Pipeline
+7. Vector Search
+8. Approval Agent
+
+本项目要求：
+
+- 对初级学习者友好
+- 重要代码必须添加易懂注释
+- 复杂流程必须补充 Mermaid 流程图
+- 每次完成任务后必须更新 Backlog
+- 发现新任务必须先进入 Backlog
+
+不要破坏已有 AGENTS.md 内容。

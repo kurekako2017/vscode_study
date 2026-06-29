@@ -20,10 +20,12 @@
 ## 利用ルール
 
 1. AGENTS.md を最優先で参照する。
-2. task.md を現在作業として実行する。
-3. roadmap.md を長期計画として参照する。
-4. 更新履歴を必ず残す。
-5. 初心者向け説明を優先する。
+2. 每次开始工作时先检查 `backlog.md`，再检查 `task.md`。
+3. task.md を現在作業として実行する。
+4. roadmap.md を長期計画として参照する。
+5. 完成后同步更新 `backlog.md`、`task.md` 和 `updates/CHANGELOG.md`。
+6. 已完成任务保留并标记为 `[x]`，未完成任务保持 `[ ]`。
+7. 初心者向け説明を優先する。
 
 ---
 
@@ -84,8 +86,15 @@
 juesuan/
 ├── AGENTS.md
 ├── README.md
+├── backlog.md
 ├── roadmap.md
 ├── task.md
+├── private/                      # 本地真实公司资料，不纳入 Git
+│   ├── company_data/
+│   ├── company_profile.md
+│   ├── company_master.md
+│   ├── company_data_summary.md
+│   └── company_tax_adjustment_summary.md
 ├── docs/
 │   ├── freee/
 │   │   └── freee主手册.md
@@ -119,6 +128,21 @@ juesuan/
     └── CHANGELOG.md
 ```
 
+## Private Data
+
+private/ 目录保存真实公司资料，不纳入 Git 管理。
+
+包括：
+
+- 决算书
+- 法人税申告书
+- company_master
+- company_profile
+- company_data_summary
+- company_tax_adjustment_summary
+
+这些资料仅用于本地生成案例，不上传 GitHub。
+
 ## 知识库导航设计
 
 - `docs/freee/`：freee 日常记账、月结和决算主流程。
@@ -130,6 +154,7 @@ juesuan/
 - `docs/screenshots/`：只保存完成脱敏的操作截图。
 - `archive/`：保留不再作为主入口的历史资料。
 - `updates/`：记录知识库结构和内容变更。
+- `private/`：真实公司资料及其汇总，仅限本地使用，不纳入 Git。
 - 根目录：治理规则、路线图、当前任务及历史总稿。
 
 ## 知识库导航（按业务主题）
@@ -165,6 +190,7 @@ juesuan/
 
 ### 2026-06-29
 
+- 创建 `backlog.md`，增加开工检查与完工同步更新规则。
 - 将历史总稿拆分为 9 份专题手册。
 - 增加手册导航、历史资料入口和推荐使用顺序。
 - 第二阶段建立 `docs/` 企业级分类结构并修复相对链接。

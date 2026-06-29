@@ -42,5 +42,56 @@ secret*
 private/
 local-only/
 
+# Sensitive Company Data
+softbs/notes/juesuan/company_data/
+softbs/notes/juesuan/company_data_summary.md
+softbs/notes/juesuan/company_tax_adjustment_summary.md
+
 # Workspace Rules
 不上传GitHub文件清单.md
+
+# ========================================
+# juesuan 实际公司资料（禁止上传）
+# ========================================
+
+notes/juesuan/company_data/
+
+# PDF
+notes/juesuan/company_data/*.pdf
+
+# Excel
+notes/juesuan/company_data/*.xlsx
+
+# CSV
+notes/juesuan/company_data/*.csv
+
+# 导出资料
+notes/juesuan/company_data/export/
+
+# 临时文件
+notes/juesuan/company_data/temp/
+
+# =====================================
+# juesuan private company data
+# =====================================
+
+notes/juesuan/private/
+notes/juesuan/private/**
+
+# legacy private paths
+notes/juesuan/company_data/
+notes/juesuan/company_profile.md
+notes/juesuan/company_master.md
+notes/juesuan/company_data_summary.md
+notes/juesuan/company_tax_adjustment_summary.md
+
+# Actual workspace path
+softbs/notes/juesuan/private/
+softbs/notes/juesuan/private/**
+
+# Actual legacy private paths
+softbs/notes/juesuan/company_data/
+softbs/notes/juesuan/company_profile.md
+softbs/notes/juesuan/company_master.md
+softbs/notes/juesuan/company_data_summary.md
+softbs/notes/juesuan/company_tax_adjustment_summary.md

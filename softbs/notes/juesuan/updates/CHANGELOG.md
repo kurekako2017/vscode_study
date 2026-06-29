@@ -2,6 +2,30 @@
 
 ## 2026-06-29
 
+- 创建 `backlog.md`，统一记录已完成任务、当前待办和长期维护事项。
+- 增加工作开始时依次检查 `backlog.md`、`task.md` 的规则。
+- 增加任务完成后同步更新 backlog、task 和 CHANGELOG 的规则。
+- 保留历史任务，以 `[x]` 标识完成、以 `[ ]` 标识未完成。
+- 根据现有文件和更新记录校准任务状态：P1 e-Tax、P3 算定基礎届、P4 年末調整已完成；P2 eLTAX 完整实战版与 P5 脱敏截图内容仍待完成。
+- 执行 private 数据隔离重构，在 `juesuan/private/` 集中保存全部真实公司经营资料。
+- 将 `company_data/`、`company_profile.md`、`company_master.md`、`company_data_summary.md`、`company_tax_adjustment_summary.md` 移动至 `private/`，内容保持不变。
+- 更新 `AGENTS.md` 的真实数据优先路径和最小披露规则。
+- 更新 `README.md` 目录树及 Private Data 说明。
+- 在根 `.gitignore` 追加 `notes/juesuan/private/`、实际 `softbs/.../private/` 以及旧路径兼容规则。
+- 创建 `company_tax_adjustment_summary.md`，仅整理实际税务调整资料，不生成申告书。
+- 汇总別表四相关交际费、法人税等、租税公课、役员报酬、折旧、寄付金及其他调整项目。
+- 汇总別表五（一）的资本金、繰越損益金、当期损失、納税充当金和期末余额。
+- 汇总別表五（二）的前期税金支付、本期未払法人税等、未払消费税等及租税公课。
+- 新增汇总文件的 Git 忽略规则，防止真实税务调整数据误上传。
+- 检查仓库根 `.gitignore` 与 `company_data/` 的 Git 跟踪状态。
+- 保留全部既有忽略规则，并追加 `notes/juesuan/company_data/`、PDF、Excel、CSV、export 和 temp 禁止上传规则。
+- 实际资料目录为 `softbs/notes/juesuan/company_data/`；该路径已有忽略规则，3 份 PDF 均未被 Git 跟踪，无需执行 `git rm --cached`。
+- 在 `AGENTS.md` 增加 `company_data/` 强制保护规则：禁止上传、禁止输出完整原文及法人编号、银行账号、住址，仅允许本地摘要、案例和脱敏说明文档。
+- 读取 `company_data/` 中 3 份公司实际决算 PDF，原始文件保持不变。
+- 创建 `company_data_summary.md`，汇总实际 BS、PL、当期损益、资本金、役员报酬、消费税、法人税和法人住民税数据。
+- 将后续税务案例的数据优先级调整为：实际数据汇总、公司资料、原始 PDF、官方资料。
+- 在 `AGENTS.md` 增加实际决算数据优先与敏感资料保护规则。
+- 在工作区 `.gitignore` 中屏蔽 `company_data/` 及其敏感汇总，防止误上传 GitHub。
 - 统一案例条件：事业年度改为 `2025-05-01～2026-04-30`，役员报酬为每月 480,000円且不设通勤手当。
 - 联动修正給与処理净支付额、社会保险金额、算定基礎届平均报酬与标准报酬月额、年末调整年税额和还付额。
 - 将別表一、別表四、別表五（一）、別表五（二）及消费税案例的事业年度、决算日统一到 2026-04-30。
@@ -58,3 +82,8 @@
 - 修复因归档和 examples 分类产生的相对链接。
 - 保留 `freee_法人決算税務運用マスターガイド.md` 及全部既有历史内容。
 - 未执行 Git commit 或 push。
+创建 private/
+移动 company_data 和公司资料
+更新 .gitignore
+更新 AGENTS.md / README.md / task.md
+验证 private/ 被 Git 忽略
