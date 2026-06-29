@@ -23,7 +23,7 @@ class QuestionService:
     def create_question(self, question: str, request_id: str) -> dict[str, Any]:
         question_id = str(uuid4())
         item = self._repository.create_question(question_id, question.strip(), request_id)
-        self._publish(question_id, "status", "Question received", request_id, status="received", node=None)
+        self._publish(question_id, "received", "Question received", request_id, status="received", node=None)
         log_event(
             logger,
             "info",
@@ -58,6 +58,9 @@ class QuestionService:
     def list_approvals(self) -> list[dict[str, Any]]:
         return self._repository.list_approvals("pending")
 
+    def get_approval_for_question(self, question_id: str) -> dict[str, Any] | None:
+        return self._repository.get_approval_by_question(question_id)
+
     def decide_approval(self, approval_id: str, decision: str, request_id: str) -> dict[str, Any]:
         approval = self._repository.decide_approval(approval_id, decision)
         question_id = approval["question_id"]
@@ -70,15 +73,6 @@ class QuestionService:
             question_id=question_id,
             approval_id=approval_id,
             status=decision,
-        )
-        self._publish(
-            question_id,
-            "approval_updated",
-            "Approval accepted" if decision == "approved" else "Approval rejected",
-            request_id,
-            status=decision,
-            node="approved" if decision == "approved" else "rejected",
-            approval_id=approval_id,
         )
         return approval
 
@@ -158,30 +152,30 @@ class QuestionService:
         if node_name == "risk_classifier":
             self._transition(
                 question_id,
-                "classified",
+                "risk_checked",
                 request_id,
                 risk_level=state["risk_level"],
                 node=node_name,
             )
             self._publish(
                 question_id,
-                "status",
+                "risk_checked",
                 f"Risk classified: {state['risk_level']}",
                 request_id,
-                status="classified",
+                status="risk_checked",
                 node=node_name,
                 risk_level=state["risk_level"],
             )
         elif node_name == "approval_wait":
             approval_id = str(uuid4())
             self._repository.create_approval(approval_id, question_id)
-            self._transition(question_id, "approval_pending", request_id, node=node_name)
+            self._transition(question_id, "approval_required", request_id, node=node_name)
             self._publish(
                 question_id,
                 "approval_required",
                 "High-risk question requires approval",
                 request_id,
-                status="approval_pending",
+                status="approval_required",
                 node=node_name,
                 approval_id=approval_id,
                 risk_level=state["risk_level"],
@@ -190,7 +184,7 @@ class QuestionService:
             self._transition(question_id, "approved", request_id, node=node_name)
             self._publish(
                 question_id,
-                "status",
+                "approved",
                 "Approved; generating final answer",
                 request_id,
                 status="approved",
@@ -207,6 +201,14 @@ class QuestionService:
                 node=node_name,
             )
         elif node_name == "answer_generator":
+            self._publish(
+                question_id,
+                "answer_generated",
+                "Answer generated",
+                request_id,
+                status="answer_generated",
+                node=node_name,
+            )
             self._transition(
                 question_id,
                 "completed",
@@ -217,7 +219,7 @@ class QuestionService:
             )
             self._publish(
                 question_id,
-                "done",
+                "completed",
                 "Final report generated",
                 request_id,
                 status="completed",
@@ -291,10 +293,4 @@ class QuestionService:
         )
 
     def _approval_for_question(self, question_id: str) -> dict[str, Any] | None:
-        # 当前最小实现每个问题最多一个 Approval。
-        for status in ("pending", "approved", "rejected"):
-            for item in self._repository.list_approvals(status):
-                if item["question_id"] == question_id:
-                    return item
-        return None
-
+        return self._repository.get_approval_by_question(question_id)

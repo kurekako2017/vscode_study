@@ -42,7 +42,7 @@ export interface Report {
 export interface QuestionEvent {
   question_id: string;
   sequence: number;
-  event: "status" | "approval_required" | "approval_updated" | "done" | "rejected" | "error";
+  event: "received" | "risk_checked" | "answer_generated" | "approval_required" | "approved" | "rejected" | "completed" | "error";
   message: string;
   request_id: string;
   status: string;

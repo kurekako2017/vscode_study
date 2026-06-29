@@ -135,6 +135,16 @@ class SQLiteRepository:
             ).fetchone()
             return dict(row) if row else None
 
+    def get_approval_by_question(self, question_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """SELECT a.*, q.question, q.risk_level, q.updated_at
+                   FROM approvals a JOIN questions q ON q.question_id = a.question_id
+                   WHERE a.question_id = ?""",
+                (question_id,),
+            ).fetchone()
+            return dict(row) if row else None
+
     def list_approvals(self, status: str = "pending") -> list[dict[str, Any]]:
         with self._connect() as connection:
             rows = connection.execute(

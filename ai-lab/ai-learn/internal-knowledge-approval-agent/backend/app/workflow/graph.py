@@ -6,25 +6,8 @@ from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
+from app.workflow.nodes import answer_generated, risk_checked
 from app.workflow.state import WorkflowState
-
-
-HIGH_RISK_KEYWORDS = {
-    "契約",
-    "合同",
-    "個人情報",
-    "个人信息",
-    "セキュリティ",
-    "安全",
-    "経費",
-    "报销",
-    "法務",
-    "法律",
-    "障害",
-    "故障",
-    "incident",
-    "security",
-}
 
 
 class KnowledgeApprovalWorkflow:
@@ -91,45 +74,17 @@ class KnowledgeApprovalWorkflow:
 
     async def _risk_classifier(self, state: WorkflowState) -> dict[str, str]:
         await self._delay()
-        normalized = state["question"].casefold()
-        risk = "HIGH" if any(word.casefold() in normalized for word in HIGH_RISK_KEYWORDS) else "LOW"
-        return {"risk_level": risk, "status": "classified"}
+        return risk_checked(state)
 
     async def _answer_generator(self, state: WorkflowState) -> dict[str, str]:
         """固定模板生成正式报告，不调用 LLM 或外部网络。"""
 
         await self._delay()
-        approval_note = (
-            "承認者による確認済み"
-            if state.get("approval_decision") == "approved"
-            else "低リスク判定により自動確定"
-        )
-        report = "\n".join(
-            [
-                "# 社内文書検索・承認ワークフロー 回答レポート",
-                "",
-                "## 質問",
-                state["question"],
-                "",
-                "## 正式回答",
-                "関連する社内手順を確認しました。担当部門の最新規程と手順書に従って対応してください。",
-                "",
-                "## リスク・承認状態",
-                f"- リスクレベル: {state.get('risk_level', 'HIGH')}",
-                f"- 確定方法: {approval_note}",
-                "",
-                "## 参照資料",
-                "- 社内業務マニュアル v1.0（固定ローカル資料）",
-                "- 情報取扱手順書 v1.0（固定ローカル資料）",
-                "",
-                "> 現在は固定データによる回答です。実運用前に文書所有者へ確認してください。",
-            ]
-        )
-        return {"status": "completed", "report": report}
+        return answer_generated(state)
 
     async def _approval_wait(self, _: WorkflowState) -> dict[str, str]:
         await self._delay()
-        return {"status": "approval_pending"}
+        return {"status": "approval_required"}
 
     async def _approved(self, _: WorkflowState) -> dict[str, str]:
         await self._delay()

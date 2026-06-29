@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from app.config.settings import Settings
 from app.repositories.sqlite_repository import SQLiteRepository
+from app.services.approval_service import ApprovalService
 from app.services.question_service import QuestionService
 from app.workflow.graph import KnowledgeApprovalWorkflow
 
@@ -12,7 +13,13 @@ from app.workflow.graph import KnowledgeApprovalWorkflow
 class AppContainer:
     settings: Settings
     repository: SQLiteRepository
-    service: QuestionService
+    question_service: QuestionService
+    approval_service: ApprovalService
+
+    @property
+    def service(self) -> QuestionService:
+        """Compatibility alias for existing callers."""
+        return self.question_service
 
 
 def build_container(settings: Settings | None = None) -> AppContainer:
@@ -22,6 +29,6 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     repository = SQLiteRepository(resolved.database_path)
     repository.initialize()
     workflow = KnowledgeApprovalWorkflow(resolved.workflow_step_delay_seconds)
-    service = QuestionService(repository, workflow)
-    return AppContainer(resolved, repository, service)
-
+    question_service = QuestionService(repository, workflow)
+    approval_service = ApprovalService(question_service)
+    return AppContainer(resolved, repository, question_service, approval_service)

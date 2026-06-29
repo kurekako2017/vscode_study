@@ -27,8 +27,8 @@ export async function listApprovals(): Promise<Approval[]> {
   return unwrap<Approval[]>(await fetch("/api/approvals"));
 }
 
-export async function decideApproval(id: string, decision: "approve" | "reject"): Promise<Approval> {
-  return unwrap<Approval>(await fetch(`/api/approvals/${id}/${decision}`, { method: "POST" }));
+export async function decideApproval(questionId: string, decision: "approve" | "reject"): Promise<Approval> {
+  return unwrap<Approval>(await fetch(`/api/approvals/${questionId}/${decision}`, { method: "POST" }));
 }
 
 export async function getReport(questionId: string): Promise<Report> {
@@ -42,7 +42,7 @@ export function subscribeQuestion(
 ): () => void {
   const source = new EventSource(`/api/questions/${questionId}/events`);
   const receive = (message: MessageEvent<string>) => onEvent(JSON.parse(message.data) as QuestionEvent);
-  ["status", "approval_required", "approval_updated", "done", "rejected", "error"].forEach((name) => {
+  ["received", "risk_checked", "answer_generated", "approval_required", "approved", "rejected", "completed", "error"].forEach((name) => {
     source.addEventListener(name, receive as EventListener);
   });
   source.onerror = (event) => {

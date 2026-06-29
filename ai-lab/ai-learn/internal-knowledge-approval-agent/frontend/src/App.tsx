@@ -46,7 +46,7 @@ export default function App() {
         setStatus(item.status);
         if (item.event === "approval_required") {
           setView("approvals");
-        } else if (item.event === "done") {
+        } else if (item.event === "completed") {
           unsubscribe.current?.();
           void getReport(id).then((value) => {
             setReport(value);
@@ -87,7 +87,7 @@ export default function App() {
     // 页面刷新后可能没有旧 SSE，决定前重新订阅保证能看到恢复事件。
     watch(item.question_id);
     try {
-      await decideApproval(item.approval_id, decision);
+      await decideApproval(item.question_id, decision);
       setView("status");
       await refreshApprovals();
     } catch (reason) {

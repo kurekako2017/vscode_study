@@ -42,6 +42,7 @@ class JsonFormatter(logging.Formatter):
             "request_id": values.get("request_id") or _request_id.get(),
             "question_id": values.get("question_id") or "-",
             "event": values.get("event", "application_log"),
+            "status": values.get("status") or "-",
             "message": record.getMessage(),
             "error_code": values.get("error_code"),
             "duration_ms": values.get("duration_ms"),
@@ -103,4 +104,3 @@ def log_event(
         **safe_fields,
     }
     getattr(logger, level)(message, extra={"structured": values})
-

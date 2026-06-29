@@ -23,7 +23,7 @@ describe("API client", () => {
       error: null,
     }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
-    await decideApproval("a-1", "approve");
-    expect(fetchMock).toHaveBeenCalledWith("/api/approvals/a-1/approve", { method: "POST" });
+    await decideApproval("q-1", "approve");
+    expect(fetchMock).toHaveBeenCalledWith("/api/approvals/q-1/approve", { method: "POST" });
   });
 });

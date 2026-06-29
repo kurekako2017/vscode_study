@@ -112,10 +112,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return error_response(request, 409, "REPORT_NOT_READY", "Final report is not ready")
         return error_response(request, 500, "INTERNAL_ERROR", "Internal server error")
 
-    @application.get("/health")
-    async def health() -> dict[str, str]:
-        return {"status": "ok", "service": container.settings.service_name}
-
     application.include_router(router)
     return application
 

@@ -9,7 +9,7 @@ from app.repositories.sqlite_repository import SQLiteRepository
 
 
 logger = get_logger(__name__)
-TERMINAL_EVENTS = {"done", "rejected", "error"}
+TERMINAL_EVENTS = {"completed", "rejected", "error"}
 
 
 async def stream_question_events(
@@ -44,4 +44,3 @@ async def stream_question_events(
         # keep-alive 可避免部分代理把空闲连接关闭。
         yield ": keep-alive\n\n"
         await asyncio.sleep(0.25)
-

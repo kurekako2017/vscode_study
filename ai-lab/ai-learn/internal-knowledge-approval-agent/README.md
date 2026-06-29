@@ -2,8 +2,42 @@
 
 日本語名称：**社内文書検索・承認ワークフローAIエージェント**
 
+## 最短启动路径
+
+1. 进入项目目录
+
+   ```bash
+   cd ~/workspace/vscode_study/ai-lab/ai-learn/internal-knowledge-approval-agent
+   ```
+
+2. 检查环境
+
+   ```bash
+   ./scripts/check_env.sh
+   ```
+
+3. 启动 Backend
+
+   ```bash
+   ./scripts/start_backend.sh
+   ```
+
+4. 新开终端，启动 Frontend
+
+   ```bash
+   ./scripts/start_frontend.sh
+   ```
+
+5. 浏览器访问 `http://127.0.0.1:5173`。
+6. 测试 LOW 风险问题：`休暇申請の手順を確認したい`。
+7. 测试 HIGH 风险问题：`個人情報の取扱手順を確認したい`。
+8. HIGH 风险时分别创建两个问题，测试 **Approve** 和 **Reject**。
+9. 回到 Backend 终端，查看日志中的 `request_id` 和 `question_id`。
+
 ## 目录
 
+- [快速启动](#快速启动)
+- [最短启动路径](#最短启动路径)
 - [项目概要](#项目概要)
 - [业务范围](#业务范围)
 - [核心流程](#核心流程)
@@ -11,6 +45,24 @@
 - [文档导航](#文档导航)
 - [设计原则](#设计原则)
 - [后续实施顺序](#后续实施顺序)
+
+## 快速启动
+
+要求 Python 3、Node.js、npm 和 curl。项目不需要 LLM、PostgreSQL、Redis 或 RabbitMQ。
+
+```bash
+./scripts/check_env.sh
+./scripts/run_tests.sh
+./scripts/start_backend.sh
+```
+
+另开终端启动前端：
+
+```bash
+./scripts/start_frontend.sh
+```
+
+Backend: `http://127.0.0.1:8000`；Frontend: `http://127.0.0.1:5173`。完整 curl 流程见 [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md)。
 
 ## 项目概要
 
@@ -53,9 +105,7 @@ flowchart LR
 
 ## 当前阶段
 
-本阶段只建立架构资产，共 7 份 Markdown 文档。尚未创建 Backend、Frontend、数据库或容器文件，不连接真实 LLM，不使用 OpenAI API，不保存任何 API Key。
-
-下一阶段的最小实现应采用固定文档、规则 Retriever、固定 Rerank 和 Static Answer Provider，以便先验证 API、Workflow、审批中断、SSE 和审计边界。
+第二阶段最小可运行版本已实现 FastAPI、LangGraph、SQLite、SSE 和 React 前端。回答使用固定本地文档与确定性模板，不连接真实 LLM，不使用 OpenAI API，不保存任何 API Key。
 
 ## 文档导航
 
@@ -87,4 +137,3 @@ flowchart LR
 4. 实现 React 提问、审批和结果页面。
 5. 增加安全、审计、错误路径和恢复测试。
 6. 完成容器化与本地端到端验证。
-
