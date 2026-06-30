@@ -47,6 +47,10 @@ softbs/notes/juesuan/company_data/
 softbs/notes/juesuan/company_data_summary.md
 softbs/notes/juesuan/company_tax_adjustment_summary.md
 
+# Business documents - never upload
+softbs/notes/business/
+softbs/notes/business/**
+
 # Workspace Rules
 不上传GitHub文件清单.md
 
