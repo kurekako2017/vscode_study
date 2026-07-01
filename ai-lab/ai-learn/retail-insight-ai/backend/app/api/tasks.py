@@ -7,8 +7,8 @@ from app.api.dependencies import get_event_repository, get_task_service
 from app.events.sse import stream_task_events
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.event_repository import EventRepository
-from app.schemas.report_api import ReportResponse
 from app.schemas.common import ApiResponse, success_response
+from app.schemas.report_api import ReportResponse
 from app.schemas.task_api import TaskCreateRequest, TaskCreateResponse, TaskResponse
 from app.services.task_service import TaskService
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 logger = get_logger(__name__)
 
 
-@router.post("", response_model=ApiResponse[TaskCreateResponse], status_code=status.HTTP_202_ACCEPTED)
+@router.post(path="", response_model=ApiResponse[TaskCreateResponse], status_code=status.HTTP_202_ACCEPTED)
 async def create_task(
     payload: TaskCreateRequest,
     background_tasks: BackgroundTasks,
@@ -31,7 +31,7 @@ async def create_task(
     return success_response(data, get_request_id())
 
 
-@router.get("/{task_id}", response_model=ApiResponse[TaskResponse])
+@router.get(path="/{task_id}", response_model=ApiResponse[TaskResponse])
 async def get_task(
     task_id: str,
     service: TaskService = Depends(get_task_service),
