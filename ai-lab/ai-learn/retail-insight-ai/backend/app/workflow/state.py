@@ -5,6 +5,7 @@ from typing import Literal, TypedDict
 from app.models.analysis import KPIResult, ResearchResult
 
 
+# 定义 LangGraph 节点共享的类型化状态；每个 Node 只更新自己负责的字段。
 class AnalysisState(TypedDict, total=False):
     """LangGraph 节点共享的类型化状态；每个 Node 只更新自己负责的字段。"""
 

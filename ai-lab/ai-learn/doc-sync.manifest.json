@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "description": "Cross-project documentation sync groups for retail-insight-ai and ai-agent-retail-handbook-v3.",
+  "groups": [
+    {
+      "name": "overview",
+      "paths": [
+        "retail-insight-ai/README.md",
+        "ai-agent-retail-handbook-v3/README.md",
+        "ai-agent-retail-handbook-v3/PROJECT_BIBLE.md",
+        "ai-agent-retail-handbook-v3/02_日本AI现场面试.md",
+        "ai-agent-retail-handbook-v3/07_面试口头训练.md"
+      ]
+    },
+    {
+      "name": "governance",
+      "paths": [
+        "retail-insight-ai/ROADMAP.md",
+        "retail-insight-ai/TASK.md",
+        "retail-insight-ai/docs/PROJECT_BACKLOG.md",
+        "retail-insight-ai/docs/CHANGELOG.md",
+        "ai-agent-retail-handbook-v3/ROADMAP.md",
+        "ai-agent-retail-handbook-v3/TASK.md",
+        "ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md",
+        "ai-agent-retail-handbook-v3/docs/CHANGELOG.md",
+        "ai-agent-retail-handbook-v3/10_Production_Roadmap.md"
+      ]
+    },
+    {
+      "name": "study-and-runbook",
+      "paths": [
+        "retail-insight-ai/RUNBOOK_LOCAL.md",
+        "retail-insight-ai/CODE_STUDY_GUIDE.md",
+        "retail-insight-ai/VERIFY_CHECKLIST.md",
+        "retail-insight-ai/STUDY_PLAN_DAY1_DAY3.md",
+        "ai-agent-retail-handbook-v3/01_日本AI项目实战.md",
+        "ai-agent-retail-handbook-v3/04_日本现场开发.md",
+        "ai-agent-retail-handbook-v3/05_TL代码审查.md",
+        "ai-agent-retail-handbook-v3/06_学习路线.md",
+        "ai-agent-retail-handbook-v3/11_Project_Structure.md"
+      ]
+    },
+    {
+      "name": "architecture",
+      "paths": [
+        "retail-insight-ai/docs/ARCHITECTURE.md",
+        "retail-insight-ai/docs/DECISIONS.md",
+        "ai-agent-retail-handbook-v3/03_AI核心知识.md",
+        "ai-agent-retail-handbook-v3/08_架构图册.md",
+        "ai-agent-retail-handbook-v3/09_系统设计书.md",
+        "ai-agent-retail-handbook-v3/12_ADR.md"
+      ]
+    }
+  ]
+}

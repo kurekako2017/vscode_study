@@ -158,6 +158,14 @@ VERIFY_CHECKLIST.md
 
 如果新增功能没有更新学习文档，视为未完成。
 
+## 6.1 跨项目文档镜像
+
+`retail-insight-ai` 与 `ai-agent-retail-handbook-v3` 共享 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py)。
+
+- 同步关系由 [doc-sync.manifest.json](../doc-sync.manifest.json) 统一定义。
+- 同步只刷新文档末尾的 `DOC-SYNC` 区块，不覆盖正文。
+- 本项目文档变更后，应刷新同步器，让 handbook 侧对应文档一起更新。
+
 ---
 
 ## 7. 测试要求

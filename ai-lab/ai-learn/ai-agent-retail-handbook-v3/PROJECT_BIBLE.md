@@ -271,3 +271,21 @@ V3 遵守一本书原则：
 - 新增内容必须回到 Retail Insight AI
 - 章节标题统一使用中文
 - 技术名保留英文
+
+<!-- DOC-SYNC:START group=overview -->
+## 文档同步块
+
+- group: `overview`
+- file: `ai-agent-retail-handbook-v3/PROJECT_BIBLE.md`
+- self_sha256: `e1dc1118cf4a13b542ad81cdd9bfc63a872af5a6fc7ec93430d44ea5cead5860`
+- peers:
+- `retail-insight-ai/README.md` | sha256=51340b3878b7fccbd5a7bdcdcbc2ed0f4c0bab07fae94fe85b1ddfd54eeca283 | # Retail Insight AI / ## 明天先做什么 / 1. 运行 `check_env` / 2. 启动 Backend
+- `ai-agent-retail-handbook-v3/README.md` | sha256=572e4166668f669ef002b0a0610c3d745b2b1529531a036afd19453db289a826 | # Retail Insight AI Handbook V3 / # 项目介绍 / Retail Insight AI 是《日本 AI Agent 企业开发与面试宝典》V3 的统一项目。 / 日文名称：小売業向け AI 経営分析システム。
+- `ai-agent-retail-handbook-v3/02_日本AI现场面试.md` | sha256=713cdb0ae9c24284a5c62cbad95a808bf2bb530f2db5c514aae34e871dea816d | # 02_日本AI现场面试 / ## 目录 / - [第一章 面试表达总则](#第一章-面试表达总则) / - [第二章 自我介绍](#第二章-自我介绍)
+- `ai-agent-retail-handbook-v3/07_面试口头训练.md` | sha256=af984812e08556e127ee61023203fc8e85957a971fe9c307a287dae27cd30fbe | # 07_面试口头训练 / 本文件只用于开口训练。练习时先遮住回答，听完问题后立即开口；说完再对照关键词，不逐字追求一致。 / ## 第一章 30秒回答训练 / ### 1. 自己紹介をお願いします。
+
+说明：
+- 这个块由 `scripts/sync_retail_handbook_docs.py` 自动维护。
+- 只同步这个块，不覆盖各自正文。
+- 任一组内文档正文变化时，整组文档的同步块都会一起刷新。
+<!-- DOC-SYNC:END group=overview -->

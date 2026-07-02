@@ -29,6 +29,8 @@ class AnalysisWorkflow:
     输入与状态增量，TaskService 则统一处理持久化、终态和对外事件。
     """
 
+    # Workflow 只负责编排，不保存 Task 的 queued/completed 生命周期。这样 Node 可以专注
+    # 输入与状态增量，TaskService 则统一处理持久化、终态和对外事件。
     def __init__(
         self,
         kpi_workflow: FixedKPIWorkflow,
@@ -190,13 +192,17 @@ class AnalysisWorkflow:
         )
         return {"report_markdown": report_markdown}
 
-    async def stream(self, initial_state: AnalysisState) -> AsyncIterator[tuple[str, AnalysisState]]:
+    async def stream(
+        self, initial_state: AnalysisState
+    ) -> AsyncIterator[tuple[str, AnalysisState]]:
         """按 Node 增量流式执行，并为 TaskService 重建当前完整 State。"""
 
         current_state: AnalysisState = dict(initial_state)
         # updates 模式只返回 Node patch，适合发布逐节点进度，避免重复传输整个 State。
         try:
-            async for update in self._graph.astream(initial_state, stream_mode="updates"):
+            async for update in self._graph.astream(
+                initial_state, stream_mode="updates"
+            ):
                 for node_name, patch in update.items():
                     current_state.update(patch)
                     yield node_name, dict(current_state)

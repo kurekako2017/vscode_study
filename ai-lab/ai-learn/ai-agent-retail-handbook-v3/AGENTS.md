@@ -2,6 +2,14 @@
 
 本项目遵守 AI-LAB 全局规则。
 
+## 跨项目文档同步
+
+`ai-agent-retail-handbook-v3` 与 `retail-insight-ai` 通过 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py) 维护同步块。
+
+- 同步映射由 [doc-sync.manifest.json](../doc-sync.manifest.json) 统一管理。
+- 同步只维护文档末尾的 `DOC-SYNC` 区块，不覆盖正文。
+- retail 侧文档变化后，运行同步器会刷新手册侧对应文档。
+
 开发前：
 
 1. 阅读 AGENTS.md
@@ -35,4 +43,3 @@
 架构变化必须更新 `docs/ARCHITECTURE.md`；重要决策必须追加到 `docs/DECISIONS.md`。
 
 开发完成后必须更新 `TASK.md`、`docs/PROJECT_BACKLOG.md` 和 `docs/CHANGELOG.md`，并保留全部历史记录。
-
