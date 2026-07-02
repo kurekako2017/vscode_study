@@ -16,7 +16,7 @@ class ReportGenerator:
 
         # 使用列表逐段构建，比分散字符串拼接更容易调整模板和测试章节边界。
         lines = [
-            "# Retail Insight AI 経営分析レポート",
+            "# Retail Insight AI 経営分析レポート ",
             "",
             "## 分析依頼",
             "",

@@ -57,17 +57,21 @@ class AnalysisWorkflow:
 
         # route 先把 API mode 转成显式路径，避免 Node 内部隐藏复杂 if/else。
         builder.add_edge(START, "route")
+        # route 决定后续路径，KPI-only 直接进入报告，Hybrid 继续调查，Research-only 跳过 KPI。
         builder.add_conditional_edges(
             "route",
             self._after_route,
             {"kpi": "kpi", "research": "research"},
         )
+        # KPI-only 直接进入报告，Hybrid 继续调查，Research-only 跳过 KPI。
         builder.add_conditional_edges(
             "kpi",
             self._after_kpi,
             {"research": "research", "report": "report"},
         )
+        #   Research-only 跳过 KPI，其余模式先执行确定性计算。
         builder.add_edge("research", "report")
+        #   report 节点是最后一步，生成 Markdown 报告并结束。
         builder.add_edge("report", END)
         return builder.compile()
 
@@ -77,6 +81,7 @@ class AnalysisWorkflow:
         if self._step_delay_seconds > 0:
             await asyncio.sleep(self._step_delay_seconds)
 
+    #   node是每个步骤的执行函数，state是当前的分析状态，返回一个字典表示该节点的输出增量。
     async def _route_node(self, state: AnalysisState) -> dict[str, str]:
         """读取 mode 并写入 route；Node 返回增量而不是复制整个 State。"""
 
