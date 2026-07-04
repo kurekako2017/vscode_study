@@ -425,6 +425,84 @@ Versioning rule:
 Future approval relationship:
 - Retrieval returns document facts only and does not create approval state or RAG answers.
 
+#### 4.5.12 `POST /api/v1/internal-rag/answer`
+
+Purpose:
+Freeze the internal RAG answer contract on top of the existing document retrieval provider boundary.
+
+Request:
+
+```json
+{
+  "question": "What is the monthly sales policy?",
+  "limit": 5,
+  "include_archived": false,
+  "document_type": "markdown",
+  "language": "en",
+  "tags": ["sales", "policy"],
+  "answer_mode": "extractive",
+  "require_citations": true
+}
+```
+
+Rules:
+
+- `question`: required, non-empty string.
+- `limit`: optional, positive integer within the frozen range.
+- `include_archived`: optional boolean, defaults to `false`.
+- `document_type`: optional frozen document type filter.
+- `language`: optional frozen language filter.
+- `tags`: optional list of non-empty strings.
+- `answer_mode`: required enum `extractive | summary`.
+- `require_citations`: required boolean and frozen as `true`.
+
+Response `200 OK`:
+
+```json
+{
+  "answer": "Extractive answer placeholder",
+  "citations": [
+    {
+      "document_id": "doc-123",
+      "chunk_id": "chk-123",
+      "chunk_index": 0,
+      "excerpt": "Sales policy summary ...",
+      "source": {
+        "source_type": "local_file",
+        "uri": "upload://upl-123/policy.md",
+        "label": "policy.md",
+        "external_id": null
+      },
+      "score": 0.87
+    }
+  ],
+  "retrieval_mode": "keyword",
+  "answer_mode": "extractive",
+  "confidence": 0.72,
+  "warnings": []
+}
+```
+
+Status codes:
+`200 OK`, `400 Bad Request`, `422 Unprocessable Entity`, `500 Internal Server Error`, `503 Service Unavailable`.
+
+Error codes:
+`invalid_question`, `retrieval_unavailable`, `insufficient_context`, `citation_required`, `provider_timeout`, `repository_error`, `internal_error`.
+
+Validation rules:
+- `question` must not be blank.
+- `limit` must stay within the frozen range.
+- `require_citations` is frozen as `true`; `false` is a contract violation.
+- `answer_mode=summary` is frozen as a contract option, but it does not imply that a real LLM provider is currently implemented.
+- `retrieval_mode` is frozen as `keyword` for this phase because the contract sits on top of the existing document retrieval provider.
+
+Versioning rule:
+- Internal RAG answer semantics are frozen under `/api/v1`.
+
+Future approval relationship:
+- Internal RAG returns grounded answers and citations only and does not create approval state.
+- Future approval integration must be a separate step and must not be implied by answer generation success.
+
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
 - `200 OK`: successful read.
@@ -463,7 +541,10 @@ Frozen error code families:
 - `unsupported_document_type`
 - `invalid_metadata`
 - `invalid_query`
+- `invalid_question`
 - `retrieval_unavailable`
+- `insufficient_context`
+- `citation_required`
 - `chunk_failed`
 - `repository_error`
 - `provider_error`

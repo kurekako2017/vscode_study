@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026-07-04 Sprint 9.2 Internal RAG MVP without LLM
+
+- 实现 `POST /api/v1/internal-rag/answer`，基于现有 `DocumentRetrievalProvider` 进行 deterministic answer assembly。
+- `answer_mode=extractive` 直接组装 top retrieval excerpts，并为使用的每个 excerpt 返回 citation。
+- `answer_mode=summary` 采用稳定的本地摘要规则，不调用 LLM、embedding 或 pgvector。
+- `invalid_question`、`insufficient_context`、`citation_required`、`archived exclusion` 行为已由 backend tests 覆盖。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- `python3 -m unittest discover -s tests -v` 与 `python3 -m compileall app tests` 已通过。
+
+## 2026-07-04 Sprint 9.1 Internal RAG Contract Freeze
+
+- 冻结 `POST /api/v1/internal-rag/answer`，定义 question / limit / include_archived / document_type / language / tags / answer_mode / require_citations 请求合同。
+- 冻结 internal RAG response contract，包含 `answer`、`citations[]`、`retrieval_mode`、`answer_mode`、`confidence`、`warnings[]`。
+- 冻结 `internal_rag.started`、`internal_rag.retrieval_completed`、`internal_rag.answer_generated`、`internal_rag.failed` 事件语义。
+- 在 `docs/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
+- 在 `docs/PROMPT_STANDARD.md` 增加 Internal RAG prompt family，在 `docs/ERROR_CATALOG.md` 增加内部 RAG 错误码分组。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次不实现 RAG、LLM、embedding、pgvector、frontend，且不修改 retrieval API 行为。
+
 ## 2026-07-04 Sprint 8.2 Document Retrieval API MVP Implementation
 
 - 实现 `POST /api/v1/document-retrieval/search`，以 keyword-only 方式在现有 in-memory document chunks 上执行检索。

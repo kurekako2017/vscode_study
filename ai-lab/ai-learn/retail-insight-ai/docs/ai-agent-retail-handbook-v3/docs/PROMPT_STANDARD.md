@@ -18,6 +18,7 @@ Do not hardcode production prompts directly inside workflow logic.
 - Approval
 - Report
 - Retrieval
+- Internal RAG
 - Evaluation
 - Guardrails
 
@@ -70,6 +71,15 @@ Each prompt definition must declare:
 - Input: query, data scope, top-k, filters
 - Output: ranked context candidates
 - Variables: `query`, `retrieval_scope`, `top_k`, `filters`
+
+### Internal RAG
+
+- Role: grounded answer synthesizer
+- Input: question, ranked retrieval results, citation policy, answer mode
+- Output: answer with citations and confidence notes
+- Variables: `question`, `retrieval_results`, `answer_mode`, `require_citations`, `confidence_floor`
+- Constraints: every factual claim must be grounded in citations; do not invent unsupported facts; return an insufficiency signal when context is too thin; keep answers schema-bound.
+- Fallback: `insufficient_context`
 
 ### Evaluation
 

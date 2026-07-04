@@ -35,7 +35,8 @@ This guide explains when to use workflow, agent, tool, repository, provider, ret
 ## 7. Internal RAG / 内部 RAG / 社内 RAG
 
 - Use for internal documents, manuals, policies, FAQs, and uploaded files.
-- Requires chunking, metadata, citation, ACL, and evaluation.
+- Use after retrieval when a grounded answer with citations is needed.
+- Requires chunking, metadata, citation, ACL, evaluation, and a citation-safe answer contract.
 
 ## 8. Internet Search / 互联网检索 / インターネット検索
 
@@ -96,7 +97,7 @@ This guide explains when to use workflow, agent, tool, repository, provider, ret
 | Durable fact storage | Repository | audit and replay |
 | Replaceable integration | Provider | isolation and swapability |
 | Structured internal facts | Business Retrieval | deterministic grounding |
-| Internal docs | Internal RAG | citation and ACL |
+| Internal docs | Internal RAG | retrieval + citation + grounded answer |
 | Public web evidence | Internet Search | freshness and evidence |
 | High-risk publication | Approval + Human Review | accountability |
 

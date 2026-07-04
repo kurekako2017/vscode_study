@@ -12,6 +12,12 @@ from app.schemas.document_retrieval_api import (
     DocumentRetrievalSearchRequest,
     DocumentRetrievalSearchResponse,
 )
+from app.schemas.internal_rag_api import (
+    InternalRagAnswerMode,
+    InternalRagAnswerRequest,
+    InternalRagAnswerResponse,
+    InternalRagCitationResponse,
+)
 
 __all__ = [
     "DocumentArchiveResponse",
@@ -21,6 +27,10 @@ __all__ = [
     "DocumentRetrievalResultResponse",
     "DocumentRetrievalSearchRequest",
     "DocumentRetrievalSearchResponse",
+    "InternalRagAnswerMode",
+    "InternalRagAnswerRequest",
+    "InternalRagAnswerResponse",
+    "InternalRagCitationResponse",
     "DocumentUploadSessionResponse",
     "UploadSessionStatus",
 ]

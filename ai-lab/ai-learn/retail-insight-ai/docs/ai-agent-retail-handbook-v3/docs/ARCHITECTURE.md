@@ -745,11 +745,15 @@ retail-insight-ai/
 
 ### Current State
 
-- 当前尚未形成统一 Retrieval Layer。
+- 当前 Retrieval Layer 已出现稳定的 service/provider 边界，但仍处于本地 InMemory 实现阶段。
+- 当前 Research 与未来 Internal Search / Internet Search / Structured Retrieval 仍然是不同能力域，尚未合并成统一平台层。
+- `DocumentRetrievalService` 现在依赖 `DocumentRetrievalProvider`，而不是直接依赖 raw chunk storage。
+- Internal RAG contract is frozen on top of the same retrieval provider boundary, but answer generation is still only a documented future boundary.
 
 ### Target State
 
 - 未来 Retrieval Layer 统一承接结构化业务检索、社内文档检索、互联网检索、上下文合并、引用追踪和评估。
+  - Internal RAG Answering
 
 ### Planned
 
@@ -759,6 +763,11 @@ flowchart LR
     B --> C[Business Retrieval]
     B --> D[Internal Retrieval]
     B --> E[Internet Retrieval]
+    D --> D1[DocumentRetrievalProvider]
+    D1 --> D2[InMemoryKeywordRetrieval]
+    D2 --> D3[Internal RAG Contract]
+    D3 --> D4[Citation Assembly]
+    D4 --> D5[Answer Contract]
     C --> F[Context Merge]
     D --> F
     E --> F
@@ -783,15 +792,73 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Internal Question] --> B[Document Retrieval Request]
-    B --> C[Keyword Search]
-    C --> D[Chunk Retrieval]
-    D --> E[Future Vector Retrieval]
-    E --> F[Internal Context]
-    F --> G[Context Merge]
-    G --> H[Analysis]
+    A[Internal Question] --> B[Validate question and answer mode]
+    B --> C[Document Retrieval Request]
+    C --> D[DocumentRetrievalProvider]
+    D --> E[Retrieved Chunks]
+    E --> F[Citation Assembly]
+    F --> G[Answer Contract]
+    G --> H[Context Merge]
+    H --> I[Analysis]
 ```
 
+### Current State
+
+- Internal RAG MVP 已实现 deterministic answer assembly。
+- Internal RAG 只依赖 existing DocumentRetrievalProvider，不直接碰 raw chunk storage。
+- `answer_mode=extractive | summary` 都不调用 LLM。
+
+### Planned
+
+- 未来 summary mode 可以替换成可插拔 LLM provider，但 citation contract 不变。
+- Internal RAG 仍然必须保持 retrieval provider boundary 不变。
+
+## Retrieval to Citation Flow
+
+```mermaid
+flowchart TD
+    A[Retrieval Result] --> B[Chunk Excerpt]
+    B --> C[Citation Object]
+    C --> D[Confidence Note]
+    D --> E[Answer Payload]
+```
+
+### Result
+
+- Citations preserve `document_id`、`chunk_id`、`chunk_index`、`excerpt`、`source` 和 `score`。
+- Answer payloads remain secret-safe and schema-bound.
+
+## Future LLM Provider Flow
+
+```mermaid
+flowchart TD
+    A[Summary Mode Request] --> B[Future LLM Provider]
+    B --> C[Draft Answer]
+    C --> D[Citation Check]
+    D --> E[Final Answer Contract]
+```
+
+### Planned
+
+- Future LLM providers must be replaceable and must not change the frozen internal RAG API contract.
+
+## Future Approval Integration Flow
+
+```mermaid
+flowchart TD
+    A[internal_rag.answer_generated] --> B[Future Approval Intake]
+    B --> C[pending_approval]
+    C --> D[approved]
+    C --> E[rejected]
+    D --> F[published]
+    E --> G[revision]
+    G --> C
+```
+
+### Planned
+
+- Internal RAG itself does not create approval state.
+- Approval remains a separate future API and must not be implied by answer success.
 ## Internet Search Flow
 
 ```mermaid

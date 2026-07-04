@@ -57,3 +57,14 @@
 | `invalid_query` | 422 | Query is invalid. | Query text or filters failed validation. | No | retrieval |
 | `retrieval_unavailable` | 503 | Retrieval is temporarily unavailable. | Retrieval layer is down or disabled. | Yes | retrieval |
 | `repository_error` | 500 | Retrieval storage error. | Repository operation failed during search. | Yes | retrieval |
+
+## 内部 RAG 错误 / Internal RAG Errors / 社内 RAG エラー
+
+| Code | HTTP | User | Developer | Retryable | Source |
+|---|---:|---|---|---|---|
+| `invalid_question` | 422 | Question is invalid. | Question text failed validation or was blank. | No | internal_rag |
+| `retrieval_unavailable` | 503 | Retrieval is temporarily unavailable. | Retrieval provider could not produce contexts. | Yes | internal_rag |
+| `insufficient_context` | 422 | Not enough context was found. | Retrieved evidence is insufficient for a grounded answer. | No | internal_rag |
+| `citation_required` | 400 | Citations are required. | Request disabled the frozen citation requirement. | No | internal_rag |
+| `provider_timeout` | 503 | Answer generation timed out. | Provider timed out while assembling the answer. | Yes | internal_rag |
+| `repository_error` | 500 | Answer storage error. | Repository operation failed during RAG flow. | Yes | internal_rag |

@@ -13,6 +13,7 @@ from app.models.document import (
     ImportBatch,
     Language,
 )
+from app.models.internal_rag import InternalRagEvaluationResult, InternalRagWarning
 from app.models.document_import import DocumentImportError, DocumentImportRecord, DocumentImportStatus
 from app.models.event import TaskEvent
 from app.models.persistence import (
@@ -44,6 +45,8 @@ __all__ = [
     "DocumentVersion",
     "ImportErrorRecord",
     "ImportBatch",
+    "InternalRagEvaluationResult",
+    "InternalRagWarning",
     "KPIResult",
     "Language",
     "ResearchResult",

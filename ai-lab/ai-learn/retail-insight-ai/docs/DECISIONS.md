@@ -394,6 +394,69 @@
 - `backend/tests/test_document_retrieval_api.py` 覆盖空查询、无结果、归档过滤、include_archived 与排序确定性。
 - 未来 full-text search、hybrid search、retrieval provider 或 PostgreSQL 搜索后端都必须保持 contract 兼容。
 
+## ADR-020
+
+日期：2026-07-04
+
+决策：将 `DocumentRetrievalService` 从 raw chunk storage 中解耦出来，改为依赖 `DocumentRetrievalProvider`，并保留当前 `InMemoryKeywordRetrieval` 作为唯一本地实现。
+
+原因：Retrieval API 已经冻结了 HTTP contract，但如果 service 继续直接读取 chunk repository，那么后续切换 PostgreSQL full-text、hybrid search 或其他检索后端时，service 层仍会绑定存储细节。把检索算法下沉到 provider，可以保持 service 只负责 API、事件和错误语义。
+
+备选方案：
+
+- 继续让 service 直接操作 `DocumentChunkRepository`；该方案会让检索实现与 chunk storage 强耦合。
+- 直接把 retrieval 收敛成 RAG；该方案会破坏当前 keyword-only contract。
+
+影响：
+
+- `backend/app/services/document_retrieval_service.py` 只保留 API/事件/错误边界。
+- `backend/app/repositories/interfaces/document_retrieval_provider.py` 定义检索后端合同。
+- `backend/app/repositories/implementations/in_memory/document_retrieval.py` 提供当前 keyword-only 本地实现。
+- `backend/app/config/container.py` 在组合根中装配 retrieval provider。
+- `docs/ARCHITECTURE.md` 需要同步更新 retrieval layer boundary。
+
+## ADR-021
+
+日期：2026-07-04
+
+决策：将 `POST /api/v1/internal-rag/answer` 冻结为基于现有 Document Retrieval Provider 的上层只读回答 contract，并显式区分 retrieval 与 answer generation。
+
+原因：如果直接把内部 RAG 写成“带答案生成的检索 API”而不先冻结 contract，后续 summary mode、citation 规则、未来 LLM provider、审批集成和错误语义都会跟着实现细节漂移。先冻结 contract 可以把 retrieval provider、citation model 和 answer mode 分层固定下来。
+
+备选方案：
+
+- 继续只保留 document-retrieval/search，不冻结 internal RAG contract；该方案会延迟 grounded answer 边界的冻结。
+- 直接把 internal RAG 与真实 LLM / embedding / pgvector 绑定；该方案会把当前 phase 拉进生成式实现，破坏 docs-only freeze 目标。
+
+影响：
+
+- `docs/API_CONTRACT.md` 新增 `/api/v1/internal-rag/answer`。
+- `docs/EVENT_CONTRACT.md` 新增 `internal_rag.*` 事件族。
+- `docs/ERROR_CATALOG.md` 新增 internal RAG 错误码分组。
+- `docs/PROMPT_STANDARD.md` 新增 Internal RAG prompt family。
+- `docs/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
+- 后续如果要实现真正回答能力，必须以新的 provider / workflow 变体落地，而不能回写当前 retrieval contract。
+
+## ADR-022
+
+日期：2026-07-04
+
+决策：在现有 `DocumentRetrievalProvider` 之上实现 deterministic Internal RAG MVP，并保持 extractive / summary 两种 answer mode 都不调用 LLM。
+
+原因：当前阶段目标是把 internal RAG contract 从 freeze 推到可运行的最小实现，但仍要避免引入真实 LLM、embedding 或 pgvector。使用 existing retrieval provider 作为唯一上下文来源，可以保持 citation 规则、错误语义和 retrieval boundary 不变，同时让 answer assembly 逻辑保持可测试、可重复。
+
+备选方案：
+
+- 直接接入真实 LLM provider；该方案会提前进入生成式阶段，不符合当前 sprint 的 no-LLM 约束。
+- 只保留 contract freeze，不实现 MVP；该方案无法验证 citation 规则、insufficient_context 和 archived filter 行为。
+
+影响：
+
+- `backend/app/services/internal_rag_service.py` 作为 grounded answer service。
+- `backend/app/api/internal_rag.py` 暴露 `POST /api/v1/internal-rag/answer`。
+- `backend/tests/test_internal_rag_api.py` 覆盖 extractive、summary、invalid_question、insufficient_context、citations、archived exclusion。
+- `docs/ARCHITECTURE.md` 需要同步记录 Internal RAG MVP without LLM 的真实实现边界。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

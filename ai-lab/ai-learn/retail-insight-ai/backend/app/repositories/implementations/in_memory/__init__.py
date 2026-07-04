@@ -2,12 +2,14 @@
 
 from app.repositories.implementations.in_memory.document_repository import InMemoryDocumentRepository
 from app.repositories.implementations.in_memory.document_chunk_repository import InMemoryDocumentChunkRepository
+from app.repositories.implementations.in_memory.document_retrieval import InMemoryKeywordRetrieval
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
 from app.repositories.implementations.in_memory.task_repository import InMemoryTaskRepository
 
 __all__ = [
     "InMemoryDocumentChunkRepository",
+    "InMemoryKeywordRetrieval",
     "InMemoryDocumentRepository",
     "InMemoryEventRepository",
     "InMemoryReportRepository",

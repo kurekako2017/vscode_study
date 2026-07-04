@@ -84,7 +84,18 @@ This file freezes document upload related error codes and their operator-facing 
 | `provider_timeout` | 503 | External processing timed out. | Provider timed out while handling upload. | Yes | provider | Show retry button |
 | `event_publish_failed` | 500 | Upload finished with notification issues. | Event publish failed after persistence. | Yes | event | Show partial success warning |
 
-## 10. Retry Guidance / 重试建议 / 再試行ガイド
+## 10. Internal RAG Errors / 内部 RAG 错误 / 社内 RAG エラー
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `invalid_question` | 422 | Question is invalid. | Question text failed validation or was blank. | No | internal_rag | Highlight question input |
+| `retrieval_unavailable` | 503 | Retrieval is temporarily unavailable. | Retrieval provider could not produce contexts. | Yes | internal_rag | Show retry notice |
+| `insufficient_context` | 422 | Not enough context was found. | Retrieved evidence is insufficient for a grounded answer. | No | internal_rag | Show refine query hint |
+| `citation_required` | 400 | Citations are required. | Request disabled the frozen citation requirement. | No | internal_rag | Force citations enabled |
+| `provider_timeout` | 503 | Answer generation timed out. | Provider timed out while assembling the answer. | Yes | internal_rag | Show retry button |
+| `repository_error` | 500 | Answer storage error. | Repository operation failed during RAG flow. | Yes | internal_rag | Show retry and support hint |
+
+## 11. Retry Guidance / 重试建议 / 再試行ガイド
 
 - Retryable errors should keep the current session state and allow safe retry.
 - Non-retryable validation errors should be fixed in the current form before retry.

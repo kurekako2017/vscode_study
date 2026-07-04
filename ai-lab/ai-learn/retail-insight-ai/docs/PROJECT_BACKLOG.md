@@ -32,9 +32,9 @@
 
 ## 当前阶段
 
-Sprint 8.2: Document Retrieval API MVP Implementation
+Sprint 9.2: Internal RAG MVP without LLM
 
-状态：进行中
+状态：已完成
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -182,10 +182,46 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
 - [x] frozen contract remains unchanged
 
+### Sprint 8.3: Retrieval Repository Abstraction + Worktree Cleanup
+
+- [x] `DocumentRetrievalService` depends on `DocumentRetrievalProvider`
+- [x] `InMemoryKeywordRetrieval` keeps current keyword scoring and ordering behavior
+- [x] POST /api/v1/document-retrieval/search response shape unchanged
+- [x] `git status` confirmed no untracked chunk files
+- [x] current retrieval boundary documented in Architecture / Decisions / Changelog / Task
+- [x] existing retrieval tests remain expected to pass after abstraction change
+- [ ] future PostgreSQL full-text / hybrid search backend remains to be planned
+
+### Sprint 9.1: Internal RAG Contract Freeze
+
+- [x] `POST /api/v1/internal-rag/answer` contract frozen
+- [x] `internal_rag.started` / `internal_rag.retrieval_completed` / `internal_rag.answer_generated` / `internal_rag.failed` frozen
+- [x] `invalid_question` / `retrieval_unavailable` / `insufficient_context` / `citation_required` / `provider_timeout` / `repository_error` frozen
+- [x] Internal RAG Flow / Retrieval to Citation Flow / Future LLM Provider Flow / Future Approval Integration Flow added to Architecture
+- [x] Prompt Standard updated with Internal RAG prompt family
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror updated
+- [x] retrieval API behavior unchanged
+
+### Sprint 9.2: Internal RAG MVP without LLM
+
+- [x] `POST /api/v1/internal-rag/answer` implemented on top of `DocumentRetrievalProvider`
+- [x] extractive answer assembly uses top retrieval excerpts
+- [x] summary mode stays deterministic and does not call an LLM
+- [x] citations are returned for every excerpt used in the answer
+- [x] `invalid_question` / `insufficient_context` / `citation_required` behavior covered by backend tests
+- [x] archived documents are excluded unless `include_archived=true`
+- [x] existing retrieval tests still pass
+- [x] backend full test suite and compileall pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] retrieval API behavior remains unchanged
+
 ## 当前近期优先级
 
 ### Enterprise Priority
 
+- [x] Sprint 9.2 Internal RAG MVP without LLM
+- [x] Sprint 9.1 Internal RAG Contract Freeze
+- [x] Sprint 8.3 Retrieval Repository Abstraction + Worktree Cleanup
 - [x] Sprint 8.2 Document Retrieval API MVP Implementation
 - [x] Sprint 8.1 Document Retrieval Contract Freeze
 - [ ] 第一优先级：文件化输入（CSV / JSON / Markdown）+ PostgreSQL 持久化基础
@@ -458,6 +494,23 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [x] 实现 empty query / no match / archived exclusion / include_archived / deterministic ordering 测试
 - [x] 保持 frozen contract 不变
 - [x] 完成主项目与 handbook 的任务、路线图、Backlog、Changelog、决策同步
+
+### 2026-07-04 Sprint 8.3 Retrieval Repository Abstraction + Worktree Cleanup
+
+- [x] 将 `DocumentRetrievalService` 从 raw chunk storage 解耦到 `DocumentRetrievalProvider`
+- [x] 保持 `InMemoryKeywordRetrieval` 的 keyword-only scoring / sorting 行为不变
+- [x] 确认工作区没有额外 untracked chunk 文件
+- [x] 更新主项目的 Architecture、DECISIONS、CHANGELOG、TASK、Backlog
+- [ ] handbook mirror 自动同步被阻塞：`../scripts/sync_retail_handbook_docs.py` 需要缺失的 `ai-agent-retail-handbook-v3/README.md`
+
+### 2026-07-04 Sprint 9.1 Internal RAG Contract Freeze
+
+- [x] 冻结 `POST /api/v1/internal-rag/answer`
+- [x] 冻结 `internal_rag.started`、`internal_rag.retrieval_completed`、`internal_rag.answer_generated`、`internal_rag.failed`
+- [x] 冻结 `invalid_question`、`retrieval_unavailable`、`insufficient_context`、`citation_required`、`provider_timeout`、`repository_error`
+- [x] 新增 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow
+- [x] 完成主项目与 handbook 的任务、路线图、Backlog、Changelog、决策同步
+- [x] 仅冻结 contract，不实现 RAG、embedding、pgvector、frontend
 
 ## Architecture Principles
 

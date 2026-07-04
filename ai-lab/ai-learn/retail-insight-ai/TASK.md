@@ -4,28 +4,76 @@
 
 ## 当前阶段
 
-Sprint 8.2: Document Retrieval API MVP Implementation
+Sprint 9.2: Internal RAG MVP without LLM
 
 ## 当前最高优先级任务
 
 ### Sprint Result
 
-- [x] POST /api/v1/document-retrieval/search implemented
-- [x] keyword-only search over existing in-memory document chunks implemented
-- [x] empty query returns invalid_query
+- [x] POST /api/v1/internal-rag/answer implemented
+- [x] InternalRagService added on top of DocumentRetrievalProvider
+- [x] extractive answer assembly uses top retrieval excerpts
+- [x] summary mode is deterministic and does not call an LLM
+- [x] citation validation returns grounded citations for each used excerpt
+- [x] invalid_question / insufficient_context / citation_required behavior covered
 - [x] archived documents are excluded unless include_archived=true
-- [x] deterministic score ordering implemented
-- [x] retrieval events started / completed / failed emitted
-- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
-- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] backend tests added for extractive success, summary determinism, no context, empty question, citations, and archived exclusion
+- [x] existing retrieval tests still pass
 - [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
-- [x] frozen contract remains unchanged
+- [x] retrieval API behavior remains unchanged
 
 ### Boundary
 
-- 当前实现已包含 Document Retrieval API MVP，keyword-only search 只读取 existing in-memory document chunks。
-- 不实现 frontend、不实现 RAG、不实现 embedding、不实现 pgvector、不实现 hybrid search、不实现 Approval API。
-- 继续保持 PostgreSQL Document Repository 仅设计不实现，versions / RAG / embedding / pgvector / Approval API 仍冻结未实现。
+- 当前实现已包含 Internal RAG MVP without LLM，answer generation 仍是 deterministic assembly，不调用 LLM。
+- 不实现 frontend、不实现 embedding、不实现 pgvector、不实现真实 LLM provider、不实现 PostgreSQL retrieval backend。
+- 继续保持 `/api/v1/document-retrieval/search` contract、scoring 和 response shape 不变。
+
+## Sprint 8.3: Retrieval Repository Abstraction + Worktree Cleanup
+
+### Current State
+
+Document Retrieval service 已改为依赖 `DocumentRetrievalProvider`，不再直接依赖 raw chunk storage。
+
+### Target State
+
+Internal Document Retrieval 继续保持 keyword-only 行为，但检索后端边界已经独立出来，后续可替换成 PostgreSQL full-text 或其他 provider。
+
+### Planned
+
+- 保持 `POST /api/v1/document-retrieval/search` contract 不变。
+- 保持 scoring / sorting / response shape 不变。
+- 继续不实现 RAG、embedding、pgvector、frontend。
+
+## Sprint 9.1: Internal RAG Contract Freeze
+
+### Sprint Result
+
+- [x] `POST /api/v1/internal-rag/answer` contract frozen
+- [x] internal_rag.started / retrieval_completed / answer_generated / failed frozen
+- [x] invalid_question / retrieval_unavailable / insufficient_context / citation_required / provider_timeout / repository_error frozen
+- [x] Internal RAG Flow / Retrieval to Citation Flow / Future LLM Provider Flow / Future Approval Integration Flow added to Architecture
+- [x] Prompt Standard updated with Internal RAG prompt family
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror updated
+- [x] retrieval API behavior unchanged
+
+### Boundary
+
+- 只冻结 Internal RAG contract，不实现 RAG。
+- 不调用 LLM、不实现 embedding、不实现 pgvector、不实现 frontend。
+- 继续保持 retrieval API 行为、评分和返回结构不变。
+
+### Current State
+
+Internal RAG 只是基于 Document Retrieval Provider 的上层 contract，没有实际回答引擎。
+
+### Target State
+
+未来 Internal RAG 将成为 retrieval 之后、approval 之前的稳定 grounded answer boundary。
+
+### Planned
+
+- 继续保持 `/api/v1/internal-rag/answer` 与 `/api/v1/document-retrieval/search` 分离。
+- 未来 summary mode 可接入可替换 LLM provider，但不得破坏 contract。
 
 ## Sprint 8.2: Document Retrieval API MVP Implementation
 

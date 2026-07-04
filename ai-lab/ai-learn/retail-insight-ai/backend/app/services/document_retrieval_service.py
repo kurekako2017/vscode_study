@@ -1,16 +1,15 @@
 """文档检索服务。
 
 文件职责：
-- 提供 POST /api/v1/document-retrieval/search 的 keyword-only 检索逻辑。
-- 在现有文档域与 chunk 域之上做只读排名，不引入 LLM、RAG 或向量检索。
-- 记录检索事件，便于未来 SSE、审计和监控扩展。
+- 提供 POST /api/v1/document-retrieval/search 的应用服务入口。
+- 负责检索事件、错误语义和 HTTP contract 的稳定边界。
+- 把实际 keyword 搜索下放给 retrieval provider，避免 service 直接依赖 raw chunk storage。
 
 谁会调用它：
 - `backend/app/api/document_retrieval.py` 路由通过依赖注入调用它。
 
 它调用谁：
-- `DocumentRepository` 读取文档事实和过滤条件。
-- `DocumentChunkRepository` 读取已生成的 chunk。
+- `DocumentRetrievalProvider` 执行检索后端逻辑。
 - `EventPublisher` 记录检索事件。
 
 输入是什么：
@@ -20,51 +19,54 @@
 - `DocumentRetrievalSearchResponse`，或者抛出稳定的应用异常。
 
 为什么需要这一层：
-- 检索是 chunk 与 future RAG 之间的只读边界，不能把搜索逻辑塞进路由或模型层。
+- 检索 service 只保留 API 和事件边界，未来 full-text search、hybrid search 或 PostgreSQL 后端替换时不需要改 route。
 
 日本现场面试怎么讲：
-- 这是文档检索的应用服务层，先做 deterministic keyword search，后续可以无痛替换成 PostgreSQL full-text 或 hybrid search。
+- 这是文档检索的应用服务层，真正的 keyword ranking 已经下沉到 provider，service 不再直接碰 chunk storage。
 """
 
 from __future__ import annotations
 
-import re
 from threading import RLock
 
 from app.errors.base import AppException
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import InvalidQueryException
 from app.events.publisher import EventPublisher
-from app.models.document import Document, DocumentChunk, DocumentStatus, DocumentType, Language
 from app.observability.logging import get_logger, get_request_id, log_event
+from app.repositories.implementations.in_memory.document_retrieval import InMemoryKeywordRetrieval
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
+from app.repositories.interfaces.document_retrieval_provider import DocumentRetrievalProvider
 from app.repositories.interfaces.document_repository import DocumentRepository
-from app.schemas.document_api import DocumentResponse, DocumentSourceResponse
-from app.schemas.document_retrieval_api import (
-    DocumentRetrievalResultResponse,
-    DocumentRetrievalSearchRequest,
-    DocumentRetrievalSearchResponse,
-)
+from app.schemas.document_retrieval_api import DocumentRetrievalSearchRequest, DocumentRetrievalSearchResponse
 
 logger = get_logger(__name__)
 
-_TOKEN_RE = re.compile(r"[\w\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff-]+", re.UNICODE)
-
 
 class DocumentRetrievalService:
-    """封装文档检索、过滤、排名和事件发布逻辑。"""
+    """封装文档检索 API、事件发布和错误映射逻辑。"""
 
     def __init__(
         self,
-        document_repository: DocumentRepository,
-        chunk_repository: DocumentChunkRepository,
-        event_publisher: EventPublisher,
+        retrieval_provider: DocumentRetrievalProvider | DocumentRepository,
+        event_publisher: EventPublisher | DocumentChunkRepository | None = None,
+        chunk_repository: DocumentChunkRepository | None = None,
     ) -> None:
         """保存仓储与事件发布器，并初始化进程内互斥锁。"""
 
-        self._document_repository = document_repository
-        self._chunk_repository = chunk_repository
-        self._event_publisher = event_publisher
+        if isinstance(retrieval_provider, DocumentRetrievalProvider):
+            if not isinstance(event_publisher, EventPublisher):
+                raise TypeError("event_publisher is required when retrieval_provider is a provider")
+            provider = retrieval_provider
+            publisher = event_publisher
+        else:
+            if not isinstance(event_publisher, DocumentChunkRepository) or not isinstance(chunk_repository, EventPublisher):
+                raise TypeError("legacy constructor requires document_repository, chunk_repository, event_publisher")
+            provider = InMemoryKeywordRetrieval(retrieval_provider, event_publisher)
+            publisher = chunk_repository
+
+        self._retrieval_provider = provider
+        self._event_publisher = publisher
         self._lock = RLock()
 
     def search(self, request: DocumentRetrievalSearchRequest) -> DocumentRetrievalSearchResponse:
@@ -90,7 +92,7 @@ class DocumentRetrievalService:
                         }
                     )
 
-                results, total_matches = self._search_documents(request, query)
+                results, total_matches = self._retrieval_provider.search(request)
                 response = DocumentRetrievalSearchResponse(
                     results=results,
                     total=total_matches,
@@ -141,163 +143,10 @@ class DocumentRetrievalService:
                     detail={"query_length": len(self._normalize_query(request.query))},
                 ) from exc
 
-    def _search_documents(
-        self,
-        request: DocumentRetrievalSearchRequest,
-        query: str,
-    ) -> tuple[list[DocumentRetrievalResultResponse], int]:
-        """读取文档与 chunk 快照，按 deterministic keyword score 排序。"""
-
-        self._validate_limit(request.limit)
-        document_type = self._parse_document_type(request.document_type)
-        language = self._parse_language(request.language)
-        query_terms = self._unique_terms(query)
-        if not query_terms:
-            raise InvalidQueryException({"field": "query", "reason": "query must contain searchable terms"})
-        normalized_query = " ".join(query_terms)
-
-        results: list[tuple[float, str, int, str, DocumentRetrievalResultResponse]] = []
-        for document in self._iter_documents():
-            if not self._matches_document(document, request, document_type=document_type, language=language):
-                continue
-            chunks = self._chunk_repository.list_for_document(document.document_id, document.version)
-            for chunk in chunks:
-                score = self._score_chunk(chunk, query_terms, normalized_query)
-                if score <= 0:
-                    continue
-                result = DocumentRetrievalResultResponse(
-                    document_id=document.document_id,
-                    chunk_id=chunk.chunk_id,
-                    chunk_index=chunk.chunk_index,
-                    content_excerpt=self._content_excerpt(chunk.content, query_terms),
-                    score=round(score, 4),
-                    source=DocumentSourceResponse.from_domain(document.metadata.source),
-                    metadata=DocumentResponse.from_domain(document),
-                )
-                results.append(
-                    (
-                        result.score,
-                        result.document_id,
-                        result.chunk_index,
-                        result.chunk_id,
-                        result,
-                    )
-                )
-
-        results.sort(key=lambda item: (-item[0], item[1], item[2], item[3]))
-        limited = [item[4] for item in results[: request.limit]]
-        return limited, len(results)
-
-    def _iter_documents(self) -> list[Document]:
-        """按 document_id 排序返回文档快照，确保检索顺序稳定。"""
-
-        documents = self._document_repository.list_all()
-        return sorted(documents, key=lambda document: document.document_id)
-
-    def _matches_document(
-        self,
-        document: Document,
-        request: DocumentRetrievalSearchRequest,
-        *,
-        document_type: DocumentType | None,
-        language: Language | None,
-    ) -> bool:
-        """先做元数据过滤，再进入 chunk 级 keyword 排名。"""
-
-        metadata = document.metadata
-        if metadata.status is DocumentStatus.ARCHIVED and not request.include_archived:
-            return False
-        if document_type is not None and metadata.document_type is not document_type:
-            return False
-        if language is not None and metadata.language is not language:
-            return False
-        if request.tags:
-            tags = set(metadata.tags)
-            if not set(request.tags).issubset(tags):
-                return False
-        return True
-
-    def _validate_limit(self, limit: int) -> None:
-        """冻结 limit 范围，避免越界分页破坏 contract。"""
-
-        if limit < 1 or limit > 100:
-            raise InvalidQueryException({"field": "limit", "reason": "limit must be within 1 and 100"})
-
-    def _parse_document_type(self, value: str | None) -> DocumentType | None:
-        """把字符串 filter 转成领域枚举，保持 request 轻量。"""
-
-        if value is None:
-            return None
-        try:
-            return DocumentType(value)
-        except ValueError as exc:
-            raise InvalidQueryException({"field": "document_type", "reason": "unsupported document_type", "value": value}) from exc
-
-    def _parse_language(self, value: str | None) -> Language | None:
-        """把字符串 filter 转成领域枚举，保持 request 轻量。"""
-
-        if value is None:
-            return None
-        try:
-            return Language(value)
-        except ValueError as exc:
-            raise InvalidQueryException({"field": "language", "reason": "unsupported language", "value": value}) from exc
-
-    def _score_chunk(
-        self,
-        chunk: DocumentChunk,
-        query_terms: list[str],
-        normalized_query: str,
-    ) -> float:
-        """只基于 chunk.content 计算 deterministic keyword score。"""
-
-        content = chunk.content.lower()
-        matched_terms = [term for term in query_terms if term in content]
-        if not matched_terms:
-            return 0.0
-
-        score = len(matched_terms) / len(query_terms)
-        if normalized_query in content:
-            score = min(1.0, score + 0.25)
-        return score
-
-    def _unique_terms(self, value: str) -> list[str]:
-        """提取稳定的 keyword tokens，保留出现顺序并去重。"""
-
-        tokens = _TOKEN_RE.findall(value.lower())
-        unique: list[str] = []
-        seen: set[str] = set()
-        for token in tokens:
-            if token not in seen:
-                seen.add(token)
-                unique.append(token)
-        return unique
-
     def _normalize_query(self, value: str) -> str:
         """去掉首尾空白，避免空白 query 进入搜索逻辑。"""
 
         return value.strip()
-
-    def _content_excerpt(self, content: str, query_terms: list[str], window: int = 160) -> str:
-        """截取与命中词相关的稳定摘要，优先返回最早命中附近内容。"""
-
-        lowered = content.lower()
-        hit_index = len(content)
-        for term in query_terms:
-            index = lowered.find(term)
-            if index != -1 and index < hit_index:
-                hit_index = index
-
-        if hit_index == len(content):
-            excerpt = content[:window]
-        else:
-            start = max(0, hit_index - window // 3)
-            end = min(len(content), start + window)
-            excerpt = content[start:end]
-        excerpt = " ".join(excerpt.split())
-        if len(excerpt) > window:
-            excerpt = excerpt[: window - 3].rstrip() + "..."
-        return excerpt
 
     def _request_summary(self, request: DocumentRetrievalSearchRequest) -> dict[str, object]:
         """把检索请求摘要写入日志/事件，但不泄露原始 query。"""

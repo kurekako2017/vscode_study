@@ -4,16 +4,15 @@
 
 ## 当前阶段
 
-Sprint 8.2: Document Retrieval API MVP Implementation
+Sprint 9.2: Internal RAG MVP without LLM
 
 当前状态：
 
 - Code implemented
 - InMemory path verified
-- PostgreSQL schema implemented
-- PostgreSQL repository tests prepared
-- PostgreSQL real integration test pending
-- Status: In Progress / Partially Verified
+- Full backend tests pass
+- Python compileall pass
+- Status: Completed / Verified
 
 ## Project Positioning
 
@@ -116,6 +115,49 @@ handbook 后续所有路线图描述都必须显式区分 Current State、Target
 
 - 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
 - 继续保持 Retrieval 不承担 LLM answer generation。
+
+## Sprint 9.1: Internal RAG Contract Freeze
+
+### Current State
+
+- Internal RAG 仅完成 contract freeze。
+- 当前没有 RAG implementation、没有 LLM provider、没有 embedding、没有 pgvector。
+
+### Target State
+
+- Internal RAG 成为 retrieval 之后、approval 之前的稳定 answer boundary。
+- Answer mode 与 citation requirement 在 contract 层冻结。
+
+### Result
+
+- 已冻结 `/api/v1/internal-rag/answer`。
+- 已冻结 Internal RAG events / errors / prompt family / architecture flow。
+
+### Planned
+
+- 不实现 RAG / embedding / pgvector / frontend。
+- 未来 summary mode 若接入 LLM provider，必须版本化并保持兼容边界。
+
+## Sprint 9.2: Internal RAG MVP without LLM
+
+### Current State
+
+- Internal RAG 已在 existing DocumentRetrievalProvider 之上完成 deterministic answer assembly。
+- extractive / summary 两种 answer mode 都不调用 LLM。
+
+### Target State
+
+- 未来 summary mode 可以接入可插拔 LLM provider，但 citation contract 不变。
+
+### Result
+
+- `POST /api/v1/internal-rag/answer` 已实现。
+- backend tests 与 compileall 已通过。
+
+### Planned
+
+- 继续保持 `POST /api/v1/internal-rag/answer` 与 retrieval API 分离。
+- 未来若接 LLM provider，只能替换 answer assembly 层。
 
 ## Phase 1 Sync: 文件化输入基础
 

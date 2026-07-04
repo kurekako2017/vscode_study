@@ -1,6 +1,7 @@
 from fastapi import Request
 
 from app.config.container import AppContainer
+from app.services.internal_rag_service import InternalRagService
 from app.services.document_chunk_service import DocumentChunkService
 from app.services.document_import_service import DocumentImportService
 from app.services.document_archive_service import DocumentArchiveService
@@ -70,3 +71,9 @@ async def get_document_archive_service(request: Request) -> DocumentArchiveServi
     """向文档归档路由注入同步 archive service。"""
 
     return request.app.state.container.document_archive_service
+
+
+async def get_internal_rag_service(request: Request) -> InternalRagService:
+    """向 internal RAG 路由注入 grounded answer service。"""
+
+    return request.app.state.container.internal_rag_service

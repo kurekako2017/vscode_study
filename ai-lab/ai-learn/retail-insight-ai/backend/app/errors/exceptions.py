@@ -211,3 +211,45 @@ class InvalidQueryException(AppException):
             422,
             detail=detail,
         )
+
+
+class InvalidQuestionException(AppException):
+    """表示 internal RAG 的 question 为空或不合法。"""
+
+    def __init__(self, detail: dict[str, Any] | None = None) -> None:
+        """返回 422，并保留安全的 question 校验摘要。"""
+
+        super().__init__(
+            ErrorCode.INVALID_QUESTION,
+            "Question is invalid",
+            422,
+            detail=detail,
+        )
+
+
+class InsufficientContextException(AppException):
+    """表示检索返回的证据不足以生成 grounded answer。"""
+
+    def __init__(self, detail: dict[str, Any] | None = None) -> None:
+        """返回 422，并保留上下文不足的稳定原因。"""
+
+        super().__init__(
+            ErrorCode.INSUFFICIENT_CONTEXT,
+            "Not enough context was found",
+            422,
+            detail=detail,
+        )
+
+
+class CitationRequiredException(AppException):
+    """表示请求要求 citations，但当前结果无法提供完整引用。"""
+
+    def __init__(self, detail: dict[str, Any] | None = None) -> None:
+        """返回 400，让客户端知道必须开启或保留 citations。"""
+
+        super().__init__(
+            ErrorCode.CITATION_REQUIRED,
+            "Citations are required",
+            400,
+            detail=detail,
+        )

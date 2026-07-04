@@ -42,6 +42,10 @@ Document upload events are frozen as a separate family and do not replace task S
 - `document.retrieval.started`
 - `document.retrieval.completed`
 - `document.retrieval.failed`
+- `internal_rag.started`
+- `internal_rag.retrieval_completed`
+- `internal_rag.answer_generated`
+- `internal_rag.failed`
 - `document.version.created`
 - `document.validation.failed`
 
@@ -156,6 +160,17 @@ Document chunk events must keep payloads secret-safe and document-centric.
 Document retrieval events must keep payloads secret-safe and document-centric.
 文档检索事件的 payload 必须安全且以文档为中心。
 文書検索イベントの payload は安全で文書中心でなければなりません。
+
+### 6.5 Internal RAG Event Semantics / 内部 RAG 事件语义 / 社内 RAG イベント意味
+
+- `internal_rag.started`: internal RAG request accepted and answer flow began.
+- `internal_rag.retrieval_completed`: retrieval phase finished and citation candidates are ready.
+- `internal_rag.answer_generated`: answer contract was assembled and returned.
+- `internal_rag.failed`: internal RAG failed before completion.
+
+Internal RAG events must keep payloads secret-safe, citation-aware, and document-centric.
+内部 RAG 事件的 payload 必须安全、可追溯并以文档为中心。
+内部 RAG イベントの payload は安全で、追跡可能で、文書中心でなければなりません。
 
 ## 7. Versioning Rules / 版本规则 / バージョン規則
 

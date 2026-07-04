@@ -4,20 +4,21 @@
 
 ## 当前阶段
 
-Sprint 8.2: Document Retrieval API MVP Implementation
+Sprint 9.2: Internal RAG MVP without LLM
 
 ## 当前最高优先级任务
 
-- [x] POST /api/v1/document-retrieval/search implemented
-- [x] keyword-only search over existing in-memory document chunks implemented
-- [x] empty query returns invalid_query
+- [x] POST /api/v1/internal-rag/answer implemented
+- [x] InternalRagService added on top of DocumentRetrievalProvider
+- [x] extractive answer assembly uses top retrieval excerpts
+- [x] summary mode is deterministic and does not call an LLM
+- [x] citation validation returns grounded citations for each used excerpt
+- [x] invalid_question / insufficient_context / citation_required behavior covered
 - [x] archived documents are excluded unless include_archived=true
-- [x] deterministic score ordering implemented
-- [x] retrieval events started / completed / failed emitted
-- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
-- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] backend tests added for extractive success, summary determinism, no context, empty question, citations, and archived exclusion
+- [x] existing retrieval tests still pass
 - [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
-- [x] frozen contract remains unchanged
+- [x] retrieval API behavior remains unchanged
 
 ## Sprint 8.2: Document Retrieval API MVP Implementation
 
@@ -33,6 +34,21 @@ Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边
 
 - 后续可在不破坏 contract 的前提下引入 PostgreSQL full-text / hybrid search。
 - 继续保持 Retrieval 仅为只读边界，不接入 LLM answer generation。
+
+## Sprint 9.1: Internal RAG Contract Freeze
+
+### Current State
+
+Internal RAG 只是基于 Document Retrieval Provider 的上层 contract，没有实际回答引擎。
+
+### Target State
+
+未来 Internal RAG 将成为 retrieval 之后、approval 之前的稳定 grounded answer boundary。
+
+### Planned
+
+- 继续保持 `/api/v1/internal-rag/answer` 与 `/api/v1/document-retrieval/search` 分离。
+- 未来 summary mode 可接入可替换 LLM provider，但不得破坏 contract。
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
