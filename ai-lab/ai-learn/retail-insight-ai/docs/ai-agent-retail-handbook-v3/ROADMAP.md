@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Phase 6: Document Import Pipeline MVP Sync
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 当前状态：
 
@@ -73,6 +73,50 @@ handbook 后续所有路线图描述都必须显式区分 Current State、Target
 
 当前将 Epic 12 作为横向平台能力标记，不表示已经实现完整 RAG 平台。
 
+## Sprint 8.1: Document Retrieval Contract Freeze
+
+### Current State
+
+- 当前实现仍以 Document Chunk Pipeline MVP 为最新后端边界。
+- Document Retrieval 仅完成契约冻结，尚未进入 backend 实现。
+
+### Target State
+
+- Retrieval 成为 Chunk 与 future RAG 之间的稳定只读边界。
+- 未来实现必须保持 keyword-only contract compatibility。
+
+### Result
+
+- 已冻结 `POST /api/v1/document-retrieval/search`。
+- 已冻结 retrieval events 与 retrieval errors。
+- 已更新 `TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+
+### Planned
+
+- 只做契约冻结，不实现 Retrieval API。
+- 不引入 RAG / embedding / pgvector / hybrid search。
+
+## Sprint 8.2: Document Retrieval API MVP Implementation
+
+### Current State
+
+- Document Retrieval API 已实现，并严格遵守 Sprint 8.1 冻结 contract。
+
+### Target State
+
+- Retrieval 仍保持 keyword-only 只读边界，后续可替换搜索后端但不破坏 contract。
+
+### Result
+
+- `POST /api/v1/document-retrieval/search` 已实现。
+- 基于现有 in-memory document chunks 完成 keyword search。
+- 已补充 retrieval tests 与 backend full suite verification。
+
+### Planned
+
+- 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
+- 继续保持 Retrieval 不承担 LLM answer generation。
+
 ## Phase 1 Sync: 文件化输入基础
 
 ### Current State
@@ -118,6 +162,28 @@ Task、Event、Report 有可选事务持久化能力，同时 Approval / Import 
 ### Planned
 
 - 当前未完成真实 PostgreSQL 联调验收
+
+## Phase 7 Sync: Document Chunk Pipeline MVP
+
+### Current State
+
+- `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks` 已实现。
+- 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
+- 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
+
+### Target State
+
+- 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
+- chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
+- chunk pipeline 不改变 approval 状态，也不承担 search / embedding 职责。
+
+### Result
+
+- 支持 import 完成后的文档切片、chunk 查询与事件记录。
+
+### Planned
+
+- `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
 - 当前未实现 Approval API、Import API、Document Search、RAG、Internet Search
 - 当前环境缺少 Docker CLI
 - 当前环境未安装 `psycopg` 到实际运行 venv

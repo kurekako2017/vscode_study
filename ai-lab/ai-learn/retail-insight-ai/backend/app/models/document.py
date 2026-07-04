@@ -266,6 +266,7 @@ class DocumentChunk:
     chunk_id: str
     chunk_index: int
     content: str
+    character_count: int
     metadata: DocumentMetadata
     created_at: datetime = field(default_factory=utc_now)
 

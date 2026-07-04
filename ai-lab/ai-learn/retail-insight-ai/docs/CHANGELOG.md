@@ -1,5 +1,28 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-04 Sprint 8.2 Document Retrieval API MVP Implementation
+
+- 实现 `POST /api/v1/document-retrieval/search`，以 keyword-only 方式在现有 in-memory document chunks 上执行检索。
+- 支持 `query`、`limit`、`include_archived`、`document_type`、`language`、`tags`，并返回 `document_id`、`chunk_id`、`chunk_index`、`content_excerpt`、`score`、`source`、`metadata`。
+- 新增 `backend/app/api/document_retrieval.py`、`backend/app/services/document_retrieval_service.py`、`backend/app/schemas/document_retrieval_api.py` 与 `backend/tests/test_document_retrieval_api.py`。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 LLM、RAG、embedding、pgvector、hybrid search、frontend 或 PostgreSQL document repository。
+
+## 2026-07-04 Sprint 8.1 Document Retrieval Contract Freeze
+
+- 冻结 `POST /api/v1/document-retrieval/search` 的请求、响应、状态码、错误码、检索事件与错误目录。
+- 在 `docs/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow 与 Future RAG Integration Flow。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 Retrieval API、RAG、embedding、pgvector、hybrid search 或 future approval flow。
+
+## 2026-07-04 Sprint 7 Document Chunk Pipeline MVP
+
+- 实现 `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks`。
+- Chunk pipeline 只接受 validated 文档，只支持 Markdown / Text，并采用 deterministic replace 规则。
+- 新增 `backend/app/repositories/interfaces/document_chunk_repository.py`、`backend/app/repositories/implementations/in_memory/document_chunk_repository.py`、`backend/app/services/document_chunk_service.py`、`backend/app/api/document_chunks.py`、`backend/app/schemas/document_chunk_api.py` 与 `backend/tests/test_document_chunk_api.py`。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 frontend、RAG、embedding、pgvector、Approval API、PostgreSQL Document Repository、versions、search。
+
 ## 2026-07-04 Sprint 6 Document Import Pipeline MVP
 
 - 实现 `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}`。

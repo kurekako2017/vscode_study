@@ -129,14 +129,14 @@ All document upload endpoints are frozen under `/api/v1`.
 Shared request rule:
 
 - `POST /api/v1/documents` accepts `multipart/form-data` with `file` and `metadata`.
-- `GET` and `DELETE` endpoints use path and query parameters only.
+- `GET`, `DELETE`, and chunk `POST` endpoints use path parameters only; chunk `POST` has no request body.
 - `metadata` must include the frozen document domain fields from `docs/MASTER_PROMPT.md` and `docs/ARCHITECTURE.md`.
 
 Shared response rule:
 
 - Response bodies must stay document-centric.
 - Approval state is not embedded as an active workflow object in this freeze.
-- `chunks` remain a reserved future collection and may be empty until chunking is implemented.
+- `POST /api/v1/documents/{document_id}/chunks` and `GET /api/v1/documents/{document_id}/chunks` expose chunk snapshots; chunk payloads are not embedded in upload or list responses.
 - Upload responses return a `DocumentUploadSession` snapshot that reflects the completed synchronous MVP upload.
 - List responses expose `next_cursor` as a planned pagination placeholder; it is not an implemented cursor-based pagination contract yet.
 
@@ -346,10 +346,78 @@ Versioning rule:
 Future approval relationship:
 - Approval is version-aware in the future, but this endpoint does not create approval records.
 
-#### 4.5.5 `GET /api/v1/documents/{document_id}/chunks`
+#### 4.5.5 `POST /api/v1/documents/{document_id}/chunks`
 
 Purpose:
-Reserve the chunk collection boundary for the future chunk pipeline.
+Create or replace the deterministic chunk set for a validated document.
+
+Request:
+
+- Path parameter: `document_id`
+- No request body.
+
+Response `201 Created`:
+
+```json
+{
+  "document_id": "doc-123",
+  "version": 1,
+  "items": [
+    {
+      "document_id": "doc-123",
+      "version": 1,
+      "chunk_id": "chk-123",
+      "chunk_index": 0,
+      "content": "Paragraph one.",
+      "character_count": 14,
+      "metadata": {
+        "document_id": "doc-123",
+        "title": "June Sales Review",
+        "description": "Monthly document upload",
+        "owner": "analysis-team",
+        "created_at": "2026-07-04T12:34:56Z",
+        "updated_at": "2026-07-04T12:34:56Z",
+        "version": 1,
+        "language": "en",
+        "document_type": "markdown",
+        "status": "validated",
+        "tags": ["sales", "monthly"],
+        "source": {
+          "source_type": "local_file",
+          "source_uri": "backend/data/documents/june_sales_review.md"
+        },
+        "checksum": "sha256-..."
+      },
+      "created_at": "2026-07-04T12:34:56Z"
+    }
+  ],
+  "next_cursor": null
+}
+```
+
+Status codes:
+`201 Created`, `404 Not Found`, `409 Conflict`, `415 Unsupported Media Type`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `document_archived`, `document_not_validated`, `unsupported_document_type`, `chunk_failed`, `repository_error`, `internal_error`.
+
+Validation rules:
+- `document_id` must reference an existing document.
+- The document must be in `validated` status.
+- Archived documents are rejected.
+- Only `markdown` and `text` are supported in the current chunk pipeline.
+- Repeated chunking replaces the stored chunk set with the same deterministic output for the same document version.
+
+Versioning rule:
+- Chunk output fields must remain additive only within `/api/v1`.
+
+Future approval relationship:
+- Chunk generation is a preprocessing step only and does not create approval state.
+
+#### 4.5.6 `GET /api/v1/documents/{document_id}/chunks`
+
+Purpose:
+Read the stored chunk set for a validated document version.
 
 Request:
 
@@ -360,27 +428,30 @@ Response `200 OK`:
 ```json
 {
   "document_id": "doc-123",
-  "items": []
+  "version": 1,
+  "items": [],
+  "next_cursor": null
 }
 ```
 
 Status codes:
-`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+`200 OK`, `404 Not Found`, `409 Conflict`, `415 Unsupported Media Type`, `500 Internal Server Error`.
 
 Error codes:
-`document_not_found`, `repository_error`, `internal_error`.
+`document_not_found`, `document_archived`, `document_not_validated`, `unsupported_document_type`, `repository_error`, `internal_error`.
 
 Validation rules:
-- Until chunking is implemented, an empty `items` array is a valid frozen response.
-- No chunk creation or re-chunking is implied by this endpoint.
+- The document must exist and be validated.
+- Archived documents are rejected.
+- The endpoint returns the stored chunk snapshot for the current version.
 
 Versioning rule:
-- Chunk schema additions must remain additive.
+- Chunk reads stay backward compatible within `/api/v1`.
 
 Future approval relationship:
-- Chunk generation is a preprocessing step only and does not create approval state.
+- Chunk reads are independent of approval state.
 
-#### 4.5.6 `DELETE /api/v1/documents/{document_id}`
+#### 4.5.7 `DELETE /api/v1/documents/{document_id}`
 
 Purpose:
 Archive a document and preserve version history rather than physically deleting facts.
@@ -420,7 +491,7 @@ Versioning rule:
 Future approval relationship:
 - If approval is added later, active approval states may block archive until the future approval API resolves the document.
 
-### 4.5.7 `GET /api/v1/documents/{document_id}/upload`
+#### 4.5.8 `GET /api/v1/documents/{document_id}/upload`
 
 Purpose:
 Read the frozen upload session snapshot for retries and progress display.
@@ -453,7 +524,7 @@ Error codes:
 Versioning rule:
 - Upload session semantics stay versioned together with `/api/v1/documents`.
 
-#### 4.5.8 `POST /api/v1/documents/{document_id}/import`
+#### 4.5.9 `POST /api/v1/documents/{document_id}/import`
 
 Purpose:
 Run the document import pipeline for an already uploaded document and mark successful imports as validated.
@@ -496,7 +567,7 @@ Versioning rule:
 Future approval relationship:
 - Import prepares the document for future chunking, retrieval, and approval, but does not create approval records.
 
-#### 4.5.9 `GET /api/v1/document-imports/{import_id}`
+#### 4.5.10 `GET /api/v1/document-imports/{import_id}`
 
 Purpose:
 Read the status and error state of a previously created document import record.
@@ -527,6 +598,95 @@ Error codes:
 
 Versioning rule:
 - Import record reads are frozen under `/api/v1`.
+
+#### 4.5.11 `POST /api/v1/document-retrieval/search`
+
+Purpose:
+Run internal document retrieval over the frozen document chunks and return keyword-based ranked results.
+
+Request:
+
+```json
+{
+  "query": "monthly sales policy",
+  "limit": 10,
+  "include_archived": false,
+  "document_type": "markdown",
+  "language": "en",
+  "tags": ["sales", "policy"]
+}
+```
+
+Rules:
+
+- `query`: required, non-empty string.
+- `limit`: optional, positive integer within the frozen range.
+- `include_archived`: optional boolean, defaults to `false`.
+- `document_type`: optional frozen document type filter.
+- `language`: optional frozen language filter.
+- `tags`: optional list of non-empty strings.
+
+Response `200 OK`:
+
+```json
+{
+  "results": [
+    {
+      "document_id": "doc-123",
+      "chunk_id": "chk-123",
+      "chunk_index": 0,
+      "content_excerpt": "Sales policy summary ...",
+      "score": 0.87,
+      "source": {
+        "source_type": "local_file",
+        "uri": "upload://upl-123/policy.md",
+        "label": "policy.md",
+        "external_id": null
+      },
+      "metadata": {
+        "document_id": "doc-123",
+        "title": "Sales Policy",
+        "description": "Internal policy",
+        "owner": "analysis-team",
+        "created_at": "2026-07-04T12:34:56Z",
+        "updated_at": "2026-07-04T12:34:56Z",
+        "version": 1,
+        "language": "en",
+        "document_type": "markdown",
+        "status": "validated",
+        "tags": ["sales", "policy"],
+        "source": {
+          "source_type": "local_file",
+          "source_uri": "backend/data/documents/policy.md"
+        },
+        "checksum": "sha256-..."
+      }
+    }
+  ],
+  "total": 1,
+  "query": "monthly sales policy",
+  "retrieval_mode": "keyword"
+}
+```
+
+Status codes:
+`200 OK`, `400 Bad Request`, `500 Internal Server Error`, `503 Service Unavailable`.
+
+Error codes:
+`invalid_query`, `retrieval_unavailable`, `repository_error`, `internal_error`.
+
+Validation rules:
+- `query` must not be blank.
+- `limit` must stay within the frozen range.
+- Filters must use frozen enum values and tag strings when supplied.
+- `include_archived=false` excludes archived documents from ranked results.
+- Retrieval mode is frozen as `keyword` for this MVP.
+
+Versioning rule:
+- Retrieval search semantics are frozen under `/api/v1`.
+
+Future approval relationship:
+- Retrieval returns document facts only and does not create approval state or RAG answers.
 
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
@@ -562,8 +722,12 @@ Frozen error code families:
 - `document_import_not_found`
 - `document_archived`
 - `import_already_running`
+- `document_not_validated`
 - `unsupported_document_type`
 - `invalid_metadata`
+- `invalid_query`
+- `retrieval_unavailable`
+- `chunk_failed`
 - `repository_error`
 - `provider_error`
 - `workflow_error`

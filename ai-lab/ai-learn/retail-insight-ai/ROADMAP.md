@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Phase 6: Document Import Pipeline MVP
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 ## Epic 14: Engineering Standards (Final Freeze)
 
@@ -25,6 +25,50 @@ Phase 6: Document Import Pipeline MVP
 - Handbook mirror docs created
 - Sync manifest expanded
 - Future AI tools must follow the frozen standards before editing the repository
+
+## Sprint 8.1: Document Retrieval Contract Freeze
+
+### Current State
+
+- 当前实现仍以 Document Chunk Pipeline MVP 为最新后端边界。
+- Document Retrieval 仅完成契约冻结，尚未进入 backend 实现。
+
+### Target State
+
+- Retrieval 成为 Chunk 与 future RAG 之间的稳定只读边界。
+- 未来实现必须保持 keyword-only contract compatibility。
+
+### Result
+
+- 已冻结 `POST /api/v1/document-retrieval/search`。
+- 已冻结 retrieval events 与 retrieval errors。
+- 已更新 `TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+
+### Planned
+
+- 只做契约冻结，不实现 Retrieval API。
+- 不引入 RAG / embedding / pgvector / hybrid search。
+
+## Sprint 8.2: Document Retrieval API MVP Implementation
+
+### Current State
+
+- Document Retrieval API 已实现，并严格遵守 Sprint 8.1 冻结 contract。
+
+### Target State
+
+- Retrieval 仍保持 keyword-only 只读边界，后续可替换搜索后端但不破坏 contract。
+
+### Result
+
+- `POST /api/v1/document-retrieval/search` 已实现。
+- 基于现有 in-memory document chunks 完成 keyword search。
+- 已补充 retrieval tests 与 backend full suite verification。
+
+### Planned
+
+- 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
+- 继续保持 Retrieval 不承担 LLM answer generation。
 
 当前状态：
 
@@ -189,6 +233,28 @@ Phase 6: Document Import Pipeline MVP
 ### Planned
 
 - `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
+
+## Sprint 7: Document Chunk Pipeline MVP
+
+### Current State
+
+- `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks` 已实现。
+- 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
+- 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
+
+### Target State
+
+- 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
+- chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
+- chunk pipeline 不改变 approval 状态，也不承担 search / embedding 职责。
+
+### Result
+
+- 支持 import 完成后的文档切片、chunk 查询与事件记录。
+
+### Planned
+
+- `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
 
 ## Epic 12 Positioning
 

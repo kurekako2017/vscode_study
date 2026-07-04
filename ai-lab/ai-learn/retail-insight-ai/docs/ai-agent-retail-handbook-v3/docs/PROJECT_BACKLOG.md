@@ -8,7 +8,7 @@
 
 ## 当前阶段
 
-Phase 6: Document Import Pipeline MVP
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -66,6 +66,41 @@ Phase 6: Document Import Pipeline MVP
 - [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
 - [ ] PostgreSQL Document Repository remains design-only
 - [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
+
+### Sprint 7: Document Chunk Pipeline MVP
+
+- [x] POST /api/v1/documents/{document_id}/chunks implemented
+- [x] GET /api/v1/documents/{document_id}/chunks implemented
+- [x] chunk pipeline requires validated documents and rejects archived / unvalidated / unsupported types
+- [x] deterministic replace rule implemented for repeated chunking
+- [x] backend tests added for markdown/text success, pre-import rejection, archived rejection, unsupported PDF rejection, stored chunk reads, deterministic repeat, and event recording
+- [x] existing upload/read/archive/import tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] versions / RAG / embedding / pgvector / Approval API remain frozen for later phases
+
+### Sprint 8.1: Document Retrieval Contract Freeze
+
+- [x] POST /api/v1/document-retrieval/search contract frozen
+- [x] document.retrieval.started / completed / failed contract frozen
+- [x] invalid_query / retrieval_unavailable / repository_error frozen in Error Catalog
+- [x] Document Retrieval Flow / Source Trace Flow / Future RAG Integration Flow added to Architecture
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror sync
+- [ ] Retrieval implementation remains pending
+- [ ] RAG / embedding / pgvector / hybrid search remain frozen for later phases
+
+### Sprint 8.2: Document Retrieval API MVP Implementation
+
+- [x] POST /api/v1/document-retrieval/search implemented
+- [x] keyword-only search over existing in-memory document chunks implemented
+- [x] empty query returns invalid_query
+- [x] archived documents are excluded unless include_archived=true
+- [x] deterministic score ordering implemented
+- [x] retrieval events started / completed / failed emitted
+- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
+- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [x] frozen contract remains unchanged
 
 ## Backlog
 
@@ -240,6 +275,23 @@ Phase 6: Document Import Pipeline MVP
 - [x] 同步 `data_imports` / `import_errors` schema 预留
 - [x] 同步 `approval_requests` / `approval_events` schema 预留
 - [x] 同步默认仍为 `inmemory` 的运行边界
+
+### 2026-07-04 Sprint 8.1 Document Retrieval Contract Freeze
+
+- [x] 同步 `POST /api/v1/document-retrieval/search`
+- [x] 同步 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`
+- [x] 同步 `invalid_query`、`retrieval_unavailable`、`repository_error`
+- [x] 同步 Document Retrieval Flow、Source Trace Flow、Future RAG Integration Flow
+- [x] 同步主项目与 handbook 的任务、路线图、Backlog、Changelog、决策
+- [ ] Retrieval implementation / RAG / embedding / pgvector / hybrid search 留待后续 Sprint
+
+### 2026-07-04 Sprint 8.2 Document Retrieval API MVP Implementation
+
+- [x] 同步 `POST /api/v1/document-retrieval/search` 实现结果
+- [x] 同步 keyword-only in-memory chunk search
+- [x] 同步 empty query / no match / archived exclusion / include_archived / deterministic ordering 测试
+- [x] 保持 frozen contract 不变
+- [x] 同步主项目与 handbook 的任务、路线图、Backlog、Changelog、决策
 
 <!-- DOC-SYNC:START group=governance -->
 ## 文档同步块

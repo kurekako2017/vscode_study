@@ -42,3 +42,18 @@
 | `document_archived` | 409 | Document is archived. | Archived documents cannot be imported again. | No | import |
 | `unsupported_document_type` | 415 | This document type is not supported for import. | Planned-only document type cannot enter import pipeline. | No | import |
 | `invalid_metadata` | 422 | Document metadata is invalid. | Import eligibility checks failed. | No | import |
+
+## 切片错误 / Chunk Errors / チャンクエラー
+
+| Code | HTTP | User | Developer | Retryable | Source |
+|---|---:|---|---|---|---|
+| `document_not_validated` | 409 | Document is not validated yet. | Chunk pipeline requires validated document status. | No | chunk |
+| `chunk_failed` | 500 | Document chunking failed. | Chunk generation or persistence failed. | Yes | chunk |
+
+## 检索错误 / Retrieval Errors / 検索エラー
+
+| Code | HTTP | User | Developer | Retryable | Source |
+|---|---:|---|---|---|---|
+| `invalid_query` | 422 | Query is invalid. | Query text or filters failed validation. | No | retrieval |
+| `retrieval_unavailable` | 503 | Retrieval is temporarily unavailable. | Retrieval layer is down or disabled. | Yes | retrieval |
+| `repository_error` | 500 | Retrieval storage error. | Repository operation failed during search. | Yes | retrieval |

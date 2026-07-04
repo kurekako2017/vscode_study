@@ -4,27 +4,43 @@
 
 ## 当前阶段
 
-Sprint 6: Document Import Pipeline MVP
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 ## 当前最高优先级任务
 
 ### Sprint Result
 
-- [x] POST /api/v1/documents/{document_id}/import implemented as Document Import Pipeline MVP
-- [x] GET /api/v1/document-imports/{import_id} implemented
-- [x] import status transitions pending / running / completed / failed implemented
-- [x] successful import marks document as validated
-- [x] backend tests added for markdown/text success, unsupported PDF failure, missing document, archived document, deterministic repeat, status read, and event recording
-- [x] existing upload/read/archive tests still pass
-- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
-- [ ] PostgreSQL Document Repository remains design-only
-- [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
+- [x] POST /api/v1/document-retrieval/search implemented
+- [x] keyword-only search over existing in-memory document chunks implemented
+- [x] empty query returns invalid_query
+- [x] archived documents are excluded unless include_archived=true
+- [x] deterministic score ordering implemented
+- [x] retrieval events started / completed / failed emitted
+- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
+- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] frozen contract remains unchanged
 
 ### Boundary
 
-- 当前实现已进入 Document Import Pipeline MVP，文档读写的后端 MVP 已覆盖上传、读取、归档与导入。
-- 不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
-- 继续保持 PostgreSQL Document Repository 仅设计不实现，versions / chunks / RAG / embedding / pgvector 仍冻结未实现。
+- 当前实现已包含 Document Retrieval API MVP，keyword-only search 只读取 existing in-memory document chunks。
+- 不实现 frontend、不实现 RAG、不实现 embedding、不实现 pgvector、不实现 hybrid search、不实现 Approval API。
+- 继续保持 PostgreSQL Document Repository 仅设计不实现，versions / RAG / embedding / pgvector / Approval API 仍冻结未实现。
+
+## Sprint 8.2: Document Retrieval API MVP Implementation
+
+### Current State
+
+Document Retrieval API 已实现，且严格遵守 Sprint 8.1 冻结 contract。
+
+### Target State
+
+Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边界。
+
+### Planned
+
+- 后续可在不破坏 contract 的前提下引入 PostgreSQL full-text / hybrid search。
+- 继续保持 Retrieval 仅为只读边界，不接入 LLM answer generation。
 
 ## Epic 14: Engineering Standards（Final Freeze）
 
@@ -49,7 +65,7 @@ Sprint 6: Document Import Pipeline MVP
 
 下一任务：
 
-- 保持 chunks / RAG / approval 仅处于冻结状态，不进入实现。
+- 在 contract 不变前提下，评估 retrieval ranking 的可解释性、filter coverage 和 future search backend 替换点。
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 

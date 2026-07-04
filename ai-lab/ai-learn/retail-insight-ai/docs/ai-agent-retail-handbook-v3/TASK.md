@@ -4,25 +4,44 @@
 
 ## 当前阶段
 
-Sprint 6: Document Import Pipeline MVP
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 ## 当前最高优先级任务
 
-- [x] POST /api/v1/documents/{document_id}/import implemented as Document Import Pipeline MVP
-- [x] GET /api/v1/document-imports/{import_id} implemented
-- [x] import status transitions pending / running / completed / failed implemented
-- [x] successful import marks document as validated
-- [x] backend tests added for markdown/text success, unsupported PDF failure, missing document, archived document, deterministic repeat, status read, and event recording
-- [x] existing upload/read/archive tests still pass
-- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
-- [ ] PostgreSQL Document Repository remains design-only
-- [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
+- [x] POST /api/v1/document-retrieval/search implemented
+- [x] keyword-only search over existing in-memory document chunks implemented
+- [x] empty query returns invalid_query
+- [x] archived documents are excluded unless include_archived=true
+- [x] deterministic score ordering implemented
+- [x] retrieval events started / completed / failed emitted
+- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
+- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] frozen contract remains unchanged
+
+## Sprint 8.2: Document Retrieval API MVP Implementation
+
+### Current State
+
+Document Retrieval API 已实现，且严格遵守 Sprint 8.1 冻结 contract。
+
+### Target State
+
+Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边界。
+
+### Planned
+
+- 后续可在不破坏 contract 的前提下引入 PostgreSQL full-text / hybrid search。
+- 继续保持 Retrieval 仅为只读边界，不接入 LLM answer generation。
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
 ### Current State
 
-当前 `Retail Insight AI` 仍然是项目名称，当前 handbok 用于描述零售分析领域参考实现。
+- 当前实现仍停留在 Document Chunk Pipeline MVP，文档读写的后端 MVP 已覆盖上传、读取、归档、导入与切分。
+- Document Retrieval 仅完成契约冻结，尚未进入 backend 实现。
+- 不实现 frontend、不实现 RAG、不实现 embedding、不实现 pgvector、不实现 hybrid search、不实现 Approval API。
+- 继续保持 PostgreSQL Document Repository 仅设计不实现，versions / RAG / embedding / pgvector / Approval API 仍冻结未实现。
 
 ### Target State
 

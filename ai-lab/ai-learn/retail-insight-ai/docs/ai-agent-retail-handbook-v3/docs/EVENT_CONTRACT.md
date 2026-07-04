@@ -38,6 +38,12 @@ Document upload events are frozen as a separate family and do not replace task S
 - `document.import.validated`
 - `document.import.completed`
 - `document.import.failed`
+- `document.chunk.started`
+- `document.chunk.completed`
+- `document.chunk.failed`
+- `document.retrieval.started`
+- `document.retrieval.completed`
+- `document.retrieval.failed`
 
 ## 3. Event Envelope / 事件封装 / イベント封筒
 
@@ -126,6 +132,26 @@ After `error`, do not send `done`.
 Document import events must keep payloads secret-safe and document-centric.
 文档导入事件的 payload 必须安全且以文档为中心。
 文書インポートイベントの payload は安全で文書中心でなければなりません。
+
+### 6.3 Document Chunk Event Semantics / 文档切片事件语义 / 文書チャンクイベント意味
+
+- `document.chunk.started`: chunk request accepted and chunk pipeline began.
+- `document.chunk.completed`: chunk set was generated or replaced successfully.
+- `document.chunk.failed`: chunk pipeline failed before completion.
+
+Document chunk events must keep payloads secret-safe and document-centric.
+文档切片事件的 payload 必须安全且以文档为中心。
+文書チャンクイベントの payload は安全で文書中心でなければなりません。
+
+### 6.4 Document Retrieval Event Semantics / 文档检索事件语义 / 文書検索イベント意味
+
+- `document.retrieval.started`: retrieval request accepted and ranked search began.
+- `document.retrieval.completed`: retrieval finished successfully and results were returned.
+- `document.retrieval.failed`: retrieval failed before completion.
+
+Document retrieval events must keep payloads secret-safe and document-centric.
+文档检索事件的 payload 必须安全且以文档为中心。
+文書検索イベントの payload は安全で文書中心でなければなりません。
 
 ## 7. Versioning Rules / 版本规则 / バージョン規則
 

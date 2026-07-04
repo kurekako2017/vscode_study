@@ -32,7 +32,7 @@
 
 ## 当前阶段
 
-Phase 6: Document Import Pipeline MVP
+Sprint 8.2: Document Retrieval API MVP Implementation
 
 状态：进行中
 
@@ -147,10 +147,47 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [ ] PostgreSQL Document Repository remains design-only
 - [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
 
+### Sprint 7: Document Chunk Pipeline MVP
+
+- [x] POST /api/v1/documents/{document_id}/chunks implemented
+- [x] GET /api/v1/documents/{document_id}/chunks implemented
+- [x] chunk pipeline requires validated documents and rejects archived / unvalidated / unsupported types
+- [x] deterministic replace rule implemented for repeated chunking
+- [x] backend tests added for markdown/text success, pre-import rejection, archived rejection, unsupported PDF rejection, stored chunk reads, deterministic repeat, and event recording
+- [x] existing upload/read/archive/import tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] versions / RAG / embedding / pgvector / Approval API remain frozen for later phases
+
+### Sprint 8.1: Document Retrieval Contract Freeze
+
+- [x] POST /api/v1/document-retrieval/search contract frozen
+- [x] document.retrieval.started / completed / failed contract frozen
+- [x] invalid_query / retrieval_unavailable / repository_error frozen in Error Catalog
+- [x] Document Retrieval Flow / Source Trace Flow / Future RAG Integration Flow added to Architecture
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror sync
+- [ ] Retrieval implementation remains pending
+- [ ] RAG / embedding / pgvector / hybrid search remain frozen for later phases
+
+### Sprint 8.2: Document Retrieval API MVP Implementation
+
+- [x] POST /api/v1/document-retrieval/search implemented
+- [x] keyword-only search over existing in-memory document chunks implemented
+- [x] empty query returns invalid_query
+- [x] archived documents are excluded unless include_archived=true
+- [x] deterministic score ordering implemented
+- [x] retrieval events started / completed / failed emitted
+- [x] backend tests added for success, no match, empty query, archived exclusion, include_archived, and deterministic ordering
+- [x] existing upload/read/archive/import/chunk tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [x] frozen contract remains unchanged
+
 ## 当前近期优先级
 
 ### Enterprise Priority
 
+- [x] Sprint 8.2 Document Retrieval API MVP Implementation
+- [x] Sprint 8.1 Document Retrieval Contract Freeze
 - [ ] 第一优先级：文件化输入（CSV / JSON / Markdown）+ PostgreSQL 持久化基础
 - [ ] 明确文件输入目录结构、样例数据规范、版本字段与加载边界
 - [ ] 明确 PostgreSQL 持久化表结构、迁移方案与 Repository 替换策略
@@ -404,6 +441,23 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [x] 完成文档域模型、仓储接口、InMemory 仓储、验证与单元测试
 - [x] 完成主项目与 handbook 的架构、路线图、任务、Backlog、Changelog、决策同步
 - [ ] Upload API / RAG / pgvector / PostgreSQL Repository 留待后续 Sprint
+
+### 2026-07-04 Sprint 8.1 Document Retrieval Contract Freeze
+
+- [x] 冻结 `POST /api/v1/document-retrieval/search`
+- [x] 冻结 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`
+- [x] 冻结 `invalid_query`、`retrieval_unavailable`、`repository_error`
+- [x] 新增 Document Retrieval Flow、Source Trace Flow、Future RAG Integration Flow
+- [x] 完成主项目与 handbook 的任务、路线图、Backlog、Changelog、决策同步
+- [ ] Retrieval implementation / RAG / embedding / pgvector / hybrid search 留待后续 Sprint
+
+### 2026-07-04 Sprint 8.2 Document Retrieval API MVP Implementation
+
+- [x] 实现 `POST /api/v1/document-retrieval/search`
+- [x] 仅对现有 in-memory document chunks 做 keyword search
+- [x] 实现 empty query / no match / archived exclusion / include_archived / deterministic ordering 测试
+- [x] 保持 frozen contract 不变
+- [x] 完成主项目与 handbook 的任务、路线图、Backlog、Changelog、决策同步
 
 ## Architecture Principles
 

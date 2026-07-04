@@ -59,7 +59,22 @@ This file freezes document upload related error codes and their operator-facing 
 | `unsupported_document_type` | 415 | This document type is not supported for import. | Planned-only document type cannot enter import pipeline. | No | import | Show supported types |
 | `invalid_metadata` | 422 | Document metadata is invalid. | Import eligibility checks failed. | No | import | Highlight metadata issue |
 
-## 7. Retrieval / Database / Event / Provider Errors / 检索 / 数据库 / 事件 / 提供器错误 / 検索 / DB / イベント / プロバイダーエラー
+## 7. Document Chunk Errors / 文档切片错误 / 文書チャンクエラー
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `document_not_validated` | 409 | Document is not validated yet. | Chunk pipeline requires validated document status. | No | chunk | Show import required state |
+| `chunk_failed` | 500 | Document chunking failed. | Chunk generation or persistence failed. | Yes | chunk | Show retry and support hint |
+
+## 8. Document Retrieval Errors / 文档检索错误 / 文書検索エラー
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `invalid_query` | 422 | Query is invalid. | Query text or filters failed validation. | No | retrieval | Highlight query input |
+| `retrieval_unavailable` | 503 | Retrieval is temporarily unavailable. | Retrieval layer is down or disabled. | Yes | retrieval | Show retry notice |
+| `repository_error` | 500 | Retrieval storage error. | Repository operation failed during search. | Yes | retrieval | Show retry and support hint |
+
+## 9. Retrieval / Database / Event / Provider Errors / 检索 / 数据库 / 事件 / 提供器错误 / 検索 / DB / イベント / プロバイダーエラー
 
 | Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
 |---|---:|---|---|---|---|---|
@@ -69,7 +84,7 @@ This file freezes document upload related error codes and their operator-facing 
 | `provider_timeout` | 503 | External processing timed out. | Provider timed out while handling upload. | Yes | provider | Show retry button |
 | `event_publish_failed` | 500 | Upload finished with notification issues. | Event publish failed after persistence. | Yes | event | Show partial success warning |
 
-## 8. Retry Guidance / 重试建议 / 再試行ガイド
+## 10. Retry Guidance / 重试建议 / 再試行ガイド
 
 - Retryable errors should keep the current session state and allow safe retry.
 - Non-retryable validation errors should be fixed in the current form before retry.

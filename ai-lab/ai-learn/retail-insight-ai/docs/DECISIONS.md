@@ -331,6 +331,69 @@
 - `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 需要同步导入契约。
 - 成功导入后，文档状态推进到 `validated`，但不生成 chunk、不进入 RAG、不进入审批。
 
+## ADR-017
+
+日期：2026-07-04
+
+决策：将 Document Chunk Pipeline 作为独立的同步 MVP 实现，采用 deterministic replace 规则，并复用独立的 InMemory chunk repository。
+
+原因：Chunk Pipeline 是 Import 之后通往 RAG、全文检索和上下文组装的前置边界，但当前阶段不应直接把 chunk、embedding 或 search 与 Document 本体强耦合。deterministic replace 可以让重复 chunk 结果稳定，并为后续持久化替换提供清晰合同。
+
+备选方案：
+
+- 把 chunk 结果直接塞进 DocumentRepository；该方案会混淆文档事实和切片事实。
+- 只返回一次性结果、不存储 chunk；该方案无法支持后续 GET /chunks、检索或审计。
+
+影响：
+
+- `backend/app/services/document_chunk_service.py` 成为 chunk 状态机与事件发布入口。
+- `backend/app/api/document_chunks.py` 暴露 `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks`。
+- `backend/app/repositories/interfaces/document_chunk_repository.py` 为切片事实提供独立存储边界。
+- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md` 需要同步 chunk 契约。
+- 仅支持 `markdown` 和 `text` 进入当前 chunk 闭环，重复 chunk 会覆盖旧结果并保持确定性。
+
+## ADR-018
+
+日期：2026-07-04
+
+决策：将 Document Retrieval Contract 冻结为 keyword-only read boundary，并把它作为 chunk pipeline 与 future RAG 之间的独立稳定接口，而不是直接实现 RAG。
+
+原因：内部检索是文档域向 RAG 演进前的关键只读边界。如果不先冻结请求、响应、事件和错误码，后续检索实现会随着 RAG、hybrid search 和 future approval 频繁变动。
+
+备选方案：
+
+- 直接把 retrieval 绑定到 RAG 或 hybrid search；该方案会让当前冻结边界和未来生成式能力耦合。
+- 继续等待 RAG 实现后再补 retrieval contract；该方案会延迟检索边界冻结，增加后续重构成本。
+
+影响：
+
+- `docs/API_CONTRACT.md` 冻结 `POST /api/v1/document-retrieval/search`。
+- `docs/EVENT_CONTRACT.md` 冻结 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`。
+- `docs/ERROR_CATALOG.md` 冻结 `invalid_query`、`retrieval_unavailable`、`repository_error` 的检索语义。
+- `docs/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow、Future RAG Integration Flow。
+- 当前实现仍停留在 Document Chunk Pipeline MVP，retrieval implementation 继续后置。
+
+## ADR-019
+
+日期：2026-07-04
+
+决策：将 Retrieval API MVP 实现为 deterministic keyword-only search，并且只在现有 in-memory document chunks 上执行过滤与排序，不引入 LLM、embedding、pgvector 或 PostgreSQL 搜索后端。
+
+原因：当前阶段的目标是把已冻结的检索 contract 落地为可运行的最小实现，同时保持后续 full-text search、hybrid search 或 retrieval provider 替换点清晰。如果一开始就接入生成式或向量检索，会破坏当前 contract 的稳定性和可学习性。
+
+备选方案：
+
+- 直接把 retrieval 绑定到 RAG / embedding / hybrid search；该方案会让 MVP 边界和未来生成式能力耦合。
+- 继续只冻结 contract、不实现 API；该方案会让检索边界停留在文档层，无法验证请求、响应、事件与错误语义。
+
+影响：
+
+- `backend/app/api/document_retrieval.py` 暴露 `POST /api/v1/document-retrieval/search`。
+- `backend/app/services/document_retrieval_service.py` 负责关键词检索、过滤、确定性排序与事件发布。
+- `backend/app/schemas/document_retrieval_api.py` 固定检索请求与响应结构。
+- `backend/tests/test_document_retrieval_api.py` 覆盖空查询、无结果、归档过滤、include_archived 与排序确定性。
+- 未来 full-text search、hybrid search、retrieval provider 或 PostgreSQL 搜索后端都必须保持 contract 兼容。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

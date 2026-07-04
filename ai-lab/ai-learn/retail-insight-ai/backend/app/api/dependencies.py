@@ -1,8 +1,10 @@
 from fastapi import Request
 
 from app.config.container import AppContainer
+from app.services.document_chunk_service import DocumentChunkService
 from app.services.document_import_service import DocumentImportService
 from app.services.document_archive_service import DocumentArchiveService
+from app.services.document_retrieval_service import DocumentRetrievalService
 from app.services.document_read_service import DocumentReadService
 from app.events.publisher import EventPublisher
 from app.services.document_upload_service import DocumentUploadService
@@ -44,6 +46,18 @@ async def get_document_read_service(request: Request) -> DocumentReadService:
     """向文档读取路由注入同步读 service。"""
 
     return request.app.state.container.document_read_service
+
+
+async def get_document_chunk_service(request: Request) -> DocumentChunkService:
+    """向文档 chunk 路由注入同步 chunk service。"""
+
+    return request.app.state.container.document_chunk_service
+
+
+async def get_document_retrieval_service(request: Request) -> DocumentRetrievalService:
+    """向文档检索路由注入同步 retrieval service。"""
+
+    return request.app.state.container.document_retrieval_service
 
 
 async def get_document_import_service(request: Request) -> DocumentImportService:

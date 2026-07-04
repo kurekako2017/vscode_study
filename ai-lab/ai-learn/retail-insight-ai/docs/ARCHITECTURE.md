@@ -384,6 +384,89 @@ flowchart TD
     G --> C
 ```
 
+## Sprint 7 Document Chunk Pipeline MVP
+
+### Current State
+
+- `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks` 已实现。
+- 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
+- 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
+
+### Target State
+
+- 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
+- chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
+- chunk pipeline 不改变 approval 状态，也不承担 search / embedding 职责。
+
+### Result
+
+- 支持 import 完成后的文档切片、chunk 查询与事件记录。
+
+### Planned
+
+- `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
+
+## Document Chunk Pipeline
+
+```mermaid
+flowchart TD
+    A[POST /api/v1/documents/{document_id}/chunks] --> B[Load validated document]
+    B --> C{Document exists?}
+    C -->|no| X[document_not_found]
+    C -->|yes| D{Archived?}
+    D -->|yes| Y[document_archived]
+    D -->|no| E{Validated?}
+    E -->|no| Z[document_not_validated]
+    E -->|yes| F{Type supported?}
+    F -->|no| U[unsupported_document_type]
+    F -->|yes| G[Split by paragraph / fixed-size fallback]
+    G --> H[Replace stored chunk set]
+    H --> I[document.chunk.completed]
+```
+
+## Chunk Lifecycle
+
+```mermaid
+flowchart TD
+    A[pending chunk request] --> B[running]
+    B --> C[completed]
+    B --> D[failed]
+```
+
+## Chunk Error Flow
+
+```mermaid
+flowchart TD
+    A[Chunk Request] --> B{Document exists?}
+    B -->|no| X[document_not_found]
+    B -->|yes| C{Archived?}
+    C -->|yes| Y[document_archived]
+    C -->|no| D{Validated?}
+    D -->|no| Z[document_not_validated]
+    D -->|yes| E{Type supported?}
+    E -->|no| U[unsupported_document_type]
+    E -->|yes| F[chunk_failed only on unexpected failure]
+```
+
+## Future RAG Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.chunk.completed] --> B[Future Retriever]
+    B --> C[Future Context Builder]
+    C --> D[Future RAG Answering]
+```
+
+## Future Approval Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.chunk.completed] --> B[Future Approval Intake]
+    B --> C[pending_approval]
+    C --> D[approved]
+    C --> E[rejected]
+```
+
 ## Upload Session Flow
 
 ```mermaid
@@ -432,6 +515,84 @@ flowchart TD
     F --> B
 ```
 
+## Sprint 8.1 Document Retrieval Contract Freeze
+
+### Current State
+
+- `POST /api/v1/document-retrieval/search` 已冻结为内部文档检索 contract。
+- 当前只冻结 keyword retrieval，不实现 RAG、embedding 或真实搜索后端。
+- 当前检索结果以 document/chunk/source/metadata 为核心，不能把答案生成混进该 contract。
+
+### Target State
+
+- 文档检索成为 chunk 之后、RAG 之前的稳定只读边界。
+- 检索请求必须支持 query、limit、include_archived、document_type、language、tags。
+- 检索响应必须返回 `results[]`、`total`、`query`、`retrieval_mode=keyword`。
+
+### Result
+
+- 只冻结 API / Event / Error contract，不实现检索后端。
+
+### Planned
+
+- 未来检索实现可替换为 keyword search、full-text search、hybrid search 或 retrieval provider，但必须保持契约兼容。
+
+## Sprint 8.2 Document Retrieval API MVP Implementation
+
+### Current State
+
+- `POST /api/v1/document-retrieval/search` 已实现为 keyword-only search。
+- 当前检索只读取现有 in-memory document chunks，不调用 LLM、embedding、pgvector 或 PostgreSQL 搜索后端。
+- 当前支持 `query`、`limit`、`include_archived`、`document_type`、`language`、`tags`，并返回 `document_id`、`chunk_id`、`chunk_index`、`content_excerpt`、`score`、`source`、`metadata`。
+- 当前事件已实现 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`。
+
+### Target State
+
+- 检索继续保持为 chunk 之后、RAG 之前的稳定只读边界。
+- 未来可以替换 keyword scoring 为 full-text search、hybrid search 或 retrieval provider，但 response contract 必须保持兼容。
+
+### Result
+
+- 当前 MVP 已可通过测试验证空查询、无结果、归档过滤、include_archived 与确定性排序。
+
+### Planned
+
+- 未来检索后端可迁移到 PostgreSQL full-text 或混合检索，但不在当前 sprint 引入。
+- 当前阶段不把答案生成、引用拼装或上下文构建塞进 retrieval API。
+
+## Document Retrieval Flow
+
+```mermaid
+flowchart TD
+    A[POST /api/v1/document-retrieval/search] --> B[Validate query and filters]
+    B -->|invalid| X[invalid_query]
+    B -->|ok| C[Load document chunks]
+    C --> D[Apply keyword ranking]
+    D --> E[Assemble results]
+    E --> F[document.retrieval.completed]
+```
+
+## Source Trace Flow
+
+```mermaid
+flowchart TD
+    A[Result Item] --> B[document_id]
+    A --> C[chunk_id]
+    A --> D[chunk_index]
+    A --> E[source]
+    A --> F[metadata]
+    E --> G[Trace back to uploaded document]
+    F --> G
+```
+
+## Future RAG Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.retrieval.completed] --> B[Future Context Builder]
+    B --> C[Future RAG Answering]
+```
+
 ## Phase 2 PostgreSQL Persistence MVP
 
 ### Current State
@@ -440,7 +601,7 @@ flowchart TD
 - 当前已新增可选 `postgres` backend
 - 当前 Task、Task Event、Report 已具备 PostgreSQL Repository
 - 当前 `data_imports`、`import_errors`、`approval_requests`、`approval_events` 仅完成 schema 与模型预留
-- 当前尚未实现 Approval API、Import API、Document Search、RAG、Internet Search
+- 当前尚未实现 Approval API、Document Search、RAG、Internet Search；Import API 已有同步 MVP，PostgreSQL Import Repository 仍未实现
 - 当前状态：
   `Code implemented`
   `InMemory path verified`

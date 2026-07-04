@@ -182,3 +182,32 @@ class DocumentImportAlreadyRunningException(AppException):
             detail={"document_id": document_id},
             task_id=document_id,
         )
+
+
+class DocumentNotValidatedException(AppException):
+    """表示文档尚未完成导入验证，不能进入 chunk pipeline。"""
+
+    def __init__(self, document_id: str) -> None:
+        """返回 409，并把 document_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.DOCUMENT_NOT_VALIDATED,
+            "Document is not validated",
+            409,
+            detail={"document_id": document_id},
+            task_id=document_id,
+        )
+
+
+class InvalidQueryException(AppException):
+    """表示检索 query 为空或不符合冻结约束。"""
+
+    def __init__(self, detail: dict[str, Any] | None = None) -> None:
+        """返回 422，并保留安全的查询校验摘要。"""
+
+        super().__init__(
+            ErrorCode.INVALID_QUERY,
+            "Query is invalid",
+            422,
+            detail=detail,
+        )
