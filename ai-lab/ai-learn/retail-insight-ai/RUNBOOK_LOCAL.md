@@ -76,6 +76,8 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 - `source .venv/bin/activate` 后，终端提示符通常会出现 `(.venv)`。
 - `cp ../.env.example ../.env` 创建项目根目录配置；如果 `.env` 已存在，可以跳过，避免覆盖自己的配置。
 - Backend 会读取项目根 `.env`，`RESEARCH_PROVIDER` 和 `DATA_PROVIDER` 默认都是 `static`。
+- `REPOSITORY_BACKEND` 默认是 `inmemory`；若要测试 PostgreSQL，需要手动改成 `postgres` 并补齐 `POSTGRES_*` 连接参数。
+- Phase 1 起，KPI 从 `backend/data/business/*.csv` 读取，Research 从 `backend/data/research/*.json` 读取，文档样例位于 `backend/data/documents/*.md`。
 
 出现以下信息表示启动成功：
 
@@ -109,6 +111,26 @@ kill <PID>
 再重新执行 Uvicorn 命令。Frontend 的 Vite 代理固定连接 8000，因此初学阶段建议释放 8000，而不是只把 Backend 改到其它端口。
 
 停止 Backend：回到运行 Uvicorn 的终端，按 `Ctrl+C`。
+
+### 3.1 PostgreSQL 可选启动说明
+
+如果本机具备 Docker CLI，可在项目根目录执行：
+
+```bash
+docker compose up -d postgres
+```
+
+然后把根目录 `.env` 中的 `REPOSITORY_BACKEND` 改为 `postgres`，再确认以下变量：
+
+```bash
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5432
+POSTGRES_DB=retail_insight_ai
+POSTGRES_USER=retail
+POSTGRES_PASSWORD=retail
+```
+
+当前环境若提示 `docker: command not found`，说明只能继续使用默认 `inmemory` 模式，这不会影响本地学习与 Phase 1 功能验证。
 
 ## 4. Frontend 启动步骤
 

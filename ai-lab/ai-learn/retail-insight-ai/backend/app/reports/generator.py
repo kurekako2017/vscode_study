@@ -59,8 +59,10 @@ class ReportGenerator:
             [
                 "## 確認事項",
                 "",
-                "- 本レポートは static provider とローカル固定データで生成されています。",
+                "- 本レポートは local file input と static provider で生成されています。",
                 "- 経営判断前に、対象期間と元データを確認してください。",
+                "- 現在は承認前提の下書き分岐を持たず直接生成します。",
+                "- 後続 Phase で draft / pending_approval / approved / rejected / revised を追加予定です。",
                 "",
             ]
         )

@@ -18,6 +18,7 @@ class SettingsTest(unittest.TestCase):
             "LOG_LEVEL": "WARNING",
             "RESEARCH_PROVIDER": "static",
             "DATA_PROVIDER": "static",
+            "REPOSITORY_BACKEND": "inmemory",
             "CORS_ORIGINS": '["http://localhost:5173"]',
         }
         with patch.dict(os.environ, environment, clear=False):
@@ -25,6 +26,7 @@ class SettingsTest(unittest.TestCase):
 
         self.assertEqual(settings.app_env, "test")
         self.assertEqual(settings.log_level, "WARNING")
+        self.assertEqual(settings.repository_backend, "inmemory")
         self.assertEqual(settings.cors_origins, ["http://localhost:5173"])
 
     def test_unknown_provider_is_rejected(self) -> None:

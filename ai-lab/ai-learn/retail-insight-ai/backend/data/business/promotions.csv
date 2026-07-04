@@ -1,0 +1,4 @@
+promotion_id,channel,baseline_revenue_jpy,promoted_revenue_jpy
+promo-001,app,1200000,1380000
+promo-002,email,900000,1017000
+promo-003,line,1100000,1265000

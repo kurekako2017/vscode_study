@@ -1,16 +1,144 @@
 # ai-agent-retail-handbook-v3 Roadmap
 
-最后更新：2026-06-29
+最后更新：2026-07-04
 
 ## 当前阶段
 
-待根据项目现状确认。
+Phase 2: PostgreSQL Persistence MVP Sync
+
+## Project Positioning
+
+### Current State
+
+当前项目名称：
+
+`Retail Insight AI`
+
+当前定位：
+
+`Retail Analysis Domain Reference Implementation`
+
+### Target State
+
+未来平台目标：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+### Planned
+
+handbook 后续所有路线图描述都必须显式区分 Current State、Target State 和 Planned。
+
+## Architecture Principles
+
+- Platform First
+- Domain Driven
+- Provider Pattern
+- Repository Pattern
+- Workflow Driven
+- Configuration First
+- Test First
+- Documentation First
+- Backward Compatibility
+
+## Epic 0: Enterprise Platform Architecture Evolution
+
+- [ ] Architecture Freeze
+- [ ] Directory Refactor
+- [ ] Repository Abstraction
+- [ ] Workflow Abstraction
+- [ ] Provider Abstraction
+- [ ] Documentation Standard
+- [ ] Testing Standard
+
+## Epic 12: Retrieval and RAG Platform
+
+### Current State
+
+当前 handbook 还未把 Retrieval and RAG Platform 作为独立横向平台能力展开。
+
+### Target State
+
+未来 Epic 12 覆盖结构化业务检索、社内文档检索、互联网检索、上下文合并、引用与风险控制。
+
+### Planned
+
+当前将 Epic 12 作为横向平台能力标记，不表示已经实现完整 RAG 平台。
+
+## Phase 1 Sync: 文件化输入基础
+
+### Current State
+
+主项目已完成本地 CSV / JSON / Markdown 文件输入的第一轮实现。
+
+### Target State
+
+文件输入成为 PostgreSQL、Approval Workflow、Document Upload 之前的稳定输入边界。
+
+### Planned
+
+- 当前 Report 状态为 `generated`
+- 后续扩展：
+  `draft / pending_approval / approved / rejected / revised`
+
+## Phase 1.5 Sync: Contract Freeze and Approval Design
+
+### Current State
+
+主项目已完成 Phase 1.5 文档冻结。
+
+### Target State
+
+Data Contract、Import Error Model、Approval State Machine 成为 Phase 2 设计输入。
+
+### Planned
+
+- 当前只实现 `generated`
+- 后续扩展：
+  `draft / pending_approval / approved / rejected / revised / published / archived`
+
+## Phase 2 Sync: PostgreSQL Persistence MVP
+
+### Current State
+
+主项目已完成 PostgreSQL Repository MVP，并保持 `inmemory` 为默认后端。
+
+### Target State
+
+Task、Event、Report 有可选事务持久化能力，同时 Approval / Import 为后续 Phase 预留稳定表结构。
+
+### Planned
+
+- 当前未完成真实 PostgreSQL 联调验收
+- 当前未实现 Approval API、Import API、Document Search、RAG、Internet Search
+
+## Definition of Done
+
+任何一个 Phase 只有在以下项目全部满足后，才能标记完成：
+
+- Code
+- Unit Test
+- Integration Test
+- Frontend Test
+- Handbook
+- Changelog
+- Decision Record
+- Architecture Update
+- Mermaid Diagram Update
+- Task Update
 
 ## 下一阶段
 
-1. 完成项目结构和运行环境检查。
-2. 从 `docs/PROJECT_BACKLOG.md` 选择最高优先级任务。
-3. 明确验收标准并同步到 `TASK.md`。
+1. 将 retail-insight-ai 的 Phase 1 到 Phase 8 规划同步映射到 handbook。
+2. 为测试文档和架构文档建立固定模板与缺失章节。
+3. 将 CHANGELOG 和 DECISIONS 作为每次功能变更的强制同步入口。
+
+## Handbook 同步路线
+
+1. 主项目 Phase 规划更新
+2. handbook 任务、Backlog、Roadmap 同步
+3. handbook 架构、系统设计、生产路线图同步
+4. handbook CHANGELOG 与 DECISIONS 同步
+5. 通过同步门禁后才允许关闭主项目 Phase
 
 ## 长期规划
 

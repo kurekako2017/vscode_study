@@ -92,6 +92,24 @@ class ResearchProviderException(AppException):
         )
 
 
+class LocalDataFileException(AppException):
+    """表示本地 CSV / JSON 输入缺失或格式不合法。"""
+
+    def __init__(self, path: object, data_kind: str, reason: str) -> None:
+        """只公开安全的路径和原因摘要，不暴露原始堆栈。"""
+
+        super().__init__(
+            ErrorCode.LOCAL_DATA_FILE_ERROR,
+            "Local data file is invalid",
+            500,
+            detail={
+                "path": str(path),
+                "data_kind": data_kind,
+                "reason": reason,
+            },
+        )
+
+
 class ReportGenerationException(AppException):
     """表示报告合成阶段失败。"""
 

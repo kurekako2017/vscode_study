@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     task_execution_mode: Literal["background"] = "background"
     research_provider: Literal["static"] = "static"
     data_provider: Literal["static"] = "static"
+    repository_backend: Literal["inmemory", "postgres"] = "inmemory"
+    postgres_host: str = "127.0.0.1"
+    postgres_port: int = 5432
+    postgres_db: str = "retail_insight_ai"
+    postgres_user: str = "retail_user"
+    postgres_password: str = "retail_password"
     cors_origins: list[str] = Field(
         default_factory=lambda: [
             "http://127.0.0.1:5173",

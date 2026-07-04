@@ -1,16 +1,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from app.agents.providers.static_research import StaticResearchProvider
 from app.agents.research_agent import ResearchAgent
 from app.config.settings import Settings
+from app.data_loaders import LocalBusinessDataLoader, LocalResearchDataLoader
+from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
 from app.repositories.implementations.in_memory.task_repository import InMemoryTaskRepository
 from app.repositories.interfaces.event_repository import EventRepository
+from app.repositories.interfaces.report_repository import ReportRepository
+from app.repositories.interfaces.task_repository import TaskRepository
+from app.repositories.postgres.event_repository import PostgresEventRepository
+from app.repositories.postgres.report_repository import PostgresReportRepository
+from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.reports.generator import ReportGenerator
 from app.services.task_service import TaskService
 from app.workflow.graph import AnalysisWorkflow
@@ -23,22 +31,25 @@ class AppContainer:
     settings: Settings
     task_service: TaskService
     event_repository: EventRepository
+    repository_backend: str
 
 
 def build_container(settings: Settings | None = None) -> AppContainer:
     """在唯一组合根中连接接口与当前 InMemory/Static 实现。"""
 
     settings = settings or Settings()
-    # 所有具体实现都只在这里出现，业务层因此可以依赖稳定接口。
-    task_repository = InMemoryTaskRepository()
-    report_repository = InMemoryReportRepository()
-    event_repository = InMemoryEventRepository()
+    task_repository, report_repository, event_repository = _build_repositories(settings)
     event_publisher = EventPublisher(event_repository)
-    research_provider = StaticResearchProvider(fail=settings.static_research_fail)
+    business_data_loader = LocalBusinessDataLoader()
+    research_data_loader = LocalResearchDataLoader()
+    research_provider = StaticResearchProvider(
+        data_loader=research_data_loader,
+        fail=settings.static_research_fail,
+    )
     research_agent = ResearchAgent(research_provider)
     report_generator = ReportGenerator()
     workflow = AnalysisWorkflow(
-        kpi_workflow=FixedKPIWorkflow(),
+        kpi_workflow=FixedKPIWorkflow(data_loader=business_data_loader),
         research_agent=research_agent,
         report_generator=report_generator,
         step_delay_seconds=settings.workflow_step_delay_seconds,
@@ -54,4 +65,35 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         settings=settings,
         task_service=task_service,
         event_repository=event_repository,
+        repository_backend=settings.repository_backend,
+    )
+
+
+def _build_repositories(
+    settings: Settings,
+) -> tuple[TaskRepository, ReportRepository, EventRepository]:
+    """根据配置选择 InMemory 或 PostgreSQL Repository。"""
+
+    if settings.repository_backend == "inmemory":
+        return (
+            InMemoryTaskRepository(),
+            InMemoryReportRepository(),
+            InMemoryEventRepository(),
+        )
+
+    connection_factory = PostgresConnectionFactory(
+        PostgresConfig(
+            host=settings.postgres_host,
+            port=settings.postgres_port,
+            db=settings.postgres_db,
+            user=settings.postgres_user,
+            password=settings.postgres_password,
+        )
+    )
+    schema_path = Path(__file__).resolve().parents[2] / "db" / "schema.sql"
+    connection_factory.initialize_schema(schema_path)
+    return (
+        PostgresTaskRepository(connection_factory),
+        PostgresReportRepository(connection_factory),
+        PostgresEventRepository(connection_factory),
     )

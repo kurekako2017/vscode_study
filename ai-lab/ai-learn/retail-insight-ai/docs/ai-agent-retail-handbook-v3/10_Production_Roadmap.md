@@ -16,11 +16,126 @@
 
 Retail Insight AI 的升级以业务范围、风险和运维责任为门禁，不以引入组件数量作为完成标准。
 
+- 每个 Phase 完成后，必须同步更新 handbook 文档和本路线图中的对应等级说明。
+- 测试方法、流程图和架构图的同步不是附加项，而是阶段关闭条件。
+
 - 当前实现能力：FastAPI、TaskService、LangGraph Workflow、Fixed KPI Workflow、Research Agent、SSE、Report Generator、SQLite、Docker。
 - 正式运用优先级：身份与权限、审计、持久化、可观测性、备份恢复先于规模扩展。
 - KPI 始终保持确定性；Agent 只处理调查型任务。
 - 每一级必须满足上一等级的质量门禁，不能跨级跳过数据、权限或恢复能力。
 - 成本同时包含基础设施、模型调用、开发、测试、安全、运维和业务确认。
+
+## 1.1 Project Positioning
+
+### Current State
+
+当前项目名称保持为：
+
+`Retail Insight AI`
+
+当前项目是零售分析领域参考实现。
+
+### Target State
+
+未来平台目标名称：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+### Planned
+
+本路线图中的平台化能力都表示 ERIP 目标架构，不表示当前平台已经存在。
+
+## 1.2 Architecture Principles
+
+- Platform First
+- Domain Driven
+- Provider Pattern
+- Repository Pattern
+- Workflow Driven
+- Configuration First
+- Test First
+- Documentation First
+- Backward Compatibility
+
+## 1.3 Definition of Done
+
+任何一个 Phase 或 Level 的关闭至少需要满足：
+
+- Code
+- Unit Test
+- Integration Test
+- Frontend Test
+- Handbook
+- Changelog
+- Decision Record
+- Architecture Update
+- Mermaid Diagram Update
+- Task Update
+
+## 1.4 Epic 0 Deliverables
+
+- [ ] Architecture Freeze
+- [ ] Directory Freeze
+- [ ] Repository Freeze
+- [ ] Provider Freeze
+- [ ] Workflow Freeze
+- [ ] Database Freeze
+- [ ] Testing Freeze
+- [ ] Documentation Freeze
+
+## 1.5 Epic 12 Retrieval and RAG Platform
+
+### Current State
+
+当前尚未形成完整 Retrieval Platform。
+
+### Target State
+
+未来 Epic 12 作为横向平台能力，覆盖结构化业务数据检索、社内文档检索、互联网检索和 Hybrid Search 规划。
+
+### Planned
+
+Epic 12 当前作为横向平台能力标记，不代表已经实现。
+
+## 1.6 Phase 1 File Input Foundation
+
+### Current State
+
+主项目已完成 CSV / JSON / Markdown 文件输入落地。
+
+### Planned
+
+- 当前为 local file input + InMemory Repository
+- 当前 Report 状态为 `generated`
+- 后续演进到 Approval Workflow：
+  `draft / pending_approval / approved / rejected / revised`
+
+## 1.7 Phase 1.5 Contract Freeze and Approval Design
+
+### Current State
+
+主项目已完成 Contract Freeze 与审批状态机设计冻结。
+
+### Planned
+
+- 当前不实现 PostgreSQL
+- 当前不实现审批 API
+- 为 Phase 2 准备：
+  `data_imports`
+  `import_errors`
+  `reports.approval_status`
+  `report_versions`
+  `approval_requests`
+  `approval_events`
+
+## 1.8 Phase 2 PostgreSQL Persistence MVP
+
+- Current State:
+  主项目已落地 PostgreSQL Repository MVP，但默认运行模式仍为 `inmemory`。
+- Target State:
+  建立 Task、Event、Report 的事务持久化基础，并为 Approval / Import 预留事实表。
+- Planned:
+  在具备 PostgreSQL 环境后完成联调，再进入文档入库与审批 API 阶段。
 
 ## 2. Level 1 Demo
 

@@ -8,6 +8,36 @@ Retail Insight AI 是《日本 AI Agent 企业开发与面试宝典》V3 的统�
 
 本目录所有内容都围绕 Retail Insight AI 展开。
 
+## Project Positioning
+
+### Current State
+
+当前项目名称保持为：
+
+`Retail Insight AI`
+
+当前项目定位为：
+
+`Retail Analysis Domain Reference Implementation`
+
+### Target State
+
+未来平台目标名称为：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+ERIP 是未来企业平台架构目标，不表示当前手册描述的是一个已存在的平台。
+
+### Planned
+
+本 handbook 需要持续记录：
+
+- 当前 Retail Insight AI 的实现边界
+- 面向 ERIP 的目标架构
+- 从当前到目标的演进路径
+
+不得把 ERIP 写成当前已实现现状。
+
 ## 文档同步
 
 本手册与 [retail-insight-ai](../retail-insight-ai/README.md) 保持同步块联动，脚本位于 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py)。

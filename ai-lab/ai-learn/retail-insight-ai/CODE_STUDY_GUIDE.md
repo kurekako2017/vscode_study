@@ -20,10 +20,10 @@ Workflow (LangGraph)
   route 节点决定执行路径
     ↓
 KPI
-  用固定规则生成确定性指标（research 模式跳过）
+  从本地 CSV 生成确定性指标（research 模式跳过）
     ↓
 Research
-  调用本地 StaticResearchProvider（kpi 模式跳过）
+  调用本地 StaticResearchProvider，并从 JSON 读取 Research 数据（kpi 模式跳过）
     ↓
 Report
   把已有结果组合成 Markdown
@@ -37,7 +37,7 @@ React
 
 一句话记忆：**HTTP 创建任务，Workflow 做分析，SSE 报进度，HTTP 再取报告。**
 
-当前实现全部使用进程内存储和本地固定数据：不调用真实 LLM，不需要 PostgreSQL、Redis 或 RabbitMQ。Backend 重启后，任务、事件和报告都会丢失。
+当前实现默认使用进程内存储和本地文件输入：不调用真实 LLM，不需要 PostgreSQL、Redis 或 RabbitMQ。Phase 2 已新增可选 PostgreSQL Repository，但默认后端仍是 `inmemory`；只有显式切换后，任务、事件和报告才会跨进程保留。
 
 ## 2. 后端阅读顺序
 
@@ -47,12 +47,12 @@ React
 2. `backend/app/api/tasks.py`：四个任务 API 怎样接收和返回数据。
 3. `backend/app/services/task_service.py`：任务生命周期和完整业务用例。
 4. `backend/app/workflow/graph.py`，再读 `workflow/state.py`：Node、Edge、State 和模式分支。
-5. `backend/app/kpi/workflow.py`：KPI 的固定计算规则。
-6. `backend/app/agents/research_agent.py`，再读 `agents/providers/static_research.py`：Research 抽象与本地实现。
+5. `backend/app/kpi/workflow.py`，再读 `backend/app/data_loaders/local_files.py`：KPI 如何从 CSV 聚合。
+6. `backend/app/agents/research_agent.py`，再读 `agents/providers/static_research.py`：Research 抽象与本地 JSON 实现。
 7. `backend/app/reports/generator.py`：最终 Markdown 如何拼装。
 8. `backend/app/events/publisher.py`，再读 `events/sse.py`：事件怎样保存并编码成 SSE。
-9. `backend/app/repositories/interfaces/`，再读 `repositories/implementations/in_memory/`：为什么业务层不直接依赖字典。
-10. 第二轮再补读 `config/container.py`、`schemas/`、`models/`、`errors/` 和 `observability/logging.py`。
+9. `backend/app/repositories/interfaces/`，再读 `repositories/implementations/in_memory/` 与 `repositories/postgres/`：为什么业务层不直接依赖具体存储。
+10. 第二轮再补读 `config/container.py`、`app/db/connection.py`、`schemas/`、`models/`、`errors/` 和 `observability/logging.py`。
 
 阅读 `workflow/graph.py` 时，分别用 `hybrid`、`kpi`、`research` 三种 mode 在纸上画路径：
 

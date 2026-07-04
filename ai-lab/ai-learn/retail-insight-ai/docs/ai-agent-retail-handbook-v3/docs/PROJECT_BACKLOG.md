@@ -1,14 +1,36 @@
 # 项目总待办清单
 
-最后更新：2026-07-02
+最后更新：2026-07-04
 
 ## 项目目标
 
-待确认
+作为 retail-insight-ai 企业化改造的 handbook 镜像与讲解文档集合，持续同步任务、架构、测试方法、决策和变更历史。
 
 ## 当前阶段
 
-待确认
+企业化文档同步治理建设
+
+## Epic 0: Enterprise Platform Architecture Evolution
+
+### Current State
+
+当前 handbook 仍主要服务于 `Retail Insight AI` 这一零售分析领域参考实现。
+
+### Target State
+
+未来平台目标为：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+### Planned Tasks
+
+- [ ] Architecture Freeze
+- [ ] Directory Refactor
+- [ ] Repository Abstraction
+- [ ] Workflow Abstraction
+- [ ] Provider Abstraction
+- [ ] Documentation Standard
+- [ ] Testing Standard
 
 ## Backlog
 
@@ -16,15 +38,66 @@
 
 - [ ] 项目结构检查
 
+### Epic 2
+
+- [ ] 建立 Phase 完成后的 handbook 同步关闭条件
+- [ ] 补齐架构文档必备图示章节
+- [ ] 补齐测试用例固定模板
+- [ ] 建立 CHANGELOG / DECISIONS 强制同步规则
+- [ ] 检查 08_架构图册、09_系统设计书、10_Production_Roadmap 的企业化待完善章节
+
+### Epic 3
+
+- [ ] 明确 Retail Insight AI 与 ERIP 的 Current / Target / Planned 定位
+- [ ] 在 handbook 中冻结 Architecture Principles
+- [ ] 在 handbook 中写入 Definition of Done
+
+### Epic 12: Retrieval and RAG Platform
+
+- [ ] Business Data Retrieval
+- [ ] SQL-based structured retrieval
+- [ ] Internal Document Retrieval
+- [ ] Internal RAG MVP
+- [ ] Document chunk retrieval
+- [ ] PostgreSQL keyword search
+- [ ] PostgreSQL full-text search planning
+- [ ] pgvector planning
+- [ ] Hybrid search planning
+- [ ] Internet Search Retrieval
+- [ ] Retrieval provider interface
+- [ ] Context merge strategy
+- [ ] Source citation model
+- [ ] Reference tracking
+- [ ] Hallucination risk control
+- [ ] Retrieval evaluation
+- [ ] Handbook 文档已同步
+
+### Phase 1: 文件化输入基础
+
+- [x] KPI CSV 输入已同步到 handbook
+- [x] Research JSON 输入已同步到 handbook
+- [x] Documents Markdown 输入目录已同步到 handbook
+- [x] Approval Workflow 状态预留说明已同步到 handbook
+- [ ] PostgreSQL 持久化基础
+
+### Phase 1.5: Data Contract Freeze + Approval State Machine Design
+
+- [x] Data Contract 已同步到 handbook
+- [x] Import Error Model 已同步到 handbook
+- [x] Approval State Machine 已同步到 handbook
+- [x] Phase 2 PostgreSQL 准备项已同步到 handbook
+
 ## 技术债
 
 ### High
 
-- [ ] 待确认
+- [ ] handbook 同步门禁尚未形成闭环
+- [ ] 测试模板和架构模板仍不完整
 
 ## 已知问题
 
-- [ ] 待确认
+- [ ] 当前 handbook 架构文档仍有治理占位章节
+- [ ] 当前 handbook 决策文档尚未覆盖同步治理规则
 
 ## 完成记录
 
@@ -42,6 +115,35 @@
 - [x] 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的文档同步映射
 - [x] 新增跨项目文档同步脚本 `../../scripts/sync_retail_handbook_docs.py`
 - [x] 新增同步清单 `../../doc-sync.manifest.json`
+
+### 2026-07-04 Handbook Sync Governance
+
+- [x] 将主项目 Phase 级 handbook 同步规则映射到 handbook 侧治理文件
+- [x] 新增测试用例模板要求
+- [x] 新增架构文档必备图示要求
+- [x] 新增 CHANGELOG / DECISIONS 强制同步要求
+
+### 2026-07-04 Phase 1 文件化输入实现
+
+- [x] 同步 KPI CSV 输入边界
+- [x] 同步 Research JSON 输入边界
+- [x] 同步 Document Markdown 输入边界
+- [x] 同步 Approval Workflow 状态预留说明
+
+### 2026-07-04 Phase 1.5 Contract Freeze and Approval Design
+
+- [x] 同步 Data Contract Freeze
+- [x] 同步 Import Error Model
+- [x] 同步 Approval State Machine
+- [x] 同步 Phase 2 PostgreSQL 准备项
+
+### 2026-07-04 Phase 2 PostgreSQL Persistence MVP
+
+- [x] 同步 `REPOSITORY_BACKEND=inmemory|postgres`
+- [x] 同步 PostgreSQL Task / Event / Report Repository 边界
+- [x] 同步 `data_imports` / `import_errors` schema 预留
+- [x] 同步 `approval_requests` / `approval_events` schema 预留
+- [x] 同步默认仍为 `inmemory` 的运行边界
 
 <!-- DOC-SYNC:START group=governance -->
 ## 文档同步块

@@ -11,6 +11,7 @@ class ReportResponse(BaseModel):
     task_id: str
     markdown: str
     provider: str
+    status: str
     created_at: datetime
 
     @classmethod
@@ -21,5 +22,6 @@ class ReportResponse(BaseModel):
             task_id=report.task_id,
             markdown=report.markdown,
             provider=report.provider,
+            status=report.status.value,
             created_at=report.created_at,
         )

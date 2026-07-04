@@ -1,0 +1,4 @@
+sku_id,category,average_inventory_jpy,cost_of_goods_sold_jpy
+sku-001,apparel,1200000,5100000
+sku-002,food,980000,4500000
+sku-003,home,750000,3300000

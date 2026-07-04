@@ -30,6 +30,95 @@
 - API、Worker、SSE 可作为独立部署单元扩展，但不为每个类创建服务。
 - 目录结构能够映射基本设计、详细设计、测试和运维责任。
 
+## 1.1 Project Positioning
+
+### Current State
+
+当前项目名称保持为：
+
+`Retail Insight AI`
+
+当前定位：
+
+`Retail Analysis Domain Reference Implementation`
+
+### Target State
+
+未来平台目标名称：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+### Planned
+
+本文件中的平台化目录结构用于描述 ERIP 目标架构，不表示当前仓库已经全部按该结构落地。
+
+## 1.2 Architecture Principles
+
+- Platform First
+- Domain Driven
+- Provider Pattern
+- Repository Pattern
+- Workflow Driven
+- Configuration First
+- Test First
+- Documentation First
+- Backward Compatibility
+
+## 1.3 Target Architecture Mapping
+
+未来目标逻辑分层：
+
+```text
+Platform
+Domain
+Provider
+Workflow
+Repository
+Approval
+Documents
+Search
+Import
+Audit
+Database
+Frontend
+```
+
+当前尚未全部实现，当前 `backend/`、`frontend/`、`docs/` 仍是现阶段主目录。
+
+## 1.4 Directory Refactor Design
+
+### Platform Layer
+
+- 负责平台通用能力、配置、审批、审计、权限与装配。
+
+### Domain Layer
+
+- 负责 Task、Analysis、Workflow、Report 等领域模型与用例。
+
+### Infrastructure Layer
+
+- 负责 Repository、Provider、Database、Search、Import 等外部适配。
+
+### Frontend
+
+- 负责页面状态、交互流程、前端契约与展示。
+
+### Documentation
+
+- 负责架构、设计、ADR、测试、运维与培训文档。
+
+### Data
+
+- 负责 CSV / Excel / JSON / Markdown 输入样例与导入入口。
+
+### Template
+
+- 负责报告模板、Prompt 模板、导入模板。
+
+### Test
+
+- 负责 unit / integration / api / workflow / frontend / db / performance / manual 覆盖。
+
 ## 2. 顶层目录
 
 ```text

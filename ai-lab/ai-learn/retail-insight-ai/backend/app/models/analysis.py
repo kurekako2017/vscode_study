@@ -12,8 +12,8 @@ class KPIResult:
     inventory_turnover: float
     active_members: int
     promotion_lift_rate: float
-    data_version: str = "local-static-2026-06"
-    rule_version: str = "kpi-v1"
+    data_version: str = "local-files"
+    rule_version: str = "kpi-file-v1"
 
 
 @dataclass(frozen=True)
@@ -23,3 +23,4 @@ class ResearchResult:
     summary: str
     sources: list[str] = field(default_factory=list)
     provider: str = "static"
+    data_version: str = "local-files"

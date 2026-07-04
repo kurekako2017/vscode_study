@@ -1,0 +1,7 @@
+member_id,segment,is_active
+m-001,gold,true
+m-002,silver,true
+m-003,silver,false
+m-004,gold,true
+m-005,regular,true
+m-006,regular,true

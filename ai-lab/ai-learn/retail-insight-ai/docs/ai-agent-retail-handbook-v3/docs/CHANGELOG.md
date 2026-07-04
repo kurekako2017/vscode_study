@@ -1,5 +1,79 @@
 # CHANGELOG
 
+## 2026-07-04 Phase 2 PostgreSQL Persistence MVP
+
+- 同步主项目 PostgreSQL Persistence MVP。
+- 新增 `REPOSITORY_BACKEND=inmemory|postgres` 说明，默认值仍为 `inmemory`。
+- 同步 PostgreSQL Task / Event / Report Repository 边界。
+- 同步 `tasks`、`task_events`、`reports`、`report_versions` 表。
+- 同步 `data_imports`、`import_errors`、`approval_requests`、`approval_events` 的 schema-only 预留说明。
+- 同步 Approval / Import 尚未接入业务 API 的边界。
+
+## 2026-07-04 Architecture Positioning
+
+- 新增企业架构定位（Architecture Positioning）。
+- 明确 `Retail Insight AI` 保持为当前项目名称。
+- 明确 `Enterprise Retail Intelligence Platform (ERIP)` 是未来平台架构目标，不是当前已存在平台。
+- 新增 `Epic 0: Enterprise Platform Architecture Evolution`。
+- 新增 Architecture Principles。
+- 新增 Target Architecture 逻辑分层。
+- 新增 Phase 完成的 Definition of Done。
+- 同步更新 handbook README、ROADMAP、TASK、PROJECT_BACKLOG、ARCHITECTURE、架构图册、系统设计书、Production Roadmap、Project Structure。
+
+## 2026-07-04 Epic 0 Architecture Freeze
+
+- 新增 Enterprise Architecture Freeze 设计。
+- 新增 Directory Refactor Design。
+- 新增 Repository Abstraction Design。
+- 新增 Provider Abstraction Design。
+- 新增 Workflow Architecture、Document Pipeline、Business Data Pipeline、Approval Workflow。
+- 新增 Database Target ER Diagram。
+- 新增 Testing Matrix 与 Documentation Matrix。
+- 新增 Epic 0 Deliverables 清单。
+
+## 2026-07-04 Epic 12 Retrieval and RAG Platform
+
+- 新增 `Epic 12: Retrieval and RAG Platform`。
+- 明确 RAG 不只包括社内文档，还包括结构化业务数据检索与互联网检索。
+- 新增检索层相关架构章节：
+  Retrieval Layer Architecture、Business Retrieval Flow、Internal RAG Flow、Internet Search Flow、Context Merge Flow、Citation and Source Trace Flow、Future Hybrid Search Architecture。
+
+## 2026-07-04 Phase 1 文件化输入实现
+
+- 同步主项目的文件化输入改造。
+- KPI 改为从 `backend/data/business/*.csv` 读取并计算。
+- Research 改为从 `backend/data/research/*.json` 读取 `summary / sources`。
+- 新增 `backend/data/documents/*.md` 输入边界说明。
+- 报告当前状态为 `generated`，并预留后续审批状态：
+  `draft / pending_approval / approved / rejected / revised`。
+
+## 2026-07-04 Phase 1.5 Contract Freeze and Approval Design
+
+- 同步 Data Contract Freeze。
+- 同步 Import Error Model：
+  `missing_file`、`invalid_header`、`invalid_type`、`empty_dataset`、`invalid_json`、`invalid_source`、`unsupported_encoding`。
+- 同步 Approval State Machine：
+  `generated / draft / pending_approval / approved / rejected / revised / published / archived`。
+- 同步 Phase 2 PostgreSQL 准备项。
+
+## 2026-07-04
+
+- 新增企业化阶段 handbook 同步治理规则。
+- 规定每个 Phase 完成后必须同步更新 handbook 文档。
+- 新增测试用例固定模板要求：
+  用例目标、前端操作流程、后端处理流程、数据输入来源、预期输出、验收标准、Mermaid 前端流程图、Mermaid 后端流程图。
+- 新增架构文档必备图示要求：
+  前端流程图、后端流程图、数据流图、数据库 ER 图、LangGraph workflow 图、文档检索流程图、审批 workflow 图、互联网检索流程图。
+- 影响文件：
+  `TASK.md`
+  `ROADMAP.md`
+  `docs/PROJECT_BACKLOG.md`
+  `docs/ARCHITECTURE.md`
+  `docs/DECISIONS.md`
+  `08_架构图册.md`
+  `09_系统设计书.md`
+  `10_Production_Roadmap.md`
+
 ## 2026-07-02
 
 - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。

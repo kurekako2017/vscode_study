@@ -1,5 +1,125 @@
 # Retail Insight AI
 
+## Project Positioning
+
+### Current State
+
+`Retail Insight AI` 是当前项目名称，也是当前仓库唯一项目标识。
+
+当前项目定位为：
+
+`Retail Analysis Domain Reference Implementation`
+
+它是企业零售智能平台演进的起点，用于验证零售分析 Domain 的任务受理、Workflow、KPI、Research、Report 和 SSE 链路。
+
+### Target State
+
+未来平台目标名称为：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+ERIP 是持续演进目标，不是当前已经存在的平台，也不是当前 Repository 名称。
+
+### Planned
+
+后续演进方向是：
+
+`Retail Insight AI`
+→ 零售分析领域参考实现
+→ 企业平台化抽象沉淀
+→ `Enterprise Retail Intelligence Platform (ERIP)` 目标架构
+
+当前不得将项目描述为“ERIP 已实现”或“ERIP 已存在”。
+
+## Architecture Principles
+
+### Current State
+
+当前仓库已具备部分分层基础，例如 TaskService、Workflow、Provider、Repository 边界，但尚未完成平台级统一抽象。
+
+### Target State
+
+未来企业化演进遵守以下原则：
+
+- Platform First
+- Domain Driven
+- Provider Pattern
+- Repository Pattern
+- Workflow Driven
+- Configuration First
+- Test First
+- Documentation First
+- Backward Compatibility
+
+### Planned
+
+这些原则将用于后续目录重构、Provider / Repository / Workflow 抽象和文档治理，不表示当前所有模块都已完全符合。
+
+## Enterprise Platform Architecture Evolution
+
+### Current State
+
+当前仓库目录仍以教学型单项目结构为主，重点是本地可运行与可学习。
+
+### Target State
+
+未来目标架构将逐步演进到以下逻辑分层：
+
+```text
+Platform
+Domain
+Provider
+Workflow
+Repository
+Approval
+Documents
+Search
+Import
+Audit
+Database
+Frontend
+```
+
+### Planned
+
+上述结构表示 ERIP 目标架构视图，当前尚未全部实现，也不表示当前仓库必须立即按该结构重命名或重组。
+
+## Definition of Done
+
+未来任何一个 Phase 要标记完成，必须同时满足以下条件：
+
+- Code
+- Unit Test
+- Integration Test
+- Frontend Test
+- Handbook
+- Changelog
+- Decision Record
+- Architecture Update
+- Mermaid Diagram Update
+- Task Update
+
+只要任一项未完成，对应 Phase 就不能从 `[ ]` 改为 `[x]`。
+
+## Epic 0 Scope
+
+### Current State
+
+当前只完成企业架构定位，尚未冻结完整企业架构细节。
+
+### Planned
+
+`Epic 0` 的目标是完成 Enterprise Architecture Freeze，包括：
+
+- Architecture Freeze
+- Directory Freeze
+- Repository Freeze
+- Provider Freeze
+- Workflow Freeze
+- Database Freeze
+- Testing Freeze
+- Documentation Freeze
+
 ## 明天先做什么
 
 1. 运行 `check_env`
@@ -35,9 +155,9 @@ http://127.0.0.1:5173
 
 详细的 Backend、Frontend、API、SSE、Report 自测和排障步骤见 [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md)。
 
-Retail Insight AI 是一个可部署的 Level 1 本地 Demo：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行确定性 KPI 与 Static Research，SSE 实时返回进度，最终展示 Markdown 报告。
+Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业平台化架构的零售分析领域参考实现：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行确定性 KPI 与 Static Research，SSE 实时返回进度，最终展示 Markdown 报告。
 
-核心 API、TaskService、Workflow、SSE、Report Generator 和 Frontend 都是真实实现。当前部署配置使用本地固定业务数据、`StaticResearchProvider` 和 `InMemoryRepository`，不调用真实 LLM，也不需要 API Key；进程重启后任务数据会丢失，因此仍不能用于真实经营决策。
+核心 API、TaskService、Workflow、SSE、Report Generator 和 Frontend 都是真实实现。当前部署配置默认使用本地文件输入业务数据、`StaticResearchProvider` 和 `InMemoryRepository`，不调用真实 LLM，也不需要 API Key；Phase 2 已新增可选 PostgreSQL 持久化后端，但默认仍是 `inmemory`，因此不配置数据库时本地启动方式不变。
 
 ## 文档同步
 
@@ -56,7 +176,7 @@ Retail Insight AI 是一个可部署的 Level 1 本地 Demo：用户从 React �
 当前角色边界：
 
 - `FixedKPIWorkflow` 负责确定性 KPI，不允许模型改写公式。
-- `ResearchAgent` 负责调查型结论，当前调用本地 `StaticResearchProvider`。
+- `ResearchAgent` 负责调查型结论，当前调用本地 `StaticResearchProvider`，并从 `backend/data/research/*.json` 读取摘要与来源。
 - `AnalysisWorkflow` 负责 State、Node、Edge 和条件路由。
 - `TaskService` 负责任务生命周期、事件发布、报告保存和失败收敛。
 - React 前端只持有页面状态，Backend 是任务和报告的事实来源。
@@ -71,8 +191,10 @@ Retail Insight AI 是一个可部署的 Level 1 本地 Demo：用户从 React �
 - React 展示任务表单、Workflow 时间线、失败信息和报告。
 - JSON 结构化日志记录 request_id、task_id、关键事件、错误码与耗时。
 - InMemory Repository 保存 Task、Event、Report；进程重启后数据丢失。
+- Phase 2 新增可选 PostgreSQL Repository，可持久化 Task、Event、Report，并为 Approval / Import 预留表结构。
 - FastAPI `BackgroundTasks` 在 API 进程内执行任务；尚无队列、幂等消费或跨实例恢复。
 - 无登录、RBAC、租户隔离、真实数据、真实 LLM、Checkpoint 或人工审批。
+- 当前未实现 Approval API、Import API、Document Search、RAG、Internet Search、MCP 或 pgvector。
 
 ## 3. 项目结构
 
@@ -676,3 +798,20 @@ cp .env.example .env
 - 只同步这个块，不覆盖各自正文。
 - 任一组内文档正文变化时，整组文档的同步块都会一起刷新。
 <!-- DOC-SYNC:END group=overview -->
+## 本地数据输入
+
+### Current State
+
+- KPI 输入目录：
+  `backend/data/business/`
+- Research 输入目录：
+  `backend/data/research/`
+- Documents 输入目录：
+  `backend/data/documents/`
+
+### Planned
+
+- 当前 Report 仍直接生成，状态为 `generated`。
+- 后续 Approval Workflow 将扩展为：
+  `draft / pending_approval / approved / rejected / revised`
+- 当前文件输入层与审批流解耦，不会阻碍后续审批接入。

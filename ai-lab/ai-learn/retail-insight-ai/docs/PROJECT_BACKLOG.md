@@ -1,6 +1,6 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-02
+最后更新：2026-07-04
 
 ## 项目目标
 
@@ -32,9 +32,44 @@
 
 ## 当前阶段
 
-Phase 2: Internal Knowledge Approval Agent
+Phase 2: PostgreSQL Persistence MVP
 
 状态：进行中
+
+## Epic 0: Enterprise Platform Architecture Evolution
+
+### Current State
+
+当前项目名称保持为 `Retail Insight AI`，项目仍是零售分析领域参考实现，平台级抽象尚未冻结。
+
+### Target State
+
+未来目标平台名称：
+
+`Enterprise Retail Intelligence Platform (ERIP)`
+
+ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前目录已经完成平台化。
+
+### Planned Tasks
+
+- [ ] Architecture Freeze
+- [ ] Directory Refactor
+- [ ] Repository Abstraction
+- [ ] Workflow Abstraction
+- [ ] Provider Abstraction
+- [ ] Documentation Standard
+- [ ] Testing Standard
+
+### Epic 0 Deliverables
+
+- [ ] Architecture Freeze
+- [ ] Directory Freeze
+- [ ] Repository Freeze
+- [ ] Provider Freeze
+- [ ] Workflow Freeze
+- [ ] Database Freeze
+- [ ] Testing Freeze
+- [ ] Documentation Freeze
 
 ## 工作区规则继承
 
@@ -53,6 +88,16 @@ Phase 2: Internal Knowledge Approval Agent
 - docs/CHANGELOG.md
 
 ## 当前近期优先级
+
+### Enterprise Priority
+
+- [ ] 第一优先级：文件化输入（CSV / JSON / Markdown）+ PostgreSQL 持久化基础
+- [ ] 明确文件输入目录结构、样例数据规范、版本字段与加载边界
+- [ ] 明确 PostgreSQL 持久化表结构、迁移方案与 Repository 替换策略
+- [ ] 明确本地最小可行运行方案，不依赖真实外部服务
+- [ ] 明确 Phase 完成后的 handbook 文档同步清单与验收标准
+- [ ] 明确 Retail Insight AI 与 ERIP 的 Current / Target / Planned 定位边界
+- [ ] 明确 Retrieval and RAG Platform 的横向能力边界
 
 ### P0
 
@@ -133,6 +178,328 @@ Phase 2: Internal Knowledge Approval Agent
 - [ ] Metrics Dashboard
 - [ ] Cost Tracking
 
+### Epic 8: Enterprise Delivery Plan
+
+- [x] Phase 1 文件化输入基础
+- [x] Phase 1.5 Data Contract Freeze + Approval State Machine Design
+- [ ] Phase 2 PostgreSQL 持久化基础
+- [ ] Phase 3 社内文档上传与入库
+- [ ] Phase 4 切分与检索基础
+- [ ] Phase 5 审批 Workflow
+- [ ] Phase 6 互联网检索能力
+- [ ] Phase 7 LangChain + LangGraph 工作流整合
+- [ ] Phase 8 测试体系与流程图文档
+
+### Epic 12: Retrieval and RAG Platform
+
+说明：
+
+当前将 Epic 12 作为横向平台能力，不表示当前已经实现完整 RAG 平台。
+
+- [ ] Business Data Retrieval
+- [ ] SQL-based structured retrieval
+- [ ] Internal Document Retrieval
+- [ ] Internal RAG MVP
+- [ ] Document chunk retrieval
+- [ ] PostgreSQL keyword search
+- [ ] PostgreSQL full-text search planning
+- [ ] pgvector planning
+- [ ] Hybrid search planning
+- [ ] Internet Search Retrieval
+- [ ] Retrieval provider interface
+- [ ] Context merge strategy
+- [ ] Source citation model
+- [ ] Reference tracking
+- [ ] Hallucination risk control
+- [ ] Retrieval evaluation
+- [ ] Handbook 文档已同步
+
+## Phase 1 到 Phase 8 详细计划
+
+### Phase 1.5: Data Contract Freeze + Approval State Machine Design
+
+- 状态：已完成文档冻结。
+- 本次完成：
+  - [x] 冻结业务 CSV 字段契约
+  - [x] 冻结 Research JSON 字段契约
+  - [x] 冻结 Documents Markdown 当前边界与未来导入规则
+  - [x] 冻结导入错误模型
+  - [x] 冻结 Approval State Machine
+  - [x] 冻结 Phase 2 PostgreSQL 准备项
+- 后续待办：
+  - [ ] 将导入错误模型映射到真实 Repository
+  - [ ] 将审批状态机映射到真实 API / Repository / Event
+  - [ ] 将数据契约映射到 PostgreSQL schema version 策略
+
+### Phase 2: PostgreSQL Persistence MVP
+
+- 状态：代码已落地，联调待完成。
+- 本次完成：
+  - [x] 新增 `REPOSITORY_BACKEND=inmemory|postgres` 配置开关，默认仍为 `inmemory`
+  - [x] 新增 PostgreSQL 连接工厂与 UTC 会话设置
+  - [x] 新增 `tasks`、`task_events`、`reports`、`report_versions` 表
+  - [x] 新增 `data_imports`、`import_errors` schema 预留
+  - [x] 新增 `approval_requests`、`approval_events` schema 预留
+  - [x] 新增 PostgreSQL Repository 与 backend switch 测试
+  - [x] 同步主项目与 handbook 文档
+- 后续待办：
+  - [ ] 在具备 PostgreSQL 环境后执行真实集成测试
+  - [ ] 实现 data imports / import errors Repository
+  - [ ] 将 reports approval status 接入真实审批状态流转
+  - [ ] 为 Phase 3 文档入库与 Phase 5 审批 API 复用当前 schema
+
+## Handbook 同步治理规则
+
+- 每个 Phase 完成后，必须同步更新 `docs/ai-agent-retail-handbook-v3/` 对应文档。
+- handbook 同步最小集合：
+  `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
+- 若变更涉及测试、流程、系统设计、生产路线图，还必须同步检查并更新：
+  `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
+- 未同步 handbook 文档的 Phase 不得从 `[ ]` 改为 `[x]`。
+- 所有功能变更必须追加到 handbook 侧：
+  `docs/ai-agent-retail-handbook-v3/docs/CHANGELOG.md`
+  `docs/ai-agent-retail-handbook-v3/docs/DECISIONS.md`
+
+## Architecture Principles
+
+- Platform First
+- Domain Driven
+- Provider Pattern
+- Repository Pattern
+- Workflow Driven
+- Configuration First
+- Test First
+- Documentation First
+- Backward Compatibility
+
+## Target Architecture
+
+### Current State
+
+当前仓库未完全按平台化逻辑分层。
+
+### Target State
+
+未来目标逻辑分层：
+
+```text
+Platform
+Domain
+Provider
+Workflow
+Repository
+Approval
+Documents
+Search
+Import
+Audit
+Database
+Frontend
+```
+
+### Planned
+
+该结构用于 ERIP 目标架构规划，当前尚未全部实现。
+
+## Epic 12 Positioning
+
+### Current State
+
+当前 RAG 尚未形成统一 Retrieval Layer。
+
+### Target State
+
+未来 RAG 范围明确包括：
+
+- 结构化业务数据检索
+- 社内文档检索
+- 互联网检索
+- 上下文合并
+- 引用与来源追踪
+- 幻觉风险控制
+- 检索评估
+
+### Planned
+
+Epic 12 作为横向平台能力推进，而不是单一文档 RAG 能力。
+
+## Definition of Done
+
+任何一个 Phase 完成，必须同时满足：
+
+- [ ] Code
+- [ ] Unit Test
+- [ ] Integration Test
+- [ ] Frontend Test
+- [ ] Handbook
+- [ ] Changelog
+- [ ] Decision Record
+- [ ] Architecture Update
+- [ ] Mermaid Diagram Update
+- [ ] Task Update
+
+## 测试文档规则
+
+- 每个测试用例必须包含：
+  - 用例目标
+  - 前端操作流程
+  - 后端处理流程
+  - 数据输入来源
+  - 预期输出
+  - 验收标准
+  - Mermaid 前端流程图
+  - Mermaid 后端流程图
+
+## 架构文档最小章节
+
+- 前端流程图
+- 后端流程图
+- 数据流图
+- 数据库 ER 图
+- LangGraph workflow 图
+- Retrieval Layer Architecture
+- Business Retrieval Flow
+- Internal RAG Flow
+- Internet Search Flow
+- Context Merge Flow
+- Citation and Source Trace Flow
+- Future Hybrid Search Architecture
+- 文档检索流程图
+- 审批 workflow 图
+- 互联网检索流程图
+
+### Phase 1: 文件化输入基础
+
+- 状态：已完成第一轮实现，保持本地可运行。
+- 本次完成：
+  - [x] KPI 从 `backend/data/business/*.csv` 读取并计算
+  - [x] Research 从 `backend/data/research/*.json` 读取 summary / sources
+  - [x] 新增 `backend/data/documents/` Markdown 输入目录
+  - [x] Report 增加 `generated` 状态，预留后续 Approval Workflow
+  - [x] 新增文件输入测试与 hybrid 报告测试
+- 后续待办：
+  - [ ] 将 CSV / JSON 文件版本规则固化到导入规范
+  - [ ] 将 `generated` 向 `draft / pending_approval / approved / rejected / revised` 扩展
+  - [ ] 为 PostgreSQL 导入和持久化设计映射表结构
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  建立 CSV / JSON / Markdown 输入通路，替代 KPI、Research 和知识文档中的写死数据。
+- 修改范围：
+  数据目录规范、文件加载层、Provider 输入边界、示例数据、README / RUNBOOK / VERIFY 文档。
+- 验收标准：
+  任务执行可读取文件数据；移除关键运行路径中的硬编码示例值；本地仍可直接启动。
+- 测试方法：
+  文件加载单元测试、任务 API 集成测试、缺失文件与非法格式测试、手工验证报告来源。
+- 风险：
+  数据文件格式不一致、编码问题、样例数据与业务模型字段不匹配。
+
+### Phase 2: PostgreSQL 持久化基础
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  为任务、事件、报告与导入记录提供可持久化数据库基础，并支持后续审批与检索扩展。
+- 修改范围：
+  PostgreSQL Repository、连接配置、迁移文件、表结构、运行脚本、部署文档。
+- 验收标准：
+  任务、事件、报告写入 PostgreSQL；进程重启后数据保留；接口合同保持稳定。
+- 测试方法：
+  Repository 测试、数据库集成测试、迁移测试、任务执行后持久化验证。
+- 风险：
+  本地数据库准备复杂、Schema 调整频繁、事务边界设计不足。
+
+### Phase 3: 社内文档上传与入库
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  支持上传社内文档，并为每份文档建立版本、来源和审计信息。
+- 修改范围：
+  Upload API、文档元数据、文件存储策略、前端上传页面、错误处理与日志。
+- 验收标准：
+  支持上传受控格式文档；文档可登记并查询元数据；失败路径可追踪。
+- 测试方法：
+  上传接口测试、前端交互测试、重复文件测试、非法格式测试。
+- 风险：
+  敏感文档处理、文件大小限制、存储策略和权限设计不充分。
+
+### Phase 4: 切分与检索基础
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  实现文档切分、片段入库、基础检索与引用输出，为 Approval Agent 和知识问答提供上下文。
+- 修改范围：
+  Chunk Pipeline、Retriever 抽象、片段存储、引用格式、Architecture 文档。
+- 验收标准：
+  上传文档可切分；查询时可返回 Top-K 片段和来源；检索结果可进入报告或审批上下文。
+- 测试方法：
+  Chunk 单元测试、检索回归测试、来源引用测试、端到端手工验证。
+- 风险：
+  Chunk 策略不稳定、检索质量不够、文档版本与索引版本失配。
+
+### Phase 5: 审批 Workflow
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  建立可追踪的人工审批流程，支持提交、待审批、批准、拒绝和审计留痕。
+- 修改范围：
+  LangGraph 状态机、审批 API、审批日志表、前端审批界面、异常恢复逻辑。
+- 验收标准：
+  审批任务可稳定流转；日志完整；拒绝与重试路径可验证。
+- 测试方法：
+  状态迁移测试、审批接口测试、前端流程测试、失败恢复测试。
+- 风险：
+  状态管理复杂、幂等处理不足、人工操作与自动化边界不清。
+
+### Phase 6: 互联网检索能力
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  在可控策略下引入互联网检索，为外部市场与竞品信息提供补充证据。
+- 修改范围：
+  Search Provider 抽象、可信来源规则、审计字段、降级策略、配置开关。
+- 验收标准：
+  可按配置启停互联网检索；结果保留来源；网络失败时主流程可降级。
+- 测试方法：
+  Provider 合同测试、失败降级测试、来源校验测试、人工抽样验证。
+- 风险：
+  外部数据质量、网络波动、成本与时效不可控。
+
+### Phase 7: LangChain + LangGraph 工作流整合
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  把 LangChain 组件能力与 LangGraph 状态编排整合，形成清晰的 Tool / Retriever / Prompt / Workflow 分层。
+- 修改范围：
+  Workflow 组装层、Tool 适配层、Prompt 管理、Retriever 接口、架构文档和 ADR。
+- 验收标准：
+  组件职责清晰；核心状态流仍由 LangGraph 控制；新增组件不破坏现有 API。
+- 测试方法：
+  集成测试、Tool 调用测试、Prompt 回归测试、异常回退测试。
+- 风险：
+  框架职责重叠、抽象过度、调试成本上升。
+
+### Phase 8: 测试体系与流程图文档
+
+- [ ] 是否完成
+- [ ] Handbook 文档已同步
+- 目标：
+  建立完整测试用例、测试方法、前后台流程图、系统架构图和学习文档同步机制。
+- 修改范围：
+  Backend / Frontend 测试、验证清单、流程图、`docs/ARCHITECTURE.md`、README、RUNBOOK。
+- 验收标准：
+  核心链路具备单元、集成、端到端验证；文档图示完整且与实现一致。
+- 测试方法：
+  执行自动化测试脚本、人工验收清单、文档对照审计。
+- 风险：
+  文档和实现不同步、测试成本过高、覆盖率高但有效性不足。
+
 ## Technical Debt
 
 ### High
@@ -140,12 +507,18 @@ Phase 2: Internal Knowledge Approval Agent
 - [ ] Chunk Strategy 统一
 - [ ] Embedding 抽象层
 - [ ] Prompt 版本管理
+- [ ] 文件化输入契约未定义
+- [ ] PostgreSQL Schema 与 Repository 边界未定义
+- [ ] handbook 同步治理未形成关闭条件
 
 ### Medium
 
 - [ ] API 统一返回格式
 - [ ] 前端错误处理统一
 - [ ] 初级学者友好注释补充
+- [ ] Upload / Chunk / Retriever 流程图缺失
+- [ ] 测试分层与测试数据策略未成体系
+- [ ] handbook 测试模板与架构模板仍需补齐
 
 ### Low
 
@@ -181,6 +554,43 @@ Open
 - [x] 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的文档同步映射
 - [x] 新增跨项目文档同步脚本 `../../scripts/sync_retail_handbook_docs.py`
 - [x] 新增同步清单 `../../doc-sync.manifest.json`
+
+### 2026-07-04 Enterprise Planning
+
+- [x] 将企业化改造需求纳入 TASK / Backlog / Roadmap
+- [x] 新增 Phase 1 到 Phase 8 实施计划
+- [x] 明确第一优先级为“文件化输入 + PostgreSQL 持久化基础”
+- [x] 补充 Upload、检索、审批、互联网检索、LangChain + LangGraph、测试与架构文档任务
+
+### 2026-07-04 Handbook Sync Governance
+
+- [x] 新增 Phase 完成后的 handbook 同步规则
+- [x] 新增测试用例强制模板规则
+- [x] 新增架构文档必备图示清单
+- [x] 新增 handbook CHANGELOG 与 DECISIONS 强制同步规则
+
+### 2026-07-04 Epic 12 Retrieval and RAG Platform
+
+- [x] 新增 Epic 12: Retrieval and RAG Platform
+
+### 2026-07-04 Phase 1 文件化输入实现
+
+- [x] KPI 硬编码数值迁移到 `backend/data/business/*.csv`
+- [x] Research 硬编码摘要和来源迁移到 `backend/data/research/*.json`
+- [x] 新增 `backend/data/documents/company_policy_sample.md`
+- [x] 新增文件输入测试、Research JSON 测试、hybrid 报告测试
+- [x] 报告模型预留 `generated / draft / pending_approval / approved / rejected / revised`
+
+### 2026-07-04 Phase 1.5 Contract Freeze and Approval Design
+
+- [x] 新增 `docs/DATA_CONTRACTS.md`
+- [x] 新增 `docs/APPROVAL_WORKFLOW.md`
+- [x] 新增 `docs/DATABASE.md`
+- [x] 冻结导入错误模型
+- [x] 冻结 Approval State Machine
+- [x] 冻结 Phase 2 PostgreSQL 准备项
+- [x] 明确 RAG 不只包括社内文档，还包括结构化业务数据检索和互联网检索
+- [x] 新增 Retrieval Layer 相关架构章节与图示要求
 
 <!-- DOC-SYNC:START group=governance -->
 ## 文档同步块

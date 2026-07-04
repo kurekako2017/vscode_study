@@ -1,0 +1,113 @@
+"""EventRepository 的 PostgreSQL 实现。
+
+文件职责：
+- 负责 task_events 表的 append / list_after。
+- 当前只保存任务事件，不接审批事件表。
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from app.db.connection import PostgresConnectionFactory
+from app.models.event import TaskEvent
+from app.models.task import utc_now
+
+
+class PostgresEventRepository:
+    """EventRepository 的 PostgreSQL 实现。"""
+
+    def __init__(self, connection_factory: PostgresConnectionFactory) -> None:
+        """注入连接工厂。"""
+
+        self._connection_factory = connection_factory
+
+    def append(
+        self,
+        task_id: str,
+        event_type: str,
+        message: str,
+        data: dict[str, Any] | None = None,
+    ) -> TaskEvent:
+        """追加事件，并按任务分配顺序号。"""
+
+        event_data = data or {}
+        with self._connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT task_id FROM tasks WHERE task_id = %s FOR UPDATE",
+                    (task_id,),
+                )
+                if cursor.fetchone() is None:
+                    raise KeyError(task_id)
+                cursor.execute(
+                    """
+                    SELECT COALESCE(MAX(sequence), 0) + 1
+                    FROM task_events
+                    WHERE task_id = %s
+                    """,
+                    (task_id,),
+                )
+                next_sequence = cursor.fetchone()[0]
+                cursor.execute(
+                    """
+                    INSERT INTO task_events (
+                        task_id, sequence, event_type, message, data_json, created_at
+                    ) VALUES (%s, %s, %s, %s, %s::jsonb, %s)
+                    RETURNING created_at
+                    """,
+                    (
+                        task_id,
+                        next_sequence,
+                        event_type,
+                        message,
+                        self._to_json(event_data),
+                        utc_now(),
+                    ),
+                )
+                created_at = cursor.fetchone()[0]
+        return TaskEvent(
+            task_id=task_id,
+            sequence=next_sequence,
+            event_type=event_type,
+            message=message,
+            data=event_data,
+            created_at=created_at,
+        )
+
+    def list_after(self, task_id: str, sequence: int = 0) -> list[TaskEvent]:
+        """读取指定序号之后的事件。"""
+
+        with self._connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT task_id, sequence, event_type, message, data_json, created_at
+                    FROM task_events
+                    WHERE task_id = %s AND sequence > %s
+                    ORDER BY sequence ASC
+                    """,
+                    (task_id, sequence),
+                )
+                rows = cursor.fetchall()
+        return [self._to_domain(row) for row in rows]
+
+    def _to_domain(self, row) -> TaskEvent:
+        """把数据库行转换为领域 TaskEvent。"""
+
+        task_id, sequence, event_type, message, data_json, created_at = row
+        return TaskEvent(
+            task_id=task_id,
+            sequence=sequence,
+            event_type=event_type,
+            message=message,
+            data=dict(data_json or {}),
+            created_at=created_at,
+        )
+
+    def _to_json(self, payload: dict[str, Any]) -> str:
+        """延迟导入 json，避免模块级无关依赖。"""
+
+        import json
+
+        return json.dumps(payload, ensure_ascii=False)

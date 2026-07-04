@@ -74,7 +74,8 @@ cd ~/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
   curl -sS "http://127.0.0.1:8000/api/tasks/$TASK_ID/report"
   ```
 
-- 预期结果：响应包含 `"success":true`、`"provider":"static"`，`markdown` 中有报告标题、KPI 和 Research 章节。也可在页面提交任务，确认“分析レポート”区域出现同一报告。
+- 预期结果：响应包含 `"success":true`、`"provider":"static"`、`"status":"generated"`，`markdown` 中有报告标题、KPI 和 Research 章节。也可在页面提交任务，确认“分析レポート”区域出现同一报告。
+- 补充确认：报告末尾应说明当前仍是直接生成，后续会扩展到 `draft / pending_approval / approved / rejected / revised`。
 - 失败时看：`backend/app/reports/generator.py`、`backend/app/services/task_service.py`、`repositories/implementations/in_memory/report_repository.py` 和 `frontend/src/App.tsx` 的 `loadReport()`。若返回 `REPORT_NOT_FOUND`，先确认 SSE 已收到 done。
 
 ## 7. 错误输入是否显示错误
@@ -117,6 +118,20 @@ curl -sS -X POST http://127.0.0.1:8000/api/tasks -H 'Content-Type: application/j
 
 - 预期结果：Backend tests、Frontend tests、Frontend build 和 Python compileall 全部通过。
 - 失败时看：输出中第一个失败阶段及对应的 `backend/tests/` 或 `frontend/src/*.test.ts*`；不要跳过第一个错误继续猜后续问题。
+
+## PostgreSQL 可选验证
+
+- 命令（具备 Docker CLI 时）：
+
+  ```bash
+  docker compose up -d postgres
+  cd backend
+  source .venv/bin/activate
+  REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v
+  ```
+
+- 预期结果：`create task`、`append event`、`save report`、`get report` 覆盖通过。
+- 当前边界：如果环境缺少 `docker` 或 `psycopg`，该验证允许跳过，但必须记录未执行原因，不得伪造通过。
 
 <!-- DOC-SYNC:START group=study-and-runbook -->
 ## 文档同步块

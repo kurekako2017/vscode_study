@@ -1,5 +1,50 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-04
+
+- 实现 Phase 2：PostgreSQL Persistence MVP 的代码基础。
+- 新增 `backend/app/db/connection.py` 与 `backend/app/repositories/postgres/`。
+- 新增 `backend/db/schema.sql`、`backend/db/init.sql`。
+- 新增 `REPOSITORY_BACKEND=inmemory|postgres`，默认保持 `inmemory`。
+- 新增 PostgreSQL 连接配置：
+  `POSTGRES_HOST`、`POSTGRES_PORT`、`POSTGRES_DB`、`POSTGRES_USER`、`POSTGRES_PASSWORD`。
+- 为 `tasks`、`task_events`、`reports`、`report_versions` 实现 PostgreSQL Repository。
+- 为 `data_imports`、`import_errors`、`approval_requests`、`approval_events` 新增 schema 与基础模型预留。
+- `reports` 表新增 `approval_status` 字段，当前值仍为 `generated`。
+- `docker-compose.yml` 新增 PostgreSQL service。
+- 新增 backend switch 测试与 PostgreSQL Repository 集成测试骨架。
+- 同步更新 `docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook 对应文档。
+
+- 新增 Phase 1.5：Data Contract Freeze + Approval State Machine Design。
+- 新增 `docs/DATA_CONTRACTS.md`，冻结业务 CSV、Research JSON、Documents Markdown 契约。
+- 新增 `docs/APPROVAL_WORKFLOW.md`，冻结 `generated / draft / pending_approval / approved / rejected / revised / published / archived` 状态机。
+- 新增 `docs/DATABASE.md`，冻结 Phase 2 PostgreSQL 准备项：
+  `data_imports`、`import_errors`、`reports`、`report_versions`、`approval_requests`、`approval_events`。
+- 新增导入错误模型：
+  `missing_file`、`invalid_header`、`invalid_type`、`empty_dataset`、`invalid_json`、`invalid_source`、`unsupported_encoding`。
+- 完成 Phase 1 文件化输入实现。
+- 新增 `backend/app/data_loaders/` 本地文件加载层。
+- KPI 从 `backend/data/business/sales.csv`、`inventory.csv`、`members.csv`、`promotions.csv` 读取并计算。
+- Research 从 `backend/data/research/market_trend_2026_06.json` 与 `competitor_summary_2026_06.json` 读取 summary / sources。
+- 新增 `backend/data/documents/company_policy_sample.md`，作为后续文档上传与检索输入边界样例。
+- Report API 新增 `status` 字段，当前值为 `generated`，并为后续 Approval Workflow 预留 `draft / pending_approval / approved / rejected / revised`。
+- 新增文件输入测试、Research JSON 测试、hybrid 报告测试。
+- 新增企业架构定位（Architecture Positioning）。
+- 明确 `Retail Insight AI` 仍为当前项目名称和仓库名称。
+- 明确 `Enterprise Retail Intelligence Platform (ERIP)` 为未来平台化目标，而非当前已实现平台。
+- 新增 `Epic 0: Enterprise Platform Architecture Evolution`。
+- 新增平台化架构原则：
+  Platform First、Domain Driven、Provider Pattern、Repository Pattern、Workflow Driven、Configuration First、Test First、Documentation First、Backward Compatibility。
+- 新增目标架构逻辑分层：
+  Platform、Domain、Provider、Workflow、Repository、Approval、Documents、Search、Import、Audit、Database、Frontend。
+- 新增 Phase 完成的 Definition of Done。
+- 新增 `Epic 0` 的 Enterprise Architecture Freeze 设计内容：
+  Architecture Freeze、Directory Refactor Design、Repository Abstraction Design、Provider Abstraction Design、Workflow Architecture、Document Pipeline、Business Data Pipeline、Approval Workflow、Database Target Design、Testing Matrix、Documentation Matrix、Epic 0 Deliverables。
+- 新增 `Epic 12: Retrieval and RAG Platform`。
+- 明确 RAG 包含结构化业务数据检索、社内文档检索、互联网检索，而不只限于社内文档。
+- 新增检索层相关架构章节：
+  Retrieval Layer Architecture、Business Retrieval Flow、Internal RAG Flow、Internet Search Flow、Context Merge Flow、Citation and Source Trace Flow、Future Hybrid Search Architecture。
+
 ## 2026-07-02
 
 - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。

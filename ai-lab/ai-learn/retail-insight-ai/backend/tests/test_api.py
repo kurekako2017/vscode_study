@@ -82,9 +82,12 @@ class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(envelope["success"])
         report = envelope["data"]
         self.assertEqual(report["provider"], "static")
+        self.assertEqual(report["status"], "generated")
         self.assertIn("# Retail Insight AI 経営分析レポート", report["markdown"])
         self.assertIn("## KPI サマリー", report["markdown"])
         self.assertIn("## Research サマリー", report["markdown"])
+        self.assertIn("15,750,000 円", report["markdown"])
+        self.assertIn("pending_approval", report["markdown"])
 
     async def test_validation_failure_uses_error_envelope(self) -> None:
         response = await self.client.post(
