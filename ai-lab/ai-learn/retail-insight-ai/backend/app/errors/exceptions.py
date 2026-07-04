@@ -373,3 +373,18 @@ class ReportRevisionConflictException(AppException):
             detail={"current": current},
             task_id=task_id,
         )
+
+
+class AuditLogAppendException(AppException):
+    """表示审计日志追加失败。"""
+
+    def __init__(self, audit_log_id: str | None = None, detail: dict[str, Any] | None = None) -> None:
+        """返回 500，并保留安全的审计追加失败信息。"""
+
+        super().__init__(
+            ErrorCode.AUDIT_LOG_FAILED,
+            "Audit log append failed",
+            500,
+            detail=detail,
+            task_id=audit_log_id,
+        )

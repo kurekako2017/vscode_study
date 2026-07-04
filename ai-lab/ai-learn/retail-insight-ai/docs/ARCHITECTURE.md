@@ -1,6 +1,6 @@
 # retail-insight-ai Architecture
 
-最后更新：2026-07-04
+最后更新：2026-07-05
 
 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。
 
@@ -94,9 +94,9 @@ Human-readable architecture explanations are trilingual by default.
 
 ### Current State
 
-- 当前没有实现 RBAC、认证服务或 Audit API。
+- 当前没有真实 RBAC、认证服务、JWT、OAuth 或外部身份提供器。
 - 当前 Approval API、Retrieval API 和 Internal RAG 仍只依赖既有 backend service boundary。
-- 当前 security model 仍然是 contract-only，不能被解释为已上线的身份系统。
+- 当前 security model 已在 Sprint 11.2 落地为 placeholder principal + static catalog + append-only audit seam，但仍不能被解释为已上线的身份系统。
 
 中文（简体）：
 这一阶段先把企业安全基础的概念层冻结下来，再谈实现。我们只冻结用户、组织、部门、角色、权限、策略、审计日志和操作日志的语义，不提前引入真实认证或 RBAC 服务。
@@ -115,7 +115,7 @@ Human-readable architecture explanations are trilingual by default.
 ### Result
 
 - User / organization / department / role / permission / policy concepts are frozen as documentation-level domain models.
-- Security API contracts are frozen for future implementation without changing existing document, retrieval, RAG, or approval response shapes.
+- Security API contracts are frozen and now have a backend MVP with a system placeholder principal.
 - Audit log contract and operation log contract are defined as read-only, append-only facts.
 
 ### Planned
@@ -123,6 +123,66 @@ Human-readable architecture explanations are trilingual by default.
 - Later backend work may implement authentication middleware, RBAC enforcement, and audit append paths.
 - The current contract only freezes the read surface and the approval-action matrix.
 - Future implementation must preserve the frozen permission names and event names.
+
+## Sprint 11.2 Security Domain + InMemory Audit MVP / 企业安全域 + InMemory 审计最小可行实现 / 企業セキュリティ領域 + InMemory 監査 MVP
+
+### Current State
+
+- 当前 backend 仍不接真实认证、JWT、OAuth 或外部身份提供器。
+- 当前 current user 采用 `user_id="system"` 的 placeholder principal。
+- 当前 role / permission / policy 使用 frozen static catalog，不做动态授权决策。
+- 当前 audit log 采用 append-only InMemoryAuditRepository，并通过 AuditService 记录成功与失败。
+
+中文（简体）：
+这一阶段把安全域从“只冻结契约”推进到“有后端可运行的读模型 + 审计追加 seam”。重点不是做真实登录，而是把 current user、角色目录、权限目录和审计事实分成独立边界，后续替换认证或持久化时不用重写 API。
+
+日本語：
+この段階では、セキュリティ領域を「契約凍結だけ」から「バックエンドで動く read model + 監査追加 seam」へ進めます。目的は実ログインではなく、current user、role catalog、permission catalog、audit fact を分離して、後続の認証や永続化差し替えを容易にすることです。
+
+### Target State
+
+- 未来 RBAC middleware 可以直接消费 current user snapshot，而不破坏 `users/me` contract。
+- 未来 audit persistence 可以替换 repository 实现，而不破坏 `GET /api/v1/audit-logs` contract。
+- 未来真身份接入前，系统占位用户仍然是当前默认行为。
+
+### Result
+
+- `User` / `Organization` / `Department` / `Role` / `Permission` / `Policy` domain models added.
+- `GET /api/v1/users/me` returns the system placeholder principal.
+- `GET /api/v1/security/roles` and `GET /api/v1/security/permissions` return frozen static catalogs.
+- `AuditLog` model, `AuditRepository`, `InMemoryAuditRepository`, and `AuditService` added.
+- `GET /api/v1/audit-logs` returns append-only audit facts.
+- `audit.log.created` is logged after successful append; `audit.log.failed` is logged only when append fails.
+- Existing approval/document/RAG APIs remain unaffacted by RBAC enforcement in this sprint.
+
+### Planned
+
+- Later backend work may implement authentication middleware, RBAC enforcement, and audit append paths.
+- The current contract only freezes the read surface and the approval-action matrix.
+- Future implementation must preserve the frozen permission names and event names.
+
+### Security Read Flow
+
+```mermaid
+flowchart TD
+    A[GET /api/v1/users/me] --> B[SecurityService]
+    B --> C[System Placeholder Principal]
+    A2[GET /api/v1/security/roles] --> B
+    A3[GET /api/v1/security/permissions] --> B
+    A --> D[ApiResponse]
+    A2 --> D
+    A3 --> D
+```
+
+### Audit Append Flow
+
+```mermaid
+flowchart TD
+    A[Future audit write path] --> B[AuditService]
+    B --> C[InMemoryAuditRepository]
+    C --> D[GET /api/v1/audit-logs]
+    B --> E[audit.log.created / audit.log.failed]
+```
 
 ## Enterprise Security Overview
 
@@ -132,6 +192,7 @@ Human-readable architecture explanations are trilingual by default.
 - `role` groups permissions for a job function or operational responsibility.
 - `permission` names one stable action.
 - `policy` resolves whether a role may perform an action on a resource.
+- Current runtime uses `user_id="system"` as a placeholder principal until real authentication arrives.
 - `audit log` is append-only and read-only.
 - `operation log` is the operator-facing projection of audit facts.
 

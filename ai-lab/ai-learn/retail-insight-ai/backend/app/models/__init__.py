@@ -1,6 +1,7 @@
 """Domain models."""
 
 from app.models.analysis import KPIResult, ResearchResult
+from app.models.audit import AuditLog, AuditLogResult
 from app.models.document import (
     ApprovalStatus,
     Document,
@@ -14,6 +15,16 @@ from app.models.document import (
     Language,
 )
 from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
+from app.models.security import (
+    Department,
+    Organization,
+    Permission,
+    Policy,
+    PolicyEffect,
+    Role,
+    User,
+    UserStatus,
+)
 from app.models.internal_rag import (
     InternalRagEvaluationResult,
     InternalRagWarning,
@@ -36,8 +47,11 @@ __all__ = [
     "ApprovalEvent",
     "ApprovalRequest",
     "ApprovalStatus",
+    "AuditLog",
+    "AuditLogResult",
     "DataImport",
     "DataImportStatus",
+    "Department",
     "Document",
     "DocumentChunk",
     "DocumentImportError",
@@ -59,9 +73,16 @@ __all__ = [
     "Report",
     "ReportStatus",
     "ReportVersion",
+    "Organization",
+    "Permission",
+    "Policy",
+    "PolicyEffect",
+    "Role",
     "RAGAnswerGenerationResult",
     "RAGFallbackReason",
     "RAGPromptContext",
+    "User",
+    "UserStatus",
     "Task",
     "TaskEvent",
     "TaskStatus",

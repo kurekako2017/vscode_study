@@ -1,16 +1,18 @@
 from fastapi import Request
 
 from app.config.container import AppContainer
+from app.services.audit_service import AuditService
 from app.services.approval_service import ApprovalService
-from app.services.internal_rag_service import InternalRagService
 from app.services.document_chunk_service import DocumentChunkService
-from app.services.document_import_service import DocumentImportService
 from app.services.document_archive_service import DocumentArchiveService
+from app.services.document_import_service import DocumentImportService
 from app.services.document_retrieval_service import DocumentRetrievalService
 from app.services.document_read_service import DocumentReadService
+from app.services.internal_rag_service import InternalRagService
 from app.events.publisher import EventPublisher
 from app.services.document_upload_service import DocumentUploadService
 from app.repositories.interfaces.event_repository import EventRepository
+from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
 
 
@@ -84,3 +86,15 @@ async def get_approval_service(request: Request) -> ApprovalService:
     """向 approval 路由注入审批工作流 service。"""
 
     return request.app.state.container.approval_service
+
+
+async def get_security_service(request: Request) -> SecurityService:
+    """向 security 路由注入当前用户和冻结目录 service。"""
+
+    return request.app.state.container.security_service
+
+
+async def get_audit_service(request: Request) -> AuditService:
+    """向 audit 路由注入 append-only 审计 service。"""
+
+    return request.app.state.container.audit_service

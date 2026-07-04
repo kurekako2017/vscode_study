@@ -12,6 +12,7 @@ from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
 from app.providers.llm_provider import LLMProvider
 from app.providers.stub_llm_provider import StubLLMProvider
+from app.repositories.implementations.in_memory.audit_repository import InMemoryAuditRepository
 from app.repositories.implementations.in_memory.approval_repository import InMemoryApprovalRepository
 from app.repositories.implementations.in_memory.document_chunk_repository import InMemoryDocumentChunkRepository
 from app.repositories.implementations.in_memory.document_retrieval import InMemoryKeywordRetrieval
@@ -22,6 +23,7 @@ from app.repositories.implementations.in_memory.task_repository import InMemoryT
 from app.repositories.interfaces.document_repository import DocumentRepository
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
 from app.repositories.interfaces.document_retrieval_provider import DocumentRetrievalProvider
+from app.repositories.interfaces.audit_repository import AuditRepository
 from app.repositories.interfaces.approval_repository import ApprovalRepository
 from app.repositories.interfaces.event_repository import EventRepository
 from app.repositories.interfaces.report_repository import ReportRepository
@@ -30,6 +32,7 @@ from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.services.document_archive_service import DocumentArchiveService
+from app.services.audit_service import AuditService
 from app.services.approval_service import ApprovalService
 from app.services.document_chunk_service import DocumentChunkService
 from app.services.document_retrieval_service import DocumentRetrievalService
@@ -39,6 +42,7 @@ from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.document_upload_service import DocumentUploadService
+from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
 from app.workflow.graph import AnalysisWorkflow
 
@@ -64,6 +68,9 @@ class AppContainer:
     document_read_service: DocumentReadService
     document_archive_service: DocumentArchiveService
     document_upload_service: DocumentUploadService
+    audit_repository: AuditRepository
+    audit_service: AuditService
+    security_service: SecurityService
     event_repository: EventRepository
     repository_backend: str
 
@@ -75,6 +82,9 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     task_repository, report_repository, event_repository = _build_repositories(settings)
     event_publisher = EventPublisher(event_repository)
     approval_repository = InMemoryApprovalRepository()
+    audit_repository = InMemoryAuditRepository()
+    audit_service = AuditService(audit_repository)
+    security_service = SecurityService()
     document_repository = InMemoryDocumentRepository()
     document_chunk_repository = InMemoryDocumentChunkRepository()
     document_retrieval_provider = InMemoryKeywordRetrieval(
@@ -144,6 +154,9 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         document_read_service=document_read_service,
         document_archive_service=document_archive_service,
         document_upload_service=document_upload_service,
+        audit_repository=audit_repository,
+        audit_service=audit_service,
+        security_service=security_service,
         event_repository=event_repository,
         repository_backend=settings.repository_backend,
     )

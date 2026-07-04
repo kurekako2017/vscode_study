@@ -7,6 +7,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.audit_logs import router as audit_logs_router
+from app.api.security import router as security_router
 from app.api.document_chunks import router as document_chunks_router
 from app.api.document_retrieval import router as document_retrieval_router
 from app.api.document_imports import router as document_imports_router
@@ -88,8 +90,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.container = container
     # 注册异常处理器和路由
     register_exception_handlers(application)
-    # 注册健康检查、任务和文档上传路由
+    # 注册健康检查、任务、文档、审批和安全相关路由。
     application.include_router(health_router)
+    application.include_router(security_router)
+    application.include_router(audit_logs_router)
     application.include_router(documents_router)
     application.include_router(document_chunks_router)
     application.include_router(document_retrieval_router)
