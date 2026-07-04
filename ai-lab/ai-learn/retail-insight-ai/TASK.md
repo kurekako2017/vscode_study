@@ -4,18 +4,27 @@
 
 ## 当前阶段
 
-Phase 2: PostgreSQL Persistence MVP
+Sprint 4: Document Read API MVP
 
 ## 当前最高优先级任务
 
-### Enterprise Priority
+### Sprint Result
 
-- [x] 第一优先级：文件化输入（CSV / JSON / Markdown）+ PostgreSQL 持久化基础
-- [ ] 明确文件输入目录结构、版本规则与导入边界
-- [ ] 明确 PostgreSQL 表结构、Repository 接口与迁移边界
-- [ ] 明确本地可运行最小验收路径，不接真实外部服务
-- [ ] 明确 Retrieval and RAG Platform 的横向能力边界
-- [ ] 冻结 Data Contract 与 Approval State Machine
+- [x] GET /api/v1/documents implemented
+- [x] GET /api/v1/documents/{document_id} implemented
+- [x] basic list filters implemented for status / document_type / language / tag / owner
+- [x] document_not_found 404 behavior implemented for missing documents
+- [x] backend tests added for empty list, upload then list, upload then get, missing document, and filters
+- [x] existing upload tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] DELETE / versions / chunks remain frozen for later phases
+
+### Boundary
+
+- 当前实现已进入 Document Read API MVP，文档读写的后端 MVP 已完成前两步。
+- 不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
+- 继续保持 PostgreSQL Document Repository 仅设计不实现，DELETE / versions / chunks 仍冻结未实现。
 
 ## Epic 14: Engineering Standards（Final Freeze）
 
@@ -40,7 +49,7 @@ Phase 2: PostgreSQL Persistence MVP
 
 下一任务：
 
-- 以后新增 API、Event、Prompt、Workflow、Provider、Repository 时，先按本次冻结文档执行，再进入具体 Phase 开发。
+- 保持 Upload API 仅处于冻结状态，不进入实现。
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 

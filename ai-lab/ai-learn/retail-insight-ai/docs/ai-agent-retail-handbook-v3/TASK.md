@@ -4,16 +4,19 @@
 
 ## 当前阶段
 
-Phase 2: PostgreSQL Persistence MVP Sync
+Sprint 4: Document Read API MVP
 
 ## 当前最高优先级任务
 
-- [x] 同步 PostgreSQL Persistence MVP 的主项目边界
-- [x] 同步 Repository backend switch 设计
-- [x] 同步 Approval / Import schema-only 预留说明
-- [x] 同步 handbook CHANGELOG / DECISIONS / 架构图册 / 系统设计书
-- [x] 同步三语言架构图规则
-- [ ] 等待真实 PostgreSQL 环境联调结果后关闭 Phase 2
+- [x] GET /api/v1/documents implemented
+- [x] GET /api/v1/documents/{document_id} implemented
+- [x] basic list filters implemented for status / document_type / language / tag / owner
+- [x] document_not_found 404 behavior implemented for missing documents
+- [x] backend tests added for empty list, upload then list, upload then get, missing document, and filters
+- [x] existing upload tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] DELETE / versions / chunks remain frozen for later phases
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -100,6 +103,64 @@ Phase 2: PostgreSQL Persistence MVP Sync
 - [ ] Retrieval evaluation
 - [ ] Handbook 文档已同步
 
+## Sprint 1 Follow-up: Phase 3.1 Document Domain Model
+
+### Current State
+
+Document Domain Model 已作为 Phase 3.1 共同基础同步到 handbook。
+
+### Synced Result
+
+- [x] Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource
+- [x] DocumentStatus / DocumentType / Language / ApprovalStatus reuse
+- [x] DocumentRepository Interface
+- [x] InMemoryDocumentRepository
+- [x] Document creation / metadata validation / status transition / CRUD / checksum duplicate detection
+- [x] Handbook Architecture / ROADMAP / PROJECT_BACKLOG / DECISIONS / CHANGELOG / 图册 / 系统设计书 / 生产路线图 同步
+- [x] `backend/app/repositories/implementations/in_memory/document_repository.py` 仅存在于正确路径
+- [x] 之前提到的重复路径是报告 typo，不是实际误放文件
+
+### Next Step
+
+- 保持 Document Domain Model 作为后续 Upload / RAG / Approval / PostgreSQL 的唯一领域基础。
+
+## Sprint 2 Follow-up: Document Upload API Contract Freeze
+
+### Current State
+
+Document Upload API contract 已冻结，当前仍不表示 Upload API 已实现。
+
+### Synced Result
+
+- [x] Document Upload API contract 已冻结
+- [x] Document Upload event contract 已冻结
+- [x] Document Upload Validation Flow 已同步
+- [x] Future Approval Integration Flow 已同步
+- [x] Handbook Architecture / ROADMAP / PROJECT_BACKLOG / DECISIONS / CHANGELOG / 图册 / 系统设计书 / 生产路线图 同步
+- [ ] Upload API implementation
+- [ ] Upload persistence implementation
+
+## Sprint 2.5 Follow-up: Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+### Current State
+
+Document Upload Workflow, Error Catalog, and Upload Policy 已同步到 handbook。
+
+### Synced Result
+
+- [x] Document Upload Workflow
+- [x] Upload Session contract
+- [x] Idempotency contract
+- [x] `docs/ERROR_CATALOG.md`
+- [x] `docs/UPLOAD_POLICY.md`
+- [x] Handbook Architecture / ROADMAP / PROJECT_BACKLOG / DECISIONS / CHANGELOG / 图册 / 系统设计书 / 生产路线图 同步
+- [ ] Upload API implementation
+- [ ] Upload Session persistence
+
+### Next Step
+
+- 保持 Upload API 仅处于冻结状态，不进入实现。
+
 ## Phase 1 Sync: 文件化输入实现
 
 ### Current State
@@ -152,6 +213,27 @@ handbook 尚未把 Data Contract、Import Error Model 和 Approval State Machine
 - [x] `reports.approval_status` 已入库，当前值仍为 `generated`
 - [x] Handbook 文档已同步
 - [x] 当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv、PostgreSQL 集成测试被 skip
+
+## Sprint 1 Follow-up: Phase 3.1 Document Domain Model
+
+### Current State
+
+Document Domain Model 已作为 Phase 3.1 共同基础同步到 handbook。
+
+### Synced Result
+
+- [x] Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource
+- [x] DocumentStatus / DocumentType / Language / ApprovalStatus reuse
+- [x] DocumentRepository Interface
+- [x] InMemoryDocumentRepository
+- [x] Document creation / metadata validation / status transition / CRUD / checksum duplicate detection
+- [x] Handbook Architecture / ROADMAP / PROJECT_BACKLOG / DECISIONS / CHANGELOG / 图册 / 系统设计书 / 生产路线图 同步
+- [x] `backend/app/repositories/implementations/in_memory/document_repository.py` 仅存在于正确路径
+- [x] 之前提到的重复路径是报告 typo，不是实际误放文件
+
+### Next Step
+
+- 保持 Document Domain Model 作为后续 Upload / RAG / Approval / PostgreSQL 的唯一领域基础。
 
 ## Handbook 同步规则
 

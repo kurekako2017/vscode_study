@@ -1,7 +1,9 @@
 from fastapi import Request
 
 from app.config.container import AppContainer
+from app.services.document_read_service import DocumentReadService
 from app.events.publisher import EventPublisher
+from app.services.document_upload_service import DocumentUploadService
 from app.repositories.interfaces.event_repository import EventRepository
 from app.services.task_service import TaskService
 
@@ -28,3 +30,15 @@ async def get_event_publisher(request: Request) -> EventPublisher:
     """按需构造轻量事件发布器；底层 Repository 仍由容器统一持有。"""
 
     return EventPublisher(request.app.state.container.event_repository)
+
+
+async def get_document_upload_service(request: Request) -> DocumentUploadService:
+    """向文档上传路由注入同步上传 service。"""
+
+    return request.app.state.container.document_upload_service
+
+
+async def get_document_read_service(request: Request) -> DocumentReadService:
+    """向文档读取路由注入同步读 service。"""
+
+    return request.app.state.container.document_read_service

@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.documents import router as documents_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
@@ -82,8 +83,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.container = container
     # 注册异常处理器和路由
     register_exception_handlers(application)
-    # 注册健康检查和任务路由
+    # 注册健康检查、任务和文档上传路由
     application.include_router(health_router)
+    application.include_router(documents_router)
     application.include_router(router=tasks_router)
     return application
 

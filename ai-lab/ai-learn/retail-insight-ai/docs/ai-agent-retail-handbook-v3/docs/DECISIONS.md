@@ -173,3 +173,81 @@
 - handbook `docs/` 新增 7 份标准镜像文档。
 - 后续 AI 工具和学习者都必须先读这些标准文档，再读具体实现章节。
 - 若主项目标准文档发生变更，handbook 镜像必须同一会话内刷新。
+
+## ADR-011
+
+日期：2026-07-04
+
+决策：将 Phase 3.1 Document Domain Model 作为后续 Upload、Version Management、Internal RAG、Approval Workflow、Retrieval 和 PostgreSQL Persistence 的共同领域基线，并同步镜像到 handbook。
+
+原因：文档领域的状态、版本、来源、元数据和校验逻辑必须先冻结，否则后续上传、审批、检索和持久化都会基于不稳定的语义。
+
+备选方案：继续把文档领域拆散到 Upload API、RAG 和 Repository 实现里分别定义；该方案会导致契约重复、测试分散和 handbook 无法形成单一讲解入口。
+
+影响：
+
+- handbook 必须同步记录：
+  `Document`
+  `DocumentVersion`
+  `DocumentChunk`
+  `DocumentMetadata`
+  `DocumentSource`
+  `DocumentStatus`
+  `DocumentType`
+  `Language`
+  `ApprovalStatus`
+- `ImportBatch` 复用既有 `DataImport` 语义。
+- `DocumentRepository Interface` 与 `InMemoryDocumentRepository` 作为当前唯一实现边界。
+- `backend/app/repositories/implementations/in_memory/document_repository.py` 仅保留在正确路径。
+
+## ADR-012
+
+日期：2026-07-04
+
+决策：先冻结 Document Upload API Contract，再进入 Upload API 实现阶段。
+
+原因：上传接口、事件和验证流程一旦开始实现，如果没有先冻结请求体、响应体、错误码、状态码和未来审批关系，后续实现会在前端、后端和数据库之间产生重复契约。
+
+备选方案：边实现边定义上传契约；该方案会使 `Document Domain`、事件流和审批关系反复调整，不利于后续测试和 handbook 同步。
+
+影响：
+
+- `docs/API_CONTRACT.md` 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+- `docs/EVENT_CONTRACT.md` 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
+- `docs/DATABASE.md` 仅预留 Document Upload 持久化边界，不表示已实现 Upload API。
+- 当前实现仍只允许 Document Domain Model，不引入 Upload API、RAG、pgvector 或前端变更。
+
+## ADR-013
+
+日期：2026-07-04
+
+决策：在 Upload API 实现前，先冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog 和 Upload Policy，作为最终实现前的最后契约层。
+
+原因：仅冻结 endpoint 和 event 还不足以支持安全实现；上传会话、幂等、错误分类和策略边界必须先冻结，否则实现时会在重试、进度、错误提示和存储约束上反复返工。
+
+备选方案：直接实现 Upload API，再补会话和错误目录；该方案会使前端提示、后端校验和未来审批关系之间出现契约缺口。
+
+影响：
+
+- `docs/ERROR_CATALOG.md` 成为上传、校验、仓储、审批、检索、数据库、事件和提供器错误的统一目录。
+- `docs/UPLOAD_POLICY.md` 成为上传大小、扩展名、MIME、编码、幂等和删除语义的统一策略入口。
+- `docs/API_CONTRACT.md` 必须包含 Upload Session 与 Idempotency 规则。
+- `docs/EVENT_CONTRACT.md` 必须覆盖 Upload Workflow 事件族。
+- 当前实现边界仍然停留在 Document Domain Model + contract freeze，不进入 Upload API 代码实现。
+
+## ADR-014
+
+日期：2026-07-04
+
+决策：`POST /api/v1/documents` 采用同步 MVP 实现，成功时返回完成态 `DocumentUploadSession`，重复 checksum 返回已有结果，`Idempotency-Key` 同 key 不同 checksum 返回冲突。
+
+原因：当前阶段没有异步存储队列或独立 session 后台 worker；同步实现更适合当前的本地可运行与教学目标，同时能把 checksum、幂等和重复检测的边界一次性冻结在 service 层。
+
+备选方案：把 Upload API 做成异步 accepted/completed 两阶段；该方案需要额外的后台 worker、session 持久化与更复杂的前端轮询逻辑，不符合当前 MVP 范围。
+
+影响：
+
+- `backend/app/api/documents.py` 直接调用同步上传 service。
+- `backend/app/services/document_upload_service.py` 负责校验、checksum、重复检测、幂等和事件发布。
+- `backend/tests/test_document_upload_api.py` 必须覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放和幂等冲突。
+- `docs/API_CONTRACT.md` 需要把 Upload Session 明确为完成态响应。

@@ -1,6 +1,43 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-04 Sprint 4 Document Read API MVP
+
+- 实现 `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}`。
+- 支持 status / document_type / language / tag / owner 基础过滤，并在缺失文档时返回 `document_not_found`。
+- 新增 `backend/app/services/document_read_service.py`、`backend/tests/test_document_read_api.py`，并复用现有 `InMemoryDocumentRepository`。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 frontend、RAG、chunking、pgvector、Approval API、DELETE、versions、chunks、PostgreSQL Document Repository。
+
+## 2026-07-04 Sprint 3 Document Upload API MVP Implementation
+
+- 实现 `POST /api/v1/documents` 的同步 MVP。
+- 支持 multipart/form-data、metadata JSON、title / description / owner / tags / language 校验、SHA-256 checksum、duplicate checksum detection 和 `Idempotency-Key`。
+- 新增 `backend/app/api/documents.py`、`backend/app/services/document_upload_service.py`、`backend/app/schemas/document_api.py` 与 `backend/tests/test_document_upload_api.py`。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
+
+## 2026-07-04 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+- 冻结 Document Upload Workflow、Upload Session contract、Idempotency contract、Error Catalog 和 Upload Policy。
+- 新增 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`。
+- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍不实现 Upload API，不修改 backend 业务代码，不修改 frontend。
+
+## 2026-07-04 Sprint 2 Document Upload API Contract Freeze
+
+- 冻结 Document Upload API contract，覆盖 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+- 冻结 Document Upload event contract，覆盖 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
+- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次仍只停留在 Document Domain Model，未实现 Upload API、未修改 backend 业务代码、未修改 frontend。
+
 ## 2026-07-04
+
+- 完成 `Sprint 1: Phase 3.1 Document Domain Model`。
+- 新增 `backend/app/models/document.py`，定义 Document、DocumentVersion、DocumentChunk placeholder、DocumentMetadata、DocumentSource、DocumentStatus、DocumentType、Language，并复用现有 ApprovalStatus 与 ImportBatch。
+- 新增 `backend/app/repositories/interfaces/document_repository.py` 与 `backend/app/repositories/implementations/in_memory/document_repository.py`。
+- 新增文档域单元测试，覆盖 Document creation、metadata validation、status transition、Repository CRUD、checksum duplicate detection。
+- 更新 `docs/ARCHITECTURE.md`、`docs/PROJECT_BACKLOG.md`、`docs/ROADMAP.md`、`docs/TASK.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次未实现 Upload API、RAG、Chunk、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
 - 完成 `Epic 14: Engineering Standards (Final Freeze)` 文档冻结。
 - Master Prompt Summary was added after Epic 14 final freeze.

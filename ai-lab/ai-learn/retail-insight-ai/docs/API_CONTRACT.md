@@ -17,7 +17,7 @@ This document freezes HTTP API rules for `Retail Insight AI`.
 
 - Path segments: lowercase plural nouns where possible.
 - JSON fields: `snake_case` on backend contracts unless an existing frozen contract already differs.
-- IDs: `task_id`, `request_id`, `trace_id`, `report_id`, `approval_request_id`.
+- IDs: `task_id`, `request_id`, `trace_id`, `report_id`, `approval_request_id`, `upload_id`, `document_id`.
 - Time fields: ISO 8601 UTC strings.
 
 ## 4. Frozen Current APIs / 当前冻结 API / 現在凍結 API
@@ -120,9 +120,334 @@ Notes:
 - `status` here is report approval status, not task execution status.
 - Current implemented report status is `generated`.
 
+### 4.5 Document Upload APIs / 文档上传 API / 文書アップロード API
+
+All document upload endpoints are frozen under `/api/v1`.
+所有文档上传接口都冻结在 `/api/v1`。
+すべての文書アップロード API は `/api/v1` 配下で凍結します。
+
+Shared request rule:
+
+- `POST /api/v1/documents` accepts `multipart/form-data` with `file` and `metadata`.
+- `GET` and `DELETE` endpoints use path and query parameters only.
+- `metadata` must include the frozen document domain fields from `docs/MASTER_PROMPT.md` and `docs/ARCHITECTURE.md`.
+
+Shared response rule:
+
+- Response bodies must stay document-centric.
+- Approval state is not embedded as an active workflow object in this freeze.
+- `chunks` remain a reserved future collection and may be empty until chunking is implemented.
+- Upload responses return a `DocumentUploadSession` snapshot that reflects the completed synchronous MVP upload.
+
+DocumentUploadSession:
+
+```json
+{
+  "upload_id": "upl-123",
+  "document_id": "doc-123",
+  "status": "accepted",
+  "progress": 0,
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Statuses:
+`accepted | validating | storing | completed | failed`
+
+#### 4.5.1 `POST /api/v1/documents`
+
+Purpose:
+Create a new document record, validate metadata, compute or verify checksum, and freeze the first document version boundary.
+
+Request:
+
+```json
+{
+  "file": "<binary>",
+  "metadata": {
+    "title": "June Sales Review",
+    "description": "Monthly document upload",
+    "owner": "analysis-team",
+    "version": 1,
+    "language": "en",
+    "document_type": "markdown",
+    "tags": ["sales", "monthly"],
+    "source": {
+      "source_type": "local_file",
+      "source_uri": "backend/data/documents/june_sales_review.md"
+    },
+    "checksum": "sha256-..."
+  }
+}
+```
+
+Response `201 Created`:
+
+```json
+{
+  "document_id": "doc-123",
+  "upload_id": "upl-123",
+  "status": "completed",
+  "progress": 100,
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`201 Created`, `400 Bad Request`, `409 Conflict`, `413 Payload Too Large`, `415 Unsupported Media Type`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`missing_title`, `empty_file`, `unsupported_document_type`, `invalid_metadata`, `duplicate_checksum`, `repository_error`, `idempotency_conflict`, `upload_too_large`, `unsupported_encoding`, `internal_error`.
+
+Validation rules:
+- `title` is required and must not be blank.
+- `file` must not be empty.
+- `document_type` must be one of the frozen document types.
+- `language` must be one of `en`, `ja`, `zh-CN`, `unknown`.
+- `checksum` must be present and unique for the repository scope.
+- Future approval is not auto-created by this endpoint.
+- A duplicate checksum returns the existing document result instead of creating a second record.
+
+Versioning rule:
+- This endpoint is frozen as `/api/v1/documents`.
+- Breaking request or response changes require `/api/v2/documents`.
+
+Future approval relationship:
+- Upload creates the document domain boundary only.
+- Approval remains a separate future API and must not be implied by upload success.
+
+Idempotency rule:
+- `Idempotency-Key` is optional in MVP but recommended.
+- Same key + same checksum returns the existing upload result.
+- Same key + different checksum returns `409 Conflict` with `idempotency_conflict`.
+- Future production should require `Idempotency-Key`.
+
+#### 4.5.2 `GET /api/v1/documents`
+
+Purpose:
+List uploaded documents with frozen metadata filters.
+
+Request:
+
+- Query parameters: `status`, `document_type`, `language`, `owner`, `tag`, `limit`, `cursor`.
+
+Response `200 OK`:
+
+```json
+{
+  "items": [],
+  "next_cursor": null
+}
+```
+
+Status codes:
+`200 OK`, `400 Bad Request`, `500 Internal Server Error`.
+
+Error codes:
+`validation_error`, `repository_error`, `internal_error`.
+
+Validation rules:
+- `limit` must stay within the frozen pagination range.
+- Filters must use frozen enum values when supplied.
+
+Versioning rule:
+- List semantics stay frozen under `/api/v1/documents`.
+
+Future approval relationship:
+- Approval metadata must not become a hard dependency of list retrieval.
+
+#### 4.5.3 `GET /api/v1/documents/{document_id}`
+
+Purpose:
+Read one document and its frozen metadata snapshot.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `200 OK`:
+
+```json
+{
+  "document_id": "doc-123",
+  "title": "June Sales Review",
+  "description": "Monthly document upload",
+  "owner": "analysis-team",
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "version": 1,
+  "language": "en",
+  "document_type": "markdown",
+  "status": "uploaded",
+  "tags": ["sales", "monthly"],
+  "source": {
+    "source_type": "local_file",
+    "source_uri": "backend/data/documents/june_sales_review.md"
+  },
+  "checksum": "sha256-..."
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `repository_error`, `internal_error`.
+
+Validation rules:
+- `document_id` must be a valid resource identifier.
+
+Versioning rule:
+- Detail response stays backward compatible within `/api/v1`.
+
+Future approval relationship:
+- Future approval data, if added, must be an additive expansion only.
+
+#### 4.5.4 `GET /api/v1/documents/{document_id}/versions`
+
+Purpose:
+Read the frozen version history for one document.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `200 OK`:
+
+```json
+{
+  "document_id": "doc-123",
+  "items": []
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `document_version_not_found`, `repository_error`, `internal_error`.
+
+Validation rules:
+- Version items must be ordered by `version_no`.
+- Version history must never be rewritten in place.
+
+Versioning rule:
+- New version metadata fields must be additive only.
+
+Future approval relationship:
+- Approval is version-aware in the future, but this endpoint does not create approval records.
+
+#### 4.5.5 `GET /api/v1/documents/{document_id}/chunks`
+
+Purpose:
+Reserve the chunk collection boundary for the future chunk pipeline.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `200 OK`:
+
+```json
+{
+  "document_id": "doc-123",
+  "items": []
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `repository_error`, `internal_error`.
+
+Validation rules:
+- Until chunking is implemented, an empty `items` array is a valid frozen response.
+- No chunk creation or re-chunking is implied by this endpoint.
+
+Versioning rule:
+- Chunk schema additions must remain additive.
+
+Future approval relationship:
+- Chunk generation is a preprocessing step only and does not create approval state.
+
+#### 4.5.6 `DELETE /api/v1/documents/{document_id}`
+
+Purpose:
+Archive a document and preserve version history rather than physically deleting facts.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `202 Accepted`:
+
+```json
+{
+  "document_id": "doc-123",
+  "status": "archived"
+}
+```
+
+Status codes:
+`202 Accepted`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `document_delete_conflict`, `document_validation_failed`, `repository_error`, `internal_error`.
+
+Validation rules:
+- Delete means archive / soft delete for the frozen contract.
+- Physical removal of version history is not part of this contract.
+
+Versioning rule:
+- Deletion semantics must not break existing resource reads.
+
+Future approval relationship:
+- If approval is added later, active approval states may block archive until the future approval API resolves the document.
+
+### 4.5.7 `GET /api/v1/documents/{document_id}/upload`
+
+Purpose:
+Read the frozen upload session snapshot for retries and progress display.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `200 OK`:
+
+```json
+{
+  "upload_id": "upl-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "progress": 100,
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:35:01Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `repository_error`, `internal_error`.
+
+Versioning rule:
+- Upload session semantics stay versioned together with `/api/v1/documents`.
+
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
 - `200 OK`: successful read.
+- `201 Created`: document upload creation.
 - `202 Accepted`: accepted async task creation.
 - `400 Bad Request`: malformed or invalid input.
 - `404 Not Found`: resource not found.
@@ -153,6 +478,13 @@ Frozen error code families:
 - `provider_error`
 - `workflow_error`
 - `internal_error`
+- `document_not_found`
+- `document_validation_failed`
+- `document_duplicate_checksum`
+- `document_type_unsupported`
+- `document_metadata_invalid`
+- `document_delete_conflict`
+- `document_version_not_found`
 
 Future approval/import/retrieval APIs must add explicit error codes without reusing unrelated ones.
 

@@ -48,6 +48,288 @@
 - 由 `docs/APPROVAL_WORKFLOW.md` 作为审批状态机单一来源
 - 由 `docs/DATABASE.md` 作为 Phase 2 表结构准备来源
 
+## Phase 3.1 Document Domain Model
+
+### Current State
+
+- 当前已经补齐 Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource。
+- 当前只实现 `InMemoryDocumentRepository`，还没有 Upload API、RAG、Chunk、pgvector 或 PostgreSQL Document Repository。
+- `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有 `ReportStatus`。
+
+### Target State
+
+- Document Domain 成为 Upload、Version Management、Internal RAG、Approval Workflow、Retrieval 与 PostgreSQL Persistence 的共同基础。
+- 未来所有文档相关能力都必须沿用本节定义的状态、类型、语言和元数据，不得重新发明另一套文档语义。
+
+### Planned
+
+- 后续 Upload API、Document Pipeline、Chunk Pipeline、Retrieval Provider、Approval API 和 PostgreSQL Repository 都必须基于本节模型扩展。
+- 当前阶段只允许 `uploaded` 作为新建文档的初始状态，未来状态仅作为生命周期占位与迁移边界。
+
+## Document Domain
+
+```mermaid
+flowchart LR
+    S[DocumentSource] --> M[DocumentMetadata]
+    M --> D[Document]
+    D --> V[DocumentVersion]
+    D --> C[DocumentChunk placeholder]
+    M --> T[DocumentType]
+    M --> L[Language]
+    M --> ST[DocumentStatus]
+    D --> A[ApprovalStatus reuse]
+```
+
+## Document Lifecycle
+
+```mermaid
+flowchart TD
+    U[uploaded] --> V[validated]
+    V --> I[indexed]
+    I --> DR[draft]
+    DR --> PA[pending_approval]
+    PA --> AP[approved]
+    AP --> P[published]
+    P --> AR[archived]
+```
+
+## Document Metadata
+
+```mermaid
+flowchart TD
+    M[DocumentMetadata] --> ID[document_id]
+    M --> T[title]
+    M --> DS[description]
+    M --> O[owner]
+    M --> CT[created_at]
+    M --> UT[updated_at]
+    M --> V[version]
+    M --> L[language]
+    M --> DT[document_type]
+    M --> ST[status]
+    M --> TG[tags]
+    M --> S[source]
+    M --> CS[checksum]
+```
+
+## Future Document Pipeline
+
+```mermaid
+flowchart LR
+    A[Future Upload API] --> B[Validation]
+    B --> C[Document Domain]
+    C --> D[Version Management]
+    D --> E[Repository]
+    E --> F[Retrieval / RAG Future]
+    E --> G[Approval Workflow Future]
+    F --> H[PostgreSQL Persistence Future]
+```
+
+## Current vs Future
+
+```mermaid
+flowchart LR
+    C[Current: Domain Model + InMemory Repository] --> F[Future: Upload API + Chunk + Retrieval + Approval + PostgreSQL]
+```
+
+## Sprint 2 Document Upload API Contract Freeze
+
+### Current State
+
+- 当前实现仍只停留在 Document Domain Model。
+- 当前没有 Upload API，没有 Upload 事件流，没有前端改动。
+
+### Target State
+
+- 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+- 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
+- Upload API 只负责受理、校验、版本边界和事件发布，不直接实现审批。
+
+### Planned
+
+- 后续实现必须遵守 `docs/API_CONTRACT.md` 与 `docs/EVENT_CONTRACT.md`。
+- 当前阶段不实现 Upload API，不修改业务代码，不把审批状态当成 Upload 成功的隐含结果。
+
+## Document Upload API Flow
+
+```mermaid
+flowchart TD
+    A[Client / Future UI] --> B[POST /api/v1/documents]
+    B --> C[Request Validation]
+    C -->|fail| D[validation_error]
+    C -->|pass| E[Document Domain Model]
+    E --> F[DocumentRepository]
+    F --> G[document.upload.started]
+    G --> H[document.version.created]
+    H --> I[document.upload.completed]
+    C -->|checksum duplicate| J[document.upload.failed]
+```
+
+## Document Upload Event Flow
+
+```mermaid
+flowchart TD
+    A[Upload Accepted] --> B[document.upload.started]
+    B --> C[document.upload.validated]
+    C --> D[document.version.created]
+    D --> E[document.upload.completed]
+    C -->|validation failure| F[document.validation.failed]
+    D -->|storage failure| G[document.upload.failed]
+```
+
+## Document Upload Validation Flow
+
+```mermaid
+flowchart TD
+    A[Upload Request] --> B[title present?]
+    B -->|no| Z[reject]
+    B -->|yes| C[file empty?]
+    C -->|yes| Z
+    C -->|no| D[document type supported?]
+    D -->|no| Z
+    D -->|yes| E[metadata valid?]
+    E -->|no| Z
+    E -->|yes| F[checksum duplicate?]
+    F -->|yes| Z
+    F -->|no| G[accept]
+```
+
+## Future Approval Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.upload.completed] --> B[Future Approval Intake]
+    B --> C[pending_approval]
+    C --> D[approved]
+    C --> E[rejected]
+    D --> F[published]
+    E --> G[revision]
+    G --> C
+```
+
+## Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+### Current State
+
+- 当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
+- 当前 Upload Workflow 只作为前置契约冻结，不是已实现流程。
+
+### Target State
+
+- 冻结 Upload Request Accepted、Upload Session Created、File Validation、Metadata Validation、Checksum Calculation、Duplicate Detection、Version Decision、Repository Save、Event Publishing、Response Returned。
+- 冻结 Error Catalog 与 Upload Policy 作为 Upload API 实现前的最后约束。
+
+### Planned
+
+- 后续 Upload API 实现必须先遵守 Upload Session、Idempotency、Error Catalog、Upload Policy。
+- 当前阶段不实现 Upload API，不引入文件存储、Chunk、RAG、Approval API、pgvector 或前端上传 UI。
+
+## Document Upload Workflow
+
+```mermaid
+flowchart TD
+    A[Upload Request Accepted] --> B[Upload Session Created]
+    B --> C[File Validation]
+    C --> D[Metadata Validation]
+    D --> E[Checksum Calculation]
+    E --> F[Duplicate Detection]
+    F --> G[Version Decision]
+    G --> H[Repository Save]
+    H --> I[Event Publishing]
+    I --> J[Response Returned]
+```
+
+## Sprint 3 Document Upload API MVP Implementation
+
+### Current State
+
+- `POST /api/v1/documents` 已实现同步 MVP。
+- 当前只实现 backend，不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
+
+### Target State
+
+- 继续保持 `DocumentUploadSession`、checksum duplicate detection、`Idempotency-Key`、event publishing 和 `InMemoryDocumentRepository` 作为当前文档上传闭环。
+
+### Result
+
+- 成功上传返回 `201 Created` 和完成态 `DocumentUploadSession`。
+- 重复 checksum 返回已有结果。
+- `Idempotency-Key` 同 key 不同 checksum 返回 `idempotency_conflict`。
+
+### Planned
+
+- 后续只读接口、删除接口、版本接口和 chunks 接口仍保持冻结未实现。
+- PostgreSQL Document Repository 仍保持设计不实现。
+
+## Sprint 4 Document Read API MVP
+
+### Current State
+
+- `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已实现。
+- 当前只使用现有 `InMemoryDocumentRepository`，不引入新的检索层或 PostgreSQL 读实现。
+
+### Target State
+
+- 保持低风险读取能力，支持 status / document_type / language / owner / tag 的基础过滤。
+
+### Result
+
+- 列表接口返回 `items` 与 `next_cursor`。
+- 详情接口在缺失时返回 `document_not_found`。
+
+### Planned
+
+- `DELETE`、`versions`、`chunks` 继续冻结未实现。
+- PostgreSQL Document Repository 仍只设计不实现。
+
+## Upload Session Flow
+
+```mermaid
+flowchart TD
+    A[accepted] --> B[validating]
+    B --> C[storing]
+    C --> D[completed]
+    B --> E[failed]
+    C --> E
+```
+
+## Validation Flow
+
+```mermaid
+flowchart TD
+    A[Request] --> B[title check]
+    B -->|fail| X[missing_title]
+    B -->|pass| C[file check]
+    C -->|fail| Y[empty_file]
+    C -->|pass| D[metadata check]
+    D -->|fail| Z[invalid_metadata]
+    D -->|pass| E[encoding / type check]
+    E -->|fail| U[unsupported_document_type / unsupported_encoding]
+    E -->|pass| F[checksum + idempotency check]
+```
+
+## Duplicate Detection Flow
+
+```mermaid
+flowchart TD
+    A[Same Idempotency-Key] --> B{Same checksum?}
+    B -->|yes| C[return existing result]
+    B -->|no| D[idempotency_conflict]
+    E[Same checksum without key] --> F[duplicate_checksum]
+```
+
+## Future Approval Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.upload.completed] --> B[pending_approval]
+    B --> C[approved]
+    B --> D[rejected]
+    C --> E[published]
+    D --> F[revision]
+    F --> B
+```
+
 ## Phase 2 PostgreSQL Persistence MVP
 
 ### Current State

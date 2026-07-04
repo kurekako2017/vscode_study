@@ -17,6 +17,23 @@ Current families remain frozen for existing task event streams.
 当前任务事件流继续冻结为以上事件族。
 既存タスクイベントストリームでは上記イベント種別を維持します。
 
+## 2.1 Document Upload Event Families / 文档上传事件族 / 文書アップロードイベント種別
+
+Document upload events are frozen as a separate family and do not replace task SSE events.
+文档上传事件族单独冻结，不替代任务 SSE 事件。
+文書アップロードイベントは別系統として凍結し、タスク SSE を置き換えません。
+
+- `document.upload.accepted`
+- `document.upload.validating`
+- `document.upload.storing`
+- `document.upload.completed`
+- `document.upload.failed`
+- `document.upload.duplicate_detected`
+- `document.upload.started`
+- `document.upload.validated`
+- `document.version.created`
+- `document.validation.failed`
+
 ## 3. Event Envelope / 事件封装 / イベント封筒
 
 Every event must include the following logical fields:
@@ -79,6 +96,23 @@ Rule:
 After `error`, do not send `done`.
 规则：`error` 之后禁止再发送 `done`。
 ルール：`error` の後に `done` を送信してはいけません。
+
+### 6.1 Document Upload Event Semantics / 文档上传事件语义 / 文書アップロードイベント意味
+
+- `document.upload.accepted`: upload request accepted and session created.
+- `document.upload.validating`: file and metadata validation is in progress.
+- `document.upload.storing`: repository save is in progress.
+- `document.upload.duplicate_detected`: a duplicate checksum or duplicate session was detected.
+- `document.upload.completed`: upload session completed successfully.
+- `document.upload.failed`: upload session failed before completion.
+- `document.version.created`: the first frozen version record was created.
+- `document.validation.failed`: validation failed before the upload could complete.
+- `document.upload.started`: upload request accepted and validation began.
+- `document.upload.validated`: metadata, type, language, and checksum validation passed.
+
+Document upload events must keep payloads secret-safe and document-centric.
+文档上传事件的 payload 必须安全且以文档为中心。
+文書アップロードイベントの payload は安全で文書中心でなければなりません。
 
 ## 7. Versioning Rules / 版本规则 / バージョン規則
 

@@ -11,6 +11,11 @@
 - [7. 等级对照](#7-等级对照)
 - [8. 未来两年升级路线图](#8-未来两年升级路线图)
 - [9. 投资与决策门禁](#9-投资与决策门禁)
+- [1.9 Phase 3.1 Document Domain Model](#19-phase-31-document-domain-model)
+- [1.10 Sprint 2 Document Upload API Contract Freeze](#110-sprint-2-document-upload-api-contract-freeze)
+- [1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze](#111-sprint-25-document-upload-workflow--error-catalog--upload-policy-freeze)
+- [1.12 Sprint 3 Document Upload API MVP](#112-sprint-3-document-upload-api-mvp)
+- [1.13 Sprint 4 Document Read API MVP](#113-sprint-4-document-read-api-mvp)
 
 ## 1. Roadmap 原则
 
@@ -145,6 +150,61 @@ Epic 12 当前作为横向平台能力标记，不代表已经实现。
   在具备 PostgreSQL 环境后完成联调，再进入文档入库与审批 API 阶段。
 - Pending Reason:
   当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
+
+## 1.9 Phase 3.1 Document Domain Model
+
+- Current State:
+  主项目已补齐 Document Domain Model 和 InMemory Document Repository，作为后续 Upload、RAG、审批和持久化的共同基础。
+- Target State:
+  Document Domain 统一承载 Document、DocumentVersion、DocumentChunk placeholder、DocumentMetadata、DocumentSource、DocumentStatus、DocumentType、Language 与 ApprovalStatus reuse。
+- Result:
+  已完成 Document Domain Model、Repository Interface、InMemoryRepository、基础验证、单元测试和 handbook 同步。
+- Planned:
+  不在本阶段实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository。
+
+## 1.10 Sprint 2 Document Upload API Contract Freeze
+
+- Current State:
+  当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
+- Target State:
+  冻结 Upload API、事件契约、验证流程和未来审批关系，作为后续实现的唯一输入契约。
+- Result:
+  已冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+- Planned:
+  只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
+
+## 1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+- Current State:
+  当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
+- Target State:
+  冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog、Upload Policy，作为 Upload API 实现前的最后边界。
+- Result:
+  已创建 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`，并冻结 Upload Workflow / Upload Session / Idempotency。
+- Planned:
+  只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
+
+## 1.12 Sprint 3 Document Upload API MVP
+
+- Current State:
+  `POST /api/v1/documents` 已实现同步 MVP。
+- Target State:
+  完成文档上传同步闭环：multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repository save -> event publish -> 201 response。
+- Result:
+  已实现 `POST /api/v1/documents`，并补充 backend 单元测试覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放与幂等冲突。
+- Planned:
+  继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 冻结但未实现；PostgreSQL Document Repository 仍只设计不实现。
+
+## 1.13 Sprint 4 Document Read API MVP
+
+- Current State:
+  `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已实现。
+- Target State:
+  低风险读取能力直接复用现有 `InMemoryDocumentRepository`，只在 service 层完成基础过滤与缺失文档映射。
+- Result:
+  已实现列表读取、单文档读取与基础过滤，并补充 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件。
+- Planned:
+  `DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
 
 ## 2. Level 1 Demo
 

@@ -3,8 +3,10 @@ from __future__ import annotations
 import inspect
 import unittest
 
+from app.repositories.implementations.in_memory.document_repository import InMemoryDocumentRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
 from app.repositories.implementations.in_memory.task_repository import InMemoryTaskRepository
+from app.repositories.interfaces.document_repository import DocumentRepository
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.task_repository import TaskRepository
 from app.services.task_service import TaskService
@@ -16,6 +18,7 @@ class RepositoryBoundaryTest(unittest.TestCase):
     def test_in_memory_repositories_implement_protocols(self) -> None:
         self.assertIsInstance(InMemoryTaskRepository(), TaskRepository)
         self.assertIsInstance(InMemoryReportRepository(), ReportRepository)
+        self.assertIsInstance(InMemoryDocumentRepository(), DocumentRepository)
 
     def test_task_service_does_not_import_repository_implementation(self) -> None:
         source = inspect.getsource(inspect.getmodule(TaskService))

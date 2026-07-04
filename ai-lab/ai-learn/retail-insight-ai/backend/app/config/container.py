@@ -10,9 +10,11 @@ from app.data_loaders import LocalBusinessDataLoader, LocalResearchDataLoader
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
+from app.repositories.implementations.in_memory.document_repository import InMemoryDocumentRepository
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
 from app.repositories.implementations.in_memory.task_repository import InMemoryTaskRepository
+from app.repositories.interfaces.document_repository import DocumentRepository
 from app.repositories.interfaces.event_repository import EventRepository
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.task_repository import TaskRepository
@@ -20,6 +22,8 @@ from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.reports.generator import ReportGenerator
+from app.services.document_read_service import DocumentReadService
+from app.services.document_upload_service import DocumentUploadService
 from app.services.task_service import TaskService
 from app.workflow.graph import AnalysisWorkflow
 
@@ -30,6 +34,9 @@ class AppContainer:
 
     settings: Settings
     task_service: TaskService
+    document_repository: DocumentRepository
+    document_read_service: DocumentReadService
+    document_upload_service: DocumentUploadService
     event_repository: EventRepository
     repository_backend: str
 
@@ -40,6 +47,12 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     settings = settings or Settings()
     task_repository, report_repository, event_repository = _build_repositories(settings)
     event_publisher = EventPublisher(event_repository)
+    document_repository = InMemoryDocumentRepository()
+    document_read_service = DocumentReadService(document_repository)
+    document_upload_service = DocumentUploadService(
+        repository=document_repository,
+        event_publisher=event_publisher,
+    )
     business_data_loader = LocalBusinessDataLoader()
     research_data_loader = LocalResearchDataLoader()
     research_provider = StaticResearchProvider(
@@ -64,6 +77,9 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     return AppContainer(
         settings=settings,
         task_service=task_service,
+        document_repository=document_repository,
+        document_read_service=document_read_service,
+        document_upload_service=document_upload_service,
         event_repository=event_repository,
         repository_backend=settings.repository_backend,
     )

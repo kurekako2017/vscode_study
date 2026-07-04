@@ -122,3 +122,18 @@ class ReportGenerationException(AppException):
             500,
             task_id=task_id,
         )
+
+
+class DocumentNotFoundException(AppException):
+    """表示指定 document_id 不存在。"""
+
+    def __init__(self, document_id: str) -> None:
+        """返回 404，并把 document_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.DOCUMENT_NOT_FOUND,
+            "Document not found",
+            404,
+            detail={"document_id": document_id},
+            task_id=document_id,
+        )

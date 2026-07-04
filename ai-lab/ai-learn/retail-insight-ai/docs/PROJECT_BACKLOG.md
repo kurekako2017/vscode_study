@@ -32,7 +32,7 @@
 
 ## 当前阶段
 
-Phase 2: PostgreSQL Persistence MVP
+Phase 4: Document Read API MVP
 
 状态：进行中
 
@@ -83,6 +83,18 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [ ] Database Freeze
 - [ ] Testing Freeze
 - [ ] Documentation Freeze
+
+### Sprint 1: Phase 3.1 Document Domain Model
+
+- [x] Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource
+- [x] DocumentStatus / DocumentType / Language / ApprovalStatus reuse
+- [x] DocumentRepository Interface
+- [x] InMemoryDocumentRepository
+- [x] Document creation / metadata validation / status transition / CRUD / checksum duplicate tests
+- [x] Architecture / Roadmap / TASK / CHANGELOG / DECISIONS / handbook mirror sync
+- [ ] Document Upload API design only, no implementation yet
+- [ ] PostgreSQL Document Repository design only, no implementation yet
+- [ ] RAG pipeline design based on the frozen document domain model
 
 ## 工作区规则继承
 
@@ -244,6 +256,66 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
   - [ ] 将审批状态机映射到真实 API / Repository / Event
   - [ ] 将数据契约映射到 PostgreSQL schema version 策略
 
+### Sprint 2: Document Upload API Contract Freeze
+
+- 状态：已完成文档冻结。
+- 本次完成：
+  - [x] 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`
+  - [x] 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`
+  - [x] 冻结 Document Upload Validation Flow 与 Future Approval Integration Flow
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+- 后续待办：
+  - [ ] 实现 Upload API
+  - [ ] 实现 Document Upload persistence
+  - [ ] 补齐 Upload API integration tests
+
+### Sprint 2.5: Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+- 状态：已完成文档冻结。
+- 本次完成：
+  - [x] 冻结 Document Upload Workflow
+  - [x] 冻结 Upload Session contract
+  - [x] 冻结 Idempotency contract
+  - [x] 新增 `docs/ERROR_CATALOG.md`
+  - [x] 新增 `docs/UPLOAD_POLICY.md`
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+- 后续待办：
+  - [ ] 实现 Upload API
+  - [ ] 实现 Upload Session persistence
+  - [ ] 实现 Upload API integration tests
+
+### Sprint 3: Document Upload API MVP
+
+- 状态：已实现并待验证。
+- 本次完成：
+  - [x] 实现 `POST /api/v1/documents`
+  - [x] 实现 multipart/form-data 请求处理
+  - [x] 实现 title / description / owner / tags / language 校验
+  - [x] 实现 SHA-256 checksum、duplicate checksum detection、Idempotency-Key 处理
+  - [x] 实现 `DocumentUploadSession` 成功响应
+  - [x] 实现 upload 事件发布到现有 event repository
+  - [x] 新增 backend 单元测试覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放与幂等冲突
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+- 后续待办：
+  - [ ] 实现 GET / DELETE / versions / chunks 只读接口
+  - [ ] 保持 PostgreSQL Document Repository 仅设计不实现
+  - [ ] 补齐 Upload API integration tests 的真实联调验证
+
+### Sprint 4: Document Read API MVP
+
+- 状态：已实现并待验证。
+- 本次完成：
+  - [x] 实现 `GET /api/v1/documents`
+  - [x] 实现 `GET /api/v1/documents/{document_id}`
+  - [x] 实现 status / document_type / language / tag / owner 过滤
+  - [x] 实现 `document_not_found` 404 行为
+  - [x] 新增 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件
+  - [x] existing upload tests still pass
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+- 后续待办：
+  - [ ] `DELETE`、`versions`、`chunks` 接口仍冻结未实现
+  - [ ] PostgreSQL Document Repository 仍保持设计不实现
+
 ### Phase 2: PostgreSQL Persistence MVP
 
 - 状态：In Progress / Partially Verified。
@@ -291,6 +363,12 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - 在 `docs/ai-agent-retail-handbook-v3/docs/` 建立对应镜像。
 - 将 `../doc-sync.manifest.json` 扩展为包含 `engineering-standards` 同步组。
 - 未修改 `backend/`、`frontend/`、`scripts/`。
+
+### 2026-07-04 Sprint 1 Phase 3.1 Document Domain Model
+
+- [x] 完成文档域模型、仓储接口、InMemory 仓储、验证与单元测试
+- [x] 完成主项目与 handbook 的架构、路线图、任务、Backlog、Changelog、决策同步
+- [ ] Upload API / RAG / pgvector / PostgreSQL Repository 留待后续 Sprint
 
 ## Architecture Principles
 

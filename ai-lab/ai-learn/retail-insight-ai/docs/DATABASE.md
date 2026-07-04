@@ -10,6 +10,7 @@
 - 当前已新增可选 PostgreSQL Repository
 - 当前已提供 `backend/db/schema.sql` 与 `backend/db/init.sql`
 - 当前已建 `approval_requests` / `approval_events` 表，但尚未接入审批 API
+- 当前仍只实现 Document Domain Model，不存在 Upload API 对应表结构
 
 ## Target State
 
@@ -23,11 +24,17 @@
 - `report_versions`
 - `approval_requests`
 - `approval_events`
+- `documents`
+- `document_versions`
+- `document_chunks`
+- `document_sources`
+- `document_upload_sessions`
 
 ## Planned
 
 - 当前已落地 PostgreSQL 表结构与 Task / Event / Report Repository
 - 当前文档继续作为 Import / Approval 扩展的设计输入
+- Document Upload 相关表只作为未来扩展边界，不表示已经实现 Upload API
 
 ## Runtime Rules
 
@@ -200,6 +207,102 @@
 | `reason` | TEXT NULL | 拒绝或修订原因 |
 | `created_at` | TIMESTAMPTZ | 事件时间 |
 
+## documents
+
+### Purpose
+
+保存文档事实主记录。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，document_id |
+| `title` | TEXT | 文档标题 |
+| `description` | TEXT NULL | 文档描述 |
+| `owner` | TEXT | 所属人 |
+| `version` | INTEGER | 当前版本号 |
+| `language` | TEXT | `en / ja / zh-CN / unknown` |
+| `document_type` | TEXT | 冻结文档类型 |
+| `status` | TEXT | `uploaded / validated / indexed / draft / pending_approval / approved / published / archived` |
+| `tags` | JSONB / TEXT[] | 标签集合 |
+| `source` | JSONB | 来源对象 |
+| `checksum` | TEXT | 文件校验值 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `updated_at` | TIMESTAMPTZ | 更新时间 |
+
+## document_versions
+
+### Purpose
+
+保存文档版本历史。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID | 主键 |
+| `document_id` | UUID / TEXT | 关联 `documents.id` |
+| `version_no` | INTEGER | 版本号 |
+| `storage_path` | TEXT | 本地或对象存储路径 |
+| `checksum` | TEXT | 版本校验值 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `created_by` | TEXT NULL | 未来上传者 |
+
+## document_chunks
+
+### Purpose
+
+保留未来 chunk pipeline 的占位表。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID | 主键 |
+| `document_version_id` | UUID | 关联 `document_versions.id` |
+| `chunk_no` | INTEGER | 顺序号 |
+| `content` | TEXT | chunk 内容 |
+| `metadata` | JSONB | chunk 元数据 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+## document_sources
+
+### Purpose
+
+保存文档来源信息，便于追踪上传输入。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID | 主键 |
+| `document_id` | UUID / TEXT | 关联 `documents.id` |
+| `source_type` | TEXT | `local_file / api / manual` |
+| `source_uri` | TEXT | 来源路径或 URI |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+## document_upload_sessions
+
+### Purpose
+
+保存文档上传会话状态，支撑幂等、进度、重试与支持排障。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `upload_id` | UUID / TEXT | 上传会话 ID |
+| `document_id` | UUID / TEXT | 关联 `documents.id` |
+| `status` | TEXT | `accepted` / `validating` / `storing` / `completed` / `failed` |
+| `progress` | INTEGER | 0-100 进度 |
+| `error_code` | TEXT NULL | 错误码 |
+| `error_message` | TEXT NULL | 错误说明 |
+| `idempotency_key` | TEXT NULL | 幂等键 |
+| `checksum` | TEXT NULL | 校验值 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `updated_at` | TIMESTAMPTZ | 更新时间 |
+
 ## Database ER Preparation
 
 ```mermaid
@@ -208,4 +311,9 @@ erDiagram
     REPORTS ||--o{ REPORT_VERSIONS : has
     REPORT_VERSIONS ||--o{ APPROVAL_REQUESTS : submits
     APPROVAL_REQUESTS ||--o{ APPROVAL_EVENTS : emits
+    DOCUMENTS ||--o{ DOCUMENT_VERSIONS : has
+    DOCUMENTS ||--o{ DOCUMENT_SOURCES : has
+    DOCUMENT_VERSIONS ||--o{ DOCUMENT_CHUNKS : has
+    DOCUMENTS ||--o{ DOCUMENT_UPLOAD_SESSIONS : has
+    DOCUMENT_VERSIONS ||--o| APPROVAL_REQUESTS : future
 ```

@@ -17,7 +17,7 @@ This document freezes HTTP API rules for `Retail Insight AI`.
 
 - Path segments: lowercase plural nouns where possible.
 - JSON fields: `snake_case` on backend contracts unless an existing frozen contract already differs.
-- IDs: `task_id`, `request_id`, `trace_id`, `report_id`, `approval_request_id`.
+- IDs: `task_id`, `request_id`, `trace_id`, `report_id`, `approval_request_id`, `upload_id`, `document_id`.
 - Time fields: ISO 8601 UTC strings.
 
 ## 4. Frozen Current APIs / 当前冻结 API / 現在凍結 API
@@ -120,9 +120,43 @@ Notes:
 - `status` here is report approval status, not task execution status.
 - Current implemented report status is `generated`.
 
+### 4.5 Document Upload APIs / 文档上传 API / 文書アップロード API
+
+All document upload endpoints are frozen under `/api/v1`.
+所有文档上传接口都冻结在 `/api/v1`。
+すべての文書アップロード API は `/api/v1` 配下で凍結します。
+
+- `POST /api/v1/documents` accepts `multipart/form-data` with `file` and `metadata`.
+- `POST /api/v1/documents` may include `Idempotency-Key` for future-safe retries.
+- Upload responses return a `DocumentUploadSession` snapshot that reflects the completed synchronous MVP upload.
+
+DocumentUploadSession:
+
+```json
+{
+  "upload_id": "upl-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "progress": 100,
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Statuses:
+`accepted | validating | storing | completed | failed`
+
+- Same checksum returns the existing document result instead of creating a second record.
+- Same key + same checksum returns the existing upload result.
+- Same key + different checksum returns `409 Conflict` with `idempotency_conflict`.
+- Future production should require `Idempotency-Key`.
+
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
 - `200 OK`: successful read.
+- `201 Created`: document upload creation.
 - `202 Accepted`: accepted async task creation.
 - `400 Bad Request`: malformed or invalid input.
 - `404 Not Found`: resource not found.

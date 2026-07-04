@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Phase 2: PostgreSQL Persistence MVP Sync
+Phase 4: Document Read API MVP Sync
 
 当前状态：
 
@@ -122,6 +122,94 @@ Task、Event、Report 有可选事务持久化能力，同时 Approval / Import 
 - 当前环境缺少 Docker CLI
 - 当前环境未安装 `psycopg` 到实际运行 venv
 - PostgreSQL 集成测试当前被 skip
+
+## 1.9 Phase 3.1 Document Domain Model
+
+### Current State
+
+主项目已补齐 Document Domain Model 和 InMemory Document Repository。
+
+### Target State
+
+Document Domain 作为 Upload、Version Management、Internal RAG、Approval Workflow、Retrieval 与 PostgreSQL Persistence 的共同基础。
+
+### Planned
+
+- 当前只允许 `uploaded` 作为新建文档初始状态
+- 当前不实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository
+
+## 1.10 Sprint 2 Document Upload API Contract Freeze
+
+### Current State
+
+当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
+
+### Target State
+
+冻结 Upload API、事件契约、验证流程和未来审批关系，作为后续实现的唯一输入契约。
+
+### Result
+
+已冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+
+### Planned
+
+只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
+
+## 1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+### Current State
+
+当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
+
+### Target State
+
+冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog、Upload Policy，作为 Upload API 实现前的最后边界。
+
+### Result
+
+已创建 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`，并冻结 Upload Workflow / Upload Session / Idempotency。
+
+### Planned
+
+只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
+
+## 1.12 Sprint 3 Document Upload API MVP
+
+### Current State
+
+主项目已进入 `POST /api/v1/documents` 的同步 MVP 实现阶段。
+
+### Target State
+
+完成文档上传同步闭环：
+multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repository save -> event publish -> 201 response。
+
+### Result
+
+已实现 `POST /api/v1/documents`，并补充 backend 单元测试覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放与幂等冲突。
+
+### Planned
+
+继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 冻结但未实现；PostgreSQL Document Repository 仍只设计不实现。
+
+## 1.13 Sprint 4 Document Read API MVP
+
+### Current State
+
+主项目已进入低风险读接口实现阶段。
+
+### Target State
+
+完成 `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 的后端 MVP。
+
+### Result
+
+已实现列表读取、单文档读取与基础过滤，并补充 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件。
+
+### Planned
+
+`DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
 
 ## Definition of Done
 

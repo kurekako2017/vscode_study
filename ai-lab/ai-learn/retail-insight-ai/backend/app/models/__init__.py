@@ -1,6 +1,18 @@
 """Domain models."""
 
 from app.models.analysis import KPIResult, ResearchResult
+from app.models.document import (
+    ApprovalStatus,
+    Document,
+    DocumentChunk,
+    DocumentMetadata,
+    DocumentSource,
+    DocumentStatus,
+    DocumentType,
+    DocumentVersion,
+    ImportBatch,
+    Language,
+)
 from app.models.event import TaskEvent
 from app.models.persistence import (
     ApprovalEvent,
@@ -16,10 +28,20 @@ from app.models.task import Task, TaskStatus
 __all__ = [
     "ApprovalEvent",
     "ApprovalRequest",
+    "ApprovalStatus",
     "DataImport",
     "DataImportStatus",
+    "Document",
+    "DocumentChunk",
+    "DocumentMetadata",
+    "DocumentSource",
+    "DocumentStatus",
+    "DocumentType",
+    "DocumentVersion",
     "ImportErrorRecord",
+    "ImportBatch",
     "KPIResult",
+    "Language",
     "ResearchResult",
     "Report",
     "ReportStatus",

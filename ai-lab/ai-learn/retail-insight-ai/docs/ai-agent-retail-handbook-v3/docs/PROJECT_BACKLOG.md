@@ -8,7 +8,7 @@
 
 ## 当前阶段
 
-企业化文档同步治理建设
+Phase 4: Document Read API MVP
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -86,6 +86,61 @@
 - [x] Import Error Model 已同步到 handbook
 - [x] Approval State Machine 已同步到 handbook
 - [x] Phase 2 PostgreSQL 准备项已同步到 handbook
+
+### Sprint 1: Phase 3.1 Document Domain Model
+
+- [x] Document Domain Model 已同步到 handbook
+- [x] Document Repository Interface 已同步到 handbook
+- [x] InMemory Document Repository 已同步到 handbook
+- [x] 仅保留正确路径 `backend/app/repositories/implementations/in_memory/document_repository.py`
+- [x] 先前出现的重复路径是报告 typo，不是实际误放文件
+
+### Sprint 2: Document Upload API Contract Freeze
+
+- [x] Document Upload API contract 已冻结
+- [x] Document Upload event contract 已冻结
+- [x] Document Upload Mermaid diagrams 已同步
+- [x] DATABASE / ARCHITECTURE / CHANGELOG / DECISIONS / TASK / ROADMAP / handbook mirror 已同步
+- [ ] Document Upload API implementation
+- [ ] Document Upload persistence implementation
+- [ ] Document Upload integration tests
+
+### Sprint 2.5: Document Upload Workflow + Error Catalog + Upload Policy Freeze
+
+- [x] Document Upload Workflow 已冻结
+- [x] Upload Session contract 已冻结
+- [x] Idempotency contract 已冻结
+- [x] 新增 `docs/ERROR_CATALOG.md`
+- [x] 新增 `docs/UPLOAD_POLICY.md`
+- [x] 更新 handbook mirror 对应文档
+- [ ] Document Upload API implementation
+- [ ] Upload Session persistence
+- [ ] Upload API integration tests
+
+### Sprint 3: Document Upload API MVP
+
+- [x] `POST /api/v1/documents` 已实现
+- [x] multipart/form-data 请求、metadata 校验、checksum、重复检测、幂等与事件发布已实现
+- [x] backend 单元测试已新增并通过后续验证
+- [x] docs / TASK / ROADMAP / CHANGELOG / DECISIONS / handbook mirror 已同步
+- [ ] `GET /api/v1/documents` 等后续只读接口仍保持冻结未实现
+- [ ] PostgreSQL Document Repository 仍保持设计不实现
+- [ ] Upload API 后续扩展（versions / chunks / delete）仍保持冻结
+
+### Sprint 4: Document Read API MVP
+
+- 状态：已实现并待验证。
+- 本次完成：
+  - [x] 实现 `GET /api/v1/documents`
+  - [x] 实现 `GET /api/v1/documents/{document_id}`
+  - [x] 实现 status / document_type / language / tag / owner 过滤
+  - [x] 实现 `document_not_found` 404 行为
+  - [x] 新增 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件
+  - [x] existing upload tests still pass
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+- 后续待办：
+  - [ ] `DELETE`、`versions`、`chunks` 接口仍冻结未实现
+  - [ ] PostgreSQL Document Repository 仍保持设计不实现
 
 ## 技术债
 
