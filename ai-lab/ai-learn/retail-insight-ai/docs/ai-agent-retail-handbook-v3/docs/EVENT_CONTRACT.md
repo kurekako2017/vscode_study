@@ -33,6 +33,11 @@ Document upload events are frozen as a separate family and do not replace task S
 - `document.upload.validated`
 - `document.version.created`
 - `document.validation.failed`
+- `document.archive.completed`
+- `document.import.started`
+- `document.import.validated`
+- `document.import.completed`
+- `document.import.failed`
 
 ## 3. Event Envelope / 事件封装 / イベント封筒
 
@@ -109,6 +114,18 @@ After `error`, do not send `done`.
 - `document.validation.failed`: validation failed before completion.
 - `document.upload.started`: legacy-compatible alias for the accepted/validating boundary.
 - `document.upload.validated`: legacy-compatible alias for validation success.
+- `document.archive.completed`: document was soft deleted and preserved for future reads.
+
+### 6.2 Document Import Event Semantics / 文档导入事件语义 / 文書インポートイベント意味
+
+- `document.import.started`: import request accepted and import session created.
+- `document.import.validated`: uploaded document passed import eligibility checks.
+- `document.import.completed`: document import completed and the document was marked as validated.
+- `document.import.failed`: document import failed before completion.
+
+Document import events must keep payloads secret-safe and document-centric.
+文档导入事件的 payload 必须安全且以文档为中心。
+文書インポートイベントの payload は安全で文書中心でなければなりません。
 
 ## 7. Versioning Rules / 版本规则 / バージョン規則
 

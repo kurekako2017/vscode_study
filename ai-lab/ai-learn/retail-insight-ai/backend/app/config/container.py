@@ -21,7 +21,9 @@ from app.repositories.interfaces.task_repository import TaskRepository
 from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
+from app.services.document_archive_service import DocumentArchiveService
 from app.reports.generator import ReportGenerator
+from app.services.document_import_service import DocumentImportService
 from app.services.document_read_service import DocumentReadService
 from app.services.document_upload_service import DocumentUploadService
 from app.services.task_service import TaskService
@@ -35,7 +37,9 @@ class AppContainer:
     settings: Settings
     task_service: TaskService
     document_repository: DocumentRepository
+    document_import_service: DocumentImportService
     document_read_service: DocumentReadService
+    document_archive_service: DocumentArchiveService
     document_upload_service: DocumentUploadService
     event_repository: EventRepository
     repository_backend: str
@@ -48,7 +52,9 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     task_repository, report_repository, event_repository = _build_repositories(settings)
     event_publisher = EventPublisher(event_repository)
     document_repository = InMemoryDocumentRepository()
+    document_import_service = DocumentImportService(document_repository, event_publisher)
     document_read_service = DocumentReadService(document_repository)
+    document_archive_service = DocumentArchiveService(document_repository, event_publisher)
     document_upload_service = DocumentUploadService(
         repository=document_repository,
         event_publisher=event_publisher,
@@ -78,7 +84,9 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         settings=settings,
         task_service=task_service,
         document_repository=document_repository,
+        document_import_service=document_import_service,
         document_read_service=document_read_service,
+        document_archive_service=document_archive_service,
         document_upload_service=document_upload_service,
         event_repository=event_repository,
         repository_backend=settings.repository_backend,

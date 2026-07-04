@@ -33,3 +33,12 @@
 | `provider_timeout` | 503 | Processing timed out. | Provider timeout. | Yes | provider |
 | `event_publish_failed` | 500 | Progress update failed. | Event publish failed. | Yes | event |
 
+## 导入错误 / Import Errors / インポートエラー
+
+| Code | HTTP | User | Developer | Retryable | Source |
+|---|---:|---|---|---|---|
+| `document_import_not_found` | 404 | Import record not found. | Requested import_id does not exist. | No | import |
+| `import_already_running` | 409 | Another import is already running. | Same document_id already has a running import session. | Maybe | import |
+| `document_archived` | 409 | Document is archived. | Archived documents cannot be imported again. | No | import |
+| `unsupported_document_type` | 415 | This document type is not supported for import. | Planned-only document type cannot enter import pipeline. | No | import |
+| `invalid_metadata` | 422 | Document metadata is invalid. | Import eligibility checks failed. | No | import |

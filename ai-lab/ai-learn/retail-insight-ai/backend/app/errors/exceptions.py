@@ -137,3 +137,48 @@ class DocumentNotFoundException(AppException):
             detail={"document_id": document_id},
             task_id=document_id,
         )
+
+
+class DocumentArchivedException(AppException):
+    """表示文档已归档，当前导入或写入操作不允许继续。"""
+
+    def __init__(self, document_id: str) -> None:
+        """返回 409，并把 document_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.DOCUMENT_ARCHIVED,
+            "Document is archived",
+            409,
+            detail={"document_id": document_id},
+            task_id=document_id,
+        )
+
+
+class DocumentImportNotFoundException(AppException):
+    """表示指定 import_id 不存在。"""
+
+    def __init__(self, import_id: str) -> None:
+        """返回 404，并把 import_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.DOCUMENT_IMPORT_NOT_FOUND,
+            "Document import not found",
+            404,
+            detail={"import_id": import_id},
+            task_id=import_id,
+        )
+
+
+class DocumentImportAlreadyRunningException(AppException):
+    """表示同一文档已有导入会话正在运行。"""
+
+    def __init__(self, document_id: str) -> None:
+        """返回 409，并把 document_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.IMPORT_ALREADY_RUNNING,
+            "Document import already running",
+            409,
+            detail={"document_id": document_id},
+            task_id=document_id,
+        )

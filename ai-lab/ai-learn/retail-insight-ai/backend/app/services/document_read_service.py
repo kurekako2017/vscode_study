@@ -47,6 +47,9 @@ class DocumentReadService:
         language: Language | None = None,
         owner: str | None = None,
         tag: str | None = None,
+        include_archived: bool = False,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> DocumentListResponse:
         """返回符合过滤条件的文档列表。"""
 
@@ -54,8 +57,18 @@ class DocumentReadService:
         filtered = [
             document
             for document in documents
-            if self._matches(document, status=status, document_type=document_type, language=language, owner=owner, tag=tag)
+            if self._matches(
+                document,
+                status=status,
+                document_type=document_type,
+                language=language,
+                owner=owner,
+                tag=tag,
+                include_archived=include_archived,
+            )
         ]
+        if limit is not None:
+            filtered = filtered[:limit]
         return DocumentListResponse.from_domain(filtered)
 
     def get_document(self, document_id: str) -> DocumentResponse:
@@ -75,8 +88,11 @@ class DocumentReadService:
         language: Language | None,
         owner: str | None,
         tag: str | None,
+        include_archived: bool,
     ) -> bool:
         metadata = document.metadata
+        if metadata.status is DocumentStatus.ARCHIVED and not include_archived and status is not DocumentStatus.ARCHIVED:
+            return False
         if status is not None and metadata.status is not status:
             return False
         if document_type is not None and metadata.document_type is not document_type:

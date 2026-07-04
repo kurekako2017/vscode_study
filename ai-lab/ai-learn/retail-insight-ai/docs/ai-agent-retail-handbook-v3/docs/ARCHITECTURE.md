@@ -289,6 +289,108 @@ flowchart TD
 - `DELETE`、`versions`、`chunks` 继续冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
 
+## Sprint 5 Document Archive API MVP
+
+### Current State
+
+- `DELETE /api/v1/documents/{document_id}` 仍未实现。
+- 列表接口需要明确 archived 的默认过滤边界。
+
+### Target State
+
+- DELETE 语义冻结为 archive / soft delete，不做物理删除。
+- archived 文档默认不出现在列表中，除非显式请求 `include_archived=true` 或 `status=archived`。
+
+### Result
+
+- 软删除归档语义已经冻结，后续可直接接入实现。
+
+### Planned
+
+- `versions`、`chunks`、PostgreSQL Document Repository 仍只设计不实现。
+
+## Sprint 6 Document Import Pipeline MVP
+
+### Current State
+
+- `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
+- 当前导入流水线只做同步 MVP，不创建 chunk、不做检索、不做审批。
+- 当前只复用现有 `InMemoryDocumentRepository`，不引入 PostgreSQL Import Repository。
+
+### Target State
+
+- 导入流水线成为 future chunking、internal RAG、full-text search、approval workflow 与 audit 的前置边界。
+- 成功导入后，文档状态推进到 `validated`。
+- 仅允许 `markdown`、`text`、`csv`、`json` 进入当前导入闭环。
+
+### Result
+
+- 导入结果、错误与状态查询已可在后端读取。
+
+### Planned
+
+- `versions`、`chunks`、RAG、embedding、pgvector、Internet Search、Approval API 与 PostgreSQL Document Repository 继续冻结未实现。
+
+## Document Import Pipeline
+
+```mermaid
+flowchart TD
+    A[POST /api/v1/documents/{document_id}/import] --> B[Load uploaded document]
+    B --> C[Validate document status]
+    C -->|archived| X[document_archived]
+    C -->|missing| Y[document_not_found]
+    C --> D[Validate document type]
+    D -->|unsupported| Z[unsupported_document_type]
+    D --> E[Mark running]
+    E --> F[Mark document validated]
+    F --> G[Persist import record in memory]
+    G --> H[document.import.completed]
+```
+
+## Import Status Flow
+
+```mermaid
+flowchart TD
+    A[pending] --> B[running]
+    B --> C[completed]
+    B --> D[failed]
+```
+
+## Import Error Flow
+
+```mermaid
+flowchart TD
+    A[Import Request] --> B{Document exists?}
+    B -->|no| X[document_not_found]
+    B -->|yes| C{Archived?}
+    C -->|yes| Y[document_archived]
+    C -->|no| D{Type supported?}
+    D -->|no| Z[unsupported_document_type]
+    D -->|yes| E[Import completed]
+```
+
+## Future Chunking Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.import.completed] --> B[Future Chunk Pipeline]
+    B --> C[DocumentChunk]
+    C --> D[Future Internal RAG]
+```
+
+## Future Approval Integration Flow
+
+```mermaid
+flowchart TD
+    A[document.import.completed] --> B[Future Approval Intake]
+    B --> C[pending_approval]
+    C --> D[approved]
+    C --> E[rejected]
+    D --> F[published]
+    E --> G[revision]
+    G --> C
+```
+
 ## Upload Session Flow
 
 ```mermaid

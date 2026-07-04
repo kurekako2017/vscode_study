@@ -206,6 +206,26 @@ Epic 12 当前作为横向平台能力标记，不代表已经实现。
 - Planned:
   `DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
 
+## 1.14 Sprint 5 Document Archive API MVP
+
+- Current State:
+  `DELETE /api/v1/documents/{document_id}` 仍未实现。
+- Target State:
+  DELETE 语义冻结为 archive / soft delete，不做物理删除；archived 文档默认不出现在列表中。
+- Planned:
+  `versions`、`chunks`、PostgreSQL Document Repository 仍只设计不实现。
+
+## 1.15 Sprint 6 Document Import Pipeline MVP
+
+- Current State:
+  `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
+- Target State:
+  形成文档导入最小闭环，为 future chunking、RAG、全文检索和审批提供前置边界。
+- Result:
+  导入成功后，文档状态推进到 `validated`；导入失败时保留错误码与错误信息。
+- Planned:
+  `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
+
 ## 2. Level 1 Demo
 
 **目标范围**

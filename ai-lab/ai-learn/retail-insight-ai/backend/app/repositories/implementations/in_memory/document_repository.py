@@ -96,12 +96,14 @@ class InMemoryDocumentRepository:
             self._documents[document.document_id] = deepcopy(document)
 
     def delete(self, document_id: str) -> None:
-        """删除指定文档。"""
+        """将指定文档软删除为 archived，保留历史事实。"""
 
         with self._lock:
-            if document_id not in self._documents:
+            document = self._documents.get(document_id)
+            if document is None:
                 raise KeyError(document_id)
-            del self._documents[document_id]
+            document.archive()
+            self._documents[document_id] = deepcopy(document)
 
     def find_by_checksum(self, checksum: str) -> Document | None:
         """按 checksum 查找文档，供重复检测和未来导入去重使用。"""

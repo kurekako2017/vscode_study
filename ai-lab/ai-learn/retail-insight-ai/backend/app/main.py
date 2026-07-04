@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.document_imports import router as document_imports_router
 from app.api.documents import router as documents_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
@@ -86,6 +87,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # 注册健康检查、任务和文档上传路由
     application.include_router(health_router)
     application.include_router(documents_router)
+    application.include_router(document_imports_router)
     application.include_router(router=tasks_router)
     return application
 

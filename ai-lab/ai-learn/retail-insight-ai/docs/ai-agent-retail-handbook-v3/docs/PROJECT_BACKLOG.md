@@ -8,7 +8,7 @@
 
 ## 当前阶段
 
-Phase 4: Document Read API MVP
+Phase 6: Document Import Pipeline MVP
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -31,6 +31,41 @@ Phase 4: Document Read API MVP
 - [ ] Provider Abstraction
 - [ ] Documentation Standard
 - [ ] Testing Standard
+
+### Sprint 4: Document Read API MVP
+
+- [x] GET /api/v1/documents implemented
+- [x] GET /api/v1/documents/{document_id} implemented
+- [x] basic list filters implemented for status / document_type / language / tag / owner
+- [x] document_not_found 404 behavior implemented for missing documents
+- [x] backend tests added for empty list, upload then list, upload then get, missing document, and filters
+- [x] existing upload tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] DELETE / versions / chunks remain frozen for later phases
+
+### Sprint 5: Document Archive API MVP
+
+- [x] DELETE /api/v1/documents/{document_id} implemented as archive / soft delete
+- [x] archived documents remain readable by GET /api/v1/documents/{document_id}
+- [x] list default excludes archived unless include_archived=true or status=archived
+- [x] backend tests added for archive success, archive missing, archive idempotency, and archived list visibility
+- [x] existing upload/read tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] versions / chunks remain frozen for later phases
+
+### Sprint 6: Document Import Pipeline MVP
+
+- [x] POST /api/v1/documents/{document_id}/import implemented
+- [x] GET /api/v1/document-imports/{import_id} implemented
+- [x] import status transitions pending / running / completed / failed implemented
+- [x] successful import marks document as validated
+- [x] backend tests added for markdown/text success, unsupported PDF failure, missing document, archived document, deterministic repeat, status read, and event recording
+- [x] existing upload/read/archive tests still pass
+- [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
+- [ ] PostgreSQL Document Repository remains design-only
+- [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
 
 ## Backlog
 

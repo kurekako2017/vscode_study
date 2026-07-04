@@ -4,27 +4,27 @@
 
 ## 当前阶段
 
-Sprint 4: Document Read API MVP
+Sprint 6: Document Import Pipeline MVP
 
 ## 当前最高优先级任务
 
 ### Sprint Result
 
-- [x] GET /api/v1/documents implemented
-- [x] GET /api/v1/documents/{document_id} implemented
-- [x] basic list filters implemented for status / document_type / language / tag / owner
-- [x] document_not_found 404 behavior implemented for missing documents
-- [x] backend tests added for empty list, upload then list, upload then get, missing document, and filters
-- [x] existing upload tests still pass
+- [x] POST /api/v1/documents/{document_id}/import implemented as Document Import Pipeline MVP
+- [x] GET /api/v1/document-imports/{import_id} implemented
+- [x] import status transitions pending / running / completed / failed implemented
+- [x] successful import marks document as validated
+- [x] backend tests added for markdown/text success, unsupported PDF failure, missing document, archived document, deterministic repeat, status read, and event recording
+- [x] existing upload/read/archive tests still pass
 - [x] Architecture / Task / Roadmap / Backlog / Changelog / Decisions / handbook mirror sync
 - [ ] PostgreSQL Document Repository remains design-only
-- [ ] DELETE / versions / chunks remain frozen for later phases
+- [ ] versions / chunks / RAG / embedding / pgvector remain frozen for later phases
 
 ### Boundary
 
-- 当前实现已进入 Document Read API MVP，文档读写的后端 MVP 已完成前两步。
+- 当前实现已进入 Document Import Pipeline MVP，文档读写的后端 MVP 已覆盖上传、读取、归档与导入。
 - 不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
-- 继续保持 PostgreSQL Document Repository 仅设计不实现，DELETE / versions / chunks 仍冻结未实现。
+- 继续保持 PostgreSQL Document Repository 仅设计不实现，versions / chunks / RAG / embedding / pgvector 仍冻结未实现。
 
 ## Epic 14: Engineering Standards（Final Freeze）
 
@@ -49,7 +49,7 @@ Sprint 4: Document Read API MVP
 
 下一任务：
 
-- 保持 Upload API 仅处于冻结状态，不进入实现。
+- 保持 chunks / RAG / approval 仅处于冻结状态，不进入实现。
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 

@@ -354,6 +354,15 @@ class Document:
         self.metadata = replace(self.metadata, status=target, updated_at=timestamp)
         self.updated_at = timestamp
 
+    def archive(self) -> None:
+        """将文档软删除为 archived，但保留全部事实数据。"""
+
+        if self.metadata.status is DocumentStatus.ARCHIVED:
+            return
+        timestamp = utc_now()
+        self.metadata = replace(self.metadata, status=DocumentStatus.ARCHIVED, updated_at=timestamp)
+        self.updated_at = timestamp
+
     def to_version(self) -> DocumentVersion:
         """把当前文档快照转换为版本记录，供版本历史和审批流复用。"""
 

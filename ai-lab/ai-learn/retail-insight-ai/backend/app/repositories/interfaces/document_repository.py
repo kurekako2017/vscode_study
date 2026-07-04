@@ -55,7 +55,7 @@ class DocumentRepository(Protocol):
         ...
 
     def delete(self, document_id: str) -> None:
-        """删除指定文档；不存在时应报错。"""
+        """软删除指定文档，语义上应将状态归档；不存在时应报错。"""
 
         ...
 

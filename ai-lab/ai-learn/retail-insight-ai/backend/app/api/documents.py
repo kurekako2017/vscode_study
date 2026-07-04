@@ -2,15 +2,21 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, File, Form, Header, Query, UploadFile, status
 
-from app.api.dependencies import get_document_read_service, get_document_upload_service
+from app.api.dependencies import (
+    get_document_archive_service,
+    get_document_read_service,
+    get_document_upload_service,
+)
 from app.observability.logging import get_request_id
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.document_api import (
+    DocumentArchiveResponse,
     DocumentListResponse,
     DocumentResponse,
     DocumentUploadSessionResponse,
 )
 from app.models.document import DocumentStatus, DocumentType, Language
+from app.services.document_archive_service import DocumentArchiveService
 from app.services.document_read_service import DocumentReadService
 from app.services.document_upload_service import DocumentUploadService
 
@@ -49,6 +55,9 @@ async def list_documents(
     language: Language | None = Query(default=None),
     owner: str | None = Query(default=None),
     tag: str | None = Query(default=None),
+    include_archived: bool = Query(default=False),
+    limit: int | None = Query(default=None, ge=1, le=100),
+    cursor: str | None = Query(default=None),
     service: DocumentReadService = Depends(get_document_read_service),
 ) -> ApiResponse[DocumentListResponse]:
     """列出文档并支持低风险过滤，不改变上传事实。"""
@@ -59,6 +68,9 @@ async def list_documents(
         language=language,
         owner=owner,
         tag=tag,
+        include_archived=include_archived,
+        limit=limit,
+        cursor=cursor,
     )
     return success_response(data, get_request_id())
 
@@ -71,4 +83,19 @@ async def get_document(
     """读取单个文档与其冻结元数据快照。"""
 
     data = service.get_document(document_id)
+    return success_response(data, get_request_id())
+
+
+@router.delete(
+    path="/{document_id}",
+    response_model=ApiResponse[DocumentArchiveResponse],
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def archive_document(
+    document_id: str,
+    service: DocumentArchiveService = Depends(get_document_archive_service),
+) -> ApiResponse[DocumentArchiveResponse]:
+    """将文档软删除为 archived，同时保留版本与读取能力。"""
+
+    data = service.archive_document(document_id)
     return success_response(data, get_request_id())

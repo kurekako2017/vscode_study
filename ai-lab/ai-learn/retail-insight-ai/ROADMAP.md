@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Phase 4: Document Read API MVP
+Phase 6: Document Import Pipeline MVP
 
 ## Epic 14: Engineering Standards (Final Freeze)
 
@@ -147,6 +147,48 @@ Phase 4: Document Read API MVP
 
 - `DELETE`、`versions`、`chunks` 接口继续保持冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
+
+## Sprint 5: Document Archive API MVP
+
+### Current State
+
+- `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已可用。
+- 现在进入 `DELETE /api/v1/documents/{document_id}` 的软删除实现阶段。
+
+### Target State
+
+- 完成文档归档删除的后端 MVP。
+
+### Result
+
+- DELETE 语义冻结为 archive / soft delete。
+- archived 文档保持可读。
+- 列表默认排除 archived，除非显式请求包含 archived。
+
+### Planned
+
+- `versions`、`chunks` 接口继续保持冻结未实现。
+- PostgreSQL Document Repository 仍只设计不实现。
+
+## Sprint 6: Document Import Pipeline MVP
+
+### Current State
+
+- `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
+- 当前导入流水线只做同步 MVP，不创建 chunk、不做检索、不做审批。
+
+### Target State
+
+- 形成文档导入的最小闭环，为未来 chunking、RAG、全文检索和审批提供前置边界。
+
+### Result
+
+- 导入成功后，文档状态推进到 `validated`。
+- 导入失败时，导入记录保留错误码与错误信息。
+
+### Planned
+
+- `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
 ## Epic 12 Positioning
 

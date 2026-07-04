@@ -218,6 +218,26 @@
 
 - `backend/app/models/document.py` 成为文档域的单一模型入口。
 - `backend/app/repositories/interfaces/document_repository.py` 成为文档事实存储的唯一接口入口。
+
+## ADR-012
+
+日期：2026-07-04
+
+决策：将 `DELETE /api/v1/documents/{document_id}` 冻结为 archive / soft delete，而不是物理删除，并且默认列表排除 archived，只有显式请求才包含 archived。
+
+原因：文档域在当前阶段需要保留版本历史、上传事实和后续审计基础。物理删除会破坏已冻结的读接口和未来版本管理边界；默认排除 archived 可以避免读列表混入历史归档数据，同时又保留显式查询能力。
+
+备选方案：
+
+- 物理删除；该方案会丢失事实数据，不适合当前文档域边界。
+- 列表默认包含 archived；该方案会让常规浏览结果混入历史归档项，增加理解成本。
+
+影响：
+
+- `backend/app/models/document.py` 增加软删除归档能力。
+- `backend/app/repositories/implementations/in_memory/document_repository.py` 的 delete 语义改为 archive。
+- `GET /api/v1/documents` 默认过滤 archived，但可通过 `include_archived=true` 或 `status=archived` 显式查看。
+- `DELETE` 事件语义可以通过 `document.archive.completed` 逐步接入审计和 SSE。
 - `backend/app/repositories/implementations/in_memory/document_repository.py` 作为当前默认本地实现。
 - `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有报告审批状态语义。
 - `docs/ARCHITECTURE.md`、`ROADMAP.md`、`TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook 图册必须同步记录该冻结结果。
@@ -290,6 +310,26 @@
 - `backend/app/api/documents.py` 增加读接口，但不触碰 Upload 行为。
 - `document_not_found` 使用稳定 404 语义。
 - 过滤条件只覆盖当前易实现的 status、document_type、language、owner、tag。
+
+## ADR-016
+
+日期：2026-07-04
+
+决策：将 Document Import Pipeline 作为独立的同步 MVP 实现，复用现有 `InMemoryDocumentRepository`，并把导入状态、导入事件与导入读取资源冻结为独立 API。
+
+原因：Import Pipeline 是未来 Chunking、Internal RAG、全文检索、审批和审计的前置边界，但当前阶段不应直接引入 chunk、embedding、pgvector 或 PostgreSQL Import Repository。同步 MVP 可以在不增加外部依赖的前提下，把导入状态、错误和事件先固定下来。
+
+备选方案：
+
+- 直接实现 Chunk / RAG / Approval；该方案会把本阶段改动范围扩大到后续平台能力。
+- 直接实现 PostgreSQL Import Repository；该方案会提高实现成本并延迟当前最小闭环。
+
+影响：
+
+- `backend/app/services/document_import_service.py` 成为导入状态机与事件发布入口。
+- `backend/app/api/document_imports.py` 暴露 `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}`。
+- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 需要同步导入契约。
+- 成功导入后，文档状态推进到 `validated`，但不生成 chunk、不进入 RAG、不进入审批。
 
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块

@@ -49,7 +49,17 @@ This file freezes document upload related error codes and their operator-facing 
 | `approval_required` | 409 | Approval is required before publish. | Future approval gate blocks the operation. | No | approval | Show approval required state |
 | `approval_rejected` | 409 | The document was rejected. | Future approval workflow rejected the document. | No | approval | Show rejected state |
 
-## 6. Retrieval / Database / Event / Provider Errors / 检索 / 数据库 / 事件 / 提供器错误 / 検索 / DB / イベント / プロバイダーエラー
+## 6. Document Import Errors / 文档导入错误 / 文書インポートエラー
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `document_import_not_found` | 404 | Import record not found. | Requested import_id does not exist. | No | import | Show not found screen |
+| `import_already_running` | 409 | Another import is already running. | Same document_id already has a running import session. | Maybe | import | Show running state badge |
+| `document_archived` | 409 | Document is archived. | Archived documents cannot be imported again. | No | import | Show archived badge |
+| `unsupported_document_type` | 415 | This document type is not supported for import. | Planned-only document type cannot enter import pipeline. | No | import | Show supported types |
+| `invalid_metadata` | 422 | Document metadata is invalid. | Import eligibility checks failed. | No | import | Highlight metadata issue |
+
+## 7. Retrieval / Database / Event / Provider Errors / 检索 / 数据库 / 事件 / 提供器错误 / 検索 / DB / イベント / プロバイダーエラー
 
 | Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
 |---|---:|---|---|---|---|---|
@@ -59,9 +69,8 @@ This file freezes document upload related error codes and their operator-facing 
 | `provider_timeout` | 503 | External processing timed out. | Provider timed out while handling upload. | Yes | provider | Show retry button |
 | `event_publish_failed` | 500 | Upload finished with notification issues. | Event publish failed after persistence. | Yes | event | Show partial success warning |
 
-## 7. Retry Guidance / 重试建议 / 再試行ガイド
+## 8. Retry Guidance / 重试建议 / 再試行ガイド
 
 - Retryable errors should keep the current session state and allow safe retry.
 - Non-retryable validation errors should be fixed in the current form before retry.
 - Idempotency conflicts should use a new idempotency key only after the payload changes.
-

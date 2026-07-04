@@ -13,6 +13,7 @@ from app.models.document import (
     ImportBatch,
     Language,
 )
+from app.models.document_import import DocumentImportError, DocumentImportRecord, DocumentImportStatus
 from app.models.event import TaskEvent
 from app.models.persistence import (
     ApprovalEvent,
@@ -33,6 +34,9 @@ __all__ = [
     "DataImportStatus",
     "Document",
     "DocumentChunk",
+    "DocumentImportError",
+    "DocumentImportRecord",
+    "DocumentImportStatus",
     "DocumentMetadata",
     "DocumentSource",
     "DocumentStatus",

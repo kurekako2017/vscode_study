@@ -129,6 +129,8 @@ All document upload endpoints are frozen under `/api/v1`.
 - `POST /api/v1/documents` accepts `multipart/form-data` with `file` and `metadata`.
 - `POST /api/v1/documents` may include `Idempotency-Key` for future-safe retries.
 - Upload responses return a `DocumentUploadSession` snapshot that reflects the completed synchronous MVP upload.
+- `GET /api/v1/documents` keeps `next_cursor` as a planned pagination placeholder; `include_archived=true` or `status=archived` can expose archived documents.
+- `DELETE /api/v1/documents/{document_id}` is archive / soft delete, and archived documents remain readable.
 
 DocumentUploadSession:
 
@@ -152,6 +154,81 @@ Statuses:
 - Same key + same checksum returns the existing upload result.
 - Same key + different checksum returns `409 Conflict` with `idempotency_conflict`.
 - Future production should require `Idempotency-Key`.
+
+#### 4.5.8 `POST /api/v1/documents/{document_id}/import`
+
+Purpose:
+Run the document import pipeline for an already uploaded document and mark successful imports as validated.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `201 Created`:
+
+```json
+{
+  "import_id": "imp-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`201 Created`, `404 Not Found`, `409 Conflict`, `415 Unsupported Media Type`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `document_archived`, `unsupported_document_type`, `invalid_metadata`, `import_already_running`, `repository_error`, `internal_error`.
+
+Validation rules:
+- The document must already exist in the document repository.
+- Archived documents must not be imported.
+- Allowed import document types are `markdown`, `text`, `csv`, and `json`.
+- Planned-only types such as `pdf`, `word`, `excel`, and `image` return `unsupported_document_type`.
+- Successful import marks the document as `validated`.
+- Repeated import of the same document is deterministic and returns the same import record.
+
+Versioning rule:
+- Import semantics are frozen under `/api/v1`.
+
+Future approval relationship:
+- Import prepares the document for future chunking, retrieval, and approval, but does not create approval records.
+
+#### 4.5.9 `GET /api/v1/document-imports/{import_id}`
+
+Purpose:
+Read the status and error state of a previously created document import record.
+
+Request:
+
+- Path parameter: `import_id`
+
+Response `200 OK`:
+
+```json
+{
+  "import_id": "imp-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_import_not_found`, `repository_error`, `internal_error`.
+
+Versioning rule:
+- Import record reads are frozen under `/api/v1`.
 
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
@@ -183,6 +260,12 @@ Frozen error code families:
 - `validation_error`
 - `task_not_found`
 - `report_not_found`
+- `document_not_found`
+- `document_import_not_found`
+- `document_archived`
+- `import_already_running`
+- `unsupported_document_type`
+- `invalid_metadata`
 - `repository_error`
 - `provider_error`
 - `workflow_error`

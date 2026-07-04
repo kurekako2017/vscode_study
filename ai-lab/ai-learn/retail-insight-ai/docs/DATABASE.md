@@ -10,7 +10,7 @@
 - 当前已新增可选 PostgreSQL Repository
 - 当前已提供 `backend/db/schema.sql` 与 `backend/db/init.sql`
 - 当前已建 `approval_requests` / `approval_events` 表，但尚未接入审批 API
-- 当前仍只实现 Document Domain Model，不存在 Upload API 对应表结构
+- 当前仍只实现 Document Domain Model 与 InMemory Document Import MVP，不存在 PostgreSQL Import 表结构
 
 ## Target State
 
@@ -29,12 +29,14 @@
 - `document_chunks`
 - `document_sources`
 - `document_upload_sessions`
+- `document_imports`
 
 ## Planned
 
 - 当前已落地 PostgreSQL 表结构与 Task / Event / Report Repository
 - 当前文档继续作为 Import / Approval 扩展的设计输入
 - Document Upload 相关表只作为未来扩展边界，不表示已经实现 Upload API
+- Document Import 相关表只作为未来扩展边界，不表示已经实现 PostgreSQL Import API
 
 ## Runtime Rules
 
@@ -303,6 +305,24 @@
 | `created_at` | TIMESTAMPTZ | 创建时间 |
 | `updated_at` | TIMESTAMPTZ | 更新时间 |
 
+## document_imports
+
+### Purpose
+
+保存文档导入会话状态，支撑 Import Pipeline 的状态查询、重试与审计。
+
+### Planned Fields
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `import_id` | UUID / TEXT | 导入会话 ID |
+| `document_id` | UUID / TEXT | 关联 `documents.id` |
+| `status` | TEXT | `pending` / `running` / `completed` / `failed` |
+| `error_code` | TEXT NULL | 错误码 |
+| `error_message` | TEXT NULL | 错误说明 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `updated_at` | TIMESTAMPTZ | 更新时间 |
+
 ## Database ER Preparation
 
 ```mermaid
@@ -315,5 +335,6 @@ erDiagram
     DOCUMENTS ||--o{ DOCUMENT_SOURCES : has
     DOCUMENT_VERSIONS ||--o{ DOCUMENT_CHUNKS : has
     DOCUMENTS ||--o{ DOCUMENT_UPLOAD_SESSIONS : has
+    DOCUMENTS ||--o{ DOCUMENT_IMPORTS : has
     DOCUMENT_VERSIONS ||--o| APPROVAL_REQUESTS : future
 ```

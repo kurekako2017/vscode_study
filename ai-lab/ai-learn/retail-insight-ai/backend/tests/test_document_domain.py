@@ -166,7 +166,14 @@ class InMemoryDocumentRepositoryTest(unittest.TestCase):
         self.assertEqual(updated.content, "Updated document body")
 
         self.repository.delete("doc-100")
-        self.assertIsNone(self.repository.get("doc-100"))
+        archived = self.repository.get("doc-100")
+        self.assertIsNotNone(archived)
+        self.assertEqual(archived.status, DocumentStatus.ARCHIVED)
+
+        self.repository.delete("doc-100")
+        archived_again = self.repository.get("doc-100")
+        self.assertIsNotNone(archived_again)
+        self.assertEqual(archived_again.status, DocumentStatus.ARCHIVED)
 
     def test_repository_rejects_duplicate_checksum(self) -> None:
         first = self._build_document("doc-200", "sha256:dup-200")

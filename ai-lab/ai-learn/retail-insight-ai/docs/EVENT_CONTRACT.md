@@ -31,6 +31,11 @@ Document upload events are frozen as a separate family and do not replace task S
 - `document.upload.duplicate_detected`
 - `document.upload.started`
 - `document.upload.validated`
+- `document.archive.completed`
+- `document.import.started`
+- `document.import.validated`
+- `document.import.completed`
+- `document.import.failed`
 - `document.version.created`
 - `document.validation.failed`
 
@@ -109,6 +114,18 @@ After `error`, do not send `done`.
 - `document.validation.failed`: validation failed before the upload could complete.
 - `document.upload.started`: upload request accepted and validation began.
 - `document.upload.validated`: metadata, type, language, and checksum validation passed.
+- `document.archive.completed`: document was soft deleted and preserved for future reads.
+
+### 6.2 Document Import Event Semantics / 文档导入事件语义 / 文書インポートイベント意味
+
+- `document.import.started`: import request accepted and import session created.
+- `document.import.validated`: uploaded document passed import eligibility checks.
+- `document.import.completed`: document import completed and the document was marked as validated.
+- `document.import.failed`: document import failed before completion.
+
+Document import events must keep payloads secret-safe and document-centric.
+文档导入事件的 payload 必须安全且以文档为中心。
+文書インポートイベントの payload は安全で文書中心でなければなりません。
 
 Document upload events must keep payloads secret-safe and document-centric.
 文档上传事件的 payload 必须安全且以文档为中心。

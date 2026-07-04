@@ -138,6 +138,7 @@ Shared response rule:
 - Approval state is not embedded as an active workflow object in this freeze.
 - `chunks` remain a reserved future collection and may be empty until chunking is implemented.
 - Upload responses return a `DocumentUploadSession` snapshot that reflects the completed synchronous MVP upload.
+- List responses expose `next_cursor` as a planned pagination placeholder; it is not an implemented cursor-based pagination contract yet.
 
 DocumentUploadSession:
 
@@ -235,7 +236,7 @@ List uploaded documents with frozen metadata filters.
 
 Request:
 
-- Query parameters: `status`, `document_type`, `language`, `owner`, `tag`, `limit`, `cursor`.
+- Query parameters: `status`, `document_type`, `language`, `owner`, `tag`, `include_archived`, `limit`, `cursor`.
 
 Response `200 OK`:
 
@@ -255,6 +256,8 @@ Error codes:
 Validation rules:
 - `limit` must stay within the frozen pagination range.
 - Filters must use frozen enum values when supplied.
+- `cursor` is documented as a planned pagination placeholder and does not change response pagination yet.
+- Archived documents are excluded by default and can be included with `include_archived=true` or by setting `status=archived`.
 
 Versioning rule:
 - List semantics stay frozen under `/api/v1/documents`.
@@ -390,20 +393,26 @@ Response `202 Accepted`:
 
 ```json
 {
-  "document_id": "doc-123",
-  "status": "archived"
+  "success": true,
+  "request_id": "req-123",
+  "data": {
+    "document_id": "doc-123",
+    "status": "archived"
+  },
+  "error": null
 }
 ```
 
 Status codes:
-`202 Accepted`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+`202 Accepted`, `404 Not Found`, `500 Internal Server Error`.
 
 Error codes:
-`document_not_found`, `document_delete_conflict`, `document_validation_failed`, `repository_error`, `internal_error`.
+`document_not_found`, `repository_error`, `internal_error`.
 
 Validation rules:
 - Delete means archive / soft delete for the frozen contract.
 - Physical removal of version history is not part of this contract.
+- The operation is idempotent: archiving an already archived document still returns success.
 
 Versioning rule:
 - Deletion semantics must not break existing resource reads.
@@ -444,6 +453,81 @@ Error codes:
 Versioning rule:
 - Upload session semantics stay versioned together with `/api/v1/documents`.
 
+#### 4.5.8 `POST /api/v1/documents/{document_id}/import`
+
+Purpose:
+Run the document import pipeline for an already uploaded document and mark successful imports as validated.
+
+Request:
+
+- Path parameter: `document_id`
+
+Response `201 Created`:
+
+```json
+{
+  "import_id": "imp-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`201 Created`, `404 Not Found`, `409 Conflict`, `415 Unsupported Media Type`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`document_not_found`, `document_archived`, `unsupported_document_type`, `invalid_metadata`, `import_already_running`, `repository_error`, `internal_error`.
+
+Validation rules:
+- The document must already exist in the document repository.
+- Archived documents must not be imported.
+- Allowed import document types are `markdown`, `text`, `csv`, and `json`.
+- Planned-only types such as `pdf`, `word`, `excel`, and `image` return `unsupported_document_type`.
+- Successful import marks the document as `validated`.
+- Repeated import of the same document is deterministic and returns the same import record.
+
+Versioning rule:
+- Import semantics are frozen under `/api/v1`.
+
+Future approval relationship:
+- Import prepares the document for future chunking, retrieval, and approval, but does not create approval records.
+
+#### 4.5.9 `GET /api/v1/document-imports/{import_id}`
+
+Purpose:
+Read the status and error state of a previously created document import record.
+
+Request:
+
+- Path parameter: `import_id`
+
+Response `200 OK`:
+
+```json
+{
+  "import_id": "imp-123",
+  "document_id": "doc-123",
+  "status": "completed",
+  "created_at": "2026-07-04T12:34:56Z",
+  "updated_at": "2026-07-04T12:34:56Z",
+  "error_code": null,
+  "error_message": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`document_import_not_found`, `repository_error`, `internal_error`.
+
+Versioning rule:
+- Import record reads are frozen under `/api/v1`.
+
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
 - `200 OK`: successful read.
@@ -474,6 +558,12 @@ Frozen error code families:
 - `validation_error`
 - `task_not_found`
 - `report_not_found`
+- `document_not_found`
+- `document_import_not_found`
+- `document_archived`
+- `import_already_running`
+- `unsupported_document_type`
+- `invalid_metadata`
 - `repository_error`
 - `provider_error`
 - `workflow_error`

@@ -32,7 +32,6 @@ from pydantic import BaseModel, Field
 
 from app.models.document import (
     Document,
-    DocumentMetadata,
     DocumentSource,
     DocumentStatus,
     DocumentType,
@@ -122,6 +121,19 @@ class DocumentResponse(BaseModel):
         )
 
 
+class DocumentArchiveResponse(BaseModel):
+    """定义 DELETE /api/v1/documents/{document_id} 的归档响应。"""
+
+    document_id: str
+    status: DocumentStatus
+
+    @classmethod
+    def from_domain(cls, document: Document) -> "DocumentArchiveResponse":
+        """返回归档后的最小响应视图。"""
+
+        return cls(document_id=document.document_id, status=document.status)
+
+
 class DocumentListResponse(BaseModel):
     """定义 GET /api/v1/documents 的分页式响应合同。"""
 
@@ -136,6 +148,7 @@ class DocumentListResponse(BaseModel):
 
 
 __all__ = [
+    "DocumentArchiveResponse",
     "DocumentListResponse",
     "DocumentResponse",
     "DocumentSourceResponse",

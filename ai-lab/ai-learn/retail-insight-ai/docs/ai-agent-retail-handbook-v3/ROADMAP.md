@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Phase 4: Document Read API MVP Sync
+Phase 6: Document Import Pipeline MVP Sync
 
 当前状态：
 
@@ -210,6 +210,42 @@ multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repo
 ### Planned
 
 `DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
+
+## 1.14 Sprint 5 Document Archive API MVP
+
+### Current State
+
+主项目已进入 `DELETE /api/v1/documents/{document_id}` 的软删除实现阶段。
+
+### Target State
+
+完成文档归档删除的后端 MVP。
+
+### Result
+
+DELETE 语义冻结为 archive / soft delete，archived 文档保持可读，列表默认排除 archived。
+
+### Planned
+
+`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
+
+## 1.15 Sprint 6 Document Import Pipeline MVP
+
+### Current State
+
+主项目已进入 `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 的实现阶段。
+
+### Target State
+
+完成文档导入最小闭环，为 future chunking、RAG、全文检索和审批提供前置边界。
+
+### Result
+
+导入成功后，文档状态推进到 `validated`；导入失败时保留错误码与错误信息。
+
+### Planned
+
+`versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
 ## Definition of Done
 
