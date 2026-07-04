@@ -1,12 +1,100 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-04
+最后更新：2026-07-05
 
 ## 当前阶段
 
-Sprint 9.4: LLM Provider Seam Contract Freeze
+Sprint 11.1: Enterprise Security Foundation Contract Freeze
+
+### Future Sprint Checklist
+
+- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 ## 当前最高优先级任务
+
+### Sprint Result
+
+- [x] user / organization / department / role / permission / policy concepts frozen
+- [x] GET /api/v1/users/me, GET /api/v1/security/roles, GET /api/v1/security/permissions, GET /api/v1/audit-logs contract frozen
+- [x] RBAC approval-action matrix frozen
+- [x] audit log contract and operation log contract frozen
+- [x] future authentication relationship documented
+- [x] docs updated: API_CONTRACT / EVENT_CONTRACT / ERROR_CATALOG / ARCHITECTURE / DATABASE / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror
+- [x] backend / frontend / scripts untouched
+
+### Boundary
+
+- 当前实现仍然只停留在 docs contract freeze，不修改 backend、frontend 或 scripts。
+- 当前 security foundation 只是未来 RBAC / audit 的契约边界，不代表已实现身份系统。
+- 不改变现有 document retrieval、internal RAG 或 approval API response contract。
+
+## Sprint 10.2: Approval API MVP Implementation
+
+### Sprint Result
+
+- [x] POST /api/v1/reports/{task_id}/submit-approval implemented
+- [x] GET /api/v1/approvals implemented
+- [x] GET /api/v1/approvals/{approval_id} implemented
+- [x] POST /api/v1/approvals/{approval_id}/approve implemented
+- [x] POST /api/v1/approvals/{approval_id}/reject implemented
+- [x] POST /api/v1/reports/{task_id}/revise implemented
+- [x] immutable report version snapshot model added
+- [x] ApprovalRequest / ApprovalEvent domain models added
+- [x] InMemory approval repository added
+- [x] approval submitted / approved / rejected / revised / failed events emitted
+- [x] approval API tests added for success and error paths
+- [x] backend full suite and compileall pending verification
+
+### Boundary
+
+- 当前实现仍只在 backend 生效，不修改 frontend 或 scripts。
+- 当前 approval workflow 依赖 frozen contract，但已进入 MVP implementation。
+- 不改变现有 report / retrieval / internal RAG response contract。
+
+## Sprint 10.1: Approval Workflow Contract Freeze
+
+### Sprint Result
+
+- [x] approval domain model frozen
+- [x] approval API contract frozen
+- [x] approval event contract frozen
+- [x] approval error catalog frozen
+- [x] approval state transition rules frozen
+- [x] report revision relationship / audit relationship / future RBAC relationship documented
+- [x] docs updated: API_CONTRACT / EVENT_CONTRACT / ERROR_CATALOG / ARCHITECTURE / DATABASE / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror
+- [x] backend / frontend / scripts untouched
+
+### Current State
+
+- Approval workflow is contract-only.
+- Report revisions remain immutable snapshots.
+
+### Target State
+
+- Future Approval API can be implemented without changing report / retrieval / internal RAG boundary.
+
+### Planned
+
+- Keep this phase doc-only.
+- Implementation must wait for a later backend sprint.
+
+## Sprint 9.5: LLM Provider Seam Stub MVP
+
+### Current State
+
+- Internal RAG 仍然默认走 deterministic extractive path。
+- `StubLLMProvider` 已接入 `RAGAnswerGenerator`，但只有在 `INTERNAL_RAG_USE_LLM=true` 时才会使用。
+
+### Target State
+
+- 未来真实 LLM provider 可以替换 stub provider，而不改变 API contract 或 retrieval boundary。
+
+### Planned
+
+- 继续保持 deterministic fallback 为默认路径。
+- 未来若接入真实 provider，只允许替换 provider 实现，不允许改动 internal RAG response contract。
+
+## Sprint 9.4: LLM Provider Seam Contract Freeze
 
 ### Sprint Result
 

@@ -498,6 +498,105 @@
 - `docs/ARCHITECTURE.md` 冻结 optional LLM provider flow、fallback flow 与 token/cost/latency tracking placeholders。
 - `POST /api/v1/internal-rag/answer` 的 response 结构保持不变，当前仍以 deterministic extractive mode 为默认实现。
 
+## ADR-025
+
+日期：2026-07-04
+
+决策：在已冻结的 LLM provider seam 上落地 StubLLMProvider + RAGAnswerGenerator MVP，并通过 `LLM_PROVIDER=stub` 和 `INTERNAL_RAG_USE_LLM=false` 控制默认仍然走 deterministic fallback。
+
+原因：当前阶段需要验证 provider seam 的实际代码路径、容错逻辑和 usage placeholder 记录，但仍不能接入真实模型或外部 API。Stub provider 可以让测试验证 seam，同时不改变 internal RAG 的 frozen response contract。
+
+备选方案：
+
+- 直接接真实 LLM provider；该方案不符合当前 no-external-API 约束。
+- 只保留 contract freeze，不实现 seam；该方案无法验证 fallback、usage placeholder 和 provider path。
+
+影响：
+
+- `backend/app/providers/` 新增 `LLMProvider` 协议和 `StubLLMProvider`。
+- `backend/app/services/rag_answer_generator.py` 成为 answer assembly seam。
+- `backend/app/config/settings.py` 新增 `llm_provider` / `internal_rag_use_llm` 配置。
+- `backend/tests/test_rag_answer_generator.py` 覆盖默认 deterministic、stub provider、timeout fallback、invalid output fallback、usage placeholder。
+- `docs/ARCHITECTURE.md` 需要记录 Stub LLM Provider Flow 与 fallback behavior。
+
+## ADR-026
+
+日期：2026-07-04
+
+决策：先冻结 Approval Workflow contract，再进入 Approval API 实现阶段，并把 report revision、audit 和 future RBAC 关系写入架构与数据库准备文档。
+
+原因：Approval Workflow 会直接影响 report 版本、审计轨迹和后续权限控制。如果不先冻结 API、event、error 和 state machine，后续实现会在 report revision、audit 与 RBAC 之间反复变更。
+
+备选方案：
+
+- 先实现 Approval API 再补 contract；该方案会让状态机、事件和错误码在前后端之间漂移。
+- 继续只保留 report `generated`；该方案无法承接企业阶段的审核与发布边界。
+
+影响：
+
+- `docs/API_CONTRACT.md` 新增 `/api/v1/reports/{task_id}/submit-approval`、`/api/v1/approvals`、`/api/v1/approvals/{approval_id}`、`/api/v1/approvals/{approval_id}/approve`、`/api/v1/approvals/{approval_id}/reject`、`/api/v1/reports/{task_id}/revise`。
+- `docs/EVENT_CONTRACT.md` 新增 `approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
+- `docs/ERROR_CATALOG.md` 新增 approval workflow error section。
+- `docs/ARCHITECTURE.md` 与 `docs/DATABASE.md` 记录 report revision relationship、audit relationship 与 future RBAC relationship。
+- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录。
+
+## ADR-027
+
+日期：2026-07-04
+
+决策：将人类可读项目文档的语言策略冻结为三语标准：English、中文（简体）、日本語。
+
+原因：本项目既要服务英文执行稳定性，又要服务中文教学与日本语项目语境。若文档长期混用单语或多处只写英文，后续治理文档、架构图、错误目录和工作流说明会更容易被误读。
+
+备选方案：
+
+- 继续允许任意单语写法；该方案会降低教学可读性和跨语种一致性。
+- 只要求部分文档三语；该方案会让冻结文档与一般文档之间出现解释断层。
+
+影响：
+
+- `docs/MASTER_PROMPT.md`、`docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md` 冻结文档语言政策。
+- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 同步记录该规则。
+- English-only 仅允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes、event names。
+- 后续新增文档必须先检查三语一致性，再进入评审。
+
+## ADR-028
+
+日期：2026-07-05
+
+决策：Approval Workflow contract 冻结后，先实现 backend-only Approval API MVP，使用 InMemory approval repository、immutable report version snapshot 和 ApprovalService 作为当前实现边界。
+
+原因：审批 contract 已冻结，但仍需要真实验证 report revision、audit event、拒绝原因和 revision snapshot 的关系，且不能把 RBAC、外部 workflow engine 或前端改动提前引入。
+
+备选方案：继续停留在 contract freeze；该方案无法验证审批状态机与版本边界的真实运行路径。
+
+影响：
+
+- `POST /api/v1/reports/{task_id}/submit-approval`、`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}`、`POST /api/v1/approvals/{approval_id}/approve`、`POST /api/v1/approvals/{approval_id}/reject`、`POST /api/v1/reports/{task_id}/revise` 进入 backend MVP。
+- 审批历史与 report version 事实层保持可替换，后续可演进到 PostgreSQL repository。
+- `docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现结果。
+- Approval API / Approval Events / Approval Errors / Approval Architecture sections were checked for trilingual coverage and supplemented where English-only prose remained.
+
+## ADR-029
+
+日期：2026-07-05
+
+决策：先冻结企业安全基础合同，再进入 RBAC / Audit / Authentication 的 backend 实现阶段，并把用户、组织、部门、角色、权限与策略写入架构与数据库准备文档。
+
+原因：企业安全能力会直接影响审批、审计和未来身份接入。如果不先冻结 `users/me`、`security/roles`、`security/permissions`、`audit-logs`、权限模型和审计契约，后续实现会在授权边界和审计事实之间反复变更。
+
+备选方案：
+
+- 先实现 RBAC 再补 contract；该方案会让角色、权限和审计边界在前后端之间漂移。
+- 继续只依赖隐式权限判断；该方案无法承接企业审计和审批治理要求。
+
+影响：
+
+- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 冻结企业安全基础合同。
+- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该冻结。
+- 后续 RBAC 实现必须沿用 frozen role / permission names 和 audit log contract，不能重新命名。
+- English-only 仍只允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

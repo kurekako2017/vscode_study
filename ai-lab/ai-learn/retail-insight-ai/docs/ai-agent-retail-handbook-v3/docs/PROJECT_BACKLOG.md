@@ -1,6 +1,6 @@
 # 项目总待办清单
 
-最后更新：2026-07-04
+最后更新：2026-07-05
 
 ## 项目目标
 
@@ -8,20 +8,63 @@
 
 ## 当前阶段
 
-Sprint 9.4: LLM Provider Seam Contract Freeze
+Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
 状态：已完成
 
-### Sprint 9.4: LLM Provider Seam Contract Freeze
+### Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
-- [x] `LLMProvider` interface concept frozen
-- [x] `RAGAnswerGenerator` concept frozen
-- [x] prompt input/output contract frozen for future model-backed answers
-- [x] provider error model frozen for unavailable / timeout / invalid output / citation missing / cost limit cases
-- [x] deterministic extractive fallback remains the current default
-- [x] token / cost / latency tracking placeholders documented
-- [x] handbook architecture / prompt / design / error docs updated
-- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS synchronized
+- [x] user / organization / department / role / permission / policy concepts frozen
+- [x] GET /api/v1/users/me contract frozen
+- [x] GET /api/v1/security/roles contract frozen
+- [x] GET /api/v1/security/permissions contract frozen
+- [x] GET /api/v1/audit-logs contract frozen
+- [x] RBAC approval-action matrix frozen
+- [x] audit log contract and operation log contract frozen
+- [x] future authentication relationship documented
+- [x] docs and handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Sprint 10.2: Approval API MVP Implementation
+
+- [x] POST /api/v1/reports/{task_id}/submit-approval implemented
+- [x] GET /api/v1/approvals implemented
+- [x] GET /api/v1/approvals/{approval_id} implemented
+- [x] POST /api/v1/approvals/{approval_id}/approve implemented
+- [x] POST /api/v1/approvals/{approval_id}/reject implemented
+- [x] POST /api/v1/reports/{task_id}/revise implemented
+- [x] immutable report version snapshot model added
+- [x] ApprovalRequest / ApprovalEvent domain models added
+- [x] InMemory approval repository added
+- [x] approval events emitted and backend tests added
+- [x] docs and handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Sprint 10.1: Approval Workflow Contract Freeze
+
+- [x] approval domain model frozen
+- [x] approval API contract frozen
+- [x] approval event contract frozen
+- [x] approval error catalog frozen
+- [x] approval state transition rules frozen
+- [x] report revision relationship / audit relationship / future RBAC relationship documented
+- [x] docs and handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Sprint 9.5: LLM Provider Seam Stub MVP
+
+- [x] `StubLLMProvider` added as the local no-external-API provider implementation
+- [x] `RAGAnswerGenerator` now routes through an optional provider seam
+- [x] `LLM_PROVIDER=stub` and `INTERNAL_RAG_USE_LLM=false` defaults added
+- [x] provider failure / timeout / invalid output fallback to deterministic answer
+- [x] usage / cost / latency placeholder model recorded internally
+- [x] default deterministic path remains unchanged
+- [x] backend tests added for default path, stub path, fallback, invalid output, and usage placeholders
+- [x] backend full suite and compileall pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
 - [x] handbook / backend / frontend / scripts boundary unchanged
 
 ## Epic 0: Enterprise Platform Architecture Evolution
@@ -38,7 +81,12 @@ Sprint 9.4: LLM Provider Seam Contract Freeze
 
 ### Planned Tasks
 
+- [x] Sprint 10.2 Approval API MVP Implementation
+- [x] Sprint 10.1 Approval Workflow Contract Freeze
+- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Sprint 9.5 LLM Provider Seam Stub MVP
 - [x] Sprint 9.4 LLM Provider Seam Contract Freeze
+- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 - [ ] Architecture Freeze
 - [ ] Directory Refactor
 - [ ] Repository Abstraction

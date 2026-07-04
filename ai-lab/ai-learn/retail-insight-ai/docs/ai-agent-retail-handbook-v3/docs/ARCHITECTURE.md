@@ -4,6 +4,10 @@
 
 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。
 
+Human-readable architecture explanations are trilingual by default.
+本文件中的人类可读架构说明默认采用三语。
+本書の人間向けアーキテクチャ説明は三言語を標準とします。
+
 ## Engineering Standards Freeze
 
 ### Current State
@@ -860,6 +864,59 @@ flowchart TD
 - Internal RAG itself does not create approval state.
 - Approval remains a separate future API and must not be implied by answer success.
 
+## Sprint 9.5 LLM Provider Seam Stub MVP
+
+### Current State
+
+- Internal RAG 仍然默认走 deterministic extractive path。
+- `StubLLMProvider` 已接入 `RAGAnswerGenerator`，但只有在 `INTERNAL_RAG_USE_LLM=true` 时才会使用。
+- 当前不调用 OpenAI、Azure 或任何外部 API，不引入真实 LLM dependency。
+
+### Target State
+
+- 未来真实 LLM provider 可以替换 stub provider，而不改变 retrieval contract、citation contract 或 API contract。
+- usage / cost / latency placeholder 记录只用于内部事件和日志，不暴露为 API response 字段。
+
+### Result
+
+- `StubLLMProvider`、`RAGAnswerGenerator`、`LLM_PROVIDER=stub`、`INTERNAL_RAG_USE_LLM=false` 默认值已落地。
+- provider failure / timeout / invalid output / missing citation 都会回退到 deterministic answer。
+- backend full suite 与 compileall 已通过。
+
+### Planned
+
+- 继续保持 deterministic fallback 为默认路径。
+- 未来若接入真实 provider，只允许替换 provider 实现，不允许改动 internal RAG response contract。
+
+## Stub LLM Provider Flow
+
+```mermaid
+flowchart TD
+    A[Internal RAG request] --> B[RAGAnswerGenerator]
+    B --> C{INTERNAL_RAG_USE_LLM?}
+    C -->|no| D[Deterministic answer]
+    C -->|yes| E[StubLLMProvider]
+    E --> F{output valid?}
+    F -->|yes| G[Use stub answer]
+    F -->|no| D
+    E --> H[Usage placeholders]
+    H --> G
+```
+
+## Usage Placeholder Flow
+
+```mermaid
+flowchart TD
+    A[StubLLMProvider] --> B[prompt_tokens]
+    A --> C[completion_tokens]
+    A --> D[estimated_cost]
+    A --> E[latency_ms]
+    B --> F[Internal events/logs]
+    C --> F
+    D --> F
+    E --> F
+```
+
 ## Sprint 9.4 LLM Provider Seam Contract Freeze
 
 ### Current State
@@ -1123,14 +1180,225 @@ flowchart LR
 
 ### Current State
 
-- 当前 handbook 只记录了 Phase 1 文件输入
-- 当前还未完整记录 Import Error Model 和扩展后的审批状态机
+- 当前 handbook 已记录 Phase 1 文件输入、Import Error Model 和 Approval Workflow contract freeze
+- 当前仍然没有 Approval API 实现，只有 contract boundary
 
 ### Planned
 
 - Data Contract 作为文件输入单一来源
 - Import Error Model 作为未来导入失败单一来源
 - Approval State Machine 作为未来承認ワークフロー单一来源
+
+## Sprint 10.1 Approval Workflow Contract Freeze
+
+### Current State
+
+- Approval workflow 已有 backend-only MVP，但仍然必须遵守 frozen contract。
+- 当前 report revision 仍然是 immutable snapshot boundary。
+
+中文（简体）：
+审批工作流现在已经有 backend MVP，但仍然以冻结 contract 为边界。当前实现的关键是把审批记录、审计事件和 report revision snapshot 分开，不允许把可变正文当成审批事实。
+
+日本語：
+承認ワークフローは backend MVP まで実装済みですが、境界は凍結済み契約のままです。承認記録、監査イベント、report revision snapshot を分離し、可変本文を承認事実として扱わないことが重要です。
+
+### Target State
+
+- Future Approval API 可以在不修改 report / retrieval / internal RAG contract 的情况下实现。
+
+### Result
+
+- approval domain model、API contract、event contract、error catalog 和 state machine 已冻结。
+- report revision relationship、audit relationship、future RBAC relationship 已写入 handbook 架构层。
+- backend-only Approval API MVP 已落地。
+
+中文（简体）：
+这个结果表示“契约已冻结，代码已落地”。后续只能沿用相同的审批状态语义继续演进，不能把前端、RBAC 或外部 workflow engine 直接塞进当前边界。
+
+日本語：
+この結果は「契約は凍結済みで、コードも実装済み」という意味です。今後は同じ状態意味を保ったまま拡張し、frontend、RBAC、外部 workflow engine を直接混ぜ込んではいけません。
+
+### Planned
+
+- 后续 Approval API 只允许复用当前冻结的状态语义。
+- 未来 RBAC 只能约束权限，不能改变已冻结的状态转移规则。
+
+## Sprint 11.1 Enterprise Security Foundation Contract Freeze / 企业安全基础合同冻结 / エンタープライズセキュリティ基盤契約凍結
+
+### Current State
+
+- 当前没有实现 RBAC、认证服务或 Audit API。
+- 当前 Approval API、Retrieval API 和 Internal RAG 仍只依赖既有 backend service boundary。
+- 当前 security model 仍然是 contract-only，不能被解释为已上线的身份系统。
+
+中文（简体）：
+这一阶段先把企业安全基础的概念层冻结下来，再谈实现。我们只冻结用户、组织、部门、角色、权限、策略、审计日志和操作日志的语义，不提前引入真实认证或 RBAC 服务。
+
+日本語：
+この段階では、企業セキュリティ基盤の概念層を先に凍結します。ユーザー、組織、部署、ロール、権限、ポリシー、監査ログ、操作ログの意味だけを固定し、実認証や RBAC サービスはまだ導入しません。
+
+### Target State
+
+- `GET /api/v1/users/me` provides the authenticated principal snapshot.
+- `GET /api/v1/security/roles` provides the frozen role catalog.
+- `GET /api/v1/security/permissions` provides the frozen permission catalog.
+- `GET /api/v1/audit-logs` provides append-only audit facts and the operation log projection.
+- RBAC approval-action matrix is fixed before backend implementation.
+
+### Result
+
+- User / organization / department / role / permission / policy concepts are frozen as documentation-level domain models.
+- Security API contracts are frozen for future implementation without changing existing document, retrieval, RAG, or approval response shapes.
+- Audit log contract and operation log contract are defined as read-only, append-only facts.
+
+### Planned
+
+- Later backend work may implement authentication middleware, RBAC enforcement, and audit append paths.
+- The current contract only freezes the read surface and the approval-action matrix.
+- Future implementation must preserve the frozen permission names and event names.
+
+## Enterprise Security Overview
+
+### Security Domain Model
+
+- `user` belongs to one `organization` and one `department`.
+- `role` groups permissions for a job function or operational responsibility.
+- `permission` names one stable action.
+- `policy` resolves whether a role may perform an action on a resource.
+- `audit log` is append-only and read-only.
+- `operation log` is the operator-facing projection of audit facts.
+
+### RBAC Approval-Action Matrix
+
+| Action | Permission | Default Roles |
+|---|---|---|
+| `GET /api/v1/users/me` | authenticated identity | all authenticated users |
+| `GET /api/v1/security/roles` | `system.admin` | admin |
+| `GET /api/v1/security/permissions` | `system.admin` | admin |
+| `GET /api/v1/audit-logs` | `audit.read` | auditor, admin |
+| `POST /api/v1/reports/{task_id}/submit-approval` | `report.submit_approval` | analyst, manager, admin |
+| `GET /api/v1/approvals` | `approval.review` | approver, manager, auditor, admin |
+| `GET /api/v1/approvals/{approval_id}` | `approval.review` | approver, manager, auditor, admin |
+| `POST /api/v1/approvals/{approval_id}/approve` | `approval.approve` | approver, manager, admin |
+| `POST /api/v1/approvals/{approval_id}/reject` | `approval.reject` | approver, manager, admin |
+| `POST /api/v1/reports/{task_id}/revise` | `approval.revise` | analyst, manager, approver, admin |
+
+### Audit Log Contract
+
+- Audit logs are append-only facts and are safe to read after the originating operation is archived.
+- Audit log records must include actor, resource, result, request_id, trace_id, timestamp, and a secret-safe metadata payload.
+- Operation logs are a projection of the same facts for human review and support workflows.
+- Audit failures must not leak sensitive input, and they must preserve the failure error code.
+
+### Future Authentication Flow
+
+```mermaid
+flowchart LR
+    A[Identity Provider] --> B[Authentication Middleware]
+    B --> C[Authenticated Principal]
+    C --> D[RBAC Policy Resolver]
+    D --> E[API / Service Boundary]
+    E --> F[Audit Log Writer]
+```
+
+### RBAC Flow
+
+```mermaid
+flowchart TD
+    A[User] --> B[Role Assignment]
+    B --> C[Permission Resolution]
+    C --> D{Allowed?}
+    D -->|yes| E[Proceed]
+    D -->|no| F[permission_denied]
+```
+
+### Approval Permission Flow
+
+```mermaid
+flowchart TD
+    A[Approval Action] --> B[Policy Check]
+    B --> C{Permission Matched?}
+    C -->|yes| D[Approval API]
+    C -->|no| E[forbidden / permission_denied]
+```
+
+### Audit Log Flow
+
+```mermaid
+flowchart TD
+    A[Business Action] --> B[Audit Fact]
+    B --> C[Append-only Store]
+    C --> D[Audit Log API]
+    C --> E[Operation Log Projection]
+```
+
+### Future Authentication Flow Notes
+
+- Authentication is a future seam, not a current implementation dependency.
+- RBAC consumes the authenticated principal after the identity provider is introduced.
+- Audit logging must remain available as a read model even before the authentication seam ships.
+
+## Approval Workflow Model
+
+```mermaid
+flowchart TD
+    A[generated] --> B[draft]
+    B --> C[pending_approval]
+    C --> D[approved]
+    C --> E[rejected]
+    E --> F[revised]
+    D --> F
+    F --> C
+    D --> G[published]
+    G --> H[archived]
+```
+
+## Report Revision Flow
+
+```mermaid
+flowchart LR
+    A[approved or rejected snapshot] --> B[Create Revision]
+    B --> C[new immutable version]
+    C --> D[revised]
+    D --> E[pending_approval]
+```
+
+## Approval Event Flow
+
+```mermaid
+flowchart TD
+    A[submit-approval] --> B[approval.submitted]
+    B --> C[approve]
+    B --> D[reject]
+    C --> E[approval.approved]
+    D --> F[approval.rejected]
+    F --> G[revise]
+    G --> H[approval.revised]
+    E --> I[publish]
+    I --> J[approval.published]
+```
+
+## Approval + Audit Flow
+
+```mermaid
+flowchart TD
+    A[Approval API] --> B[approval_requests]
+    A --> C[approval_events]
+    C --> D[audit trail]
+    B --> E[report_version_id]
+    E --> F[report_versions]
+    F --> D
+```
+
+## Future RBAC Integration Flow
+
+```mermaid
+flowchart TD
+    A[Identity Provider] --> B[Role / Permission Check]
+    B --> C[Approval API]
+    C --> D[submit / approve / reject / revise]
+    B -->|deny| E[authorization rejected]
+```
 
 ## Approval State Machine
 

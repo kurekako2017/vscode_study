@@ -13,16 +13,21 @@ from app.models.document import (
     ImportBatch,
     Language,
 )
-from app.models.internal_rag import InternalRagEvaluationResult, InternalRagWarning
+from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
+from app.models.internal_rag import (
+    InternalRagEvaluationResult,
+    InternalRagWarning,
+    LLMUsageMetrics,
+    RAGAnswerGenerationResult,
+    RAGFallbackReason,
+    RAGPromptContext,
+)
 from app.models.document_import import DocumentImportError, DocumentImportRecord, DocumentImportStatus
 from app.models.event import TaskEvent
 from app.models.persistence import (
-    ApprovalEvent,
-    ApprovalRequest,
     DataImport,
     DataImportStatus,
     ImportErrorRecord,
-    ReportVersion,
 )
 from app.models.report import Report, ReportStatus
 from app.models.task import Task, TaskStatus
@@ -47,12 +52,16 @@ __all__ = [
     "ImportBatch",
     "InternalRagEvaluationResult",
     "InternalRagWarning",
+    "LLMUsageMetrics",
     "KPIResult",
     "Language",
     "ResearchResult",
     "Report",
     "ReportStatus",
     "ReportVersion",
+    "RAGAnswerGenerationResult",
+    "RAGFallbackReason",
+    "RAGPromptContext",
     "Task",
     "TaskEvent",
     "TaskStatus",

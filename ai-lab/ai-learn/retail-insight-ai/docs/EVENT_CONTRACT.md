@@ -6,6 +6,10 @@ This document freezes SSE event envelope rules.
 本文件冻结 SSE 事件封装规范。
 本書は SSE イベントの封筒規約を凍結します。
 
+Human-readable explanations in this document are trilingual by default.
+本文件中的人类可读说明默认采用三语。
+本書の人間向け説明は三言語を標準とします。
+
 ## 2. Current Event Families / 当前事件族 / 現在イベント種別
 
 - `started`
@@ -46,6 +50,16 @@ Document upload events are frozen as a separate family and do not replace task S
 - `internal_rag.retrieval_completed`
 - `internal_rag.answer_generated`
 - `internal_rag.failed`
+- `approval.submitted`
+- `approval.approved`
+- `approval.rejected`
+- `approval.revised`
+- `approval.published`
+- `approval.failed`
+- `security.role.assigned`
+- `security.permission.denied`
+- `audit.log.created`
+- `audit.log.failed`
 - `document.version.created`
 - `document.validation.failed`
 
@@ -171,6 +185,42 @@ Document retrieval events must keep payloads secret-safe and document-centric.
 Internal RAG events must keep payloads secret-safe, citation-aware, and document-centric.
 内部 RAG 事件的 payload 必须安全、可追溯并以文档为中心。
 内部 RAG イベントの payload は安全で、追跡可能で、文書中心でなければなりません。
+
+### 6.6 Approval Workflow Event Semantics / 审批工作流事件语义 / 承認ワークフローイベント意味
+
+- `approval.submitted`: report version entered `pending_approval`.
+- `approval.approved`: approval decision granted for the frozen report version.
+- `approval.rejected`: approval decision denied and rejection reason recorded.
+- `approval.revised`: a new immutable report revision was created from an earlier snapshot.
+- `approval.published`: approved report was promoted to business-confirmed published output.
+- `approval.failed`: approval workflow failed before completion.
+
+中文（简体）：
+这些事件描述审批流程的关键状态变化：提交、通过、拒绝、修订、发布和失败。事件载荷必须同时满足审计可追踪和报告版本可回放的要求。
+
+日本語：
+これらのイベントは、承認フローの主要な状態変化を表します。submit / approve / reject / revise / publish / failed を区別し、payload は監査追跡とレポート版の再現性を満たす必要があります。
+
+Approval workflow events must keep payloads secret-safe, audit-safe, and report-version aware.
+审批工作流事件的 payload 必须安全、可审计并且感知报告版本。
+承認ワークフローイベントの payload は安全で、監査可能で、レポート版を意識したものでなければなりません。
+
+### 6.7 Enterprise Security Event Semantics / 企业安全事件语义 / 企業セキュリティイベント意味
+
+- `security.role.assigned`: a role binding changed for a user or identity snapshot.
+- `security.permission.denied`: a permission check failed and the request was rejected.
+- `audit.log.created`: an append-only audit entry was successfully stored.
+- `audit.log.failed`: an audit entry could not be persisted.
+
+中文（简体）：
+企业安全事件只记录“谁被赋予什么角色”“哪一次权限检查被拒绝”“哪一条审计事实被写入或失败”。这些事件不携带敏感正文，只承载身份、权限和审计元数据。
+
+日本語：
+企業セキュリティイベントは、「誰にどの役割が付与されたか」「どの権限チェックが拒否されたか」「どの監査事実が保存されたか／失敗したか」だけを記録します。機密本文は含めず、身份・権限・監査メタデータのみを運びます。
+
+Enterprise security events must stay secret-safe, identity-aware, and audit-friendly.
+企业安全事件的 payload 必须安全、感知身份并适合审计。
+企業セキュリティイベントの payload は安全で、identity-aware かつ監査に適したものでなければなりません。
 
 ## 7. Versioning Rules / 版本规则 / バージョン規則
 

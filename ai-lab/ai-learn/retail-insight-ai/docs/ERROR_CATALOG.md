@@ -6,6 +6,10 @@ This file freezes document upload related error codes and their operator-facing 
 本文件冻结文档上传相关错误码与面向用户的处理方式。
 本書は文書アップロード関連のエラーコードと利用者向け挙動を凍結します。
 
+Human-readable explanations in this catalog are trilingual by default.
+本目录中的人类可读说明默认采用三语。
+本カタログの人間向け説明は三言語を標準とします。
+
 ## 2. Key Terms / 关键术语 / 主要用語
 
 | English | 中文（简体） | 日本語 |
@@ -95,7 +99,48 @@ This file freezes document upload related error codes and their operator-facing 
 | `provider_timeout` | 503 | Answer generation timed out. | Provider timed out while assembling the answer. | Yes | internal_rag | Show retry button |
 | `repository_error` | 500 | Answer storage error. | Repository operation failed during RAG flow. | Yes | internal_rag | Show retry and support hint |
 
-## 11. Future LLM Provider Errors / 未来 LLM 提供器错误 / 将来の LLM プロバイダーエラー
+## 11. Approval Workflow Errors / 审批工作流错误 / 承認ワークフローエラー
+
+These error codes are frozen for the approval workflow contract and the report revision relationship.
+
+中文（简体）：
+这组错误码固定给审批工作流与报告修订关系使用。它们区分“未找到”“状态冲突”“缺少拒绝原因”和“修订冲突”，便于前端与运维按稳定语义处理。
+
+日本語：
+このエラーコード群は承認ワークフローとレポート修正版の関係専用です。未検出、状態競合、拒否理由不足、修正版競合を区別し、UI と運用が安定した意味で扱えるようにします。
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `approval_not_found` | 404 | Approval record not found. | Requested approval_id does not exist. | No | approval | Show not found screen |
+| `approval_required` | 409 | Approval is required before publishing. | The report cannot be published until approval completes. | No | approval | Show approval required state |
+| `approval_already_submitted` | 409 | Approval was already submitted. | The current report version already has a pending approval. | No | approval | Show pending approval state |
+| `approval_already_decided` | 409 | Approval was already decided. | The approval record already has a final decision. | No | approval | Show final state badge |
+| `approval_rejected` | 409 | The report was rejected. | The report version is blocked by a rejection decision. | No | approval | Show rejected state |
+| `invalid_approval_state` | 409 | Approval state is invalid. | The requested transition is not allowed by the frozen state machine. | No | approval | Show refresh and state hint |
+| `missing_rejection_reason` | 422 | Rejection reason is required. | Reject request omitted the frozen reason field. | No | approval | Highlight reason field |
+| `report_not_found` | 404 | Report not found. | Requested task_id or report record does not exist. | No | approval | Show not found screen |
+| `report_revision_conflict` | 409 | Report revision conflict. | The report cannot be revised from the current frozen state. | Maybe | approval | Show refresh and revision hint |
+
+## 12. Enterprise Security Errors / 企业安全错误 / 企業セキュリティエラー
+
+These error codes are frozen for the future security foundation contract.
+
+中文（简体）：
+这一组错误码固定给未来的身份、权限和审计读取合同使用。它们分别覆盖未认证、无权限、角色无效、角色不存在和审计写入失败的边界。
+
+日本語：
+このエラーコード群は、将来の認証・認可・監査読み取り契約専用です。未認証、権限不足、ロール無効、ロール未検出、監査書き込み失敗を区別します。
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `unauthorized` | 401 | You must sign in first. | Request lacks a valid authenticated principal. | No | security | Show sign-in prompt |
+| `forbidden` | 403 | You do not have access. | Authenticated principal lacks access to the resource. | No | security | Show access denied screen |
+| `permission_denied` | 403 | This action is not permitted. | RBAC policy denied the requested action. | No | security | Show permission denied warning |
+| `role_not_found` | 404 | Role not found. | Requested role does not exist in the frozen catalog. | No | security | Show role not found state |
+| `invalid_role` | 422 | Role is invalid. | Role value is not part of the frozen role model. | No | security | Highlight role selector |
+| `audit_log_failed` | 500 | Audit record could not be saved. | Audit log append failed. | Yes | security | Show retry and support hint |
+
+## 13. Future LLM Provider Errors / 未来 LLM 提供器错误 / 将来の LLM プロバイダーエラー
 
 These error codes are frozen for the future LLM provider seam. The current deterministic path does not emit them yet.
 
@@ -107,7 +152,7 @@ These error codes are frozen for the future LLM provider seam. The current deter
 | `llm_citation_missing` | 422 | Citations are required. | LLM answer omitted required grounded citations. | Maybe | llm_provider | Fall back to deterministic mode or request regeneration |
 | `llm_cost_limit_exceeded` | 429 | Answer generation budget exceeded. | Token or cost ceiling was reached before completion. | Maybe | llm_provider | Fall back to deterministic mode or stop generation |
 
-## 12. Internal RAG Warnings / 内部 RAG 警告 / 社内 RAG 警告
+## 14. Internal RAG Warnings / 内部 RAG 警告 / 社内 RAG 警告
 
 The following values are warning signals for internal RAG quality and do not represent new HTTP error codes:
 
@@ -115,7 +160,7 @@ The following values are warning signals for internal RAG quality and do not rep
 - `missing_citation`: at least one answer excerpt could not be grounded to a valid citation.
 - `weak_match`: citation grounding exists, but the match quality is weak.
 
-## 13. Retry Guidance / 重试建议 / 再試行ガイド
+## 15. Retry Guidance / 重试建议 / 再試行ガイド
 
 - Retryable errors should keep the current session state and allow safe retry.
 - Non-retryable validation errors should be fixed in the current form before retry.

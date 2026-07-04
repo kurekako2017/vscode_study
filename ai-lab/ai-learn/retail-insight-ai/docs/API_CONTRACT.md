@@ -6,6 +6,10 @@ This document freezes HTTP API rules for `Retail Insight AI`.
 本文件冻结 `Retail Insight AI` 的 HTTP API 规范。
 本書は `Retail Insight AI` の HTTP API 規約を凍結します。
 
+Human-readable explanations in this document are trilingual by default.
+本文件中的人类可读说明默认采用三语。
+本書の人間向け説明は三言語を標準とします。
+
 ## 2. Versioning Rules / 版本规则 / バージョン規則
 
 - Existing endpoints keep current paths and behavior unless a documented breaking change is approved.
@@ -768,6 +772,473 @@ Future approval relationship:
 - Internal RAG returns grounded answers and citations only and does not create approval state.
 - Future approval integration must be a separate step and must not be implied by answer generation success.
 
+#### 4.5.13 Approval Workflow APIs
+
+Purpose:
+Freeze the approval workflow contract on top of report revisions, audit history, and future RBAC.
+
+中文（简体）：
+冻结审批工作流的 HTTP 合同，核心是“审批记录”和“报告版本快照”分离。审批 API 只负责提交、查询、批准、拒绝和修订，不负责 RBAC，也不允许把可变正文当作审批事实。
+
+日本語：
+承認ワークフローの HTTP 契約を凍結します。承認記録とレポート版スナップショットを分離し、API は submit / list / detail / approve / reject / revise だけを担当します。RBAC や可変本文の上書きは含めません。
+
+Approval domain model:
+
+- One `task_id` still identifies the report business aggregate.
+- Each report revision is an immutable snapshot.
+- `approval_id` identifies the approval request record for a report version.
+- `report_version_id` identifies the frozen report snapshot under review.
+- `revised_from_version_id` identifies the prior version that spawned a revision.
+
+State model:
+
+- `draft`
+- `pending_approval`
+- `approved`
+- `rejected`
+- `revised`
+- `published`
+- `archived`
+
+State rules:
+
+- `draft -> pending_approval` when the report is submitted for approval.
+- `pending_approval -> approved` when the approval is granted.
+- `pending_approval -> rejected` when the approval is denied.
+- `rejected -> revised` when a new revision is created.
+- `approved -> revised` is allowed only by creating a new immutable revision; the approved snapshot itself must not change.
+- `approved -> published` is the business-confirmation step and produces the final business output.
+- `published -> archived` keeps the published report readable while removing it from active use.
+- Approved reports cannot be overwritten.
+- Rejected reports must keep a rejection reason.
+- Archived reports remain readable.
+
+Future RBAC relationship:
+
+- Authorization is not implemented in this contract freeze.
+- Future RBAC will decide who may submit, approve, reject, revise, or publish.
+- The API contract must remain valid even before RBAC is connected.
+
+Audit relationship:
+
+- Approval decisions are append-only facts.
+- Revision creation must preserve the prior version and record the new version in the audit trail.
+- Approval payloads must stay secret-safe and never include full report text.
+
+##### `POST /api/v1/reports/{task_id}/submit-approval`
+
+Purpose:
+Create a pending approval record for the current report version.
+
+Request:
+
+```json
+{
+  "comment": "Ready for review"
+}
+```
+
+Response `201 Created`:
+
+```json
+{
+  "approval_id": "apr-123",
+  "task_id": "task-123",
+  "report_version_id": "repver-456",
+  "status": "pending_approval",
+  "requested_at": "2026-07-04T12:34:56Z",
+  "requested_by": "reviewer-1",
+  "decided_at": null,
+  "decided_by": null,
+  "decision_reason": null,
+  "revision_no": 1,
+  "revised_from_version_id": null
+}
+```
+
+Status codes:
+`201 Created`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`approval_not_found`, `approval_already_submitted`, `approval_already_decided`, `invalid_approval_state`, `report_not_found`, `report_revision_conflict`, `internal_error`.
+
+##### `GET /api/v1/approvals`
+
+Purpose:
+List approval records for audit, operations, and future workflow monitoring.
+
+Request:
+
+- Query parameters: `status`, `task_id`, `limit`, `cursor`.
+
+Response `200 OK`:
+
+```json
+{
+  "items": [
+    {
+      "approval_id": "apr-123",
+      "task_id": "task-123",
+      "report_version_id": "repver-456",
+      "status": "pending_approval",
+      "requested_at": "2026-07-04T12:34:56Z",
+      "requested_by": "reviewer-1",
+      "decided_at": null,
+      "decided_by": null,
+      "decision_reason": null,
+      "revision_no": 1,
+      "revised_from_version_id": null
+    }
+  ],
+  "next_cursor": null
+}
+```
+
+Status codes:
+`200 OK`, `400 Bad Request`, `500 Internal Server Error`.
+
+Error codes:
+`validation_error`, `repository_error`, `internal_error`.
+
+##### `GET /api/v1/approvals/{approval_id}`
+
+Purpose:
+Read one approval record and its frozen report-version binding.
+
+Request:
+
+- Path parameter: `approval_id`.
+
+Response `200 OK`:
+
+```json
+{
+  "approval_id": "apr-123",
+  "task_id": "task-123",
+  "report_version_id": "repver-456",
+  "status": "pending_approval",
+  "requested_at": "2026-07-04T12:34:56Z",
+  "requested_by": "reviewer-1",
+  "decided_at": null,
+  "decided_by": null,
+  "decision_reason": null,
+  "revision_no": 1,
+  "revised_from_version_id": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+
+Error codes:
+`approval_not_found`, `repository_error`, `internal_error`.
+
+##### `POST /api/v1/approvals/{approval_id}/approve`
+
+Purpose:
+Approve the pending approval record.
+
+Request:
+
+```json
+{
+  "comment": "Approved after review"
+}
+```
+
+Response `200 OK`:
+
+```json
+{
+  "approval_id": "apr-123",
+  "task_id": "task-123",
+  "report_version_id": "repver-456",
+  "status": "approved",
+  "requested_at": "2026-07-04T12:34:56Z",
+  "requested_by": "reviewer-1",
+  "decided_at": "2026-07-04T12:40:00Z",
+  "decided_by": "approver-1",
+  "decision_reason": null,
+  "revision_no": 1,
+  "revised_from_version_id": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `409 Conflict`, `500 Internal Server Error`.
+
+Error codes:
+`approval_not_found`, `approval_already_decided`, `approval_already_submitted`, `invalid_approval_state`, `report_revision_conflict`, `internal_error`.
+
+##### `POST /api/v1/approvals/{approval_id}/reject`
+
+Purpose:
+Reject the pending approval record.
+
+Request:
+
+```json
+{
+  "reason": "The report needs a clearer source trace."
+}
+```
+
+Response `200 OK`:
+
+```json
+{
+  "approval_id": "apr-123",
+  "task_id": "task-123",
+  "report_version_id": "repver-456",
+  "status": "rejected",
+  "requested_at": "2026-07-04T12:34:56Z",
+  "requested_by": "reviewer-1",
+  "decided_at": "2026-07-04T12:40:00Z",
+  "decided_by": "approver-1",
+  "decision_reason": "The report needs a clearer source trace.",
+  "revision_no": 1,
+  "revised_from_version_id": null
+}
+```
+
+Status codes:
+`200 OK`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`approval_not_found`, `approval_already_decided`, `approval_rejected`, `invalid_approval_state`, `missing_rejection_reason`, `internal_error`.
+
+##### `POST /api/v1/reports/{task_id}/revise`
+
+Purpose:
+Create a new immutable report revision without overwriting the approved or rejected snapshot.
+
+Request:
+
+```json
+{
+  "revision_reason": "Clarify the cited policy language."
+}
+```
+
+Response `201 Created`:
+
+```json
+{
+  "task_id": "task-123",
+  "report_version_id": "repver-457",
+  "status": "revised",
+  "revision_no": 2,
+  "revised_from_version_id": "repver-456"
+}
+```
+
+Status codes:
+`201 Created`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+
+Error codes:
+`report_not_found`, `report_revision_conflict`, `invalid_approval_state`, `approval_rejected`, `missing_rejection_reason`, `internal_error`.
+
+Versioning rule:
+- Approval workflow semantics are frozen under `/api/v1`.
+
+Future approval relationship:
+- Approval APIs manage report-version snapshots and audit events only.
+- Publishing is a downstream business confirmation step and must not be confused with revision creation.
+- Future RBAC will constrain who may call these endpoints, but the payload contract is frozen independently of authorization.
+
+中文（简体）：
+审批 API 只管理报告版本快照和审计事件。发布是下游业务确认步骤，不能和 revision 混淆。未来 RBAC 只限制谁能调用，不改变当前 payload 合同。
+
+日本語：
+承認 API はレポート版スナップショットと監査イベントのみを管理します。公開は下流の業務確認であり、revision と混同してはいけません。将来の RBAC は呼び出し主体を制御するだけで、payload 契約は変えません。
+
+#### 4.5.14 Enterprise Security APIs / 企业安全 API / 企業セキュリティ API
+
+Purpose:
+Freeze the future identity, RBAC, and audit read contract before implementation.
+
+中文（简体）：
+这一组 API 先冻结“谁在执行”和“谁被授权”的读取合同，再冻结审计读取合同。当前阶段只定义契约，不实现 RBAC、认证服务或审计写入逻辑。
+
+日本語：
+この API 群は「誰が実行しているか」と「誰が許可されているか」の読み取り契約、および監査読み取り契約を先に凍結します。現段階では契約のみを定義し、RBAC・認証サービス・監査書き込みは実装しません。
+
+Security domain model:
+
+- `user` belongs to one `organization` and one `department`.
+- `role` is a reusable authorization label.
+- `permission` is a frozen action token such as `document.read` or `approval.approve`.
+- `policy` maps roles to permissions and can later gain scope rules.
+- `audit log` is append-only and read-only.
+- `operation log` is the business-readable projection of audit facts.
+
+##### RBAC Approval-Action Matrix
+
+| API / Action | Required Permission | Default Role Coverage |
+|---|---|---|
+| `GET /api/v1/users/me` | authenticated identity | all authenticated users |
+| `GET /api/v1/security/roles` | `system.admin` | admin |
+| `GET /api/v1/security/permissions` | `system.admin` | admin |
+| `GET /api/v1/audit-logs` | `audit.read` | auditor, admin |
+| `POST /api/v1/reports/{task_id}/submit-approval` | `report.submit_approval` | analyst, manager, admin |
+| `GET /api/v1/approvals` | `approval.review` | approver, manager, auditor, admin |
+| `GET /api/v1/approvals/{approval_id}` | `approval.review` | approver, manager, auditor, admin |
+| `POST /api/v1/approvals/{approval_id}/approve` | `approval.approve` | approver, manager, admin |
+| `POST /api/v1/approvals/{approval_id}/reject` | `approval.reject` | approver, manager, admin |
+| `POST /api/v1/reports/{task_id}/revise` | `approval.revise` | analyst, manager, approver, admin |
+
+Frozen roles:
+
+- `admin`
+- `manager`
+- `analyst`
+- `viewer`
+- `approver`
+- `auditor`
+
+Frozen permissions:
+
+- `document.read`
+- `document.upload`
+- `document.archive`
+- `document.import`
+- `document.chunk`
+- `document.search`
+- `rag.answer`
+- `report.read`
+- `report.submit_approval`
+- `approval.review`
+- `approval.approve`
+- `approval.reject`
+- `approval.revise`
+- `audit.read`
+- `system.admin`
+
+Future authentication relationship:
+
+- `GET /api/v1/users/me` will be populated by a future authentication provider or middleware.
+- The current contract does not define login, logout, token issuance, or identity provider wiring.
+- RBAC may later consume the authenticated principal, but the API contract remains read-only for now.
+
+##### `GET /api/v1/users/me`
+
+Purpose:
+Return the current authenticated principal snapshot.
+
+Response `200 OK`:
+
+```json
+{
+  "user_id": "user-123",
+  "username": "li.chen",
+  "display_name": "Li Chen",
+  "organization_id": "org-001",
+  "department_id": "dept-001",
+  "roles": ["analyst", "approver"],
+  "permissions": ["document.read", "report.submit_approval", "approval.review"],
+  "status": "active"
+}
+```
+
+Status codes:
+`200 OK`, `401 Unauthorized`, `500 Internal Server Error`.
+
+Error codes:
+`unauthorized`, `internal_error`.
+
+##### `GET /api/v1/security/roles`
+
+Purpose:
+List the frozen role catalog and the permissions granted by each role.
+
+Response `200 OK`:
+
+```json
+{
+  "items": [
+    {
+      "role": "analyst",
+      "description": "Creates documents, retrieves context, and submits reports for approval.",
+      "permissions": ["document.read", "document.upload", "document.import", "document.chunk", "document.search", "rag.answer", "report.read", "report.submit_approval"]
+    }
+  ]
+}
+```
+
+Status codes:
+`200 OK`, `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`.
+
+Error codes:
+`unauthorized`, `forbidden`, `internal_error`.
+
+##### `GET /api/v1/security/permissions`
+
+Purpose:
+List the frozen permission catalog and its human-readable meanings.
+
+Response `200 OK`:
+
+```json
+{
+  "items": [
+    {
+      "permission": "approval.approve",
+      "description": "Approve a pending report revision.",
+      "category": "approval"
+    }
+  ]
+}
+```
+
+Status codes:
+`200 OK`, `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`.
+
+Error codes:
+`unauthorized`, `forbidden`, `internal_error`.
+
+##### `GET /api/v1/audit-logs`
+
+Purpose:
+List append-only audit facts and the derived operation log projection.
+
+Response `200 OK`:
+
+```json
+{
+  "items": [
+    {
+      "audit_log_id": "aud-123",
+      "operation_type": "approval.approved",
+      "actor_id": "approver-1",
+      "organization_id": "org-001",
+      "department_id": "dept-001",
+      "resource_type": "approval",
+      "resource_id": "apr-123",
+      "result": "success",
+      "error_code": null,
+      "request_id": "req-123",
+      "trace_id": "trace-123",
+      "timestamp": "2026-07-05T12:34:56Z",
+      "metadata": {}
+    }
+  ],
+  "next_cursor": null
+}
+```
+
+Status codes:
+`200 OK`, `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`.
+
+Error codes:
+`unauthorized`, `forbidden`, `audit_log_failed`, `internal_error`.
+
+Future audit relationship:
+
+- Audit logs are read-only facts.
+- Operation logs are a human-readable projection of the same frozen facts.
+- Future write paths may append audit facts, but this contract only freezes the read surface.
+
 ## 5. HTTP Status Rules / 状态码规则 / HTTP ステータス規則
 
 - `200 OK`: successful read.
@@ -822,6 +1293,12 @@ Frozen error code families:
 - `document_metadata_invalid`
 - `document_delete_conflict`
 - `document_version_not_found`
+- `unauthorized`
+- `forbidden`
+- `permission_denied`
+- `role_not_found`
+- `invalid_role`
+- `audit_log_failed`
 
 Future approval/import/retrieval APIs must add explicit error codes without reusing unrelated ones.
 

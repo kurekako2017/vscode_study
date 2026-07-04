@@ -4,8 +4,10 @@ from app.services.document_archive_service import DocumentArchiveService
 from app.services.document_retrieval_service import DocumentRetrievalService
 from app.services.internal_rag_evaluation_service import InternalRagEvaluationService
 from app.services.internal_rag_service import InternalRagService
+from app.services.approval_service import ApprovalService
 from app.services.document_read_service import DocumentReadService
 from app.services.task_service import TaskService
+from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.document_upload_service import DocumentUploadService
 
 __all__ = [
@@ -13,9 +15,11 @@ __all__ = [
     "DocumentChunkService",
     "DocumentImportService",
     "DocumentRetrievalService",
+    "ApprovalService",
     "InternalRagEvaluationService",
     "InternalRagService",
     "DocumentReadService",
+    "RAGAnswerGenerator",
     "DocumentUploadService",
     "TaskService",
 ]

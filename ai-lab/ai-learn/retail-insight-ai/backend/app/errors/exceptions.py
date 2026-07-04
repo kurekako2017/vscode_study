@@ -253,3 +253,123 @@ class CitationRequiredException(AppException):
             400,
             detail=detail,
         )
+
+
+class ApprovalNotFoundException(AppException):
+    """表示指定 approval_id 不存在。"""
+
+    def __init__(self, approval_id: str) -> None:
+        """返回 404，并把 approval_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.APPROVAL_NOT_FOUND,
+            "Approval not found",
+            404,
+            detail={"approval_id": approval_id},
+            task_id=approval_id,
+        )
+
+
+class ApprovalAlreadySubmittedException(AppException):
+    """表示当前报告版本已经处于 pending_approval。"""
+
+    def __init__(self, task_id: str) -> None:
+        """返回 409，并把 task_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.APPROVAL_ALREADY_SUBMITTED,
+            "Approval already submitted",
+            409,
+            detail={"task_id": task_id},
+            task_id=task_id,
+        )
+
+
+class ApprovalAlreadyDecidedException(AppException):
+    """表示审批已经有最终结果。"""
+
+    def __init__(self, approval_id: str, status: str) -> None:
+        """返回 409，并把最终状态保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.APPROVAL_ALREADY_DECIDED,
+            "Approval already decided",
+            409,
+            detail={"approval_id": approval_id, "status": status},
+            task_id=approval_id,
+        )
+
+
+class ApprovalRejectedReportException(AppException):
+    """表示报告已经被拒绝，不能继续当前审批流。"""
+
+    def __init__(self, task_id: str) -> None:
+        """返回 409，并把 task_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.APPROVAL_REJECTED,
+            "Report was rejected",
+            409,
+            detail={"task_id": task_id},
+            task_id=task_id,
+        )
+
+
+class MissingRejectionReasonException(AppException):
+    """表示 reject 请求缺少原因。"""
+
+    def __init__(self, approval_id: str | None = None) -> None:
+        """返回 422，确保拒绝理由始终被保留。"""
+
+        super().__init__(
+            ErrorCode.MISSING_REJECTION_REASON,
+            "Rejection reason is required",
+            422,
+            detail={"approval_id": approval_id} if approval_id else {},
+            task_id=approval_id,
+        )
+
+
+class InvalidApprovalStateException(AppException):
+    """表示审批状态迁移违反冻结状态机。"""
+
+    def __init__(self, approval_id: str | None, current: str, target: str) -> None:
+        """返回 409，帮助定位非法状态跳转。"""
+
+        super().__init__(
+            ErrorCode.INVALID_APPROVAL_STATE,
+            "Invalid approval state transition",
+            409,
+            detail={"current": current, "target": target},
+            task_id=approval_id,
+        )
+
+
+class ApprovalReportNotFoundException(AppException):
+    """表示审批关联的报告尚不存在。"""
+
+    def __init__(self, task_id: str) -> None:
+        """返回 404，并把 task_id 保留给日志关联。"""
+
+        super().__init__(
+            ErrorCode.REPORT_NOT_FOUND_APPROVAL,
+            "Report not found",
+            404,
+            detail={"task_id": task_id},
+            task_id=task_id,
+        )
+
+
+class ReportRevisionConflictException(AppException):
+    """表示报告版本不能在当前状态下创建修订。"""
+
+    def __init__(self, task_id: str, current: str) -> None:
+        """返回 409，并记录当前状态。"""
+
+        super().__init__(
+            ErrorCode.REPORT_REVISION_CONFLICT,
+            "Report revision conflict",
+            409,
+            detail={"current": current},
+            task_id=task_id,
+        )

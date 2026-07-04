@@ -9,7 +9,7 @@
 - 当前默认仍使用 InMemory Repository
 - 当前已新增可选 PostgreSQL Repository
 - 当前已提供 `backend/db/schema.sql` 与 `backend/db/init.sql`
-- 当前已建 `approval_requests` / `approval_events` 表，但尚未接入审批 API
+- 当前已建 `approval_requests` / `approval_events` 表，审批 API 仍未实现，但 contract 已冻结
 - 当前仍只实现 Document Domain Model 与 InMemory Document Import MVP，不存在 PostgreSQL Import 表结构
 
 ## Target State
@@ -170,6 +170,7 @@
 | `version_no` | INTEGER | 版本号 |
 | `markdown` | TEXT | 报告正文 |
 | `status` | TEXT | 版本状态 |
+| `revised_from_version_id` | UUID NULL | 指向被修订的上一版 |
 | `revision_reason` | TEXT NULL | 修订原因 |
 | `created_at` | TIMESTAMPTZ | 创建时间 |
 | `created_by` | TEXT NULL | 未来操作者 |
@@ -192,6 +193,14 @@
 | `approver_id` | TEXT NULL | 审批者 |
 | `decision_at` | TIMESTAMPTZ NULL | 审批时间 |
 
+### Relationship Notes
+
+- 一条 `report` 对应一组 `report_versions`，其中最新版本是当前可审批快照。
+- `approval_requests.report_version_id` 绑定单一报告版本，不直接指向可变正文。
+- `report_versions.revised_from_version_id` 记录修订来源，保证 approved snapshot 不可覆盖。
+- `approval_requests` 与 `approval_events` 共同构成审批审计链。
+- 未来 RBAC 只控制谁可以写入审批记录，不改变表关系。
+
 ## approval_events
 
 ### Purpose
@@ -204,10 +213,16 @@
 | --- | --- | --- |
 | `id` | UUID | 主键 |
 | `approval_request_id` | UUID | 关联 `approval_requests.id` |
-| `event_type` | TEXT | `submitted` / `approved` / `rejected` / `revised` / `published` / `archived` |
+| `event_type` | TEXT | `submitted` / `approved` / `rejected` / `revised` / `published` / `failed` |
 | `actor_id` | TEXT NULL | 操作者 |
 | `reason` | TEXT NULL | 拒绝或修订原因 |
 | `created_at` | TIMESTAMPTZ | 事件时间 |
+
+### Approval Audit Notes
+
+- `approval_events` 是 append-only 审计轨迹，不能改写历史决策。
+- `reason` 在 reject / revise 场景必须保持安全且可审计。
+- `published` 代表 business-confirmed output，仍然对应同一 report version lineage。
 
 ## documents
 
@@ -323,6 +338,125 @@
 | `created_at` | TIMESTAMPTZ | 创建时间 |
 | `updated_at` | TIMESTAMPTZ | 更新时间 |
 
+## Security Domain Model / 安全域模型 / セキュリティドメインモデル
+
+### Purpose
+
+Freeze the future identity, authorization, and audit storage concepts before RBAC implementation.
+
+### Current State
+
+- 当前没有认证 API、RBAC API 或 Audit API 的后端实现。
+- 当前只冻结数据概念，不把它们解释为已上线的表结构依赖。
+- 未来实现可以落到 PostgreSQL，但现阶段仅作为合同准备。
+
+中文（简体）：
+这里冻结的是企业安全的概念层：用户属于组织和部门，角色通过策略映射到权限，审计日志与操作日志以追加写方式保存。现在只定义边界，不把实现细节当成现状。
+
+日本語：
+ここで凍結するのは企業セキュリティの概念層です。ユーザーは組織と部署に属し、ロールはポリシーを介して権限へ写像され、監査ログと操作ログは追記型で保存されます。現時点では境界だけを定義し、実装済みとはみなしません。
+
+### users
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，user_id |
+| `username` | TEXT | 登录名 |
+| `display_name` | TEXT | 展示名称 |
+| `organization_id` | UUID / TEXT | 所属组织 |
+| `department_id` | UUID / TEXT | 所属部门 |
+| `status` | TEXT | `active / suspended / disabled` |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `updated_at` | TIMESTAMPTZ | 更新时间 |
+
+### organizations
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，organization_id |
+| `name` | TEXT | 组织名称 |
+| `status` | TEXT | `active / archived` |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### departments
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，department_id |
+| `organization_id` | UUID / TEXT | 关联组织 |
+| `name` | TEXT | 部门名称 |
+| `parent_department_id` | UUID / TEXT NULL | 上级部门 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### roles
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，role_id |
+| `name` | TEXT | `admin / manager / analyst / viewer / approver / auditor` |
+| `description` | TEXT | 角色说明 |
+| `is_system_role` | BOOLEAN | 是否冻结系统角色 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### permissions
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，permission_id |
+| `name` | TEXT | `document.read` / `approval.approve` 等 |
+| `category` | TEXT | `document / report / approval / audit / system` |
+| `description` | TEXT | 权限说明 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### policies
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，policy_id |
+| `role_id` | UUID / TEXT | 关联 `roles.id` |
+| `permission_id` | UUID / TEXT | 关联 `permissions.id` |
+| `effect` | TEXT | `allow / deny` |
+| `resource_scope` | TEXT NULL | 未来作用域占位 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### audit_logs
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，audit_log_id |
+| `actor_id` | UUID / TEXT NULL | 执行者 |
+| `organization_id` | UUID / TEXT NULL | 组织 |
+| `department_id` | UUID / TEXT NULL | 部门 |
+| `operation_type` | TEXT | 操作类型 |
+| `resource_type` | TEXT | 资源类型 |
+| `resource_id` | TEXT | 资源标识 |
+| `result` | TEXT | `success / denied / failed` |
+| `error_code` | TEXT NULL | 失败时错误码 |
+| `request_id` | TEXT | 请求追踪 |
+| `trace_id` | TEXT | 链路追踪 |
+| `metadata` | JSONB | 安全元数据 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### operation_logs
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| `id` | UUID / TEXT | 主键，operation_log_id |
+| `audit_log_id` | UUID / TEXT | 关联 `audit_logs.id` |
+| `summary` | TEXT | 人类可读摘要 |
+| `actor_label` | TEXT | 展示用执行者名称 |
+| `resource_label` | TEXT | 展示用资源名称 |
+| `result` | TEXT | 操作结果 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+
+### Security Relationship Notes
+
+- 用户属于一个组织和一个部门，角色通过策略映射到权限。
+- `roles` 与 `permissions` 是冻结目录，未来实现必须沿用这些名称。
+- `audit_logs` 是 append-only 事实表，不应被业务更新语句改写。
+- `operation_logs` 可以作为读取投影或物化视图，不改变审计事实本身。
+- Approval 权限矩阵应与 `docs/API_CONTRACT.md` 保持一致。
+
 ## Database ER Preparation
 
 ```mermaid
@@ -337,4 +471,10 @@ erDiagram
     DOCUMENTS ||--o{ DOCUMENT_UPLOAD_SESSIONS : has
     DOCUMENTS ||--o{ DOCUMENT_IMPORTS : has
     DOCUMENT_VERSIONS ||--o| APPROVAL_REQUESTS : future
+    USERS ||--o{ AUDIT_LOGS : actors
+    ORGANIZATIONS ||--o{ USERS : contains
+    ORGANIZATIONS ||--o{ DEPARTMENTS : contains
+    DEPARTMENTS ||--o{ USERS : contains
+    ROLES ||--o{ POLICIES : maps
+    PERMISSIONS ||--o{ POLICIES : maps
 ```

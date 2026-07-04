@@ -110,7 +110,14 @@ These standards apply to code, tests, prompts, Mermaid diagrams, SQL, and archit
 | Error Code | 错误码 | エラーコード |
 | Structured Logging | 结构化日志 | 構造化ログ |
 
-## 18. Definition / 定义 / 定義
+## 18. Documentation Language Policy / 文档语言策略 / ドキュメント言語ポリシー
+
+- Human-readable project documentation must be trilingual: English, 中文（简体）, 日本語.
+- English-only is allowed only for code identifiers, API paths, class names, environment variables, enum values, error codes, and event names.
+- Freeze-level docs, architecture docs, API contracts, event contracts, error catalogs, changelogs, and decisions must keep the reader-facing explanation aligned across the three languages.
+- Future sprint checklist items should include `Human-readable documentation is trilingual: English / 中文（简体） / 日本語` so the rule remains visible in every work session.
+
+## 19. Definition / 定义 / 定義
 
 Good code in this repository is:
 

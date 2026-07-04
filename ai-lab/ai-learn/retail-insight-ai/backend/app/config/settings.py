@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     task_execution_mode: Literal["background"] = "background"
     research_provider: Literal["static"] = "static"
     data_provider: Literal["static"] = "static"
+    llm_provider: Literal["stub"] = "stub"
+    internal_rag_use_llm: bool = False
     repository_backend: Literal["inmemory", "postgres"] = "inmemory"
     postgres_host: str = "127.0.0.1"
     postgres_port: int = 5432

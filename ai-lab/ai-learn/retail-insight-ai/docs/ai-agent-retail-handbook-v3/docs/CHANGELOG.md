@@ -1,5 +1,48 @@
 # CHANGELOG
 
+## 2026-07-05 Sprint 11.1 Enterprise Security Foundation Contract Freeze
+
+- 冻结企业安全基础合同，覆盖 user / organization / department / role / permission / policy 概念。
+- 冻结 `GET /api/v1/users/me`、`GET /api/v1/security/roles`、`GET /api/v1/security/permissions`、`GET /api/v1/audit-logs` 的未来读接口边界。
+- 冻结 RBAC approval-action matrix、audit log contract、operation log contract 和 future authentication relationship。
+- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次不修改 backend、frontend 或 scripts。
+
+## 2026-07-05 Sprint 10.2 Approval API MVP Implementation
+
+- 在 frozen approval contract 上实现 backend-only Approval API MVP。
+- 新增 `POST /api/v1/reports/{task_id}/submit-approval`、`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}`、`POST /api/v1/approvals/{approval_id}/approve`、`POST /api/v1/approvals/{approval_id}/reject`、`POST /api/v1/reports/{task_id}/revise`。
+- 新增 immutable `ReportVersion`、`ApprovalRequest`、`ApprovalEvent`、InMemory approval repository 和 approval service / router / tests。
+- approval submitted / approved / rejected / revised / failed events 进入 backend event trail。
+- 继续保持 report / retrieval / internal RAG response contract 不变。
+- Approval API / Approval Events / Approval Errors / Approval Architecture sections were checked and supplemented with 中文（简体） / 日本語 summaries where they were still English-only.
+
+## 2026-07-04 Sprint 10.1 follow-up Trilingual Documentation Rule Freeze
+
+- 冻结文档语言政策：所有人类可读项目文档默认采用 English / 中文（简体） / 日本語 三语。
+- 明确 English-only 仅允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
+- 更新 `docs/MASTER_PROMPT.md`、`docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`。
+- 本次仅冻结规则，不重写旧文档正文。
+
+## 2026-07-04 Sprint 10.1 Approval Workflow Contract Freeze
+
+- 冻结 Approval Workflow contract，覆盖 `submit-approval`、`approvals list/detail`、`approve`、`reject`、`revise` 的 API 边界。
+- 冻结 approval state machine：`draft`、`pending_approval`、`approved`、`rejected`、`revised`、`published`、`archived`。
+- 冻结 approval events：`approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
+- 冻结 approval error catalog，并明确 report revision relationship、audit relationship、future RBAC relationship。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 本次不修改 backend、frontend 或 scripts。
+
+## 2026-07-04 Sprint 9.5 LLM Provider Seam Stub MVP
+
+- 新增 `StubLLMProvider` 作为本地 provider stub，不访问 OpenAI、Azure 或任何外部 API。
+- 新增 `RAGAnswerGenerator`，并通过 `LLM_PROVIDER=stub` / `INTERNAL_RAG_USE_LLM=false` 控制是否启用 model seam。
+- provider failure、timeout、invalid output、missing citation 都回退到 deterministic extractive answer。
+- 记录 `provider_name`、`prompt_tokens`、`completion_tokens`、`estimated_cost`、`latency_ms` 占位信息，仅用于内部事件/日志，不暴露到 API response。
+- 新增 `backend/tests/test_rag_answer_generator.py`，并确认 backend full suite 与 compileall 已通过。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`。
+- 本次不修改 `/api/v1/internal-rag/answer` response contract，不修改 frontend。
+
 ## 2026-07-04 Sprint 9.4 LLM Provider Seam Contract Freeze
 
 - 冻结未来 `LLMProvider` interface concept、`RAGAnswerGenerator` concept 以及 prompt input/output contract。

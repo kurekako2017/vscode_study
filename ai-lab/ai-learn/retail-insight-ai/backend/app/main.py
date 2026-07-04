@@ -11,6 +11,7 @@ from app.api.document_chunks import router as document_chunks_router
 from app.api.document_retrieval import router as document_retrieval_router
 from app.api.document_imports import router as document_imports_router
 from app.api.documents import router as documents_router
+from app.api.approvals import router as approvals_router
 from app.api.internal_rag import router as internal_rag_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
@@ -93,6 +94,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(document_chunks_router)
     application.include_router(document_retrieval_router)
     application.include_router(internal_rag_router)
+    application.include_router(approvals_router)
     application.include_router(document_imports_router)
     application.include_router(router=tasks_router)
     return application

@@ -50,6 +50,9 @@ All AI tools working in this repository must follow this document before they wr
 ### Three-language Documentation Rule
 
 - Freeze-level documents must keep title, key terms, critical flow, and non-negotiable rules aligned across English, 简体中文, and 日本語.
+- Human-readable project documentation is trilingual by default: English, 中文（简体）, 日本語.
+- English-only is allowed only for code identifiers, API paths, class names, environment variables, enum values, error codes, and event names.
+- Future sprint checklists must keep the item `Human-readable documentation is trilingual: English / 中文（简体） / 日本語` present as a permanent review reminder.
 
 ### Handbook Sync Rule
 

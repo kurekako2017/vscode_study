@@ -42,14 +42,13 @@ from app.models.document import DocumentType, Language
 from app.models.internal_rag import InternalRagWarning
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.document_retrieval_provider import DocumentRetrievalProvider
-from app.schemas.document_retrieval_api import DocumentRetrievalResultResponse, DocumentRetrievalSearchRequest
+from app.schemas.document_retrieval_api import DocumentRetrievalSearchRequest
 from app.schemas.internal_rag_api import (
-    InternalRagAnswerMode,
     InternalRagAnswerRequest,
     InternalRagAnswerResponse,
-    InternalRagCitationResponse,
 )
 from app.services.internal_rag_evaluation_service import InternalRagEvaluationService
+from app.services.rag_answer_generator import RAGAnswerGenerator
 
 logger = get_logger(__name__)
 
@@ -61,12 +60,14 @@ class InternalRagService:
         self,
         retrieval_provider: DocumentRetrievalProvider,
         event_publisher: EventPublisher,
+        answer_generator: RAGAnswerGenerator | None = None,
         evaluation_service: InternalRagEvaluationService | None = None,
     ) -> None:
         """注入 retrieval provider 和事件发布器，保持 service 不直连 chunk storage。"""
 
         self._retrieval_provider = retrieval_provider
         self._event_publisher = event_publisher
+        self._answer_generator = answer_generator or RAGAnswerGenerator()
         self._evaluation_service = evaluation_service or InternalRagEvaluationService()
         # internal RAG 的输出必须稳定，所以这里沿用与 retrieval service 一样的进程内互斥锁。
         self._lock = RLock()
@@ -109,17 +110,14 @@ class InternalRagService:
                         }
                     )
 
-                citations = self._build_citations(results)
-                if request.require_citations and not citations:
-                    raise CitationRequiredException(
-                        {
-                            "field": "citations",
-                            "reason": "retrieved evidence did not yield citations",
-                        }
-                    )
-
-                selected_citations = self._select_citations(citations, request.limit)
-                answer = self._assemble_answer(request.answer_mode, selected_citations)
+                generation = self._answer_generator.generate(
+                    request=request,
+                    question=question,
+                    retrieval_results=results,
+                    total_matches=total_matches,
+                )
+                selected_citations = generation.citations
+                answer = generation.answer
                 evaluation = self._evaluation_service.evaluate(
                     query=question,
                     answer=answer,
@@ -158,6 +156,13 @@ class InternalRagService:
                         "coverage_score": evaluation.coverage_score,
                         "citation_score": evaluation.citation_score,
                         "warnings": warnings,
+                        "provider_name": generation.provider_name,
+                        "used_llm_provider": generation.used_llm_provider,
+                        "fallback_reason": generation.fallback_reason.value,
+                        "prompt_tokens": generation.usage.prompt_tokens,
+                        "completion_tokens": generation.usage.completion_tokens,
+                        "estimated_cost": generation.usage.estimated_cost,
+                        "latency_ms": generation.usage.latency_ms,
                     },
                 )
                 self._publish(
@@ -172,6 +177,13 @@ class InternalRagService:
                         "coverage_score": evaluation.coverage_score,
                         "citation_score": evaluation.citation_score,
                         "warnings": warnings,
+                        "provider_name": generation.provider_name,
+                        "used_llm_provider": generation.used_llm_provider,
+                        "fallback_reason": generation.fallback_reason.value,
+                        "prompt_tokens": generation.usage.prompt_tokens,
+                        "completion_tokens": generation.usage.completion_tokens,
+                        "estimated_cost": generation.usage.estimated_cost,
+                        "latency_ms": generation.usage.latency_ms,
                     },
                 )
                 return response
@@ -257,56 +269,6 @@ class InternalRagService:
         """把领域枚举显式转成检索 request 需要的字符串。"""
 
         return value.value if value is not None else None
-
-    def _build_citations(self, results: list[DocumentRetrievalResultResponse]) -> list[InternalRagCitationResponse]:
-        """把 retrieval 结果转成一条条可追溯 citation。"""
-
-        citations: list[InternalRagCitationResponse] = []
-        for result in results:
-            citations.append(
-                InternalRagCitationResponse(
-                    document_id=result.document_id,
-                    chunk_id=result.chunk_id,
-                    chunk_index=result.chunk_index,
-                    excerpt=result.content_excerpt,
-                    source=result.source,
-                    score=result.score,
-                )
-            )
-        return citations
-
-    def _select_citations(
-        self,
-        citations: list[InternalRagCitationResponse],
-        limit: int,
-    ) -> list[InternalRagCitationResponse]:
-        """只使用 top retrieval excerpts，避免回答合成结果过长且不稳定。"""
-
-        max_citations = min(len(citations), max(1, min(limit, 3)))
-        return citations[:max_citations]
-
-    def _assemble_answer(
-        self,
-        answer_mode: InternalRagAnswerMode,
-        citations: list[InternalRagCitationResponse],
-    ) -> str:
-        """根据 answer_mode 生成 deterministic answer，不调用任何 LLM。"""
-
-        if answer_mode is InternalRagAnswerMode.EXTRACTIVE:
-            lines = [f"{index}. {citation.excerpt}" for index, citation in enumerate(citations, start=1)]
-            return "Extractive answer:\n" + "\n".join(lines)
-
-        summary_parts = [self._summarize_excerpt(citation.excerpt) for citation in citations]
-        joined = " ".join(part for part in summary_parts if part)
-        return "Summary: " + joined if joined else "Summary: no concise summary available."
-
-    def _summarize_excerpt(self, excerpt: str, *, word_limit: int = 20) -> str:
-        """用简单截断模拟 summary，保证当前阶段完全 deterministic。"""
-
-        words = excerpt.split()
-        if len(words) <= word_limit:
-            return excerpt
-        return " ".join(words[:word_limit]).rstrip(",;:") + "..."
 
     def _request_summary(self, request: InternalRagAnswerRequest) -> dict[str, object]:
         """把安全的请求摘要写入事件，不暴露 question 原文。"""

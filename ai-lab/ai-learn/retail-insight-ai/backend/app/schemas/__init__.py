@@ -18,6 +18,14 @@ from app.schemas.internal_rag_api import (
     InternalRagAnswerResponse,
     InternalRagCitationResponse,
 )
+from app.schemas.approval_api import (
+    ApprovalListResponse,
+    ApprovalRejectRequest,
+    ApprovalResponse,
+    ApprovalRevisionResponse,
+    ApprovalReviseRequest,
+    ApprovalSubmitRequest,
+)
 
 __all__ = [
     "DocumentArchiveResponse",
@@ -33,4 +41,10 @@ __all__ = [
     "InternalRagCitationResponse",
     "DocumentUploadSessionResponse",
     "UploadSessionStatus",
+    "ApprovalListResponse",
+    "ApprovalRejectRequest",
+    "ApprovalResponse",
+    "ApprovalRevisionResponse",
+    "ApprovalReviseRequest",
+    "ApprovalSubmitRequest",
 ]

@@ -1,6 +1,7 @@
 from fastapi import Request
 
 from app.config.container import AppContainer
+from app.services.approval_service import ApprovalService
 from app.services.internal_rag_service import InternalRagService
 from app.services.document_chunk_service import DocumentChunkService
 from app.services.document_import_service import DocumentImportService
@@ -77,3 +78,9 @@ async def get_internal_rag_service(request: Request) -> InternalRagService:
     """向 internal RAG 路由注入 grounded answer service。"""
 
     return request.app.state.container.internal_rag_service
+
+
+async def get_approval_service(request: Request) -> ApprovalService:
+    """向 approval 路由注入审批工作流 service。"""
+
+    return request.app.state.container.approval_service

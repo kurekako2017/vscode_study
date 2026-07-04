@@ -88,3 +88,5 @@ Use this guide when adding new capabilities without breaking frozen standards.
 - Backlog updated
 - Changelog updated
 - Handbook mirror updated
+- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- Keep the trilingual checklist item in future sprint planning so the rule remains a standing review point.

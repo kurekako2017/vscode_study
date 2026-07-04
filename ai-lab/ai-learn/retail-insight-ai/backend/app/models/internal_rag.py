@@ -30,6 +30,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from app.schemas.internal_rag_api import InternalRagAnswerMode, InternalRagCitationResponse
+
 
 class InternalRagWarning(StrEnum):
     """定义 internal RAG 的非致命质量警告。"""
@@ -52,4 +54,58 @@ class InternalRagEvaluationResult:
     warnings: tuple[InternalRagWarning, ...] = field(default_factory=tuple)
 
 
-__all__ = ["InternalRagEvaluationResult", "InternalRagWarning"]
+class RAGFallbackReason(StrEnum):
+    """定义 RAG answer generation 在何种情况下回退。"""
+
+    NONE = "none"
+    DISABLED = "disabled"
+    TIMEOUT = "timeout"
+    UNAVAILABLE = "unavailable"
+    INVALID_OUTPUT = "invalid_output"
+    MISSING_CITATION = "missing_citation"
+
+
+@dataclass(frozen=True)
+class LLMUsageMetrics:
+    """记录未来 LLM provider 的 token / cost / latency 占位信息。"""
+
+    provider_name: str
+    prompt_tokens: int
+    completion_tokens: int
+    estimated_cost: float
+    latency_ms: int
+
+
+@dataclass(frozen=True)
+class RAGAnswerGenerationResult:
+    """保存 RAG answer generator 的内部输出，不直接作为 HTTP 响应返回。"""
+
+    answer: str
+    citations: list[InternalRagCitationResponse]
+    retrieval_mode: str
+    answer_mode: InternalRagAnswerMode
+    provider_name: str
+    usage: LLMUsageMetrics
+    used_llm_provider: bool
+    fallback_reason: RAGFallbackReason = RAGFallbackReason.NONE
+
+
+@dataclass(frozen=True)
+class RAGPromptContext:
+    """把回答生成所需的 prompt 输入显式打包，方便 stub provider 和未来真实 provider 共用。"""
+
+    question: str
+    answer_mode: InternalRagAnswerMode
+    limit: int
+    citations: list[InternalRagCitationResponse]
+    retrieval_excerpts: tuple[str, ...]
+
+
+__all__ = [
+    "InternalRagEvaluationResult",
+    "InternalRagWarning",
+    "LLMUsageMetrics",
+    "RAGAnswerGenerationResult",
+    "RAGFallbackReason",
+    "RAGPromptContext",
+]
