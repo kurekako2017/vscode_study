@@ -185,7 +185,7 @@ log_event(logger, "info", "study_checkpoint", "Reached study checkpoint",
 
 ## 7. 十个小练习
 
-每次只做一个练习，修改前先运行 `./scripts/run_tests.sh`，修改后再运行一次。练习不要求一次全部提交。
+每次只做一个练习，修改前先运行 `./scripts/run_tests.sh`，修改后再运行一次。若当前练习涉及 Phase 2 PostgreSQL 持久化，再补跑 `./scripts/verify_postgres_phase2.sh`，确认当前环境是“真正验证通过”还是“明确记录跳过原因”。练习不要求一次全部提交。
 
 1. **改报告标题**：修改 `reports/generator.py` 的第一行标题，并同步更新 `backend/tests/test_api.py` 的断言。
 2. **改 KPI 文案**：只把报告中的“売上高”换成另一段显示文案，不修改 `KPIResult` 字段和计算公式。

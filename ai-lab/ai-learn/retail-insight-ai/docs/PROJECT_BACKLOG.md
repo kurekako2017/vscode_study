@@ -60,6 +60,19 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [ ] Documentation Standard
 - [ ] Testing Standard
 
+### Epic 14: Engineering Standards (Final Freeze)
+
+- [x] 冻结唯一 Master Prompt
+- [x] 冻结 API Contract
+- [x] 冻结 SSE Event Contract
+- [x] 冻结 Prompt Standard
+- [x] 冻结 Coding Standard
+- [x] 冻结 Development Guide
+- [x] 冻结 AI Agent Design Guide
+- [x] 建立 handbook 镜像文档
+- [x] 扩展文档同步清单
+- [ ] 后续 Phase 在新增能力时按冻结文档执行一致性审查
+
 ### Epic 0 Deliverables
 
 - [ ] Architecture Freeze
@@ -233,17 +246,26 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 
 ### Phase 2: PostgreSQL Persistence MVP
 
-- 状态：代码已落地，联调待完成。
+- 状态：In Progress / Partially Verified。
 - 本次完成：
+  - [x] Code implemented
+  - [x] InMemory path verified
+  - [x] PostgreSQL schema implemented
+  - [x] PostgreSQL repository tests prepared
+  - [x] PostgreSQL verification script added
   - [x] 新增 `REPOSITORY_BACKEND=inmemory|postgres` 配置开关，默认仍为 `inmemory`
   - [x] 新增 PostgreSQL 连接工厂与 UTC 会话设置
   - [x] 新增 `tasks`、`task_events`、`reports`、`report_versions` 表
   - [x] 新增 `data_imports`、`import_errors` schema 预留
   - [x] 新增 `approval_requests`、`approval_events` schema 预留
   - [x] 新增 PostgreSQL Repository 与 backend switch 测试
+  - [x] 新增 `scripts/verify_postgres_phase2.sh`，统一输出依赖检查、跳过原因与手动验证命令
   - [x] 同步主项目与 handbook 文档
 - 后续待办：
+  - [ ] PostgreSQL real integration test pending
   - [ ] 在具备 PostgreSQL 环境后执行真实集成测试
+  - [x] 记录当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv、测试被 skip 的验证边界
+  - [ ] 在具备同级 `ai-agent-retail-handbook-v3/` 工作区后执行 `python3 ../scripts/sync_retail_handbook_docs.py`
   - [ ] 实现 data imports / import errors Repository
   - [ ] 将 reports approval status 接入真实审批状态流转
   - [ ] 为 Phase 3 文档入库与 Phase 5 审批 API 复用当前 schema
@@ -259,6 +281,16 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - 所有功能变更必须追加到 handbook 侧：
   `docs/ai-agent-retail-handbook-v3/docs/CHANGELOG.md`
   `docs/ai-agent-retail-handbook-v3/docs/DECISIONS.md`
+
+## 本次完成记录
+
+### 2026-07-04
+
+- 完成 Epic 14：Engineering Standards（Final Freeze）文档冻结。
+- 新增 Master Prompt、API / Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide。
+- 在 `docs/ai-agent-retail-handbook-v3/docs/` 建立对应镜像。
+- 将 `../doc-sync.manifest.json` 扩展为包含 `engineering-standards` 同步组。
+- 未修改 `backend/`、`frontend/`、`scripts/`。
 
 ## Architecture Principles
 

@@ -6,6 +6,15 @@
 
 Phase 2: PostgreSQL Persistence MVP Sync
 
+当前状态：
+
+- Code implemented
+- InMemory path verified
+- PostgreSQL schema implemented
+- PostgreSQL repository tests prepared
+- PostgreSQL real integration test pending
+- Status: In Progress / Partially Verified
+
 ## Project Positioning
 
 ### Current State
@@ -110,6 +119,9 @@ Task、Event、Report 有可选事务持久化能力，同时 Approval / Import 
 
 - 当前未完成真实 PostgreSQL 联调验收
 - 当前未实现 Approval API、Import API、Document Search、RAG、Internet Search
+- 当前环境缺少 Docker CLI
+- 当前环境未安装 `psycopg` 到实际运行 venv
+- PostgreSQL 集成测试当前被 skip
 
 ## Definition of Done
 

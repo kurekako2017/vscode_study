@@ -2,6 +2,21 @@
 
 ## 2026-07-04
 
+- 完成 `Epic 14: Engineering Standards (Final Freeze)` 文档冻结。
+- Master Prompt Summary was added after Epic 14 final freeze.
+- 新增 `docs/MASTER_PROMPT.md`，作为唯一 Master Prompt。
+- 新增 `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md`。
+- 新增 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/PROMPT_STANDARD.md`。
+- 在 `docs/ai-agent-retail-handbook-v3/docs/` 新增上述 7 份镜像文档。
+- 更新 `ROADMAP.md`、`TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 记录本次冻结。
+- 扩展 `../doc-sync.manifest.json`，新增 `engineering-standards` 同步组。
+- 本次未修改 `backend/`、`frontend/`、`scripts/`，未新增业务代码，未修改数据库 schema。
+
+- 新增 `scripts/verify_postgres_phase2.sh`，统一 Phase 2 PostgreSQL 验证入口。
+- 该脚本会先检查 `psycopg` 与 Docker，再决定自动启动 `postgres` 容器并执行 `tests.test_postgres_repositories`，或明确输出跳过原因与手动命令。
+- 修正 `RUNBOOK_LOCAL.md` 中 PostgreSQL 示例账号口径，统一为 `retail_user / retail_password`。
+- README、RUNBOOK、VERIFY_CHECKLIST、CODE_STUDY_GUIDE 补充 PostgreSQL 验证脚本说明。
+- 尝试执行 `python3 ../scripts/sync_retail_handbook_docs.py` 刷新外部 handbook，同步因缺少同级 `ai-agent-retail-handbook-v3/README.md` 工作区文件而阻塞。
 - 实现 Phase 2：PostgreSQL Persistence MVP 的代码基础。
 - 新增 `backend/app/db/connection.py` 与 `backend/app/repositories/postgres/`。
 - 新增 `backend/db/schema.sql`、`backend/db/init.sql`。
@@ -14,6 +29,14 @@
 - `docker-compose.yml` 新增 PostgreSQL service。
 - 新增 backend switch 测试与 PostgreSQL Repository 集成测试骨架。
 - 同步更新 `docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook 对应文档。
+- 修正 Phase 2 状态口径为：
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL real integration test pending`
+  `Status: In Progress / Partially Verified`
+- 明确当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv，因此 PostgreSQL 集成测试被 skip。
 
 - 新增 Phase 1.5：Data Contract Freeze + Approval State Machine Design。
 - 新增 `docs/DATA_CONTRACTS.md`，冻结业务 CSV、Research JSON、Documents Markdown 契约。

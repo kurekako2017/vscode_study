@@ -124,14 +124,11 @@ curl -sS -X POST http://127.0.0.1:8000/api/tasks -H 'Content-Type: application/j
 - 命令（具备 Docker CLI 时）：
 
   ```bash
-  docker compose up -d postgres
-  cd backend
-  source .venv/bin/activate
-  REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v
+  ./scripts/verify_postgres_phase2.sh
   ```
 
-- 预期结果：`create task`、`append event`、`save report`、`get report` 覆盖通过。
-- 当前边界：如果环境缺少 `docker` 或 `psycopg`，该验证允许跳过，但必须记录未执行原因，不得伪造通过。
+- 预期结果：脚本先检查 `psycopg` 和 Docker；条件满足时自动拉起 `postgres` 容器，并让 `create task`、`append event`、`save report`、`get report` 覆盖通过。
+- 当前边界：如果环境缺少 `docker` 或 `psycopg`，脚本会明确打印跳过原因与手动命令；允许跳过，但必须保留该输出，不得伪造通过。
 
 <!-- DOC-SYNC:START group=study-and-runbook -->
 ## 文档同步块

@@ -4,6 +4,29 @@
 
 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。
 
+## Epic 14 Engineering Standards Freeze
+
+### Current State
+
+- Architecture、Workflow、Contract、Prompt、Development Standard 的约束分散在 README、AGENTS、Architecture 文档与历史任务记录中。
+- 不同 AI 工具可能对 API version、SSE event、prompt 分类和 workflow 边界产生不一致解释。
+
+### Target State
+
+- `docs/MASTER_PROMPT.md` 成为唯一总入口。
+- `docs/API_CONTRACT.md` 冻结 HTTP 边界。
+- `docs/EVENT_CONTRACT.md` 冻结 SSE 事件封装。
+- `docs/PROMPT_STANDARD.md` 冻结 Prompt 分类与模板要求。
+- `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md` 冻结工程实现与设计判断入口。
+
+### Planned
+
+- 以后新增 API 必须 version。
+- 以后新增 event family 或 breaking event 字段必须 version。
+- 以后新增 prompt family 必须声明 category、variables、output、version。
+- 以后所有 AI 工具必须先读冻结文档，再执行具体实现。
+- Epic 14 has frozen the master prompt, API contract, event contract, prompt standard, coding standard, development guide, and AI agent design guide as the final planning baseline.
+
 ## Phase 1.5 Contract Freeze and Approval Design
 
 ### Current State
@@ -34,6 +57,13 @@
 - 当前 Task、Task Event、Report 已具备 PostgreSQL Repository
 - 当前 `data_imports`、`import_errors`、`approval_requests`、`approval_events` 仅完成 schema 与模型预留
 - 当前尚未实现 Approval API、Import API、Document Search、RAG、Internet Search
+- 当前状态：
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL real integration test pending`
+  `Status: In Progress / Partially Verified`
 
 ### Target State
 
@@ -46,6 +76,14 @@
 - Phase 2 完成真实 PostgreSQL 联调后，继续保持 `REPOSITORY_BACKEND=inmemory` 默认值
 - Phase 3 复用 `data_imports` 与 `import_errors`
 - Phase 5 复用 `reports.approval_status`、`report_versions`、`approval_requests`、`approval_events`
+- 当前未验证原因：
+  当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
+- 下一步验证命令：
+  `docker compose up -d postgres`
+  `cd backend`
+  `source .venv/bin/activate`
+  `pip install -r requirements.txt`
+  `REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v`
 
 ## Repository Backend Switch
 

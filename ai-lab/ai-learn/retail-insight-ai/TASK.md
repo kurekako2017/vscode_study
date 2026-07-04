@@ -17,6 +17,31 @@ Phase 2: PostgreSQL Persistence MVP
 - [ ] 明确 Retrieval and RAG Platform 的横向能力边界
 - [ ] 冻结 Data Contract 与 Approval State Machine
 
+## Epic 14: Engineering Standards（Final Freeze）
+
+- [x] 新增 `docs/MASTER_PROMPT.md`
+- [x] 新增 `docs/CODING_STANDARD.md`
+- [x] 新增 `docs/DEVELOPMENT_GUIDE.md`
+- [x] 新增 `docs/AI_AGENT_DESIGN_GUIDE.md`
+- [x] 新增 `docs/API_CONTRACT.md`
+- [x] 新增 `docs/EVENT_CONTRACT.md`
+- [x] 新增 `docs/PROMPT_STANDARD.md`
+- [x] 在 `docs/ai-agent-retail-handbook-v3/docs/` 建立 handbook 镜像
+- [x] 扩展 `../doc-sync.manifest.json` 以纳入 Engineering Standards 同步组
+- [x] 冻结 Architecture / Workflow / Contract / Development Standard 文档入口
+
+当前边界：
+
+- 本次不修改 `backend/`
+- 本次不修改 `frontend/`
+- 本次不修改 `scripts/`
+- 本次不新增业务代码
+- 本次不修改数据库 schema
+
+下一任务：
+
+- 以后新增 API、Event、Prompt、Workflow、Provider、Repository 时，先按本次冻结文档执行，再进入具体 Phase 开发。
+
 ## Epic 0: Enterprise Platform Architecture Evolution
 
 ### Current State
@@ -167,6 +192,8 @@ Frontend
 - 如果本次变更涉及测试、流程、架构、运行方式，还必须同步检查并更新：
   `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 未完成 Handbook 同步，不得将对应 Phase 标记为完成。
+- 所有核心架构图必须三语言维护：
+  English、中文（简体）、日本語。
 
 ## 测试用例文档规则
 
@@ -233,6 +260,14 @@ Frontend
 
 - [ ] 是否完成
 - [x] Handbook 文档已同步
+- 当前状态：
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL verification script added`
+  `PostgreSQL real integration test pending`
+  `Status: In Progress / Partially Verified`
 - 目标：
   为 Task、Event、Report 和后续导入记录建立 PostgreSQL 持久化基础，同时保留本地可切换运行能力。
 - 修改范围：
@@ -241,6 +276,16 @@ Frontend
   `REPOSITORY_BACKEND` 支持 `inmemory / postgres`；默认仍为 `inmemory`；Task / Event / Report 具备 PostgreSQL Repository；`data_imports`、`import_errors`、`approval_requests`、`approval_events` 完成 schema 与基础模型预留；当前 `reports.approval_status` 仍写入 `generated`。
 - 测试方法：
   InMemory 全量回归；Repository backend switch 单元测试；PostgreSQL Repository 集成测试覆盖 create task、append event、save report、get report；当前环境缺少 `psycopg` / Docker 时记录跳过原因并提供手动命令。
+- 当前未验证原因：
+  当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。已新增 `./scripts/verify_postgres_phase2.sh` 统一输出跳过原因与手动验证命令。外部 handbook 同步脚本因缺少同级 `../ai-agent-retail-handbook-v3/` 工作区而未执行。
+- 下一步验证命令：
+  `./scripts/verify_postgres_phase2.sh`
+  或手工执行：
+  `docker compose up -d postgres`
+  `cd backend`
+  `source .venv/bin/activate`
+  `pip install -r requirements.txt`
+  `REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v`
 - 风险：
   本地环境数据库依赖增加、Schema 演进成本、连接池与事务边界设计不当、未完成真实 PostgreSQL 联调前不可宣称 Phase 2 全部关闭。
 

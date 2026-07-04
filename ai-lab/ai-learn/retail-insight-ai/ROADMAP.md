@@ -6,6 +6,36 @@
 
 Phase 2: PostgreSQL Persistence MVP
 
+## Epic 14: Engineering Standards (Final Freeze)
+
+### Current State
+
+- Architecture、Workflow、Contract、Development Standard 此前分散在多个治理文档中
+- 各类 AI 工具尚无单一 Master Prompt 和统一工程标准入口
+
+### Target State
+
+- `docs/MASTER_PROMPT.md` 成为唯一 Master Prompt
+- API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide 全部冻结
+- handbook 侧存在镜像文档，供教学与审查同步引用
+
+### Result
+
+- Freeze docs created
+- Handbook mirror docs created
+- Sync manifest expanded
+- Future AI tools must follow the frozen standards before editing the repository
+
+当前状态：
+
+- Code implemented
+- InMemory path verified
+- PostgreSQL schema implemented
+- PostgreSQL repository tests prepared
+- PostgreSQL verification script added
+- PostgreSQL real integration test pending
+- Status: In Progress / Partially Verified
+
 当前企业化主线：
 
 1. 文件化输入（CSV / JSON / Markdown）
@@ -191,6 +221,8 @@ Frontend
   `docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
 - 若本次变更涉及任务治理、生产路线图或系统流程，还必须同步检查：
   `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
+- 所有核心架构图必须三语言维护：
+  English、中文（简体）、日本語。
 
 ## 测试与架构文档门禁
 
@@ -217,8 +249,8 @@ Frontend
 
 - 目标：为 Task、Event、Report 与导入记录建立数据库持久化能力。
 - 交付重点：`REPOSITORY_BACKEND` 切换、PostgreSQL 连接管理、`schema.sql` / `init.sql`、Task / Event / Report Repository、导入与审批 schema 预留。
-- 当前结果：已完成 PostgreSQL Repository MVP，默认后端仍为 `inmemory`；`reports.approval_status` 已入库但当前值仍为 `generated`；`data_imports`、`import_errors`、`approval_requests`、`approval_events` 已建表但未接入 API。
-- 当前边界：当前环境未执行真实 PostgreSQL 集成测试，原因是本地未安装 `psycopg` 且没有 Docker CLI；因此本阶段保持进行中，待环境具备后完成联调验收。
+- 当前结果：Code implemented；InMemory path verified；PostgreSQL schema implemented；PostgreSQL repository tests prepared；默认后端仍为 `inmemory`；`reports.approval_status` 已入库但当前值仍为 `generated`；`data_imports`、`import_errors`、`approval_requests`、`approval_events` 已建表但未接入 API。
+- 当前边界：PostgreSQL real integration test pending；已新增 `./scripts/verify_postgres_phase2.sh` 统一输出验证入口；当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip；Status: In Progress / Partially Verified。
 
 ### Phase 3: 社内文档上传与入库
 

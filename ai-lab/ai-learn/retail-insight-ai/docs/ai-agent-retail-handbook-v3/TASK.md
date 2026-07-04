@@ -12,6 +12,7 @@ Phase 2: PostgreSQL Persistence MVP Sync
 - [x] 同步 Repository backend switch 设计
 - [x] 同步 Approval / Import schema-only 预留说明
 - [x] 同步 handbook CHANGELOG / DECISIONS / 架构图册 / 系统设计书
+- [x] 同步三语言架构图规则
 - [ ] 等待真实 PostgreSQL 环境联调结果后关闭 Phase 2
 
 ## Epic 0: Enterprise Platform Architecture Evolution
@@ -137,6 +138,12 @@ handbook 尚未把 Data Contract、Import Error Model 和 Approval State Machine
 
 ### Synced Result
 
+- [x] Code implemented
+- [x] InMemory path verified
+- [x] PostgreSQL schema implemented
+- [x] PostgreSQL repository tests prepared
+- [ ] PostgreSQL real integration test pending
+- [x] Status: In Progress / Partially Verified
 - [x] `REPOSITORY_BACKEND` 支持 `inmemory / postgres`
 - [x] 默认值仍为 `inmemory`
 - [x] PostgreSQL 覆盖 Task / Event / Report 持久化
@@ -144,6 +151,7 @@ handbook 尚未把 Data Contract、Import Error Model 和 Approval State Machine
 - [x] `approval_requests`、`approval_events` 仅完成 schema 预留
 - [x] `reports.approval_status` 已入库，当前值仍为 `generated`
 - [x] Handbook 文档已同步
+- [x] 当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv、PostgreSQL 集成测试被 skip
 
 ## Handbook 同步规则
 
@@ -153,6 +161,8 @@ handbook 尚未把 Data Contract、Import Error Model 和 Approval State Machine
 - 若变更涉及测试、流程、系统设计和生产路线图，还必须同步检查并更新：
   `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 未完成 handbook 同步，不得把主项目对应 Phase 标记为完成。
+- 所有核心架构图必须三语言维护：
+  English、中文（简体）、日本語。
 
 ## 文档模板规则
 

@@ -143,3 +143,33 @@
 - Task / Event / Report 走统一 Repository Interface
 - Approval / Import 本阶段仅保留 schema 扩展位
 - handbook 在讲解 Phase 2 时必须区分代码已实现与联调已完成
+
+## ADR-009
+
+日期：2026-07-04
+
+决策：Phase 2 在真实 PostgreSQL 集成测试完成前，统一标记为 `In Progress / Partially Verified`，不得描述为完全完成。
+
+原因：当前环境缺少 Docker CLI，且实际运行 venv 未安装 `psycopg`，导致 PostgreSQL 集成测试被 skip。代码和 schema 已实现，不等于真实数据库联调已完成。
+
+影响：
+
+- handbook 必须同步记录 Phase 2 的部分验证状态
+- handbook 必须同步记录真实联调命令
+- handbook 图册必须采用 English / 中文（简体） / 日本語 三语言维护
+
+## ADR-010
+
+日期：2026-07-04
+
+决策：handbook 必须镜像保存 Master Prompt、API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide 和 AI Agent Design Guide，并将其视为后续 AI 协作与教学讲解的冻结标准入口。
+
+原因：如果 handbook 只保留概念讲解，而不镜像项目标准文档，后续学习材料、面试讲解和 AI 协作规范会逐步偏离主项目的真实工程边界。
+
+备选方案：仅在 handbook 的架构章节中口头描述标准；该方案缺少可引用的单一来源，也无法支撑后续 Phase 的一致性审查。
+
+影响：
+
+- handbook `docs/` 新增 7 份标准镜像文档。
+- 后续 AI 工具和学习者都必须先读这些标准文档，再读具体实现章节。
+- 若主项目标准文档发生变更，handbook 镜像必须同一会话内刷新。

@@ -154,6 +154,7 @@ http://127.0.0.1:5173
 ```
 
 详细的 Backend、Frontend、API、SSE、Report 自测和排障步骤见 [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md)。
+如果要验证 Phase 2 的 PostgreSQL 持久化路径，优先执行 `./scripts/verify_postgres_phase2.sh`；脚本会自动检查 `psycopg` 与 Docker，条件不满足时明确输出跳过原因和手动命令。
 
 Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业平台化架构的零售分析领域参考实现：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行确定性 KPI 与 Static Research，SSE 实时返回进度，最终展示 Markdown 报告。
 

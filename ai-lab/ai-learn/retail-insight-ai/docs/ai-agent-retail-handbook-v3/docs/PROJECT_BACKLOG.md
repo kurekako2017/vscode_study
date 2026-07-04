@@ -139,6 +139,12 @@
 
 ### 2026-07-04 Phase 2 PostgreSQL Persistence MVP
 
+- [x] 同步 `Code implemented`
+- [x] 同步 `InMemory path verified`
+- [x] 同步 `PostgreSQL schema implemented`
+- [x] 同步 `PostgreSQL repository tests prepared`
+- [ ] `PostgreSQL real integration test pending`
+- [x] 同步 `Status: In Progress / Partially Verified`
 - [x] 同步 `REPOSITORY_BACKEND=inmemory|postgres`
 - [x] 同步 PostgreSQL Task / Event / Report Repository 边界
 - [x] 同步 `data_imports` / `import_errors` schema 预留

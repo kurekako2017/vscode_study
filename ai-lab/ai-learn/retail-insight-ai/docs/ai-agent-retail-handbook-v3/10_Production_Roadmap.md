@@ -132,10 +132,19 @@ Epic 12 当前作为横向平台能力标记，不代表已经实现。
 
 - Current State:
   主项目已落地 PostgreSQL Repository MVP，但默认运行模式仍为 `inmemory`。
+- Verification Status:
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL real integration test pending`
+  `Status: In Progress / Partially Verified`
 - Target State:
   建立 Task、Event、Report 的事务持久化基础，并为 Approval / Import 预留事实表。
 - Planned:
   在具备 PostgreSQL 环境后完成联调，再进入文档入库与审批 API 阶段。
+- Pending Reason:
+  当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
 
 ## 2. Level 1 Demo
 

@@ -4,6 +4,25 @@
 
 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。
 
+## Engineering Standards Freeze
+
+### Current State
+
+- handbook 过去主要通过架构图、系统设计书和 ADR 承载规则。
+- 对 Master Prompt、API Contract、Event Contract、Prompt Standard、Coding Standard 的入口还不集中。
+
+### Target State
+
+- handbook `docs/` 下存在与主项目一致的工程标准镜像。
+- 这些镜像作为教学、审查、AI 协作的统一引用入口。
+
+### Planned
+
+- 继续保持 handbook 架构说明与标准镜像分层：
+  标准文档负责冻结规则，
+  handbook 主章节负责解释、教学和面试表达。
+- Epic 14 has frozen the master prompt, API contract, event contract, prompt standard, coding standard, development guide, and AI agent design guide as the final planning baseline.
+
 ## Project Positioning
 
 ### Current State
@@ -513,6 +532,13 @@ flowchart LR
 - 当前已新增可选 `postgres` backend
 - 当前 PostgreSQL 持久化只覆盖 Task、Task Event、Report
 - 当前 Approval / Import 仍是 schema-only
+- 当前状态：
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL real integration test pending`
+  `Status: In Progress / Partially Verified`
 
 ### Target State
 
@@ -524,6 +550,14 @@ flowchart LR
 
 - 在具备 PostgreSQL 运行环境后执行真实联调
 - 保持 API / Workflow / SSE 合同稳定
+- 当前未验证原因：
+  当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
+- 下一步验证命令：
+  `docker compose up -d postgres`
+  `cd backend`
+  `source .venv/bin/activate`
+  `pip install -r requirements.txt`
+  `REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v`
 
 ```mermaid
 flowchart LR

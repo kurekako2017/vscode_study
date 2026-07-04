@@ -50,6 +50,25 @@
         "ai-agent-retail-handbook-v3/09_系统设计书.md",
         "ai-agent-retail-handbook-v3/12_ADR.md"
       ]
+    },
+    {
+      "name": "engineering-standards",
+      "paths": [
+        "retail-insight-ai/docs/MASTER_PROMPT.md",
+        "retail-insight-ai/docs/CODING_STANDARD.md",
+        "retail-insight-ai/docs/DEVELOPMENT_GUIDE.md",
+        "retail-insight-ai/docs/AI_AGENT_DESIGN_GUIDE.md",
+        "retail-insight-ai/docs/API_CONTRACT.md",
+        "retail-insight-ai/docs/EVENT_CONTRACT.md",
+        "retail-insight-ai/docs/PROMPT_STANDARD.md",
+        "ai-agent-retail-handbook-v3/docs/MASTER_PROMPT.md",
+        "ai-agent-retail-handbook-v3/docs/CODING_STANDARD.md",
+        "ai-agent-retail-handbook-v3/docs/DEVELOPMENT_GUIDE.md",
+        "ai-agent-retail-handbook-v3/docs/AI_AGENT_DESIGN_GUIDE.md",
+        "ai-agent-retail-handbook-v3/docs/API_CONTRACT.md",
+        "ai-agent-retail-handbook-v3/docs/EVENT_CONTRACT.md",
+        "ai-agent-retail-handbook-v3/docs/PROMPT_STANDARD.md"
+      ]
     }
   ]
 }

@@ -1,13 +1,31 @@
 # CHANGELOG
 
+## 2026-07-04 Epic 14 Engineering Standards Final Freeze
+
+- 同步主项目的 Engineering Standards（Final Freeze）。
+- Master Prompt Summary was added after Epic 14 final freeze.
+- 新增 handbook 镜像文档：
+  `docs/MASTER_PROMPT.md`
+  `docs/CODING_STANDARD.md`
+  `docs/DEVELOPMENT_GUIDE.md`
+  `docs/AI_AGENT_DESIGN_GUIDE.md`
+  `docs/API_CONTRACT.md`
+  `docs/EVENT_CONTRACT.md`
+  `docs/PROMPT_STANDARD.md`
+- 同步唯一 Master Prompt、API Contract、SSE Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide 的冻结结论。
+- 同步本次未修改 `backend/`、`frontend/`、`scripts/`，未新增业务代码、未修改数据库 schema 的边界。
+
 ## 2026-07-04 Phase 2 PostgreSQL Persistence MVP
 
 - 同步主项目 PostgreSQL Persistence MVP。
+- 同步 Phase 2 状态修正为 `In Progress / Partially Verified`。
 - 新增 `REPOSITORY_BACKEND=inmemory|postgres` 说明，默认值仍为 `inmemory`。
 - 同步 PostgreSQL Task / Event / Report Repository 边界。
 - 同步 `tasks`、`task_events`、`reports`、`report_versions` 表。
 - 同步 `data_imports`、`import_errors`、`approval_requests`、`approval_events` 的 schema-only 预留说明。
 - 同步 Approval / Import 尚未接入业务 API 的边界。
+- 同步当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv、测试被 skip 的说明。
+- 同步 `08_架构图册.md` 三语言化要求与核心图集。
 
 ## 2026-07-04 Architecture Positioning
 

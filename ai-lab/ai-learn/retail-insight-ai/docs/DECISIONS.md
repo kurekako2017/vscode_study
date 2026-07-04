@@ -160,6 +160,50 @@
 - InMemory 模式不依赖 PostgreSQL 驱动即可运行
 - 后续如果切到 async 或连接池方案，可在 Repository 实现层内部演进，不破坏 Service 接口
 
+## ADR-009
+
+日期：2026-07-04
+
+决策：Phase 2 在真实 PostgreSQL 集成测试完成前，统一标记为 `In Progress / Partially Verified`，不得描述为完全完成。
+
+原因：当前环境缺少 Docker CLI，且实际运行 venv 未安装 `psycopg`，导致 PostgreSQL 集成测试被 skip。代码和 schema 已实现，不等于真实数据库联调已完成。
+
+备选方案：
+
+- 将 Phase 2 标记为完成；该方案会夸大验证范围，不符合企业项目审计要求。
+
+影响：
+
+- 所有 Phase 2 文档必须显式记录：
+  `Code implemented`
+  `InMemory path verified`
+  `PostgreSQL schema implemented`
+  `PostgreSQL repository tests prepared`
+  `PostgreSQL real integration test pending`
+- 文档必须附带下一步真实联调命令。
+
+## ADR-010
+
+日期：2026-07-04
+
+决策：在 `Epic 14: Engineering Standards (Final Freeze)` 中冻结 Master Prompt、API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide 和 AI Agent Design Guide，并要求 handbook 同步镜像同时落地。
+
+原因：当前项目已经同时存在多类 AI 协作入口。如果没有单一 Master Prompt 和统一工程标准，不同 AI 工具会对 Workflow、Prompt、API 版本、SSE 事件和文档治理产生不同解释，导致后续 Phase 的实现和审查标准漂移。
+
+备选方案：
+
+- 继续把规则分散保存在 AGENTS、README、TASK、Architecture 文档中；该方案可读性差，且不能为后续 AI 工具提供唯一冻结入口。
+- 等业务代码继续演进后再补标准；该方案会把标准冻结变成事后追认，无法真正起到前置约束作用。
+
+影响：
+
+- `docs/MASTER_PROMPT.md` 成为唯一 Master Prompt。
+- `docs/API_CONTRACT.md` 与 `docs/EVENT_CONTRACT.md` 成为接口与事件冻结入口。
+- `docs/PROMPT_STANDARD.md` 成为 Prompt 分类与模板冻结入口。
+- `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md` 成为开发和设计冻结入口。
+- `docs/ai-agent-retail-handbook-v3/docs/` 必须维护对应镜像。
+- 后续若要破坏这些冻结规则，必须同一变更内更新 ADR、Architecture、Task、Backlog、Changelog、handbook 与相关测试。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

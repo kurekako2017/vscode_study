@@ -31,6 +31,13 @@ docker --version
 ```
 
 预期看到 Python、pip、Node、npm 的版本和“必需工具检查通过”。Docker 不存在时脚本只提示，不会失败。
+如果要继续验证 Phase 2 的 PostgreSQL 路径，建议额外执行：
+
+```bash
+./scripts/verify_postgres_phase2.sh
+```
+
+该脚本会先检查当前 Python 环境是否安装 `psycopg`，再检查是否具备 Docker CLI；条件满足时自动拉起 `postgres` 容器并运行 `tests.test_postgres_repositories`，否则会输出明确的跳过原因和手动命令。
 
 ## 2. 项目目录确认
 
@@ -114,20 +121,20 @@ kill <PID>
 
 ### 3.1 PostgreSQL 可选启动说明
 
-如果本机具备 Docker CLI，可在项目根目录执行：
+如果本机具备 Docker CLI，优先在项目根目录执行：
 
 ```bash
-docker compose up -d postgres
+./scripts/verify_postgres_phase2.sh
 ```
 
-然后把根目录 `.env` 中的 `REPOSITORY_BACKEND` 改为 `postgres`，再确认以下变量：
+若想手工分步验证，也可以先执行 `docker compose up -d postgres`，然后把根目录 `.env` 中的 `REPOSITORY_BACKEND` 改为 `postgres`，再确认以下变量：
 
 ```bash
 POSTGRES_HOST=127.0.0.1
 POSTGRES_PORT=5432
 POSTGRES_DB=retail_insight_ai
-POSTGRES_USER=retail
-POSTGRES_PASSWORD=retail
+POSTGRES_USER=retail_user
+POSTGRES_PASSWORD=retail_password
 ```
 
 当前环境若提示 `docker: command not found`，说明只能继续使用默认 `inmemory` 模式，这不会影响本地学习与 Phase 1 功能验证。
