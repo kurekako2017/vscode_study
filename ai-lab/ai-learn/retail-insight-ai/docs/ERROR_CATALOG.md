@@ -95,7 +95,27 @@ This file freezes document upload related error codes and their operator-facing 
 | `provider_timeout` | 503 | Answer generation timed out. | Provider timed out while assembling the answer. | Yes | internal_rag | Show retry button |
 | `repository_error` | 500 | Answer storage error. | Repository operation failed during RAG flow. | Yes | internal_rag | Show retry and support hint |
 
-## 11. Retry Guidance / 重试建议 / 再試行ガイド
+## 11. Future LLM Provider Errors / 未来 LLM 提供器错误 / 将来の LLM プロバイダーエラー
+
+These error codes are frozen for the future LLM provider seam. The current deterministic path does not emit them yet.
+
+| Code | HTTP Status | User Message | Developer Message | Retryable | Source | Future UI Behavior |
+|---|---:|---|---|---|---|---|
+| `llm_provider_unavailable` | 503 | Answer provider is temporarily unavailable. | LLM provider could not be reached or is disabled. | Yes | llm_provider | Fall back to deterministic extractive mode |
+| `llm_provider_timeout` | 503 | Answer provider timed out. | LLM provider request exceeded the frozen timeout. | Yes | llm_provider | Fall back to deterministic extractive mode |
+| `llm_output_invalid` | 502 | Answer output is invalid. | Provider returned malformed or schema-invalid output. | Yes | llm_provider | Retry or fall back to deterministic mode |
+| `llm_citation_missing` | 422 | Citations are required. | LLM answer omitted required grounded citations. | Maybe | llm_provider | Fall back to deterministic mode or request regeneration |
+| `llm_cost_limit_exceeded` | 429 | Answer generation budget exceeded. | Token or cost ceiling was reached before completion. | Maybe | llm_provider | Fall back to deterministic mode or stop generation |
+
+## 12. Internal RAG Warnings / 内部 RAG 警告 / 社内 RAG 警告
+
+The following values are warning signals for internal RAG quality and do not represent new HTTP error codes:
+
+- `low_context`: retrieval coverage is partial or thin.
+- `missing_citation`: at least one answer excerpt could not be grounded to a valid citation.
+- `weak_match`: citation grounding exists, but the match quality is weak.
+
+## 13. Retry Guidance / 重试建议 / 再試行ガイド
 
 - Retryable errors should keep the current session state and allow safe retry.
 - Non-retryable validation errors should be fixed in the current form before retry.

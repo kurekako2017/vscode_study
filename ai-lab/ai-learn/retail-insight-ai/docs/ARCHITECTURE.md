@@ -680,6 +680,132 @@ flowchart TD
     C --> E[rejected]
 ```
 
+## Sprint 9.4 LLM Provider Seam Contract Freeze
+
+### Current State
+
+- 当前 Internal RAG 仍然是 deterministic answer assembly。
+- 当前没有真实 LLM provider，没有外部调用，没有新增依赖。
+- 当前只冻结未来 model integration seam，不改变 `POST /api/v1/internal-rag/answer` response。
+
+### Target State
+
+- 未来 `LLMProvider` 可以接到 `RAGAnswerGenerator` 后面，而不改变 retrieval contract、citation contract 或 API contract。
+- provider error model、fallback behavior、token/cost/latency tracking placeholders 必须先冻结，再考虑任何实现。
+
+### Result
+
+- `LLMProvider`、`RAGAnswerGenerator`、future provider errors、fallback behavior、tracking placeholders 已在文档层冻结。
+- backend、frontend、scripts 维持不变。
+
+### Planned
+
+- 继续保持 deterministic extractive fallback 为默认路径。
+- 未来若接入模型，只允许替换 answer generation seam，不允许回写 retrieval provider boundary。
+
+## Future LLM Provider Seam
+
+```mermaid
+flowchart TD
+    A[Internal RAG request] --> B[RAGAnswerGenerator]
+    B --> C[Bind prompt contract]
+    C --> D[LLMProvider request]
+    D --> E{provider output valid?}
+    E -->|yes| F[Use provider answer]
+    E -->|no| G[Fallback to deterministic extractive mode]
+    D -->|timeout / unavailable / cost limit| G
+```
+
+## Internal RAG with Optional LLM
+
+```mermaid
+flowchart TD
+    A[Retrieval results] --> B[Deterministic extractive mode]
+    A --> C[Optional LLMProvider]
+    C --> D[RAGAnswerGenerator]
+    D --> E[Answer + citations + confidence]
+    B --> E
+```
+
+## Fallback to Extractive Mode
+
+```mermaid
+flowchart TD
+    A[Provider error or invalid output] --> B[Keep retrieval citations]
+    B --> C[Assemble deterministic answer]
+    C --> D[Return frozen API response]
+```
+
+## Token Cost Tracking Flow
+
+```mermaid
+flowchart TD
+    A[LLMProvider request] --> B[Count input tokens]
+    B --> C[Count output tokens]
+    C --> D[Estimate cost]
+    D --> E[Record latency_ms]
+    E --> F[Attach usage placeholders]
+```
+
+## Sprint 9.3 Internal RAG Evaluation + Citation Quality MVP
+
+### Current State
+
+- Internal RAG 已实现 deterministic answer assembly，并新增内部 evaluation / citation quality checking。
+- warnings taxonomy 已包含 `low_context`、`missing_citation`、`weak_match`。
+
+### Target State
+
+- 未来若引入 LLM provider，仍要复用当前 evaluation contract 与 citation quality checker。
+
+### Result
+
+- `coverage_score`、`citation_score`、`confidence` 和 warnings 由内部 evaluation service 计算。
+- citation quality checker 验证 `document_id`、`chunk_id` 与 grounded excerpt 的一致性。
+- backend tests 已覆盖 perfect citation score、missing citation warning、weak match、low context、summary citation 和 archived filtering。
+
+### Planned
+
+- 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
+- 继续保持 retrieval API contract / scoring / response shape 不变。
+
+## RAG Evaluation Flow
+
+```mermaid
+flowchart TD
+    A[Internal RAG Answer] --> B[Build citations]
+    B --> C[Validate citation grounding]
+    C --> D[Compute coverage_score]
+    C --> E[Compute citation_score]
+    D --> F[Derive confidence]
+    E --> F
+    F --> G[warnings]
+```
+
+## Citation Quality Flow
+
+```mermaid
+flowchart TD
+    A[Citation] --> B{document_id/chunk_id exists?}
+    B -->|no| X[missing_citation]
+    B -->|yes| C{excerpt grounded in chunk excerpt?}
+    C -->|no| X
+    C -->|yes| D[valid citation]
+```
+
+## Future LLM Evaluation Flow
+
+```mermaid
+flowchart TD
+    A[Future LLM answer] --> B[Reuse evaluation service]
+    B --> C[Check citations]
+    B --> D[Check coverage]
+    B --> E[Check weak_match]
+    C --> F[Final answer contract]
+    D --> F
+    E --> F
+```
+
 ## Document Retrieval Flow
 
 ```mermaid

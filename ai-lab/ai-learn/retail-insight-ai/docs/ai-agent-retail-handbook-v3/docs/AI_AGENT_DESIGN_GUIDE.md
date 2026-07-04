@@ -26,6 +26,15 @@ This guide explains when to use workflow, agent, tool, repository, provider, ret
 
 - Use a provider for replaceable source integrations.
 - Good provider examples: research source, internet search source, document retrieval source, model provider.
+- For model integrations, freeze an explicit `LLMProvider` concept so the model backend can change without affecting retrieval or API contracts.
+- Provider contracts should include timeout, retry, usage accounting, and provider error mapping.
+- Track placeholder fields for tokens, cost, latency, model name, and provider name even before real billing is introduced.
+
+### `RAGAnswerGenerator`
+
+- Use `RAGAnswerGenerator` as the answer assembly boundary between retrieval results and a future `LLMProvider`.
+- It binds prompt inputs and validates prompt outputs, but it does not own retrieval, storage, or approval state.
+- If provider output is unavailable, times out, is invalid, misses citations, or exceeds cost limits, fall back to deterministic extractive mode.
 
 ## 6. Business Retrieval / 业务检索 / 業務データ検索
 
@@ -37,6 +46,8 @@ This guide explains when to use workflow, agent, tool, repository, provider, ret
 - Use for internal documents, manuals, policies, FAQs, and uploaded files.
 - Use after retrieval when a grounded answer with citations is needed.
 - Requires chunking, metadata, citation, ACL, evaluation, and a citation-safe answer contract.
+- Keep the current no-LLM path as the default implementation until a future provider is explicitly wired in.
+- `RAGAnswerGenerator` must not change the frozen `/api/v1/internal-rag/answer` response contract.
 
 ## 8. Internet Search / 互联网检索 / インターネット検索
 
@@ -72,6 +83,7 @@ This guide explains when to use workflow, agent, tool, repository, provider, ret
 
 - Use prompts for reasoning and language generation, not as a substitute for contracts or repositories.
 - Prompt versions must be documented.
+- Prompt families that drive `RAGAnswerGenerator` must document input fields, output schema, fallback mode, and provider assumptions separately from the retrieval provider contract.
 
 ## 15. Evaluation / 评估 / 評価
 

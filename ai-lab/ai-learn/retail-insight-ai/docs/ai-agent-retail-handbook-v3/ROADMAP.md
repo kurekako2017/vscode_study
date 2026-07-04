@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Sprint 9.2: Internal RAG MVP without LLM
+Sprint 9.4: LLM Provider Seam Contract Freeze
 
 当前状态：
 
@@ -13,6 +13,48 @@ Sprint 9.2: Internal RAG MVP without LLM
 - Full backend tests pass
 - Python compileall pass
 - Status: Completed / Verified
+
+## Sprint 9.4: LLM Provider Seam Contract Freeze
+
+### Current State
+
+- Internal RAG 仍然是 deterministic answer assembly，没有真实 LLM provider。
+- 当前只冻结未来 provider seam、prompt contract 和 fallback behavior。
+
+### Target State
+
+- 未来 summary / generative answer path 可以通过 `LLMProvider` 接入，但必须保持现有 response contract 不变。
+
+### Result
+
+- `LLMProvider`、`RAGAnswerGenerator`、provider error model、fallback behavior、token/cost/latency placeholder 已在文档层冻结。
+- handbook 行为、backend、frontend、scripts 均未修改。
+
+### Planned
+
+- 继续保持 no-LLM path 为默认路径。
+- 未来若接入模型，只允许在 answer generation seam 做替换。
+
+## Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+
+### Current State
+
+- Internal RAG 已实现 deterministic answer assembly，并新增内部 evaluation / citation quality checking。
+- warnings taxonomy 已包含 `low_context`、`missing_citation`、`weak_match`。
+
+### Target State
+
+- 未来如果引入 LLM provider，仍要沿用当前 evaluation contract 与 citation quality checker。
+
+### Result
+
+- `coverage_score`、`citation_score`、`confidence` 和 warnings 已由内部 evaluation service 计算。
+- backend tests 与 compileall 已通过。
+
+### Planned
+
+- 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
+- 继续保持 retrieval API contract / scoring / response shape 不变。
 
 ## Project Positioning
 
@@ -115,28 +157,6 @@ handbook 后续所有路线图描述都必须显式区分 Current State、Target
 
 - 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
 - 继续保持 Retrieval 不承担 LLM answer generation。
-
-## Sprint 9.1: Internal RAG Contract Freeze
-
-### Current State
-
-- Internal RAG 仅完成 contract freeze。
-- 当前没有 RAG implementation、没有 LLM provider、没有 embedding、没有 pgvector。
-
-### Target State
-
-- Internal RAG 成为 retrieval 之后、approval 之前的稳定 answer boundary。
-- Answer mode 与 citation requirement 在 contract 层冻结。
-
-### Result
-
-- 已冻结 `/api/v1/internal-rag/answer`。
-- 已冻结 Internal RAG events / errors / prompt family / architecture flow。
-
-### Planned
-
-- 不实现 RAG / embedding / pgvector / frontend。
-- 未来 summary mode 若接入 LLM provider，必须版本化并保持兼容边界。
 
 ## Sprint 9.2: Internal RAG MVP without LLM
 

@@ -495,6 +495,8 @@ Validation rules:
 - `require_citations` is frozen as `true`; `false` is a contract violation.
 - `answer_mode=summary` is frozen as a contract option, but it does not imply that a real LLM provider is currently implemented.
 - `retrieval_mode` is frozen as `keyword` for this phase because the contract sits on top of the existing document retrieval provider.
+- `warnings[]` may include internal quality signals such as `low_context`, `missing_citation`, and `weak_match`; these are backward-compatible advisory values, not new error codes.
+- Future `LLMProvider` / `RAGAnswerGenerator` integration must keep this response shape unchanged and should fall back to deterministic extractive mode before any contract-breaking behavior is considered.
 
 Versioning rule:
 - Internal RAG answer semantics are frozen under `/api/v1`.

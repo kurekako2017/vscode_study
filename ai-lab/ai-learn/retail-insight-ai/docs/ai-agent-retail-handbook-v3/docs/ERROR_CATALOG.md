@@ -68,3 +68,23 @@
 | `citation_required` | 400 | Citations are required. | Request disabled the frozen citation requirement. | No | internal_rag |
 | `provider_timeout` | 503 | Answer generation timed out. | Provider timed out while assembling the answer. | Yes | internal_rag |
 | `repository_error` | 500 | Answer storage error. | Repository operation failed during RAG flow. | Yes | internal_rag |
+
+## Future LLM Provider Errors / 未来 LLM 提供器错误 / 将来の LLM プロバイダーエラー
+
+These error codes are frozen for the future LLM provider seam. The current deterministic path does not emit them yet.
+
+| Code | HTTP | User | Developer | Retryable | Source |
+|---|---:|---|---|---|---|
+| `llm_provider_unavailable` | 503 | Answer provider is temporarily unavailable. | LLM provider could not be reached or is disabled. | Yes | llm_provider |
+| `llm_provider_timeout` | 503 | Answer provider timed out. | LLM provider request exceeded the frozen timeout. | Yes | llm_provider |
+| `llm_output_invalid` | 502 | Answer output is invalid. | Provider returned malformed or schema-invalid output. | Yes | llm_provider |
+| `llm_citation_missing` | 422 | Citations are required. | LLM answer omitted required grounded citations. | Maybe | llm_provider |
+| `llm_cost_limit_exceeded` | 429 | Answer generation budget exceeded. | Token or cost ceiling was reached before completion. | Maybe | llm_provider |
+
+## Internal RAG Warnings / 内部 RAG 警告 / 社内 RAG 警告
+
+The following values are warning signals for internal RAG quality and do not represent new HTTP error codes:
+
+- `low_context`: retrieval coverage is partial or thin.
+- `missing_citation`: at least one answer excerpt could not be grounded to a valid citation.
+- `weak_match`: citation grounding exists, but the match quality is weak.

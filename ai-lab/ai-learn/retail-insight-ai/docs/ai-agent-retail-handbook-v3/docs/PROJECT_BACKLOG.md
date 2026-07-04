@@ -8,9 +8,21 @@
 
 ## 当前阶段
 
-Sprint 9.2: Internal RAG MVP without LLM
+Sprint 9.4: LLM Provider Seam Contract Freeze
 
 状态：已完成
+
+### Sprint 9.4: LLM Provider Seam Contract Freeze
+
+- [x] `LLMProvider` interface concept frozen
+- [x] `RAGAnswerGenerator` concept frozen
+- [x] prompt input/output contract frozen for future model-backed answers
+- [x] provider error model frozen for unavailable / timeout / invalid output / citation missing / cost limit cases
+- [x] deterministic extractive fallback remains the current default
+- [x] token / cost / latency tracking placeholders documented
+- [x] handbook architecture / prompt / design / error docs updated
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS synchronized
+- [x] handbook / backend / frontend / scripts boundary unchanged
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -26,6 +38,7 @@ Sprint 9.2: Internal RAG MVP without LLM
 
 ### Planned Tasks
 
+- [x] Sprint 9.4 LLM Provider Seam Contract Freeze
 - [ ] Architecture Freeze
 - [ ] Directory Refactor
 - [ ] Repository Abstraction
@@ -123,6 +136,20 @@ Sprint 9.2: Internal RAG MVP without LLM
 - [x] `invalid_question` / `insufficient_context` / `citation_required` behavior covered by backend tests
 - [x] archived documents are excluded unless `include_archived=true`
 - [x] existing retrieval tests still pass
+- [x] backend full test suite and compileall pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] retrieval API behavior remains unchanged
+
+### Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+
+- [x] citation quality checker validates document_id / chunk_id / grounded excerpt
+- [x] internal RAG evaluation service computes coverage_score / citation_score / confidence / warnings
+- [x] low_context / missing_citation / weak_match warnings are generated internally
+- [x] extractive answer has citation_score=1.0 on grounded paths
+- [x] summary mode still returns citations
+- [x] archived filtering and retrieval API behavior remain unchanged
+- [x] backend tests added for evaluation scores, missing citation warning, weak_match, and low_context
+- [x] existing retrieval and internal RAG tests still pass
 - [x] backend full test suite and compileall pass
 - [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
 - [x] retrieval API behavior remains unchanged

@@ -424,3 +424,44 @@
 - `backend/app/api/internal_rag.py` 暴露 `POST /api/v1/internal-rag/answer`。
 - `backend/tests/test_internal_rag_api.py` 覆盖 extractive、summary、invalid_question、insufficient_context、citations、archived exclusion。
 - `docs/ARCHITECTURE.md` 需要同步记录 Internal RAG MVP without LLM 的真实实现边界。
+
+## ADR-023
+
+日期：2026-07-04
+
+决策：在 deterministic Internal RAG MVP 之上增加 evaluation service 与 citation quality checker，并用 warning taxonomy 表达低上下文、弱匹配和引用缺失风险。
+
+原因：internal RAG 如果只返回 answer 和 citations，而没有稳定的评估层，就无法区分“有引用但质量一般”和“完全没有上下文”的场景。加入 evaluation service 后，可以在不改变 API response contract 的前提下，把 citation quality、coverage 和 confidence 变成可测试、可解释的内部能力。
+
+备选方案：
+
+- 只在 API response 里追加更多评估字段；该方案会改变对外 contract，不符合 backward compatibility 目标。
+- 把 warning 逻辑散落在 service 和 route 中；该方案会让质量判断难以测试和复用。
+
+影响：
+
+- `backend/app/services/internal_rag_evaluation_service.py` 成为内部评估边界。
+- `backend/app/models/internal_rag.py` 定义 `InternalRagEvaluationResult` 与 warning taxonomy。
+- `backend/tests/test_internal_rag_evaluation.py` 覆盖 citation_score、missing_citation、weak_match、low_context。
+- `docs/ARCHITECTURE.md` 需要记录 RAG Evaluation Flow 与 Citation Quality Flow。
+
+## ADR-024
+
+日期：2026-07-04
+
+决策：冻结未来 `LLMProvider` 与 `RAGAnswerGenerator` seam 作为 Internal RAG 的可替换模型接入点，但当前默认行为继续保持 deterministic extractive fallback。
+
+原因：当前项目需要先把 model integration boundary、prompt contract、provider error model 和 usage accounting placeholders 冻结下来，避免未来接入真实模型时把 retrieval contract、citation contract 和 API response 一起改掉。
+
+备选方案：
+
+- 直接把 LLM 接到 Internal RAG；该方案会把未来模型选择和当前 retrieval boundary 绑定，增加回归风险。
+- 继续只写概念、不冻结 seam；该方案会让后续 provider 接入时重新定义 prompt contract 与错误模型。
+
+影响：
+
+- `docs/PROMPT_STANDARD.md` 冻结未来 LLM prompt family 的 input / output / fallback contract。
+- `docs/AI_AGENT_DESIGN_GUIDE.md` 明确 `LLMProvider` 与 `RAGAnswerGenerator` 的职责边界。
+- `docs/ERROR_CATALOG.md` 冻结 future LLM provider error model。
+- `docs/ARCHITECTURE.md` 冻结 optional LLM provider flow、fallback flow 与 token/cost/latency tracking placeholders。
+- `POST /api/v1/internal-rag/answer` 的 response 结构保持不变，当前仍以 deterministic extractive mode 为默认实现。

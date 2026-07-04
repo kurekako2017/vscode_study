@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 2026-07-04 Sprint 9.4 LLM Provider Seam Contract Freeze
+
+- 冻结未来 `LLMProvider` interface concept、`RAGAnswerGenerator` concept 以及 prompt input/output contract。
+- 冻结 provider error model：`llm_provider_unavailable`、`llm_provider_timeout`、`llm_output_invalid`、`llm_citation_missing`、`llm_cost_limit_exceeded`。
+- 明确当前默认仍是 deterministic extractive fallback，不调用 LLM、不调用外部 provider。
+- 记录 token / cost / latency tracking placeholders，供未来模型接入时使用。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/PROMPT_STANDARD.md`、`docs/AI_AGENT_DESIGN_GUIDE.md`、`docs/ARCHITECTURE.md`、`docs/ERROR_CATALOG.md`。
+- 本次不修改 backend、frontend 或 scripts，且不改变 `/api/v1/internal-rag/answer` response。
+
+## 2026-07-04 Sprint 9.3 Internal RAG Evaluation + Citation Quality MVP
+
+- 新增 internal RAG evaluation service，用于计算 `coverage_score`、`citation_score`、`confidence` 和 warnings。
+- 新增 citation quality checker，验证 `document_id` / `chunk_id` / excerpt grounding 关系，并生成 `low_context`、`missing_citation`、`weak_match` warnings。
+- `POST /api/v1/internal-rag/answer` 仍保持 backward compatible，对外 response 未增加新字段。
+- `extractive` / `summary` 两种 answer mode 继续不调用 LLM、embedding 或 pgvector。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- `python3 -m unittest discover -s tests -v` 与 `python3 -m compileall app tests` 已通过。
+
 ## 2026-07-04 Sprint 9.2 Internal RAG MVP without LLM
 
 - 实现 `POST /api/v1/internal-rag/answer`，基于现有 `DocumentRetrievalProvider` 进行 deterministic answer assembly。

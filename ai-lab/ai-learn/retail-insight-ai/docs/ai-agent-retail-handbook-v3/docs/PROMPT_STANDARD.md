@@ -19,6 +19,7 @@ Do not hardcode production prompts directly inside workflow logic.
 - Report
 - Retrieval
 - Internal RAG
+- LLM Provider Seam
 - Evaluation
 - Guardrails
 
@@ -80,6 +81,15 @@ Each prompt definition must declare:
 - Variables: `question`, `retrieval_results`, `answer_mode`, `require_citations`, `confidence_floor`
 - Constraints: every factual claim must be grounded in citations; do not invent unsupported facts; return an insufficiency signal when context is too thin; keep answers schema-bound.
 - Fallback: `insufficient_context`
+
+### LLM Provider Seam
+
+- Role: model-backed answer assembly boundary
+- Input: question, retrieval results, citations, answer mode, provider policy, usage limits
+- Output: grounded answer draft, citations, usage metadata, confidence notes
+- Variables: `question`, `retrieval_results`, `citations`, `answer_mode`, `provider_name`, `model_name`, `max_output_tokens`, `temperature`, `token_budget`, `cost_budget`, `latency_budget`
+- Constraints: provider output must be schema-bound; missing or invalid citations must not be passed through; provider errors must not change the frozen retrieval API response; token, cost, and latency accounting placeholders must be documented even when not enforced.
+- Fallback: `deterministic_extractive_mode`
 
 ### Evaluation
 

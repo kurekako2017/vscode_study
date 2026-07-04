@@ -4,9 +4,68 @@
 
 ## 当前阶段
 
-Sprint 9.2: Internal RAG MVP without LLM
+Sprint 9.4: LLM Provider Seam Contract Freeze
 
 ## 当前最高优先级任务
+
+- [x] `LLMProvider` interface concept frozen
+- [x] `RAGAnswerGenerator` concept frozen
+- [x] prompt input/output contract frozen for future model-backed answers
+- [x] provider error model frozen for unavailable / timeout / invalid output / citation missing / cost limit cases
+- [x] deterministic extractive fallback remains the current default
+- [x] token / cost / latency tracking placeholders documented
+- [x] handbook architecture / prompt / design / error docs updated
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS synchronized
+
+### Boundary
+
+- 当前行为仍然是 deterministic internal RAG，不调用 LLM、不调用外部 provider。
+- 不修改 backend、frontend 或 scripts。
+- 不改变 `POST /api/v1/internal-rag/answer` 的 response 结构。
+
+## Sprint 9.4: LLM Provider Seam Contract Freeze
+
+### Current State
+
+Internal RAG 已完成 deterministic answer assembly，当前只冻结未来 LLM provider 的接入边界。
+
+### Target State
+
+未来可以把 `LLMProvider` 接到 `RAGAnswerGenerator` 后面，而不改变 retrieval contract、citation contract 或 API response。
+
+### Planned
+
+- 继续保持当前 no-LLM 行为作为默认路径。
+- 未来若接入模型，只允许替换 answer generation seam，不允许回写 retrieval provider boundary。
+
+## Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+
+- [x] citation quality checker validates document_id / chunk_id / grounded excerpt
+- [x] internal RAG evaluation service computes coverage_score / citation_score / confidence / warnings
+- [x] low_context / missing_citation / weak_match warnings are generated internally
+- [x] extractive answer has citation_score=1.0 on grounded paths
+- [x] summary mode still returns citations
+- [x] archived filtering and retrieval API behavior remain unchanged
+- [x] backend tests added for evaluation scores, missing citation warning, weak_match, and low_context
+- [x] existing retrieval and internal RAG tests still pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+
+## Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+
+### Current State
+
+Internal RAG 已具备 deterministic answer assembly 和内部 evaluation / citation quality checking。
+
+### Target State
+
+未来若接入 LLM provider，仍要复用当前 evaluation contract、citation quality checker 和 warning taxonomy。
+
+### Planned
+
+- 继续保持 `/api/v1/internal-rag/answer` 对外 response backward compatible。
+- 未来评估规则可扩展，但不能破坏 current warning taxonomy 和 retrieval boundary。
+
+## Sprint 9.2: Internal RAG MVP without LLM
 
 - [x] POST /api/v1/internal-rag/answer implemented
 - [x] InternalRagService added on top of DocumentRetrievalProvider

@@ -113,7 +113,7 @@ class InternalRagAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("score", citation)
         self.assertGreaterEqual(payload["confidence"], 0.0)
         self.assertLessEqual(payload["confidence"], 1.0)
-        self.assertEqual(payload["warnings"], [])
+        self.assertIn("weak_match", payload["warnings"])
 
         events = self.app.state.container.event_repository.list_after("internal_rag:internal-rag-request")
         self.assertEqual(
@@ -124,6 +124,31 @@ class InternalRagAPITest(unittest.IsolatedAsyncioTestCase):
                 "internal_rag.answer_generated",
             ],
         )
+
+    async def test_low_context_warning_is_returned_for_partial_coverage(self) -> None:
+        await self._prepare_searchable_document(
+            filename="rag-low-context.md",
+            content=(
+                b"# Monthly Policy\n\nMonthly policy paragraph one.\n\n"
+                b"Monthly policy paragraph two.\n\nMonthly policy paragraph three."
+            ),
+            title="Monthly Policy",
+            tags=["policy"],
+        )
+
+        response = await self._answer_internal_rag(
+            {
+                "question": "monthly policy",
+                "limit": 1,
+                "answer_mode": "extractive",
+                "require_citations": True,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()["data"]
+        self.assertIn("low_context", payload["warnings"])
+        self.assertGreaterEqual(len(payload["citations"]), 1)
 
     async def test_summary_mode_is_deterministic(self) -> None:
         await self._prepare_searchable_document(

@@ -32,9 +32,21 @@
 
 ## 当前阶段
 
-Sprint 9.2: Internal RAG MVP without LLM
+Sprint 9.4: LLM Provider Seam Contract Freeze
 
 状态：已完成
+
+### Sprint 9.4: LLM Provider Seam Contract Freeze
+
+- [x] `LLMProvider` interface concept frozen
+- [x] `RAGAnswerGenerator` concept frozen
+- [x] prompt input/output contract frozen for future model-backed answers
+- [x] provider error model frozen for unavailable / timeout / invalid output / citation missing / cost limit cases
+- [x] deterministic extractive fallback remains the current default
+- [x] token / cost / latency tracking placeholders documented
+- [x] `docs/PROMPT_STANDARD.md` / `docs/AI_AGENT_DESIGN_GUIDE.md` / `docs/ARCHITECTURE.md` / `docs/ERROR_CATALOG.md` updated
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] backend / frontend / scripts left untouched
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
@@ -202,6 +214,20 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 - [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror updated
 - [x] retrieval API behavior unchanged
 
+### Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+
+- [x] citation quality checker validates document_id / chunk_id / grounded excerpt
+- [x] internal RAG evaluation service computes coverage_score / citation_score / confidence / warnings
+- [x] low_context / missing_citation / weak_match warnings are generated internally
+- [x] extractive answer has citation_score=1.0 on grounded paths
+- [x] summary mode still returns citations
+- [x] archived filtering and retrieval API behavior remain unchanged
+- [x] backend tests added for evaluation scores, missing citation warning, weak_match, and low_context
+- [x] existing retrieval and internal RAG tests still pass
+- [x] backend full test suite and compileall pass
+- [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
+- [x] retrieval API behavior remains unchanged
+
 ### Sprint 9.2: Internal RAG MVP without LLM
 
 - [x] `POST /api/v1/internal-rag/answer` implemented on top of `DocumentRetrievalProvider`
@@ -219,6 +245,8 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 
 ### Enterprise Priority
 
+- [x] Sprint 9.4 LLM Provider Seam Contract Freeze
+- [x] Sprint 9.3 Internal RAG Evaluation + Citation Quality MVP
 - [x] Sprint 9.2 Internal RAG MVP without LLM
 - [x] Sprint 9.1 Internal RAG Contract Freeze
 - [x] Sprint 8.3 Retrieval Repository Abstraction + Worktree Cleanup
