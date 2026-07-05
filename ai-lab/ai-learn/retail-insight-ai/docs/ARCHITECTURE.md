@@ -8,6 +8,26 @@ Human-readable architecture explanations are trilingual by default.
 本文件中的人类可读架构说明默认采用三语。
 本書の人間向けアーキテクチャ説明は三言語を標準とします。
 
+## Current Verified Capability Envelope / 当前已验证能力边界 / 現在の検証済み能力範囲
+
+### Current State
+
+- English: the backend is verified for document lifecycle, document retrieval, internal RAG without LLM, LLM provider stub seam, approval workflow, approval RBAC, approval audit middleware, security domain, and in-memory audit log
+- 中文（简体）：后端已验证文档生命周期、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批 RBAC、审批审计中间件、安全域和 InMemory 审计日志
+- 日本語：バックエンドは、ドキュメントライフサイクル、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認 RBAC、承認監査ミドルウェア、セキュリティドメイン、InMemory 監査ログまで検証済みです
+
+### Target State
+
+- English: keep the verified backend stable while future phases intentionally add frontend UI, PostgreSQL, real authentication, real LLM, pgvector, internet search, MCP, and production deployment
+- 中文（简体）：在保持已验证后端稳定的前提下，后续阶段再有计划地加入前端 UI、PostgreSQL、真实认证、真实 LLM、pgvector、互联网搜索、MCP 和生产部署
+- 日本語：検証済みバックエンドを安定させたまま、今後の段階で frontend UI、PostgreSQL、実認証、実 LLM、pgvector、インターネット検索、MCP、本番デプロイを計画的に追加します
+
+### Result
+
+- English: the current project is runnable, learnable, and interview-ready, but not a production platform
+- 中文（简体）：当前项目可运行、可学习、可面试讲解，但还不是生产平台
+- 日本語：現在のプロジェクトは実行可能で、学習しやすく、面接説明にも使えますが、まだ本番プラットフォームではありません
+
 ## Epic 14 Engineering Standards Freeze
 
 ### Current State

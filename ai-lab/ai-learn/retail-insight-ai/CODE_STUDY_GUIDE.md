@@ -41,6 +41,8 @@ React
 
 当前 backend 还新增了企业安全基础读模型：`users/me` 返回 `system` 占位主体，`security/roles` 和 `security/permissions` 返回冻结目录，`audit-logs` 读取 append-only 审计事实。
 
+如果你的目标是 Sprint R2 的 runnable learning MVP verification，建议先打开 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)；它把“怎么启动、先看什么、每个功能能跑什么”收敛成最短路径。
+
 ## 2. 后端阅读顺序
 
 第一次阅读时不要从每个目录的 `__init__.py` 开始。按一次请求从外到内、再从内到外的顺序读：

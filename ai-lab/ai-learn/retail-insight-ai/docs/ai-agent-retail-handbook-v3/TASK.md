@@ -4,7 +4,9 @@
 
 ## 当前阶段
 
-Sprint 11.3: RBAC Enforcement for Approval APIs
+Sprint R2: Runnable Learning MVP Verification
+
+状态：已完成
 
 ### Future Sprint Checklist
 
@@ -12,7 +14,27 @@ Sprint 11.3: RBAC Enforcement for Approval APIs
 
 ## 当前最高优先级任务
 
+### Sprint R2 Result
+
+- [x] backend import 验证通过：`from app.main import app; print(app.title)`
+- [x] OpenAPI / Swagger 验证通过：`app.openapi()` 可生成并返回 `Retail Insight AI`
+- [x] 最小可运行路径已通过 ASGI 验证，覆盖 health、task、document、pipeline、approval、security 与 audit
+- [x] 新增 `docs/LEARNING_API_WALKTHROUGH.md`，用于 runnable learning 路径
+- [x] 更新 README / RUNBOOK / VERIFY / CODE_STUDY / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG
+
+### Verification Boundary
+
+- 当前只做 runnable verification，不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
+- 通过 ASGI 直接验证最小路径；当前环境中 uvicorn 已启动，但外部 localhost 端口在不同 exec shell 中不可直连，所以最终可运行性以 ASGI 验证为准。
+- 如果后续要做真实网络联通，再单独开网络验证 sprint。
+
 ### Sprint Result
+
+- [x] 已完成收口整理，不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT / OAuth
+- [x] 后端验证通过：`python3 -m unittest discover -s tests -v`
+- [x] 后端编译检查通过：`python3 -m compileall app tests`
+- [x] 当前已完成能力、未完成能力和项目边界已整理为三语摘要
+- [x] handbook mirror 已同步
 
 - [x] approval APIs now enforce RBAC with the existing current-user seam
 - [x] default system admin placeholder user passes all approval checks
@@ -21,6 +43,30 @@ Sprint 11.3: RBAC Enforcement for Approval APIs
 - [x] docs updated: API_CONTRACT / ARCHITECTURE / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror
 - [x] backend / frontend / scripts boundary unchanged
 - [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Completed Capabilities
+
+- English: Document Upload, Document Read, Document Archive, Document Import, Document Chunk, Document Retrieval, Internal RAG without LLM, LLM Provider Stub Seam, Approval Workflow, RBAC for Approval APIs, Approval Audit Middleware, Security Domain, InMemory Audit Log
+- 中文（简体）：文档上传、文档读取、文档归档、文档导入、文档切分、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批 API 的 RBAC、审批审计中间件、安全域、InMemory 审计日志
+- 日本語：ドキュメントアップロード、ドキュメント読取、ドキュメントアーカイブ、ドキュメントインポート、ドキュメントチャンク、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認 API の RBAC、承認監査ミドルウェア、セキュリティドメイン、InMemory 監査ログ
+
+### Remaining Capabilities
+
+- English: frontend UI, PostgreSQL repository full migration, real authentication, JWT/OAuth, real LLM provider, pgvector, internet search, MCP, production deployment
+- 中文（简体）：前端 UI、PostgreSQL 仓库全面迁移、真实认证、JWT/OAuth、真实 LLM 提供方、pgvector、互联网搜索、MCP、生产部署
+- 日本語：frontend UI、PostgreSQL リポジトリの完全移行、実認証、JWT/OAuth、実 LLM provider、pgvector、インターネット検索、MCP、本番デプロイ
+
+### Validation
+
+- Backend unit tests: `python3 -m unittest discover -s tests -v` -> passed, `115` tests run, `1` skipped because `psycopg` is not installed in the current environment
+- Backend compile check: `python3 -m compileall app tests` -> passed
+
+### Next Focus
+
+- Keep the current scope frozen until frontend, PostgreSQL, real auth, and real LLM are intentionally scheduled
+- Use the current backend as the stable interview and learning baseline
+
+## 历史完成项
 
 ### Boundary
 

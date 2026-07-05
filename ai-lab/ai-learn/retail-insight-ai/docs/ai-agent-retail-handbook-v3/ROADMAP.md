@@ -4,7 +4,15 @@
 
 ## 当前阶段
 
-Sprint 11.3: RBAC Enforcement for Approval APIs
+Sprint R2: Runnable Learning MVP Verification
+
+### Current Status
+
+- Backend import verification passed: `from app.main import app; print(app.title)`
+- OpenAPI schema verification passed: `app.openapi()["info"]["title"]`
+- ASGI route verification passed for the minimal runnable surfaces
+- No new feature work was added in this verification sprint
+- Human-readable summaries are trilingual: English / 中文（简体） / 日本語
 
 ### Future Sprint Checklist
 
@@ -12,10 +20,16 @@ Sprint 11.3: RBAC Enforcement for Approval APIs
 
 当前状态：
 
-- Approval API RBAC enforcement implemented on approval endpoints only
+- Approval API RBAC enforcement remains implemented on approval endpoints only
 - Current user seam remains placeholder-based and default system admin passes all checks
-- Denied approval access writes `security.permission.denied` audit facts
+- Denied approval access still writes `security.permission.denied` audit facts
 - Status: Completed / Verified
+
+### Sprint R2 Summary
+
+- English: the project is runnable, teachable, and interview-ready without adding new features
+- 中文（简体）：项目已具备可运行、可教学、可面试讲解的最小学习版
+- 日本語：プロジェクトは新機能を追加せずに、実行可能・学習可能・面接説明可能な状態です
 
 ## Sprint 11.3: RBAC Enforcement for Approval APIs
 

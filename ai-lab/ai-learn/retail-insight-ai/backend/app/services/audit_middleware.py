@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from inspect import isawaitable
 from typing import Any, TypeVar
 
@@ -43,7 +43,7 @@ class AuditAction:
     resource_type: str
     resource_id: str
     action: str
-    metadata: dict[str, Any] = None  # type: ignore[assignment]
+    metadata: dict[str, Any] = field(default_factory=dict)
     permission: str | None = None
     permissions: tuple[str, ...] = ()
     role: str | None = None

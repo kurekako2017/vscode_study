@@ -38,6 +38,8 @@ ERIP 是未来企业平台架构目标，不表示当前手册描述的是一个
 
 不得把 ERIP 写成当前已实现现状。
 
+如果你想先按“可跑起来、可边测试边学习、可准备面试回答”的顺序学习，先看 [docs/LEARNING_API_WALKTHROUGH.md](../../docs/LEARNING_API_WALKTHROUGH.md)。
+
 ## 文档同步
 
 本手册与 [retail-insight-ai](../retail-insight-ai/README.md) 保持同步块联动，脚本位于 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py)。

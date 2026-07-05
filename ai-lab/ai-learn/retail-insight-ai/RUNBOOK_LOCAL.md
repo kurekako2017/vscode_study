@@ -39,6 +39,8 @@ docker --version
 
 该脚本会先检查当前 Python 环境是否安装 `psycopg`，再检查是否具备 Docker CLI；条件满足时自动拉起 `postgres` 容器并运行 `tests.test_postgres_repositories`，否则会输出明确的跳过原因和手动命令。
 
+如果你现在的目标只是 Sprint R2 的 runnable learning verification，可以直接查看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)，它只保留最小启动命令、Swagger、curl 示例和面试要点。
+
 ## 2. 项目目录确认
 
 从 `ai-learn` 工作区进入项目：

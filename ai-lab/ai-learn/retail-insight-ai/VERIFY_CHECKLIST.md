@@ -133,6 +133,12 @@ curl -sS -X POST http://127.0.0.1:8000/api/tasks -H 'Content-Type: application/j
 - 预期结果：Backend tests、Frontend tests、Frontend build 和 Python compileall 全部通过。
 - 失败时看：输出中第一个失败阶段及对应的 `backend/tests/` 或 `frontend/src/*.test.ts*`；不要跳过第一个错误继续猜后续问题。
 
+## 10. Runnable Learning MVP
+
+- 学习顺序：先读 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)，再按里面的顺序跑 health、task、document、pipeline、approval 和 security。
+- 预期结果：每个最小路径都能返回稳定的 HTTP 响应，文档和审批边界都能在不接真实外部依赖的前提下跑起来。
+- 失败时看：`backend/app/main.py`、`backend/app/api/`、`backend/app/services/`、`backend/app/repositories/`，以及 `backend/tests/` 里的最小用例。
+
 ## PostgreSQL 可选验证
 
 - 命令（具备 Docker CLI 时）：

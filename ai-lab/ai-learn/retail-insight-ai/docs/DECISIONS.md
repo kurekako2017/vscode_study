@@ -640,6 +640,26 @@
 - `backend/tests/test_approval_api.py` 覆盖 allow / deny 路径和 denied audit logging。
 - `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
 
+## ADR-032
+
+日期：2026-07-05
+
+决策：将本次 Final Wrap-up Sprint 只定义为项目收口与验证，不新增功能，不扩展 frontend、PostgreSQL、真实认证、真实 LLM、pgvector、internet search、MCP 或 production deployment 范围，并把当前已完成能力与未完成能力写入三语摘要。
+
+原因：项目已经进入可运行、可学习、可面试讲解的收口阶段。此时继续扩展功能会模糊已验证边界，也会让学习者难以判断当前版本到底支持什么、还缺什么。
+
+备选方案：
+
+- 继续边收口边新增功能；该方案会破坏当前的验证结论，且不利于明确项目边界。
+- 只更新代码不更新文档；该方案会让已完成能力、未完成能力和测试结果无法在治理文档中对齐。
+
+影响：
+
+- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要记录最终收口结果。
+- 当前完成能力被固定为：Document Upload / Read / Archive / Import / Chunk / Retrieval、Internal RAG without LLM、LLM Provider Stub Seam、Approval Workflow、RBAC for Approval APIs、Approval Audit Middleware、Security Domain、InMemory Audit Log。
+- 当前未完成能力被固定为：frontend UI、PostgreSQL repository full migration、real authentication、JWT/OAuth、real LLM provider、pgvector、internet search、MCP、production deployment。
+- English / 中文（简体） / 日本語 三语摘要继续作为人类可读文档的默认表达方式。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

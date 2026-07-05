@@ -2,6 +2,23 @@
 
 # CHANGELOG
 
+## 2026-07-05 Sprint R2 Runnable Learning MVP Verification
+
+- 验证 `from app.main import app; print(app.title)` 和 `app.openapi()` 可正常运行。
+- 通过 ASGI 直接确认最小可运行路径：health、task、document、pipeline、approval、security、audit。
+- 新增 `docs/LEARNING_API_WALKTHROUGH.md`，把 runnable learning 路径收敛成最短学习顺序。
+- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
+- 本次不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
+
+## 2026-07-05 Final Wrap-up Sprint: Project Consolidation and Verification
+
+- 本次仅做收口整理和验证，不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT / OAuth。
+- `python3 -m unittest discover -s tests -v` 通过，`115` 个测试运行，`1` 个 PostgreSQL 相关测试因当前环境缺少 `psycopg` 跳过。
+- `python3 -m compileall app tests` 通过。
+- 当前已完成能力、未完成能力和项目边界已整理为三语摘要，并同步到 handbook mirror。
+- 当前完成能力包括：Document Upload / Read / Archive / Import / Chunk / Retrieval、Internal RAG without LLM、LLM Provider Stub Seam、Approval Workflow、Approval RBAC、Approval Audit Middleware、Security Domain、InMemory Audit Log。
+- 当前未完成能力包括：frontend UI、PostgreSQL repository full migration、real authentication、JWT/OAuth、real LLM provider、pgvector、internet search、MCP、production deployment。
+
 ## 2026-07-05 Sprint 11.3 RBAC Enforcement for Approval APIs
 
 - 在现有 `SecurityService` current-user seam 上，只对 approval APIs 强制 RBAC，不扩展到 document / retrieval / RAG / task APIs。

@@ -135,7 +135,9 @@ async def get_approval(
         resource_id=approval_id,
         action="get_approval",
         permission="approval.review",
-        operation=lambda: ApprovalResponse.from_domain(service.get_approval(approval_id)),
+        operation=lambda: ApprovalResponse.from_domain(
+            service.get_approval(approval_id)
+        ),
         metadata={"approval_id": approval_id},
     )
     return success_response(data, get_request_id())
