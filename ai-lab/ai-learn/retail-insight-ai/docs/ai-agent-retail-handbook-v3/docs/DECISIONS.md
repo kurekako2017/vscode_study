@@ -134,6 +134,27 @@
 
 日期：2026-07-04
 
+
+## ADR-031
+
+日期：2026-07-05
+
+决策：在 Security Domain + InMemory Audit MVP 之上，先只对 Approval Workflow APIs 实现 backend-only RBAC enforcement，并通过 current user seam、permission catalog 和 audit append-only seam 记录 permission denied 事实。
+
+原因：Approval API 已经有稳定 contract 和 report revision boundary，但企业安全能力需要先验证当前用户、权限判定和 denied audit 事实的真实运行路径。把 RBAC 限定在 approval APIs 上，可以保持 document / retrieval / RAG / task APIs 现状不变，同时为后续真实认证和更细粒度授权留出替换点。
+
+备选方案：
+
+- 立即把 RBAC 扩展到所有 API；该方案会扩大本 sprint 范围，并引入不必要的回归面。
+- 继续不做 RBAC enforcement；该方案会让 approval 安全边界停留在 contract-only，无法验证 denied audit path。
+
+影响：
+
+- `backend/app/services/security_service.py` 提供 current user seam 以及 permission check helper。
+- `backend/app/api/approvals.py` 只在 approval APIs 上调用 RBAC helper。
+- `permission_denied` 通过 append-only audit log 记录 denied facts。
+- `backend/tests/test_approval_api.py` 覆盖 allow / deny 路径和 denied audit logging。
+- `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
 决策：Phase 2 采用双后端 Repository 策略，默认仍为 `inmemory`，仅在显式配置时启用 PostgreSQL。
 
 原因：handbook 需要忠实反映主项目“本地可运行优先”的边界，不能把 PostgreSQL 说成默认必选依赖。

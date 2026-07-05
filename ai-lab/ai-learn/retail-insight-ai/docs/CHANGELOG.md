@@ -2,6 +2,27 @@
 
 # CHANGELOG
 
+## 2026-07-05 Sprint 11.3 RBAC Enforcement for Approval APIs
+
+- 在现有 `SecurityService` current-user seam 上，只对 approval APIs 强制 RBAC，不扩展到 document / retrieval / RAG / task APIs。
+- `POST /api/v1/reports/{task_id}/submit-approval` 现在要求 `report.submit_approval`；`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}` 要求 `approval.review`；`approve`、`reject`、`revise` 分别要求 `approval.approve`、`approval.reject`、`approval.revise`。
+- default system admin placeholder user 继续通过所有 approval permission checks。
+- permission denied 会写入 append-only audit fact，并以 `permission_denied` 返回 403。
+- 新增 backend tests 覆盖允许路径、拒绝路径与 denied audit logging。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md` 以及 handbook mirror。
+- 本次不修改 frontend、scripts 或 approval response shape。
+
+## 2026-07-05 Sprint 11.2 Security Domain + InMemory Audit MVP
+
+- 新增 security domain models：`User`、`Organization`、`Department`、`Role`、`Permission`、`Policy`。
+- 实现 `GET /api/v1/users/me`、`GET /api/v1/security/roles`、`GET /api/v1/security/permissions` 和 `GET /api/v1/audit-logs`。
+- 新增 `AuditLog`、`AuditRepository`、`InMemoryAuditRepository` 和 `AuditService`，并把审计写入边界做成 append-only seam。
+- current user 使用 `user_id="system"` 的 placeholder principal，roles 预置为 `admin`，permissions 预置为 frozen catalog。
+- `audit.log.created` / `audit.log.failed` 作为结构化日志事件记录审计追加成功和失败。
+- 新增 backend tests，覆盖系统用户、冻结目录、审计追加、审计只读读取和 append-only 语义。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 本次仍不实现真实认证、JWT、OAuth、RBAC enforcement、PostgreSQL audit repository 或 frontend 变更。
+
 ## 2026-07-05 Sprint 11.1 Enterprise Security Foundation Contract Freeze
 
 - 冻结企业安全基础合同，覆盖 user / organization / department / role / permission / policy 概念。

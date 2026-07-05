@@ -4,13 +4,31 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 ### Future Sprint Checklist
 
-- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 ## 当前最高优先级任务
+
+### Sprint Result
+
+- [x] approval APIs now enforce RBAC with the existing current-user seam
+- [x] default system admin placeholder user passes all approval checks
+- [x] denied approval access writes append-only audit facts
+- [x] backend tests added for submit / review / approve / reject / revise deny paths
+- [x] docs updated: API_CONTRACT / ARCHITECTURE / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Boundary
+
+- 当前实现只在 approval APIs 上做 RBAC，不扩展到 document / retrieval / RAG / task APIs。
+- 当前 current user seam 仍是 placeholder principal，不接真实认证、JWT、OAuth 或外部身份提供器。
+- 不改变现有 approval response contract。
+
+### Sprint Result
 
 - [x] user / organization / department / role / permission / policy concepts frozen
 - [x] GET /api/v1/users/me, GET /api/v1/security/roles, GET /api/v1/security/permissions, GET /api/v1/audit-logs contract frozen

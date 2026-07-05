@@ -4,17 +4,48 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 ### Future Sprint Checklist
 
-- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 当前状态：
 
-- Security foundation contract frozen
-- Approval API remains unchanged
+- Approval API RBAC enforcement implemented on approval endpoints only
+- Current user seam remains placeholder-based and default system admin passes all checks
+- Denied approval access writes `security.permission.denied` audit facts
 - Status: Completed / Verified
+
+## Sprint 11.3: RBAC Enforcement for Approval APIs
+
+### Current State
+
+- 当前仍使用 `user_id="system"` 的 placeholder principal 作为 current user seam。
+- 当前 RBAC 仅强制在 approval APIs 上，不扩展到 document / retrieval / RAG / task APIs。
+- 当前 system admin 占位用户可以通过所有 approval permission checks。
+- 当前 permission denied 会先写入 append-only audit log，再返回 `permission_denied`。
+
+### Target State
+
+- 未来可以在不改变 approval API response shape 的前提下替换 current user 来源。
+
+### Result
+
+- POST /api/v1/reports/{task_id}/submit-approval now requires `report.submit_approval`
+- GET /api/v1/approvals now requires `approval.review`
+- GET /api/v1/approvals/{approval_id} now requires `approval.review`
+- POST /api/v1/approvals/{approval_id}/approve now requires `approval.approve`
+- POST /api/v1/approvals/{approval_id}/reject now requires `approval.reject`
+- POST /api/v1/reports/{task_id}/revise now requires `approval.revise`
+- permission denied writes append-only audit facts
+- backend tests cover allow / deny paths and denied audit logging
+- handbook mirror synchronized
+
+### Planned
+
+- Future RBAC can replace the placeholder current user seam without changing approval API payloads.
+- Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
 
 ## Sprint 11.1: Enterprise Security Foundation Contract Freeze
 

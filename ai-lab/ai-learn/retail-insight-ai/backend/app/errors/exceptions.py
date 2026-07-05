@@ -14,7 +14,9 @@ class ValidationAppException(AppException):
     def __init__(self, detail: dict[str, Any] | None = None) -> None:
         """返回 422，并保留经过 JSON 安全转换的字段错误。"""
 
-        super().__init__(ErrorCode.VALIDATION_ERROR, "Request validation failed", 422, detail=detail)
+        super().__init__(
+            ErrorCode.VALIDATION_ERROR, "Request validation failed", 422, detail=detail
+        )
 
 
 class TaskNotFoundException(AppException):
@@ -255,6 +257,37 @@ class CitationRequiredException(AppException):
         )
 
 
+class PermissionDeniedException(AppException):
+    """表示当前主体没有执行该操作所需的权限。"""
+
+    def __init__(
+        self,
+        permission: str,
+        *,
+        action: str,
+        resource_type: str,
+        resource_id: str,
+        detail: dict[str, Any] | None = None,
+    ) -> None:
+        """返回 403，并保留安全的权限拒绝上下文。"""
+
+        payload = {
+            "required_permission": permission,
+            "action": action,
+            "resource_type": resource_type,
+            "resource_id": resource_id,
+        }
+        if detail:
+            payload.update(detail)
+
+        super().__init__(
+            ErrorCode.PERMISSION_DENIED,
+            "This action is not permitted",
+            403,
+            detail=payload,
+        )
+
+
 class ApprovalNotFoundException(AppException):
     """表示指定 approval_id 不存在。"""
 
@@ -378,7 +411,9 @@ class ReportRevisionConflictException(AppException):
 class AuditLogAppendException(AppException):
     """表示审计日志追加失败。"""
 
-    def __init__(self, audit_log_id: str | None = None, detail: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, audit_log_id: str | None = None, detail: dict[str, Any] | None = None
+    ) -> None:
         """返回 500，并保留安全的审计追加失败信息。"""
 
         super().__init__(

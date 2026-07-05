@@ -160,6 +160,15 @@ Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业
 
 核心 API、TaskService、Workflow、SSE、Report Generator 和 Frontend 都是真实实现。当前部署配置默认使用本地文件输入业务数据、`StaticResearchProvider` 和 `InMemoryRepository`，不调用真实 LLM，也不需要 API Key；Phase 2 已新增可选 PostgreSQL 持久化后端，但默认仍是 `inmemory`，因此不配置数据库时本地启动方式不变。
 
+当前 backend 还提供企业安全基础读模型：
+
+- `GET /api/v1/users/me`
+- `GET /api/v1/security/roles`
+- `GET /api/v1/security/permissions`
+- `GET /api/v1/audit-logs`
+
+当前 current user 使用 `user_id="system"` 的 placeholder principal；审计事实通过 append-only InMemoryAuditRepository 保存，仍然不接真实认证、JWT、OAuth 或 RBAC enforcement。
+
 ## 文档同步
 
 本项目与 [ai-agent-retail-handbook-v3](../ai-agent-retail-handbook-v3/README.md) 共用一套文档同步块，脚本位于 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py)。
@@ -188,13 +197,14 @@ Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业
 - `GET /api/tasks/{task_id}` 查询任务状态。
 - `GET /api/tasks/{task_id}/events` 通过 SSE 返回 `status / done / error`。
 - `GET /api/tasks/{task_id}/report` 返回最终报告。
+- `GET /api/v1/users/me`、`GET /api/v1/security/roles`、`GET /api/v1/security/permissions` 和 `GET /api/v1/audit-logs` 提供企业安全读模型与审计读模型。
 - LangGraph 1.x 编排 `route / kpi / research / report` Node。
 - React 展示任务表单、Workflow 时间线、失败信息和报告。
 - JSON 结构化日志记录 request_id、task_id、关键事件、错误码与耗时。
 - InMemory Repository 保存 Task、Event、Report；进程重启后数据丢失。
 - Phase 2 新增可选 PostgreSQL Repository，可持久化 Task、Event、Report，并为 Approval / Import 预留表结构。
 - FastAPI `BackgroundTasks` 在 API 进程内执行任务；尚无队列、幂等消费或跨实例恢复。
-- 无登录、RBAC、租户隔离、真实数据、真实 LLM、Checkpoint 或人工审批。
+- 无真实登录、RBAC、租户隔离、真实数据、真实 LLM、Checkpoint 或人工审批。
 - 当前未实现 Approval API、Import API、Document Search、RAG、Internet Search、MCP 或 pgvector。
 
 ## 3. 项目结构

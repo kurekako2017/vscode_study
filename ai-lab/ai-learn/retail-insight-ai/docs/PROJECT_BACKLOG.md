@@ -32,9 +32,36 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 状态：已完成
+
+### Sprint 11.3: RBAC Enforcement for Approval APIs
+
+- [x] submit-approval / approvals list-detail / approve / reject / revise enforce RBAC via current user seam
+- [x] default system admin placeholder user passes all approval checks
+- [x] denied approval access writes append-only audit facts
+- [x] backend tests added for allow / deny paths and denied audit logging
+- [x] docs / roadmap / task / changelog / decisions / architecture / handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Sprint 11.2: Security Domain + InMemory Audit MVP
+
+- [x] user / organization / department / role / permission / policy domain models added
+- [x] GET /api/v1/users/me implemented with system placeholder principal
+- [x] GET /api/v1/security/roles implemented with frozen static role catalog
+- [x] GET /api/v1/security/permissions implemented with frozen static permission catalog
+- [x] append-only AuditLog model added
+- [x] InMemoryAuditRepository added
+- [x] GET /api/v1/audit-logs implemented
+- [x] audit.log.created / audit.log.failed structured logging recorded on append success/failure
+- [x] backend tests added for security read APIs and audit append-only behavior
+- [x] backend compileall and unittest discover passed
+- [x] docs / roadmap / task / changelog / decisions / architecture updated
+- [x] handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 ### Sprint 11.1: Enterprise Security Foundation Contract Freeze
 

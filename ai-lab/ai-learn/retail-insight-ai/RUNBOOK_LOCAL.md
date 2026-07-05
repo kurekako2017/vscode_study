@@ -265,7 +265,31 @@ curl -sS "http://127.0.0.1:8000/api/tasks/${TASK_ID}"
 - `TASK_NOT_FOUND`：确认 task_id 是否复制完整，以及 Backend 是否刚刚重启。
 - `failed`：查看 `data.error`，并按 task_id 检查 Backend 日志。
 
-### 5.4 读取报告
+### 5.4 Security read model 和 audit 读取
+
+命令：
+
+```bash
+curl -sS http://127.0.0.1:8000/api/v1/users/me
+curl -sS http://127.0.0.1:8000/api/v1/security/roles
+curl -sS http://127.0.0.1:8000/api/v1/security/permissions
+curl -sS http://127.0.0.1:8000/api/v1/audit-logs
+```
+
+预期结果：
+
+- `users/me` 返回 `user_id="system"` 的 placeholder principal。
+- `security/roles` 返回 frozen role catalog。
+- `security/permissions` 返回 frozen permission catalog。
+- `audit-logs` 返回 `items` 数组；默认情况下可以是空列表。
+
+如果要验证 audit append-only 行为，直接运行对应单测即可：
+
+```bash
+cd backend && python3 -m unittest tests.test_security_audit_api.SecurityAuditAPITest.test_audit_log_append_and_read -v
+```
+
+### 5.5 读取报告
 
 任务 completed 后执行：
 
@@ -283,7 +307,7 @@ curl -sS "http://127.0.0.1:8000/api/tasks/${TASK_ID}/report"
 
 如果返回 `REPORT_NOT_FOUND`，通常是任务尚未完成；先重新查询状态。
 
-### 5.5 SSE 测试
+### 5.6 SSE 测试
 
 ```bash
 curl -N "http://127.0.0.1:8000/api/tasks/${TASK_ID}/events"

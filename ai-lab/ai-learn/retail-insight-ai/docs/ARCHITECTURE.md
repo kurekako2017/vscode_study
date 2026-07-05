@@ -153,7 +153,7 @@ Human-readable architecture explanations are trilingual by default.
 - `AuditLog` model, `AuditRepository`, `InMemoryAuditRepository`, and `AuditService` added.
 - `GET /api/v1/audit-logs` returns append-only audit facts.
 - `audit.log.created` is logged after successful append; `audit.log.failed` is logged only when append fails.
-- Existing approval/document/RAG APIs remain unaffacted by RBAC enforcement in this sprint.
+- Existing approval/document/RAG APIs remain unaffected by RBAC enforcement in this sprint.
 
 ### Planned
 
@@ -183,6 +183,42 @@ flowchart TD
     C --> D[GET /api/v1/audit-logs]
     B --> E[audit.log.created / audit.log.failed]
 ```
+
+## Sprint 11.3 RBAC Enforcement for Approval APIs
+
+### Current State
+
+- 当前 current user 仍然使用 `user_id="system"` 的 placeholder principal。
+- 当前 RBAC 只在 approval APIs 上生效，不扩展到 document / retrieval / RAG / task APIs。
+- 当前 default system admin 占位用户通过全部 approval permission checks。
+- 当前 permission denied 会先写 append-only audit fact，再返回 `permission_denied`。
+
+中文（简体）：
+这一层把 approval API 的 RBAC 门禁落到 backend service / route seam 上，但仍然不引入真实认证、JWT、OAuth 或外部身份提供器。这样可以先验证 current-user seam、permission map 和 denied audit fact，再决定未来怎么接入真正登录。
+
+日本語：
+この層では approval API の RBAC ガードを backend service / route seam に実装しますが、実認証、JWT、OAuth、外部 IdP はまだ導入しません。current-user seam、permission map、deny 時の audit fact を先に検証し、その後に本物のログイン接続を検討できます。
+
+### Target State
+
+- 未来可以在不改变 approval API response shape 的前提下替换 current user 来源。
+
+### Result
+
+- `POST /api/v1/reports/{task_id}/submit-approval` now requires `report.submit_approval`
+- `GET /api/v1/approvals` now requires `approval.review`
+- `GET /api/v1/approvals/{approval_id}` now requires `approval.review`
+- `POST /api/v1/approvals/{approval_id}/approve` now requires `approval.approve`
+- `POST /api/v1/approvals/{approval_id}/reject` now requires `approval.reject`
+- `POST /api/v1/reports/{task_id}/revise` now requires `approval.revise`
+- denied approval access writes `security.permission.denied` audit facts
+- backend tests cover allow / deny paths and audit logging
+- handbook mirror synchronized
+
+### Planned
+
+- Future RBAC can replace the placeholder current user seam without changing approval payloads.
+- Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
 
 ## Enterprise Security Overview
 

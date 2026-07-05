@@ -4,15 +4,47 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 ### Future Sprint Checklist
 
-- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 ## 当前最高优先级任务
 
 ### Sprint Result
+
+- [x] approval APIs now enforce RBAC with the existing current-user seam
+- [x] default system admin placeholder user passes all approval checks
+- [x] denied approval access writes append-only audit facts
+- [x] backend tests added for submit / review / approve / reject / revise deny paths
+- [x] docs updated: API_CONTRACT / ARCHITECTURE / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Boundary
+
+- 当前实现只在 approval APIs 上做 RBAC，不扩展到 document / retrieval / RAG / task APIs。
+- 当前 current user seam 仍是 placeholder principal，不接真实认证、JWT、OAuth 或外部身份提供器。
+- 不改变现有 approval response contract。
+
+### Sprint Result
+
+- [x] user / organization / department / role / permission / policy domain models added
+- [x] GET /api/v1/users/me implemented with system placeholder principal
+- [x] GET /api/v1/security/roles implemented with frozen static role catalog
+- [x] GET /api/v1/security/permissions implemented with frozen static permission catalog
+- [x] append-only AuditLog model added
+- [x] InMemoryAuditRepository added
+- [x] GET /api/v1/audit-logs implemented
+- [x] audit.log.created / audit.log.failed structured logging recorded on append success/failure
+- [x] backend tests added for security read APIs and audit append-only behavior
+- [x] backend compileall and unittest discover passed
+- [x] docs updated: ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / ARCHITECTURE / handbook mirror
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+
+### Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
 - [x] user / organization / department / role / permission / policy concepts frozen
 - [x] GET /api/v1/users/me, GET /api/v1/security/roles, GET /api/v1/security/permissions, GET /api/v1/audit-logs contract frozen
@@ -24,8 +56,8 @@ Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
 ### Boundary
 
-- 当前实现仍然只停留在 docs contract freeze，不修改 backend、frontend 或 scripts。
-- 当前 security foundation 只是未来 RBAC / audit 的契约边界，不代表已实现身份系统。
+- 当前实现已从 docs contract freeze 进入 backend MVP，但仍不接真实认证、JWT、OAuth 或外部身份提供器。
+- 当前 security foundation 仍只是未来 RBAC / audit 的契约边界，不代表已实现真实身份系统。
 - 不改变现有 document retrieval、internal RAG 或 approval API response contract。
 
 ## Sprint 10.2: Approval API MVP Implementation

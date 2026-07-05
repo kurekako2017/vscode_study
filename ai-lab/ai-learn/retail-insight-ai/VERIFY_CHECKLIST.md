@@ -108,6 +108,20 @@ curl -sS -X POST http://127.0.0.1:8000/api/tasks -H 'Content-Type: application/j
 - 预期结果：Backend JSON 日志中能找到 `"request_id":"verify-log-001"`；`task_created`、Workflow 节点、`task_completed` 和 SSE 相关日志包含同一个非空 `task_id`。
 - 失败时看：`backend/app/main.py` 的 `request_context()`、`backend/app/observability/logging.py`、`backend/app/events/publisher.py` 和 `backend/app/services/task_service.py`。
 
+## 9. Security read model 和 audit 读取是否正常
+
+- 命令（终端 C）：
+
+  ```bash
+  curl -sS http://127.0.0.1:8000/api/v1/users/me
+  curl -sS http://127.0.0.1:8000/api/v1/security/roles
+  curl -sS http://127.0.0.1:8000/api/v1/security/permissions
+  curl -sS http://127.0.0.1:8000/api/v1/audit-logs
+  ```
+
+- 预期结果：`users/me` 返回 `user_id="system"` 的 placeholder principal；`security/roles` 返回冻结角色目录；`security/permissions` 返回冻结权限目录；`audit-logs` 返回 append-only 记录列表，`next_cursor` 目前为 `null`。
+- 失败时看：`backend/app/api/security.py`、`backend/app/api/audit_logs.py`、`backend/app/services/security_service.py`、`backend/app/services/audit_service.py` 和 Backend 终端日志。
+
 ## 一次性代码验证
 
 - 命令：

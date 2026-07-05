@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-07-05 Sprint 11.3 RBAC Enforcement for Approval APIs
+
+- 在现有 `SecurityService` current-user seam 上，只对 approval APIs 强制 RBAC，不扩展到 document / retrieval / RAG / task APIs。
+- `POST /api/v1/reports/{task_id}/submit-approval` 现在要求 `report.submit_approval`；`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}` 要求 `approval.review`；`approve`、`reject`、`revise` 分别要求 `approval.approve`、`approval.reject`、`approval.revise`。
+- default system admin placeholder user 继续通过所有 approval permission checks。
+- permission denied 会写入 append-only audit fact，并以 `permission_denied` 返回 403。
+- 新增 backend tests 覆盖允许路径、拒绝路径与 denied audit logging。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md` 以及 handbook mirror。
+- 本次不修改 frontend、scripts 或 approval response shape。
+
 ## 2026-07-05 Sprint 11.1 Enterprise Security Foundation Contract Freeze
 
 - 冻结企业安全基础合同，覆盖 user / organization / department / role / permission / policy 概念。

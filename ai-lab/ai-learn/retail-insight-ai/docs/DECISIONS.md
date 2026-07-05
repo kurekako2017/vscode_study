@@ -597,6 +597,49 @@
 - 后续 RBAC 实现必须沿用 frozen role / permission names 和 audit log contract，不能重新命名。
 - English-only 仍只允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
 
+## ADR-030
+
+日期：2026-07-05
+
+决策：在企业安全基础合同冻结之后，先实现 backend-only Security Domain MVP 和 append-only InMemory Audit MVP，使用 system placeholder principal、static role/permission catalog 和 AuditService 作为当前实现边界。
+
+原因：只有 contract freeze 还不足以验证 current user snapshot、冻结目录读取和 audit append-only seam 的真实运行路径；但此阶段又不能引入真实认证、JWT、OAuth、RBAC enforcement 或 PostgreSQL audit repository，因此需要一个可运行但仍然本地化的 MVP。
+
+备选方案：
+
+- 继续停留在 contract freeze；该方案无法验证 users/me、security/roles、security/permissions 和 audit-logs 的后端读模型。
+- 直接接入真实认证 / RBAC / PostgreSQL 审计；该方案会提前引入当前阶段禁止的外部依赖与安全复杂度。
+
+影响：
+
+- `GET /api/v1/users/me` 现在返回 `user_id="system"` 的 placeholder principal。
+- `GET /api/v1/security/roles` 与 `GET /api/v1/security/permissions` 现在返回 frozen static catalog。
+- `GET /api/v1/audit-logs` 现在读取 append-only InMemoryAuditRepository。
+- `audit.log.created` / `audit.log.failed` 作为结构化日志事件记录 append 成功与失败。
+- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要同步记录该实现结果。
+- 当前仍不实现真实登录、RBAC enforcement、JWT、OAuth、PostgreSQL audit repository 或 frontend 变更。
+
+## ADR-031
+
+日期：2026-07-05
+
+决策：在 Security Domain + InMemory Audit MVP 之上，先只对 Approval Workflow APIs 实现 backend-only RBAC enforcement，并通过 current user seam、permission catalog 和 audit append-only seam 记录 permission denied 事实。
+
+原因：Approval API 已经有稳定 contract 和 report revision boundary，但企业安全能力需要先验证当前用户、权限判定和 denied audit 事实的真实运行路径。把 RBAC 限定在 approval APIs 上，可以保持 document / retrieval / RAG / task APIs 现状不变，同时为后续真实认证和更细粒度授权留出替换点。
+
+备选方案：
+
+- 立即把 RBAC 扩展到所有 API；该方案会扩大本 sprint 范围，并引入不必要的回归面。
+- 继续不做 RBAC enforcement；该方案会让 approval 安全边界停留在 contract-only，无法验证 denied audit path。
+
+影响：
+
+- `backend/app/services/security_service.py` 提供 current user seam 以及 permission check helper。
+- `backend/app/api/approvals.py` 只在 approval APIs 上调用 RBAC helper。
+- `permission_denied` 通过 append-only audit log 记录 denied facts。
+- `backend/tests/test_approval_api.py` 覆盖 allow / deny 路径和 denied audit logging。
+- `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

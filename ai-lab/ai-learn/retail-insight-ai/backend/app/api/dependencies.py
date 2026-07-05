@@ -1,17 +1,19 @@
-from fastapi import Request
+from fastapi import Depends, Request
 
 from app.config.container import AppContainer
-from app.services.audit_service import AuditService
-from app.services.approval_service import ApprovalService
-from app.services.document_chunk_service import DocumentChunkService
-from app.services.document_archive_service import DocumentArchiveService
-from app.services.document_import_service import DocumentImportService
-from app.services.document_retrieval_service import DocumentRetrievalService
-from app.services.document_read_service import DocumentReadService
-from app.services.internal_rag_service import InternalRagService
 from app.events.publisher import EventPublisher
-from app.services.document_upload_service import DocumentUploadService
 from app.repositories.interfaces.event_repository import EventRepository
+from app.services.approval_service import ApprovalService
+from app.services.audit_middleware import AuditMiddleware
+from app.services.audit_service import AuditService
+from app.services.document_archive_service import DocumentArchiveService
+from app.services.document_chunk_service import DocumentChunkService
+from app.services.document_import_service import DocumentImportService
+from app.services.document_read_service import DocumentReadService
+from app.services.document_retrieval_service import DocumentRetrievalService
+from app.services.document_upload_service import DocumentUploadService
+from app.services.internal_rag_service import InternalRagService
+from app.services.rbac_guard import RBACGuard
 from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
 
@@ -98,3 +100,25 @@ async def get_audit_service(request: Request) -> AuditService:
     """向 audit 路由注入 append-only 审计 service。"""
 
     return request.app.state.container.audit_service
+
+
+async def get_audit_middleware(
+    security_service: SecurityService = Depends(get_security_service),
+    audit_service: AuditService = Depends(get_audit_service),
+) -> AuditMiddleware:
+    """向 approval 路由注入 approval 专用审计中间层。"""
+
+    return AuditMiddleware(
+        audit_service=audit_service,
+        security_service=security_service,
+        rbac_guard=RBACGuard(security_service, audit_service),
+    )
+
+
+async def get_rbac_guard(
+    security_service: SecurityService = Depends(get_security_service),
+    audit_service: AuditService = Depends(get_audit_service),
+) -> RBACGuard:
+    """向需要统一授权的路由注入可复用 RBAC guard。"""
+
+    return RBACGuard(security_service, audit_service)

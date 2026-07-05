@@ -4,24 +4,81 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 ### Future Sprint Checklist
 
-- [ ] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 当前状态：
 
-- Security foundation contract frozen
-- Approval API remains unchanged
+- Approval API RBAC enforcement implemented on approval endpoints only
+- Current user seam remains placeholder-based and default system admin passes all checks
+- Denied approval access writes `security.permission.denied` audit facts
 - Status: Completed / Verified
+
+## Sprint 11.3: RBAC Enforcement for Approval APIs
+
+### Current State
+
+- 当前仍使用 `user_id="system"` 的 placeholder principal 作为 current user seam。
+- 当前 RBAC 仅强制在 approval APIs 上，不扩展到 document / retrieval / RAG / task APIs。
+- 当前 system admin 占位用户可以通过所有 approval permission checks。
+- 当前 permission denied 会先写入 append-only audit log，再返回 `permission_denied`。
+
+### Target State
+
+- 未来可以在不改变 approval API response shape 的前提下替换 current user 来源。
+
+### Result
+
+- POST /api/v1/reports/{task_id}/submit-approval now requires `report.submit_approval`
+- GET /api/v1/approvals now requires `approval.review`
+- GET /api/v1/approvals/{approval_id} now requires `approval.review`
+- POST /api/v1/approvals/{approval_id}/approve now requires `approval.approve`
+- POST /api/v1/approvals/{approval_id}/reject now requires `approval.reject`
+- POST /api/v1/reports/{task_id}/revise now requires `approval.revise`
+- permission denied writes append-only audit facts
+- backend tests cover allow / deny paths and denied audit logging
+- handbook mirror synchronized
+
+### Planned
+
+- Future RBAC can replace the placeholder current user seam without changing approval API payloads.
+- Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
+
+## Sprint 11.2: Security Domain + InMemory Audit MVP
+
+### Current State
+
+- 当前没有真实认证、JWT、OAuth 或外部身份提供器。
+- 当前 current user 使用 `user_id="system"` 的 placeholder principal。
+- 当前 security catalog 使用静态目录，尚未接 RBAC enforcement。
+- 当前 audit log 使用 append-only InMemoryAuditRepository，并通过 AuditService 记录成功与失败。
+
+### Target State
+
+- 未来可以在不改动 document / retrieval / approval response contract 的前提下接入身份与权限层。
+
+### Result
+
+- user / organization / department / role / permission / policy domain models added
+- GET /api/v1/users/me / GET /api/v1/security/roles / GET /api/v1/security/permissions implemented
+- append-only audit log MVP implemented
+- audit.log.created / audit.log.failed logging recorded
+- handbook mirror synchronized
+
+### Planned
+
+- 后续 RBAC 只需替换 placeholder principal 和静态目录，不可重命名 permission / event names。
+- 未来 audit persistence 可替换 repository 实现，但不能破坏 append-only 语义。
 
 ## Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
 ### Current State
 
 - 当前还没有 RBAC、认证 middleware 或 Audit API 的 backend 实现。
-- 当前 security model 只作为 docs contract 冻结，不改变现有 API 行为。
+- 当前 security model 已冻结为 contract，并在 Sprint 11.2 落地为 backend MVP。
 
 ### Target State
 
@@ -37,7 +94,7 @@ Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
 ### Planned
 
-- 保持当前 docs-only 边界，等待后续 backend security implementation。
+- 保持 contract 口径不变，允许后续 backend security implementation 替换 placeholder principal。
 - 未来实现只能补充认证与授权，不允许回写已冻结的权限名称和事件名称。
 
 ## Sprint 10.2: Approval API MVP Implementation

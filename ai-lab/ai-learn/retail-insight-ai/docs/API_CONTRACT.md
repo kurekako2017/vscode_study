@@ -778,10 +778,10 @@ Purpose:
 Freeze the approval workflow contract on top of report revisions, audit history, and future RBAC.
 
 中文（简体）：
-冻结审批工作流的 HTTP 合同，核心是“审批记录”和“报告版本快照”分离。审批 API 只负责提交、查询、批准、拒绝和修订，不负责 RBAC，也不允许把可变正文当作审批事实。
+冻结审批工作流的 HTTP 合同，核心是“审批记录”和“报告版本快照”分离。审批 API 只负责提交、查询、批准、拒绝和修订，RBAC 现在由 current user seam 执行，permission denied 会返回 403 并写入审计事实。
 
 日本語：
-承認ワークフローの HTTP 契約を凍結します。承認記録とレポート版スナップショットを分離し、API は submit / list / detail / approve / reject / revise だけを担当します。RBAC や可変本文の上書きは含めません。
+承認ワークフローの HTTP 契約を凍結します。承認記録とレポート版スナップショットを分離し、API は submit / list / detail / approve / reject / revise だけを担当します。RBAC は current-user seam で実行し、permission denied は 403 と監査事実を書き込みます。
 
 Approval domain model:
 
@@ -814,11 +814,12 @@ State rules:
 - Rejected reports must keep a rejection reason.
 - Archived reports remain readable.
 
-Future RBAC relationship:
+RBAC relationship:
 
-- Authorization is not implemented in this contract freeze.
-- Future RBAC will decide who may submit, approve, reject, revise, or publish.
-- The API contract must remain valid even before RBAC is connected.
+- Authorization is enforced on the approval APIs using the current user seam.
+- Default system admin placeholder user passes all approval checks.
+- Denied approval access returns `403 Forbidden` with `permission_denied` and records an audit fact.
+- The API contract remains valid even when the current user source is swapped later.
 
 Audit relationship:
 
@@ -858,10 +859,10 @@ Response `201 Created`:
 ```
 
 Status codes:
-`201 Created`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+`201 Created`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
 
 Error codes:
-`approval_not_found`, `approval_already_submitted`, `approval_already_decided`, `invalid_approval_state`, `report_not_found`, `report_revision_conflict`, `internal_error`.
+`approval_not_found`, `approval_already_submitted`, `approval_already_decided`, `invalid_approval_state`, `permission_denied`, `report_not_found`, `report_revision_conflict`, `internal_error`.
 
 ##### `GET /api/v1/approvals`
 
@@ -896,10 +897,10 @@ Response `200 OK`:
 ```
 
 Status codes:
-`200 OK`, `400 Bad Request`, `500 Internal Server Error`.
+`200 OK`, `403 Forbidden`, `400 Bad Request`, `500 Internal Server Error`.
 
 Error codes:
-`validation_error`, `repository_error`, `internal_error`.
+`permission_denied`, `validation_error`, `repository_error`, `internal_error`.
 
 ##### `GET /api/v1/approvals/{approval_id}`
 
@@ -929,10 +930,10 @@ Response `200 OK`:
 ```
 
 Status codes:
-`200 OK`, `404 Not Found`, `500 Internal Server Error`.
+`200 OK`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
 
 Error codes:
-`approval_not_found`, `repository_error`, `internal_error`.
+`permission_denied`, `approval_not_found`, `repository_error`, `internal_error`.
 
 ##### `POST /api/v1/approvals/{approval_id}/approve`
 
@@ -966,10 +967,10 @@ Response `200 OK`:
 ```
 
 Status codes:
-`200 OK`, `404 Not Found`, `409 Conflict`, `500 Internal Server Error`.
+`200 OK`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `500 Internal Server Error`.
 
 Error codes:
-`approval_not_found`, `approval_already_decided`, `approval_already_submitted`, `invalid_approval_state`, `report_revision_conflict`, `internal_error`.
+`approval_not_found`, `approval_already_decided`, `approval_already_submitted`, `invalid_approval_state`, `permission_denied`, `report_revision_conflict`, `internal_error`.
 
 ##### `POST /api/v1/approvals/{approval_id}/reject`
 
@@ -1003,10 +1004,10 @@ Response `200 OK`:
 ```
 
 Status codes:
-`200 OK`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+`200 OK`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
 
 Error codes:
-`approval_not_found`, `approval_already_decided`, `approval_rejected`, `invalid_approval_state`, `missing_rejection_reason`, `internal_error`.
+`approval_not_found`, `approval_already_decided`, `approval_rejected`, `invalid_approval_state`, `missing_rejection_reason`, `permission_denied`, `internal_error`.
 
 ##### `POST /api/v1/reports/{task_id}/revise`
 
@@ -1034,10 +1035,10 @@ Response `201 Created`:
 ```
 
 Status codes:
-`201 Created`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
+`201 Created`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `500 Internal Server Error`.
 
 Error codes:
-`report_not_found`, `report_revision_conflict`, `invalid_approval_state`, `approval_rejected`, `missing_rejection_reason`, `internal_error`.
+`report_not_found`, `report_revision_conflict`, `invalid_approval_state`, `approval_rejected`, `missing_rejection_reason`, `permission_denied`, `internal_error`.
 
 Versioning rule:
 - Approval workflow semantics are frozen under `/api/v1`.

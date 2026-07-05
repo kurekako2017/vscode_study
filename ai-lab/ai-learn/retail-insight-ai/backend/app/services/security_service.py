@@ -35,7 +35,7 @@ from app.models.security import (
     User,
     UserStatus,
 )
-
+from app.services.audit_service import AuditService
 
 _ORGANIZATION = Organization(
     organization_id="org-system",
@@ -49,14 +49,26 @@ _DEPARTMENT = Department(
     display_name="System Department",
 )
 _FROZEN_PERMISSIONS: tuple[Permission, ...] = (
-    Permission("system.admin", "Manage platform settings and privileged operations.", "system"),
+    Permission(
+        "system.admin", "Manage platform settings and privileged operations.", "system"
+    ),
     Permission("document.read", "Read documents and document metadata.", "document"),
-    Permission("document.upload", "Upload documents into the local document pipeline.", "document"),
-    Permission("document.archive", "Archive a document without deleting facts.", "document"),
+    Permission(
+        "document.upload",
+        "Upload documents into the local document pipeline.",
+        "document",
+    ),
+    Permission(
+        "document.archive", "Archive a document without deleting facts.", "document"
+    ),
     Permission("document.import", "Run the document import pipeline.", "document"),
     Permission("document.chunk", "Generate or refresh document chunks.", "document"),
-    Permission("document.search", "Search document chunks and retrieval results.", "document"),
-    Permission("rag.answer", "Generate grounded RAG answers from retrieved evidence.", "rag"),
+    Permission(
+        "document.search", "Search document chunks and retrieval results.", "document"
+    ),
+    Permission(
+        "rag.answer", "Generate grounded RAG answers from retrieved evidence.", "rag"
+    ),
     Permission("report.read", "Read analysis reports and report versions.", "report"),
     Permission("report.submit_approval", "Submit a report for approval.", "report"),
     Permission("approval.review", "Review pending approval requests.", "approval"),
@@ -65,7 +77,9 @@ _FROZEN_PERMISSIONS: tuple[Permission, ...] = (
     Permission("approval.revise", "Revise a report version snapshot.", "approval"),
     Permission("audit.read", "Read append-only audit logs.", "audit"),
 )
-_ALL_PERMISSION_NAMES = tuple(permission.permission for permission in _FROZEN_PERMISSIONS)
+_ALL_PERMISSION_NAMES = tuple(
+    permission.permission for permission in _FROZEN_PERMISSIONS
+)
 _ALL_ROLES: tuple[Role, ...] = (
     Role(
         role="admin",
@@ -143,10 +157,83 @@ _POLICY_PLACEHOLDER = Policy(
 class SecurityService:
     """返回当前用户快照和冻结目录。"""
 
+    def __init__(self, current_user: User | None = None) -> None:
+        """允许测试注入受限主体，默认仍是 system admin 占位用户。"""
+
+        self._current_user = current_user or _CURRENT_USER
+
     def get_current_user(self) -> User:
         """返回系统占位用户，后续可由认证中间件替换。"""
 
-        return _CURRENT_USER
+        return self._current_user
+
+    def has_permission(self, user: User, permission: str) -> bool:
+        """判断当前主体是否拥有目标权限，system.admin 视为全权通过。"""
+
+        return self.is_admin(user) or permission in user.permissions
+
+    def has_role(self, user: User, role: str) -> bool:
+        """判断当前主体是否拥有指定角色。"""
+
+        return role in user.roles
+
+    def has_permissions(
+        self,
+        user: User,
+        permissions: tuple[str, ...],
+        *,
+        require_all: bool = True,
+    ) -> bool:
+        """判断当前主体是否满足多权限要求。"""
+
+        if not permissions:
+            return True
+        if require_all:
+            return all(
+                self.has_permission(user, permission) for permission in permissions
+            )
+        return any(self.has_permission(user, permission) for permission in permissions)
+
+    def has_roles(
+        self,
+        user: User,
+        roles: tuple[str, ...],
+        *,
+        require_all: bool = False,
+    ) -> bool:
+        """判断当前主体是否满足多角色要求。"""
+
+        if not roles:
+            return True
+        if require_all:
+            return all(self.has_role(user, role) for role in roles)
+        return any(self.has_role(user, role) for role in roles)
+
+    def is_admin(self, user: User) -> bool:
+        """判断当前主体是否为系统管理员占位用户。"""
+
+        return "system.admin" in user.permissions or "admin" in user.roles
+
+    def require_permission(
+        self,
+        permission: str,
+        *,
+        action: str,
+        resource_type: str,
+        resource_id: str,
+        audit_service: AuditService,
+    ) -> User:
+        """校验当前用户权限；拒绝时先写审计事实，再抛出 403。"""
+
+        from app.services.rbac_guard import RBACGuard
+
+        guard = RBACGuard(self, audit_service)
+        return guard.require(
+            permission=permission,
+            action=action,
+            resource_type=resource_type,
+            resource_id=resource_id,
+        )
 
     def list_roles(self) -> tuple[Role, ...]:
         """返回 frozen role catalog。"""
@@ -162,4 +249,3 @@ class SecurityService:
         """返回策略占位对象，供未来 RBAC / scope 规则扩展。"""
 
         return _POLICY_PLACEHOLDER
-

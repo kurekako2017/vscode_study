@@ -8,9 +8,19 @@
 
 ## 当前阶段
 
-Sprint 11.1: Enterprise Security Foundation Contract Freeze
+Sprint 11.3: RBAC Enforcement for Approval APIs
 
 状态：已完成
+
+### Sprint 11.3: RBAC Enforcement for Approval APIs
+
+- [x] submit-approval / approvals list-detail / approve / reject / revise enforce RBAC via current user seam
+- [x] default system admin placeholder user passes all approval checks
+- [x] denied approval access writes append-only audit facts
+- [x] backend tests added for allow / deny paths and denied audit logging
+- [x] docs / roadmap / task / changelog / decisions / architecture / handbook mirror synchronized
+- [x] backend / frontend / scripts boundary unchanged
+- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
 ### Sprint 11.1: Enterprise Security Foundation Contract Freeze
 
