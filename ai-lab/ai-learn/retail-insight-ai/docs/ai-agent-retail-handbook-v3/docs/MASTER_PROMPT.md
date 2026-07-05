@@ -156,6 +156,15 @@ All AI tools working in this repository must follow this document before they wr
 
 ## 15. Documentation Rules / 文档规则 / ドキュメントルール
 
+- Documentation refactor must not delete existing complete content.
+- Prefer adding, organizing, and merging. Do not compress a full explanation into one sentence when the original content is valuable.
+- If a table becomes hard to understand, restore it into section-based explanations.
+- Keep directory structures as tree diagrams with Chinese explanations.
+- Keep `docs/TEST_CASES.md` permanently as a program-flow learning document, not a command list.
+- Keep `docs/LEARNING_API_WALKTHROUGH.md` permanently as an interface-learning document, not a table-only summary.
+- Keep enterprise testing system explanations in `README.md`, `docs/LEARNING_API_WALKTHROUGH.md`, `docs/TEST_CASES.md`, `RUNBOOK_LOCAL.md`, and `VERIFY_CHECKLIST.md`.
+- `docs/ai-agent-retail-handbook-v3/` is the learning and interview center, and `docs/ai-agent-retail-handbook-v3/docs/` is the technical spec mirror.
+- Before deleting any document, first confirm that README navigation has a replacement entry and that no useful content will be lost.
 - Update `TASK.md`, `docs/PROJECT_BACKLOG.md`, and `docs/CHANGELOG.md` after every completed work session.
 - Update `docs/ARCHITECTURE.md` for architecture changes.
 - Update `docs/DECISIONS.md` for important decisions.

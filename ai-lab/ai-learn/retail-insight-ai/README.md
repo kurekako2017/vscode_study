@@ -1,235 +1,277 @@
 # Retail Insight AI
 
-Retail Insight AI 是一个面向日本现场 AI Agent 学习的经营分析项目。它的目标不是只给出一个 Demo，而是让你能把一个完整链路跑通、看懂、讲清楚，再逐步向企业级架构演进。
+README 是本项目总入口。
 
-项目主链路是：
+Retail Insight AI 是一个面向日本现场 AI Agent 开发学习、项目讲解和面试准备的经营分析后端项目。它不是只展示一个 Demo，而是把“怎么启动、怎么验证、怎么学习、怎么阅读源码、怎么做面试表达、怎么治理文档”串成一条可执行学习链。
+
+主链路目标是：
 
 ```text
-React → FastAPI → Task API → TaskService → Workflow → KPI Engine → Research Provider → Report Generator → SSE → React
+React
+→ FastAPI
+→ Task API
+→ TaskService
+→ Workflow
+→ KPI Engine
+→ Research Provider
+→ Report Generator
+→ SSE
+→ React
 ```
 
-当前项目定位是：
+## 1. 项目一句话介绍
 
-- 可运行
-- 可学习
-- 可面试讲解
-- 可逐步企业级升级
+Retail Insight AI 是一个以 `FastAPI + React + SSE + Local Static Provider + InMemory Repository` 为当前基线的零售经营分析 Agent 项目，用来学习企业级后端分层、接口合同、审批、审计、RAG 骨架和日本现场讲解方式。
 
-## 当前阶段
+## 2. 当前已经能跑的能力
 
-当前默认阶段是：
+- `GET /health` 健康检查。
+- `POST /api/tasks` 到报告读取的主任务链路。
+- `GET /api/tasks/{task_id}/events` 的 `SSE` 进度流。
+- Document Upload / Read / Archive / Import / Chunk / Retrieval。
+- `POST /api/v1/internal-rag/answer` 的本地 deterministic Internal RAG。
+- 审批提交、审批列表/详情、批准、拒绝、修订。
+- `GET /api/v1/users/me`、`roles`、`permissions`、`audit-logs` 的安全读模型。
+- 本地 `StaticResearchProvider`、`InMemoryRepository`、`LocalBusinessDataProvider`。
 
-- Local Static Provider
-- InMemory / Local Repository
-- FastAPI
-- React
-- SSE
+## 3. 当前只是骨架或部分完成的能力
 
-当前明确不接入：
+- `frontend/` 可以运行，但当前不是主学习入口。
+- PostgreSQL Repository 仍是可选路径，不是默认运行路径。
+- `LLM Provider` 接缝已留出，但默认不接真实模型。
+- 真实认证、`JWT`、`OAuth`、`MCP`、互联网搜索仍未接入。
+- 审批、安全、审计当前是本地学习型实现，不是生产级完整方案。
 
-- 真实 OpenAI
-- 真实 LLM
-- PostgreSQL
-- Redis
-- RabbitMQ
-- 真实外部业务系统
+## 4. 未来规划能力
 
-## 最短阅读路径
+- 真实 `LLM` Provider。
+- PostgreSQL 持久化默认化。
+- `JWT/OAuth` 与企业身份系统接入。
+- `pgvector`、更完整检索、企业级 RAG 评估。
+- 更完整的 `RBAC`、审批、审计、运维观测。
+- 前后端一体化联调和正式 `E2E` 路线。
 
-| 顺序 | 先看什么 | 目的 | 不建议一开始看什么 |
-| --- | --- | --- | --- |
-| 1 | `README.md` | 先知道项目是什么、当前边界是什么 | 全量 backlog 历史和长篇架构细节 |
-| 2 | [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证、怎么按接口学习 | 过深的实现细节和未来规划 |
-| 3 | [CODE_STUDY_GUIDE.md](./CODE_STUDY_GUIDE.md) | 先知道代码应该按什么顺序读 | 先看前端细节或测试细枝末节 |
+## 5. 项目验证体系
 
-## 文档导航中心
+Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
-这部分是整套文档的入口索引。目标是把“项目是什么、怎么启动、怎么学、怎么测、怎么面试、怎么维护”分开，避免同类内容分散维护。
+项目验证体系分四层：
 
-### 各文档作用
+| 层级 | 工具 | 目的 |
+|---|---|---|
+| 单元测试（Unit Test） | python -m unittest | 验证单个模块或类的逻辑是否正确 |
+| 接口验证（API Verification） | Swagger UI (/docs) | 手工验证 API 请求、响应和业务流程 |
+| 前后端集成测试（Integration Test） | React + FastAPI | 验证完整用户操作流程 |
+| 端到端测试（E2E Test） | Playwright / Cypress | 模拟真实用户完成整个业务流程 |
 
-| 文档 | 作用 | 适合谁 |
-| --- | --- | --- |
-| [README.md](./README.md) | 项目入口，看项目是什么、怎么启动、先读什么 | 所有人，尤其是第一次进入项目的人 |
-| [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md) | 本地启动与排错 | 需要在本地把项目跑起来的人 |
-| [VERIFY_CHECKLIST.md](./VERIFY_CHECKLIST.md) | 启动后怎么确认项目正常 | 想快速确认系统状态的人 |
-| [CODE_STUDY_GUIDE.md](./CODE_STUDY_GUIDE.md) | 看源码的顺序 | 想读懂实现的人 |
-| [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 按 Swagger 跑完整主链路 | 初学者和需要跑通流程的人 |
-| [docs/TEST_CASES.md](./docs/TEST_CASES.md) | 测试文件、测试输入、预期输出、测试命令 | 想知道“每个测试保护什么”的人 |
-| [docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md](./docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md) | 日本项目面试讲解稿 | 要准备日本项目面试的人 |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 系统架构 | 需要理解分层和边界的人 |
-| [docs/API_CONTRACT.md](./docs/API_CONTRACT.md) | API 契约 | 需要确认接口合同的人 |
-| [docs/EVENT_CONTRACT.md](./docs/EVENT_CONTRACT.md) | 事件契约 | 需要确认 SSE / event 语义的人 |
-| [docs/ERROR_CATALOG.md](./docs/ERROR_CATALOG.md) | 错误码说明 | 排错、联调、测试设计的人 |
-| [docs/DATABASE.md](./docs/DATABASE.md) | 数据库设计 | 需要看存储结构的人 |
-| [TASK.md](./TASK.md) | 当前任务和阶段状态 | 需要知道现在在做什么的人 |
-| [ROADMAP.md](./ROADMAP.md) | 路线图和阶段规划 | 需要知道后续方向的人 |
-| [docs/PROJECT_BACKLOG.md](./docs/PROJECT_BACKLOG.md) | 项目待办和历史完成记录 | 需要追踪技术债和历史的人 |
-| [docs/CHANGELOG.md](./docs/CHANGELOG.md) | 变更日志 | 需要看本次改了什么的人 |
-| [docs/MASTER_PROMPT.md](./docs/MASTER_PROMPT.md) | AI 执行规则 | 所有 AI 工具和维护者 |
-| [docs/CODING_STANDARD.md](./docs/CODING_STANDARD.md) | 编码规范 | 需要改代码的人 |
-| [docs/DEVELOPMENT_GUIDE.md](./docs/DEVELOPMENT_GUIDE.md) | 开发流程 | 需要做功能修改的人 |
+必须明确：
 
-### 初学者先读的 5 个文档
+- Swagger 不是测试环境。
+- Swagger 不是正式 UI。
+- Swagger 是 API 调试与验证工具。
+- UI 完成以后 Swagger 通常仍然保留。
+- Swagger 和 React 调用的是同一套 FastAPI API。
+- 当前阶段主要用 Swagger 验证后端骨架。
+- UI 完成后再做前后端 Integration Test。
+- 发布前再考虑 E2E Test。
 
-1. `README.md`
-2. `RUNBOOK_LOCAL.md`
-3. `VERIFY_CHECKLIST.md`
-4. `docs/LEARNING_API_WALKTHROUGH.md`
-5. `CODE_STUDY_GUIDE.md`
-
-### 面试准备先读的 3 个文档
-
-1. `README.md`
-2. `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`
-3. `docs/ARCHITECTURE.md`
-
-### 开发维护再看的详细设计文档
-
-1. `docs/API_CONTRACT.md`
-2. `docs/EVENT_CONTRACT.md`
-3. `docs/ERROR_CATALOG.md`
-4. `docs/DATABASE.md`
-5. `docs/MASTER_PROMPT.md`
-6. `docs/CODING_STANDARD.md`
-7. `docs/DEVELOPMENT_GUIDE.md`
-8. `TASK.md`
-9. `ROADMAP.md`
-10. `docs/PROJECT_BACKLOG.md`
-11. `docs/CHANGELOG.md`
-
-### 不要一开始看的文档
-
-1. `docs/MASTER_PROMPT.md`
-2. `docs/API_CONTRACT.md`
-3. `docs/EVENT_CONTRACT.md`
-4. `docs/DATABASE.md`
-5. `docs/CHANGELOG.md`
-6. `docs/PROJECT_BACKLOG.md`
-7. `ROADMAP.md`
-8. `TASK.md`
-
-### 文档数量控制规则
-
-- 不要随意新增 Markdown 文档。
-- 同类内容优先合并到现有文档。
-- `README.md` 负责导航。
-- `docs/LEARNING_API_WALKTHROUGH.md` 负责运行学习。
-- `docs/TEST_CASES.md` 负责测试学习。
-- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 负责面试。
-- `RUNBOOK_LOCAL.md` 负责启动排错。
-- `VERIFY_CHECKLIST.md` 负责验证。
-- `CODE_STUDY_GUIDE.md` 负责源码阅读。
-
-## 第一次启动项目
-
-第一次启动时，按下面顺序执行。每一步都只做一件事，便于你把“命令、作用、结果、排错”对应起来。
-
-| 步骤 | 命令 | 作用 | 成功标志 | 失败现象 | 下一步操作 |
-| --- | --- | --- | --- | --- | --- |
-| 1 | `./scripts/check_env.sh` | 检查 Python、Node、npm 等本地环境是否满足最低要求 | 终端显示检查通过，且版本号满足要求 | 脚本报错、版本过低、找不到命令 | 先修复本地环境，再继续第 2 步 |
-| 2 | `./scripts/start_backend.sh` | 启动 FastAPI 后端 | 终端出现 `Uvicorn running on http://127.0.0.1:8000` 和 `Application startup complete` | `ModuleNotFoundError`、`Address already in use`、`ImportError` | 先按后端终端日志排错，再回到第 2 步 |
-| 3 | `./scripts/start_frontend.sh` | 启动 React 前端 | 终端出现 `Local: http://127.0.0.1:5173/` | 5173 端口占用、npm 依赖未安装、Vite 启动失败 | 先处理前端终端日志，再回到第 3 步 |
-| 4 | 打开 `http://127.0.0.1:8000/docs` | 查看 Swagger，确认 API 已注册 | 页面能正常打开并列出接口 | 浏览器无法访问、页面空白、返回 404 | 回到第 2 步确认后端是否真的启动 |
-| 5 | 打开 `http://127.0.0.1:5173` | 查看前端页面，确认页面能连到后端 | 页面可打开，能看到项目界面 | 页面白屏、按钮无响应、请求失败 | 检查前端终端和浏览器 Network |
-| 6 | `./scripts/run_tests.sh` | 做一次完整的本地验证 | Backend tests、Frontend tests、Frontend build、Python compileall 都通过 | 某一阶段失败，脚本停在第一个错误处 | 先修复最早失败的阶段，再重新执行 |
-
-如果你只想先快速确认最小运行链路，可以优先看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)。
-
-## 当前能力与边界
-
-当前项目已经可以稳定运行的能力包括：
-
-- `POST /api/tasks`
-- `GET /api/tasks/{task_id}`
-- `GET /api/tasks/{task_id}/events`
-- `GET /api/tasks/{task_id}/report`
-- `GET /api/v1/documents`
-- `GET /api/v1/documents/{document_id}`
-- `POST /api/v1/documents`
-- `POST /api/v1/documents/{document_id}/import`
-- `POST /api/v1/documents/{document_id}/chunks`
-- `POST /api/v1/document-retrieval/search`
-- `POST /api/v1/internal-rag/answer`
-- `POST /api/v1/reports/{task_id}/submit-approval`
-- `GET /api/v1/approvals`
-- `GET /api/v1/approvals/{approval_id}`
-- `POST /api/v1/approvals/{approval_id}/approve`
-- `POST /api/v1/approvals/{approval_id}/reject`
-- `GET /api/v1/users/me`
-- `GET /api/v1/security/roles`
-- `GET /api/v1/security/permissions`
-- `GET /api/v1/audit-logs`
-
-当前明确还没有接入的能力包括：
-
-- 前端 UI 打磨
-- PostgreSQL 仓库全面迁移
-- 真实认证
-- JWT / OAuth
-- 真实 LLM 提供方
-- pgvector
-- 互联网搜索
-- MCP
-- 生产部署
-
-## 项目结构
+## 6. 项目目录结构树
 
 ```text
 retail-insight-ai/
-├── backend/                    # FastAPI 后端，包含 API、Service、Repository、Model
-│   ├── app/                    # 后端应用主体
-│   │   ├── api/                # 接口层，负责 HTTP 路由和请求响应
-│   │   ├── services/           # 业务服务层，负责用例编排
-│   │   ├── workflow/           # 工作流层，负责任务流转和分支控制
-│   │   ├── kpi/                # KPI 计算层，负责确定性指标
-│   │   ├── agents/             # Agent 和 Provider 抽象
-│   │   ├── reports/            # 报告生成层
-│   │   ├── repositories/       # 仓储层，负责数据读写抽象
-│   │   ├── errors/             # 错误码和异常处理
-│   │   ├── events/             # 事件和 SSE 相关实现
-│   │   ├── observability/      # 日志、request_id、观测相关
-│   │   ├── models/             # 领域模型
-│   │   ├── schemas/            # 请求/响应 DTO
-│   │   └── config/             # 配置与依赖注入
-│   ├── tests/                  # 后端测试
-│   ├── Dockerfile              # 后端镜像
-│   └── requirements.txt        # Python 依赖
-├── frontend/                   # React 前端，目前不是主学习路径
-│   ├── src/                    # 前端代码
-│   ├── Dockerfile              # 前端镜像
-│   ├── nginx.conf              # 静态页面与后端代理配置
-│   └── package.json            # 前端依赖与脚本
-├── docs/                       # 架构、学习、测试、面试和契约文档
-├── scripts/                    # 启动、检查、验证脚本
-└── docker-compose.yml          # PostgreSQL 等本地服务预留
+├── backend/              # FastAPI 后端，包含 API、Service、Repository、Model
+│   ├── app/
+│   │   ├── api/          # API 路由层
+│   │   ├── services/     # 业务服务层
+│   │   ├── repositories/ # 数据访问层
+│   │   ├── models/       # 领域模型
+│   │   ├── schemas/      # 请求与响应 DTO
+│   │   ├── providers/    # LLM / Search Provider 抽象
+│   │   ├── workflow/     # Workflow / LangGraph 相关流程
+│   │   ├── errors/       # 错误码与异常
+│   │   ├── config/       # 配置与依赖注入
+│   │   └── observability/# 日志与观测
+│   └── tests/            # 后端自动化测试
+├── frontend/             # React 前端，目前不是主学习入口
+├── docs/                 # 技术文档、学习文档、handbook
+├── scripts/              # 启动、检查、测试脚本
+└── docker-compose.yml    # PostgreSQL 等本地服务预留
 ```
 
-## 文档同步
+补充说明：
 
-本项目与 `ai-agent-retail-handbook-v3` 共用文档同步机制。同步脚本位于 [ai-learn/scripts/sync_retail_handbook_docs.py](../scripts/sync_retail_handbook_docs.py)，同步范围由 [doc-sync.manifest.json](../doc-sync.manifest.json) 管理。
+- `README.md` 负责项目总入口和阅读顺序。
+- `RUNBOOK_LOCAL.md` 负责启动与排错。
+- `VERIFY_CHECKLIST.md` 负责逐项验证。
+- `docs/` 下的 `ARCHITECTURE`、`API_CONTRACT`、`DATABASE`、`ERROR_CATALOG` 等负责技术规范。
+- `docs/ai-agent-retail-handbook-v3/` 是长期学习和日本面试中心。
 
-- 同步只刷新文档末尾的 `DOC-SYNC` 区块，不覆盖正文。
-- 本项目文档变化后，需要刷新同步器，让 handbook 侧对应文档一起更新。
+## 7. 文档导航中心
 
-## 学习顺序建议
+README 是项目总入口。
 
-1. 先启动后端和前端。
-2. 再用 Swagger 看接口形状。
-3. 再按 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) 逐个接口验证。
-4. 再看 [CODE_STUDY_GUIDE.md](./CODE_STUDY_GUIDE.md) 理解源码顺序。
-5. 最后对照 [docs/TEST_CASES.md](./docs/TEST_CASES.md) 和 [VERIFY_CHECKLIST.md](./VERIFY_CHECKLIST.md) 做完整验证。
+`docs/ai-agent-retail-handbook-v3/` 是长期学习和日本面试中心。
 
-## 术语说明
+`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md`、`docs/DATABASE.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md` 等是技术规范文档，不要误当成日常学习第一入口。
 
-- `StaticResearchProvider`：本地静态 Research 提供方。
-- `InMemoryRepository`：进程内仓库实现。
-- `TaskService`：任务生命周期协调层。
-- `Workflow`：业务流程编排层。
-- `SSE`：前端实时接收任务进度的通道。
+不要因为文件看起来重复就直接删除。要先合并有用内容，再移动到 `docs/_archive_candidate/`，不能直接删除。
 
-## 运行提示
+### 【日常学习主线】
 
-- 默认使用本地文件和 InMemory 数据，不需要 API Key。
-- 如果你看到 `docker: command not found`，说明当前环境没有 Docker CLI，这不影响本地学习路径。
-- 如果 8000 或 5173 端口被占用，先结束旧进程，再重新启动。
+```text
+README.md
+→ RUNBOOK_LOCAL.md
+→ Swagger
+→ docs/LEARNING_API_WALKTHROUGH.md
+→ docs/TEST_CASES.md
+→ CODE_STUDY_GUIDE.md
+→ docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
+```
+
+### 【技术设计查阅】
+
+```text
+docs/ARCHITECTURE.md
+docs/API_CONTRACT.md
+docs/EVENT_CONTRACT.md
+docs/ERROR_CATALOG.md
+docs/DATABASE.md
+docs/DECISIONS.md
+docs/CODING_STANDARD.md
+docs/DEVELOPMENT_GUIDE.md
+docs/MASTER_PROMPT.md
+```
+
+### 【项目管理查阅】
+
+```text
+TASK.md
+ROADMAP.md
+docs/PROJECT_BACKLOG.md
+docs/CHANGELOG.md
+```
+
+### 【handbook 学习中心】
+
+```text
+docs/ai-agent-retail-handbook-v3/README.md
+docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md
+docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md
+docs/ai-agent-retail-handbook-v3/03_AI核心知识.md
+docs/ai-agent-retail-handbook-v3/04_日本现场开发.md
+docs/ai-agent-retail-handbook-v3/05_TL代码审查.md
+docs/ai-agent-retail-handbook-v3/06_学习路线.md
+docs/ai-agent-retail-handbook-v3/07_面试口头训练.md
+docs/ai-agent-retail-handbook-v3/08_架构图册.md
+docs/ai-agent-retail-handbook-v3/09_系统设计书.md
+docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md
+docs/ai-agent-retail-handbook-v3/11_Project_Structure.md
+docs/ai-agent-retail-handbook-v3/12_ADR.md
+docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
+docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md
+```
+
+## 8. 学习路线
+
+推荐学习顺序：
+
+1. 先看 `README.md`，确认项目边界、目录和文档入口。
+2. 再看 `RUNBOOK_LOCAL.md`，把后端、Swagger、ReDoc、OpenAPI JSON 跑起来。
+3. 打开 Swagger，先执行 `GET /health`，再按 `docs/LEARNING_API_WALKTHROUGH.md` 学主链路。
+4. 再读 `docs/TEST_CASES.md`，理解每个能力由哪个测试文件保护。
+5. 最后进入 `CODE_STUDY_GUIDE.md` 和 handbook，做源码阅读和面试表达训练。
+
+## 9. 测试路线
+
+推荐测试路线：
+
+1. 先用 Swagger 做接口验证，确认后端确实启动。
+2. 再在 `backend/` 目录执行 `python3 -m unittest ...` 做单元测试验证。
+3. 再做 React + FastAPI 的联调验证。
+4. 最后再考虑 `Playwright / Cypress` 的正式 `E2E` 路线。
+
+特别注意：
+
+- `unittest` 命令必须在 `backend/` 目录执行。
+- 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
+- 如果看到 `ModuleNotFoundError: No module named tests`，通常不是代码坏了，而是执行目录错了。
+
+## 10. 源码阅读路线
+
+源码阅读顺序建议固定为：
+
+```text
+Swagger
+→ backend/app/api/
+→ backend/app/services/
+→ backend/app/workflow/
+→ backend/app/repositories/
+→ backend/app/models/
+→ backend/tests/
+```
+
+阅读理由：
+
+- 先从 Swagger 看输入输出，避免一上来就迷失在源码细节里。
+- 再从 `api` 看路由层。
+- 再看 `services` 和 `workflow` 理解业务编排。
+- 再看 `repositories` 和 `models` 理解数据边界。
+- 最后用 `tests` 反向确认哪些能力被保护。
+
+## 11. 面试准备路线
+
+推荐顺序：
+
+1. `README.md`
+2. `docs/LEARNING_API_WALKTHROUGH.md`
+3. `docs/TEST_CASES.md`
+4. `CODE_STUDY_GUIDE.md`
+5. `docs/ai-agent-retail-handbook-v3/README.md`
+6. `docs/ai-agent-retail-handbook-v3/06_学习路线.md`
+7. `docs/ai-agent-retail-handbook-v3/07_面试口头训练.md`
+8. `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`
+
+面试表达时要能说清：
+
+- 项目当前已完成什么。
+- 哪些能力只是骨架或冻结合同。
+- 为什么当前阶段先用本地 Provider / InMemory。
+- 为什么 Swagger、unittest、审批、审计、RAG 骨架对企业项目讲解有价值。
+
+## 12. 文档治理规则
+
+文档治理原则：
+
+1. 不要把完整学习内容压缩成一张表。
+2. 不要把主链路接口写成一长行表格。
+3. 不要删除已有内容，先补充、整理、合并。
+4. 目录结构必须保留树形图 + 中文说明。
+5. `docs/TEST_CASES.md` 必须保持为测试学习文档，不能退化成命令列表。
+6. `docs/LEARNING_API_WALKTHROUGH.md` 必须保持为分接口学习文档，不能退化成接口表格。
+7. 企业项目测试体系要长期保留在 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`docs/TEST_CASES.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`。
+8. 重复文档先进入治理清单，明确主维护文档，再决定是否归档。
+9. 如果文件需要废弃，先确认内容已经并入主文档，再移动到 `docs/_archive_candidate/`，不能直接删除。
+10. handbook 根目录是学习和面试中心，`handbook/docs` 是技术规范镜像和治理记录。
+
+## 13. 第一次启动项目
+
+1. 先执行 `./scripts/check_env.sh`。
+2. 再执行 `./scripts/start_backend.sh`。
+3. 打开 `http://127.0.0.1:8000/docs` 验证 Swagger。
+4. 打开 `http://127.0.0.1:8000/redoc` 阅读 ReDoc。
+5. 打开 `http://127.0.0.1:8000/openapi.json` 确认 OpenAPI JSON。
+6. 如需前端联调，再执行 `./scripts/start_frontend.sh`。
+7. 最后按 `VERIFY_CHECKLIST.md` 做逐项验证。
+
+## 14. 当前实现边界
+
+当前明确不宣称已完成：
+
+- 真实 OpenAI / 真实 LLM 接入。
+- PostgreSQL 默认化。
+- Redis / RabbitMQ。
+- 企业级正式认证。
+- 生产级前端体验。
+- 正式 `E2E` 自动化。
+
+当前环境如果没有 Docker CLI，不应把 Docker Build 或 PostgreSQL 验证写成已通过。

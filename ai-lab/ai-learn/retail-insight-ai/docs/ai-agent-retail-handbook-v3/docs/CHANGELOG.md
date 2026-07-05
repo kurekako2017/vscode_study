@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-07-05 Documentation Restore + Safe Merge Sprint
+
+- `README.md` 补充 handbook 根目录与 `docs` 目录职责说明。
+- `docs/MASTER_PROMPT.md` 同步补充文档恢复规则。
+- 本次仅做文档补充和合并，不删除既有内容。
+
+## 2026-07-05 文档重构 V1
+
+- `README.md` 重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统。
+- `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证。
+- `docs/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
+- `docs/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
+- `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`。
+- `INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
+- 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现。
+
 ## 2026-07-05 Documentation Consolidation Sprint 2
 
 - README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
@@ -16,7 +32,7 @@
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
 - 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
-- 新增 `docs/TEST_CASES.md` 和 `docs/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 新增 `docs/TEST_CASES.md` 和 `INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
 - 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
 - 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
 - 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。

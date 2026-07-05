@@ -2,6 +2,37 @@
 
 # CHANGELOG
 
+## 2026-07-05 Documentation Restore + Safe Merge Sprint
+
+- `README.md` 恢复树形目录结构图、文档导航中心和企业项目测试体系说明。
+- `docs/LEARNING_API_WALKTHROUGH.md` 恢复分接口学习章节，并补回每个接口的完整学习流程。
+- `docs/TEST_CASES.md` 恢复分测试文件学习章节，并补回每个测试文件的程序运行流程。
+- `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/MASTER_PROMPT.md` 补充文档规则和验证体系说明。
+- `docs/ai-agent-retail-handbook-v3/README.md` 补充根目录与 `docs` 目录职责说明。
+- 本次仅修改文档，不修改 backend、frontend、scripts、业务代码、测试代码。
+
+## 2026-07-05 文档重构 V1
+
+- `README.md` 重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统。
+- `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证。
+- `docs/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
+- `docs/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
+- `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`。
+- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
+- 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现。
+
+## 2026-07-05 文档重构 V3
+
+- `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明和文档导航中心。
+- `docs/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志。
+- `docs/TEST_CASES.md` 重写为程序运行流程学习文档，补齐程序流转、后台日志观察点和学习日志。
+- `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、命令、成功判断、失败现象和修复方法。
+- `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、命令、预想结果、失败现象和参考文档。
+- `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`。
+- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答。
+- 删除并收敛旧面试文档引用，统一指向 handbook 唯一入口。
+- 本次仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现。
+
 ## 2026-07-05 Documentation Consolidation Sprint 2
 
 - README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
@@ -28,7 +59,7 @@
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
 - 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
-- 新增 `docs/TEST_CASES.md` 和 `docs/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 新增 `docs/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
 - 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
 - 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
 - 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。

@@ -8,6 +8,38 @@ Documentation Consolidation Sprint 2
 
 状态：已完成
 
+### Documentation Restore + Safe Merge Sprint 结果
+
+- [x] 恢复 README 的树形目录结构图和文档导航中心，保留原有目录说明与验证系统
+- [x] 将 `docs/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习说明，补回每个接口的完整学习路径
+- [x] 将 `docs/TEST_CASES.md` 恢复为程序运行流程学习文档，补回每个测试文件的完整流程说明
+- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/MASTER_PROMPT.md` 的企业项目测试体系和文档规则说明
+- [x] 补充 `docs/ai-agent-retail-handbook-v3/README.md` 的根目录与 `docs` 目录职责说明
+- [x] 同步更新 handbook 镜像侧 `MASTER_PROMPT` 规则说明
+- [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务代码、测试代码
+
+### 文档重构 V3 结果
+
+- [x] README 重写为项目门户，并补齐项目概览、架构、目录、文档导航和验证系统
+- [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
+- [x] `docs/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
+- [x] `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
+- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 保持企业 AI 后端项目面试稿定位，继续作为唯一面试文档入口
+- [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
+
+### 文档重构 V1 结果
+
+- [x] `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明、文档导航中心和文档原则
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志
+- [x] `docs/TEST_CASES.md` 重写为程序运行流程学习文档，补齐测试目的、程序流转、后台日志观察点和学习日志
+- [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、成功判断、失败原因和解决方法
+- [x] `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、执行命令、预想结果、失败现象和对应文档
+- [x] `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`
+- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答
+- [x] 仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现
+- [x] 删除并收敛旧面试文档引用，统一指向 handbook 唯一入口
+
 ### Documentation Consolidation Sprint 2 Result
 
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
@@ -35,7 +67,7 @@ Documentation Consolidation Sprint 2
 - [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
@@ -50,7 +82,7 @@ Documentation Consolidation Sprint 2
 - [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 

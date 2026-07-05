@@ -8,6 +8,15 @@ Documentation Consolidation Sprint 2
 
 ### Current Status
 
+- README now acts as the project portal and explains the verification system
+- Learning walkthrough now explains Swagger, current learning stage, and sequence templates
+- Test cases now explain Swagger versus unittest, plus bug and capability protection
+- Code study guide now fixes the reading order to Swagger -> API -> Service -> Repository -> Domain -> Tests
+- Interview guide remains the only interview document entry in the handbook mirror
+- No backend, frontend, business logic, database, or test implementation changed
+
+### 文档重构 V1
+
 - README now acts as the document navigation center
 - Learning walkthrough is organized by Swagger endpoint order
 - Test cases are explained as file-by-file learning notes
@@ -15,6 +24,15 @@ Documentation Consolidation Sprint 2
 - Startup / verification / code-reading documents were tightened for beginners
 - No new feature work was added in this documentation sprint
 - Human-readable summaries remain Chinese-first with Japanese as auxiliary
+
+### 文档重构 V3
+
+- README now acts as the only project entrance and documents the full navigation hierarchy
+- Learning walkthrough now explains Swagger / ReDoc / OpenAPI JSON, backend logs, and next-study steps
+- Test cases now explain program flow instead of only test commands
+- Startup, verification, and code-reading guides now explain Why / How / Success / Failure
+- Interview guide now positions the project as an enterprise AI backend project, not a learning project
+- No backend, frontend, business logic, database, or test implementation changed
 
 ### Future Sprint Checklist
 

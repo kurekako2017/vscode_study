@@ -8,6 +8,22 @@ Documentation Consolidation Sprint 2
 
 状态：已完成
 
+### Documentation Restore + Safe Merge Sprint 结果
+
+- [x] 补充 handbook 根目录与 `docs` 目录职责说明
+- [x] 同步更新 handbook 镜像侧 `MASTER_PROMPT` 文档规则
+- [x] 与主仓保持相同的文档恢复方向，不删除既有内容
+
+### 文档重构 V1 结果
+
+- [x] `README.md` 已重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统
+- [x] `RUNBOOK_LOCAL.md` 已重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
+- [x] `docs/TEST_CASES.md` 已重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
+- [x] `CODE_STUDY_GUIDE.md` 已重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
+- [x] `INTERVIEW_GUIDE.md` 继续作为唯一面试文档入口
+- [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
+
 ### Documentation Consolidation Sprint 2 Result
 
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
@@ -31,7 +47,7 @@ Documentation Consolidation Sprint 2
 - [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 继续作为收口检查
 
