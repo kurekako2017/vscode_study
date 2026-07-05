@@ -39,7 +39,7 @@ docker --version
 
 该脚本会先检查当前 Python 环境是否安装 `psycopg`，再检查是否具备 Docker CLI；条件满足时自动拉起 `postgres` 容器并运行 `tests.test_postgres_repositories`，否则会输出明确的跳过原因和手动命令。
 
-如果你现在的目标只是 Sprint R2 的 runnable learning verification，可以直接查看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)，它只保留最小启动命令、Swagger、curl 示例和面试要点。
+如果你现在的目标只是 Sprint R3 的 runnable learning verification，可以直接查看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)，它只保留最小启动命令、Swagger、curl 示例和面试要点。
 
 ## 2. 项目目录确认
 
@@ -88,6 +88,23 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 - `REPOSITORY_BACKEND` 默认是 `inmemory`；若要测试 PostgreSQL，需要手动改成 `postgres` 并补齐 `POSTGRES_*` 连接参数。
 - Phase 1 起，KPI 从 `backend/data/business/*.csv` 读取，Research 从 `backend/data/research/*.json` 读取，文档样例位于 `backend/data/documents/*.md`。
 
+Swagger 地址：
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+最小启动验证命令：
+
+```bash
+cd backend
+python3 -c "from app.main import app; print(app.title)"
+python3 - <<'PY'
+from app.main import app
+print(app.openapi()["info"]["title"])
+PY
+```
+
 出现以下信息表示启动成功：
 
 ```text
@@ -118,6 +135,14 @@ kill <PID>
 ```
 
 再重新执行 Uvicorn 命令。Frontend 的 Vite 代理固定连接 8000，因此初学阶段建议释放 8000，而不是只把 Backend 改到其它端口。
+
+常见启动失败原因：
+
+- `ModuleNotFoundError`: 忘了进入 `backend` 目录或没有激活虚拟环境。
+- `Address already in use`: 8000 端口被上一个 uvicorn 占住。
+- `ImportError` / `SyntaxError`: 先看 `backend/app/main.py` 和最近改动的 backend 文件。
+- `connection refused`: Backend 没起来，或者你在另一个终端里连的是未启动的进程。
+- 在 WSL 里看不到浏览器页面：确认 Windows 侧浏览器访问的是 `127.0.0.1:8000` 或 `127.0.0.1:5173`，而不是容器/虚拟机内网地址。
 
 停止 Backend：回到运行 Uvicorn 的终端，按 `Ctrl+C`。
 

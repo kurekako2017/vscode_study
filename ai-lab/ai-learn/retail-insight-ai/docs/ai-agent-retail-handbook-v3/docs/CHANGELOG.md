@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
+
+- 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
+- 新增 `docs/TEST_CASES.md` 和 `docs/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
+- 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
+- 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
+
 ## 2026-07-05 Sprint R2 Runnable Learning MVP Verification
 
 - 验证 `from app.main import app; print(app.title)` 和 `app.openapi()` 可正常运行。

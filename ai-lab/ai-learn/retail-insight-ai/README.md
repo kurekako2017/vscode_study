@@ -31,6 +31,18 @@ ERIP 是持续演进目标，不是当前已经存在的平台，也不是当前
 
 当前不得将项目描述为“ERIP 已实现”或“ERIP 已存在”。
 
+## 最短阅读路径
+
+| 顺序 | 先看什么 | 解决什么问题 | 不建议一开始看什么 |
+| --- | --- | --- | --- |
+| 1 | `README.md` | 先知道项目是什么、当前边界是什么 | 全量 backlog 历史和长篇架构图 |
+| 2 | [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证、怎么跑最小路径 | 过深的代码细节和未来规划 |
+| 3 | [CODE_STUDY_GUIDE.md](./CODE_STUDY_GUIDE.md) | 先知道代码应该按什么顺序读 | 先看前端细节或长篇 ADR 历史 |
+
+English: start with `README.md`, then the learning walkthrough, then the code study guide.
+中文（简体）：先看 `README.md`，再看学习走读文档，最后看代码学习指南。
+日本語：まず `README.md`、次に学習ウォークスルー、最後にコード学習ガイドを読みます。
+
 ## Architecture Principles
 
 ### Current State
@@ -155,7 +167,7 @@ http://127.0.0.1:5173
 
 详细的 Backend、Frontend、API、SSE、Report 自测和排障步骤见 [RUNBOOK_LOCAL.md](./RUNBOOK_LOCAL.md)。
 如果要验证 Phase 2 的 PostgreSQL 持久化路径，优先执行 `./scripts/verify_postgres_phase2.sh`；脚本会自动检查 `psycopg` 与 Docker，条件不满足时明确输出跳过原因和手动命令。
-如果只想做 Sprint R2 的 runnable learning verification，优先看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)。
+如果只想做 Sprint R3 的 runnable learning verification，优先看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)。
 
 Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业平台化架构的零售分析领域参考实现：用户从 React 页面提交零售经营问题，FastAPI 创建任务，LangGraph 按模式执行确定性 KPI 与 Static Research，SSE 实时返回进度，最终展示 Markdown 报告。
 
@@ -171,6 +183,7 @@ Retail Insight AI 是一个可部署的 Level 1 本地 Demo，也是未来企业
 当前 current user 使用 `user_id="system"` 的 placeholder principal；审计事实通过 append-only InMemoryAuditRepository 保存，仍然不接真实认证、JWT、OAuth 或 RBAC enforcement。
 
 如果你想先按“可跑起来、可边测试边学习、可准备面试回答”的顺序学习，先看 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)。
+要看测试清单和面试讲法，继续看 [docs/TEST_CASES.md](./docs/TEST_CASES.md) 和 [docs/INTERVIEW_GUIDE.md](./docs/INTERVIEW_GUIDE.md)。
 
 ## 文档同步
 

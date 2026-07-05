@@ -32,9 +32,18 @@
 
 ## 当前阶段
 
-Sprint R2: Runnable Learning MVP Verification
+Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
 
 状态：已完成
+
+### Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
+
+- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
+- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] backend tests 与 compileall 继续作为收口检查
 
 ### Sprint R2: Runnable Learning MVP Verification
 

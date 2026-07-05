@@ -1,9 +1,23 @@
 # LEARNING API WALKTHROUGH
 
-This document is the runnable learning path for Sprint R2.
+This document is the runnable learning path for Sprint R3.
 English summary: start the backend, verify Swagger, then walk through the smallest working API surfaces in the same order the project explains them.
 中文（简体）摘要：先启动后端，再确认 Swagger，然后按最小可运行路径学习各个 API。
 日本語要約：まず backend を起動し、Swagger を確認してから、最小可動パスで各 API を学びます。
+
+## Shortest Path / 最短路径 / 最短経路
+
+| Order | Read this first | Problem it solves | 不建议一开始看的内容 |
+| --- | --- | --- | --- |
+| 1 | `README.md` | Find the project purpose, current boundary, and where to start | Full backlog history, handbook mirror appendices |
+| 2 | `docs/LEARNING_API_WALKTHROUGH.md` | Learn how to start and verify the runnable MVP | Deep architecture diagrams and future platform plans |
+| 3 | `CODE_STUDY_GUIDE.md` | Learn the code reading order and the runtime call chain | Frontend deep dive before understanding backend flow |
+| 4 | `docs/TEST_CASES.md` | See which tests exist and what they protect | Reading every test body before knowing the file map |
+| 5 | `docs/INTERVIEW_GUIDE.md` | Learn how to explain the project in interviews | Memorizing answers before understanding the system shape |
+
+English: start with `README.md`, then `LEARNING_API_WALKTHROUGH.md`, then `CODE_STUDY_GUIDE.md`.
+中文（简体）：先看 `README.md`，再看 `docs/LEARNING_API_WALKTHROUGH.md`，最后看 `CODE_STUDY_GUIDE.md`。
+日本語：まず `README.md`、次に `docs/LEARNING_API_WALKTHROUGH.md`、最後に `CODE_STUDY_GUIDE.md` を読みます。
 
 ## 1. Start Commands
 
@@ -63,7 +77,18 @@ English: this order moves from the smallest health check to the most layered bus
 中文（简体）：这个顺序从最小健康检查一路走到最复杂的业务链路。
 日本語：この順序は、最小の health check から最も層の深い業務フローへ進みます。
 
-## 4. What Works Now
+## 4. Document Roles / 文档职责 / 文書の役割
+
+| Document | What it answers | 不建议一开始看什么 |
+| --- | --- | --- |
+| `README.md` | What this project is and where to start | Full decision history |
+| `docs/LEARNING_API_WALKTHROUGH.md` | How to start, what runs, what still does not run | Long backlog narratives |
+| `CODE_STUDY_GUIDE.md` | Which files to read and why | Fine-grained implementation details before the runtime chain |
+| `RUNBOOK_LOCAL.md` | How to start the app locally end-to-end | Frontend deep code before backend starts |
+| `VERIFY_CHECKLIST.md` | Which commands prove the system works | Raw unit test internals before basic startup |
+| `docs/INTERVIEW_GUIDE.md` | How to explain the project in interviews | Internal file-by-file details before the high-level story |
+
+## 5. What Works Now
 
 - `GET /health` returns service metadata and `request_id`.
 - Task APIs create a runnable in-memory workflow and return a report.
@@ -71,7 +96,7 @@ English: this order moves from the smallest health check to the most layered bus
 - Approval APIs support submit, list, detail, approve, and reject.
 - Security APIs expose current user, role catalog, permission catalog, and audit logs.
 
-## 5. What Does Not Yet Work
+## 6. What Does Not Yet Work
 
 - frontend UI polishing
 - PostgreSQL repository full migration
@@ -86,7 +111,7 @@ English: this order moves from the smallest health check to the most layered bus
 中文（简体）：这些未完成项不是失败，而是当前阶段明确冻结的边界。
 日本語：これらの未完了項目は失敗ではなく、現在フェーズで明示的に凍結された境界です。
 
-## 6. Curl Examples
+## 7. Curl Examples
 
 ```bash
 curl -sS http://127.0.0.1:8000/health
@@ -97,7 +122,7 @@ curl -sS http://127.0.0.1:8000/api/v1/security/roles
 
 For document upload, use multipart form data with `file` and `metadata`.
 
-## 7. Expected Responses
+## 8. Expected Responses
 
 - Health: `status=ok`
 - Task create: HTTP 202 and a `task_id`
@@ -108,7 +133,7 @@ For document upload, use multipart form data with `file` and `metadata`.
 - Approval: HTTP 201 on submit, HTTP 200 on list/detail/approve/reject
 - Security: HTTP 200 with frozen read models
 
-## 8. Common Errors
+## 9. Common Errors
 
 - `VALIDATION_ERROR`: request body shape is wrong
 - `document_not_found`: the document id does not exist
@@ -117,7 +142,7 @@ For document upload, use multipart form data with `file` and `metadata`.
 - `REPORT_NOT_FOUND`: the task has not produced a report yet
 - `psycopg is not installed`: PostgreSQL integration tests are skipped in this environment
 
-## 9. Interview Points
+## 10. Interview Points
 
 1. The project is runnable without external LLM or PostgreSQL.
 2. Task, document, approval, security, and audit are separated by service boundaries.

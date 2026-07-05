@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-Sprint R2: Runnable Learning MVP Verification
+Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
 
 状态：已完成
 
@@ -14,19 +14,20 @@ Sprint R2: Runnable Learning MVP Verification
 
 ## 当前最高优先级任务
 
-### Sprint R2 Result
+### Sprint R3 Result
 
-- [x] backend import 验证通过：`from app.main import app; print(app.title)`
-- [x] OpenAPI / Swagger 验证通过：`app.openapi()` 可生成并返回 `Retail Insight AI`
-- [x] 最小可运行路径已通过 ASGI 验证，覆盖 health、task、document、pipeline、approval、security 与 audit
-- [x] 新增 `docs/LEARNING_API_WALKTHROUGH.md`，用于 runnable learning 路径
-- [x] 更新 README / RUNBOOK / VERIFY / CODE_STUDY / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG
+- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
+- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Verification Boundary
 
-- 当前只做 runnable verification，不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
-- 通过 ASGI 直接验证最小路径；当前环境中 uvicorn 已启动，但外部 localhost 端口在不同 exec shell 中不可直连，所以最终可运行性以 ASGI 验证为准。
-- 如果后续要做真实网络联通，再单独开网络验证 sprint。
+- 当前只做文档优化和学习路径整理，不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
+- 不伪造 PostgreSQL、真实 LLM、JWT/OAuth、MCP 或 frontend 已完成。
+- 需要代码级变更时，必须进入新的实现 sprint。
 
 ### Sprint Result
 

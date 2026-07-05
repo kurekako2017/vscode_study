@@ -4,14 +4,14 @@
 
 ## 当前阶段
 
-Sprint R2: Runnable Learning MVP Verification
+Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
 
 ### Current Status
 
-- Backend import verification passed: `from app.main import app; print(app.title)`
-- OpenAPI schema verification passed: `app.openapi()["info"]["title"]`
-- ASGI route verification passed for the minimal runnable surfaces
-- No new feature work was added in this verification sprint
+- Learning path was shortened to `README.md` → `docs/LEARNING_API_WALKTHROUGH.md` → `CODE_STUDY_GUIDE.md`
+- Startup guidance now includes backend commands, Swagger address, minimal validation commands, and common failures
+- New documentation added for test cases and interview guidance
+- No new feature work was added in this documentation sprint
 - Human-readable summaries are trilingual: English / 中文（简体） / 日本語
 
 ### Future Sprint Checklist
@@ -25,11 +25,11 @@ Sprint R2: Runnable Learning MVP Verification
 - Denied approval access still writes `security.permission.denied` audit facts
 - Status: Completed / Verified
 
-### Sprint R2 Summary
+### Sprint R3 Summary
 
-- English: the project is runnable, teachable, and interview-ready without adding new features
-- 中文（简体）：项目已具备可运行、可教学、可面试讲解的最小学习版
-- 日本語：プロジェクトは新機能を追加せずに、実行可能・学習可能・面接説明可能な状態です
+- English: the learning and interview docs are optimized without changing business logic
+- 中文（简体）：在不改变业务逻辑的前提下，学习与面试文档已优化
+- 日本語：業務ロジックを変えずに、学習と面接の文書が最適化されました
 
 ## Sprint 11.3: RBAC Enforcement for Approval APIs
 

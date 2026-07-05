@@ -8,6 +8,12 @@ cd ~/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
 
 需要三个终端：终端 A 运行 Backend，终端 B 运行 Frontend，终端 C 执行检查命令。首次启动会安装本地依赖，耗时可能较长。
 
+WSL / VS Code 注意点：
+
+- 用 VS Code 的 WSL Ubuntu 终端执行这些命令，不要在 Windows PowerShell 里直接跑项目内路径。
+- 如果你从 Explorer 打开仓库，确认终端当前目录确实是 `retail-insight-ai`。
+- 端口访问优先使用 `127.0.0.1`，不要手动改成容器或虚拟机内网地址。
+
 ## 1. Backend 是否启动
 
 - 命令（终端 A）：
@@ -18,6 +24,31 @@ cd ~/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
 
 - 预期结果：终端出现 `Uvicorn running on http://127.0.0.1:8000` 和 `Application startup complete`，随后持续运行。
 - 失败时看：`scripts/start_backend.sh`、`backend/requirements.txt`、`backend/app/main.py`、Backend 终端异常堆栈。环境问题先运行 `./scripts/check_env.sh`。
+
+Swagger 地址：
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+最小启动验证命令：
+
+```bash
+cd backend
+python3 -c "from app.main import app; print(app.title)"
+python3 - <<'PY'
+from app.main import app
+print(app.openapi()["info"]["title"])
+PY
+```
+
+常见启动失败原因：
+
+- `ModuleNotFoundError`: 没有进入 `backend` 目录，或没有使用正确的 Python 环境。
+- `Address already in use`: 8000 端口上已经有旧的 uvicorn。
+- `ImportError` / `SyntaxError`: 先看 `backend/app/main.py` 和最近修改的 backend 文件。
+- `connection refused`: Backend 没有成功启动，或者命中了错误的端口。
+- 在 WSL 里浏览器打不开：确认 Windows 浏览器访问的是 `127.0.0.1:8000/docs`，而不是容器内部地址。
 
 ## 2. Frontend 是否启动
 

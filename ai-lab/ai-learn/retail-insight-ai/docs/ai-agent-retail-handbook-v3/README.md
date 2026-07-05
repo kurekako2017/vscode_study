@@ -39,6 +39,9 @@ ERIP 是未来企业平台架构目标，不表示当前手册描述的是一个
 不得把 ERIP 写成当前已实现现状。
 
 如果你想先按“可跑起来、可边测试边学习、可准备面试回答”的顺序学习，先看 [docs/LEARNING_API_WALKTHROUGH.md](../../docs/LEARNING_API_WALKTHROUGH.md)。
+要看测试清单和面试讲法，继续看 [docs/TEST_CASES.md](../../docs/TEST_CASES.md) 和 [docs/INTERVIEW_GUIDE.md](../../docs/INTERVIEW_GUIDE.md)。
+
+如果你想先按“可跑起来、可边测试边学习、可准备面试回答”的顺序学习，先看 [docs/LEARNING_API_WALKTHROUGH.md](../../docs/LEARNING_API_WALKTHROUGH.md)。
 
 ## 文档同步
 

@@ -4,6 +4,20 @@
 
 > 路径说明：下文路径都相对于 `retail-insight-ai/`。需求中提到的 `api/routes/tasks.py` 在本项目中的实际路径是 `backend/app/api/tasks.py`，项目没有 `api/routes/` 这一层。
 
+## 最短学习路径
+
+| 顺序 | 先看什么 | 解决什么问题 | 不建议一开始看什么 |
+| --- | --- | --- | --- |
+| 1 | [README.md](./README.md) | 先知道项目是什么、当前边界是什么 | backlog 历史和完整 ADR 细节 |
+| 2 | [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划 |
+| 3 | 本文 | 先知道代码应该按什么顺序读 | 先看前端实现和测试细枝末节 |
+
+English: start with `README.md`, then the learning walkthrough, then this guide.
+中文（简体）：先看 `README.md`，再看学习走读文档，最后看本文。
+日本語：まず `README.md`、次に学習ウォークスルー、最後にこのガイドを読みます。
+
+如果你需要先查测试覆盖面，打开 [docs/TEST_CASES.md](./docs/TEST_CASES.md)；如果你需要准备面试表达，打开 [docs/INTERVIEW_GUIDE.md](./docs/INTERVIEW_GUIDE.md)。
+
 ## 1. 项目整体运行流程
 
 ```text
@@ -41,7 +55,7 @@ React
 
 当前 backend 还新增了企业安全基础读模型：`users/me` 返回 `system` 占位主体，`security/roles` 和 `security/permissions` 返回冻结目录，`audit-logs` 读取 append-only 审计事实。
 
-如果你的目标是 Sprint R2 的 runnable learning MVP verification，建议先打开 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)；它把“怎么启动、先看什么、每个功能能跑什么”收敛成最短路径。
+如果你的目标是 Sprint R3 的 runnable learning 文档优化，建议先打开 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)；它把“怎么启动、先看什么、每个功能能跑什么”收敛成最短路径。
 
 ## 2. 后端阅读顺序
 
