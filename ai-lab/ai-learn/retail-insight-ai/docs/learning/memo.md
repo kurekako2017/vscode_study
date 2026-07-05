@@ -1,80 +1,171 @@
-# AI Learn 核心概念图（Concept Map）
+# AI Learn Concept Map（企业 AI 后端学习地图）
 
-这个文档用于记录学习过程中容易混淆的概念关系、流程关系和企业项目理解，不作为正式术语表。
+> **文档定位**
 
-正式术语表仍然是：
+本系列文档用于建立企业 AI 后端项目的知识体系。
 
-[术语速查表.md](../../术语速查表.md)
+它不是：
 
-## 1. Python -> FastAPI -> OpenAPI -> Swagger / ReDoc
+- 术语手册
+- API 文档
+- 源码说明
 
-```mermaid
-flowchart TD
-    A[Python 代码] --> B[FastAPI]
-    B --> C[分析 Router]
-    B --> D[分析 Request Model]
-    B --> E[分析 Response Model]
-    B --> F[分析 Path]
-    B --> G[分析 Query]
-    B --> H[分析 Header]
-    C --> I[生成 OpenAPI JSON]
-    D --> I
-    E --> I
-    F --> I
-    G --> I
-    H --> I
-    I --> J[Swagger UI]
-    I --> K[ReDoc]
+而是：
+
+> 建立知识之间联系（Concept Map）。
+
+正式术语统一维护在：
+
+```
+ai-lab/术语速查表.md
 ```
 
-| 概念 | 作用 | 容易混淆点 | 一句话总结 |
-|---|---|---|---|
-| Python 代码 | 编写后端接口和业务逻辑的基础 | 它本身不是文档系统 | 先有 Python 代码，后面才有 FastAPI 的接口定义。 |
-| FastAPI | 把 Python 代码变成可调用 API | 它不是 Swagger 本身 | FastAPI 会读取路由和模型，自动生成 OpenAPI。 |
-| OpenAPI JSON | 接口标准描述文件 | 它不是网页 | OpenAPI JSON 是接口合同的机器可读形式。 |
-| Swagger UI | API 调试与验证界面 | 它不是正式 UI | Swagger 主要用于调试、验证和联调。 |
-| ReDoc | API 阅读界面 | 它不是测试工具 | ReDoc 适合阅读接口说明和结构。 |
+---
 
-一句话总结：
+# 为什么要写 Concept Map？
 
-> Python 代码通过 FastAPI 生成 OpenAPI JSON，再由 Swagger UI 和 ReDoc 展示成可读、可验证的接口文档。
+很多知识点单独看都懂：
 
-## 2. RAG 学习路径
+- HTTP
+- FastAPI
+- Swagger
+- RAG
+- Workflow
+- Repository
 
-```mermaid
-flowchart TD
-    A[文档 / 资料] --> B[Chunk 切分]
-    B --> C[Retriever 检索]
-    C --> D[Citation 引用]
-    D --> E[回答生成]
+但是不知道：
+
+它们之间是什么关系？
+
+企业为什么这么设计？
+
+Concept Map 就是回答：
+
+> 为什么？
+
+---
+
+# 学习目标
+
+本系列主要帮助建立：
+
+- 企业 AI 后端整体认识
+- 企业项目开发流程
+- 系统架构理解
+- 源码阅读能力
+- 日本企业面试表达能力
+
+---
+
+# 学习路线
+
+建议严格按照下面顺序。
+
+```
+Python
+    ↓
+FastAPI
+    ↓
+HTTP
+    ↓
+OpenAPI
+    ↓
+Swagger
+    ↓
+Router
+    ↓
+Service
+    ↓
+Repository
+    ↓
+Database
+    ↓
+Document
+    ↓
+RAG
+    ↓
+Workflow
+    ↓
+Approval
+    ↓
+RBAC
+    ↓
+Audit
+    ↓
+Enterprise AI Backend
 ```
 
-| 概念 | 作用 | 容易混淆点 | 一句话总结 |
-|---|---|---|---|
-| 文档 / 资料 | 提供原始知识来源 | 它不是最终答案 | RAG 的起点永远是可追溯的资料。 |
-| Chunk 切分 | 把长文档拆成小块 | 它不是检索本身 | 切分粒度会影响检索质量。 |
-| Retriever | 找到相关证据 | 它不是直接回答模块 | Retriever 负责找证据，不负责编答案。 |
-| Citation | 标明证据来源 | 它不是装饰字段 | Citation 让答案可解释、可追踪。 |
-| 回答生成 | 基于证据组织答案 | 它不是凭空创作 | 回答必须尽量和证据保持一致。 |
+---
 
-一句话总结：
+# Concept Map 目录
 
-> RAG 的核心不是“让模型会说”，而是“让答案有证据、有来源、可回溯”。
+|编号|主题|状态|
+|------|--------------------------|------|
+|01|Python → FastAPI → OpenAPI → Swagger → ReDoc|✅|
+|02|HTTP（GET / POST / PUT / DELETE）|计划|
+|03|FastAPI 生命周期|计划|
+|04|Router → Service → Repository|计划|
+|05|Request / Response / Schema|计划|
+|06|Document System|计划|
+|07|RAG 全流程|计划|
+|08|Workflow 与 Agent|计划|
+|09|Approval Workflow|计划|
+|10|RBAC 与 Audit|计划|
+|11|Repository Pattern|计划|
+|12|Provider Pattern|计划|
+|13|Enterprise AI Backend Architecture|计划|
+|14|企业测试体系|计划|
+|15|前后端联调|计划|
+|16|企业部署流程|计划|
 
-## 3. 企业学习提示
+---
 
-```mermaid
-flowchart TD
-    A[先确认接口和输入输出] --> B[再看流程、日志和错误码]
-    B --> C[最后看前端或既存系统如何联调]
-```
+# 与其它文档的关系
 
-| 顺序 | 学习重点 | 为什么这样看 |
-|---|---|---|
-| 1 | 接口和输入输出 | 先确认系统边界和合同。 |
-| 2 | 流程、日志、错误码 | 再确认问题如何定位和排查。 |
-| 3 | 前端或既存系统联调 | 最后看真实使用场景如何串起来。 |
+|文档|作用|
+|------|----------------------------|
+|Concept Map|理解为什么这样设计|
+|术语速查表|理解术语是什么意思|
+|LEARNING_API_WALKTHROUGH|学习接口|
+|TEST_CASES|学习测试|
+|CODE_STUDY_GUIDE|学习源码|
 
-一句话总结：
+---
 
-> 企业项目学习先看边界，再看流程，最后看联调，这样最容易把概念和实现对应起来。
+# 学习建议
+
+每学习一个模块：
+
+① 阅读 memo
+
+↓
+
+② Swagger 实际调用
+
+↓
+
+③ 阅读源码
+
+↓
+
+④ 看测试
+
+↓
+
+⑤ 自己总结
+
+---
+
+# 最终目标
+
+最终形成属于自己的：
+
+> Enterprise AI Backend Notebook
+
+以后：
+
+- 日本面试
+- 阅读源码
+- 工作开发
+
+全部使用这一套知识体系。
