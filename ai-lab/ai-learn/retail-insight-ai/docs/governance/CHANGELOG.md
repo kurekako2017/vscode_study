@@ -2,6 +2,31 @@
 
 # CHANGELOG
 
+## 2026-07-05 Learning Trace Phase 3
+
+- learning trace 从单行 JSON 改为终端可读 block，便于学习调用链。
+- `POST /api/tasks` 的学习链路会在后台任务完成后统一打印完整 block。
+- `LEARNING_TRACE=false` 时仍然不会输出任何学习 trace。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 补充了可读格式说明和节点含义。
+- 本次仅优化学习 trace 的显示格式，不修改 API 行为、返回值、Swagger、OpenAPI、SSE 或业务逻辑。
+
+## 2026-07-05 Learning Trace Phase 2
+
+- 学习日志升级为 `HTTP Request -> Router -> Service -> Workflow -> Provider -> Repository -> Schema(Response Model) -> HTTP Response`。
+- `GET /health` 与 `POST /api/tasks` 输出更细的学习节点，便于按 `node / class / method / file` 阅读源码调用链。
+- `LEARNING_TRACE=false` 时仍然不产生新增学习日志。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`，说明默认关闭、如何开启和如何关闭。
+- 本次只增强 Learning Trace，不修改 API 行为、返回值、Swagger、OpenAPI、SSE 或测试逻辑。
+
+## 2026-07-05 Learning Trace Phase 1
+
+- 新增可关闭的 Learning Trace，用于学习 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events` 的调用链。
+- `LEARNING_TRACE=false` 时完全关闭，不影响 API 行为、返回值、Swagger 或业务逻辑。
+- 新增 `backend/app/core/learning_trace.py`，统一提供 `trace_enter()`、`trace_step()`、`trace_exit()`。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 新增 `Learning Trace（学习调用链日志）` 章节，说明开启时机、存在原因、阅读方式和 Swagger 配合方法。
+- `.env.example` 增加 `LEARNING_TRACE=false`。
+- 本次只做 Documentation + Learning Trace，不修改测试逻辑，也不扩大到其他 API。
+
 ## 2026-07-05 Documentation Organization + AI Agent Guide 中文化 Sprint
 
 - `docs/` 下活动 Markdown 已按职责移动到 `learning/`、`architecture/`、`contracts/`、`development/`、`database/`、`governance/`。

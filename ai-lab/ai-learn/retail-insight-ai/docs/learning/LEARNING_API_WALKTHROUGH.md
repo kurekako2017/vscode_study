@@ -21,6 +21,312 @@
 
 补充说明：Swagger 不是测试环境，Swagger 不是正式 UI，Swagger 是 API 调试与验证工具。UI 完成以后 Swagger 通常仍然保留，因为 React 和 Swagger 调用的是同一套 FastAPI API。当前阶段主要用 Swagger 验证后端骨架；UI 完成后再做前后端 Integration Test；发布前再考虑 E2E Test。
 
+## 后台日志怎么观察
+
+后台日志就是启动 FastAPI 的那个终端输出。
+
+如果你是手动启动后端，通常会看到类似这样的命令：
+
+```bash
+cd backend
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+如果你是通过项目脚本启动，那么就观察那个显示 `uvicorn`、`FastAPI`、`SSE`、`request_id` 的 Terminal。也就是说，Backend Terminal Log 不是单独的新工具，而是后端进程正在运行时的控制台输出。
+
+做 Swagger `Execute` 之后，不要只看一个地方，要同时看这三块：
+
+1. `Swagger Response Body`
+1. `Swagger Response Headers`
+1. `Backend Terminal Log`
+
+这三块是同一次请求的三个视角。
+
+| 观察项 | 含义 | 为什么要看 |
+|---|---|---|
+| `request_id` | 一次请求的追踪 ID | 用来串联同一次请求的日志 |
+| `HTTP method/path` | `GET` / `POST` 和 URL | 判断请求是否进入后端 |
+| `status code` | `200` / `201` / `400` / `404` / `500` | 判断接口成功还是失败 |
+| `event` | 业务事件名称 | 判断程序执行到哪个阶段 |
+| `task_id` | 任务 ID | 跟踪任务链路 |
+| `document_id` | 文档 ID | 跟踪文档链路 |
+| `status` | `queued` / `running` / `completed` / `failed` | 判断业务状态变化 |
+| `error_code` | 错误码 | 定位失败原因 |
+| `duration_ms` | 耗时 | 判断性能问题 |
+
+学习时建议按这个顺序串起来看：
+
+```text
+阅读接口文档
+↓
+打开 Swagger
+↓
+Execute
+↓
+看 Response Body
+↓
+看 Response Headers
+↓
+看 Backend Terminal Log
+↓
+用 request_id / task_id / document_id 关联日志
+↓
+再去看源码 Router -> Service -> Repository
+```
+
+这里要特别记住两句话：
+
+- Swagger 只告诉我们接口响应结果。
+- Backend Log 能告诉我们请求是否真正进入后端，以及执行到了哪个业务阶段。
+
+## Learning Trace（学习调用链日志）
+
+Learning Trace 是一组可关闭的教学日志，用来把 Swagger、Router、Service、Repository 和 SSE 串成同一条学习链路。
+
+什么时候开启：
+
+- 只在你想学习“请求是怎么走到源码里”的时候开启。
+- 正常使用、普通调试、日常运行都保持默认关闭。
+- 默认配置是 `LEARNING_TRACE=false`，关闭时完全没有影响。
+
+为什么存在：
+
+- Swagger 只能告诉我们接口响应结果。
+- Learning Trace 用来补上“请求在后端内部到底走到了哪里”。
+- 它特别适合初学者对照阅读 `Router -> Service -> Repository`，再理解 SSE 这种长连接是怎么持续输出事件的。
+
+如何阅读：
+
+```text
+打开 Swagger
+↓
+Execute
+↓
+看 Response Body
+↓
+看 Response Headers
+↓
+看 Backend Terminal Log
+↓
+用 request_id / task_id / document_id 关联日志
+↓
+再看源码 Router -> Service -> Repository
+```
+
+和 Swagger 配合的方法：
+
+- 先在 Swagger 里执行一次接口。
+- 再回到后端终端看 Learning Trace。
+- 用 `request_id` 串联同一次请求。
+- `task_id` 适合任务链路，`document_id` 适合文档链路。
+- 这套方法目前先覆盖 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events`。
+
+开启步骤：
+
+1. 打开项目根目录 `.env`
+2. 增加或修改：
+
+```env
+LEARNING_TRACE=true
+```
+
+3. 重启后端：
+
+```bash
+cd backend
+python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+4. 打开 Swagger 执行 `GET /health`
+5. 在后端 Terminal 中查找 `learning_trace` 或 `Router -> health() -> Response`
+
+关闭步骤：
+
+- 在项目根目录 `.env` 中把 `LEARNING_TRACE=false`
+- 然后重启后端
+
+排查说明：
+
+- 如果只看到 `event=health_check`，而没有看到 `learning_trace`，通常表示：
+  - `.env` 没有设置 `LEARNING_TRACE=true`
+  - 或者后端没有重启
+  - 或者当前启动命令没有读取项目根目录 `.env`
+
+### Learning Trace Phase 2
+
+Phase 2 目标是把学习日志升级成更像企业项目的调用链视图。
+
+默认仍然关闭：
+
+```env
+LEARNING_TRACE=false
+```
+
+开启后，在终端里可以看到类似这样的学习链路：
+
+```text
+HTTP Request
+↓
+Router
+↓
+Service
+↓
+Workflow
+↓
+Provider
+↓
+Repository
+↓
+Schema(Response Model)
+↓
+HTTP Response
+```
+
+这套日志用于学习程序调用流程，不会改变 Swagger、OpenAPI、API Response、SSE 或任何业务逻辑。
+
+对 `POST /api/tasks` 来说，这条学习链路会在后台任务完成后统一打印完整 block，方便你把 Router、Service、Workflow、Provider、Repository 和 Response 串起来看。
+
+每个节点的含义：
+
+| 节点 | 含义 |
+|---|---|
+| `HTTP Request` | 一次 HTTP 请求进入后端 |
+| `Router` | FastAPI 路由函数，负责接收请求和调用 Service |
+| `Service` | 业务编排层，负责调用 Workflow、Repository 或 Provider |
+| `Workflow` | 流程编排层，负责控制任务步骤顺序 |
+| `Provider` | 数据或研究来源提供层 |
+| `Repository` | 数据读写层，负责保存或读取业务状态 |
+| `Schema(Response Model)` | 响应模型转换层，把领域对象转成 API JSON |
+| `HTTP Response` | 响应离开后端，返回给 Swagger 或前端 |
+
+对于 `GET /health`，你会看到：
+
+```text
+HTTP Request
+↓
+Router
+↓
+health()
+↓
+HealthResponse
+↓
+HTTP Response
+```
+
+对于 `POST /api/tasks`，你会看到：
+
+```text
+HTTP Request
+↓
+Router
+↓
+Service
+↓
+Workflow
+↓
+Provider
+↓
+Repository
+↓
+Schema(Response Model)
+↓
+HTTP Response
+```
+
+如果只想关闭 Phase 2，仍然只需要把 `.env` 中的值改回：
+
+```env
+LEARNING_TRACE=false
+```
+
+然后重启后端即可。
+
+# 后台日志观察（Backend Log Observation Guide）
+
+企业开发调试接口时，后台日志不是只看有没有报错，而是按照固定顺序观察。
+
+建议学习流程：
+
+```text
+Swagger Execute
+↓
+查看 request_id
+↓
+查看 Learning Trace
+↓
+查看业务事件（event）
+↓
+查看业务状态（status）
+↓
+查看 Response
+↓
+结束
+```
+
+统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条链路”。
+
+| 后台日志观察项 | 为什么看 | 正常意味着什么 |
+|---------------|----------|----------------|
+| `request_id` | 关联一次完整请求 | 同一次请求所有日志拥有相同 `request_id` |
+| `learning_trace.enter` | 请求开始 | Learning Trace 已开启 |
+| `HTTP Request` | 请求进入 FastAPI | 请求成功进入应用 |
+| `Router` | 是否进入 Router | 路由匹配成功 |
+| `Service` | 是否进入业务层 | 开始执行业务逻辑 |
+| `Workflow` | 是否进入工作流 | Workflow 正常执行（存在时） |
+| `Provider` | 是否调用 Provider | 数据来源开始执行（存在时） |
+| `Repository` | 是否访问 Repository | 已进入数据访问层（存在时） |
+| `Schema(Response Model)` | 是否构造返回对象 | Response Model 创建成功 |
+| `HTTP Response` | 请求结束 | 返回状态码正常 |
+| `learning_trace.exit` | Trace 结束 | 整个调用链完成 |
+| `duration_ms` | 性能分析 | 接口耗时 |
+| `error_code` | 是否异常 | `null` 表示正常 |
+
+## 学习建议
+
+第一次学习一个接口：
+
+① Execute
+
+② 看 Swagger Response
+
+③ 看后台 Learning Trace
+
+④ 看 Router
+
+⑤ 看 Service
+
+⑥ 看 Workflow（如果有）
+
+⑦ 看 Provider（如果有）
+
+⑧ 看 Repository（如果有）
+
+⑨ 看 Response Model
+
+⑩ 返回源码继续阅读
+
+> 企业项目中，不建议只关注 Response。
+>
+> 更重要的是理解：
+>
+> HTTP Request
+> ↓
+> Router
+> ↓
+> Service
+> ↓
+> Workflow
+> ↓
+> Provider
+> ↓
+> Repository
+> ↓
+> Response Model
+> ↓
+> HTTP Response
+>
+> Learning Trace 正是为了帮助理解这一完整调用过程。
+
 # 主链路接口总览
 
 | 序号 | API | 功能 | Swagger 操作 | 输入 | 返回 | 对应测试 | Service | 下一步学习 |

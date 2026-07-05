@@ -4,6 +4,7 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 
+from app.core.learning_trace import trace_exit, trace_step
 from app.repositories.interfaces.event_repository import EventRepository
 from app.observability.logging import get_logger, log_event
 from app.schemas.events import TaskEventResponse
@@ -22,6 +23,7 @@ async def stream_task_events(
     当前轮询只适合教学版 Memory Repository，生产环境应替换为可等待的新事件机制。
     """
 
+    trace_step("GET", f"/api/tasks/{task_id}/events", "SSE", "SSE Connected", task_id=task_id, status="connected")
     cursor = after_sequence
     while True:
         events = repository.list_after(task_id, cursor)
@@ -29,6 +31,16 @@ async def stream_task_events(
             cursor = event.sequence
             payload = TaskEventResponse.from_domain(event).model_dump(mode="json")
             level = "error" if event.event_type == "error" else "info"
+            trace_step(
+                "GET",
+                f"/api/tasks/{task_id}/events",
+                "SSE",
+                f"event {str(event.data.get('status', event.event_type))}",
+                task_id=task_id,
+                status=str(event.data.get("status", "unknown")),
+                sequence=event.sequence,
+                error_code=event.data.get("error_code") if event.event_type == "error" else None,
+            )
             log_event(
                 logger,
                 level,
@@ -46,5 +58,14 @@ async def stream_task_events(
                 f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
             )
             if event.event_type in {"done", "error"}:
+                trace_exit(
+                    "GET",
+                    f"/api/tasks/{task_id}/events",
+                    response_status=200,
+                    task_id=task_id,
+                    detail="SSE stream closed",
+                    status=str(event.data.get("status", event.event_type)),
+                    error_code=event.data.get("error_code") if event.event_type == "error" else None,
+                )
                 return
         await asyncio.sleep(0.05)

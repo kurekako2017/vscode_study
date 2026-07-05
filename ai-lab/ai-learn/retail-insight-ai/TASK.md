@@ -8,6 +8,31 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 状态：已完成
 
+### Learning Trace Phase 1 结果
+
+- [x] 新增可关闭的 Learning Trace，统一输出学习调用链日志
+- [x] 仅覆盖 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events`
+- [x] `.env.example` 增加 `LEARNING_TRACE=false`
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace（学习调用链日志）` 章节
+- [x] 保持 API 行为、返回值、Swagger、业务逻辑、测试逻辑不变
+- [x] 完成记录：`LEARNING_TRACE=false` 时完全无影响，开启后只输出学习调用链日志，不扩展到其他 API。
+
+### Learning Trace Phase 2
+
+- [x] 学习日志升级为 `HTTP Request -> Router -> Service -> Workflow -> Provider -> Repository -> Schema(Response Model) -> HTTP Response`
+- [x] `GET /health` 与 `POST /api/tasks` 补齐更细的学习节点
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`
+- [x] 默认仍然关闭，`LEARNING_TRACE=false` 时不产生新增学习日志
+- [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
+
+### Learning Trace Phase 3
+
+- [x] learning trace 由单行 JSON 改为终端可读 block
+- [x] `POST /api/tasks` 学习链路支持后台任务完成后统一打印
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 补充可读格式说明
+- [x] `LEARNING_TRACE=false` 时仍然不输出任何学习 trace
+- [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
+
 ### Documentation Organization + AI Agent Guide 中文化 Sprint 结果
 
 - [x] `docs/` 活动 Markdown 已按 `learning`、`architecture`、`contracts`、`development`、`database`、`governance` 分层管理

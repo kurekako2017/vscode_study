@@ -15,6 +15,7 @@ from app.errors.exceptions import (
     WorkflowExecutionException,
 )
 from app.kpi.workflow import FixedKPIWorkflow
+from app.core.learning_trace import trace_step
 from app.observability.logging import get_logger, log_event
 from app.reports.generator import ReportGenerator
 from app.workflow.state import AnalysisState
@@ -85,6 +86,16 @@ class AnalysisWorkflow:
     async def _route_node(self, state: AnalysisState) -> dict[str, str]:
         """读取 mode 并写入 route；Node 返回增量而不是复制整个 State。"""
 
+        trace_step(
+            "POST",
+            "/api/tasks",
+            "Workflow",
+            "AnalysisWorkflow._route_node()",
+            class_name="AnalysisWorkflow",
+            method_name="_route_node",
+            file_path="backend/app/workflow/graph.py",
+            task_id=state.get("task_id"),
+        )
         await self._delay()
         return {"route": state["mode"]}
 
@@ -98,6 +109,16 @@ class AnalysisWorkflow:
 
         task_id = state.get("task_id")
         started_at = perf_counter()
+        trace_step(
+            "POST",
+            "/api/tasks",
+            "Workflow",
+            "FixedKPIWorkflow.run()",
+            class_name="FixedKPIWorkflow",
+            method_name="run",
+            file_path="backend/app/kpi/workflow.py",
+            task_id=task_id,
+        )
         log_event(
             logger,
             "info",
@@ -131,6 +152,16 @@ class AnalysisWorkflow:
 
         task_id = state.get("task_id")
         started_at = perf_counter()
+        trace_step(
+            "POST",
+            "/api/tasks",
+            "Provider",
+            "StaticResearchProvider.research()",
+            class_name="StaticResearchProvider",
+            method_name="research",
+            file_path="backend/app/agents/providers/static_research.py",
+            task_id=task_id,
+        )
         log_event(
             logger,
             "info",
@@ -167,6 +198,16 @@ class AnalysisWorkflow:
 
         task_id = state.get("task_id")
         started_at = perf_counter()
+        trace_step(
+            "POST",
+            "/api/tasks",
+            "Workflow",
+            "ReportGenerator.generate()",
+            class_name="ReportGenerator",
+            method_name="generate",
+            file_path="backend/app/reports/generator.py",
+            task_id=task_id,
+        )
         log_event(
             logger,
             "info",

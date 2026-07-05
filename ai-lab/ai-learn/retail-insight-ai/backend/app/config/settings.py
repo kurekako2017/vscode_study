@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     data_provider: Literal["static"] = "static"
     llm_provider: Literal["stub"] = "stub"
     internal_rag_use_llm: bool = False
+    learning_trace: bool = False
     repository_backend: Literal["inmemory", "postgres"] = "inmemory"
     postgres_host: str = "127.0.0.1"
     postgres_port: int = 5432

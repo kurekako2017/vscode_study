@@ -18,6 +18,7 @@ from app.api.internal_rag import router as internal_rag_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
+from app.core.learning_trace import configure_learning_trace, trace_enter, trace_exit
 from app.errors.handlers import register_exception_handlers
 from app.observability.logging import (
     bind_request_id,
@@ -41,6 +42,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     container = build_container(settings)  # 创建依赖容器
     # 配置日志记录器，使用容器中的设置
     configure_logging(container.settings.service_name, container.settings.log_level)
+    # 学习调用链日志是独立开关，默认关闭，不影响任何业务返回。
+    configure_learning_trace(container.settings.learning_trace)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -78,7 +81,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # bind_request_id(request_id) 将 request_id 绑定到当前上下文，便于日志记录器使用。
         token = bind_request_id(request_id)
         try:
+            trace_enter(
+                request.method,
+                request.url.path,
+                node="HTTP Request",
+                class_name="FastAPI",
+                file_path="backend/app/main.py",
+                defer_flush=request.method == "POST" and request.url.path == "/api/tasks",
+            )
             response = await call_next(request)  # 调用下一个中间件或路由处理请求。
+            trace_exit(
+                request.method,
+                request.url.path,
+                response_status=response.status_code,
+                node="HTTP Response",
+                class_name="FastAPI",
+                file_path="backend/app/main.py",
+            )
             response.headers["X-Request-ID"] = request_id
             return response
         finally:

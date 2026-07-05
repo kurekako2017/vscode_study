@@ -4,6 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
 from fastapi.responses import StreamingResponse
 
 from app.api.dependencies import get_event_repository, get_task_service
+from app.core.learning_trace import trace_step
 from app.events.sse import stream_task_events
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.event_repository import EventRepository
@@ -35,11 +36,32 @@ async def create_task(
 ) -> ApiResponse[TaskCreateResponse]:
     """创建任务并把执行安排到响应后的 BackgroundTasks。"""
 
+    trace_step(
+        "POST",
+        "/api/tasks",
+        "Router",
+        "create_task()",
+        class_name="tasks.py",
+        method_name="create_task",
+        file_path="backend/app/api/tasks.py",
+    )
     task = service.create_task(payload.question, payload.mode)
     # 先返回 202，再执行分析，避免长流程占用创建任务的 HTTP 请求。
     background_tasks.add_task(service.run_task, task.task_id)
     data = TaskCreateResponse(task_id=task.task_id, status=task.status)
-    return success_response(data, get_request_id())
+    response = success_response(data, get_request_id())
+    trace_step(
+        "POST",
+        "/api/tasks",
+        "Schema(Response Model)",
+        "TaskCreateResponse",
+        class_name="TaskCreateResponse",
+        method_name="model_construct",
+        file_path="backend/app/schemas/task_api.py",
+        task_id=task.task_id,
+        status=task.status.value,
+    )
+    return response
 
 
 # 注册任务状态查询接口
@@ -50,8 +72,29 @@ async def get_task(
 ) -> ApiResponse[TaskResponse]:
     """读取任务当前状态，任务不存在时转换为稳定的 404。"""
     # 调用服务层方法获取任务状态，并返回响应
+    trace_step(
+        "GET",
+        f"/api/tasks/{task_id}",
+        "Router",
+        "get_task()",
+        class_name="tasks.py",
+        method_name="get_task",
+        file_path="backend/app/api/tasks.py",
+        task_id=task_id,
+    )
     data = TaskResponse.from_domain(service.get_task(task_id))
-    return success_response(data, get_request_id())
+    response = success_response(data, get_request_id())
+    trace_step(
+        "GET",
+        f"/api/tasks/{task_id}",
+        "Schema(Response Model)",
+        "TaskResponse.from_domain()",
+        class_name="TaskResponse",
+        method_name="from_domain",
+        file_path="backend/app/schemas/task_api.py",
+        task_id=task_id,
+    )
+    return response
 
 
 # 注册任务事件流接口
@@ -66,6 +109,16 @@ async def get_task_events(
     # SSE 连接在任务不存在时返回 404，任务已完成时仍然可以继续接收事件流。
     # SSE 是长连接，客户端可以在任务完成后继续接收事件流，直到连接关闭。
     # 任务不存在时抛出异常，FastAPI 会自动转换为 404 响应。
+    trace_step(
+        "GET",
+        f"/api/tasks/{task_id}/events",
+        "Router",
+        "get_task_events()",
+        class_name="tasks.py",
+        method_name="get_task_events",
+        file_path="backend/app/api/tasks.py",
+        task_id=task_id,
+    )
     service.get_task(task_id)
     log_event(
         logger,

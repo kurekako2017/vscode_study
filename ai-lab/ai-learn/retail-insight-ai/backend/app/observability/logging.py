@@ -20,7 +20,17 @@ LOGGER_NAMESPACE = "retail_insight_ai"
 _request_id_context: ContextVar[str] = ContextVar("request_id", default="-")
 
 # 只允许这些字段进入日志。禁止透传任意字典可减少敏感业务数据泄漏的机会。
-_SAFE_EXTRA_FIELDS = {"status", "node", "http_method", "http_path", "sequence"}
+_SAFE_EXTRA_FIELDS = {
+    "status",
+    "node",
+    "class",
+    "method",
+    "file",
+    "http_method",
+    "http_path",
+    "sequence",
+    "document_id",
+}
 
 
 class JsonLogFormatter(logging.Formatter):
@@ -42,8 +52,13 @@ class JsonLogFormatter(logging.Formatter):
             "service": self._service,
             "request_id": structured.get("request_id") or _request_id_context.get(),
             "task_id": structured.get("task_id") or "-",
+            "document_id": structured.get("document_id") or "-",
             "event": structured.get("event") or "application_log",
             "message": record.getMessage(),
+            "node": structured.get("node"),
+            "class": structured.get("class"),
+            "method": structured.get("method"),
+            "file": structured.get("file"),
             "error_code": structured.get("error_code"),
             "duration_ms": structured.get("duration_ms"),
         }
@@ -102,9 +117,13 @@ def log_event(
     duration_ms: float | None = None,
     status: str | None = None,
     node: str | None = None,
+    class_name: str | None = None,
+    method_name: str | None = None,
+    file_path: str | None = None,
     http_method: str | None = None,
     http_path: str | None = None,
     sequence: int | None = None,
+    document_id: str | None = None,
 ) -> None:
     """记录一条安全的结构化事件，不接受 Prompt 或任意业务正文参数。"""
 
@@ -112,15 +131,20 @@ def log_event(
         "event": event,
         "request_id": request_id,
         "task_id": task_id,
+        "document_id": document_id,
         "error_code": error_code,
         "duration_ms": round(duration_ms, 2) if duration_ms is not None else None,
     }
     optional_fields = {
         "status": status,
         "node": node,
+        "class": class_name,
+        "method": method_name,
+        "file": file_path,
         "http_method": http_method,
         "http_path": http_path,
         "sequence": sequence,
+        "document_id": document_id,
     }
     data.update({key: value for key, value in optional_fields.items() if value is not None})
     getattr(logger, level)(message, extra={"structured_data": data})
