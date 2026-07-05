@@ -272,6 +272,21 @@ V3 遵守一本书原则：
 - 章节标题统一使用中文
 - 技术名保留英文
 
+## Handbook Trilingual Documentation Standard
+
+### Handbook Trilingual Documentation Standard
+
+为了保证整个 Handbook 长期一致性，所有新增或修改文档必须遵循以下规范：
+
+1. 所有目录（Table of Contents）必须采用三语言格式：`English / 日本語 / 中文（简体）`。不得只保留英文目录。
+2. 所有一级标题（H1）必须采用：`English / 日本語 / 中文（简体）`，例如：`Overall Architecture / アーキテクチャ全体 / 总体架构`。
+3. 所有二级标题（H2）原则上也采用三语言格式。如果属于代码块、标准协议名称或 ADR 编号，可保持英文。
+4. 所有核心 Mermaid 架构图必须维护 English、中文（简体）、日本語 三套版本，并保持语义一致。
+5. 每个核心流程图必须注明 `Flow Type（流程类型）`，例如：Business Workflow、System Workflow、Data Flow、Architecture、Deployment、State Machine、Sequence Diagram。
+6. 每个核心流程图建议增加 `中文学习版流程`，用于帮助阅读整体业务流程。
+7. Handbook 属于 Living Document。新增 API、Workflow、Repository、Database、RAG、Infrastructure、Architecture 后，必须同步更新目录、架构图、三语言标题、流程图、中文学习版流程（如适用）。
+8. 任何英文旧图可以保留作为历史参考或补充说明，但不得替代三语言基线图。
+
 <!-- DOC-SYNC:START group=overview -->
 ## 文档同步块
 
