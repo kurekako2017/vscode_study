@@ -9,7 +9,7 @@
 | 顺序 | 先看什么 | 先解决什么问题 | 不建议一开始看什么 |
 | --- | --- | --- | --- |
 | 1 | [README.md](./README.md) | 先知道项目是什么、当前边界是什么 | backlog 历史和完整 ADR 细节 |
-| 2 | [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划 |
+| 2 | [docs/learning/LEARNING_API_WALKTHROUGH.md](./docs/learning/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划 |
 | 3 | 本文 | 先知道代码应该按什么顺序读 | 先看前端实现和测试细枝末节 |
 
 ## 主阅读顺序
@@ -50,7 +50,7 @@ Tests
 ### 为什么先看这一层
 
 - 学习目标：先建立“请求从哪里进、结果从哪里出”的整体心智模型。
-- 推荐阅读文件：`README.md`、`docs/LEARNING_API_WALKTHROUGH.md`
+- 推荐阅读文件：`README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`
 - 推荐阅读时间：15 分钟。
 - 推荐顺序：第 1 遍。
 - 看完应该掌握什么：知道 `React`、`FastAPI`、`Workflow`、`SSE`、`Report` 是怎么串起来的。

@@ -2,21 +2,68 @@
 
 # CHANGELOG
 
+## 2026-07-05 Documentation Organization + AI Agent Guide 中文化 Sprint
+
+- `docs/` 下活动 Markdown 已按职责移动到 `learning/`、`architecture/`、`contracts/`、`development/`、`database/`、`governance/`。
+- `README.md` 已同步新目录结构、学习路线和全量 Markdown 文档导航。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、每个接口详细表和程序调用流程。
+- `docs/learning/TEST_CASES.md` 保留测试总览、每个测试文件详细表和后端程序流程，并新增“保护的 Bug / 风险”列。
+- `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 已中文化，日语为辅，覆盖 Workflow vs Agent、Tool、Repository、Provider、RAGAnswerGenerator、LLMProvider、Retrieval、Approval、RBAC / Audit 和未来模型 Provider 接入方式。
+- `docs/development/MASTER_PROMPT.md` 已补充文档合并、唯一主文档、归档候选区、学习内容保护和语言规则。
+- Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑。
+
+## 2026-07-05 Documentation Readability Optimization Sprint
+
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 所有主接口统一采用详细表格，保留 Swagger 操作、输入、输出、后台 Log、源码、测试和下一步。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 程序流程统一写文件路径、类名、方法名。
+- `docs/learning/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`。
+- `docs/learning/TEST_CASES.md` 所有测试文件统一采用详细表格，保留测试目的、API、Swagger 操作、命令、输入、输出、后台 Log、源码和为什么设计。
+- `docs/learning/TEST_CASES.md` 后端程序流程统一写文件路径、类名、方法名。
+- Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑。
+
+## 2026-07-05 Documentation Governance V2
+
+- `README.md` 升级为唯一知识导航中心，补齐全部 59 个 Markdown 文档链接、知识地图、学习路线流程图、当前完成情况矩阵和企业项目验证体系。
+- `README.md` 增加文档责任表，明确唯一职责、是否唯一、是否允许新增同类文档。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，同时保留每个接口的作用、Swagger 操作、输入、输出、后台日志、程序流程、源码、测试和下一步。
+- `docs/learning/TEST_CASES.md` 增加测试总览表，同时保留每个测试文件的测试目的、API、命令、输入、输出、Swagger 操作、后台日志、程序流程、源码和设计理由。
+- `RUNBOOK_LOCAL.md` 的启动、Swagger、ReDoc、OpenAPI、验证、测试和排错内容已由 README、LEARNING、TEST、VERIFY 承接，文件移动到 `docs/_archive_candidate/RUNBOOK_LOCAL.md`。
+- `STUDY_PLAN_DAY1_DAY3.md` 已由 README 学习路线、接口学习、测试学习和源码阅读文档承接，移动到 `docs/_archive_candidate/root/STUDY_PLAN_DAY1_DAY3.md`。
+- handbook 侧 `TASK.md`、`ROADMAP.md` 已由根目录同名主文档承接，移动到 `docs/_archive_candidate/handbook-root/`。
+- handbook/docs 技术规范镜像已由主项目 `docs/` 承接，移动到 `docs/_archive_candidate/handbook-docs/`。
+- `docs/_archive_candidate/README.md` 补充归档规则、当前归档候选文件、移动原因、停止维护状态和未来删除条件。
+- `docs/ai-agent-retail-handbook-v3/README.md` 调整为长期知识库入口，不重复维护主项目介绍；技术规范镜像统一说明为引用或镜像。
+- `docs/development/MASTER_PROMPT.md` 增加 Documentation Governance 永久规则，禁止删除学习内容、程序流程、Swagger 操作、后台 Log、输入输出和源码位置。
+- Documentation Only：未修改 backend、frontend、tests、scripts、Python、React。
+
 ## 2026-07-05 Documentation Restore + Safe Merge Sprint
 
 - `README.md` 恢复树形目录结构图、文档导航中心和企业项目测试体系说明。
-- `docs/LEARNING_API_WALKTHROUGH.md` 恢复分接口学习章节，并补回每个接口的完整学习流程。
-- `docs/TEST_CASES.md` 恢复分测试文件学习章节，并补回每个测试文件的程序运行流程。
-- `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/MASTER_PROMPT.md` 补充文档规则和验证体系说明。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复分接口学习章节，并补回每个接口的完整学习流程。
+- `docs/learning/TEST_CASES.md` 恢复分测试文件学习章节，并补回每个测试文件的程序运行流程。
+- `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/development/MASTER_PROMPT.md` 补充文档规则和验证体系说明。
 - `docs/ai-agent-retail-handbook-v3/README.md` 补充根目录与 `docs` 目录职责说明。
 - 本次仅修改文档，不修改 backend、frontend、scripts、业务代码、测试代码。
+
+## 2026-07-05 Documentation Recovery + Governance Sprint
+
+- `README.md` 重新恢复为项目总入口，补齐项目一句话介绍、当前已实现能力、部分完成能力、未来规划、项目验证体系、目录树、文档导航中心、学习路线、测试路线、源码阅读路线、面试准备路线和文档治理规则。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为按接口逐节展开的学习文档，覆盖 `GET /health`、tasks、documents、retrieval、internal-rag、approvals、security、audit 等主接口，不再用总表承载主内容。
+- `docs/learning/TEST_CASES.md` 恢复为按测试文件逐节展开的学习文档，覆盖重点测试目的、输入、预想输出、Swagger 对应操作、后端程序流程、源码和设计理由。
+- `RUNBOOK_LOCAL.md` 和 `VERIFY_CHECKLIST.md` 补充 Swagger、ReDoc、OpenAPI JSON 的区别，以及 `unittest` 必须在 `backend/` 目录执行的规则。
+- `docs/development/MASTER_PROMPT.md` 补充永久文档保护规则，明确不能把 `TEST_CASES.md` 压缩成命令列表，也不能把 `LEARNING_API_WALKTHROUGH.md` 压缩成接口表格。
+- `docs/ai-agent-retail-handbook-v3/README.md` 明确 handbook 根目录负责学习/面试，handbook/docs 负责技术规范镜像和治理记录。
+- 新增 `docs/_archive_candidate/README.md`，先登记疑似重复文档与主维护文件，不移动、不删除任何文档。
+- `docs/governance/PROJECT_BACKLOG.md` 增加“文档治理清单”章节。
+- 本次仅修改 Markdown 文档，不修改 backend/app、backend/tests、frontend、scripts、业务逻辑、API 行为、测试实现。
 
 ## 2026-07-05 文档重构 V1
 
 - `README.md` 重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统。
 - `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证。
-- `docs/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
-- `docs/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
+- `docs/learning/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
 - `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`。
 - `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
 - 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现。
@@ -24,8 +71,8 @@
 ## 2026-07-05 文档重构 V3
 
 - `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明和文档导航中心。
-- `docs/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志。
-- `docs/TEST_CASES.md` 重写为程序运行流程学习文档，补齐程序流转、后台日志观察点和学习日志。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志。
+- `docs/learning/TEST_CASES.md` 重写为程序运行流程学习文档，补齐程序流转、后台日志观察点和学习日志。
 - `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、命令、成功判断、失败现象和修复方法。
 - `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、命令、预想结果、失败现象和参考文档。
 - `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`。
@@ -37,20 +84,20 @@
 
 - README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
 - README 增加初学者只读 5 个文档、面试准备 3 个文档、开发维护再看哪些文档、不要一开始看的文档，以及文档数量控制规则。
-- `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
-- `docs/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
+- `docs/learning/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
+- `docs/learning/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
 - `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
 - `RUNBOOK_LOCAL.md` 明确项目根目录脚本和 backend 目录 uvicorn 的不同执行方式，并补上 Swagger / ReDoc / OpenAPI JSON 的用途。
 - `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档。
 - `CODE_STUDY_GUIDE.md` 增加每章推荐阅读文件和下一步看哪里。
-- `docs/MASTER_PROMPT.md` 增加文档数量控制规则。
+- `docs/development/MASTER_PROMPT.md` 增加文档数量控制规则。
 - 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts。
 
 ## 2026-07-05 Sprint R3.1 Documentation Quality Refactor
 
 - 将 `README.md` 重写为中文入口，并新增“第一次启动项目”章节，逐步说明命令、作用、成功标志、失败现象和下一步操作。
-- 将 `docs/LEARNING_API_WALKTHROUGH.md` 重写为按接口顺序展开的中文学习走读，每个接口都补齐接口作用、学习原因、Swagger 位置、输入、预期输出、知识点和源码位置。
-- 将 `docs/TEST_CASES.md` 重写为按测试文件逐项说明的中文文档，补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由。
+- 将 `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为按接口顺序展开的中文学习走读，每个接口都补齐接口作用、学习原因、Swagger 位置、输入、预期输出、知识点和源码位置。
+- 将 `docs/learning/TEST_CASES.md` 重写为按测试文件逐项说明的中文文档，补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由。
 - 将 `RUNBOOK_LOCAL.md` 改为“启动与排错指南”，并用“问题 → 原因 → 解决方法”重新组织。
 - 将 `VERIFY_CHECKLIST.md` 改为启动完成检查清单，明确每项如何验证成功。
 - 将 `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和看完应掌握的内容。
@@ -58,9 +105,9 @@
 
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
-- 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
-- 新增 `docs/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
-- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
+- 统一最短学习路径到 `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
+- 新增 `docs/learning/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
 - 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
 
@@ -68,8 +115,8 @@
 
 - 验证 `from app.main import app; print(app.title)` 和 `app.openapi()` 可正常运行。
 - 通过 ASGI 直接确认最小可运行路径：health、task、document、pipeline、approval、security、audit。
-- 新增 `docs/LEARNING_API_WALKTHROUGH.md`，把 runnable learning 路径收敛成最短学习顺序。
-- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`。
+- 新增 `docs/learning/LEARNING_API_WALKTHROUGH.md`，把 runnable learning 路径收敛成最短学习顺序。
+- 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 本次不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
 
 ## 2026-07-05 Final Wrap-up Sprint: Project Consolidation and Verification
@@ -88,7 +135,7 @@
 - default system admin placeholder user 继续通过所有 approval permission checks。
 - permission denied 会写入 append-only audit fact，并以 `permission_denied` 返回 403。
 - 新增 backend tests 覆盖允许路径、拒绝路径与 denied audit logging。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md`、`docs/contracts/API_CONTRACT.md` 以及 handbook mirror。
 - 本次不修改 frontend、scripts 或 approval response shape。
 
 ## 2026-07-05 Sprint 11.2 Security Domain + InMemory Audit MVP
@@ -99,7 +146,7 @@
 - current user 使用 `user_id="system"` 的 placeholder principal，roles 预置为 `admin`，permissions 预置为 frozen catalog。
 - `audit.log.created` / `audit.log.failed` 作为结构化日志事件记录审计追加成功和失败。
 - 新增 backend tests，覆盖系统用户、冻结目录、审计追加、审计只读读取和 append-only 语义。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 - 本次仍不实现真实认证、JWT、OAuth、RBAC enforcement、PostgreSQL audit repository 或 frontend 变更。
 
 ## 2026-07-05 Sprint 11.1 Enterprise Security Foundation Contract Freeze
@@ -107,7 +154,7 @@
 - 冻结企业安全基础合同，覆盖 user / organization / department / role / permission / policy 概念。
 - 冻结 `GET /api/v1/users/me`、`GET /api/v1/security/roles`、`GET /api/v1/security/permissions`、`GET /api/v1/audit-logs` 的未来读接口边界。
 - 冻结 RBAC approval-action matrix、audit log contract、operation log contract 和 future authentication relationship。
-- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次不修改 backend、frontend 或 scripts。
 
 ## 2026-07-05 Sprint 10.2 Approval API MVP Implementation
@@ -123,7 +170,7 @@
 
 - 冻结文档语言政策：所有人类可读项目文档默认采用 English / 中文（简体） / 日本語 三语。
 - 明确 English-only 仅允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
-- 更新 `docs/MASTER_PROMPT.md`、`docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `docs/development/MASTER_PROMPT.md`、`docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仅冻结规则，不重写旧文档正文。
 
 ## 2026-07-04 Sprint 10.1 Approval Workflow Contract Freeze
@@ -132,7 +179,7 @@
 - 冻结 approval state machine：`draft`、`pending_approval`、`approved`、`rejected`、`revised`、`published`、`archived`。
 - 冻结 approval events：`approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
 - 冻结 approval error catalog，并明确 report revision relationship、audit relationship、future RBAC relationship。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/database/DATABASE.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次不修改 backend、frontend 或 scripts。
 
 ## 2026-07-04 Sprint 9.5 LLM Provider Seam Stub MVP
@@ -142,7 +189,7 @@
 - provider failure、timeout、invalid output、missing citation 都回退到 deterministic extractive answer。
 - 记录 `provider_name`、`prompt_tokens`、`completion_tokens`、`estimated_cost`、`latency_ms` 占位信息，仅用于内部事件/日志，不暴露到 API response。
 - 新增 `backend/tests/test_rag_answer_generator.py`，并确认 backend full suite 与 compileall 已通过。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 - 本次不修改 `/api/v1/internal-rag/answer` response contract，不修改 frontend。
 
 ## 2026-07-04 Sprint 9.4 LLM Provider Seam Contract Freeze
@@ -151,7 +198,7 @@
 - 冻结 provider error model：`llm_provider_unavailable`、`llm_provider_timeout`、`llm_output_invalid`、`llm_citation_missing`、`llm_cost_limit_exceeded`。
 - 明确当前默认仍是 deterministic extractive fallback，不调用 LLM、不调用外部 provider。
 - 记录 token / cost / latency tracking placeholders，供未来模型接入时使用。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/PROMPT_STANDARD.md`、`docs/AI_AGENT_DESIGN_GUIDE.md`、`docs/ARCHITECTURE.md`、`docs/ERROR_CATALOG.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/development/PROMPT_STANDARD.md`、`docs/architecture/AI_AGENT_DESIGN_GUIDE.md`、`docs/architecture/ARCHITECTURE.md`、`docs/contracts/ERROR_CATALOG.md` 以及 handbook mirror。
 - 本次不修改 backend、frontend 或 scripts，且不改变 `/api/v1/internal-rag/answer` response。
 
 ## 2026-07-04 Sprint 9.3 Internal RAG Evaluation + Citation Quality MVP
@@ -160,7 +207,7 @@
 - 新增 citation quality checker，验证 `document_id` / `chunk_id` / excerpt grounding 关系，并生成 `low_context`、`missing_citation`、`weak_match` warnings。
 - `POST /api/v1/internal-rag/answer` 仍保持 backward compatible，对外 response 未增加新字段。
 - `extractive` / `summary` 两种 answer mode 继续不调用 LLM、embedding 或 pgvector。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 - `python3 -m unittest discover -s tests -v` 与 `python3 -m compileall app tests` 已通过。
 
 ## 2026-07-04 Sprint 9.2 Internal RAG MVP without LLM
@@ -169,7 +216,7 @@
 - `answer_mode=extractive` 直接组装 top retrieval excerpts，并为使用的每个 excerpt 返回 citation。
 - `answer_mode=summary` 采用稳定的本地摘要规则，不调用 LLM、embedding 或 pgvector。
 - `invalid_question`、`insufficient_context`、`citation_required`、`archived exclusion` 行为已由 backend tests 覆盖。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 - `python3 -m unittest discover -s tests -v` 与 `python3 -m compileall app tests` 已通过。
 
 ## 2026-07-04 Sprint 9.1 Internal RAG Contract Freeze
@@ -177,9 +224,9 @@
 - 冻结 `POST /api/v1/internal-rag/answer`，定义 question / limit / include_archived / document_type / language / tags / answer_mode / require_citations 请求合同。
 - 冻结 internal RAG response contract，包含 `answer`、`citations[]`、`retrieval_mode`、`answer_mode`、`confidence`、`warnings[]`。
 - 冻结 `internal_rag.started`、`internal_rag.retrieval_completed`、`internal_rag.answer_generated`、`internal_rag.failed` 事件语义。
-- 在 `docs/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
-- 在 `docs/PROMPT_STANDARD.md` 增加 Internal RAG prompt family，在 `docs/ERROR_CATALOG.md` 增加内部 RAG 错误码分组。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 在 `docs/architecture/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
+- 在 `docs/development/PROMPT_STANDARD.md` 增加 Internal RAG prompt family，在 `docs/contracts/ERROR_CATALOG.md` 增加内部 RAG 错误码分组。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次不实现 RAG、LLM、embedding、pgvector、frontend，且不修改 retrieval API 行为。
 
 ## 2026-07-04 Sprint 8.3 Retrieval Repository Abstraction + Worktree Cleanup
@@ -188,7 +235,7 @@
 - 新增 `backend/app/repositories/interfaces/document_retrieval_provider.py` 与 `backend/app/repositories/implementations/in_memory/document_retrieval.py`，并保留当前 `InMemoryKeywordRetrieval` 作为唯一实现。
 - `backend/app/services/document_retrieval_service.py` 现在只负责 API、事件和错误边界，不再直接依赖 chunk repository。
 - 更新 `backend/app/config/container.py` 以在组合根中装配 retrieval provider。
-- 更新 `docs/ARCHITECTURE.md`、`docs/DECISIONS.md`、`TASK.md`、`docs/PROJECT_BACKLOG.md`。
+- 更新 `docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md`、`TASK.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 检查工作区后未发现额外 untracked chunk 文件，因此无需删除重复产物。
 - 本次不改变 API response、不改变 scoring 行为、不引入 RAG、embedding、pgvector、frontend 或 PostgreSQL 搜索后端。
 
@@ -197,14 +244,14 @@
 - 实现 `POST /api/v1/document-retrieval/search`，以 keyword-only 方式在现有 in-memory document chunks 上执行检索。
 - 支持 `query`、`limit`、`include_archived`、`document_type`、`language`、`tags`，并返回 `document_id`、`chunk_id`、`chunk_index`、`content_excerpt`、`score`、`source`、`metadata`。
 - 新增 `backend/app/api/document_retrieval.py`、`backend/app/services/document_retrieval_service.py`、`backend/app/schemas/document_retrieval_api.py` 与 `backend/tests/test_document_retrieval_api.py`。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 LLM、RAG、embedding、pgvector、hybrid search、frontend 或 PostgreSQL document repository。
 
 ## 2026-07-04 Sprint 8.1 Document Retrieval Contract Freeze
 
 - 冻结 `POST /api/v1/document-retrieval/search` 的请求、响应、状态码、错误码、检索事件与错误目录。
-- 在 `docs/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow 与 Future RAG Integration Flow。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 在 `docs/architecture/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow 与 Future RAG Integration Flow。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 Retrieval API、RAG、embedding、pgvector、hybrid search 或 future approval flow。
 
 ## 2026-07-04 Sprint 7 Document Chunk Pipeline MVP
@@ -212,7 +259,7 @@
 - 实现 `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks`。
 - Chunk pipeline 只接受 validated 文档，只支持 Markdown / Text，并采用 deterministic replace 规则。
 - 新增 `backend/app/repositories/interfaces/document_chunk_repository.py`、`backend/app/repositories/implementations/in_memory/document_chunk_repository.py`、`backend/app/services/document_chunk_service.py`、`backend/app/api/document_chunks.py`、`backend/app/schemas/document_chunk_api.py` 与 `backend/tests/test_document_chunk_api.py`。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 frontend、RAG、embedding、pgvector、Approval API、PostgreSQL Document Repository、versions、search。
 
 ## 2026-07-04 Sprint 6 Document Import Pipeline MVP
@@ -221,7 +268,7 @@
 - 导入流水线支持 pending / running / completed / failed 状态，成功导入会把文档状态推进到 `validated`。
 - 对 Markdown / Text / CSV / JSON 允许导入，对 PDF / Word / Excel / Image 作为计划能力返回 `unsupported_document_type`。
 - 新增 `backend/app/models/document_import.py`、`backend/app/services/document_import_service.py`、`backend/app/api/document_imports.py`、`backend/app/schemas/document_import_api.py` 与 `backend/tests/test_document_import_api.py`。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/database/DATABASE.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 frontend、RAG、embedding、pgvector、Internet Search、Approval API、versions、chunks、PostgreSQL Document Repository。
 
 ## 2026-07-04 Sprint 5 Document Archive API MVP
@@ -229,7 +276,7 @@
 - 实现 `DELETE /api/v1/documents/{document_id}` 的软删除归档语义，不做物理删除。
 - archived 文档继续可由 `GET /api/v1/documents/{document_id}` 读取；列表默认排除 archived，并支持 `include_archived=true` 或 `status=archived`。
 - 新增 `backend/app/services/document_archive_service.py` 与 `backend/tests/test_document_archive_api.py`，并调整文档领域删除行为为 archive / soft delete。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 frontend、RAG、chunking、pgvector、Approval API、versions、chunks、PostgreSQL Document Repository。
 
 ## 2026-07-04 Sprint 4 Document Read API MVP
@@ -237,7 +284,7 @@
 - 实现 `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}`。
 - 支持 status / document_type / language / tag / owner 基础过滤，并在缺失文档时返回 `document_not_found`。
 - 新增 `backend/app/services/document_read_service.py`、`backend/tests/test_document_read_api.py`，并复用现有 `InMemoryDocumentRepository`。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 frontend、RAG、chunking、pgvector、Approval API、DELETE、versions、chunks、PostgreSQL Document Repository。
 
 ## 2026-07-04 Sprint 3 Document Upload API MVP Implementation
@@ -245,21 +292,21 @@
 - 实现 `POST /api/v1/documents` 的同步 MVP。
 - 支持 multipart/form-data、metadata JSON、title / description / owner / tags / language 校验、SHA-256 checksum、duplicate checksum detection 和 `Idempotency-Key`。
 - 新增 `backend/app/api/documents.py`、`backend/app/services/document_upload_service.py`、`backend/app/schemas/document_api.py` 与 `backend/tests/test_document_upload_api.py`。
-- 更新 `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
 
 ## 2026-07-04 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
 
 - 冻结 Document Upload Workflow、Upload Session contract、Idempotency contract、Error Catalog 和 Upload Policy。
-- 新增 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`。
-- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 新增 `docs/contracts/ERROR_CATALOG.md` 与 `docs/contracts/UPLOAD_POLICY.md`。
+- 更新 `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md`、`docs/governance/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍不实现 Upload API，不修改 backend 业务代码，不修改 frontend。
 
 ## 2026-07-04 Sprint 2 Document Upload API Contract Freeze
 
 - 冻结 Document Upload API contract，覆盖 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
 - 冻结 Document Upload event contract，覆盖 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
-- 更新 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md`、`docs/governance/PROJECT_BACKLOG.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次仍只停留在 Document Domain Model，未实现 Upload API、未修改 backend 业务代码、未修改 frontend。
 
 ## 2026-07-04
@@ -268,16 +315,16 @@
 - 新增 `backend/app/models/document.py`，定义 Document、DocumentVersion、DocumentChunk placeholder、DocumentMetadata、DocumentSource、DocumentStatus、DocumentType、Language，并复用现有 ApprovalStatus 与 ImportBatch。
 - 新增 `backend/app/repositories/interfaces/document_repository.py` 与 `backend/app/repositories/implementations/in_memory/document_repository.py`。
 - 新增文档域单元测试，覆盖 Document creation、metadata validation、status transition、Repository CRUD、checksum duplicate detection。
-- 更新 `docs/ARCHITECTURE.md`、`docs/PROJECT_BACKLOG.md`、`docs/ROADMAP.md`、`docs/TASK.md`、`docs/DECISIONS.md` 以及 handbook mirror。
+- 更新 `docs/architecture/ARCHITECTURE.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/ROADMAP.md`、`docs/TASK.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror。
 - 本次未实现 Upload API、RAG、Chunk、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
 - 完成 `Epic 14: Engineering Standards (Final Freeze)` 文档冻结。
 - Master Prompt Summary was added after Epic 14 final freeze.
-- 新增 `docs/MASTER_PROMPT.md`，作为唯一 Master Prompt。
-- 新增 `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md`。
-- 新增 `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/PROMPT_STANDARD.md`。
+- 新增 `docs/development/MASTER_PROMPT.md`，作为唯一 Master Prompt。
+- 新增 `docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md`、`docs/architecture/AI_AGENT_DESIGN_GUIDE.md`。
+- 新增 `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/development/PROMPT_STANDARD.md`。
 - 在 `docs/ai-agent-retail-handbook-v3/docs/` 新增上述 7 份镜像文档。
-- 更新 `ROADMAP.md`、`TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 记录本次冻结。
+- 更新 `ROADMAP.md`、`TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 记录本次冻结。
 - 扩展 `../doc-sync.manifest.json`，新增 `engineering-standards` 同步组。
 - 本次未修改 `backend/`、`frontend/`、`scripts/`，未新增业务代码，未修改数据库 schema。
 
@@ -297,7 +344,7 @@
 - `reports` 表新增 `approval_status` 字段，当前值仍为 `generated`。
 - `docker-compose.yml` 新增 PostgreSQL service。
 - 新增 backend switch 测试与 PostgreSQL Repository 集成测试骨架。
-- 同步更新 `docs/DATABASE.md`、`docs/ARCHITECTURE.md`、`docs/DECISIONS.md` 以及 handbook 对应文档。
+- 同步更新 `docs/database/DATABASE.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/DECISIONS.md` 以及 handbook 对应文档。
 - 修正 Phase 2 状态口径为：
   `Code implemented`
   `InMemory path verified`
@@ -308,9 +355,9 @@
 - 明确当前环境缺少 Docker CLI、未安装 `psycopg` 到实际运行 venv，因此 PostgreSQL 集成测试被 skip。
 
 - 新增 Phase 1.5：Data Contract Freeze + Approval State Machine Design。
-- 新增 `docs/DATA_CONTRACTS.md`，冻结业务 CSV、Research JSON、Documents Markdown 契约。
-- 新增 `docs/APPROVAL_WORKFLOW.md`，冻结 `generated / draft / pending_approval / approved / rejected / revised / published / archived` 状态机。
-- 新增 `docs/DATABASE.md`，冻结 Phase 2 PostgreSQL 准备项：
+- 新增 `docs/architecture/DATA_CONTRACTS.md`，冻结业务 CSV、Research JSON、Documents Markdown 契约。
+- 新增 `docs/architecture/APPROVAL_WORKFLOW.md`，冻结 `generated / draft / pending_approval / approved / rejected / revised / published / archived` 状态机。
+- 新增 `docs/database/DATABASE.md`，冻结 Phase 2 PostgreSQL 准备项：
   `data_imports`、`import_errors`、`reports`、`report_versions`、`approval_requests`、`approval_events`。
 - 新增导入错误模型：
   `missing_file`、`invalid_header`、`invalid_type`、`empty_dataset`、`invalid_json`、`invalid_source`、`unsupported_encoding`。
@@ -352,24 +399,24 @@
 - 检查结果概要：五份治理文档完整，项目处于 Phase 2 开发准备阶段；当前仍是 Level 1 本地可运行实现，Document Upload、Chunk Pipeline、Embedding、Vector Search 与 Approval Agent 尚未实现。
 - 风险概要：README 与 Backlog 的阶段描述尚未统一，CHANGELOG 尚未完整回溯既有功能，当前 WSL 环境无法使用 Docker CLI；`.env`、虚拟环境、依赖目录和构建产物已被 `.gitignore` 保护且未被 Git 跟踪。
 - 升级到 AI-LAB Project Governance V2。
-- 新增 `ROADMAP.md`、`docs/ARCHITECTURE.md` 和 `docs/DECISIONS.md`。
+- 新增 `ROADMAP.md`、`docs/architecture/ARCHITECTURE.md` 和 `docs/governance/DECISIONS.md`。
 - 更新 `AGENTS.md`，开发前增加 Roadmap、Backlog 和 TASK 强制读取顺序。
-- 影响文件：AGENTS.md、TASK.md、ROADMAP.md、docs/PROJECT_BACKLOG.md、docs/CHANGELOG.md、docs/ARCHITECTURE.md、docs/DECISIONS.md。
+- 影响文件：AGENTS.md、TASK.md、ROADMAP.md、docs/governance/PROJECT_BACKLOG.md、docs/governance/CHANGELOG.md、docs/architecture/ARCHITECTURE.md、docs/governance/DECISIONS.md。
 
 <!-- DOC-SYNC:START group=governance -->
 ## 文档同步块
 
 - group: `governance`
-- file: `retail-insight-ai/docs/CHANGELOG.md`
+- file: `retail-insight-ai/docs/governance/CHANGELOG.md`
 - self_sha256: `cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3`
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
-- `ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
-- `ai-agent-retail-handbook-v3/docs/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
+- `ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-demo)
 
 说明：

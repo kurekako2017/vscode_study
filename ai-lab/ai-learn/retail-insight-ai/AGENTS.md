@@ -227,12 +227,12 @@ VERIFY_CHECKLIST.md
 Every work session must start by reading:
 
 1. AGENTS.md
-2. docs/PROJECT_BACKLOG.md
+2. docs/governance/PROJECT_BACKLOG.md
 3. TASK.md if it exists
 
 Before coding, always check unfinished tasks and technical debt.
 
-After completing work, always update docs/PROJECT_BACKLOG.md:
+After completing work, always update docs/governance/PROJECT_BACKLOG.md:
 
 - mark completed tasks with [x]
 - update current status
@@ -246,7 +246,7 @@ Do not start coding directly without checking the backlog first.
 每次开始工作前必须执行：
 
 1. 阅读 AGENTS.md
-2. 阅读 docs/PROJECT_BACKLOG.md
+2. 阅读 docs/governance/PROJECT_BACKLOG.md
 3. 阅读 TASK.md（如果存在）
 
 开始编码前必须：
@@ -260,7 +260,7 @@ Do not start coding directly without checking the backlog first.
 
 工作完成后必须更新：
 
-`docs/PROJECT_BACKLOG.md`
+`docs/governance/PROJECT_BACKLOG.md`
 
 包括：
 
@@ -282,7 +282,7 @@ Do not start coding directly without checking the backlog first.
 每次开发前必须阅读：
 
 1. AGENTS.md
-2. docs/PROJECT_BACKLOG.md
+2. docs/governance/PROJECT_BACKLOG.md
 3. TASK.md
 
 本项目当前重点：
@@ -317,11 +317,11 @@ Phase 2: Internal Knowledge Approval Agent
 
 1. `AGENTS.md`
 2. `ROADMAP.md`
-3. `docs/PROJECT_BACKLOG.md`
+3. `docs/governance/PROJECT_BACKLOG.md`
 4. `TASK.md`
 
 开发前还必须确认当前阶段、最高优先级任务、技术债和已知问题。
 
-架构变化必须更新 `docs/ARCHITECTURE.md`；重要决策必须追加到 `docs/DECISIONS.md`。
+架构变化必须更新 `docs/architecture/ARCHITECTURE.md`；重要决策必须追加到 `docs/governance/DECISIONS.md`。
 
-开发完成后必须更新 `TASK.md`、`docs/PROJECT_BACKLOG.md` 和 `docs/CHANGELOG.md`，并保留全部历史记录。
+开发完成后必须更新 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md` 和 `docs/governance/CHANGELOG.md`，并保留全部历史记录。

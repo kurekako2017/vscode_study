@@ -16,7 +16,7 @@
 ## 每次工作开始前必须检查
 
 - [ ] 阅读 AGENTS.md
-- [ ] 阅读 docs/PROJECT_BACKLOG.md
+- [ ] 阅读 docs/governance/PROJECT_BACKLOG.md
 - [ ] 阅读 TASK.md（如果存在）
 - [ ] 检查未完成任务
 - [ ] 检查技术债
@@ -32,16 +32,101 @@
 
 ## 当前阶段
 
-Documentation Consolidation Sprint 2
+Documentation Organization + AI Agent Guide 中文化 Sprint
 
 状态：已完成
+
+### Documentation Organization + AI Agent Guide 中文化 Sprint
+
+- [x] `docs/` 下活动 Markdown 已移动到职责子目录：`learning`、`architecture`、`contracts`、`development`、`database`、`governance`
+- [x] `README.md` 已同步新路径、文档树、学习路线和全量 Markdown 导航
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 保留所有接口、Swagger 操作、输入、预想结果、后台日志、源码、测试、下一步和程序调用流程
+- [x] `docs/learning/TEST_CASES.md` 保留所有测试文件详细表和后端程序流程，并在测试总览增加“保护的 Bug / 风险”
+- [x] `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 已中文化，日语为辅，英文仅保留技术名词和代码标识符
+- [x] `docs/development/MASTER_PROMPT.md` 增加文档合并、唯一主文档、archive、学习内容保护和语言规则
+- [x] Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现、业务逻辑
+
+### Documentation Readability Optimization Sprint
+
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 所有主接口均保留 Swagger 操作、输入、输出、后台 Log、源码、测试、下一步
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 程序流程统一写文件路径、类名、方法名
+- [x] `docs/learning/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`
+- [x] `docs/learning/TEST_CASES.md` 所有测试文件均保留测试目的、API、Swagger 操作、命令、输入、输出、后台 Log、源码、为什么设计
+- [x] `docs/learning/TEST_CASES.md` 后端程序流程统一写文件路径、类名、方法名
+- [x] Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现、业务逻辑
+
+### Documentation Governance V2
+
+- [x] README 成为唯一知识导航中心，并链接当前仓库全部 59 个 Markdown 文件
+- [x] README 补齐知识地图、学习路线流程图、当前完成情况矩阵和四层企业验证体系
+- [x] README 增加文档责任表，明确唯一职责和禁止新增同类文档
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，保留所有接口完整学习章节
+- [x] `docs/learning/TEST_CASES.md` 增加测试总览表，保留所有测试文件完整学习章节
+- [x] `RUNBOOK_LOCAL.md` 已移动到 `docs/_archive_candidate/RUNBOOK_LOCAL.md`
+- [x] handbook/docs 技术规范镜像已移动到 `docs/_archive_candidate/handbook-docs/`
+- [x] handbook TASK / ROADMAP 镜像已移动到 `docs/_archive_candidate/handbook-root/`
+- [x] `STUDY_PLAN_DAY1_DAY3.md` 已移动到 `docs/_archive_candidate/root/`
+- [x] `docs/_archive_candidate/README.md` 明确归档规则、移动原因、停止维护状态和未来删除条件
+- [x] `docs/ai-agent-retail-handbook-v3/README.md` 调整为长期知识库入口，主项目介绍统一指向根 README
+- [x] `docs/development/MASTER_PROMPT.md` 增加 Documentation Governance 永久规则
+- [x] Documentation Only：未修改 backend、frontend、tests、scripts、Python、React
+
+### Documentation Recovery + Governance Sprint
+
+- [x] 重新盘点仓库 Markdown 文档，补充“文档治理清单”
+- [x] 恢复 `README.md` 为项目总入口，补齐目录树、导航中心、学习/测试/源码/面试路线
+- [x] 恢复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 为分接口学习文档，不再用总表承载主内容
+- [x] 恢复 `docs/learning/TEST_CASES.md` 为分测试文件学习文档，不再退化为命令列表
+- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md` 的 Swagger / ReDoc / OpenAPI JSON 与 unittest 规则
+- [x] 补充 `docs/development/MASTER_PROMPT.md` 的永久文档保护规则
+- [x] 补充 `docs/ai-agent-retail-handbook-v3/README.md` 的 handbook 根目录与 handbook/docs 职责边界
+- [x] 新增 `docs/_archive_candidate/README.md`，先记录疑似重复文档，不移动、不删除
+- [x] 本次只修改 Markdown 文档，不修改 backend/app、backend/tests、frontend、scripts、业务逻辑、API 行为、测试实现
+
+## 文档治理清单
+
+| 文件路径 | 文档用途 | 是否主维护文档 | 是否疑似重复 | 如果重复，建议合并到哪个文件 | 是否建议进入 docs/_archive_candidate/ | 是否需要人工确认 |
+|---|---|---|---|---|---|---|
+| `README.md` | 项目总入口、导航中心、学习和治理入口 | 是 | 是 | 主文件；与 `docs/ai-agent-retail-handbook-v3/README.md` 分工保留 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/README.md` | handbook 学习与面试入口 | 是 | 是 | 主文件；保留 handbook 定位，不合并回根 README | 否 | 否 |
+| `TASK.md` | 当前工作结果与阶段记录 | 是 | 是 | 主文件；与 handbook `TASK.md` 保持镜像但不互删 | 否 | 是 |
+| `docs/ai-agent-retail-handbook-v3/TASK.md` | handbook 侧任务镜像 | 否 | 是 | 根目录 `TASK.md` | 是 | 是 |
+| `ROADMAP.md` | 当前项目阶段路线图 | 是 | 是 | 主文件；与 handbook `ROADMAP.md` 分工保留 | 否 | 是 |
+| `docs/ai-agent-retail-handbook-v3/ROADMAP.md` | handbook 侧路线图镜像 | 否 | 是 | 根目录 `ROADMAP.md` | 是 | 是 |
+| `docs/governance/PROJECT_BACKLOG.md` | 当前项目 backlog、技术债、治理清单 | 是 | 是 | 主文件；与 handbook mirror 同步但不互删 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | handbook 侧 backlog 镜像 | 否 | 是 | `docs/governance/PROJECT_BACKLOG.md` | 是 | 是 |
+| `docs/governance/CHANGELOG.md` | 主项目变更历史 | 是 | 是 | 主文件；与 handbook mirror 同步 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | handbook 侧变更镜像 | 否 | 是 | `docs/governance/CHANGELOG.md` | 是 | 是 |
+| `docs/architecture/ARCHITECTURE.md` | 架构说明与边界 | 是 | 是 | 主文件；与 handbook mirror 同步 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/architecture/ARCHITECTURE.md` | handbook 架构镜像 | 否 | 是 | `docs/architecture/ARCHITECTURE.md` | 是 | 是 |
+| `docs/contracts/API_CONTRACT.md` | API 合同主文件 | 是 | 是 | 主文件；与 handbook mirror 同步 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/contracts/API_CONTRACT.md` | handbook API 合同镜像 | 否 | 是 | `docs/contracts/API_CONTRACT.md` | 是 | 是 |
+| `docs/contracts/EVENT_CONTRACT.md` | SSE / 事件合同主文件 | 是 | 是 | 主文件；与 handbook mirror 同步 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/contracts/EVENT_CONTRACT.md` | handbook 事件合同镜像 | 否 | 是 | `docs/contracts/EVENT_CONTRACT.md` | 是 | 是 |
+| `docs/contracts/ERROR_CATALOG.md` | 错误码主文件 | 是 | 是 | 主文件；与 handbook mirror 同步 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/docs/contracts/ERROR_CATALOG.md` | handbook 错误码镜像 | 否 | 是 | `docs/contracts/ERROR_CATALOG.md` | 是 | 是 |
+| `docs/learning/LEARNING_API_WALKTHROUGH.md` | 分接口学习主文件 | 是 | 是 | 主文件；handbook 仅引用学习路线，不替代此文档 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/06_学习路线.md` | handbook 学习路径文档 | 否 | 是 | 不直接合并；保持入口级路线，引用 `docs/learning/LEARNING_API_WALKTHROUGH.md` | 否 | 是 |
+| `docs/learning/TEST_CASES.md` | 分测试文件学习主文件 | 是 | 是 | 主文件；handbook 相关章节只引用，不替代 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/07_面试口头训练.md` | 面试口头训练 | 否 | 是 | 不合并；只保留面试训练定位 | 否 | 是 |
+| `docs/ai-agent-retail-handbook-v3/11_Project_Structure.md` | handbook 项目结构与测试结构说明 | 否 | 是 | 不合并；保留 handbook 结构视角，并引用 `docs/learning/TEST_CASES.md` | 否 | 是 |
+| `CODE_STUDY_GUIDE.md` | 源码阅读路线主文件 | 是 | 是 | 主文件；handbook 结构/学习路线文档只补充，不替代 | 否 | 否 |
+| `docs/ai-agent-retail-handbook-v3/11_Project_Structure.md` | handbook 项目结构学习文档 | 否 | 是 | `CODE_STUDY_GUIDE.md` 提供源码阅读入口 | 否 | 是 |
+| `docs/_archive_candidate/RUNBOOK_LOCAL.md` | 已停止主维护的旧启动与排错文档 | 否 | 是 | `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`docs/learning/TEST_CASES.md`、`VERIFY_CHECKLIST.md` | 已进入 | 是 |
+| `docs/_archive_candidate/root/STUDY_PLAN_DAY1_DAY3.md` | 已停止主维护的旧三日学习计划 | 否 | 是 | `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`docs/learning/TEST_CASES.md`、`CODE_STUDY_GUIDE.md` | 已进入 | 是 |
+| `docs/_archive_candidate/handbook-root/TASK.md` | 已停止主维护的 handbook 任务镜像 | 否 | 是 | `TASK.md` | 已进入 | 是 |
+| `docs/_archive_candidate/handbook-root/ROADMAP.md` | 已停止主维护的 handbook 路线图镜像 | 否 | 是 | `ROADMAP.md` | 已进入 | 是 |
+| `docs/_archive_candidate/handbook-docs/*.md` | 已停止主维护的 handbook 技术规范镜像 | 否 | 是 | 主项目 `docs/` 同名文档 | 已进入 | 是 |
+| `VERIFY_CHECKLIST.md` | 验证清单主文件 | 是 | 否 | 无 | 否 | 否 |
+| `docs/development/MASTER_PROMPT.md` | 文档与工程治理总规则 | 是 | 是 | 主文件；handbook 侧为镜像 | 否 | 否 |
 
 ### Documentation Restore + Safe Merge Sprint
 
 - [x] 恢复 README 树形目录图、文档导航和企业项目测试体系说明
-- [x] 恢复 `docs/LEARNING_API_WALKTHROUGH.md` 的分接口学习章节
-- [x] 恢复 `docs/TEST_CASES.md` 的分测试文件流程章节
-- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/MASTER_PROMPT.md` 的文档规则
+- [x] 恢复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 的分接口学习章节
+- [x] 恢复 `docs/learning/TEST_CASES.md` 的分测试文件流程章节
+- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/development/MASTER_PROMPT.md` 的文档规则
 - [x] 补充 `docs/ai-agent-retail-handbook-v3/README.md` 的根目录与 `docs` 目录职责说明
 - [x] 同步 handbook 镜像侧治理文档
 - [x] 本次只改文档，不改 backend、frontend、scripts、业务代码、测试代码
@@ -50,8 +135,8 @@ Documentation Consolidation Sprint 2
 
 - [x] `README.md` 已重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统
 - [x] `RUNBOOK_LOCAL.md` 已重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
-- [x] `docs/TEST_CASES.md` 已重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
+- [x] `docs/learning/TEST_CASES.md` 已重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
 - [x] `CODE_STUDY_GUIDE.md` 已重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续作为唯一面试文档入口
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
@@ -59,8 +144,8 @@ Documentation Consolidation Sprint 2
 ### 文档重构 V3
 
 - [x] `README.md` 已重写为唯一入口，并补齐项目介绍、当前实现范围、目录说明和文档导航中心
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已重写为中文主导的接口学习走读，并补齐 Swagger / ReDoc / OpenAPI JSON 说明
-- [x] `docs/TEST_CASES.md` 已重写为程序运行流程学习文档，并补齐程序流转和学习日志
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已重写为中文主导的接口学习走读，并补齐 Swagger / ReDoc / OpenAPI JSON 说明
+- [x] `docs/learning/TEST_CASES.md` 已重写为程序运行流程学习文档，并补齐程序流转和学习日志
 - [x] `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md` 已重写为面向新手的启动、验证和源码阅读指南
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 已重写为企业 AI 后端项目面试稿
 - [x] 仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现
@@ -69,20 +154,20 @@ Documentation Consolidation Sprint 2
 ### Documentation Consolidation Sprint 2
 
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
-- [x] `docs/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
+- [x] `docs/learning/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
 - [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
 - [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
 - [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
-- [x] `docs/MASTER_PROMPT.md` 增加文档数量控制规则
+- [x] `docs/development/MASTER_PROMPT.md` 增加文档数量控制规则
 - [x] 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts
 
 ### Sprint R3.1: Documentation Quality Refactor
 
 - [x] `README.md` 改为中文入口，并新增“第一次启动项目”章节
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
-- [x] `docs/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
+- [x] `docs/learning/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
 - [x] `RUNBOOK_LOCAL.md` 改写为“启动与排错指南”，使用“问题 → 原因 → 解决方法”组织内容
 - [x] `VERIFY_CHECKLIST.md` 改写为启动完成检查清单，并明确每项如何验证成功
 - [x] `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和掌握目标
@@ -90,11 +175,11 @@ Documentation Consolidation Sprint 2
 
 ### Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
 
-- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
-- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/learning/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
 - [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 继续作为收口检查
 
 ### Sprint R2: Runnable Learning MVP Verification
@@ -102,7 +187,7 @@ Documentation Consolidation Sprint 2
 - [x] backend import 验证通过
 - [x] OpenAPI / Swagger 验证通过
 - [x] 最小可运行路径通过 ASGI 验证
-- [x] 新增 `docs/LEARNING_API_WALKTHROUGH.md`
+- [x] 新增 `docs/learning/LEARNING_API_WALKTHROUGH.md`
 - [x] 更新 README / RUNBOOK / VERIFY / CODE_STUDY / TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG
 - [x] 不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP
 
@@ -215,7 +300,7 @@ Documentation Consolidation Sprint 2
 - [x] provider error model frozen for unavailable / timeout / invalid output / citation missing / cost limit cases
 - [x] deterministic extractive fallback remains the current default
 - [x] token / cost / latency tracking placeholders documented
-- [x] `docs/PROMPT_STANDARD.md` / `docs/AI_AGENT_DESIGN_GUIDE.md` / `docs/ARCHITECTURE.md` / `docs/ERROR_CATALOG.md` updated
+- [x] `docs/development/PROMPT_STANDARD.md` / `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` / `docs/architecture/ARCHITECTURE.md` / `docs/contracts/ERROR_CATALOG.md` updated
 - [x] TASK / ROADMAP / PROJECT_BACKLOG / CHANGELOG / DECISIONS / handbook mirror synchronized
 - [x] backend / frontend / scripts left untouched
 
@@ -290,14 +375,14 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 每次开发前必须检查：
 
 - AGENTS.md
-- docs/PROJECT_BACKLOG.md
+- docs/governance/PROJECT_BACKLOG.md
 - TASK.md
 
 每次开发后必须更新：
 
-- docs/PROJECT_BACKLOG.md
+- docs/governance/PROJECT_BACKLOG.md
 - TASK.md
-- docs/CHANGELOG.md
+- docs/governance/CHANGELOG.md
 
 ### Sprint 4: Document Read API MVP
 
@@ -577,7 +662,7 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
   - [x] 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`
   - [x] 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`
   - [x] 冻结 Document Upload Validation Flow 与 Future Approval Integration Flow
-  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror
 - 后续待办：
   - [ ] 实现 Upload API
   - [ ] 实现 Document Upload persistence
@@ -590,9 +675,9 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
   - [x] 冻结 Document Upload Workflow
   - [x] 冻结 Upload Session contract
   - [x] 冻结 Idempotency contract
-  - [x] 新增 `docs/ERROR_CATALOG.md`
-  - [x] 新增 `docs/UPLOAD_POLICY.md`
-  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+  - [x] 新增 `docs/contracts/ERROR_CATALOG.md`
+  - [x] 新增 `docs/contracts/UPLOAD_POLICY.md`
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror
 - 后续待办：
   - [ ] 实现 Upload API
   - [ ] 实现 Upload Session persistence
@@ -609,7 +694,7 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
   - [x] 实现 `DocumentUploadSession` 成功响应
   - [x] 实现 upload 事件发布到现有 event repository
   - [x] 新增 backend 单元测试覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放与幂等冲突
-  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/architecture/ARCHITECTURE.md`、`docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror
 - 后续待办：
   - [ ] 实现 GET / DELETE / versions / chunks 只读接口
   - [ ] 保持 PostgreSQL Document Repository 仅设计不实现
@@ -625,7 +710,7 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
   - [x] 实现 `document_not_found` 404 行为
   - [x] 新增 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件
   - [x] existing upload tests still pass
-  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook mirror
+  - [x] 同步 `TASK.md`、`ROADMAP.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook mirror
 - 后续待办：
   - [ ] `DELETE`、`versions`、`chunks` 接口仍冻结未实现
   - [ ] PostgreSQL Document Repository 仍保持设计不实现
@@ -660,13 +745,13 @@ ERIP 仅表示目标平台架构，不表示当前项目、当前部署或当前
 
 - 每个 Phase 完成后，必须同步更新 `docs/ai-agent-retail-handbook-v3/` 对应文档。
 - handbook 同步最小集合：
-  `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
+  `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`。
 - 若变更涉及测试、流程、系统设计、生产路线图，还必须同步检查并更新：
   `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 未同步 handbook 文档的 Phase 不得从 `[ ]` 改为 `[x]`。
 - 所有功能变更必须追加到 handbook 侧：
-  `docs/ai-agent-retail-handbook-v3/docs/CHANGELOG.md`
-  `docs/ai-agent-retail-handbook-v3/docs/DECISIONS.md`
+  `docs/ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md`
+  `docs/ai-agent-retail-handbook-v3/docs/governance/DECISIONS.md`
 
 ## 本次完成记录
 
@@ -950,7 +1035,7 @@ Epic 12 作为横向平台能力推进，而不是单一文档 RAG 能力。
 - 目标：
   建立完整测试用例、测试方法、前后台流程图、系统架构图和学习文档同步机制。
 - 修改范围：
-  Backend / Frontend 测试、验证清单、流程图、`docs/ARCHITECTURE.md`、README、RUNBOOK。
+  Backend / Frontend 测试、验证清单、流程图、`docs/architecture/ARCHITECTURE.md`、README、RUNBOOK。
 - 验收标准：
   核心链路具备单元、集成、端到端验证；文档图示完整且与实现一致。
 - 测试方法：
@@ -1041,9 +1126,9 @@ Open
 
 ### 2026-07-04 Phase 1.5 Contract Freeze and Approval Design
 
-- [x] 新增 `docs/DATA_CONTRACTS.md`
-- [x] 新增 `docs/APPROVAL_WORKFLOW.md`
-- [x] 新增 `docs/DATABASE.md`
+- [x] 新增 `docs/architecture/DATA_CONTRACTS.md`
+- [x] 新增 `docs/architecture/APPROVAL_WORKFLOW.md`
+- [x] 新增 `docs/database/DATABASE.md`
 - [x] 冻结导入错误模型
 - [x] 冻结 Approval State Machine
 - [x] 冻结 Phase 2 PostgreSQL 准备项
@@ -1054,16 +1139,16 @@ Open
 ## 文档同步块
 
 - group: `governance`
-- file: `retail-insight-ai/docs/PROJECT_BACKLOG.md`
+- file: `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md`
 - self_sha256: `b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477`
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
-- `ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
-- `ai-agent-retail-handbook-v3/docs/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
+- `ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-demo)
 
 说明：

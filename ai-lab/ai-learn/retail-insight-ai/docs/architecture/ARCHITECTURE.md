@@ -37,11 +37,11 @@ Human-readable architecture explanations are trilingual by default.
 
 ### Target State
 
-- `docs/MASTER_PROMPT.md` 成为唯一总入口。
-- `docs/API_CONTRACT.md` 冻结 HTTP 边界。
-- `docs/EVENT_CONTRACT.md` 冻结 SSE 事件封装。
-- `docs/PROMPT_STANDARD.md` 冻结 Prompt 分类与模板要求。
-- `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md` 冻结工程实现与设计判断入口。
+- `docs/development/MASTER_PROMPT.md` 成为唯一总入口。
+- `docs/contracts/API_CONTRACT.md` 冻结 HTTP 边界。
+- `docs/contracts/EVENT_CONTRACT.md` 冻结 SSE 事件封装。
+- `docs/development/PROMPT_STANDARD.md` 冻结 Prompt 分类与模板要求。
+- `docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md`、`docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 冻结工程实现与设计判断入口。
 
 ### Planned
 
@@ -68,9 +68,9 @@ Human-readable architecture explanations are trilingual by default.
 
 ### Planned
 
-- 由 `docs/DATA_CONTRACTS.md` 作为文件输入单一来源
-- 由 `docs/APPROVAL_WORKFLOW.md` 作为审批状态机单一来源
-- 由 `docs/DATABASE.md` 作为 Phase 2 表结构准备来源
+- 由 `docs/architecture/DATA_CONTRACTS.md` 作为文件输入单一来源
+- 由 `docs/architecture/APPROVAL_WORKFLOW.md` 作为审批状态机单一来源
+- 由 `docs/database/DATABASE.md` 作为 Phase 2 表结构准备来源
 
 ## Sprint 10.1 Approval Workflow Contract Freeze
 
@@ -490,7 +490,7 @@ flowchart LR
 
 ### Planned
 
-- 后续实现必须遵守 `docs/API_CONTRACT.md` 与 `docs/EVENT_CONTRACT.md`。
+- 后续实现必须遵守 `docs/contracts/API_CONTRACT.md` 与 `docs/contracts/EVENT_CONTRACT.md`。
 - 当前阶段不实现 Upload API，不修改业务代码，不把审批状态当成 Upload 成功的隐含结果。
 
 ## Document Upload API Flow
@@ -2175,10 +2175,10 @@ flowchart LR
 ## 文档同步块
 
 - group: `architecture`
-- file: `retail-insight-ai/docs/ARCHITECTURE.md`
+- file: `retail-insight-ai/docs/architecture/ARCHITECTURE.md`
 - self_sha256: `99ec6a7ef9caa11ad9233e4d6e8d40c2a55ba621584fde27685bce1a52da50b0`
 - peers:
-- `retail-insight-ai/docs/DECISIONS.md` | sha256=fde8a8d32a6812c38add97db9042a1932dda711f32999bde03e862b86bef35d5 | # retail-insight-ai Architecture Decisions / 本文件保存 Architecture Decision Record（ADR）。不得删除已生效或已废弃的历史决策。 / ## ADR-001 / 日期：2026-06-29
+- `retail-insight-ai/docs/governance/DECISIONS.md` | sha256=fde8a8d32a6812c38add97db9042a1932dda711f32999bde03e862b86bef35d5 | # retail-insight-ai Architecture Decisions / 本文件保存 Architecture Decision Record（ADR）。不得删除已生效或已废弃的历史决策。 / ## ADR-001 / 日期：2026-06-29
 - `ai-agent-retail-handbook-v3/03_AI核心知识.md` | sha256=b29ec1e0b01d85b5a69735c85dcc9e8cfac763e70e38b844dcca04cce5bb64e5 | # 03_AI核心知识 / ## 第一章 知识服务于项目 / 本书中的知识点只围绕 Retail Insight AI 展开。FastAPI、LangGraph、RAG、Streaming、Docker 都不是孤立知识，而是服务于日本小売業客户的经营分析任务。 / 【TL Review】
 - `ai-agent-retail-handbook-v3/08_架构图册.md` | sha256=ab27e2cb38443f53f6aff5c2b5d5a495a1774894d29429f463b926c5993d4611 | # 08_架构图册 / # 目录 / - [1. Overall Architecture](#1-overall-architecture) / - [2. User to API Flow](#2-user-to-api-flow)
 - `ai-agent-retail-handbook-v3/09_系统设计书.md` | sha256=506bedbfe7ebcb7f81c127c63a3ace28ee8d3329261015d798bb5b6783032f2e | # 09_系统设计书 / # 目录 / - [1. 项目概要](#1-项目概要) / - [2. 系统目标](#2-系统目标)

@@ -10,7 +10,7 @@ Use this guide when adding new capabilities without breaking frozen standards.
 
 1. Check whether an existing endpoint can be extended safely.
 2. If it is new, version it under `/api/v1/...`.
-3. Define request, response, statuses, and error codes in `docs/API_CONTRACT.md`.
+3. Define request, response, statuses, and error codes in `docs/contracts/API_CONTRACT.md`.
 4. Add tests for success, validation failure, and not-found or conflict paths.
 5. Update handbook mirror.
 

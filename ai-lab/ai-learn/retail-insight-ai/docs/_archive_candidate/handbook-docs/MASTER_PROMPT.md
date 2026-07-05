@@ -162,7 +162,7 @@ All AI tools working in this repository must follow this document before they wr
 - Keep directory structures as tree diagrams with Chinese explanations.
 - Keep `docs/TEST_CASES.md` permanently as a program-flow learning document, not a command list.
 - Keep `docs/LEARNING_API_WALKTHROUGH.md` permanently as an interface-learning document, not a table-only summary.
-- Keep enterprise testing system explanations in `README.md`, `docs/LEARNING_API_WALKTHROUGH.md`, `docs/TEST_CASES.md`, `RUNBOOK_LOCAL.md`, and `VERIFY_CHECKLIST.md`.
+- Keep enterprise testing system explanations in `README.md`, `docs/LEARNING_API_WALKTHROUGH.md`, `docs/TEST_CASES.md`, and `VERIFY_CHECKLIST.md`.
 - `docs/ai-agent-retail-handbook-v3/` is the learning and interview center, and `docs/ai-agent-retail-handbook-v3/docs/` is the technical spec mirror.
 - Before deleting any document, first confirm that README navigation has a replacement entry and that no useful content will be lost.
 - Update `TASK.md`, `docs/PROJECT_BACKLOG.md`, and `docs/CHANGELOG.md` after every completed work session.
@@ -173,8 +173,8 @@ All AI tools working in this repository must follow this document before they wr
 - Keep `README.md` as the navigation center.
 - Keep `docs/LEARNING_API_WALKTHROUGH.md` for runnable learning.
 - Keep `docs/TEST_CASES.md` for test learning.
-- Keep `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
-- Keep `RUNBOOK_LOCAL.md` for startup and troubleshooting.
+- Keep `INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
+- Keep startup and troubleshooting as part of `README.md` and `VERIFY_CHECKLIST.md`; archived runbooks must not remain active maintenance entry points.
 - Keep `VERIFY_CHECKLIST.md` for verification.
 - Keep `CODE_STUDY_GUIDE.md` for source reading order.
 

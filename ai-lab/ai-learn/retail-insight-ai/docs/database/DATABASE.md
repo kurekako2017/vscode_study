@@ -455,7 +455,7 @@ Freeze the future identity, authorization, and audit storage concepts before RBA
 - `roles` 与 `permissions` 是冻结目录，未来实现必须沿用这些名称。
 - `audit_logs` 是 append-only 事实表，不应被业务更新语句改写。
 - `operation_logs` 可以作为读取投影或物化视图，不改变审计事实本身。
-- Approval 权限矩阵应与 `docs/API_CONTRACT.md` 保持一致。
+- Approval 权限矩阵应与 `docs/contracts/API_CONTRACT.md` 保持一致。
 
 ## Database ER Preparation
 

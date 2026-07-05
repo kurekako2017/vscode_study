@@ -4,15 +4,17 @@
 
 ## 当前阶段
 
-Documentation Consolidation Sprint 2
+Documentation Governance V2
 
 ### Current Status
 
-- README now acts as the project portal and explains the verification system
-- Learning walkthrough now explains Swagger, current learning stage, and sequence templates
-- Test cases now explain Swagger versus unittest, plus bug and capability protection
-- Code study guide now fixes the reading order to Swagger -> API -> Service -> Repository -> Domain -> Tests
-- Interview guide remains the only interview document entry in the handbook mirror
+- README now acts as the single knowledge navigation center and links all current Markdown files
+- Learning walkthrough is restored as per-endpoint study content instead of a summary table
+- Test cases are restored as per-test-file study content instead of a command/table summary
+- Handbook README now separates handbook root from handbook/docs responsibilities
+- RUNBOOK_LOCAL.md has moved to docs/_archive_candidate after its content was covered by README, learning, test, and verification docs
+- handbook technical mirrors, handbook TASK/ROADMAP, and the root study plan have moved to docs/_archive_candidate after their responsibilities were assigned to main docs
+- Duplicate-document candidates are recorded before any future deletion decision
 - No backend, frontend, business logic, database, or test implementation changed
 
 ### 文档重构 V1
@@ -247,7 +249,7 @@ Documentation Consolidation Sprint 2
 
 ### Target State
 
-- `docs/MASTER_PROMPT.md` 成为唯一 Master Prompt
+- `docs/development/MASTER_PROMPT.md` 成为唯一 Master Prompt
 - API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide 全部冻结
 - handbook 侧存在镜像文档，供教学与审查同步引用
 
@@ -274,7 +276,7 @@ Documentation Consolidation Sprint 2
 
 - 已冻结 `POST /api/v1/document-retrieval/search`。
 - 已冻结 retrieval events 与 retrieval errors。
-- 已更新 `TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror。
+- 已更新 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 
 ### Planned
 
@@ -359,7 +361,7 @@ Documentation Consolidation Sprint 2
 ### Result
 
 - 已完成文档域模型、Repository Interface、InMemory Repository、基础验证与单元测试。
-- 已同步 `TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md` 以及 handbook 镜像。
+- 已同步 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook 镜像。
 - 本次未实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
 ## Sprint 2: Document Upload API Contract Freeze
@@ -392,7 +394,7 @@ Documentation Consolidation Sprint 2
 
 ### Result
 
-- 已创建 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`。
+- 已创建 `docs/contracts/ERROR_CATALOG.md` 与 `docs/contracts/UPLOAD_POLICY.md`。
 - 已冻结 Upload Workflow 的 accepted / validating / storing / completed / failed 流程。
 - 已冻结 Idempotency 规则与 Upload Session 状态。
 
@@ -679,9 +681,9 @@ Frontend
 - 每个 Phase 完成后，必须同步更新 `docs/ai-agent-retail-handbook-v3/` 对应文档。
 - handbook 同步是 Phase 完成门禁的一部分，不允许后补为“已完成”。
 - 功能、测试、流程、架构变更至少同步到：
-  `docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
+  `docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`。
 - 若本次变更涉及任务治理、生产路线图或系统流程，还必须同步检查：
-  `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
+  `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 所有核心架构图必须三语言维护：
   English、中文（简体）、日本語。
 
@@ -702,7 +704,7 @@ Frontend
 ### Phase 1.5: Data Contract Freeze + Approval State Machine Design
 
 - 目标：冻结文件输入契约、导入错误分类与报告审批状态机，避免 CSV / JSON 字段漂移，并为 Phase 2 PostgreSQL 提供表设计依据。
-- 交付重点：`docs/DATA_CONTRACTS.md`、`docs/APPROVAL_WORKFLOW.md`、`docs/DATABASE.md`、Mermaid 图、ADR。
+- 交付重点：`docs/architecture/DATA_CONTRACTS.md`、`docs/architecture/APPROVAL_WORKFLOW.md`、`docs/database/DATABASE.md`、Mermaid 图、ADR。
 - 当前结果：已冻结业务 CSV、Research JSON、Documents Markdown 边界；已冻结 `missing_file / invalid_header / invalid_type / empty_dataset / invalid_json / invalid_source / unsupported_encoding`；已冻结 `generated / draft / pending_approval / approved / rejected / revised / published / archived`。
 - 当前边界：当前仍只实现 `generated`；当前未实现 PostgreSQL、审批 API、审批事件、审批前端。
 
@@ -747,7 +749,7 @@ Frontend
 
 - 保持可运行、可验证、可维护。
 - 持续偿还高优先级技术债。
-- 重要架构变化记录到 `docs/DECISIONS.md`。
+- 重要架构变化记录到 `docs/governance/DECISIONS.md`。
 - 每个阶段结束后更新本路线图。
 
 <!-- DOC-SYNC:START group=governance -->
@@ -758,12 +760,12 @@ Frontend
 - self_sha256: `5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae`
 - peers:
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
-- `retail-insight-ai/docs/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
-- `ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
-- `ai-agent-retail-handbook-v3/docs/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
+- `ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-demo)
 
 说明：

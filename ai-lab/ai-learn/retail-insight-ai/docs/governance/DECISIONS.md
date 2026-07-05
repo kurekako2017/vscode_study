@@ -110,9 +110,9 @@
 
 影响：
 
-- `docs/DATA_CONTRACTS.md` 成为文件输入契约的单一来源
-- `docs/APPROVAL_WORKFLOW.md` 成为审批状态机的单一来源
-- `docs/DATABASE.md` 成为 Phase 2 表结构准备来源
+- `docs/architecture/DATA_CONTRACTS.md` 成为文件输入契约的单一来源
+- `docs/architecture/APPROVAL_WORKFLOW.md` 成为审批状态机的单一来源
+- `docs/database/DATABASE.md` 成为 Phase 2 表结构准备来源
 - Phase 2 至少要覆盖：
   `data_imports`
   `import_errors`
@@ -197,10 +197,10 @@
 
 影响：
 
-- `docs/MASTER_PROMPT.md` 成为唯一 Master Prompt。
-- `docs/API_CONTRACT.md` 与 `docs/EVENT_CONTRACT.md` 成为接口与事件冻结入口。
-- `docs/PROMPT_STANDARD.md` 成为 Prompt 分类与模板冻结入口。
-- `docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md`、`docs/AI_AGENT_DESIGN_GUIDE.md` 成为开发和设计冻结入口。
+- `docs/development/MASTER_PROMPT.md` 成为唯一 Master Prompt。
+- `docs/contracts/API_CONTRACT.md` 与 `docs/contracts/EVENT_CONTRACT.md` 成为接口与事件冻结入口。
+- `docs/development/PROMPT_STANDARD.md` 成为 Prompt 分类与模板冻结入口。
+- `docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md`、`docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 成为开发和设计冻结入口。
 - `docs/ai-agent-retail-handbook-v3/docs/` 必须维护对应镜像。
 - 后续若要破坏这些冻结规则，必须同一变更内更新 ADR、Architecture、Task、Backlog、Changelog、handbook 与相关测试。
 
@@ -240,7 +240,7 @@
 - `DELETE` 事件语义可以通过 `document.archive.completed` 逐步接入审计和 SSE。
 - `backend/app/repositories/implementations/in_memory/document_repository.py` 作为当前默认本地实现。
 - `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有报告审批状态语义。
-- `docs/ARCHITECTURE.md`、`ROADMAP.md`、`TASK.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook 图册必须同步记录该冻结结果。
+- `docs/architecture/ARCHITECTURE.md`、`ROADMAP.md`、`TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 以及 handbook 图册必须同步记录该冻结结果。
 
 ## ADR-012
 
@@ -254,9 +254,9 @@
 
 影响：
 
-- `docs/API_CONTRACT.md` 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
-- `docs/EVENT_CONTRACT.md` 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
-- `docs/DATABASE.md` 仅预留 Document Upload 持久化边界，不表示已实现 Upload API。
+- `docs/contracts/API_CONTRACT.md` 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
+- `docs/contracts/EVENT_CONTRACT.md` 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
+- `docs/database/DATABASE.md` 仅预留 Document Upload 持久化边界，不表示已实现 Upload API。
 - 当前实现仍只允许 Document Domain Model，不引入 Upload API、RAG、pgvector 或前端变更。
 
 ## ADR-013
@@ -271,10 +271,10 @@
 
 影响：
 
-- `docs/ERROR_CATALOG.md` 成为上传、校验、仓储、审批、检索、数据库、事件和提供器错误的统一目录。
-- `docs/UPLOAD_POLICY.md` 成为上传大小、扩展名、MIME、编码、幂等和删除语义的统一策略入口。
-- `docs/API_CONTRACT.md` 必须包含 Upload Session 与 Idempotency 规则。
-- `docs/EVENT_CONTRACT.md` 必须覆盖 Upload Workflow 事件族。
+- `docs/contracts/ERROR_CATALOG.md` 成为上传、校验、仓储、审批、检索、数据库、事件和提供器错误的统一目录。
+- `docs/contracts/UPLOAD_POLICY.md` 成为上传大小、扩展名、MIME、编码、幂等和删除语义的统一策略入口。
+- `docs/contracts/API_CONTRACT.md` 必须包含 Upload Session 与 Idempotency 规则。
+- `docs/contracts/EVENT_CONTRACT.md` 必须覆盖 Upload Workflow 事件族。
 - 当前实现边界仍然停留在 Document Domain Model + contract freeze，不进入 Upload API 代码实现。
 
 ## ADR-014
@@ -292,7 +292,7 @@
 - `backend/app/api/documents.py` 直接调用同步上传 service。
 - `backend/app/services/document_upload_service.py` 负责校验、checksum、重复检测、幂等和事件发布。
 - `backend/tests/test_document_upload_api.py` 必须覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放和幂等冲突。
-- `docs/API_CONTRACT.md` 需要把 Upload Session 明确为完成态响应。
+- `docs/contracts/API_CONTRACT.md` 需要把 Upload Session 明确为完成态响应。
 
 ## ADR-015
 
@@ -328,7 +328,7 @@
 
 - `backend/app/services/document_import_service.py` 成为导入状态机与事件发布入口。
 - `backend/app/api/document_imports.py` 暴露 `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}`。
-- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 需要同步导入契约。
+- `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md` 需要同步导入契约。
 - 成功导入后，文档状态推进到 `validated`，但不生成 chunk、不进入 RAG、不进入审批。
 
 ## ADR-017
@@ -349,7 +349,7 @@
 - `backend/app/services/document_chunk_service.py` 成为 chunk 状态机与事件发布入口。
 - `backend/app/api/document_chunks.py` 暴露 `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks`。
 - `backend/app/repositories/interfaces/document_chunk_repository.py` 为切片事实提供独立存储边界。
-- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md` 需要同步 chunk 契约。
+- `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md` 需要同步 chunk 契约。
 - 仅支持 `markdown` 和 `text` 进入当前 chunk 闭环，重复 chunk 会覆盖旧结果并保持确定性。
 
 ## ADR-018
@@ -367,10 +367,10 @@
 
 影响：
 
-- `docs/API_CONTRACT.md` 冻结 `POST /api/v1/document-retrieval/search`。
-- `docs/EVENT_CONTRACT.md` 冻结 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`。
-- `docs/ERROR_CATALOG.md` 冻结 `invalid_query`、`retrieval_unavailable`、`repository_error` 的检索语义。
-- `docs/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow、Future RAG Integration Flow。
+- `docs/contracts/API_CONTRACT.md` 冻结 `POST /api/v1/document-retrieval/search`。
+- `docs/contracts/EVENT_CONTRACT.md` 冻结 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`。
+- `docs/contracts/ERROR_CATALOG.md` 冻结 `invalid_query`、`retrieval_unavailable`、`repository_error` 的检索语义。
+- `docs/architecture/ARCHITECTURE.md` 增加 Document Retrieval Flow、Source Trace Flow、Future RAG Integration Flow。
 - 当前实现仍停留在 Document Chunk Pipeline MVP，retrieval implementation 继续后置。
 
 ## ADR-019
@@ -413,7 +413,7 @@
 - `backend/app/repositories/interfaces/document_retrieval_provider.py` 定义检索后端合同。
 - `backend/app/repositories/implementations/in_memory/document_retrieval.py` 提供当前 keyword-only 本地实现。
 - `backend/app/config/container.py` 在组合根中装配 retrieval provider。
-- `docs/ARCHITECTURE.md` 需要同步更新 retrieval layer boundary。
+- `docs/architecture/ARCHITECTURE.md` 需要同步更新 retrieval layer boundary。
 
 ## ADR-021
 
@@ -430,11 +430,11 @@
 
 影响：
 
-- `docs/API_CONTRACT.md` 新增 `/api/v1/internal-rag/answer`。
-- `docs/EVENT_CONTRACT.md` 新增 `internal_rag.*` 事件族。
-- `docs/ERROR_CATALOG.md` 新增 internal RAG 错误码分组。
-- `docs/PROMPT_STANDARD.md` 新增 Internal RAG prompt family。
-- `docs/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
+- `docs/contracts/API_CONTRACT.md` 新增 `/api/v1/internal-rag/answer`。
+- `docs/contracts/EVENT_CONTRACT.md` 新增 `internal_rag.*` 事件族。
+- `docs/contracts/ERROR_CATALOG.md` 新增 internal RAG 错误码分组。
+- `docs/development/PROMPT_STANDARD.md` 新增 Internal RAG prompt family。
+- `docs/architecture/ARCHITECTURE.md` 增加 Internal RAG Flow、Retrieval to Citation Flow、Future LLM Provider Flow、Future Approval Integration Flow。
 - 后续如果要实现真正回答能力，必须以新的 provider / workflow 变体落地，而不能回写当前 retrieval contract。
 
 ## ADR-022
@@ -455,7 +455,7 @@
 - `backend/app/services/internal_rag_service.py` 作为 grounded answer service。
 - `backend/app/api/internal_rag.py` 暴露 `POST /api/v1/internal-rag/answer`。
 - `backend/tests/test_internal_rag_api.py` 覆盖 extractive、summary、invalid_question、insufficient_context、citations、archived exclusion。
-- `docs/ARCHITECTURE.md` 需要同步记录 Internal RAG MVP without LLM 的真实实现边界。
+- `docs/architecture/ARCHITECTURE.md` 需要同步记录 Internal RAG MVP without LLM 的真实实现边界。
 
 ## ADR-023
 
@@ -475,7 +475,7 @@
 - `backend/app/services/internal_rag_evaluation_service.py` 成为内部评估边界。
 - `backend/app/models/internal_rag.py` 定义 `InternalRagEvaluationResult` 与 warning taxonomy。
 - `backend/tests/test_internal_rag_evaluation.py` 覆盖 citation_score、missing_citation、weak_match、low_context。
-- `docs/ARCHITECTURE.md` 需要记录 RAG Evaluation Flow 与 Citation Quality Flow。
+- `docs/architecture/ARCHITECTURE.md` 需要记录 RAG Evaluation Flow 与 Citation Quality Flow。
 
 ## ADR-024
 
@@ -492,10 +492,10 @@
 
 影响：
 
-- `docs/PROMPT_STANDARD.md` 冻结未来 LLM prompt family 的 input / output / fallback contract。
-- `docs/AI_AGENT_DESIGN_GUIDE.md` 明确 `LLMProvider` 与 `RAGAnswerGenerator` 的职责边界。
-- `docs/ERROR_CATALOG.md` 冻结 future LLM provider error model。
-- `docs/ARCHITECTURE.md` 冻结 optional LLM provider flow、fallback flow 与 token/cost/latency tracking placeholders。
+- `docs/development/PROMPT_STANDARD.md` 冻结未来 LLM prompt family 的 input / output / fallback contract。
+- `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 明确 `LLMProvider` 与 `RAGAnswerGenerator` 的职责边界。
+- `docs/contracts/ERROR_CATALOG.md` 冻结 future LLM provider error model。
+- `docs/architecture/ARCHITECTURE.md` 冻结 optional LLM provider flow、fallback flow 与 token/cost/latency tracking placeholders。
 - `POST /api/v1/internal-rag/answer` 的 response 结构保持不变，当前仍以 deterministic extractive mode 为默认实现。
 
 ## ADR-025
@@ -517,7 +517,7 @@
 - `backend/app/services/rag_answer_generator.py` 成为 answer assembly seam。
 - `backend/app/config/settings.py` 新增 `llm_provider` / `internal_rag_use_llm` 配置。
 - `backend/tests/test_rag_answer_generator.py` 覆盖默认 deterministic、stub provider、timeout fallback、invalid output fallback、usage placeholder。
-- `docs/ARCHITECTURE.md` 需要记录 Stub LLM Provider Flow 与 fallback behavior。
+- `docs/architecture/ARCHITECTURE.md` 需要记录 Stub LLM Provider Flow 与 fallback behavior。
 
 ## ADR-026
 
@@ -534,11 +534,11 @@
 
 影响：
 
-- `docs/API_CONTRACT.md` 新增 `/api/v1/reports/{task_id}/submit-approval`、`/api/v1/approvals`、`/api/v1/approvals/{approval_id}`、`/api/v1/approvals/{approval_id}/approve`、`/api/v1/approvals/{approval_id}/reject`、`/api/v1/reports/{task_id}/revise`。
-- `docs/EVENT_CONTRACT.md` 新增 `approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
-- `docs/ERROR_CATALOG.md` 新增 approval workflow error section。
-- `docs/ARCHITECTURE.md` 与 `docs/DATABASE.md` 记录 report revision relationship、audit relationship 与 future RBAC relationship。
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录。
+- `docs/contracts/API_CONTRACT.md` 新增 `/api/v1/reports/{task_id}/submit-approval`、`/api/v1/approvals`、`/api/v1/approvals/{approval_id}`、`/api/v1/approvals/{approval_id}/approve`、`/api/v1/approvals/{approval_id}/reject`、`/api/v1/reports/{task_id}/revise`。
+- `docs/contracts/EVENT_CONTRACT.md` 新增 `approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
+- `docs/contracts/ERROR_CATALOG.md` 新增 approval workflow error section。
+- `docs/architecture/ARCHITECTURE.md` 与 `docs/database/DATABASE.md` 记录 report revision relationship、audit relationship 与 future RBAC relationship。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 以及 handbook mirror 需要同步记录。
 
 ## ADR-027
 
@@ -555,8 +555,8 @@
 
 影响：
 
-- `docs/MASTER_PROMPT.md`、`docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md` 冻结文档语言政策。
-- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 同步记录该规则。
+- `docs/development/MASTER_PROMPT.md`、`docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md` 冻结文档语言政策。
+- `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 同步记录该规则。
 - English-only 仅允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes、event names。
 - 后续新增文档必须先检查三语一致性，再进入评审。
 
@@ -574,7 +574,7 @@
 
 - `POST /api/v1/reports/{task_id}/submit-approval`、`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}`、`POST /api/v1/approvals/{approval_id}/approve`、`POST /api/v1/approvals/{approval_id}/reject`、`POST /api/v1/reports/{task_id}/revise` 进入 backend MVP。
 - 审批历史与 report version 事实层保持可替换，后续可演进到 PostgreSQL repository。
-- `docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现结果。
+- `docs/architecture/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现结果。
 - Approval API / Approval Events / Approval Errors / Approval Architecture sections were checked for trilingual coverage and supplemented where English-only prose remained.
 
 ## ADR-029
@@ -592,8 +592,8 @@
 
 影响：
 
-- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 冻结企业安全基础合同。
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该冻结。
+- `docs/contracts/API_CONTRACT.md`、`docs/contracts/EVENT_CONTRACT.md`、`docs/contracts/ERROR_CATALOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/database/DATABASE.md` 冻结企业安全基础合同。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 以及 handbook mirror 需要同步记录该冻结。
 - 后续 RBAC 实现必须沿用 frozen role / permission names 和 audit log contract，不能重新命名。
 - English-only 仍只允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
 
@@ -616,7 +616,7 @@
 - `GET /api/v1/security/roles` 与 `GET /api/v1/security/permissions` 现在返回 frozen static catalog。
 - `GET /api/v1/audit-logs` 现在读取 append-only InMemoryAuditRepository。
 - `audit.log.created` / `audit.log.failed` 作为结构化日志事件记录 append 成功与失败。
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要同步记录该实现结果。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror 需要同步记录该实现结果。
 - 当前仍不实现真实登录、RBAC enforcement、JWT、OAuth、PostgreSQL audit repository 或 frontend 变更。
 
 ## ADR-031
@@ -638,7 +638,7 @@
 - `backend/app/api/approvals.py` 只在 approval APIs 上调用 RBAC helper。
 - `permission_denied` 通过 append-only audit log 记录 denied facts。
 - `backend/tests/test_approval_api.py` 覆盖 allow / deny 路径和 denied audit logging。
-- `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
+- `docs/contracts/API_CONTRACT.md`、`docs/architecture/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
 
 ## ADR-032
 
@@ -655,7 +655,7 @@
 
 影响：
 
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要记录最终收口结果。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror 需要记录最终收口结果。
 - 当前完成能力被固定为：Document Upload / Read / Archive / Import / Chunk / Retrieval、Internal RAG without LLM、LLM Provider Stub Seam、Approval Workflow、RBAC for Approval APIs、Approval Audit Middleware、Security Domain、InMemory Audit Log。
 - 当前未完成能力被固定为：frontend UI、PostgreSQL repository full migration、real authentication、JWT/OAuth、real LLM provider、pgvector、internet search、MCP、production deployment。
 - English / 中文（简体） / 日本語 三语摘要继续作为人类可读文档的默认表达方式。
@@ -664,10 +664,10 @@
 ## 文档同步块
 
 - group: `architecture`
-- file: `retail-insight-ai/docs/DECISIONS.md`
+- file: `retail-insight-ai/docs/governance/DECISIONS.md`
 - self_sha256: `fde8a8d32a6812c38add97db9042a1932dda711f32999bde03e862b86bef35d5`
 - peers:
-- `retail-insight-ai/docs/ARCHITECTURE.md` | sha256=99ec6a7ef9caa11ad9233e4d6e8d40c2a55ba621584fde27685bce1a52da50b0 | # retail-insight-ai Architecture / 最后更新：2026-06-29 / 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。 / ## 技术架构图
+- `retail-insight-ai/docs/architecture/ARCHITECTURE.md` | sha256=99ec6a7ef9caa11ad9233e4d6e8d40c2a55ba621584fde27685bce1a52da50b0 | # retail-insight-ai Architecture / 最后更新：2026-06-29 / 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。 / ## 技术架构图
 - `ai-agent-retail-handbook-v3/03_AI核心知识.md` | sha256=b29ec1e0b01d85b5a69735c85dcc9e8cfac763e70e38b844dcca04cce5bb64e5 | # 03_AI核心知识 / ## 第一章 知识服务于项目 / 本书中的知识点只围绕 Retail Insight AI 展开。FastAPI、LangGraph、RAG、Streaming、Docker 都不是孤立知识，而是服务于日本小売業客户的经营分析任务。 / 【TL Review】
 - `ai-agent-retail-handbook-v3/08_架构图册.md` | sha256=ab27e2cb38443f53f6aff5c2b5d5a495a1774894d29429f463b926c5993d4611 | # 08_架构图册 / # 目录 / - [1. Overall Architecture](#1-overall-architecture) / - [2. User to API Flow](#2-user-to-api-flow)
 - `ai-agent-retail-handbook-v3/09_系统设计书.md` | sha256=506bedbfe7ebcb7f81c127c63a3ace28ee8d3329261015d798bb5b6783032f2e | # 09_系统设计书 / # 目录 / - [1. 项目概要](#1-项目概要) / - [2. 系统目标](#2-系统目标)

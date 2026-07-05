@@ -1,10 +1,12 @@
 # Retail Insight AI
 
-README 是本项目总入口。
+README 是本项目唯一总入口。它不是普通目录页，而是项目知识中心：从这里进入学习路线、测试路线、源码阅读、架构设计、项目管理和 handbook 长期知识库。
 
-Retail Insight AI 是一个面向日本现场 AI Agent 开发学习、项目讲解和面试准备的经营分析后端项目。它不是只展示一个 Demo，而是把“怎么启动、怎么验证、怎么学习、怎么阅读源码、怎么做面试表达、怎么治理文档”串成一条可执行学习链。
+## 一、项目简介
 
-主链路目标是：
+Retail Insight AI 是一个面向日本现场 AI Agent 项目开发、经营分析场景学习和面试讲解的后端主导项目。
+
+当前基线：
 
 ```text
 React
@@ -19,39 +21,136 @@ React
 → React
 ```
 
-## 1. 项目一句话介绍
+项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。
 
-Retail Insight AI 是一个以 `FastAPI + React + SSE + Local Static Provider + InMemory Repository` 为当前基线的零售经营分析 Agent 项目，用来学习企业级后端分层、接口合同、审批、审计、RAG 骨架和日本现场讲解方式。
+## 二、当前完成情况矩阵
 
-## 2. 当前已经能跑的能力
+| 模块 | 当前状态 | 完成度说明 |
+|---|---|---|
+| Backend | 已实现主链路 | FastAPI、Task API、TaskService、Workflow、SSE、Report、Document、RAG、Approval、Security、Audit 已有本地实现 |
+| Frontend | 部分完成 | React 可用于联调和展示，但当前不是主学习入口 |
+| Swagger | 已完成 | `/docs` 可作为 API Verification 入口，长期保留 |
+| Workflow | 已实现确定性流程 | 当前以本地 Workflow 和可解释流程为主，不做开放式真实 Agent 调用 |
+| Repository | 本地优先 | 默认 InMemory / Local Repository，PostgreSQL 仍是可选演进方向 |
+| LLM | 未接真实模型 | 已保留 provider 位置，但默认不接 OpenAI 或真实 LLM |
+| Postgres | 部分预留 | 有合同和部分可选路径，默认不作为运行依赖 |
+| JWT | 未接入 | 当前 current user 仍是本地 placeholder |
+| MCP | 未接入 | 当前不接 MCP、外部工具系统或真实外部业务系统 |
+
+当前已经能跑的能力：
 
 - `GET /health` 健康检查。
 - `POST /api/tasks` 到报告读取的主任务链路。
-- `GET /api/tasks/{task_id}/events` 的 `SSE` 进度流。
+- `GET /api/tasks/{task_id}/events` 的 SSE 进度流。
 - Document Upload / Read / Archive / Import / Chunk / Retrieval。
 - `POST /api/v1/internal-rag/answer` 的本地 deterministic Internal RAG。
 - 审批提交、审批列表/详情、批准、拒绝、修订。
 - `GET /api/v1/users/me`、`roles`、`permissions`、`audit-logs` 的安全读模型。
-- 本地 `StaticResearchProvider`、`InMemoryRepository`、`LocalBusinessDataProvider`。
 
-## 3. 当前只是骨架或部分完成的能力
+当前明确不宣称完成：
 
-- `frontend/` 可以运行，但当前不是主学习入口。
-- PostgreSQL Repository 仍是可选路径，不是默认运行路径。
-- `LLM Provider` 接缝已留出，但默认不接真实模型。
-- 真实认证、`JWT`、`OAuth`、`MCP`、互联网搜索仍未接入。
-- 审批、安全、审计当前是本地学习型实现，不是生产级完整方案。
+- 真实 OpenAI / 真实 LLM 接入。
+- PostgreSQL 默认化。
+- Redis / RabbitMQ。
+- 企业级正式认证。
+- 生产级前端体验。
+- 正式 E2E 自动化。
 
-## 4. 未来规划能力
+## 三、项目目录
 
-- 真实 `LLM` Provider。
-- PostgreSQL 持久化默认化。
-- `JWT/OAuth` 与企业身份系统接入。
-- `pgvector`、更完整检索、企业级 RAG 评估。
-- 更完整的 `RBAC`、审批、审计、运维观测。
-- 前后端一体化联调和正式 `E2E` 路线。
+```text
+retail-insight-ai/
+├── backend/              # FastAPI 后端，包含 API、Service、Repository、Model 和测试
+│   ├── app/              # 后端应用源码
+│   ├── tests/            # 后端自动化测试
+│   └── data/             # 本地学习样例数据
+├── frontend/             # React 前端，目前用于联调和展示，不是主学习入口
+├── docs/                 # 技术文档、学习文档、测试文档、handbook 和归档候选区
+│   ├── learning/                    # API 学习与测试学习文档
+│   ├── architecture/                # 架构设计、AI Agent 设计和数据契约
+│   ├── contracts/                   # API、事件、错误码和上传策略合同
+│   ├── development/                 # 开发规范、Prompt 规则和 AI 执行规则
+│   ├── database/                    # 数据库设计文档
+│   ├── governance/                  # ADR、Backlog、Changelog 治理记录
+│   ├── _archive_candidate/          # 已完成迁移、等待人工确认删除的文档
+│   └── ai-agent-retail-handbook-v3/ # 长期知识库、学习、面试和总结
+├── scripts/              # 启动、检查、测试、同步脚本
+├── README.md             # 项目唯一总入口和知识导航中心
+├── TASK.md               # 当前任务状态
+├── ROADMAP.md            # 项目路线图
+├── CODE_STUDY_GUIDE.md   # 源码阅读路线
+└── VERIFY_CHECKLIST.md   # 启动与验证检查清单
+```
 
-## 5. 项目验证体系
+## 四、知识地图
+
+```text
+README
+├── 学习路线
+│   ├── LEARNING_API_WALKTHROUGH
+│   ├── Swagger
+│   ├── TEST_CASES
+│   └── CODE_STUDY_GUIDE
+├── 测试路线
+│   ├── VERIFY_CHECKLIST
+│   └── TEST_CASES
+├── 源码阅读
+│   ├── CODE_STUDY_GUIDE
+│   └── backend/app
+├── 架构设计
+│   ├── ARCHITECTURE
+│   ├── API_CONTRACT
+│   ├── EVENT_CONTRACT
+│   ├── DATABASE
+│   └── ERROR_CATALOG
+├── 项目管理
+│   ├── TASK
+│   ├── ROADMAP
+│   ├── PROJECT_BACKLOG
+│   └── CHANGELOG
+└── handbook
+    ├── 长期知识库
+    ├── 长期学习
+    ├── 长期面试
+    └── 长期总结
+```
+
+## 五、学习路线图
+
+推荐学习顺序：
+
+```text
+README
+↓
+docs/learning/LEARNING_API_WALKTHROUGH.md
+↓
+Swagger
+↓
+docs/learning/TEST_CASES.md
+↓
+CODE_STUDY_GUIDE
+↓
+Source Code
+↓
+docs/architecture/ARCHITECTURE.md
+↓
+docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
+```
+
+Mermaid 版本：
+
+```mermaid
+flowchart TD
+    A[README] --> B[docs/learning/LEARNING_API_WALKTHROUGH.md]
+    B --> C[Swagger /docs]
+    C --> D[docs/learning/TEST_CASES.md]
+    D --> E[CODE_STUDY_GUIDE]
+    E --> F[Source Code]
+    F --> G[docs/architecture/ARCHITECTURE.md]
+    G --> H[docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md]
+```
+
+## 六、企业项目验证体系
 
 Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
@@ -59,219 +158,169 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
 | 层级 | 工具 | 目的 |
 |---|---|---|
-| 单元测试（Unit Test） | python -m unittest | 验证单个模块或类的逻辑是否正确 |
-| 接口验证（API Verification） | Swagger UI (/docs) | 手工验证 API 请求、响应和业务流程 |
-| 前后端集成测试（Integration Test） | React + FastAPI | 验证完整用户操作流程 |
-| 端到端测试（E2E Test） | Playwright / Cypress | 模拟真实用户完成整个业务流程 |
+| Unit Test | `python -m unittest` | 验证单个模块或类的逻辑是否正确 |
+| Swagger API Verification | Swagger UI `/docs` | 手工验证 API 请求、响应和业务流程 |
+| Integration Test | React + FastAPI | 验证完整用户操作流程 |
+| E2E Test | Playwright / Cypress | 模拟真实用户完成整个业务流程 |
+
+为什么企业项目这样划分：
+
+- Unit Test 保护局部逻辑，定位最快。
+- Swagger API Verification 保护接口合同、请求响应和后端业务流程。
+- Integration Test 保护 React 和 FastAPI 的真实协作。
+- E2E Test 保护接近真实用户的完整路径。
 
 必须明确：
 
 - Swagger 不是测试环境。
 - Swagger 不是正式 UI。
 - Swagger 是 API 调试与验证工具。
-- UI 完成以后 Swagger 通常仍然保留。
-- Swagger 和 React 调用的是同一套 FastAPI API。
+- Swagger 长期保留，即使 React UI 完成以后仍用于后端验证。
+- React 以后也调用同一套 FastAPI API。
 - 当前阶段主要用 Swagger 验证后端骨架。
 - UI 完成后再做前后端 Integration Test。
 - 发布前再考虑 E2E Test。
 
-## 6. 项目目录结构树
+## 七、所有 Markdown 文档导航
+
+### 学习文档
+
+- [README.md](README.md)
+- [CODE_STUDY_GUIDE.md](CODE_STUDY_GUIDE.md)
+- [docs/learning/LEARNING_API_WALKTHROUGH.md](docs/learning/LEARNING_API_WALKTHROUGH.md)
+- [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md)
+- [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md)
+
+### API 文档
+
+- [docs/contracts/API_CONTRACT.md](docs/contracts/API_CONTRACT.md)
+- [docs/contracts/EVENT_CONTRACT.md](docs/contracts/EVENT_CONTRACT.md)
+- [docs/contracts/ERROR_CATALOG.md](docs/contracts/ERROR_CATALOG.md)
+- [docs/contracts/UPLOAD_POLICY.md](docs/contracts/UPLOAD_POLICY.md)
+- [docs/architecture/DATA_CONTRACTS.md](docs/architecture/DATA_CONTRACTS.md)
+
+### 测试文档
+
+- [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md)
+- [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md)
+
+### 架构文档
+
+- [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)
+- [docs/architecture/AI_AGENT_DESIGN_GUIDE.md](docs/architecture/AI_AGENT_DESIGN_GUIDE.md)
+- [docs/architecture/APPROVAL_WORKFLOW.md](docs/architecture/APPROVAL_WORKFLOW.md)
+- [docs/architecture/DATA_CONTRACTS.md](docs/architecture/DATA_CONTRACTS.md)
+- [docs/governance/DECISIONS.md](docs/governance/DECISIONS.md)
+
+### 数据库
+
+- [docs/database/DATABASE.md](docs/database/DATABASE.md)
+- [backend/data/documents/company_policy_sample.md](backend/data/documents/company_policy_sample.md)
+
+### 开发规范
+
+- [AGENTS.md](AGENTS.md)
+- [docs/development/CODING_STANDARD.md](docs/development/CODING_STANDARD.md)
+- [docs/development/DEVELOPMENT_GUIDE.md](docs/development/DEVELOPMENT_GUIDE.md)
+- [docs/development/MASTER_PROMPT.md](docs/development/MASTER_PROMPT.md)
+- [docs/development/PROMPT_STANDARD.md](docs/development/PROMPT_STANDARD.md)
+
+### 项目管理
+
+- [TASK.md](TASK.md)
+- [ROADMAP.md](ROADMAP.md)
+- [docs/governance/PROJECT_BACKLOG.md](docs/governance/PROJECT_BACKLOG.md)
+- [docs/governance/CHANGELOG.md](docs/governance/CHANGELOG.md)
+
+### handbook
+
+- [docs/ai-agent-retail-handbook-v3/README.md](docs/ai-agent-retail-handbook-v3/README.md)
+- [docs/ai-agent-retail-handbook-v3/AGENTS.md](docs/ai-agent-retail-handbook-v3/AGENTS.md)
+- [docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md](docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md)
+- [docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md](docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md)
+- [docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md](docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md)
+- [docs/ai-agent-retail-handbook-v3/03_AI核心知识.md](docs/ai-agent-retail-handbook-v3/03_AI核心知识.md)
+- [docs/ai-agent-retail-handbook-v3/04_日本现场开发.md](docs/ai-agent-retail-handbook-v3/04_日本现场开发.md)
+- [docs/ai-agent-retail-handbook-v3/05_TL代码审查.md](docs/ai-agent-retail-handbook-v3/05_TL代码审查.md)
+- [docs/ai-agent-retail-handbook-v3/06_学习路线.md](docs/ai-agent-retail-handbook-v3/06_学习路线.md)
+- [docs/ai-agent-retail-handbook-v3/07_面试口头训练.md](docs/ai-agent-retail-handbook-v3/07_面试口头训练.md)
+- [docs/ai-agent-retail-handbook-v3/08_架构图册.md](docs/ai-agent-retail-handbook-v3/08_架构图册.md)
+- [docs/ai-agent-retail-handbook-v3/09_系统设计书.md](docs/ai-agent-retail-handbook-v3/09_系统设计书.md)
+- [docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md](docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md)
+- [docs/ai-agent-retail-handbook-v3/11_Project_Structure.md](docs/ai-agent-retail-handbook-v3/11_Project_Structure.md)
+- [docs/ai-agent-retail-handbook-v3/12_ADR.md](docs/ai-agent-retail-handbook-v3/12_ADR.md)
+- [docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md)
+
+### Archive
+
+- [docs/_archive_candidate/README.md](docs/_archive_candidate/README.md)
+- [docs/_archive_candidate/RUNBOOK_LOCAL.md](docs/_archive_candidate/RUNBOOK_LOCAL.md)
+- [docs/_archive_candidate/root/STUDY_PLAN_DAY1_DAY3.md](docs/_archive_candidate/root/STUDY_PLAN_DAY1_DAY3.md)
+- [docs/_archive_candidate/handbook-root/TASK.md](docs/_archive_candidate/handbook-root/TASK.md)
+- [docs/_archive_candidate/handbook-root/ROADMAP.md](docs/_archive_candidate/handbook-root/ROADMAP.md)
+- [docs/_archive_candidate/handbook-docs/AI_AGENT_DESIGN_GUIDE.md](docs/_archive_candidate/handbook-docs/AI_AGENT_DESIGN_GUIDE.md)
+- [docs/_archive_candidate/handbook-docs/API_CONTRACT.md](docs/_archive_candidate/handbook-docs/API_CONTRACT.md)
+- [docs/_archive_candidate/handbook-docs/ARCHITECTURE.md](docs/_archive_candidate/handbook-docs/ARCHITECTURE.md)
+- [docs/_archive_candidate/handbook-docs/CHANGELOG.md](docs/_archive_candidate/handbook-docs/CHANGELOG.md)
+- [docs/_archive_candidate/handbook-docs/CODING_STANDARD.md](docs/_archive_candidate/handbook-docs/CODING_STANDARD.md)
+- [docs/_archive_candidate/handbook-docs/DECISIONS.md](docs/_archive_candidate/handbook-docs/DECISIONS.md)
+- [docs/_archive_candidate/handbook-docs/DEVELOPMENT_GUIDE.md](docs/_archive_candidate/handbook-docs/DEVELOPMENT_GUIDE.md)
+- [docs/_archive_candidate/handbook-docs/ERROR_CATALOG.md](docs/_archive_candidate/handbook-docs/ERROR_CATALOG.md)
+- [docs/_archive_candidate/handbook-docs/EVENT_CONTRACT.md](docs/_archive_candidate/handbook-docs/EVENT_CONTRACT.md)
+- [docs/_archive_candidate/handbook-docs/MASTER_PROMPT.md](docs/_archive_candidate/handbook-docs/MASTER_PROMPT.md)
+- [docs/_archive_candidate/handbook-docs/PROJECT_BACKLOG.md](docs/_archive_candidate/handbook-docs/PROJECT_BACKLOG.md)
+- [docs/_archive_candidate/handbook-docs/PROMPT_STANDARD.md](docs/_archive_candidate/handbook-docs/PROMPT_STANDARD.md)
+- [docs/_archive_candidate/handbook-docs/UPLOAD_POLICY.md](docs/_archive_candidate/handbook-docs/UPLOAD_POLICY.md)
+
+当前 README 链接全部 Markdown 文档：59 个。
+
+## 八、文档责任表
+
+| 文档 | 唯一职责 | 是否唯一 | 是否允许新增同类文档 |
+|---|---|---|---|
+| [README.md](README.md) | 项目唯一入口和知识导航中心 | 是 | 否 |
+| [docs/learning/LEARNING_API_WALKTHROUGH.md](docs/learning/LEARNING_API_WALKTHROUGH.md) | API 学习和 Swagger 操作说明 | 是 | 否 |
+| [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md) | 测试学习和测试 Case 导航 | 是 | 否 |
+| [CODE_STUDY_GUIDE.md](CODE_STUDY_GUIDE.md) | 源码阅读路线 | 是 | 否 |
+| [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md) | 本地验证清单 | 是 | 否 |
+| [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | 架构设计主文档 | 是 | 否 |
+| [docs/contracts/API_CONTRACT.md](docs/contracts/API_CONTRACT.md) | API 合同主文档 | 是 | 否 |
+| [docs/contracts/EVENT_CONTRACT.md](docs/contracts/EVENT_CONTRACT.md) | SSE / 事件合同主文档 | 是 | 否 |
+| [docs/contracts/ERROR_CATALOG.md](docs/contracts/ERROR_CATALOG.md) | 错误码主文档 | 是 | 否 |
+| [docs/database/DATABASE.md](docs/database/DATABASE.md) | 数据库设计主文档 | 是 | 否 |
+| [docs/ai-agent-retail-handbook-v3/README.md](docs/ai-agent-retail-handbook-v3/README.md) | handbook 长期知识库入口 | 是 | 否 |
+| [docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md) | 面试准备主文档 | 是 | 否 |
+
+禁止新增：
+
+- `README_NEW.md`
+- `INTERVIEW2.md`
+- `TEST_NEW.md`
+- `LEARNING_API_WALKTHROUGH_NEW.md`
+- `RUNBOOK_NEW.md`
+
+## 九、文档治理规则
+
+文档治理遵循：
 
 ```text
-retail-insight-ai/
-├── backend/              # FastAPI 后端，包含 API、Service、Repository、Model
-│   ├── app/
-│   │   ├── api/          # API 路由层
-│   │   ├── services/     # 业务服务层
-│   │   ├── repositories/ # 数据访问层
-│   │   ├── models/       # 领域模型
-│   │   ├── schemas/      # 请求与响应 DTO
-│   │   ├── providers/    # LLM / Search Provider 抽象
-│   │   ├── workflow/     # Workflow / LangGraph 相关流程
-│   │   ├── errors/       # 错误码与异常
-│   │   ├── config/       # 配置与依赖注入
-│   │   └── observability/# 日志与观测
-│   └── tests/            # 后端自动化测试
-├── frontend/             # React 前端，目前不是主学习入口
-├── docs/                 # 技术文档、学习文档、handbook
-├── scripts/              # 启动、检查、测试脚本
-└── docker-compose.yml    # PostgreSQL 等本地服务预留
+补充 Append
+↓
+合并 Merge
+↓
+移动 Move
+↓
+归档 Archive
+↓
+未来人工确认 Delete
 ```
 
-补充说明：
+治理规则：
 
-- `README.md` 负责项目总入口和阅读顺序。
-- `RUNBOOK_LOCAL.md` 负责启动与排错。
-- `VERIFY_CHECKLIST.md` 负责逐项验证。
-- `docs/` 下的 `ARCHITECTURE`、`API_CONTRACT`、`DATABASE`、`ERROR_CATALOG` 等负责技术规范。
-- `docs/ai-agent-retail-handbook-v3/` 是长期学习和日本面试中心。
-
-## 7. 文档导航中心
-
-README 是项目总入口。
-
-`docs/ai-agent-retail-handbook-v3/` 是长期学习和日本面试中心。
-
-`docs/ARCHITECTURE.md`、`docs/API_CONTRACT.md`、`docs/DATABASE.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md` 等是技术规范文档，不要误当成日常学习第一入口。
-
-不要因为文件看起来重复就直接删除。要先合并有用内容，再移动到 `docs/_archive_candidate/`，不能直接删除。
-
-### 【日常学习主线】
-
-```text
-README.md
-→ RUNBOOK_LOCAL.md
-→ Swagger
-→ docs/LEARNING_API_WALKTHROUGH.md
-→ docs/TEST_CASES.md
-→ CODE_STUDY_GUIDE.md
-→ docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
-```
-
-### 【技术设计查阅】
-
-```text
-docs/ARCHITECTURE.md
-docs/API_CONTRACT.md
-docs/EVENT_CONTRACT.md
-docs/ERROR_CATALOG.md
-docs/DATABASE.md
-docs/DECISIONS.md
-docs/CODING_STANDARD.md
-docs/DEVELOPMENT_GUIDE.md
-docs/MASTER_PROMPT.md
-```
-
-### 【项目管理查阅】
-
-```text
-TASK.md
-ROADMAP.md
-docs/PROJECT_BACKLOG.md
-docs/CHANGELOG.md
-```
-
-### 【handbook 学习中心】
-
-```text
-docs/ai-agent-retail-handbook-v3/README.md
-docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md
-docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md
-docs/ai-agent-retail-handbook-v3/03_AI核心知识.md
-docs/ai-agent-retail-handbook-v3/04_日本现场开发.md
-docs/ai-agent-retail-handbook-v3/05_TL代码审查.md
-docs/ai-agent-retail-handbook-v3/06_学习路线.md
-docs/ai-agent-retail-handbook-v3/07_面试口头训练.md
-docs/ai-agent-retail-handbook-v3/08_架构图册.md
-docs/ai-agent-retail-handbook-v3/09_系统设计书.md
-docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md
-docs/ai-agent-retail-handbook-v3/11_Project_Structure.md
-docs/ai-agent-retail-handbook-v3/12_ADR.md
-docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
-docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md
-```
-
-## 8. 学习路线
-
-推荐学习顺序：
-
-1. 先看 `README.md`，确认项目边界、目录和文档入口。
-2. 再看 `RUNBOOK_LOCAL.md`，把后端、Swagger、ReDoc、OpenAPI JSON 跑起来。
-3. 打开 Swagger，先执行 `GET /health`，再按 `docs/LEARNING_API_WALKTHROUGH.md` 学主链路。
-4. 再读 `docs/TEST_CASES.md`，理解每个能力由哪个测试文件保护。
-5. 最后进入 `CODE_STUDY_GUIDE.md` 和 handbook，做源码阅读和面试表达训练。
-
-## 9. 测试路线
-
-推荐测试路线：
-
-1. 先用 Swagger 做接口验证，确认后端确实启动。
-2. 再在 `backend/` 目录执行 `python3 -m unittest ...` 做单元测试验证。
-3. 再做 React + FastAPI 的联调验证。
-4. 最后再考虑 `Playwright / Cypress` 的正式 `E2E` 路线。
-
-特别注意：
-
-- `unittest` 命令必须在 `backend/` 目录执行。
-- 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
-- 如果看到 `ModuleNotFoundError: No module named tests`，通常不是代码坏了，而是执行目录错了。
-
-## 10. 源码阅读路线
-
-源码阅读顺序建议固定为：
-
-```text
-Swagger
-→ backend/app/api/
-→ backend/app/services/
-→ backend/app/workflow/
-→ backend/app/repositories/
-→ backend/app/models/
-→ backend/tests/
-```
-
-阅读理由：
-
-- 先从 Swagger 看输入输出，避免一上来就迷失在源码细节里。
-- 再从 `api` 看路由层。
-- 再看 `services` 和 `workflow` 理解业务编排。
-- 再看 `repositories` 和 `models` 理解数据边界。
-- 最后用 `tests` 反向确认哪些能力被保护。
-
-## 11. 面试准备路线
-
-推荐顺序：
-
-1. `README.md`
-2. `docs/LEARNING_API_WALKTHROUGH.md`
-3. `docs/TEST_CASES.md`
-4. `CODE_STUDY_GUIDE.md`
-5. `docs/ai-agent-retail-handbook-v3/README.md`
-6. `docs/ai-agent-retail-handbook-v3/06_学习路线.md`
-7. `docs/ai-agent-retail-handbook-v3/07_面试口头训练.md`
-8. `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`
-
-面试表达时要能说清：
-
-- 项目当前已完成什么。
-- 哪些能力只是骨架或冻结合同。
-- 为什么当前阶段先用本地 Provider / InMemory。
-- 为什么 Swagger、unittest、审批、审计、RAG 骨架对企业项目讲解有价值。
-
-## 12. 文档治理规则
-
-文档治理原则：
-
-1. 不要把完整学习内容压缩成一张表。
-2. 不要把主链路接口写成一长行表格。
-3. 不要删除已有内容，先补充、整理、合并。
-4. 目录结构必须保留树形图 + 中文说明。
-5. `docs/TEST_CASES.md` 必须保持为测试学习文档，不能退化成命令列表。
-6. `docs/LEARNING_API_WALKTHROUGH.md` 必须保持为分接口学习文档，不能退化成接口表格。
-7. 企业项目测试体系要长期保留在 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`docs/TEST_CASES.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`。
-8. 重复文档先进入治理清单，明确主维护文档，再决定是否归档。
-9. 如果文件需要废弃，先确认内容已经并入主文档，再移动到 `docs/_archive_candidate/`，不能直接删除。
-10. handbook 根目录是学习和面试中心，`handbook/docs` 是技术规范镜像和治理记录。
-
-## 13. 第一次启动项目
-
-1. 先执行 `./scripts/check_env.sh`。
-2. 再执行 `./scripts/start_backend.sh`。
-3. 打开 `http://127.0.0.1:8000/docs` 验证 Swagger。
-4. 打开 `http://127.0.0.1:8000/redoc` 阅读 ReDoc。
-5. 打开 `http://127.0.0.1:8000/openapi.json` 确认 OpenAPI JSON。
-6. 如需前端联调，再执行 `./scripts/start_frontend.sh`。
-7. 最后按 `VERIFY_CHECKLIST.md` 做逐项验证。
-
-## 14. 当前实现边界
-
-当前明确不宣称已完成：
-
-- 真实 OpenAI / 真实 LLM 接入。
-- PostgreSQL 默认化。
-- Redis / RabbitMQ。
-- 企业级正式认证。
-- 生产级前端体验。
-- 正式 `E2E` 自动化。
-
-当前环境如果没有 Docker CLI，不应把 Docker Build 或 PostgreSQL 验证写成已通过。
+- 不能为了精简删除已有有价值内容。
+- 如果两个文档重复，先把有价值内容合并到唯一主文档。
+- 原文档只移动到 `docs/_archive_candidate/`，等待以后人工确认。
+- 程序流程、Swagger 操作、后台 Log 观察、输入、输出、源码位置、测试命令、为什么这样设计，全部必须保留。
+- 目录结构必须保留树形图。
+- 章节不能压缩成摘要或单表。
+- `docs/_archive_candidate/` 里的文档不能继续作为主维护入口。

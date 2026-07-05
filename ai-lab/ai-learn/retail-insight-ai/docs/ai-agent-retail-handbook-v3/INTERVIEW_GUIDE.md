@@ -6,11 +6,34 @@
 
 ### 中文说明
 
-Retail Insight AI 是我负责设计和实现的企业 AI 后端项目，面向零售经营分析场景。当前项目已经打通任务、文档、检索、Internal RAG、审批、安全读模型和审计这条主链路，并且保留了后续接入真实 `LLM`、`PostgreSQL`、真实认证和更完整前端的扩展位。
+Retail Insight AI 是一个企业级 AI 后端项目，面向零售经营分析场景。我作为项目开发团队的一员（SE），参与了企业 AI 后端系统的设计、开发、联调、测试和持续完善。
+
+项目围绕零售经营分析场景，构建任务流程、文档管理、Internal RAG、审批流程、安全控制和审计等核心能力，并预留真实 `LLM`、`PostgreSQL` 以及前端系统接入能力。
 
 ### 日本語説明
 
-Retail Insight AI は、私が設計・実装した企業向け AI バックエンドです。小売の経営分析を対象に、タスク、文書、検索、Internal RAG、承認、安全な read model、監査までの主経路をつないでいます。将来的に実 `LLM`、`PostgreSQL`、実認証、より充実した frontend を追加できる拡張余地も残しています。
+Retail Insight AI は企業向け AI バックエンドプロジェクトです。
+
+私は開発メンバー（SE）の一員として、
+
+設計、
+実装、
+テスト、
+結合、
+改善
+
+などに参加しました。
+
+主に、
+
+・タスク処理
+・ドキュメント管理
+・Internal RAG
+・承認ワークフロー
+・RBAC
+・監査
+
+などの機能開発に携わりました。
 
 ## 当前实现
 
@@ -38,23 +61,35 @@ Retail Insight AI は、私が設計・実装した企業向け AI バックエ�
 
 ### 中文
 
-- 后端路由设计
-- `Service` 层设计和实现
-- `Repository` 接口和 InMemory 实现
-- `Workflow` 编排
-- `Provider` 抽象
-- 审计和结构化日志
-- 学习文档和面试文档
+- 参与后端模块开发
+- `FastAPI` `API` 开发
+- `Service` 层开发
+- `Repository` 层开发
+- 文档处理流程开发
+- `Internal RAG` 功能开发
+- `Approval` 工作流开发
+- `RBAC` 与 `Audit` 功能开发
+- `Swagger` 联调
+- `unittest` 编写
+- `Bug` 修复
+- 文档维护
+- 与团队成员协作完成开发
 
 ### 日本語
 
-- バックエンドのルート設計
-- `Service` 層の設計と実装
-- `Repository` の interface と InMemory 実装
-- `Workflow` の編成
-- `Provider` 抽象化
-- 監査と構造化ログ
-- 学習文書と面接文書の整備
+- バックエンドモジュール開発への参加
+- `FastAPI` `API` 開発
+- `Service` 層の開発
+- `Repository` 層の開発
+- 文書処理フローの開発
+- `Internal RAG` 機能の開発
+- `Approval` ワークフローの開発
+- `RBAC` と `Audit` 機能の開発
+- `Swagger` 連携
+- `unittest` の作成
+- `Bug` 修正
+- 文書メンテナンス
+- チームメンバーと協力して開発を進めました
 
 ## 系统架构
 
@@ -163,4 +198,3 @@ React -> FastAPI -> Task API -> TaskService -> Workflow -> KPI Engine -> Researc
 ### 日本語
 
 主経路、契約境界、拡張点を整理済みです。`Demo` だけでなく、企業向けに拡張できる backend 基盤として説明できます。
-

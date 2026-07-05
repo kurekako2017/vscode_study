@@ -4,16 +4,65 @@
 
 ## 当前阶段
 
-Documentation Consolidation Sprint 2
+Documentation Organization + AI Agent Guide 中文化 Sprint
 
 状态：已完成
+
+### Documentation Organization + AI Agent Guide 中文化 Sprint 结果
+
+- [x] `docs/` 活动 Markdown 已按 `learning`、`architecture`、`contracts`、`development`、`database`、`governance` 分层管理
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、接口详细表和程序调用流程
+- [x] `docs/learning/TEST_CASES.md` 保留测试总览、测试详细表和后端程序流程，并新增“保护的 Bug / 风险”列
+- [x] `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 已调整为中文为主、日语为辅，覆盖 Workflow、Agent、Tool、Repository、Provider、RAG、Approval、RBAC、Audit
+- [x] `README.md` 已同步新目录结构和所有 Markdown 链接
+- [x] `docs/development/MASTER_PROMPT.md` 已补充文档合并、唯一主文档、归档和语言规则
+- [x] Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑
+
+### Documentation Readability Optimization Sprint 结果
+
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 的所有主接口均采用统一详细表格
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 的程序流程统一补充文件路径、类名、方法名
+- [x] `docs/learning/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`
+- [x] `docs/learning/TEST_CASES.md` 的所有测试文件均采用统一详细表格
+- [x] `docs/learning/TEST_CASES.md` 的后端程序流程统一补充文件路径、类名、方法名
+- [x] 本次仅修改 Markdown 文档，不修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑
+
+### Documentation Governance V2 结果
+
+- [x] README 升级为唯一知识导航中心，补齐全部 Markdown 文档链接
+- [x] README 增加知识地图、学习路线流程图、当前完成情况矩阵和企业项目验证体系
+- [x] README 增加文档责任表，明确唯一职责和禁止新增同类文档
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，并保留每个接口的完整章节
+- [x] `docs/learning/TEST_CASES.md` 增加测试总览表，并保留每个测试文件的完整章节
+- [x] `RUNBOOK_LOCAL.md` 内容已由 README、LEARNING、TEST、VERIFY 承接，移动到 `docs/_archive_candidate/RUNBOOK_LOCAL.md`
+- [x] handbook/docs 技术规范镜像已移动到 `docs/_archive_candidate/handbook-docs/`
+- [x] handbook TASK / ROADMAP 镜像已移动到 `docs/_archive_candidate/handbook-root/`
+- [x] `STUDY_PLAN_DAY1_DAY3.md` 已移动到 `docs/_archive_candidate/root/`
+- [x] `docs/_archive_candidate/README.md` 更新归档规则、当前归档候选文件和未来删除条件
+- [x] `docs/ai-agent-retail-handbook-v3/README.md` 调整为长期知识库入口，不重复维护主项目介绍
+- [x] `docs/development/MASTER_PROMPT.md` 增加 Documentation Governance 永久规则
+- [x] Documentation Only：未修改 backend、frontend、tests、scripts、Python、React
+
+### Documentation Recovery + Governance Sprint 结果
+
+- [x] 先盘点仓库 Markdown 文档，再开始修改
+- [x] `README.md` 恢复为项目总入口，并补齐目录树、文档导航中心、学习路线、测试路线、源码阅读路线、面试准备路线、文档治理规则
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习文档，23 个主接口分别独立成节
+- [x] `docs/learning/TEST_CASES.md` 恢复为分测试文件学习文档，重点测试文件分别独立成节
+- [x] `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md` 补充 Swagger / ReDoc / OpenAPI JSON 与 backend 目录执行 unittest 规则
+- [x] `docs/development/MASTER_PROMPT.md` 补充永久文档保护规则
+- [x] `docs/ai-agent-retail-handbook-v3/README.md` 明确 handbook 根目录与 handbook/docs 的职责边界
+- [x] 新增 `docs/_archive_candidate/README.md` 记录疑似重复文档清单
+- [x] `docs/governance/PROJECT_BACKLOG.md` 增加“文档治理清单”
+- [x] 本次仅修改 Markdown 文档，不修改 backend、frontend、scripts、业务代码、测试代码
 
 ### Documentation Restore + Safe Merge Sprint 结果
 
 - [x] 恢复 README 的树形目录结构图和文档导航中心，保留原有目录说明与验证系统
-- [x] 将 `docs/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习说明，补回每个接口的完整学习路径
-- [x] 将 `docs/TEST_CASES.md` 恢复为程序运行流程学习文档，补回每个测试文件的完整流程说明
-- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/MASTER_PROMPT.md` 的企业项目测试体系和文档规则说明
+- [x] 将 `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习说明，补回每个接口的完整学习路径
+- [x] 将 `docs/learning/TEST_CASES.md` 恢复为程序运行流程学习文档，补回每个测试文件的完整流程说明
+- [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/development/MASTER_PROMPT.md` 的企业项目测试体系和文档规则说明
 - [x] 补充 `docs/ai-agent-retail-handbook-v3/README.md` 的根目录与 `docs` 目录职责说明
 - [x] 同步更新 handbook 镜像侧 `MASTER_PROMPT` 规则说明
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务代码、测试代码
@@ -22,8 +71,8 @@ Documentation Consolidation Sprint 2
 
 - [x] README 重写为项目门户，并补齐项目概览、架构、目录、文档导航和验证系统
 - [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
-- [x] `docs/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
+- [x] `docs/learning/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
 - [x] `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 保持企业 AI 后端项目面试稿定位，继续作为唯一面试文档入口
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
@@ -31,8 +80,8 @@ Documentation Consolidation Sprint 2
 ### 文档重构 V1 结果
 
 - [x] `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明、文档导航中心和文档原则
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志
-- [x] `docs/TEST_CASES.md` 重写为程序运行流程学习文档，补齐测试目的、程序流转、后台日志观察点和学习日志
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志
+- [x] `docs/learning/TEST_CASES.md` 重写为程序运行流程学习文档，补齐测试目的、程序流转、后台日志观察点和学习日志
 - [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、成功判断、失败原因和解决方法
 - [x] `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、执行命令、预想结果、失败现象和对应文档
 - [x] `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`
@@ -43,20 +92,20 @@ Documentation Consolidation Sprint 2
 ### Documentation Consolidation Sprint 2 Result
 
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
-- [x] `docs/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
+- [x] `docs/learning/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
 - [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
 - [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
 - [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
-- [x] `docs/MASTER_PROMPT.md` 增加文档数量控制规则
+- [x] `docs/development/MASTER_PROMPT.md` 增加文档数量控制规则
 - [x] 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts
 
 ### Sprint R3.1 Result
 
 - [x] `README.md` 改为中文入口，并新增“第一次启动项目”章节
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
-- [x] `docs/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
+- [x] `docs/learning/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
 - [x] `RUNBOOK_LOCAL.md` 改写为“启动与排错指南”，使用“问题 → 原因 → 解决方法”组织内容
 - [x] `VERIFY_CHECKLIST.md` 改写为启动完成检查清单，并明确每项如何验证成功
 - [x] `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和掌握目标
@@ -64,11 +113,11 @@ Documentation Consolidation Sprint 2
 
 ### Sprint R3 Result
 
-- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
-- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/learning/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
 - [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Future Sprint Checklist
@@ -79,11 +128,11 @@ Documentation Consolidation Sprint 2
 
 ### Sprint R3 Result
 
-- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
-- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/learning/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
 - [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
-- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Verification Boundary
@@ -382,13 +431,13 @@ Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边
 
 ## Epic 14: Engineering Standards（Final Freeze）
 
-- [x] 新增 `docs/MASTER_PROMPT.md`
-- [x] 新增 `docs/CODING_STANDARD.md`
-- [x] 新增 `docs/DEVELOPMENT_GUIDE.md`
-- [x] 新增 `docs/AI_AGENT_DESIGN_GUIDE.md`
-- [x] 新增 `docs/API_CONTRACT.md`
-- [x] 新增 `docs/EVENT_CONTRACT.md`
-- [x] 新增 `docs/PROMPT_STANDARD.md`
+- [x] 新增 `docs/development/MASTER_PROMPT.md`
+- [x] 新增 `docs/development/CODING_STANDARD.md`
+- [x] 新增 `docs/development/DEVELOPMENT_GUIDE.md`
+- [x] 新增 `docs/architecture/AI_AGENT_DESIGN_GUIDE.md`
+- [x] 新增 `docs/contracts/API_CONTRACT.md`
+- [x] 新增 `docs/contracts/EVENT_CONTRACT.md`
+- [x] 新增 `docs/development/PROMPT_STANDARD.md`
 - [x] 在 `docs/ai-agent-retail-handbook-v3/docs/` 建立 handbook 镜像
 - [x] 扩展 `../doc-sync.manifest.json` 以纳入 Engineering Standards 同步组
 - [x] 冻结 Architecture / Workflow / Contract / Development Standard 文档入口
@@ -551,7 +600,7 @@ Frontend
 
 - 每个 Phase 完成后，必须同步更新 `docs/ai-agent-retail-handbook-v3/` 下对应文档。
 - Handbook 同步至少覆盖：
-  `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
+  `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`。
 - 如果本次变更涉及测试、流程、架构、运行方式，还必须同步检查并更新：
   `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 未完成 Handbook 同步，不得将对应 Phase 标记为完成。
@@ -611,7 +660,7 @@ Frontend
 - 目标：
   固化 Phase 1 文件输入契约、导入错误模型和 Report / Approval 状态机，为 Phase 2 PostgreSQL 持久化与后续承認ワークフロー提供唯一设计依据。
 - 修改范围：
-  `docs/DATA_CONTRACTS.md`、`docs/APPROVAL_WORKFLOW.md`、`docs/DATABASE.md` 以及治理文档、架构文档、handbook 同步文档。
+  `docs/architecture/DATA_CONTRACTS.md`、`docs/architecture/APPROVAL_WORKFLOW.md`、`docs/database/DATABASE.md` 以及治理文档、架构文档、handbook 同步文档。
 - 验收标准：
   业务 CSV、Research JSON、Documents Markdown 契约冻结；导入错误模型冻结；审批状态机冻结；Phase 2 表设计准备项冻结。
 - 测试方法：
@@ -734,7 +783,7 @@ Frontend
 - 目标：
   建立完整测试用例、测试方法、前后台程序流程图和架构文档，使项目达到可交接和可审计水平。
 - 修改范围：
-  Backend tests、Frontend tests、集成测试、验证清单、`docs/ARCHITECTURE.md`、`README.md`、`VERIFY_CHECKLIST.md`。
+  Backend tests、Frontend tests、集成测试、验证清单、`docs/architecture/ARCHITECTURE.md`、`README.md`、`VERIFY_CHECKLIST.md`。
 - 验收标准：
   核心流程覆盖单元、集成、端到端验证；架构图、数据流图、审批流图、上传与检索流程图齐全且与代码一致。
 - 测试方法：
@@ -755,8 +804,8 @@ Frontend
 ## Governance V2 升级记录
 
 - [x] 创建 `ROADMAP.md`
-- [x] 创建 `docs/ARCHITECTURE.md`
-- [x] 创建 `docs/DECISIONS.md`
+- [x] 创建 `docs/architecture/ARCHITECTURE.md`
+- [x] 创建 `docs/governance/DECISIONS.md`
 - [x] 更新项目 `AGENTS.md` 的开发前读取顺序
 - [ ] 根据项目实际状态完善 Roadmap 与 Architecture
 
@@ -774,12 +823,12 @@ Frontend
 - self_sha256: `83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05`
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
-- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
-- `retail-insight-ai/docs/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
-- `ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
-- `ai-agent-retail-handbook-v3/docs/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
+- `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
+- `ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-demo)
 
 说明：

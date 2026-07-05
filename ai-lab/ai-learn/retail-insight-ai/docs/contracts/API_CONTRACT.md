@@ -95,7 +95,7 @@ Success Response:
 
 Contract:
 
-- Event envelope follows `docs/EVENT_CONTRACT.md`.
+- Event envelope follows `docs/contracts/EVENT_CONTRACT.md`.
 - Current event families are `started | status | done | error`.
 
 ### 4.4 `GET /api/tasks/{task_id}/report`
@@ -134,7 +134,7 @@ Shared request rule:
 
 - `POST /api/v1/documents` accepts `multipart/form-data` with `file` and `metadata`.
 - `GET`, `DELETE`, and chunk `POST` endpoints use path parameters only; chunk `POST` has no request body.
-- `metadata` must include the frozen document domain fields from `docs/MASTER_PROMPT.md` and `docs/ARCHITECTURE.md`.
+- `metadata` must include the frozen document domain fields from `docs/development/MASTER_PROMPT.md` and `docs/architecture/ARCHITECTURE.md`.
 
 Shared response rule:
 
