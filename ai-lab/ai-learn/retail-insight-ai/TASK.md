@@ -204,6 +204,159 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - Keep the current scope frozen until frontend, PostgreSQL, real auth, and real LLM are intentionally scheduled
 - Use the current backend as the stable interview and learning baseline
 
+## 后续优先级：面试线与项目线并行
+
+### P0：企业项目面试核心文档
+
+- [ ] 重构 01_日本AI项目介绍.md，按当前代码与企业架构抽象重写，避免写死临时实现。
+- [ ] 重构 02_日本AI项目讲解.md，去除重复项目介绍，改成问题、回答、源码、TL追问、Production回答结构。
+- [ ] 重构 03_AI核心知识.md，所有知识点必须绑定 Retail Insight AI 当前代码。
+- [ ] 重构 04_日本现场开发.md，对应日本现场开发流程、設計、Review、测试、保守改修。
+- [ ] 重构 05_TL代码审查.md，改成真实项目 Review Checklist。
+
+说明：
+
+- 优先服务日本企业面试。
+- 企业架构抽象优先，不要绑定临时实现。
+
+### P0.5：企业项目讲解能力
+
+- [ ] 维护 `INTERVIEW_GUIDE.md` 过渡内容，统一承接项目讲解材料。
+- [ ] 维护 `PROJECT_BIBLE.md` 作为唯一入口，保证总览不分散。
+- [ ] 维护 Learning Trace，用于讲解调用链和源码流转。
+- [ ] 维护 Swagger Walkthrough，用于讲解接口输入输出。
+- [ ] 维护后台日志观察，用于讲解运行过程与问题定位。
+
+说明：
+
+- 帮助建立项目讲解能力。
+- 帮助建立源码讲解能力。
+- 帮助建立接口讲解能力。
+- 帮助建立调用链讲解能力。
+- 帮助建立 TL 深问能力。
+
+### P1：学习平台继续完善
+
+- [ ] 继续维护 Learning Trace、Swagger 学习、后台日志观察、memo 文档。
+- [ ] 后续优化 Learning Trace 日志显示：module、function、endpoint、class、method、file 更清晰。
+
+## V2.0 Handbook 命名统一计划（最终阶段）
+
+当前 Handbook 经过长期演进，存在中英文混用、命名风格不一致、职责边界逐渐变化的问题。
+
+V2.0 收尾阶段统一执行一次文档命名整理。
+
+当前阶段仅记录规划，不修改任何文件。
+
+### 统一原则
+
+- 全部采用数字编号命名。
+- 文件名保持简洁。
+- 文档标题继续保持 English / 日本語 / 中文三语言。
+- 一个文档只负责一个职责（Single Responsibility）。
+- 文件名不再混用 GUIDE、BIBLE、ROADMAP 等不同风格。
+- PROJECT_BIBLE.md 继续作为唯一入口文档。
+- 所有引用统一更新，避免失效链接。
+- INTERVIEW_GUIDE.md 作为过渡文档，最终合并或重命名到 `02_项目讲解.md`。
+- README.md 保留英文名称，不参与统一命名。
+- AGENTS.md 保留英文名称，不参与统一命名。
+- PROJECT_BIBLE.md 保留英文名称，不参与统一命名。
+- SSOT 原则：所有面试内容最终只保留一份唯一事实来源。
+- 最终统一修改引用和目录。
+- 最终统一改名。
+- 等代码稳定后一次完成。
+
+### 建议最终命名
+
+- `01_项目介绍.md`
+- `02_项目讲解.md`
+- `03_核心知识.md`
+- `04_现场开发.md`
+- `05_代码审查.md`
+- `06_学习路线.md`
+- `07_面试问答.md`
+- `08_架构图册.md`
+- `09_系统设计.md`
+- `10_开发路线图.md`
+- `11_项目结构.md`
+- `12_架构决策.md`
+
+### 特殊文档
+
+- `PROJECT_BIBLE.md`
+- `README.md`
+- `AGENTS.md`
+
+继续保留英文名称，不参与统一命名。
+
+### 执行时机
+
+满足以下条件后统一执行：
+
+- 核心代码基本稳定。
+- 面试文档完成。
+- 架构图完成。
+- Handbook V2.0 定稿。
+- 一次性修改所有引用、目录、README、PROJECT_BIBLE。
+
+### 注意事项
+
+- 当前阶段禁止提前改名。
+- 所有改名统一放到 Handbook V2.0 收尾阶段一次完成，避免多次修改引用关系。
+
+### P2：项目工程文档，随代码稳定后再做
+
+- [ ] 重新校准 08_架构图册.md。
+- [ ] 重新校准 09_系统设计.md。
+- [ ] 重新校准 11_项目结构.md。
+- [ ] 重新校准 12_架构决策.md。
+
+### P3：最终整合
+
+- [ ] 最后整理 PROJECT_BIBLE.md，作为唯一总入口。
+- [ ] 新增或重构 AI Interview Notes（日本AI项目讲解手册），格式为：Question / 回答 / 源码 / 架构图 / Learning Trace / TL追问 / Production回答。
+
+原则：
+
+- 当前阶段先服务面试，不等代码100%完成。
+- 面试文档使用企业架构抽象，不绑定临时实现细节。
+- 后续代码仍可能持续演进。
+- 因此：
+- Learning 文档可以持续更新。
+- 面试文档保持企业抽象。
+- 工程设计文档等待代码稳定后统一校准。
+- 最终在 Final Freeze Sprint 完成全项目统一收口。
+- 工程文档等代码更稳定后再严格同步。
+- 不修改任何代码。
+- 不修改其它文档。
+- git diff --check 通过。
+
+## Final Freeze Sprint（最终收尾）
+
+这是整个项目最终收尾阶段。
+
+包括：
+
+- Code Freeze
+- Documentation Freeze
+- Handbook Freeze
+- README 最终整理
+- PROJECT_BIBLE 最终整理
+- Handbook 全部统一命名
+- 所有引用统一更新
+- Mermaid 图统一
+- 架构图统一
+- 截图统一
+- Learning Trace 最终校准
+- Interview 文档最终校准
+- Release v2.0
+
+说明：
+
+- 所有统一改名、统一引用、统一目录，都放到这一阶段执行。
+- 不要提前改名。
+
+
 ## 历史完成项
 
 ### Boundary
