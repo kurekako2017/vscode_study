@@ -4,13 +4,25 @@
 
 ## 当前阶段
 
-Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
+Documentation Consolidation Sprint 2
 
 状态：已完成
 
+### Documentation Consolidation Sprint 2 Result
+
+- [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
+- [x] `docs/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
+- [x] `INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
+- [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
+- [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
+- [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
+- [x] `docs/MASTER_PROMPT.md` 增加文档数量控制规则
+- [x] 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts
+
 ### Future Sprint Checklist
 
-- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is Chinese-first, with Japanese as auxiliary for interview and key terms
 
 ## 当前最高优先级任务
 

@@ -1,4 +1,4 @@
-# CODE STUDY GUIDE
+# 代码学习指南
 
 这份指南面向第一次阅读 React、FastAPI 和 LangGraph 项目的学习者。建议先把 Backend 和 Frontend 都运行起来，再按本文顺序阅读；每读到一个步骤，就在页面或日志中观察它的实际效果。
 
@@ -12,13 +12,16 @@
 | 2 | [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划 |
 | 3 | 本文 | 先知道代码应该按什么顺序读 | 先看前端实现和测试细枝末节 |
 
-English: start with `README.md`, then the learning walkthrough, then this guide.
-中文（简体）：先看 `README.md`，再看学习走读文档，最后看本文。
-日本語：まず `README.md`、次に学習ウォークスルー、最後にこのガイドを読みます。
-
-如果你需要先查测试覆盖面，打开 [docs/TEST_CASES.md](./docs/TEST_CASES.md)；如果你需要准备面试表达，打开 [docs/INTERVIEW_GUIDE.md](./docs/INTERVIEW_GUIDE.md)。
-
 ## 1. 项目整体运行流程
+
+### 章节信息
+
+- 学习目标：先建立“请求从哪里进、结果从哪里出”的整体心智模型。
+- 推荐阅读文件：`README.md`、`docs/LEARNING_API_WALKTHROUGH.md`
+- 推荐阅读时间：15 分钟。
+- 推荐顺序：第 1 遍。
+- 看完应该掌握什么：知道 React、FastAPI、Workflow、SSE、Report 是怎么串起来的。
+- 下一步看哪里：`backend/app/main.py`
 
 ```text
 React
@@ -53,11 +56,18 @@ React
 
 当前实现默认使用进程内存储和本地文件输入：不调用真实 LLM，不需要 PostgreSQL、Redis 或 RabbitMQ。Phase 2 已新增可选 PostgreSQL Repository，但默认后端仍是 `inmemory`；只有显式切换后，任务、事件和报告才会跨进程保留。
 
-当前 backend 还新增了企业安全基础读模型：`users/me` 返回 `system` 占位主体，`security/roles` 和 `security/permissions` 返回冻结目录，`audit-logs` 读取 append-only 审计事实。
-
-如果你的目标是 Sprint R3 的 runnable learning 文档优化，建议先打开 [docs/LEARNING_API_WALKTHROUGH.md](./docs/LEARNING_API_WALKTHROUGH.md)；它把“怎么启动、先看什么、每个功能能跑什么”收敛成最短路径。
+当前 backend 还提供企业安全基础读模型：`users/me` 返回 `system` 占位主体，`security/roles` 和 `security/permissions` 返回冻结目录，`audit-logs` 读取 append-only 审计事实。
 
 ## 2. 后端阅读顺序
+
+### 章节信息
+
+- 学习目标：按请求路径从外到内，读懂后端如何分层。
+- 推荐阅读文件：`backend/app/main.py`、`backend/app/api/tasks.py`、`backend/app/services/task_service.py`
+- 推荐阅读时间：30 分钟。
+- 推荐顺序：第 2 遍。
+- 看完应该掌握什么：知道路由、Service、Workflow、Provider、Repository 各自负责什么。
+- 下一步看哪里：`backend/app/api/tasks.py`
 
 第一次阅读时不要从每个目录的 `__init__.py` 开始。按一次请求从外到内、再从内到外的顺序读：
 
@@ -84,6 +94,15 @@ research: route → research → report
 
 ## 3. 前端阅读顺序
 
+### 章节信息
+
+- 学习目标：看懂页面状态如何和后端事件、报告加载联动。
+- 推荐阅读文件：`frontend/src/App.tsx`、`frontend/src/api.ts`
+- 推荐阅读时间：20 分钟。
+- 推荐顺序：第 3 遍。
+- 看完应该掌握什么：知道 React 里哪些状态对应请求、SSE、报告和错误展示。
+- 下一步看哪里：`frontend/src/App.tsx`
+
 1. `frontend/src/App.tsx`：先看顶部的七个 `useState`，理解页面保存了哪些状态。
 2. `frontend/src/api.ts`：看 HTTP 请求、统一响应解包和 EventSource 订阅。
 3. 回到 `App.tsx` 的 `submit()`：任务提交逻辑，重点看提交前重置状态和 `createTask()`。
@@ -104,6 +123,15 @@ unsubscribeRef 负责关闭旧 EventSource
 ```
 
 ## 4. 核心文件说明
+
+### 章节信息
+
+- 学习目标：把“文件职责”与“运行时调用时机”对应起来。
+- 推荐阅读文件：`backend/app/main.py`、`backend/app/api/tasks.py`、`backend/app/events/sse.py`、`frontend/src/App.tsx`
+- 推荐阅读时间：30 分钟。
+- 推荐顺序：第 4 遍。
+- 看完应该掌握什么：知道每个核心文件为什么存在，以及面试时怎么解释。
+- 下一步看哪里：`backend/app/api/tasks.py`
 
 | 文件路径 | 负责什么 | 为什么需要 | 运行时什么时候被调用 | 初学者重点看哪里 |
 | --- | --- | --- | --- | --- |
@@ -140,6 +168,15 @@ unsubscribeRef 负责关闭旧 EventSource
 
 ## 5. 一次完整任务的源码调用链
 
+### 章节信息
+
+- 学习目标：把一次 `hybrid` 请求从按钮点击追踪到最终报告。
+- 推荐阅读文件：`backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/events/sse.py`、`backend/app/reports/generator.py`
+- 推荐阅读时间：20 分钟。
+- 推荐顺序：第 5 遍。
+- 看完应该掌握什么：知道任务、事件、Workflow、报告和前端状态如何串联。
+- 下一步看哪里：`backend/app/events/sse.py`
+
 以页面默认的 `hybrid` 任务为例：
 
 1. 用户点击 `App.tsx` 中的“分析を開始”按钮，浏览器触发表单 `onSubmit={submit}`。
@@ -167,6 +204,15 @@ unsubscribeRef 负责关闭旧 EventSource
 如果中途抛出异常，`TaskService.run_task()` 的 `except` 会把 Task 改为 failed，并发布 error；React 收到后关闭 SSE，在 `role="alert"` 区域显示 error_code 和 message，不再请求报告。
 
 ## 6. Debug 学习方法
+
+### 章节信息
+
+- 学习目标：学会用断点、日志和网络面板定位问题。
+- 推荐阅读文件：`backend/app/observability/logging.py`、`backend/app/main.py`、`frontend/src/api.ts`
+- 推荐阅读时间：20 分钟。
+- 推荐顺序：第 6 遍。
+- 看完应该掌握什么：知道怎样在 Backend 和 Frontend 两边同时观察同一次请求。
+- 下一步看哪里：`backend/app/observability/logging.py`
 
 ### 6.1 Backend breakpoint
 
@@ -215,6 +261,15 @@ log_event(logger, "info", "study_checkpoint", "Reached study checkpoint",
 
 ## 7. 十个小练习
 
+### 章节信息
+
+- 学习目标：通过小改动巩固对主链路的理解。
+- 推荐阅读文件：`docs/TEST_CASES.md`、`docs/INTERVIEW_GUIDE.md`、`docs/LEARNING_API_WALKTHROUGH.md`
+- 推荐阅读时间：按需。
+- 推荐顺序：第 7 遍。
+- 看完应该掌握什么：能够独立定位一个点的代码、测试和日志。
+- 下一步看哪里：`docs/TEST_CASES.md`
+
 每次只做一个练习，修改前先运行 `./scripts/run_tests.sh`，修改后再运行一次。若当前练习涉及 Phase 2 PostgreSQL 持久化，再补跑 `./scripts/verify_postgres_phase2.sh`，确认当前环境是“真正验证通过”还是“明确记录跳过原因”。练习不要求一次全部提交。
 
 1. **改报告标题**：修改 `reports/generator.py` 的第一行标题，并同步更新 `backend/tests/test_api.py` 的断言。
@@ -229,25 +284,3 @@ log_event(logger, "info", "study_checkpoint", "Reached study checkpoint",
 10. **增加一个请求校验测试**：在 Backend 测试中提交未知 mode，断言 HTTP 422、`VALIDATION_ERROR` 和 request_id；不改变 Schema。
 
 练习修改必须继续遵守本项目边界：使用 Static Provider 和 InMemory Repository，不接真实 LLM，不引入外部基础设施。
-
-<!-- DOC-SYNC:START group=study-and-runbook -->
-## 文档同步块
-
-- group: `study-and-runbook`
-- file: `retail-insight-ai/CODE_STUDY_GUIDE.md`
-- self_sha256: `7835d7b286bdaad961b008b3623bf07ff31edf644e60239270d09e108eded449`
-- peers:
-- `retail-insight-ai/RUNBOOK_LOCAL.md` | sha256=82e649ea6d4a1124aef7bac0e5296b5bbd4077586f02199892583fefaf930f1a | # RUNBOOK_LOCAL / 这份手册用于在 VS Code + WSL Ubuntu 中，从零启动 Retail Insight AI，并亲自验证 Backend、Frontend、SSE 和 Report 全流程。所有命令默认在 WSL Ubuntu 终端执行。 / ## 1. 前提条件 / 需要以下工具：
-- `retail-insight-ai/VERIFY_CHECKLIST.md` | sha256=a102715dbf95744db73011bb1df9cd7999da3fc9d576d4677eb230a34d77b925 | # VERIFY CHECKLIST / 所有命令默认先进入项目根目录： / ```bash / cd ~/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
-- `retail-insight-ai/STUDY_PLAN_DAY1_DAY3.md` | sha256=23659aa081e315f7a7cf87c0e3266ad81620d0b0577954f4138c7a1280b6f7c5 | # Retail Insight AI 学习计划（Day1～Day3） / 这是一份面向初学者的“边运行、边阅读、边验证”学习计划。所有路径都相对于 `retail-insight-ai/` 项目根目录；命令均可直接复制到 WSL Ubuntu 的 Bash 终端执行。 / ## 三天学习目标 / 通过三天时间，完成以下目标：
-- `ai-agent-retail-handbook-v3/01_日本AI项目实战.md` | sha256=aa0cf1068c64dbdeedf2f1f5e38d235fab7d19a23aa2ad23ceee7645ac7ebac1 | # 01_日本AI项目实战 / ## 目录 / - [第一章 项目概述](#第一章-项目概述) / - [第二章 行业背景](#第二章-行业背景)
-- `ai-agent-retail-handbook-v3/04_日本现场开发.md` | sha256=bca69b09dcf09db6f0869f4af8121a3d7f4e280757c8e377cd761370c68295e5 | # 04_日本现场开发 / ## 第一章 日本现场开发总流程 / Retail Insight AI 按日本现场流程推进：需求整理、基本設計、詳細設計、API 設計、開発、単体試験、結合試験、レビュー、部署、保守改修。 / 【TL Review】
-- `ai-agent-retail-handbook-v3/05_TL代码审查.md` | sha256=797c312f4566abe80afb5f87dbbf97b22d983195cb9610de8de81f47af01c9c3 | # 05_TL代码审查 / ## 第一章 Review 总原则 / TL Review 的目标是确认 Retail Insight AI 能支撑日本小売業客户的经营分析、运用监视、障害対応和保守改修。 / 【TL Review】
-- `ai-agent-retail-handbook-v3/06_学习路线.md` | sha256=1b39176bff4feb5bcde639affcec4036334622aca73dac53c321b649d8c11e3f | # 06_学习路线 / ## 第一章 成长目标 / 目标是能够在日本 AI Agent 现场说明 Retail Insight AI 的业务背景、系统架构、担当范围、设计决策、Review 观点和运用扩展。 / 【TL Review】
-- `ai-agent-retail-handbook-v3/11_Project_Structure.md` | sha256=a40c03fd0eadeb68466c3a44a53ddf58769d104af40d37f6b658135157ef09bb | # 11_Project_Structure / # 目录 / - [1. 设计目标](#1-设计目标) / - [2. 顶层目录](#2-顶层目录)
-
-说明：
-- 这个块由 `scripts/sync_retail_handbook_docs.py` 自动维护。
-- 只同步这个块，不覆盖各自正文。
-- 任一组内文档正文变化时，整组文档的同步块都会一起刷新。
-<!-- DOC-SYNC:END group=study-and-runbook -->

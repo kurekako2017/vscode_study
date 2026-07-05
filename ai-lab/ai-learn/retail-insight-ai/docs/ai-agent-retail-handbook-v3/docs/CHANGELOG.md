@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-07-05 Documentation Consolidation Sprint 2
+
+- README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
+- README 增加初学者只读 5 个文档、面试准备 3 个文档、开发维护再看哪些文档、不要一开始看的文档，以及文档数量控制规则。
+- `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
+- `docs/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
+- `INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
+- `RUNBOOK_LOCAL.md` 明确项目根目录脚本和 backend 目录 uvicorn 的不同执行方式，并补上 Swagger / ReDoc / OpenAPI JSON 的用途。
+- `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档。
+- `CODE_STUDY_GUIDE.md` 增加每章推荐阅读文件和下一步看哪里。
+- `docs/MASTER_PROMPT.md` 增加文档数量控制规则。
+- 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts。
+
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
 - 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。

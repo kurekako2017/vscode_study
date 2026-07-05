@@ -2,6 +2,29 @@
 
 # CHANGELOG
 
+## 2026-07-05 Documentation Consolidation Sprint 2
+
+- README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
+- README 增加初学者只读 5 个文档、面试准备 3 个文档、开发维护再看哪些文档、不要一开始看的文档，以及文档数量控制规则。
+- `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
+- `docs/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
+- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
+- `RUNBOOK_LOCAL.md` 明确项目根目录脚本和 backend 目录 uvicorn 的不同执行方式，并补上 Swagger / ReDoc / OpenAPI JSON 的用途。
+- `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档。
+- `CODE_STUDY_GUIDE.md` 增加每章推荐阅读文件和下一步看哪里。
+- `docs/MASTER_PROMPT.md` 增加文档数量控制规则。
+- 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts。
+
+## 2026-07-05 Sprint R3.1 Documentation Quality Refactor
+
+- 将 `README.md` 重写为中文入口，并新增“第一次启动项目”章节，逐步说明命令、作用、成功标志、失败现象和下一步操作。
+- 将 `docs/LEARNING_API_WALKTHROUGH.md` 重写为按接口顺序展开的中文学习走读，每个接口都补齐接口作用、学习原因、Swagger 位置、输入、预期输出、知识点和源码位置。
+- 将 `docs/TEST_CASES.md` 重写为按测试文件逐项说明的中文文档，补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由。
+- 将 `RUNBOOK_LOCAL.md` 改为“启动与排错指南”，并用“问题 → 原因 → 解决方法”重新组织。
+- 将 `VERIFY_CHECKLIST.md` 改为启动完成检查清单，明确每项如何验证成功。
+- 将 `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和看完应掌握的内容。
+- 本次仅做文档质量重构，不修改 Python 代码、测试代码或接口。
+
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
 - 统一最短学习路径到 `README.md`、`docs/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。

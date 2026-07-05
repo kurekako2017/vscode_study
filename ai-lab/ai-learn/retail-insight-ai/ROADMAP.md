@@ -4,19 +4,21 @@
 
 ## 当前阶段
 
-Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
+Documentation Consolidation Sprint 2
 
 ### Current Status
 
-- Learning path was shortened to `README.md` → `docs/LEARNING_API_WALKTHROUGH.md` → `CODE_STUDY_GUIDE.md`
-- Startup guidance now includes backend commands, Swagger address, minimal validation commands, and common failures
-- New documentation added for test cases and interview guidance
+- README now acts as the document navigation center
+- Learning walkthrough is organized by Swagger endpoint order
+- Test cases are explained as file-by-file learning notes
+- Interview guide is optimized for Japanese project interviews
+- Startup / verification / code-reading documents were tightened for beginners
 - No new feature work was added in this documentation sprint
-- Human-readable summaries are trilingual: English / 中文（简体） / 日本語
+- Human-readable summaries remain Chinese-first with Japanese as auxiliary
 
 ### Future Sprint Checklist
 
-- [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
+- [x] Human-readable documentation is Chinese-first, with Japanese as auxiliary for interview and key terms
 
 当前状态：
 

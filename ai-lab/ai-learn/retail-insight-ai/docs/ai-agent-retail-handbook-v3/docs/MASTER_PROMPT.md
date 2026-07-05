@@ -160,6 +160,14 @@ All AI tools working in this repository must follow this document before they wr
 - Update `docs/ARCHITECTURE.md` for architecture changes.
 - Update `docs/DECISIONS.md` for important decisions.
 - Update handbook mirror files in `docs/ai-agent-retail-handbook-v3/`.
+- Do not add a new Markdown file when the same kind of content can be merged into an existing document.
+- Keep `README.md` as the navigation center.
+- Keep `docs/LEARNING_API_WALKTHROUGH.md` for runnable learning.
+- Keep `docs/TEST_CASES.md` for test learning.
+- Keep `INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
+- Keep `RUNBOOK_LOCAL.md` for startup and troubleshooting.
+- Keep `VERIFY_CHECKLIST.md` for verification.
+- Keep `CODE_STUDY_GUIDE.md` for source reading order.
 
 ## 16. Three-Language Rules / 三语规则 / 三言語ルール
 

@@ -4,9 +4,40 @@
 
 ## 当前阶段
 
-Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
+Documentation Consolidation Sprint 2
 
 状态：已完成
+
+### Documentation Consolidation Sprint 2 Result
+
+- [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
+- [x] `docs/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
+- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
+- [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
+- [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
+- [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
+- [x] `docs/MASTER_PROMPT.md` 增加文档数量控制规则
+- [x] 本次仅修改文档，不修改 backend/app、backend/tests、frontend、scripts
+
+### Sprint R3.1 Result
+
+- [x] `README.md` 改为中文入口，并新增“第一次启动项目”章节
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
+- [x] `docs/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
+- [x] `RUNBOOK_LOCAL.md` 改写为“启动与排错指南”，使用“问题 → 原因 → 解决方法”组织内容
+- [x] `VERIFY_CHECKLIST.md` 改写为启动完成检查清单，并明确每项如何验证成功
+- [x] `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和掌握目标
+- [x] 本次仅做文档优化，不修改 Python 代码、测试代码或接口
+
+### Sprint R3 Result
+
+- [x] 最短学习路径已收敛到 `README.md` / `docs/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
+- [x] 新增 `docs/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] `docs/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Future Sprint Checklist
 
@@ -45,15 +76,15 @@ Sprint R3: Learning Guide + Test Case + Interview Docs Optimization
 - [x] backend / frontend / scripts boundary unchanged
 - [x] Human-readable documentation is trilingual: English / 中文（简体） / 日本語
 
-### Completed Capabilities
+### 已完成能力
 
-- English: Document Upload, Document Read, Document Archive, Document Import, Document Chunk, Document Retrieval, Internal RAG without LLM, LLM Provider Stub Seam, Approval Workflow, RBAC for Approval APIs, Approval Audit Middleware, Security Domain, InMemory Audit Log
+- 英文术语：Document Upload, Document Read, Document Archive, Document Import, Document Chunk, Document Retrieval, Internal RAG without LLM, LLM Provider Stub Seam, Approval Workflow, RBAC for Approval APIs, Approval Audit Middleware, Security Domain, InMemory Audit Log
 - 中文（简体）：文档上传、文档读取、文档归档、文档导入、文档切分、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批 API 的 RBAC、审批审计中间件、安全域、InMemory 审计日志
 - 日本語：ドキュメントアップロード、ドキュメント読取、ドキュメントアーカイブ、ドキュメントインポート、ドキュメントチャンク、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認 API の RBAC、承認監査ミドルウェア、セキュリティドメイン、InMemory 監査ログ
 
-### Remaining Capabilities
+### 未完成能力
 
-- English: frontend UI, PostgreSQL repository full migration, real authentication, JWT/OAuth, real LLM provider, pgvector, internet search, MCP, production deployment
+- 英文术语：frontend UI, PostgreSQL repository full migration, real authentication, JWT/OAuth, real LLM provider, pgvector, internet search, MCP, production deployment
 - 中文（简体）：前端 UI、PostgreSQL 仓库全面迁移、真实认证、JWT/OAuth、真实 LLM 提供方、pgvector、互联网搜索、MCP、生产部署
 - 日本語：frontend UI、PostgreSQL リポジトリの完全移行、実認証、JWT/OAuth、実 LLM provider、pgvector、インターネット検索、MCP、本番デプロイ
 
