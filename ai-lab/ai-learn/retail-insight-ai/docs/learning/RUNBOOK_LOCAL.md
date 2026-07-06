@@ -2,6 +2,27 @@
 
 这份文档用于本地启动 Retail Insight AI，并区分 Swagger、ReDoc、OpenAPI JSON、unittest、前后端联调各自的作用。
 
+## 目录
+
+- [三个文档入口不是同一个用途](#三个文档入口不是同一个用途)
+- [企业项目验证体系](#企业项目验证体系)
+- [推荐启动顺序](#推荐启动顺序)
+- [如果要直接看后端原始输出](#如果要直接看后端原始输出)
+- [Swagger / ReDoc / OpenAPI JSON 的使用方式](#swagger--redoc--openapi-json-的使用方式)
+- [unittest 执行规则](#unittest-执行规则)
+- [常见问题](#常见问题)
+- [推荐验证顺序](#推荐验证顺序)
+- [Appendix A: 初学者本地启动顺序](#appendix-a-初学者本地启动顺序)
+- [Appendix B: 常见启动错误与修复](#appendix-b-常见启动错误与修复)
+- [Appendix C: Quick Start（1 Minute Quick Start）](#appendix-c-quick-start1-minute-quick-start)
+- [Appendix D: Startup Flow](#appendix-d-startup-flow)
+- [Appendix E: Startup Checklist](#appendix-e-startup-checklist)
+- [Appendix F: WSL + VSCode 使用建议](#appendix-f-wsl--vscode-使用建议)
+- [Appendix G: VSCode Debug & Run](#appendix-g-vscode-debug--run)
+- [Appendix H: Interview Demo Startup](#appendix-h-interview-demo-startup)
+- [Appendix I: Startup Decision Tree](#appendix-i-startup-decision-tree)
+- [Appendix J: FAQ](#appendix-j-faq)
+
 ## 三个文档入口不是同一个用途
 
 - Swagger 是 API 调试与验证工具。
@@ -35,8 +56,8 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
 ## 推荐启动顺序
 
-1. 在项目根目录执行 `./scripts/check_env.sh`。
-2. 在项目根目录执行 `./scripts/start_backend.sh`。
+1. 在 `<project_root>` 执行 `./scripts/check_env.sh`。
+2. 在 `<project_root>` 执行 `./scripts/start_backend.sh`。
 3. 打开 `http://127.0.0.1:8000/docs` 看 Swagger。
 4. 打开 `http://127.0.0.1:8000/redoc` 看 ReDoc。
 5. 打开 `http://127.0.0.1:8000/openapi.json` 看 OpenAPI JSON。
@@ -44,12 +65,7 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
 ## 如果要直接看后端原始输出
 
-```bash
-cd backend
-python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-这样做适合观察最原始的 FastAPI 启动日志和异常堆栈。
+这样做适合观察最原始的 FastAPI 启动日志和异常堆栈，命令与 Appendix C 保持一致，参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 ## Swagger / ReDoc / OpenAPI JSON 的使用方式
 
@@ -74,25 +90,7 @@ python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ## unittest 执行规则
 
-测试命令必须在 `backend` 目录执行：
-
-```bash
-cd backend
-python3 -m unittest discover -s tests -v
-```
-
-单文件执行方式：
-
-```bash
-cd backend
-python3 -m unittest tests.test_api -v
-```
-
-不要在项目根目录直接执行：
-
-```bash
-python3 -m unittest tests.test_api -v
-```
+测试命令必须在 `<project_root>/backend` 目录执行，完整命令与单文件执行方式参见 Appendix E 和 Appendix C。
 
 如果出现 `ModuleNotFoundError: No module named tests`，说明执行目录错了，不要先怀疑测试代码本身。
 
@@ -135,20 +133,16 @@ Swagger
 
 ## 1. 进入项目根目录
 
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 为什么这样做：
 
 - 所有相对路径命令都以项目根目录为基准。
-- `backend/requirements.txt`、`docs/learning/RUNBOOK_LOCAL.md`、`scripts/` 都是在根目录下组织的。
+- `backend/requirements.txt`、`docs/learning/RUNBOOK_LOCAL.md`、`scripts/` 都是在 `<project_root>` 下组织的。
 
 ## 2. 创建 `.venv`
 
-```bash
-python3 -m venv .venv
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 为什么这样做：
 
@@ -157,17 +151,13 @@ python3 -m venv .venv
 
 ## 3. 激活 `.venv`
 
-```bash
-source .venv/bin/activate
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 激活成功后，命令行一般会出现 `(.venv)` 前缀。
 
 ## 4. 升级 `pip`
 
-```bash
-python -m pip install --upgrade pip
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 为什么这样做：
 
@@ -176,10 +166,7 @@ python -m pip install --upgrade pip
 
 ## 5. 安装依赖
 
-```bash
-cd backend
-python -m pip install -r requirements.txt
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 为什么这样做：
 
@@ -201,14 +188,14 @@ python -c "import fastapi, uvicorn, multipart; print('dependency check ok')"
 ## 7. 检查 `.env`
 
 ```bash
-cd ..
+cd <project_root>
 test -f .env && echo ".env exists" || echo ".env missing, copy from .env.example if needed"
 ```
 
 如果需要初始化：
 
 ```bash
-cp .env.example .env
+cp <project_root>/.env.example <project_root>/.env
 ```
 
 为什么这样做：
@@ -218,10 +205,7 @@ cp .env.example .env
 
 ## 8. 启动 Backend
 
-```bash
-cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
+命令参见 [Appendix C](#appendix-c-quick-start1-minute-quick-start)。
 
 为什么这样做：
 
@@ -230,9 +214,7 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ## 9. 验证 `/health`
 
-```bash
-curl -s http://127.0.0.1:8000/health
-```
+验证命令与 Appendix C 一致，直接访问 `http://127.0.0.1:8000/health`。
 
 预期：
 
@@ -255,11 +237,7 @@ http://127.0.0.1:8000/openapi.json
 
 ## 11. 可选：启动 Frontend
 
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
+命令参见 `frontend/` 的本地启动文档或项目脚本；如果只验证后端，先完成 Appendix C 即可。
 
 为什么这样做：
 
@@ -268,10 +246,7 @@ npm run dev
 
 ## 12. 可选：运行 `unittest`
 
-```bash
-cd ../backend
-python -m unittest discover -s tests -v
-```
+命令参见 Appendix E。
 
 为什么这样做：
 
@@ -295,19 +270,13 @@ python -m unittest discover -s tests -v
 检查命令：
 
 ```bash
-cd backend
 python -m pip show python-multipart
 python -c "import multipart; print('ok')"
 ```
 
 修复命令：
 
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
-source .venv/bin/activate
-cd backend
-python -m pip install -r requirements.txt
-```
+参见 Appendix C 的完整安装流程；这里的关键是确保当前解释器里能找到 `python-multipart`。
 
 ## 2. `ModuleNotFoundError`
 
@@ -330,21 +299,128 @@ python -c "import sys; print(sys.executable)"
 
 修复命令：
 
+先回到 `<project_root>/backend`，再按 Appendix C 启动后端。
+
+## 3. `uvicorn` 找不到
+
+现象：
+
+- 执行 `uvicorn ...` 时提示 `command not found`。
+
+原因：
+
+- `uvicorn` 没装进当前环境。
+- 或者 `.venv` 没激活，系统 PATH 里没有这个命令。
+
+检查命令：
+
 ```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai/backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+which uvicorn
+python -m pip show uvicorn
 ```
+
+修复命令：
+
+参见 Appendix C；如果 `uvicorn` 找不到，通常是 `.venv` 未激活或依赖未安装。
+
+## 4. `8000` 端口被占用
+
+现象：
+
+- 启动时报 `Address already in use`。
+- 或者 `port 8000 is already in use`。
+
+原因：
+
+- 另一个后端进程已经在监听 8000。
+
+检查命令：
+
+```bash
+ss -ltnp | grep 8000
+```
+
+修复命令：
+
+先结束占用 8000 的进程，再按 Appendix C 重新启动后端。
+
+## 5. `.venv` 没有激活
+
+现象：
+
+- `python -V` 不是项目里的解释器。
+- `pip install` 后依赖还是找不到。
+
+原因：
+
+- 你执行命令时使用了系统 Python，而不是项目虚拟环境。
+
+检查命令：
+
+```bash
+which python
+python -m pip -V
+```
+
+修复命令：
+
+参见 Appendix F 的 WSL + VSCode 检查方法。
+
+## 6. `requirements` 没装完整
+
+现象：
+
+- 后端部分模块能导入，部分模块导入失败。
+- 上传、文档解析、Swagger 相关页面启动不完整。
+
+原因：
+
+- 依赖只装了一部分。
+- 或者中途安装失败，但你没有注意到报错。
+
+检查命令：
+
+```bash
+python -m pip check
+python -m pip freeze | sed -n '1,120p'
+```
+
+修复命令：
+
+回到 Appendix C 的安装步骤，重新安装依赖后再执行 `python -m pip check`。
+
+## 7. 在错误目录执行命令
+
+现象：
+
+- `python -m unittest discover -s tests -v` 找不到测试。
+- `python -m uvicorn app.main:app` 报导入错误。
+
+原因：
+
+- `backend/` 下的命令被放到了项目根目录执行。
+- 或者根目录命令被放到了 `backend/` 里执行。
+
+检查命令：
+
+```bash
+pwd
+```
+
+修复命令：
+
+先切换到 `<project_root>/backend`，再按 Appendix C 启动后端。
 
 # Appendix C: Quick Start（1 Minute Quick Start）
 
 第一次 Clone 项目后，先直接照着执行下面这组命令。
 
 ```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
+cd <project_root>
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-cd backend
+cd <project_root>/backend
 python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
@@ -400,7 +476,7 @@ Frontend (Optional)
 - [ ] Swagger 可打开
 - [ ] ReDoc 可打开
 - [ ] `openapi.json` 可打开
-- [ ] `python -m unittest discover -s tests -v` 通过
+- [ ] 在 `<project_root>/backend` 执行 `python -m unittest discover -s tests -v` 通过
 - [ ] 前端已按需启动
 
 # Appendix F: WSL + VSCode 使用建议
@@ -431,7 +507,7 @@ python -m pip -V
 
 如果输出路径在项目 `.venv` 下，通常就是对的。
 
-- VSCode Terminal 建议从项目根目录打开，再执行 `source .venv/bin/activate`。
+- VSCode Terminal 建议从 `<project_root>` 打开，再执行 `source .venv/bin/activate`。
 - 如果 Terminal 里看到的 Python 路径不是项目 `.venv`，先切换解释器，再重新打开 Terminal。
 
 # Appendix G: VSCode Debug & Run
@@ -442,14 +518,7 @@ python -m pip -V
 2. 打开项目根目录。
 3. 打开 Terminal。
 4. 选择 Python Interpreter，指向项目 `.venv`。
-5. 在 Terminal 里执行：
-
-```bash
-source .venv/bin/activate
-cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
+5. 在 Terminal 里执行 Appendix C 的启动命令。
 6. 看 Terminal Log 是否出现 `Application startup complete`。
 7. 如果要调试，把运行方式换成 VSCode 的 Python Debugger，再启动 `app.main:app`。
 8. 调试时优先看 Terminal 输出，不要只看浏览器页面。
@@ -516,160 +585,28 @@ NO
 - 再看是不是 `.venv` 没激活。
 - 再看是不是 Python / pip 指到了别的环境。
 
-# Appendix J: Beginner Tips
+# Appendix J: FAQ
 
-## 为什么必须进入 backend 再启动？
+## Q1. 为什么必须进入 backend 再启动？
 
-因为 `app.main:app` 是后端入口，很多相对路径和依赖默认都以 `backend/` 为基准。如果在项目根目录直接启动，容易出现导入路径或测试发现路径不一致的问题。新手最稳妥的做法就是先 `cd backend`，再运行后端命令。
+因为 `app.main:app` 是后端入口，很多相对路径和依赖默认都以 `<project_root>/backend` 为基准。如果在项目根目录直接启动，容易出现导入路径或测试发现路径不一致的问题。新手最稳妥的做法就是先进入 `<project_root>/backend`，再运行后端命令。
 
-## 为什么使用 `python -m uvicorn`？
+## Q2. 为什么使用 `python -m uvicorn`？
 
 这样会让 `python` 和 `uvicorn` 来自同一个解释器环境，减少“命令找得到，但依赖找不到”的问题。对新手来说，这比直接敲 `uvicorn` 更稳，也更容易排查问题。这个写法同样适合调试和文档复制执行。
 
-## 为什么使用 `python -m pip`？
+## Q3. 为什么使用 `python -m pip`？
 
 因为它明确表示“用当前 Python 对应的 pip”。如果直接用 `pip`，很容易装到系统环境或别的虚拟环境里。新手第一优先级是让安装和运行使用同一个解释器。
 
-## 为什么不要 `sudo pip install`？
+## Q4. 为什么不要 `sudo pip install`？
 
 `sudo pip install` 很容易把依赖装到系统环境，后面会污染别的项目。它也会掩盖 `.venv` 没激活的问题。这个项目更推荐把所有安装都放进 `.venv`。
 
-## 为什么使用 `.venv`？
+## Q5. 为什么使用 `.venv`？
 
 `.venv` 可以把项目依赖和系统环境隔离开。这样你升级、删除或重装依赖时，不会影响别的项目。对初学者来说，这也是最容易复现和排错的方式。
 
-## 为什么先跑 Health，再看 Swagger？
+## Q6. 为什么先跑 Health，再看 Swagger？
 
 `/health` 是最轻量的启动验证点，能最快确认服务已经活着。只有服务真正启动后，再打开 Swagger 才有意义。这个顺序可以帮助你快速判断问题是在“服务没起来”还是“接口文档没注册”。
-
-## 3. `uvicorn` 找不到
-
-现象：
-
-- 执行 `uvicorn ...` 时提示 `command not found`。
-
-原因：
-
-- `uvicorn` 没装进当前环境。
-- 或者 `.venv` 没激活，系统 PATH 里没有这个命令。
-
-检查命令：
-
-```bash
-which uvicorn
-python -m pip show uvicorn
-```
-
-修复命令：
-
-```bash
-source .venv/bin/activate
-cd backend
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-## 4. `8000` 端口被占用
-
-现象：
-
-- 启动时报 `Address already in use`。
-- 或者 `port 8000 is already in use`。
-
-原因：
-
-- 另一个后端进程已经在监听 8000。
-
-检查命令：
-
-```bash
-ss -ltnp | grep 8000
-```
-
-修复命令：
-
-```bash
-kill <PID>
-cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-## 5. `.venv` 没有激活
-
-现象：
-
-- `python -V` 不是项目里的解释器。
-- `pip install` 后依赖还是找不到。
-
-原因：
-
-- 你执行命令时使用了系统 Python，而不是项目虚拟环境。
-
-检查命令：
-
-```bash
-which python
-python -m pip -V
-```
-
-修复命令：
-
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
-source .venv/bin/activate
-which python
-python -m pip -V
-```
-
-## 6. `requirements` 没装完整
-
-现象：
-
-- 后端部分模块能导入，部分模块导入失败。
-- 上传、文档解析、Swagger 相关页面启动不完整。
-
-原因：
-
-- 依赖只装了一部分。
-- 或者中途安装失败，但你没有注意到报错。
-
-检查命令：
-
-```bash
-cd backend
-python -m pip check
-python -m pip freeze | sed -n '1,120p'
-```
-
-修复命令：
-
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai/backend
-python -m pip install -r requirements.txt
-python -m pip check
-```
-
-## 7. 在错误目录执行命令
-
-现象：
-
-- `python -m unittest discover -s tests -v` 找不到测试。
-- `python -m uvicorn app.main:app` 报导入错误。
-
-原因：
-
-- `backend/` 下的命令被放到了项目根目录执行。
-- 或者根目录命令被放到了 `backend/` 里执行。
-
-检查命令：
-
-```bash
-pwd
-```
-
-修复命令：
-
-```bash
-cd /home/victorkure/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai/backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
