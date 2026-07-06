@@ -1,6 +1,6 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-05
+最后更新：2026-07-06
 
 ## 项目目标
 
@@ -12,6 +12,14 @@
 - MCP 集成
 - 企业权限控制
 - AI 分析报告生成
+
+## 2026-07-06 Backend Startup Recovery
+
+- [x] 修复 `backend` 本地启动失败问题，补齐 `python-multipart` 依赖声明和安装步骤
+- [x] 用新建 `.venv` 重新安装 backend 依赖，并验证 `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
+- [x] 确认 `/health`、`/docs`、`/redoc`、`/openapi.json` 可访问
+- [x] 在 `docs/learning/RUNBOOK_LOCAL.md` 末尾追加初学者启动顺序与常见错误修复
+- [x] 保留原文，不重排、不删除 RUNBOOK_LOCAL 既有内容
 
 ## 每次工作开始前必须检查
 

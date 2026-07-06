@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-06 Backend Startup Recovery
+
+- 修复后端本地启动失败的根因：`python-multipart` 未声明且当前工作区没有可用 `.venv`。
+- 在 `backend/requirements.txt` 中补充 `python-multipart==0.0.20`，并创建 `.venv` 重新安装 backend 依赖。
+- 使用 `cd backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` 成功启动后端。
+- 验证 `/health`、`/docs`、`/redoc`、`/openapi.json` 均返回 200。
+- 在 `docs/learning/RUNBOOK_LOCAL.md` 末尾追加 Appendix A / Appendix B，只追加不改写原文。
+
 ## 2026-07-05 Learning Trace Phase 3
 
 - learning trace 从单行 JSON 改为终端可读 block，便于学习调用链。

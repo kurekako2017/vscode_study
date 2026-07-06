@@ -1,12 +1,22 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-05
+最后更新：2026-07-06
 
 ## 当前阶段
 
 Documentation Organization + AI Agent Guide 中文化 Sprint
 
 状态：已完成
+
+### 2026-07-06 Backend Startup Recovery
+
+- [x] 修复后端本地启动失败的根因：`python-multipart` 未声明且当前环境未安装
+- [x] 在 `backend/requirements.txt` 中补充 `python-multipart==0.0.20`
+- [x] 创建并激活 `.venv`，升级 `pip`，重新安装 backend 依赖
+- [x] 从 `backend` 目录执行 `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` 验证启动成功
+- [x] 验证 `/health`、`/docs`、`/redoc`、`/openapi.json` 均返回 200
+- [x] 只在 `docs/learning/RUNBOOK_LOCAL.md` 末尾追加 Appendix A / Appendix B，不删除原文
+- [x] 补充启动、验证与常见错误排错步骤，便于初学者复现
 
 ### Learning Trace Phase 1 结果
 

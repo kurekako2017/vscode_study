@@ -188,6 +188,7 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 - [README.md](README.md)
 - [CODE_STUDY_GUIDE.md](CODE_STUDY_GUIDE.md)
 - [docs/learning/LEARNING_API_WALKTHROUGH.md](docs/learning/LEARNING_API_WALKTHROUGH.md)
+- [docs/learning/RUNBOOK_LOCAL.md](docs/learning/RUNBOOK_LOCAL.md)
 - [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md)
 - [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md)
 

@@ -10,6 +10,7 @@
 - Swagger 能执行 `GET /health`。
 - Swagger 能执行主链路 API。
 - unittest 能在 `backend` 目录执行。
+- 如果启动时报 `Form data requires "python-multipart" to be installed`，先看 `docs/learning/RUNBOOK_LOCAL.md` 的 Appendix B。
 - 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
 - 如果报 `ModuleNotFoundError: No module named tests`，说明目录错了。
 
