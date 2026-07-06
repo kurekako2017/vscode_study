@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-06 Learning Trace Phase 4
+
+- Learning Trace 升级为源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示。
+- `backend/app/core/learning_trace.py` 按文件切换自动补出 `Controller File`、`Entering File`、`Schema File`、`Schema`，便于直接对照源码阅读。
+- `GET /health` 与 `POST /api/tasks` 的学习顺序同步到 `docs/learning/LEARNING_API_WALKTHROUGH.md`，健康检查 schema 文件名修正为 `backend/app/schemas/health.py`。
+- `LEARNING_TRACE=false` 时仍然不会输出新增学习日志。
+- 本次保持 API 行为、响应 JSON、Swagger/OpenAPI、SSE 和业务逻辑不变。
+
 ## 2026-07-06 Backend Startup Recovery
 
 - 修复后端本地启动失败的根因：`python-multipart` 未声明且当前工作区没有可用 `.venv`。

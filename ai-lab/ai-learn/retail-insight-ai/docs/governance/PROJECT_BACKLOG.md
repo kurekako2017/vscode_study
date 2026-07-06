@@ -21,6 +21,15 @@
 - [x] 在 `docs/learning/RUNBOOK_LOCAL.md` 末尾追加初学者启动顺序与常见错误修复
 - [x] 保留原文，不重排、不删除 RUNBOOK_LOCAL 既有内容
 
+## 2026-07-06 Learning Trace Phase 4
+
+- [x] Learning Trace 升级为企业级、源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示
+- [x] `backend/app/core/learning_trace.py` 支持按文件切换自动补出 `Controller File`、`Entering File`、`Schema File`、`Schema`
+- [x] `GET /health` 与 `POST /api/tasks` 的学习顺序和实际 trace 输出保持一致
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 同步更新程序调用流程，并修正健康检查 schema 文件名为真实路径 `backend/app/schemas/health.py`
+- [x] `LEARNING_TRACE=false` 时仍然不输出新增学习日志
+- [x] 本次保持 API 行为、响应 JSON、Swagger/OpenAPI、SSE、Router/Service/Workflow/Provider/Repository 逻辑不变
+
 ## 每次工作开始前必须检查
 
 - [ ] 阅读 AGENTS.md

@@ -43,6 +43,15 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] `LEARNING_TRACE=false` 时仍然不输出任何学习 trace
 - [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
 
+### Learning Trace Phase 4
+
+- [x] Learning Trace 升级为企业级、源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示
+- [x] `backend/app/core/learning_trace.py` 支持按文件切换自动补出 `Controller File`、`Entering File`、`Schema File`、`Schema`
+- [x] `GET /health` 与 `POST /api/tasks` 的学习顺序和实际 trace 输出保持一致
+- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 同步更新程序调用流程，并修正健康检查 schema 文件名为真实路径 `backend/app/schemas/health.py`
+- [x] `LEARNING_TRACE=false` 时仍然不输出新增学习 trace
+- [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
+
 ### Documentation Organization + AI Agent Guide 中文化 Sprint 结果
 
 - [x] `docs/` 活动 Markdown 已按 `learning`、`architecture`、`contracts`、`development`、`database`、`governance` 分层管理
