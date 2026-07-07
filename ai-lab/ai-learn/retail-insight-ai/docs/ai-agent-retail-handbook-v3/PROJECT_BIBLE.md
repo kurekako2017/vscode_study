@@ -68,6 +68,8 @@ React
 ↓
 FastAPI
 ↓
+TaskService
+↓
 LangGraph Workflow
 ↓
 固定 KPI 分析 / Research Agent
@@ -97,6 +99,7 @@ Streaming
 - FastAPI
 - Python
 - LangGraph
+- LangChain（Target, RAG Orchestration）
 - Workflow
 - Streaming
 - SSE
@@ -104,6 +107,14 @@ Streaming
 - RAG
 - Docker
 - SQLite
+- Keyword Retrieval（Current）
+- Hybrid Retrieval（Target）
+- Vector Database（Target, pgvector first）
+
+详细的 Technology Stack、Current / Planned / Target 边界、Retrieval Pipeline 与 Deployment Topology，
+统一以 `09_系统设计书.md` Chapter `7.0 Technical Architecture`
+和 `08_架构图册.md` Figure `28~35`
+为唯一维护入口；本文件不重复维护第二套技术演进说明。
 
 # 我的职责
 
@@ -158,12 +169,12 @@ Retail Insight AI、小売業向け AI 経営分析システムの開発を担�
 - SSO
 - Audit Log
 - Redis
-- OpenSearch
+- LangChain
 - CI/CD
 - Kubernetes
 - OpenTelemetry
 - RabbitMQ
-- VectorDB
+- Vector Database（pgvector first, Qdrant / Milvus extensible）
 - API Gateway
 - Secrets Manager
 - 多租户
@@ -179,6 +190,15 @@ Retail Insight AI、小売業向け AI 経営分析システムの開発を担�
 - 小売業向け AI 経営分析システム
 - Research Agent
 - Workflow
+- HTTP Boundary
+- Application Service
+- Repository Pattern
+- LangGraph = Workflow Orchestration
+- LangChain = RAG Orchestration
+- Embedding（Planned）
+- Keyword Retrieval（Current）
+- Hybrid Retrieval（Target）
+- Vector Database（Target）
 - KPI
 - 经营分析
 - 销售分析

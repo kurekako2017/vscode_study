@@ -2,6 +2,16 @@
 
 # CHANGELOG
 
+## 2026-07-07 Technical Architecture Handbook Alignment
+
+- `docs/ai-agent-retail-handbook-v3/09_系统设计书.md` 新增 `7.0 Technical Architecture（技术架构总览）`，补齐 Technology Stack Overview、Layered Architecture、AI Framework Relationship、Retrieval Pipeline、Technology Evolution、Enterprise Deployment、Current vs Target Matrix。
+- `docs/ai-agent-retail-handbook-v3/09_系统设计书.md` 将 Document Platform 主题统一收束为 `Appendix A Document Platform Design`，整理为 `A.1~A.6`，并同步更新目录、交叉引用与章节编号。
+- `docs/ai-agent-retail-handbook-v3/08_架构图册.md` 追加 Technology Stack Architecture、AI Framework Relationship、Retrieval Pipeline、Technology Evolution、Enterprise Deployment Topology、Container Architecture、AI Component Architecture、Create Task End-to-End 八组 Mermaid 图，并在 RC 收口时把 `28 / 29 / 33 / 34` 调整为不同视角，避免重复维护同构 Mermaid。
+- `docs/ai-agent-retail-handbook-v3/09_系统设计书.md` 在 RC 收口中统一 `Related ADR` 格式、补齐 `See Figure / See Chapter` 引用，并修复 Appendix A 与审计章节中的阶段口径和编号一致性问题。
+- 统一术语为 `Keyword Retrieval (Current)`、`Hybrid Retrieval (Target)`、`Vector Database (Target)`、`Embedding (Planned)`、`LangGraph = Workflow Orchestration`、`LangChain = RAG Orchestration`、`Repository Pattern`、`Application Service`、`HTTP Boundary`。
+- `docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md` 与 `README.md` 已同步新的 Technology Stack 入口与统一口径，并明确 `09_系统设计书.md` Chapter `7.0` 与 `08_架构图册.md` Figure `28~35` 为技术演进唯一维护入口。
+- Documentation Only：未修改 backend、frontend、tests、scripts、API 行为或业务逻辑。
+
 ## 2026-07-07 API Walkthrough Repair
 
 - 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 被截断的问题，恢复 `01~23` 全部接口章节和补充接口章节。

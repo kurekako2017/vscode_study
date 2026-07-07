@@ -2,6 +2,14 @@
 
 最后更新：2026-07-07
 
+## 2026-07-07 Technical Architecture Handbook Alignment
+
+- [x] 为 `docs/ai-agent-retail-handbook-v3/09_系统设计书.md` 新增 `7.0 Technical Architecture（技术架构总览）`
+- [x] 为 `docs/ai-agent-retail-handbook-v3/08_架构图册.md` 追加 Technology Stack Architecture / AI Framework Relationship / Retrieval Pipeline / Technology Evolution Mermaid 图
+- [x] 统一 `Keyword Retrieval (Current)`、`Hybrid Retrieval (Target)`、`Vector Database (Target)`、`LangGraph = Workflow Orchestration`、`LangChain = RAG Orchestration`
+- [x] 同步 `PROJECT_BIBLE.md`、`README.md`、`docs/governance/CHANGELOG.md`
+- [x] 本次仅修改 Markdown 文档，不修改 backend、frontend、tests、scripts 或系统行为
+
 ## 2026-07-07 API Walkthrough Repair
 
 - [x] 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 的接口章节截断与错位问题

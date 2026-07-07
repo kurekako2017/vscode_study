@@ -11,9 +11,9 @@ Retail Insight AI 是一个面向日本现场 AI Agent 项目开发、经营分�
 ```text
 React
 → FastAPI
-→ Task API
+→ HTTP Boundary
 → TaskService
-→ Workflow
+→ LangGraph Workflow
 → KPI Engine
 → Research Provider
 → Report Generator
@@ -27,7 +27,7 @@ React
 
 | 模块 | 当前状态 | 完成度说明 |
 |---|---|---|
-| Backend | 已实现主链路 | FastAPI、Task API、TaskService、Workflow、SSE、Report、Document、RAG、Approval、Security、Audit 已有本地实现 |
+| Backend | 已实现主链路 | FastAPI、HTTP Boundary、TaskService、LangGraph Workflow、SSE、Report、Document、RAG、Approval、Security、Audit 已有本地实现 |
 | Frontend | 部分完成 | React 可用于联调和展示，但当前不是主学习入口 |
 | Swagger | 已完成 | `/docs` 可作为 API Verification 入口，长期保留 |
 | Workflow | 已实现确定性流程 | 当前以本地 Workflow 和可解释流程为主，不做开放式真实 Agent 调用 |
@@ -212,6 +212,8 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 - [docs/architecture/APPROVAL_WORKFLOW.md](docs/architecture/APPROVAL_WORKFLOW.md)
 - [docs/architecture/DATA_CONTRACTS.md](docs/architecture/DATA_CONTRACTS.md)
 - [docs/governance/DECISIONS.md](docs/governance/DECISIONS.md)
+- [docs/ai-agent-retail-handbook-v3/09_系统设计书.md](docs/ai-agent-retail-handbook-v3/09_系统设计书.md) `7.0 Technical Architecture / Technology Stack Overview`
+- [docs/ai-agent-retail-handbook-v3/08_架构图册.md](docs/ai-agent-retail-handbook-v3/08_架构图册.md) `Technology Stack Architecture / Retrieval Pipeline / Technology Evolution`
 
 ### 数据库
 
