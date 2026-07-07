@@ -74,31 +74,44 @@ class AppContainer:
     event_repository: EventRepository
     repository_backend: str
 
-
+#   读取配置，创建Repository，创建Service，创建所有依赖，以后所有Router都会从这里拿Service
 def build_container(settings: Settings | None = None) -> AppContainer:
     """在唯一组合根中连接接口与当前 InMemory/Static 实现。"""
-
+    # 读取配置
     settings = settings or Settings()
+    # 根据配置选择 InMemory 或 PostgreSQL Repository
     task_repository, report_repository, event_repository = _build_repositories(settings)
+    # 创建事件发布器，注入事件仓库
     event_publisher = EventPublisher(event_repository)
+    # 创建 InMemory 实现的仓库和服务
     approval_repository = InMemoryApprovalRepository()
+    # 创建服务，注入仓库和事件发布器
     audit_repository = InMemoryAuditRepository()
+    # 创建服务，注入仓库和事件发布器
     audit_service = AuditService(audit_repository)
+    #  创建服务，注入仓库和事件发布器
     security_service = SecurityService()
+    #  创建服务，注入仓库和事件发布器
     document_repository = InMemoryDocumentRepository()
+    #  创建服务，注入仓库和事件发布器
     document_chunk_repository = InMemoryDocumentChunkRepository()
+    #  创建服务，注入仓库和事件发布器
     document_retrieval_provider = InMemoryKeywordRetrieval(
         document_repository=document_repository,
         chunk_repository=document_chunk_repository,
     )
+    #  创建服务，注入仓库和事件发布器
     llm_provider = StubLLMProvider()
+    #  创建服务，注入仓库和事件发布器
     rag_answer_generator = RAGAnswerGenerator(provider=llm_provider, use_llm=settings.internal_rag_use_llm)
     document_import_service = DocumentImportService(document_repository, event_publisher)
+    #  创建服务，注入仓库和事件发布器   
     document_chunk_service = DocumentChunkService(document_repository, document_chunk_repository, event_publisher)
     document_retrieval_service = DocumentRetrievalService(
         retrieval_provider=document_retrieval_provider,
         event_publisher=event_publisher,
     )
+    #  创建服务，注入仓库和事件发布器
     internal_rag_service = InternalRagService(
         retrieval_provider=document_retrieval_provider,
         event_publisher=event_publisher,

@@ -562,6 +562,16 @@ HealthResponse
 HTTP Response
 ```
 
+backend/app/main.py —— 理解项目是如何启动、注册中间件和路由的。
+
+backend/app/api/health.py —— 学会一个最简单的接口是如何定义的。
+
+backend/app/schemas/health.py —— 了解返回数据模型（Response Schema）。
+
+再回到 main.py，理解 include_router() 如何把接口接入应用。
+
+最后再学习 tasks.py、services、repositories 等更复杂的业务流程。
+
 ## 02. POST /api/tasks
 
 | 项目                 | 内容                                                                                                                                              |

@@ -54,14 +54,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         log_event(logger, "info", "application_stopped", "FastAPI application stopped")
 
     # 创建 FastAPI 应用实例，注册中间件、路由和异常处理器
+    # FastAPI 的 lifespan 参数允许在应用启动和关闭时执行异步代码，例如初始化数据库连接或清理资源。
     application = FastAPI(
         title=container.settings.app_name,
         version="0.1.0",
         description="Retail Insight AI deployable local backend",
         lifespan=lifespan,
     )
-    # 配置 CORS 中间件，允许跨域请求
+    # 注册中间件，配置 CORS 中间件，允许跨域请求，以后浏览器才能访问
     # cors 是 Cross-Origin Resource Sharing 的缩写，允许浏览器从不同域名的服务器请求资源。
+    # 例如，前端应用运行在 http://localhost:3000，而后端 API 运行在 http://localhost:8000，浏览器默认会阻止这种跨域请求。
+    # 生成 request_id，打日志，记录请求信息。
     application.add_middleware(
         CORSMiddleware,
         allow_origins=container.settings.cors_origins,
@@ -110,6 +113,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # 注册异常处理器和路由
     register_exception_handlers(application)
     # 注册健康检查、任务、文档、审批和安全相关路由。
+    #  注册所有Router
     application.include_router(health_router)
     application.include_router(security_router)
     application.include_router(audit_logs_router)
