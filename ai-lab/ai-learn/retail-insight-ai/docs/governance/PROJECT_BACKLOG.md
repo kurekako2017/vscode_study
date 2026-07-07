@@ -2,6 +2,14 @@
 
 最后更新：2026-07-07
 
+## 2026-07-07 API Walkthrough Repair
+
+- [x] 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 被截断的问题，恢复 `01~23` 全部接口章节和补充接口章节
+- [x] 保持原有接口顺序、Swagger 操作、输入输出、后台日志、程序调用流程不变
+- [x] 将错位的“源码学习说明”按接口归位，避免 Health 章节混入 Task / Document / Approval / Security / Audit 内容
+- [x] 每个接口仅保留一套源码学习说明，并且只说明该接口 `对应源码` 中的文件
+- [x] Documentation Only：未修改 backend、frontend、tests、scripts、API 行为或业务逻辑
+
 ## 项目目标
 
 构建企业级 Retail Insight AI 平台，包含：

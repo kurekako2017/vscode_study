@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-07 API Walkthrough Repair
+
+- 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 被截断的问题，恢复 `01~23` 全部接口章节和补充接口章节。
+- 保持原有接口顺序、Swagger 操作、输入输出、后台日志和程序调用流程不变。
+- 将错位的“源码学习说明”按接口归位，避免 Health 混入 Task、Document、Approval、Security、Audit 相关源码。
+- 每个接口只保留一套源码学习说明，并限制为说明当前接口 `对应源码` 中的文件。
+- Documentation Only：未修改 backend、frontend、tests、scripts、API 行为或业务逻辑。
+
 ## 2026-07-06 Learning Trace Phase 4
 
 - Learning Trace 升级为源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示。

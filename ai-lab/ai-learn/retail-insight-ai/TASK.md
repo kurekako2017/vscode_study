@@ -2,6 +2,14 @@
 
 最后更新：2026-07-07
 
+## 2026-07-07 API Walkthrough Repair
+
+- [x] 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 的接口章节截断与错位问题
+- [x] 恢复 `01~23` 接口章节与补充接口章节，保持原学习路线不变
+- [x] 将“源码学习说明”拆回各自接口下，避免跨章节混放源码说明
+- [x] 保持 Swagger 操作、输入输出、后台日志、程序调用流程原结构不变
+- [x] 本次仅修正文档，不修改 backend、frontend、tests、scripts 或 API 行为
+
 ## 当前阶段
 
 Documentation Organization + AI Agent Guide 中文化 Sprint
