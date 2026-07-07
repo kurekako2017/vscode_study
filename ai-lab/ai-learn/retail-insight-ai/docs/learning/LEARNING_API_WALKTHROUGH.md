@@ -572,6 +572,135 @@ backend/app/schemas/health.py —— 了解返回数据模型（Response Schema�
 
 最后再学习 tasks.py、services、repositories 等更复杂的业务流程。
 
+## 源码学习说明
+
+### backend/app/main.py（项目启动入口）
+
+**它是什么？**
+
+这个文件是整个 FastAPI 应用的启动入口，负责创建 FastAPI 实例，配置应用所需的各种设置，包括中间件、路由和依赖注入容器。
+
+---
+
+**主要负责什么？**
+
+- 初始化 FastAPI 应用。
+- 注册全局中间件，例如日志和错误处理。
+- 导入并注册所有 API 路由。
+- 设置应用的全局配置，如事件处理器。
+- 配置依赖注入容器，管理 Service 和 Repository 实例。
+
+---
+
+**在调用链中的位置**
+
+uvicorn (Web 服务器)
+↓
+`backend/app/main.py` (FastAPI 应用实例)
+↓
+Router (路由分发)
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `app = FastAPI()`: 理解 FastAPI 应用的创建。
+- `app.include_router(...)`: 理解路由是如何被注册到应用中的。
+- `app.add_middleware(...)`: 了解中间件的作用和注册方式。
+- `container = Container()`: 理解依赖注入容器的初始化和作用。
+
+---
+
+**建议下一步阅读**
+
+继续阅读：
+`backend/app/api/health.py`
+理解第一个路由的定义。
+
+### backend/app/api/health.py（Router（接口入口））
+
+**它是什么？**
+
+这个文件定义了 `/health` 接口的路由，它是处理健康检查请求的入口点，负责接收来自客户端的健康检查请求并返回应用状态。
+
+---
+
+**主要负责什么？**
+
+- 定义 `GET /health` HTTP 端点。
+- 接收健康检查的 HTTP 请求。
+- 使用 `HealthResponse` 模型构建响应。
+- 返回 HTTP 响应给客户端。
+
+---
+
+**在调用链中的位置**
+
+浏览器 / Swagger UI
+↓
+`backend/app/main.py` (FastAPI 应用实例)
+↓
+`backend/app/api/health.py` (健康检查路由)
+↓
+`backend/app/schemas/health.py` (响应模型)
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `@router.get("/health", response_model=HealthResponse)`: 理解 FastAPI 路由的定义方式，包括 HTTP 方法、路径和响应模型。
+- `async def health(...)`: 理解异步函数定义和依赖注入如何工作。
+
+---
+
+**建议下一步阅读**
+
+继续阅读：
+`backend/app/schemas/health.py`
+理解接口返回数据的结构。
+
+### backend/app/schemas/health.py（Schema（数据模型））
+
+**它是什么？**
+
+这个文件定义了 `/health` 接口返回数据的结构（Schema），确保响应数据符合预期的格式。它是用 Pydantic 定义的数据模型。
+
+---
+
+**主要负责什么？**
+
+- 定义 `HealthResponse` 数据模型。
+- 明确响应中包含的字段及其数据类型。
+- 为 FastAPI 提供自动生成 OpenAPI 文档的基础。
+- 在数据返回前进行数据验证和序列化。
+
+---
+
+**在调用链中的位置**
+
+`backend/app/api/health.py` (健康检查路由)
+↓
+`backend/app/schemas/health.py` (响应模型构建)
+↓
+HTTP Response
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `class HealthResponse(...)`: 理解 Pydantic 模型的基本定义。
+- `status: str = "ok"`: 学习如何定义字段及默认值。
+
+---
+
+**建议下一步阅读**
+
+回到 `backend/app/main.py`
+理解 `include_router()` 如何将 API 路由集成到主应用。
+
 ## 02. POST /api/tasks
 
 | 项目                 | 内容                                                                                                                                              |
@@ -683,6 +812,142 @@ Repository
 ↓
 HTTP Response
 ```
+
+## 源码学习说明
+
+### backend/app/api/tasks.py（Router - 任务接口）
+
+**它是什么？**
+
+这个文件定义了 `/api/tasks` 相关接口的路由，负责接收创建、查询和事件订阅等任务相关的 HTTP 请求，并将其转发给 `TaskService` 处理。
+
+---
+
+**主要负责什么？**
+
+- 定义 `POST /api/tasks` 用于创建新任务。
+- 定义 `GET /api/tasks/{task_id}` 用于查询任务状态。
+- 定义 `GET /api/tasks/{task_id}/events` 用于订阅任务事件（SSE）。
+- 接收 HTTP 请求中的任务参数。
+- 调用 `TaskService` 执行具体的业务逻辑。
+
+---
+
+**在调用链中的位置**
+
+浏览器 / Swagger UI
+↓
+`backend/app/main.py` (FastAPI 应用实例)
+↓
+`backend/app/api/tasks.py` (任务接口路由)
+↓
+`backend/app/services/task_service.py` (业务调度)
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `@router.post("/tasks", response_model=TaskCreateResponse, status_code=202)`: 理解创建任务的路由定义，包括响应模型和 HTTP 状态码。
+- `async def create_task(...)`: 了解如何处理请求体（request body）和依赖注入。
+- `async def get_task_events(...)`: 理解 SSE 端点的实现。
+
+---
+
+**建议下一步阅读**
+
+继续阅读：
+`backend/app/services/task_service.py`
+理解任务的核心业务逻辑。
+
+### backend/app/services/task_service.py（Service - 任务业务调度中心）
+
+**它是什么？**
+
+这个文件是任务的业务调度中心，负责处理任务的创建、状态查询和报告获取等核心业务逻辑，协调不同组件完成任务的整个生命周期。
+
+---
+
+**主要负责什么？**
+
+- 根据输入参数创建新任务。
+- 保存任务状态到 `Repository`。
+- 启动任务的工作流（`Workflow`）。
+- 从 `Repository` 查询任务的最新状态。
+- 从 `Repository` 获取任务生成的报告。
+- 发布任务事件。
+
+---
+
+**在调用链中的位置**
+
+`backend/app/api/tasks.py` (任务接口路由)
+↓
+`backend/app/services/task_service.py` (任务业务调度中心)
+↓
+`backend/app/repositories/implementations/in_memory/task_repository.py` (任务数据存储)
+↓
+`backend/app/workflow/graph.py` (任务流程编排)
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `create_task(...)`: 理解任务创建的完整流程，包括保存任务和启动工作流。
+- `get_task(...)`: 了解如何从存储中获取任务状态。
+- `get_report(...)`: 学习如何获取任务报告。
+
+---
+
+**建议下一步阅读**
+
+继续阅读：
+`backend/app/repositories/implementations/in_memory/task_repository.py`
+理解任务数据是如何存储和读取的。
+
+### backend/app/repositories/implementations/in_memory/task_repository.py（Repository - 内存任务数据存储）
+
+**它是什么？**
+
+这个文件是任务数据的内存实现存储库，负责在应用运行时管理任务对象的生命周期，提供任务的创建、读取、更新等数据操作。
+
+---
+
+**主要负责什么？**
+
+- 在内存中保存任务对象。
+- 提供 `create` 方法来存储新的任务。
+- 提供 `get` 方法通过 ID 获取任务。
+- 提供 `update` 方法来修改任务状态。
+- 提供 `list_all` 方法来获取所有任务列表。
+
+---
+
+**在调用链中的位置**
+
+`backend/app/services/task_service.py` (任务业务调度中心)
+↓
+`backend/app/repositories/implementations/in_memory/task_repository.py` (内存任务数据存储)
+↓
+内存数据结构
+
+---
+
+**初学者阅读重点**
+
+重点阅读：
+- `create(...)`: 理解任务对象的内存保存方式。
+- `get(...)`: 了解如何根据 ID 查找任务。
+- `update(...)`: 学习任务状态的更新逻辑。
+
+---
+
+**建议下一步阅读**
+
+继续阅读：
+`backend/app/workflow/graph.py` 或 `backend/app/kpi/workflow.py`
+理解任务创建后是如何被工作流推进的。
 
 ## 03. GET /api/tasks/
 

@@ -1,6 +1,6 @@
 # retail-insight-ai Roadmap
 
-最后更新：2026-07-05
+最后更新：2026-07-07
 
 ## 当前阶段
 
@@ -626,6 +626,109 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 - [ ] Retrieval evaluation
 - [ ] Handbook 文档已同步
 
+### Relationship Notes
+
+- Epic 12 作为横向检索平台总览，保留业务检索、社内文档检索、互联网检索与上下文组装的宽口径视图。
+- 语义检索、向量数据库、LangChain 编排与 Embedding 细节下沉到 Epic 13 统一规划，避免重复拆成多个平行任务池。
+
+## Epic 13: Semantic RAG / Vector Retrieval Upgrade
+
+### Current State
+
+- 当前 Document Upload / Import / Chunk 已有基础能力。
+- 当前检索以 Keyword Retrieval 为主，仍然依赖词面匹配与已有 chunk 结果排序。
+- 当前 Repository 默认 InMemory。
+- 当前没有真正 Embedding。
+- 当前没有真正 Vector Database。
+- 当前没有 LangChain RAG 编排。
+
+### Target State
+
+- 支持 Embedding。
+- 支持 Vector Database。
+- 支持 Hybrid Search（Keyword + Vector）。
+- 支持 LangChain Retriever / Chain 编排。
+- 支持 Rerank。
+- 支持 Citation。
+- 支持 Retrieval Evaluation。
+- 支持 PostgreSQL + pgvector 企业化演进。
+
+### Planned Tasks
+
+- [ ] 设计 Embedding Provider 接口
+  - [ ] OpenAI Embedding
+  - [ ] Gemini Embedding
+  - [ ] BGE / 本地 Embedding
+  - [ ] Provider fallback
+  - [ ] 配置项通过 `.env` 控制
+- [ ] 设计 Vector Store 接口
+  - [ ] pgvector 优先
+  - [ ] Qdrant / Milvus 作为未来扩展
+  - [ ] 业务代码不直接绑定具体向量库
+- [ ] 引入 LangChain
+  - [ ] 仅用于 RAG 编排
+  - [ ] 不替代 LangGraph
+  - [ ] 定义 LangChain 与 TaskService / LangGraph 的边界
+  - [ ] 定义 Retriever、Prompt、Context Builder 的职责
+- [ ] Document Chunk Metadata 升级
+  - [ ] `document_id`
+  - [ ] `chunk_id`
+  - [ ] `version`
+  - [ ] `section`
+  - [ ] `language`
+  - [ ] `document_type`
+  - [ ] `owner`
+  - [ ] `tags`
+  - [ ] `created_at`
+  - [ ] `checksum`
+  - [ ] `acl_scope`
+- [ ] Embedding Pipeline
+  - [ ] chunk -> embedding
+  - [ ] embedding cache
+  - [ ] re-embedding policy
+  - [ ] document update 后重建 embedding
+  - [ ] archived document 的向量处理策略
+- [ ] Hybrid Retrieval
+  - [ ] Keyword Search
+  - [ ] Vector Search
+  - [ ] Metadata Filter
+  - [ ] ACL Filter
+  - [ ] Score Merge
+  - [ ] Top-K
+- [ ] Rerank
+  - [ ] Cross Encoder / LLM rerank 作为未来目标
+  - [ ] 当前先设计接口和测试边界
+- [ ] Citation / Source Trace
+  - [ ] answer 必须引用 `document_id` / `chunk_id` / `version`
+  - [ ] 报告中保留 source trace
+  - [ ] 与 Audit Log 未来集成
+- [ ] Retrieval Evaluation
+  - [ ] `recall@k`
+  - [ ] `MRR`
+  - [ ] groundedness
+  - [ ] citation accuracy
+  - [ ] no-result rate
+  - [ ] latency
+- [ ] Tests
+  - [ ] unit test
+  - [ ] retrieval test
+  - [ ] embedding mock test
+  - [ ] vector store contract test
+  - [ ] LangChain integration boundary test
+- [ ] Documentation
+  - [ ] 更新 `09_系统设计书.md`
+  - [ ] 更新 `08_架构图册.md`
+  - [ ] 更新 `LEARNING_API_WALKTHROUGH.md`
+  - [ ] 更新 `DATABASE.md`，如涉及 pgvector schema
+  - [ ] 更新 `README.md` 的能力矩阵，标记为 Planned
+
+### Design Notes
+
+- Keyword Retrieval 偏向词面匹配与既有 chunk 命中，适合当前本地学习版和快速回归；Semantic Retrieval 通过 embedding 捕获语义相似、同义表达和改写问题。
+- LangChain 只作为 RAG 编排层，用来组织 Retriever、Prompt 和 Context Builder，不接管 Workflow 状态机。
+- LangGraph 继续负责 Workflow / State Machine，因为它更适合表达任务流转、重试、分支与状态持久化。
+- pgvector 是第一优先，因为它最贴近当前 PostgreSQL-first 演进路径，能把向量、元数据和业务事实放在同一套数据库治理中；后续再通过同一 Vector Store 接口扩展到 Qdrant / Milvus。
+
 ## Target Architecture
 
 ### Current State
@@ -757,10 +860,10 @@ Frontend
 
 - group: `governance`
 - file: `retail-insight-ai/ROADMAP.md`
-- self_sha256: `5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae`
+- self_sha256: `3c656b952e6f27c3769dfacedbb7f097aba52bf1e7af1977d6e11cbf0b90aa0a`
 - peers:
-- `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/TASK.md` | sha256=d5cedb3877a8682b35aac0736259b9359bc3cad610d405249b565f64c9b589f7 | # retail-insight-ai 当前任务 / 最后更新：2026-07-07 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=611bb721ffe36ce4c3c4c1be6b82709516c6a46118beda941a0e7cf442e394ed | # retail-insight-ai Project Backlog / 最后更新：2026-07-07 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
 - `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
