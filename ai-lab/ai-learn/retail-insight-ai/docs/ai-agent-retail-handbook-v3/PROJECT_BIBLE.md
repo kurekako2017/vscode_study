@@ -1,26 +1,26 @@
 # PROJECT_BIBLE
 
-本文件是 `ai-agent-retail-handbook-v3` 的唯一最高规则，也是 Retail Insight AI 的统一世界观。所有正文文档必须引用并遵守本文件。
+本文件是 `ai-agent-retail-handbook-v3` 的唯一最高规则，也是 `Enterprise Retail Intelligence Platform (ERIP)` 的统一世界观。所有正文文档必须引用并遵守本文件。
 
 # 项目名称
 
-Retail Insight AI
+Enterprise Retail Intelligence Platform (ERIP)
 
 # 日文名称
 
-小売業向け AI 経営分析システム
+Enterprise Retail Intelligence Platform（ERIP）/ 小売業向け AI 経営分析プラットフォーム
 
 # 项目世界观
 
-Retail Insight AI 是日本零售行业 AI 经营分析平台。系统围绕经营会议、销售分析、库存分析、商品分析、会员分析、市场调查和管理层报告构建。
+Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，并投入企业使用。系统围绕经营会议、销售分析、库存分析、商品分析、会员分析、市场调查和管理层报告构建。
 
-所有文档必须把 Retail Insight AI 作为同一个连续项目来讲，不按孤立知识点拆散，不按技术名词堆砌。
+所有文档必须把 Enterprise Retail Intelligence Platform（ERIP）作为同一个连续项目来讲，不按孤立知识点拆散，不按技术名词堆砌。
 
 # 项目定位
 
-Retail Insight AI 是日本零售行业 AI 经营分析平台。
+Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。
 
-系统重点是经营分析、KPI、Workflow、Research Agent、日文报告生成和管理层决策支持。
+系统重点是经营分析、KPI、LangGraph Workflow、Fixed KPI Workflow、Research Agent、Report Generator、日文报告生成和管理层决策支持。
 
 # 项目背景
 
@@ -59,7 +59,7 @@ Retail Insight AI 是日本零售行业 AI 经营分析平台。
 
 # 系统整体架构
 
-Retail Insight AI 由前端、后端、Workflow、Research Agent、数据层、报告生成和运用扩展组成。
+Enterprise Retail Intelligence Platform（ERIP）由前端、后端、LangGraph Workflow、Research Agent、数据层、Report Generator 和运用扩展组成。
 
 核心链路：
 
@@ -68,11 +68,13 @@ React
 ↓
 FastAPI
 ↓
+Task API
+↓
 TaskService
 ↓
 LangGraph Workflow
 ↓
-固定 KPI 分析 / Research Agent
+Fixed KPI Workflow / Research Agent
 ↓
 Streaming
 ↓
@@ -99,19 +101,27 @@ Streaming
 - FastAPI
 - Python
 - LangGraph
-- LangChain（Target, RAG Orchestration）
-- Workflow
+- LangChain（RAG Orchestration）
+- LangGraph Workflow
 - Streaming
 - SSE
 - Research Agent
 - RAG
+- Report Generator
 - Docker
 - SQLite
-- Keyword Retrieval（Current）
-- Hybrid Retrieval（Target）
-- Vector Database（Target, pgvector first）
+- PostgreSQL
+- Keyword Retrieval
+- Hybrid Retrieval
+- Vector Database（pgvector first）
+- RBAC
+- Audit Log
+- OpenTelemetry
+- Redis
+- RabbitMQ
+- Kubernetes
 
-详细的 Technology Stack、Current / Planned / Target 边界、Retrieval Pipeline 与 Deployment Topology，
+详细的 Technology Stack、Production Architecture、Runtime Architecture、Enterprise Deployment、Retrieval Pipeline 与 Deployment Topology，
 统一以 `09_系统设计书.md` Chapter `7.0 Technical Architecture`
 和 `08_架构图册.md` Figure `28~35`
 为唯一维护入口；本文件不重复维护第二套技术演进说明。
@@ -131,8 +141,8 @@ Streaming
 统一职责表达：
 
 ```text
-Retail Insight AI、小売業向け AI 経営分析システムの開発を担当しました。
-担当範囲は Backend、FastAPI、API Design、Workflow、Prompt、Streaming、Research、Architecture、Review です。
+私は Enterprise Retail Intelligence Platform（ERIP）V1.0 の開発を担当しました。
+担当範囲は Backend、FastAPI、Task API、TaskService、LangGraph Workflow、Research Agent、Report Generator、Streaming、Architecture、Review です。
 ```
 
 # 项目开发流程
@@ -152,19 +162,23 @@ Retail Insight AI、小売業向け AI 経営分析システムの開発を担�
 
 ## 已实现能力
 
-- FastAPI API
+- Task API
+- TaskService
 - LangGraph Workflow
 - Research Agent
-- 固定 KPI 分析
+- Fixed KPI Workflow
 - Streaming / SSE
-- Report 生成
+- Report Generator
 - SQLite
 - Docker
 - 基础 Architecture
 - Review 观点
 
-## 未来企业版追加能力
+## 企业运行能力
 
+- PostgreSQL
+- pgvector
+- Hybrid Retrieval
 - RBAC
 - SSO
 - Audit Log
@@ -186,19 +200,22 @@ Retail Insight AI、小売業向け AI 経営分析システムの開発を担�
 
 # 统一术语
 
-- Retail Insight AI
-- 小売業向け AI 経営分析システム
+- Enterprise Retail Intelligence Platform（ERIP）
+- Retail Insight AI（ERIP MVP / Current）
+- 小売業向け AI 経営分析プラットフォーム
 - Research Agent
-- Workflow
-- HTTP Boundary
-- Application Service
+- Task API
+- TaskService
+- LangGraph Workflow
+- Fixed KPI Workflow
+- Report Generator
 - Repository Pattern
 - LangGraph = Workflow Orchestration
 - LangChain = RAG Orchestration
-- Embedding（Planned）
-- Keyword Retrieval（Current）
-- Hybrid Retrieval（Target）
-- Vector Database（Target）
+- Embedding
+- Keyword Retrieval
+- Hybrid Retrieval
+- Vector Database
 - KPI
 - 经营分析
 - 销售分析
@@ -213,15 +230,15 @@ Retail Insight AI、小売業向け AI 経営分析システムの開発を担�
 # 统一项目介绍
 
 ```text
-Retail Insight AI は、日本の小売業向け AI 経営分析システムです。
-POS、在庫、商品、会員、売上、店舗、CSV、Excel、日報、月報を統合し、KPI 分析、Workflow、Research Agent、Streaming、レポート生成を通じて、経営判断を支援します。
+Retail Insight AI は、Enterprise Retail Intelligence Platform（ERIP）の Current MVP です。
+ERIP は、日本の小売業向け AI 経営分析プラットフォームであり、POS、在庫、商品、会員、売上、店舗、CSV、Excel、日報、月報を統合し、KPI 分析、LangGraph Workflow、Research Agent、Streaming、Report Generator を通じて、経営判断を支援します。
 ```
 
 # 统一自我介绍
 
 ```text
-私は Retail Insight AI、小売業向け AI 経営分析システムの開発を担当しました。
-主に Backend、FastAPI、API Design、LangGraph Workflow、Research Agent、Streaming、Report 生成、Docker、Architecture Review を担当しました。
+私は Enterprise Retail Intelligence Platform（ERIP）の Current MVP である Retail Insight AI の開発を担当しました。
+主に Backend、FastAPI、Task API、TaskService、LangGraph Workflow、Research Agent、Report Generator、Streaming、Docker、Architecture Review を担当しました。
 ```
 
 # 统一项目说明

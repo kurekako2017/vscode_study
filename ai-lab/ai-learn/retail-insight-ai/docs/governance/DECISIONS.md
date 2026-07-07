@@ -118,8 +118,42 @@
   `import_errors`
   `reports.approval_status`
   `report_versions`
-  `approval_requests`
-  `approval_events`
+
+## ADR-006A
+
+日期：2026-07-08
+
+决策：统一采用 `Enterprise Retail Intelligence Platform (ERIP)` 作为最终企业平台名称，并把 `Retail Insight AI` 固定为 ERIP 的 Current MVP / PoC / Early Prototype。
+
+原因：多个主文档、handbook 文档和面试稿同时维护时，如果不固定“当前 MVP”和“目标平台”的关系，就会出现把未来能力写成现状、把 ERIP 误解成另一个项目、以及把 `Retail Insight AI` 误解成最终产品名称的问题。
+
+备选方案：继续允许文档按上下文混用 `Retail Insight AI`、`ERIP`、企业平台、经营分析系统等说法；该方案会持续制造架构、Roadmap、ADR、Interview Answer 和 Mermaid 图之间的口径冲突。
+
+影响：
+
+- `Retail Insight AI` 只允许表示 Current MVP / PoC / Early Prototype。
+- `Enterprise Retail Intelligence Platform (ERIP)` 只允许表示 Target 企业平台。
+- 所有未来能力必须使用 `Current`、`Target`、`Planned` 或 ADR 中的 `Planned` 明确标记。
+- 核心术语统一为：
+  `Task API`
+  `TaskService`
+  `LangGraph Workflow`
+  `Fixed KPI Workflow`
+  `Research Agent`
+  `Report Generator`
+  `Repository Pattern`
+- 平台演进术语统一为：
+  `SQLite(Current)`
+  `Docker(Current)`
+  `PostgreSQL(Target)`
+  `pgvector(Target)`
+  `Hybrid Retrieval(Target)`
+  `RBAC(Target)`
+  `Audit Log(Target)`
+  `OpenTelemetry(Target)`
+  `Redis(Target)`
+  `RabbitMQ(Target)`
+  `Kubernetes(Target)`
 
 ## ADR-007
 

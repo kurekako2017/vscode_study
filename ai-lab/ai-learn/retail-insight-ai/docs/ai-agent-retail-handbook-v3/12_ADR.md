@@ -29,6 +29,12 @@
 
 ADR 状态说明：Accepted 表示当前架构决策；Planned 表示企业化目标，只有完成对应验收条件后才转为 Accepted。
 
+世界观说明：
+- `Retail Insight AI` = `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP / PoC / Early Prototype
+- `ERIP` = Target 企业平台
+- 本文中的 `Accepted` 默认表示“Current MVP 已接受的架构决策”
+- 本文中的 `Planned` 默认表示“ERIP Target 阶段的目标架构决策”
+
 ## ADR-001 使用 Task API
 
 **状态：Accepted**
@@ -185,11 +191,11 @@ SSE 连接中断不能取消任务；done 只表示成功，error 表示失败�
 
 **Context**
 
-SQLite / CSV 适合当前数据模型确认，但不满足多用户并发、备份、权限和多实例一致性。
+SQLite（Current）/ CSV 适合当前数据模型确认，但不满足多用户并发、备份、权限和多实例一致性。
 
 **Decision**
 
-企业运用以 PostgreSQL 保存业务数据、任务、报告和审计事实。
+ERIP 企业运用以 PostgreSQL（Target）保存业务数据、任务、报告和审计事实。
 
 **Alternative**
 
@@ -214,7 +220,7 @@ SQLite / CSV 适合当前数据模型确认，但不满足多用户并发、备�
 
 **Decision**
 
-Redis 保存热状态、SSE 事件、短期缓存和必要的分布式协调；PostgreSQL 保存事实。
+Redis（Target）保存热状态、SSE 事件、短期缓存和必要的分布式协调；PostgreSQL（Target）保存事实。
 
 **Alternative**
 
@@ -239,7 +245,7 @@ Redis 故障时状态 API 回退 PostgreSQL；任何不能重建的关键数据�
 
 **Decision**
 
-TaskService 投递任务到 RabbitMQ，KPI、Research、Report 使用独立 Worker Pool。
+TaskService 投递任务到 RabbitMQ（Target），Fixed KPI Workflow、Research Agent、Report Generator 使用独立 Worker Pool。
 
 **Alternative**
 
@@ -264,7 +270,7 @@ TaskService 投递任务到 RabbitMQ，KPI、Research、Report 使用独立 Work
 
 **Decision**
 
-使用 OpenTelemetry 统一 Trace、Metrics、Logs 关联，trace context 与 task_id 一起跨异步边界传递。
+使用 OpenTelemetry（Target）统一 Trace、Metrics、Logs 关联，trace context 与 task_id 一起跨异步边界传递。
 
 **Alternative**
 
@@ -339,7 +345,7 @@ Audit Log 与应用日志分离，独立管理字段、访问权限、保留期�
 
 **Decision**
 
-使用 Docker 构建 Backend 与 Frontend 运行环境，配置和 Secret 外部化。
+使用 Docker（Current）构建 Backend 与 Frontend 运行环境，配置和 Secret 外部化。
 
 **Alternative**
 
@@ -364,7 +370,7 @@ API、SSE、KPI、Research 和 Report 的扩展特性不同，但过早使用 Ku
 
 **Decision**
 
-在独立扩展、多环境治理和发布需求经容量证据确认后，使用 Kubernetes 或客户标准容器平台。
+在独立扩展、多环境治理和发布需求经容量证据确认后，使用 Kubernetes（Target）或客户标准容器平台。
 
 **Alternative**
 

@@ -1,60 +1,84 @@
-# Retail Insight AI 日本 Agent 面试攻略 V1.0
+# Enterprise Retail Intelligence Platform（ERIP） 日本 Agent 面试攻略 V1.0
 ## Volume 01 - 项目介绍与系统架构（中日双语版）
 
-> 适用对象：日本 AI Agent / Python Backend / LLM Application / RAG 工程师岗位  
-> 用法：先读中文理解，再背日文回答。面试时优先使用日文回答，中文只作为自己的理解辅助。
+> **项目定位（统一版）**
+>
+> **案件名：大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト**
+>
+> 本资料与《技術履歴書》保持一致，以**大型流通集团内部AI经营分析平台项目**为背景，而非行业 Package。
 
 ---
 
 # 1. 面试开场 / 面接冒頭
 
-## 1.1 60秒自我介绍（日文）
+## 60秒（日文）
 
-皆さま、はじめまして。  
-私はバックエンド開発を中心に、API 設計、業務ロジック、ワークフロー設計、データ連携を担当してきました。
+皆さま、はじめまして。
 
-最近の AI 関連プロジェクトでは、**Enterprise Retail Intelligence Platform（ERIP）** という小売業向け AI 経営分析システムに取り組みました。  
-このシステムでは、POS、在庫、商品、会員、販促などのデータをもとに KPI を分析し、市場・競合情報の調査結果と合わせて、日本語の経営分析レポートを生成します。
+最近担当したプロジェクトは、**大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト**です。
 
-私は主に、FastAPI による API 設計、TaskService、LangGraph Workflow、Research Agent、SSE による進捗通知、Report Generator、そして LangChain / RAG / Vector Database の構成設計を担当しました。
+本プロジェクトは、全国展開する大手流通グループの経営分析基盤を刷新するための社内AIプラットフォーム構築案件です。
 
-## 1.2 中文理解
+POS、商品、在庫、会員、販促、市場・競合情報を統合し、AI Agent を活用して経営分析レポートを自動生成します。
 
-这段用于 AI Agent 案件的开场。重点不是说“我做了 AI”，而是说：
-
-- 我是后端开发
-- 最近做的是 Enterprise Retail Intelligence Platform（ERIP）
-- 这是日本零售经营分析系统
-- 我负责 API、TaskService、LangGraph、Research Agent、SSE、Report Generator
-- LangChain / RAG / Vector Database 已纳入企业运行架构
+私は FastAPI、TaskService、LangGraph Workflow、Research Agent、SSE、Report Generator、および LangChain・RAG・pgvector アーキテクチャ設計を担当しました。
 
 ---
 
 # 2. 项目概要 / プロジェクト概要
 
-## 2.1 面试官问题（日文）
+## 日文
 
-Enterprise Retail Intelligence Platform（ERIP）の概要を説明してください。
+Enterprise Retail Intelligence Platform（ERIP）は、
 
-## 2.2 回答（日文）
+**大手流通グループの経営分析業務を支援するエンタープライズAIプラットフォーム**です。
 
-Enterprise Retail Intelligence Platform（ERIP）は、日本の小売業向け AI 経営分析システムです。  
-小売業では、経営会議の前に POS、在庫、商品、会員、販促など複数のデータを確認し、市場や競合の情報も合わせて分析する必要があります。
+店舗・商品・在庫・POS・会員・販促・市場・競合情報を統合し、AI Agent により経営分析レポートを生成します。
 
-このプロジェクトでは、利用者が分析タスクを作成すると、TaskService がタスクの状態を管理し、LangGraph Workflow が KPI 分析、Research、Report Generator の処理を制御します。  
-進捗は SSE で画面へ通知し、最終的に経営判断に使える日本語レポートを生成します。
+システム全体は FastAPI、TaskService、LangGraph を中心に設計し、LangChain、Hybrid Retrieval、pgvector を採用した企業向けアーキテクチャを採用しています。
 
-Keyword Retrieval を中心とした構成に加えて、LangChain、Embedding、pgvector を使った Hybrid Retrieval を採用しています。
+## 中文理解
 
-## 2.3 中文理解
+本项目不是行业产品（Package），而是**大型流通集团内部AI经营分析平台**。
 
-这是项目概要的标准回答。回答顺序：
+介绍项目时统一使用：
 
-1. 日本零售业务背景
-2. 系统要解决的问题
-3. TaskService + LangGraph 的执行流程
-4. SSE 进度通知
-5. LangChain / Embedding / pgvector 企业运行架构
+- 大手流通グループ向け
+- Enterprise Retail Intelligence Platform（ERIP）
+- AI経営分析基盤構築プロジェクト
+
+不要再使用：
+
+- Retail Insight AI
+- 小売業向けAIシステム
+- Package
+
+---
+
+# 3. 履历书统一口径
+
+案件名：
+
+> 大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト
+
+プロジェクト概要：
+
+全国展開する大手流通グループの社内AI経営分析基盤を構築するプロジェクト。POS・商品・在庫・会員・販促・市場・競合情報を統合し、AI Agent を活用した経営分析レポート生成基盤を構築する。
+
+担当：
+
+- FastAPI
+- TaskService
+- LangGraph Workflow
+- Research Agent
+- Repository Pattern
+- SSE
+- Report Generator
+- LangChain / RAG Architecture Design
+
+---
+
+> 本文档后续章节（FastAPI、LangGraph、LangChain、RAG、pgvector 等）保持原版内容，仅统一项目名称与项目背景即可。
 
 ---
 
@@ -188,7 +212,7 @@ TaskService 是业务用例层，不是“大杂烩 Service”。
 ## 6.2 回答（日文）
 
 LangGraph を使った理由は、AI Workflow の状態管理と条件分岐を明確にするためです。  
-Retail Insight AI では、KPI 分析、Research、Report Generator など複数の処理があり、入力内容によって実行経路が変わります。
+Enterprise Retail Intelligence Platform（ERIP） では、KPI 分析、Research、Report Generator など複数の処理があり、入力内容によって実行経路が変わります。
 
 LangGraph を使うことで、State、Node、Edge を明示でき、どの処理で失敗したか、どこから再実行できるかを把握しやすくなります。  
 単純な一方向の Chain ではなく、状態を持つ業務 Workflow として管理したかったため、LangGraph を採用しました。
@@ -251,7 +275,7 @@ RAG はどこで使いますか。
 ## 8.2 回答（日文）
 
 RAG は、Research Agent が社内の商品資料、月次報告、会議資料などを検索し、回答やレポート生成の根拠を補う部分で使います。  
-Keyword Retrieval を中心にしつつ、文書を Chunk に分割し、Embedding を作成して、pgvector に保存する構成を採用しています。
+Keyword Retrieval を基盤にしつつ、文書を Chunk に分割し、Embedding を作成して、pgvector に保存する構成を採用しています。
 
 検索時には、Keyword Retrieval と Vector Retrieval を組み合わせた Hybrid Retrieval を行い、必要に応じて Rerank し、最終的に Citation 付きの Context を Report Generator に渡します。
 
@@ -291,7 +315,7 @@ pgvector を第一候補にした理由は、PostgreSQL と同じ基盤でベク
 企業システムでは、データベース、バックアップ、権限、監視、運用手順をできるだけ統一した方が保守しやすくなります。
 
 もちろん、大規模なベクトル検索や専用の検索基盤が必要になった場合は、Qdrant や Milvus も選択肢になります。  
-ただし、Retail Insight AI の第一段階では PostgreSQL + pgvector の方が導入コストと運用コストのバランスが良いと考えています。
+ただし、Enterprise Retail Intelligence Platform（ERIP） の第一段階では PostgreSQL + pgvector の方が導入コストと運用コストのバランスが良いと考えています。
 
 ## 9.3 中文理解
 
@@ -373,7 +397,7 @@ LangChain は Retriever、Prompt、Context Builder、Tool Calling など、RAG �
 
 ## 12.1 项目 1 分钟（日文）
 
-Enterprise Retail Intelligence Platform（ERIP）は、日本の小売業向け AI 経営分析システムです。  
+Enterprise Retail Intelligence Platform（ERIP） は、日本の大手小売企業向け AI 経営分析システムです。  
 POS、在庫、商品、会員、販促データと市場・競合調査を組み合わせ、経営判断に使える日本語レポートを生成します。
 
 私はバックエンドを中心に、FastAPI、TaskService、LangGraph Workflow、Research Agent、SSE、Report Generator を担当しました。  

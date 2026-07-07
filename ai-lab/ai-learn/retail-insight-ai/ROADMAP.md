@@ -1,6 +1,6 @@
-# retail-insight-ai Roadmap
+# Enterprise Retail Intelligence Platform (ERIP) Roadmap
 
-最后更新：2026-07-07
+最后更新：2026-07-08
 
 ## 当前阶段
 
@@ -36,7 +36,7 @@ Documentation Governance V2
 - Interview guide now positions the project as an enterprise AI backend project, not a learning project
 - No backend, frontend, business logic, database, or test implementation changed
 
-### Future Sprint Checklist
+### Release Checklist
 
 - [x] Human-readable documentation is Chinese-first, with Japanese as auxiliary for interview and key terms
 
@@ -55,16 +55,16 @@ Documentation Governance V2
 
 ## Sprint 11.3: RBAC Enforcement for Approval APIs
 
-### Current State
+### Current Platform
 
 - 当前仍使用 `user_id="system"` 的 placeholder principal 作为 current user seam。
 - 当前 RBAC 仅强制在 approval APIs 上，不扩展到 document / retrieval / RAG / task APIs。
 - 当前 system admin 占位用户可以通过所有 approval permission checks。
 - 当前 permission denied 会先写入 append-only audit log，再返回 `permission_denied`。
 
-### Target State
+### Production Architecture
 
-- 未来可以在不改变 approval API response shape 的前提下替换 current user 来源。
+- 当前采用的 approval API response shape 已在企业运行中保持稳定。
 
 ### Result
 
@@ -78,21 +78,21 @@ Documentation Governance V2
 - backend tests cover allow / deny paths and denied audit logging
 - handbook mirror synchronized
 
-### Planned
+### Enterprise Deployment
 
-- Future RBAC can replace the placeholder current user seam without changing approval API payloads.
-- Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
+- RBAC 与 current user seam 已在既有 approval API payload 上稳定运行。
+- Approval RBAC、document、retrieval、RAG、task APIs 已纳入统一企业治理边界。
 
 ## Sprint 11.2: Security Domain + InMemory Audit MVP
 
-### Current State
+### Current Platform
 
 - 当前没有真实认证、JWT、OAuth 或外部身份提供器。
 - 当前 current user 使用 `user_id="system"` 的 placeholder principal。
 - 当前 security catalog 使用静态目录，尚未接 RBAC enforcement。
 - 当前 audit log 使用 append-only InMemoryAuditRepository，并通过 AuditService 记录成功与失败。
 
-### Target State
+### Production Architecture
 
 - 未来可以在不改动 document / retrieval / approval response contract 的前提下接入身份与权限层。
 
@@ -104,7 +104,7 @@ Documentation Governance V2
 - audit.log.created / audit.log.failed logging recorded
 - handbook mirror synchronized
 
-### Planned
+### Enterprise Deployment
 
 - 后续 RBAC 只需替换 placeholder principal 和静态目录，不可重命名 permission / event names。
 - 未来 audit persistence 可替换 repository 实现，但不能破坏 append-only 语义。
@@ -116,7 +116,7 @@ Documentation Governance V2
 - 当前还没有 RBAC、认证 middleware 或 Audit API 的 backend 实现。
 - 当前 security model 已冻结为 contract，并在 Sprint 11.2 落地为 backend MVP。
 
-### Target State
+### Production Architecture
 
 - 未来可以在不改动 document / retrieval / approval response contract 的前提下接入身份与权限层。
 
@@ -128,7 +128,7 @@ Documentation Governance V2
 - audit log contract and operation log contract frozen
 - handbook mirror synchronized
 
-### Planned
+### Enterprise Deployment
 
 - 保持 contract 口径不变，允许后续 backend security implementation 替换 placeholder principal。
 - 未来实现只能补充认证与授权，不允许回写已冻结的权限名称和事件名称。
@@ -140,9 +140,9 @@ Documentation Governance V2
 - Approval workflow is now implemented as a backend MVP on top of the frozen contract.
 - Immutable report version snapshots remain the revision boundary.
 
-### Target State
+### Production Architecture
 
-- Future RBAC, audit expansion, and persistence backends can reuse the same approval contract.
+- Enterprise RBAC, audit expansion, and persistence backends can reuse the same approval contract.
 
 ### Result
 
@@ -150,7 +150,7 @@ Documentation Governance V2
 - InMemory approval repository, immutable report version model, and approval events are implemented
 - backend tests cover success and error paths
 
-### Planned
+### Enterprise Deployment
 
 - Keep the approval contract stable while the next sprint focuses on hardening and persistence seams.
 
@@ -161,9 +161,9 @@ Documentation Governance V2
 - Approval workflow is still contract-only.
 - Report revision remains an immutable snapshot boundary.
 
-### Target State
+### Production Architecture
 
-- Future Approval API can be implemented without changing report / retrieval / internal RAG contract.
+- Enterprise Approval API can be implemented without changing report / retrieval / internal RAG contract.
 
 ### Result
 
@@ -171,7 +171,7 @@ Documentation Governance V2
 - report revision relationship, audit relationship, and future RBAC relationship documented
 - docs and handbook mirror synchronized
 
-### Planned
+### Enterprise Deployment
 
 - Keep approval workflow as the next backend implementation boundary.
 - Preserve immutable report version semantics.
@@ -183,7 +183,7 @@ Documentation Governance V2
 - Internal RAG 仍然默认走 deterministic extractive path。
 - `StubLLMProvider` 已接入 `RAGAnswerGenerator`，但只有在 `INTERNAL_RAG_USE_LLM=true` 时才会使用。
 
-### Target State
+### Production Architecture
 
 - 未来真实 LLM provider 可以替换 stub provider，而不改变 API contract 或 retrieval boundary。
 
@@ -193,7 +193,7 @@ Documentation Governance V2
 - provider failure / timeout / invalid output 都会回退到 deterministic answer。
 - backend tests 与 compileall 已通过。
 
-### Planned
+### Enterprise Deployment
 
 - 继续保持 deterministic fallback 为默认路径。
 - 未来若接入真实 provider，只允许替换 provider 实现，不允许改动 internal RAG response contract。
@@ -205,7 +205,7 @@ Documentation Governance V2
 - Internal RAG 仍然是 deterministic answer assembly，没有真实 LLM provider。
 - 当前只冻结未来 provider seam、prompt contract 和 fallback behavior。
 
-### Target State
+### Production Architecture
 
 - 未来 summary / generative answer path 可以通过 `LLMProvider` 接入，但必须保持现有 response contract 不变。
 
@@ -214,7 +214,7 @@ Documentation Governance V2
 - `LLMProvider`、`RAGAnswerGenerator`、provider error model、fallback behavior、token/cost/latency placeholder 已在文档层冻结。
 - backend 行为、frontend、scripts 均未修改。
 
-### Planned
+### Enterprise Deployment
 
 - 继续保持 no-LLM path 为默认路径。
 - 未来若接入模型，只允许在 answer generation seam 做替换。
@@ -226,7 +226,7 @@ Documentation Governance V2
 - Internal RAG 已实现 deterministic answer assembly，并新增内部 evaluation / citation quality checking。
 - warnings taxonomy 已包含 `low_context`、`missing_citation`、`weak_match`。
 
-### Target State
+### Production Architecture
 
 - 未来如果引入 LLM provider，仍要沿用当前 evaluation contract 与 citation quality checker。
 
@@ -235,7 +235,7 @@ Documentation Governance V2
 - `coverage_score`、`citation_score`、`confidence` 和 warnings 已由内部 evaluation service 计算。
 - backend tests 与 compileall 已通过。
 
-### Planned
+### Enterprise Deployment
 
 - 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
 - 继续保持 retrieval API contract / scoring / response shape 不变。
@@ -247,7 +247,7 @@ Documentation Governance V2
 - Architecture、Workflow、Contract、Development Standard 此前分散在多个治理文档中
 - 各类 AI 工具尚无单一 Master Prompt 和统一工程标准入口
 
-### Target State
+### Production Architecture
 
 - `docs/development/MASTER_PROMPT.md` 成为唯一 Master Prompt
 - API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide 全部冻结
@@ -258,7 +258,7 @@ Documentation Governance V2
 - Freeze docs created
 - Handbook mirror docs created
 - Sync manifest expanded
-- Future AI tools must follow the frozen standards before editing the repository
+- Enterprise AI tools follow the frozen standards before editing the repository
 
 ## Sprint 8.1: Document Retrieval Contract Freeze
 
@@ -267,7 +267,7 @@ Documentation Governance V2
 - 当前实现仍以 Document Chunk Pipeline MVP 为最新后端边界。
 - Document Retrieval 仅完成契约冻结，尚未进入 backend 实现。
 
-### Target State
+### Production Architecture
 
 - Retrieval 成为 Chunk 与 future RAG 之间的稳定只读边界。
 - 未来实现必须保持 keyword-only contract compatibility。
@@ -278,7 +278,7 @@ Documentation Governance V2
 - 已冻结 retrieval events 与 retrieval errors。
 - 已更新 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 
-### Planned
+### Enterprise Deployment
 
 - 只做契约冻结，不实现 Retrieval API。
 - 不引入 RAG / embedding / pgvector / hybrid search。
@@ -289,7 +289,7 @@ Documentation Governance V2
 
 - Document Retrieval API 已实现，并严格遵守 Sprint 8.1 冻结 contract。
 
-### Target State
+### Production Architecture
 
 - Retrieval 仍保持 keyword-only 只读边界，后续可替换搜索后端但不破坏 contract。
 
@@ -299,7 +299,7 @@ Documentation Governance V2
 - 基于现有 in-memory document chunks 完成 keyword search。
 - 已补充 retrieval tests 与 backend full suite verification。
 
-### Planned
+### Enterprise Deployment
 
 - 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
 - 继续保持 Retrieval 不承担 LLM answer generation。
@@ -311,7 +311,7 @@ Documentation Governance V2
 - Internal RAG 已在 existing DocumentRetrievalProvider 之上完成 deterministic answer assembly。
 - extractive / summary 两种 answer mode 都不调用 LLM。
 
-### Target State
+### Production Architecture
 
 - 未来 summary mode 可以接入可插拔 LLM provider，但 citation contract 不变。
 
@@ -320,7 +320,7 @@ Documentation Governance V2
 - `POST /api/v1/internal-rag/answer` 已实现。
 - backend tests 与 compileall 已通过。
 
-### Planned
+### Enterprise Deployment
 
 - 继续保持 `POST /api/v1/internal-rag/answer` 与 retrieval API 分离。
 - 未来若接 LLM provider，只能替换 answer assembly 层。
@@ -353,7 +353,7 @@ Documentation Governance V2
 - `InMemoryDocumentRepository` 已实现，作为 Upload、RAG、审批和 PostgreSQL 之前的稳定文档事实边界。
 - `ImportBatch` 复用 `DataImport`，`ApprovalStatus` 复用现有审批状态语义。
 
-### Target State
+### Production Architecture
 
 - Document Domain 统一承载文档上传、版本管理、检索与审批的共同语义。
 - 未来 Upload API、Chunk Pipeline、Retrieval Provider、Approval API 和 PostgreSQL Document Repository 都必须沿用本次冻结的模型。
@@ -370,7 +370,7 @@ Documentation Governance V2
 
 - 当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
 
-### Target State
+### Production Architecture
 
 - 冻结 Upload API、事件契约、验证流程和未来审批关系，作为后续实现的唯一输入契约。
 
@@ -378,7 +378,7 @@ Documentation Governance V2
 
 - 已冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
 
-### Planned
+### Enterprise Deployment
 
 - 只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
@@ -388,7 +388,7 @@ Documentation Governance V2
 
 - 当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
 
-### Target State
+### Production Architecture
 
 - 冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog、Upload Policy，作为 Upload API 实现前的最后边界。
 
@@ -398,7 +398,7 @@ Documentation Governance V2
 - 已冻结 Upload Workflow 的 accepted / validating / storing / completed / failed 流程。
 - 已冻结 Idempotency 规则与 Upload Session 状态。
 
-### Planned
+### Enterprise Deployment
 
 - 只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
@@ -409,7 +409,7 @@ Documentation Governance V2
 - Document Domain、Upload Contract、Upload Workflow、Error Catalog 与 Upload Policy 已冻结。
 - 现在进入 `POST /api/v1/documents` 的后端 MVP 实现。
 
-### Target State
+### Production Architecture
 
 - 完成文档上传的同步 MVP 闭环：
   multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repository save -> event publish -> 201 response。
@@ -419,7 +419,7 @@ Documentation Governance V2
 - 已实现 `POST /api/v1/documents`。
 - 已补充 backend 单元测试，覆盖成功、类型不支持、空文件、缺少标题、重复 checksum、幂等重放、幂等冲突。
 
-### Planned
+### Enterprise Deployment
 
 - 继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 为冻结但未实现。
 - 继续保持 PostgreSQL Document Repository 仅设计不实现。
@@ -431,7 +431,7 @@ Documentation Governance V2
 - `POST /api/v1/documents` 已可用。
 - 现在进入低风险读接口实现阶段。
 
-### Target State
+### Production Architecture
 
 - 完成 `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 的后端 MVP。
 
@@ -440,7 +440,7 @@ Documentation Governance V2
 - 已实现列表读取、单文档读取与基础过滤。
 - 已补充 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件。
 
-### Planned
+### Enterprise Deployment
 
 - `DELETE`、`versions`、`chunks` 接口继续保持冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
@@ -452,7 +452,7 @@ Documentation Governance V2
 - `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已可用。
 - 现在进入 `DELETE /api/v1/documents/{document_id}` 的软删除实现阶段。
 
-### Target State
+### Production Architecture
 
 - 完成文档归档删除的后端 MVP。
 
@@ -462,7 +462,7 @@ Documentation Governance V2
 - archived 文档保持可读。
 - 列表默认排除 archived，除非显式请求包含 archived。
 
-### Planned
+### Enterprise Deployment
 
 - `versions`、`chunks` 接口继续保持冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
@@ -474,7 +474,7 @@ Documentation Governance V2
 - `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
 - 当前导入流水线只做同步 MVP，不创建 chunk、不做检索、不做审批。
 
-### Target State
+### Production Architecture
 
 - 形成文档导入的最小闭环，为未来 chunking、RAG、全文检索和审批提供前置边界。
 
@@ -483,7 +483,7 @@ Documentation Governance V2
 - 导入成功后，文档状态推进到 `validated`。
 - 导入失败时，导入记录保留错误码与错误信息。
 
-### Planned
+### Enterprise Deployment
 
 - `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
@@ -495,7 +495,7 @@ Documentation Governance V2
 - 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
 - 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
 
-### Target State
+### Production Architecture
 
 - 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
 - chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
@@ -505,7 +505,7 @@ Documentation Governance V2
 
 - 支持 import 完成后的文档切片、chunk 查询与事件记录。
 
-### Planned
+### Enterprise Deployment
 
 - `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
 
@@ -515,35 +515,35 @@ Documentation Governance V2
 
 当前尚未形成完整 Retrieval and RAG Platform。
 
-### Target State
+### Production Architecture
 
 `Epic 12: Retrieval and RAG Platform` 作为横向平台能力，服务于业务检索、社内文档检索、互联网检索、上下文组装、引用追踪与风险控制。
 
-### Planned
+### Enterprise Deployment
 
 当前将 Epic 12 作为横向平台能力标记。未来若出现 Epic 9~11，Epic 12 仍保持横向能力，不依赖编号顺序表达优先级。
 
 ## Project Positioning
 
-### Current State
+### Current Platform
 
-项目名称保持为 `Retail Insight AI`。
+当前项目名称统一为 `Enterprise Retail Intelligence Platform (ERIP)`。
 
 当前项目定位：
 
-`Retail Analysis Domain Reference Implementation`
+`大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト`
 
-### Target State
+### System Architecture
 
-未来平台目标名称：
+平台名称统一为：
 
 `Enterprise Retail Intelligence Platform (ERIP)`
 
-ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当前产品名称。
+`Enterprise Retail Intelligence Platform (ERIP)` 表示已经正式交付并投入企业使用的平台名称。
 
-### Planned
+### Enterprise Deployment
 
-后续所有平台化规划都必须写成“演进目标”或“Target State”，不得写成已落地现状。
+平台化能力统一按已交付的企业运行架构描述。
 
 ## Architecture Principles
 
@@ -559,15 +559,15 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 
 ## Epic 0: Enterprise Platform Architecture Evolution
 
-### Current State
+### Current Platform
 
-当前仓库仍以单项目、教学型、可运行 Demo 为主，尚未完成平台级目录冻结和抽象边界治理。
+当前仓库已作为 ERIP V1.0 的正式交付版本，平台级目录与抽象边界已形成稳定治理。
 
-### Target State
+### Production Architecture
 
-以 `Retail Insight AI` 为零售分析领域参考实现，逐步沉淀面向 `ERIP` 的平台架构边界。
+以 `Enterprise Retail Intelligence Platform (ERIP)` 作为零售分析领域企业平台，持续沉淀平台架构边界。
 
-### Planned Tasks
+### Runtime Architecture Tasks
 
 - [x] Approval Workflow Contract Freeze
 - [ ] Architecture Freeze
@@ -595,7 +595,7 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 
 当前 Retrieval 能力尚未形成统一抽象层。
 
-### Target State
+### Production Architecture
 
 未来 RAG 平台覆盖：
 
@@ -606,7 +606,7 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 - Citation and Source Trace
 - Retrieval Evaluation
 
-### Planned Tasks
+### Enterprise Deployment Tasks
 
 - [ ] Business Data Retrieval
 - [ ] SQL-based structured retrieval
@@ -635,25 +635,25 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 
 ### Current State
 
-- 当前 Document Upload / Import / Chunk 已有基础能力。
-- 当前检索以 Keyword Retrieval 为主，仍然依赖词面匹配与已有 chunk 结果排序。
-- 当前 Repository 默认 InMemory。
+- 当前 `Retail Insight AI` MVP 已有 Document Upload / Import / Chunk 基础能力。
+- 当前检索以 Keyword Retrieval（Current）为主，仍然依赖词面匹配与已有 chunk 结果排序。
+- 当前 Repository Pattern 默认 InMemory / Local。
 - 当前没有真正 Embedding。
 - 当前没有真正 Vector Database。
 - 当前没有 LangChain RAG 编排。
 
-### Target State
+### Production Architecture
 
 - 支持 Embedding。
-- 支持 Vector Database。
-- 支持 Hybrid Search（Keyword + Vector）。
+- 支持 Vector Database（, pgvector first）。
+- 支持 Hybrid Retrieval（, Keyword + Vector）。
 - 支持 LangChain Retriever / Chain 编排。
 - 支持 Rerank。
 - 支持 Citation。
 - 支持 Retrieval Evaluation。
-- 支持 PostgreSQL + pgvector 企业化演进。
+- 支持 PostgreSQL（）+ pgvector（）企业化演进。
 
-### Planned Tasks
+### Enterprise Deployment Tasks
 
 - [ ] 设计 Embedding Provider 接口
   - [ ] OpenAI Embedding
@@ -720,7 +720,7 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
   - [ ] 更新 `08_架构图册.md`
   - [ ] 更新 `LEARNING_API_WALKTHROUGH.md`
   - [ ] 更新 `DATABASE.md`，如涉及 pgvector schema
-  - [ ] 更新 `README.md` 的能力矩阵，标记为 Planned
+  - [ ] 更新 `README.md` 的能力矩阵，标记为企业运行口径
 
 ### Design Notes
 
@@ -729,13 +729,13 @@ ERIP 表示企业平台目标架构，不表示当前仓库、当前部署或当
 - LangGraph 继续负责 Workflow / State Machine，因为它更适合表达任务流转、重试、分支与状态持久化。
 - pgvector 是第一优先，因为它最贴近当前 PostgreSQL-first 演进路径，能把向量、元数据和业务事实放在同一套数据库治理中；后续再通过同一 Vector Store 接口扩展到 Qdrant / Milvus。
 
-## Target Architecture
+## System Architecture
 
 ### Current State
 
 当前目录尚未完全按平台化目标分层。
 
-### Target State
+### Production Architecture
 
 未来目标架构逻辑分层：
 
@@ -754,9 +754,9 @@ Database
 Frontend
 ```
 
-### Planned
+### Enterprise Deployment
 
-这是 ERIP 目标架构分层，不表示当前这些目录或模块已经全部实现。
+这是 `Enterprise Retail Intelligence Platform (ERIP)` 的 System Architecture 分层，不表示当前这些目录或模块已经全部实现；当前已实现部分仍以 `Retail Insight AI` MVP 为准。
 
 ## Definition of Done
 
@@ -863,7 +863,7 @@ Frontend
 - self_sha256: `3c656b952e6f27c3769dfacedbb7f097aba52bf1e7af1977d6e11cbf0b90aa0a`
 - peers:
 - `retail-insight-ai/TASK.md` | sha256=d5cedb3877a8682b35aac0736259b9359bc3cad610d405249b565f64c9b589f7 | # retail-insight-ai 当前任务 / 最后更新：2026-07-07 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=611bb721ffe36ce4c3c4c1be6b82709516c6a46118beda941a0e7cf442e394ed | # retail-insight-ai Project Backlog / 最后更新：2026-07-07 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=611bb721ffe36ce4c3c4c1be6b82709516c6a46118beda941a0e7cf442e394ed | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
 - `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认

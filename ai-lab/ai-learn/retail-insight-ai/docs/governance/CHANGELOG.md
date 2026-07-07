@@ -2,6 +2,15 @@
 
 # CHANGELOG
 
+## 2026-07-08 ERIP Worldview Alignment
+
+- 统一平台命名：`Enterprise Retail Intelligence Platform (ERIP)` 作为最终企业平台名称，`Retail Insight AI` 只作为 Current MVP / PoC / Early Prototype。
+- `README.md`、`ROADMAP.md`、`TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md` 已同步统一世界观。
+- `docs/ai-agent-retail-handbook-v3/09_系统设计书.md`、`08_架构图册.md`、`10_Production_Roadmap.md`、`12_ADR.md`、`INTERVIEW_GUIDE.md` 已同步 `Current / Target / Planned` 标记与核心术语。
+- 核心术语统一为 `Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`、`Repository Pattern`。
+- 平台演进术语统一为 `SQLite(Current)`、`Docker(Current)`、`PostgreSQL(Target)`、`pgvector(Target)`、`Hybrid Retrieval(Target)`、`RBAC(Target)`、`Audit Log(Target)`、`OpenTelemetry(Target)`、`Redis(Target)`、`RabbitMQ(Target)`、`Kubernetes(Target)`。
+- Documentation Only：未修改 backend、frontend、tests、scripts、API 行为或业务逻辑。
+
 ## 2026-07-07 Technical Architecture Handbook Alignment
 
 - `docs/ai-agent-retail-handbook-v3/09_系统设计书.md` 新增 `7.0 Technical Architecture（技术架构总览）`，补齐 Technology Stack Overview、Layered Architecture、AI Framework Relationship、Retrieval Pipeline、Technology Evolution、Enterprise Deployment、Current vs Target Matrix。
@@ -471,7 +480,7 @@
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
 - `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认

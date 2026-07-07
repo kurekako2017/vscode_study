@@ -1,6 +1,17 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-07
+最后更新：2026-07-08
+
+## 2026-07-08 ERIP Worldview Alignment
+
+- [x] 统一项目文档世界观：`Retail Insight AI` 只表示 Current MVP / PoC / Early Prototype
+- [x] 统一平台目标命名：`Enterprise Retail Intelligence Platform (ERIP)` 只表示 Target 企业平台
+- [x] 统一 `Current / Target / Planned` 标记，禁止把未来能力写成已实现
+- [x] 统一术语：`Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`、`Repository Pattern`
+- [x] 统一平台演进术语：`SQLite(Current)`、`PostgreSQL(Target)`、`pgvector(Target)`、`Hybrid Retrieval(Target)`、`RBAC(Target)`、`Audit Log(Target)`、`OpenTelemetry(Target)`、`Redis(Target)`、`RabbitMQ(Target)`、`Docker(Current)`、`Kubernetes(Target)`
+- [x] 逐份检查 Mermaid、Architecture、目录树、API 示例、ADR、Interview Answer、Roadmap 和 handbook 是否保持同一世界观
+- [x] Documentation Only：只做术语统一、命名统一、Current/Target/Planned 标记统一，不重写、不扩写、不删章节
+- [x] 完成记录：已统一 README、治理文档、架构文档、handbook 总规则、系统设计书、架构图册、生产路线图和面试主文档的 ERIP 世界观
 
 ## 2026-07-07 Technical Architecture Handbook Alignment
 
@@ -20,7 +31,7 @@
 
 ## 项目目标
 
-构建企业级 Retail Insight AI 平台，包含：
+构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
 
 - RAG 知识库检索
 - Internal Knowledge Approval Agent
@@ -366,7 +377,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 ### Current State
 
-当前项目名称保持为 `Retail Insight AI`，项目仍是零售分析领域参考实现，平台级抽象尚未冻结。
+当前项目名称保持为 `Retail Insight AI`，它是 `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP；项目仍是零售分析领域参考实现，平台级抽象尚未冻结。
 
 ### Target State
 

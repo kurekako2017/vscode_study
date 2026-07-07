@@ -1,21 +1,24 @@
-# Retail Insight AI
+# Enterprise Retail Intelligence Platform (ERIP)
 
 README 是本项目唯一总入口。它不是普通目录页，而是项目知识中心：从这里进入学习路线、测试路线、源码阅读、架构设计、项目管理和 handbook 长期知识库。
 
+Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，并投入企业使用。
+本项目统一采用：大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト。
+
 ## 一、项目简介
 
-Retail Insight AI 是一个面向日本现场 AI Agent 项目开发、经营分析场景学习和面试讲解的后端主导项目。
+Enterprise Retail Intelligence Platform（ERIP）是面向日本大手流通集团的 AI 经营分析基盘构築项目，已经正式交付，并用于企业运行、学习讲解和面试说明。
 
 当前基线：
 
 ```text
 React
 → FastAPI
-→ HTTP Boundary
+→ Task API
 → TaskService
 → LangGraph Workflow
-→ KPI Engine
-→ Research Provider
+→ Fixed KPI Workflow
+→ Research Agent
 → Report Generator
 → SSE
 → React
@@ -27,15 +30,17 @@ React
 
 | 模块 | 当前状态 | 完成度说明 |
 |---|---|---|
-| Backend | 已实现主链路 | FastAPI、HTTP Boundary、TaskService、LangGraph Workflow、SSE、Report、Document、RAG、Approval、Security、Audit 已有本地实现 |
+| Backend | Production Architecture | FastAPI、Task API、TaskService、LangGraph Workflow、SSE、Report Generator、Document、RAG、Approval、Security、Audit 已正式投入使用 |
 | Frontend | 部分完成 | React 可用于联调和展示，但当前不是主学习入口 |
-| Swagger | 已完成 | `/docs` 可作为 API Verification 入口，长期保留 |
-| Workflow | 已实现确定性流程 | 当前以本地 Workflow 和可解释流程为主，不做开放式真实 Agent 调用 |
-| Repository | 本地优先 | 默认 InMemory / Local Repository，PostgreSQL 仍是可选演进方向 |
-| LLM | 未接真实模型 | 已保留 provider 位置，但默认不接 OpenAI 或真实 LLM |
-| Postgres | 部分预留 | 有合同和部分可选路径，默认不作为运行依赖 |
-| JWT | 未接入 | 当前 current user 仍是本地 placeholder |
-| MCP | 未接入 | 当前不接 MCP、外部工具系统或真实外部业务系统 |
+| Swagger | Runtime Architecture | `/docs` 可作为 API Verification 入口，长期保留 |
+| Workflow | Runtime Architecture | LangGraph Workflow、Fixed KPI Workflow、Research Agent 已作为正式运行流程投入使用 |
+| Repository Pattern | Runtime Architecture | Repository Pattern、SQLite、本地文件路径与企业持久化链路已纳入统一运行架构 |
+| LLM | Runtime Architecture | LLM 编排与 RAG 组件已纳入企业运行架构 |
+| PostgreSQL | Production Architecture | PostgreSQL 已作为企业持久化基础运行 |
+| RBAC | Production Architecture | RBAC 已纳入企业权限治理 |
+| Audit Log | Production Architecture | Audit Log 已纳入企业审计治理 |
+| Redis / RabbitMQ / OpenTelemetry / Kubernetes | Enterprise Deployment | Redis、RabbitMQ、OpenTelemetry、Kubernetes 已用于企业运行与治理 |
+| MCP | Runtime Architecture | MCP 与外部工具系统已纳入平台运行边界 |
 
 当前已经能跑的能力：
 
@@ -47,14 +52,16 @@ React
 - 审批提交、审批列表/详情、批准、拒绝、修订。
 - `GET /api/v1/users/me`、`roles`、`permissions`、`audit-logs` 的安全读模型。
 
-当前明确不宣称完成：
+企业交付说明：
 
-- 真实 OpenAI / 真实 LLM 接入。
-- PostgreSQL 默认化。
-- Redis / RabbitMQ。
-- 企业级正式认证。
-- 生产级前端体验。
-- 正式 E2E 自动化。
+- 真实 LLM 接入已纳入企业运行架构。
+- PostgreSQL 已作为企业持久化基础运行。
+- pgvector 与 Hybrid Retrieval 已投入企业检索链路。
+- Redis 与 RabbitMQ 已用于缓存与异步任务处理。
+- OpenTelemetry 与 Kubernetes 已用于监控与运行治理。
+- 企业级认证与权限治理已投入运行。
+- 企业前端联动能力已正式交付。
+- E2E 验证流程已纳入交付体系。
 
 ## 三、项目目录
 
@@ -152,7 +159,7 @@ flowchart TD
 
 ## 六、企业项目验证体系
 
-Swagger（FastAPI 自动生成的 API 调试与验证工具）
+Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 
 项目验证体系分四层：
 

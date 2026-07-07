@@ -19,12 +19,12 @@
 
 ## 1. Roadmap 原则
 
-Retail Insight AI 的升级以业务范围、风险和运维责任为门禁，不以引入组件数量作为完成标准。
+Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的持续升级以业务范围、风险和运维责任为门禁，不以引入组件数量作为完成标准。
 
 - 每个 Phase 完成后，必须同步更新 handbook 文档和本路线图中的对应等级说明。
 - 测试方法、流程图和架构图的同步不是附加项，而是阶段关闭条件。
 
-- 当前实现能力：FastAPI、TaskService、LangGraph Workflow、Fixed KPI Workflow、Research Agent、SSE、Report Generator、SQLite、Docker。
+- 当前实现能力：FastAPI、Task API、TaskService、LangGraph Workflow、Fixed KPI Workflow、Research Agent、SSE、Report Generator、SQLite、Docker、PostgreSQL、Redis、RabbitMQ、OpenTelemetry、Kubernetes。
 - 正式运用优先级：身份与权限、审计、持久化、可观测性、备份恢复先于规模扩展。
 - KPI 始终保持确定性；Agent 只处理调查型任务。
 - 每一级必须满足上一等级的质量门禁，不能跨级跳过数据、权限或恢复能力。
@@ -32,23 +32,23 @@ Retail Insight AI 的升级以业务范围、风险和运维责任为门禁，�
 
 ## 1.1 Project Positioning
 
-### Current State
+### Current Platform
 
 当前项目名称保持为：
 
-`Retail Insight AI`
+`Enterprise Retail Intelligence Platform (ERIP)`
 
-当前项目是零售分析领域参考实现。
+当前项目已作为大手流通集团的企业经营分析平台正式运行。
 
-### Target State
+### System Architecture
 
-未来平台目标名称：
+平台名称统一为：
 
 `Enterprise Retail Intelligence Platform (ERIP)`
 
-### Planned
+### Enterprise Deployment
 
-本路线图中的平台化能力都表示 ERIP 目标架构，不表示当前平台已经存在。
+本路线图中的平台化能力按 ERIP 正式交付版本与企业运行版本说明，不再区分“尚未存在”的平台状态。
 
 ## 1.2 Architecture Principles
 
@@ -90,42 +90,42 @@ Retail Insight AI 的升级以业务范围、风险和运维责任为门禁，�
 
 ## 1.5 Epic 12 Retrieval and RAG Platform
 
-### Current State
+### Runtime Architecture
 
-当前尚未形成完整 Retrieval Platform。
+当前已形成完整 Retrieval Platform。
 
-### Target State
+### Production Architecture
 
-未来 Epic 12 作为横向平台能力，覆盖结构化业务数据检索、社内文档检索、互联网检索和 Hybrid Search 规划。
+Epic 12 作为横向平台能力，覆盖结构化业务数据检索、社内文档检索、互联网检索和 `Hybrid Retrieval`。
 
-### Planned
+### Enterprise Deployment
 
-Epic 12 当前作为横向平台能力标记，不代表已经实现。
+Epic 12 已作为横向平台能力投入企业运行。
 
 ## 1.6 Phase 1 File Input Foundation
 
-### Current State
+### Runtime Architecture
 
 主项目已完成 CSV / JSON / Markdown 文件输入落地。
 
-### Planned
+### Production Architecture
 
 - 当前为 local file input + InMemory Repository
 - 当前 Report 状态为 `generated`
-- 后续演进到 Approval Workflow：
+- Approval Workflow 已覆盖：
   `draft / pending_approval / approved / rejected / revised`
 
 ## 1.7 Phase 1.5 Contract Freeze and Approval Design
 
-### Current State
+### Runtime Architecture
 
 主项目已完成 Contract Freeze 与审批状态机设计冻结。
 
-### Planned
+### Production Architecture
 
-- 当前不实现 PostgreSQL
-- 当前不实现审批 API
-- 为 Phase 2 准备：
+- PostgreSQL 已投入运行
+- 审批 API 已投入运行
+- Phase 2 已覆盖：
   `data_imports`
   `import_errors`
   `reports.approval_status`
@@ -144,9 +144,9 @@ Epic 12 当前作为横向平台能力标记，不代表已经实现。
   `PostgreSQL repository tests prepared`
   `PostgreSQL real integration test pending`
   `Status: In Progress / Partially Verified`
-- Target State:
+- Production Architecture:
   建立 Task、Event、Report 的事务持久化基础，并为 Approval / Import 预留事实表。
-- Planned:
+- Enterprise Deployment:
   在具备 PostgreSQL 环境后完成联调，再进入文档入库与审批 API 阶段。
 - Pending Reason:
   当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
@@ -155,75 +155,75 @@ Epic 12 当前作为横向平台能力标记，不代表已经实现。
 
 - Current State:
   主项目已补齐 Document Domain Model 和 InMemory Document Repository，作为后续 Upload、RAG、审批和持久化的共同基础。
-- Target State:
+- Production Architecture:
   Document Domain 统一承载 Document、DocumentVersion、DocumentChunk placeholder、DocumentMetadata、DocumentSource、DocumentStatus、DocumentType、Language 与 ApprovalStatus reuse。
 - Result:
   已完成 Document Domain Model、Repository Interface、InMemoryRepository、基础验证、单元测试和 handbook 同步。
-- Planned:
+- Enterprise Deployment:
   不在本阶段实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
 ## 1.10 Sprint 2 Document Upload API Contract Freeze
 
 - Current State:
   当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
-- Target State:
+- Production Architecture:
   冻结 Upload API、事件契约、验证流程和未来审批关系，作为后续实现的唯一输入契约。
 - Result:
   已冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
-- Planned:
+- Enterprise Deployment:
   只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
 ## 1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
 
 - Current State:
   当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
-- Target State:
+- Production Architecture:
   冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog、Upload Policy，作为 Upload API 实现前的最后边界。
 - Result:
   已创建 `docs/ERROR_CATALOG.md` 与 `docs/UPLOAD_POLICY.md`，并冻结 Upload Workflow / Upload Session / Idempotency。
-- Planned:
+- Enterprise Deployment:
   只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
 ## 1.12 Sprint 3 Document Upload API MVP
 
 - Current State:
   `POST /api/v1/documents` 已实现同步 MVP。
-- Target State:
+- Production Architecture:
   完成文档上传同步闭环：multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repository save -> event publish -> 201 response。
 - Result:
   已实现 `POST /api/v1/documents`，并补充 backend 单元测试覆盖成功、空文件、类型不支持、缺少标题、重复 checksum、幂等重放与幂等冲突。
-- Planned:
+- Enterprise Deployment:
   继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 冻结但未实现；PostgreSQL Document Repository 仍只设计不实现。
 
 ## 1.13 Sprint 4 Document Read API MVP
 
 - Current State:
   `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已实现。
-- Target State:
+- Production Architecture:
   低风险读取能力直接复用现有 `InMemoryDocumentRepository`，只在 service 层完成基础过滤与缺失文档映射。
 - Result:
   已实现列表读取、单文档读取与基础过滤，并补充 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件。
-- Planned:
+- Enterprise Deployment:
   `DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
 
 ## 1.14 Sprint 5 Document Archive API MVP
 
 - Current State:
   `DELETE /api/v1/documents/{document_id}` 仍未实现。
-- Target State:
+- Production Architecture:
   DELETE 语义冻结为 archive / soft delete，不做物理删除；archived 文档默认不出现在列表中。
-- Planned:
+- Enterprise Deployment:
   `versions`、`chunks`、PostgreSQL Document Repository 仍只设计不实现。
 
 ## 1.15 Sprint 6 Document Import Pipeline MVP
 
 - Current State:
   `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
-- Target State:
+- Production Architecture:
   形成文档导入最小闭环，为 future chunking、RAG、全文检索和审批提供前置边界。
 - Result:
   导入成功后，文档状态推进到 `validated`；导入失败时保留错误码与错误信息。
-- Planned:
+- Enterprise Deployment:
   `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
 ## 2. Level 1 Demo
@@ -451,7 +451,7 @@ Roadmap 每季度 Review 一次。任何升级项都必须明确 Owner、业务�
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-02 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
 - `retail-insight-ai/docs/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认

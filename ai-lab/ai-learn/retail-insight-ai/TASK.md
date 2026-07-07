@@ -1,6 +1,15 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-07
+最后更新：2026-07-08
+
+## 2026-07-08 ERIP Worldview Alignment
+
+- [x] 统一 `README.md`、`ROADMAP.md`、`TASK.md`、`ARCHITECTURE.md`、`PROJECT_BIBLE.md` 等主文档中的平台名称
+- [x] 统一 `Retail Insight AI = Current MVP / PoC / Early Prototype`
+- [x] 统一 `Enterprise Retail Intelligence Platform (ERIP) = Target 企业平台`
+- [x] 统一 `Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`、`Repository Pattern`
+- [x] 统一 `Current / Target / Planned` 标记，禁止把未来能力写成已实现
+- [x] 完成记录：治理文档、架构文档、handbook 总规则、系统设计书、架构图册、生产路线图和面试总稿已统一到 ERIP 世界观
 
 ## 2026-07-07 Technical Architecture Handbook Alignment
 
@@ -671,7 +680,7 @@ Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边
 
 ### Current State
 
-当前项目名称保持为 `Retail Insight AI`，当前仓库仍是零售分析 Domain 的参考实现，尚未演进成完整企业平台。
+当前项目名称保持为 `Retail Insight AI`，它是 `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP；当前仓库仍是零售分析 Domain 的参考实现，尚未演进成完整企业平台。
 
 ### Target State
 
@@ -679,7 +688,7 @@ Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边
 
 `Enterprise Retail Intelligence Platform (ERIP)`
 
-但当前不得把项目描述为 ERIP 已存在或已实现。
+但当前不得把项目描述为 ERIP 已存在或已实现；ERIP 只能作为 Target 企业平台来表达。
 
 ### Planned
 
@@ -1138,7 +1147,7 @@ Frontend
 - self_sha256: `d5cedb3877a8682b35aac0736259b9359bc3cad610d405249b565f64c9b589f7`
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=3c656b952e6f27c3769dfacedbb7f097aba52bf1e7af1977d6e11cbf0b90aa0a | # retail-insight-ai Roadmap / 最后更新：2026-07-07 / ## 当前阶段 / 待根据项目现状确认。
-- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=611bb721ffe36ce4c3c4c1be6b82709516c6a46118beda941a0e7cf442e394ed | # retail-insight-ai Project Backlog / 最后更新：2026-07-07 / ## 项目目标 / 构建企业级 Retail Insight AI 平台，包含：
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=611bb721ffe36ce4c3c4c1be6b82709516c6a46118beda941a0e7cf442e394ed | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
 - `retail-insight-ai/docs/governance/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认

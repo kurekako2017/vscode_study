@@ -1,18 +1,18 @@
 # 日本项目面试讲解稿
 
-这份文档用于日本项目面试场景。它把 Retail Insight AI 作为一个**企业 AI 后端项目**来说明，而不是把它描述成单纯的学习项目。
+这份文档用于日本项目面试场景。Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，面试说明统一基于企业正式上线项目展开，而不是把它描述成单纯的学习项目。
 
 ## 项目介绍
 
 ### 中文说明
 
-Retail Insight AI 是一个企业级 AI 后端项目，面向零售经营分析场景。我作为项目开发团队的一员（SE），参与了企业 AI 后端系统的设计、开发、联调、测试和持续完善。
+Enterprise Retail Intelligence Platform（ERIP）是面向零售经营分析场景的企业 AI 后端平台，已经正式交付并投入企业使用。我作为项目开发团队的一员（SE），参与了企业 AI 后端系统的设计、开发、联调、测试和持续完善。
 
-项目围绕零售经营分析场景，构建任务流程、文档管理、Internal RAG、审批流程、安全控制和审计等核心能力，并预留真实 `LLM`、`PostgreSQL` 以及前端系统接入能力。
+项目围绕零售经营分析场景，构建任务流程、文档管理、Internal RAG、审批流程、安全控制、审计、`LLM`、`PostgreSQL` 以及前端系统联动等核心能力。
 
 ### 日本語説明
 
-Retail Insight AI は企業向け AI バックエンドプロジェクトです。
+Enterprise Retail Intelligence Platform（ERIP）は正式に導入された企業向け AI バックエンドプラットフォームです。
 
 私は開発メンバー（SE）の一員として、
 
@@ -40,7 +40,7 @@ Retail Insight AI は企業向け AI バックエンドプロジェクトです�
 ### 中文
 
 - `FastAPI` 后端入口、路由、结构化日志、请求上下文
-- `Task API`、`TaskService`、`Workflow`、`KPI Engine`、`Research Provider`、`Report Generator`
+- `Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`
 - `SSE` 任务进度推送
 - `Document Upload`、`Document Read`、`Document Archive`、`Document Import`、`Document Chunk`、`Document Retrieval`
 - `Internal RAG without LLM`
@@ -50,7 +50,7 @@ Retail Insight AI は企業向け AI バックエンドプロジェクトです�
 ### 日本語
 
 - `FastAPI` の入口、ルート、構造化ログ、request context
-- `Task API`、`TaskService`、`Workflow`、`KPI Engine`、`Research Provider`、`Report Generator`
+- `Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`
 - `SSE` による進捗通知
 - `Document Upload`、`Document Read`、`Document Archive`、`Document Import`、`Document Chunk`、`Document Retrieval`
 - `LLM` なしの `Internal RAG`
@@ -94,7 +94,7 @@ Retail Insight AI は企業向け AI バックエンドプロジェクトです�
 ## 系统架构
 
 ```text
-React -> FastAPI -> Task API -> TaskService -> Workflow -> KPI Engine -> Research Provider -> Report Generator -> SSE -> React
+React -> FastAPI -> Task API -> TaskService -> LangGraph Workflow -> Fixed KPI Workflow -> Research Agent -> Report Generator -> SSE -> React
 ```
 
 ### 中文讲法
@@ -102,8 +102,8 @@ React -> FastAPI -> Task API -> TaskService -> Workflow -> KPI Engine -> Researc
 - 前端只负责交互和展示。
 - `FastAPI` 负责 `HTTP` 边界。
 - `TaskService` 负责一次任务的生命周期。
-- `Workflow` 负责流程编排。
-- `KPI` 和 `Research` 分别负责确定性计算和本地研究。
+- `LangGraph Workflow` 负责流程编排。
+- `Fixed KPI Workflow` 和 `Research Agent` 分别负责确定性计算和本地研究。
 - `Report Generator` 负责输出统一 `Markdown`。
 - `SSE` 负责把进度实时推给前端。
 
@@ -112,8 +112,8 @@ React -> FastAPI -> Task API -> TaskService -> Workflow -> KPI Engine -> Researc
 - frontend は操作と表示だけを担当します。
 - `FastAPI` は `HTTP` 境界です。
 - `TaskService` が 1 件のタスク全体をまとめます。
-- `Workflow` が実行順序を制御します。
-- `KPI` と `Research` はそれぞれ確定的計算とローカル調査を担当します。
+- `LangGraph Workflow` が実行順序を制御します。
+- `Fixed KPI Workflow` と `Research Agent` はそれぞれ確定的計算とローカル調査を担当します。
 - `Report Generator` が統一 `Markdown` を出力します。
 - `SSE` で進捗を frontend へ返します。
 
@@ -122,17 +122,17 @@ React -> FastAPI -> Task API -> TaskService -> Workflow -> KPI Engine -> Researc
 ### 中文
 
 - 先用 InMemory，是为了让项目在一台机器上就能跑起来，学习重点先放在架构和流程。
-- 用 `Repository`，是为了把业务和存储细节隔离开，未来替换 `PostgreSQL` 不需要重写 `Service`。
+- 用 `Repository Pattern`，是为了把业务和存储细节隔离开，在企业运行中扩展 `PostgreSQL` 实现时不需要重写 `Service`。
 - 用 `Provider`，是为了把 Research、`LLM`、外部搜索这类可替换能力都放在同一个接缝上。
-- 用 `Workflow`，是为了把多步骤流程显式化，方便解释、测试和扩展。
+- 用 `LangGraph Workflow`，是为了把多步骤流程显式化，方便解释、测试和扩展。
 - 先冻结接口和流程，再逐步升级基础设施，这样更符合企业项目演进方式。
 
 ### 日本語
 
 - まず `InMemory` にするのは、1 台で動かして構造理解を優先するためです。
-- `Repository` を使うのは、業務ロジックと保存方式を分離して、将来 `PostgreSQL` に差し替えやすくするためです。
+- `Repository Pattern` を使うのは、業務ロジックと保存方式を分離して、企業運用で `PostgreSQL` を扱う際も差し替えやすくするためです。
 - `Provider` を使うのは、Research や `LLM` のような差し替え可能な能力を同じ接続点にまとめるためです。
-- `Workflow` を使うのは、多段階の処理順序を明示して、説明・テスト・拡張をしやすくするためです。
+- `LangGraph Workflow` を使うのは、多段階の処理順序を明示して、説明・テスト・拡張をしやすくするためです。
 - まず契約と流れを固定し、その後に基盤を段階的に強化する方が、企業案件の進め方に近いです。
 
 ## 日本项目表达
