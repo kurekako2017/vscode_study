@@ -141,6 +141,9 @@ def trace_source_chain(
 
     session = _ensure_session(http_method, http_path, title=title)
     for file_path, snippet in source_chain:
+        if not file_path and snippet == "HTTP Response":
+            # 终端里已经会用 HTTP 200 Response 表示响应阶段，这里不重复打印同义词。
+            continue
         session.add(
             TraceStep(
                 node="Source Chain",
