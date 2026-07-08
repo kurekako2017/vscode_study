@@ -603,7 +603,7 @@ backend/app/schemas/health.py —— 了解返回数据模型（Response Schema�
 | Swagger 操作         | 打开`POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
 | 输入（入力）         | `question`、`mode`                                                                                                                            |
 | 预想结果（予想結果） | HTTP`202`，返回 `task_id` 和 `status=queued`                                                                                                |
-| 后台日志观察         | `request_id`、`task_id`、`queued`、后续任务推进日志                                                                                         |
+| 后台日志观察         | `request_id`、`task_id`、`request.question`、`request.mode`、`queued`、后续任务推进日志                                                       |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                     |
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py` |
 | 下一步               | `GET /api/tasks/{task_id}`                                                                                                                      |
@@ -619,23 +619,40 @@ tasks.py（Router）
 ↓
 TaskService.create_task()
 ↓
+[LEARNING REQUEST BODY]
+task_id / question / mode
+↓
 TaskRepository.create()
 ↓
-HTTP 202
+EventPublisher.publish(queued)
 ↓
-返回 task_id
+BackgroundTasks.add_task()
 ↓
-后台异步开始
+HTTP 202 Response
+```
+
+```text
+后台异步开始（BackgroundTasks）
 ↓
 TaskService.run_task()
 ↓
-AnalysisWorkflow
+TaskRepository.save(running)
 ↓
-Research
+EventPublisher.publish(running)
 ↓
-Report
+AnalysisWorkflow.stream()
 ↓
-Task Completed
+_route_node()
+↓
+FixedKPIWorkflow.run()
+↓
+StaticResearchProvider.research()
+↓
+ReportGenerator.generate()
+↓
+TaskRepository.save(completed)
+↓
+EventPublisher.publish(completed)
 ```
 
 ## 源码学习说明

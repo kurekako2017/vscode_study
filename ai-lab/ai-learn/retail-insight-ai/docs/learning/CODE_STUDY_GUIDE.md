@@ -246,7 +246,7 @@ unsubscribeRef 负责关闭旧 EventSource
 4. Vite 开发代理把 `/api` 请求转发到 `http://127.0.0.1:8000`。
 5. `main.py:request_context()` 生成或读取 `X-Request-ID`，绑定日志上下文。
 6. FastAPI 用 `TaskCreateRequest` 校验 `question` 和 `mode`，再调用 `api/tasks.py:create_task()`。
-7. 路由调用 `TaskService.create_task()`：生成 `task_id`，保存 `queued` Task，发布第一条 `queued` status 事件。
+7. 路由调用 `TaskService.create_task()`：先打印 `[LEARNING REQUEST BODY]`，把 `task_id`、`question`、`mode` 记到终端，再生成 `task_id`、保存 `queued` Task、发布第一条 `queued` status 事件。
 8. 路由把 `TaskService.run_task(task_id)` 加入 `BackgroundTasks`，先向浏览器返回 HTTP 202。
 9. React 保存 `task_id`，然后 `api.ts:subscribeToTask()` 创建 `/api/tasks/{task_id}/events` 的 `EventSource`。
 10. 后台 `run_task()` 把任务改为 `running`，并发布 `Task started`。

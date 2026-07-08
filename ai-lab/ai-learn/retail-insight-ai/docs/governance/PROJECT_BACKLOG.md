@@ -2,6 +2,17 @@
 
 最后更新：2026-07-08
 
+## 2026-07-08 Learning Request Body Trace
+
+- [x] 在 `TaskService.create_task()` 追加学习日志，终端可直接看到 `request.question`、`request.mode` 和 `task_id`
+- [x] 保持 API response、Workflow、Repository 和测试逻辑不变
+- [x] 同步更新 `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`docs/learning/RUNBOOK_LOCAL.md`、`docs/learning/CODE_STUDY_GUIDE.md` 和 `VERIFY_CHECKLIST.md`
+- [x] 完成后验证 `POST /api/tasks` 的终端输出能明确看到 `question: 你好`
+
+### 完成记录
+
+- 2026-07-08：新增学习请求体日志，帮助新手在终端直接确认 `question` 和 `mode` 已进入 `TaskService.create_task()`，未改变 API response、Workflow、Repository 或测试逻辑。
+
 ## 2026-07-08 ERIP Worldview Alignment
 
 - [x] 统一项目文档世界观：`Retail Insight AI` 只表示 Current MVP / PoC / Early Prototype

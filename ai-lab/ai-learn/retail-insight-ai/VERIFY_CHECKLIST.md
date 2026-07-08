@@ -61,7 +61,7 @@ curl -sS http://127.0.0.1:8000/openapi.json | head
 2. 用返回的 `task_id` 执行 `GET /api/tasks/{task_id}`
 3. 再执行 `GET /api/tasks/{task_id}/report`
 
-预想结果：任务可创建，状态可读取，报告最终可取回。
+预想结果：任务可创建，状态可读取，报告最终可取回；终端还能看到 `question: 你好`、`mode: hybrid` 和 `task_id` 的学习日志。
 
 ## 6. Swagger 能执行文档主链路 API
 

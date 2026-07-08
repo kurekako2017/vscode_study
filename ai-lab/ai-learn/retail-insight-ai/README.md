@@ -45,7 +45,7 @@ React
 当前已经能跑的能力：
 
 - `GET /health` 健康检查。
-- `POST /api/tasks` 到报告读取的主任务链路。
+- `POST /api/tasks` 到报告读取的主任务链路，创建时会额外打印 `request.question`、`request.mode` 和 `task_id` 的学习日志。
 - `GET /api/tasks/{task_id}/events` 的 SSE 进度流。
 - Document Upload / Read / Archive / Import / Chunk / Retrieval。
 - `POST /api/v1/internal-rag/answer` 的本地 deterministic Internal RAG。

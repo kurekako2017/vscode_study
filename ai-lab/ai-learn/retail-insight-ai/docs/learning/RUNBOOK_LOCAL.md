@@ -80,6 +80,8 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 3. `GET /api/tasks/{task_id}`
 4. `GET /api/tasks/{task_id}/report`
 
+执行 `POST /api/tasks` 后，先看启动后端的终端日志，应该能直接看到 `[LEARNING REQUEST BODY]`，其中包含 `task_id`、`question` 和 `mode`，方便确认请求体是否按预期进入 `TaskService`。
+
 ### ReDoc
 
 用途：阅读字段结构和响应模型，不适合高频点击调试。

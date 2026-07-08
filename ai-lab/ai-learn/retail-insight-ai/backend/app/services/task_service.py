@@ -49,6 +49,17 @@ class TaskService:
         """建立 queued 任务并发布首个进度事件。"""
 
         task = Task(task_id=str(uuid4()), question=question.strip(), mode=mode)
+        # 这条学习日志只负责把 request body 的核心字段打到终端，方便新手确认
+        # Router 传进来的 question / mode 没有被业务流程悄悄改写；它不影响 Task、
+        # Workflow 或 Repository，只是给教学调试用的可读痕迹。
+        log_event(
+            logger,
+            "info",
+            "learning_request_body",
+            f"[LEARNING REQUEST BODY]\ntask_id: {task.task_id}\nquestion: {question}\nmode: {mode}",
+            task_id=task.task_id,
+            status="received",
+        )
         trace_step(
             "POST",
             "/api/tasks",
