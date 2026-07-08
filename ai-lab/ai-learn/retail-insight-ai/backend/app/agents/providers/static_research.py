@@ -25,7 +25,6 @@ from __future__ import annotations
 from app.data_loaders import LocalResearchDataLoader
 from app.errors.exceptions import ResearchProviderException
 from app.models.analysis import ResearchResult
-from app.core.learning_trace import trace_step
 
 
 class StaticResearchProvider:
@@ -48,15 +47,6 @@ class StaticResearchProvider:
 
         if self._fail:
             raise ResearchProviderException(provider=self.name)
-        trace_step(
-            "POST",
-            "/api/tasks",
-            "Provider",
-            "StaticResearchProvider.research()",
-            class_name="StaticResearchProvider",
-            method_name="research",
-            file_path="backend/app/agents/providers/static_research.py",
-        )
         dataset = self._data_loader.load_research_dataset()
         return ResearchResult(
             summary=dataset.summary,

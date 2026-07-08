@@ -48,19 +48,19 @@ async def create_task(
     task = service.create_task(payload.question, payload.mode)
     # 先返回 202，再执行分析，避免长流程占用创建任务的 HTTP 请求。
     background_tasks.add_task(service.run_task, task.task_id)
-    data = TaskCreateResponse(task_id=task.task_id, status=task.status)
-    response = success_response(data, get_request_id())
     trace_step(
         "POST",
         "/api/tasks",
-        "Schema(Response Model)",
-        "TaskCreateResponse",
-        class_name="TaskCreateResponse",
-        method_name="model_construct",
-        file_path="backend/app/schemas/task_api.py",
+        "Router",
+        "BackgroundTasks.add_task()",
+        class_name="BackgroundTasks",
+        method_name="add_task",
+        file_path="backend/app/api/tasks.py",
         task_id=task.task_id,
-        status=task.status.value,
+        label="BackgroundTasks.add_task()",
     )
+    data = TaskCreateResponse(task_id=task.task_id, status=task.status)
+    response = success_response(data, get_request_id())
     return response
 
 

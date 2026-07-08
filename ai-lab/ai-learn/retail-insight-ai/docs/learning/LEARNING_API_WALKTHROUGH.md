@@ -572,6 +572,48 @@ backend/app/schemas/health.py —— 了解返回数据模型（Response Schema�
 
 ## 源码学习说明
 
+### backend/app/api/tasks.py
+为什么这里开始学习：这是整个业务链路唯一 HTTP 入口。负责接收请求、创建 Task、注册 `BackgroundTasks`、立即返回 HTTP 202。  
+阅读重点：`create_task()`、`get_task()`、`get_task_events()`、`get_report()`
+
+### backend/app/services/task_service.py
+为什么这里学习：这是整个任务生命周期的核心。HTTP 请求阶段负责 `create_task()`，后台异步阶段负责 `run_task()`。  
+阅读重点：`create_task()`、`run_task()`、`get_task()`、`get_report()`
+
+### backend/app/repositories/implementations/in_memory/task_repository.py
+为什么这里学习：Task 第一次创建、状态变化、最终完成，全部保存于这里。  
+阅读重点：`create()`、`get()`、`save()`
+
+### backend/app/events/publisher.py
+说明：Workflow 每推进一步都会发布 Event，SSE 就是读取这里。  
+阅读重点：`publish()`
+
+### backend/app/workflow/graph.py
+为什么这里学习：HTTP 请求已经结束，真正业务分析从这里开始。Workflow 负责 `route -> kpi -> research -> report`。  
+阅读重点：`stream()`、`_route_node()`、`_kpi_node()`、`_research_node()`、`_report_node()`
+
+### backend/app/kpi/workflow.py
+说明：负责 KPI Workflow。  
+阅读重点：`run()`
+
+### backend/app/agents/providers/static_research.py
+说明：负责当前静态 Research。  
+阅读重点：`research()`
+
+### backend/app/reports/generator.py
+说明：负责生成最终 Report。  
+阅读重点：`generate()`
+
+Learning Tip  
+第一次阅读源码建议按照下面顺序：  
+1. Swagger Execute  
+2. Learning Trace  
+3. TaskService.create_task()  
+4. TaskRepository.create()  
+5. BackgroundTasks  
+6. Workflow  
+7. Report
+
 ### backend/app/main.py（项目启动入口）
 作用：创建应用实例，并把路由和依赖接到同一个后端上。  
 为什么现在学习：先知道请求从哪里进入项目，后面读接口才不会迷路。  
@@ -603,7 +645,7 @@ backend/app/schemas/health.py —— 了解返回数据模型（Response Schema�
 | Swagger 操作         | 打开`POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
 | 输入（入力）         | `question`、`mode`                                                                                                                            |
 | 预想结果（予想結果） | HTTP`202`，返回 `task_id` 和 `status=queued`                                                                                                |
-| 后台日志观察         | `request_id`、`task_id`、`request.question`、`request.mode`、`queued`、后续任务推进日志                                                       |
+| 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、Workflow 主链路日志                                                |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                     |
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py` |
 | 下一步               | `GET /api/tasks/{task_id}`                                                                                                                      |
@@ -611,6 +653,8 @@ backend/app/schemas/health.py —— 了解返回数据模型（Response Schema�
 ### 程序调用流程
 
 ```text
+HTTP Request
+↓
 Swagger UI
 ↓
 POST /api/tasks
@@ -619,8 +663,8 @@ tasks.py（Router）
 ↓
 TaskService.create_task()
 ↓
-[LEARNING REQUEST BODY]
-task_id / question / mode
+Request Body
+question / mode
 ↓
 TaskRepository.create()
 ↓
@@ -632,7 +676,7 @@ HTTP 202 Response
 ```
 
 ```text
-后台异步开始（BackgroundTasks）
+Background Task
 ↓
 TaskService.run_task()
 ↓
@@ -642,13 +686,13 @@ EventPublisher.publish(running)
 ↓
 AnalysisWorkflow.stream()
 ↓
-_route_node()
+Route
 ↓
-FixedKPIWorkflow.run()
+KPI
 ↓
-StaticResearchProvider.research()
+Research
 ↓
-ReportGenerator.generate()
+Report
 ↓
 TaskRepository.save(completed)
 ↓
@@ -657,65 +701,49 @@ EventPublisher.publish(completed)
 
 ## 源码学习说明
 
-### backend/app/api/tasks.py（任务接口入口）
-作用：接收创建任务请求，并暴露后续状态、事件、报告相关入口。  
-为什么现在学习：`POST /api/tasks` 是主业务链路真正起跑的地方。  
-重点关注：
-- `create_task()`
-- `get_task()`
-- `get_task_events()`
-- `get_report()`
+### 主调用链（★★★★★）
 
-### backend/app/services/task_service.py（任务业务调度中心）
-作用：先创建任务，再推进 Workflow，最后回收状态和报告。  
-为什么现在学习：这里决定任务什么时候排队、什么时候真正开始执行。  
-重点关注：
-- `create_task()`
-- `run_task()`
-- `get_task()`
-- `get_report()`
+### backend/app/api/tasks.py
+为什么现在学习：这是整个业务链路唯一 HTTP 入口。  
+作用：接收请求、调用 `TaskService.create_task()`、注册 `BackgroundTasks`、立即返回 HTTP 202。  
+阅读重点：`create_task()`
 
-### backend/app/repositories/implementations/in_memory/task_repository.py（任务数据存储）
-作用：保存任务初始状态和后续状态变化，当前默认是内存实现。  
-为什么现在学习：先看状态存放位置，后面读 SSE 和 report 会更清楚。  
-重点关注：
-- `create()`
-- `get()`
-- `save()`
+### backend/app/services/task_service.py
+为什么现在学习：它把 HTTP 请求阶段和后台异步阶段连接起来。  
+作用：先执行 `create_task()` 创建任务，再在 `run_task()` 里推进完整生命周期。  
+阅读重点：`create_task()`、`run_task()`
 
-### backend/app/workflow/graph.py（任务流程编排）
-作用：把 route、kpi、research、report 串成可逐步推进的任务图。  
-为什么现在学习：创建任务以后，真正的分析流程就是从这里继续往后走。  
-重点关注：
-- `_route_node()`
-- `_kpi_node()`
-- `_research_node()`
-- `_report_node()`
-- `stream()`
+### backend/app/repositories/implementations/in_memory/task_repository.py
+为什么现在学习：Task 的创建、进入 running、最终 completed，都先落在这里。  
+作用：保存任务当前状态，支撑主链路最核心的状态变化。  
+阅读重点：`create()`、`save()`
 
-### backend/app/kpi/workflow.py（KPI 计算流程）
-作用：负责执行确定性的 KPI 计算步骤。  
-为什么现在学习：主链路里的第一类业务结果通常先从这里产出。  
-重点关注：
-- `run()`
+### backend/app/workflow/graph.py
+为什么现在学习：HTTP 生命周期结束后，真正的业务分析从这里开始。  
+作用：把 `Route -> KPI -> Research -> Report` 串成可执行的 Workflow。  
+阅读重点：`stream()`、`_route_node()`、`_kpi_node()`、`_research_node()`、`_report_node()`
 
-### backend/app/agents/providers/static_research.py（静态 Research Provider）
-作用：为当前任务提供本地 research 数据和来源。  
-为什么现在学习：当前项目没有真实外部检索，research 结果先从这里来。  
-重点关注：
-- `research()`
+### backend/app/kpi/workflow.py
+为什么现在学习：它对应主链路里的 KPI 节点。  
+作用：执行确定性的 KPI 计算。  
+阅读重点：`run()`
 
-### backend/app/reports/generator.py（报告生成器）
-作用：把 KPI 和 Research 结果拼成最终 Markdown 报告。  
-为什么现在学习：任务创建的最终目标不是状态变更，而是产出报告。  
-重点关注：
-- `generate()`
+### backend/app/agents/providers/static_research.py
+为什么现在学习：它对应主链路里的 Research 节点。  
+作用：提供当前本地静态 Research 结果。  
+阅读重点：`research()`
 
-### backend/app/events/publisher.py（事件发布器）
-作用：把任务推进过程写成事件，供后续 SSE 读取。  
-为什么现在学习：任务虽然在后台运行，但前端仍需要看到每一步进度。  
-重点关注：
-- `publish()`
+### backend/app/reports/generator.py
+为什么现在学习：主链路最后的目标不是状态变更，而是生成报告。  
+作用：把 KPI 和 Research 结果组合成最终 Markdown Report。  
+阅读重点：`generate()`
+
+### 相关模块（了解即可）
+
+### backend/app/events/publisher.py
+作用：把任务推进结果发布成 Event，供后续 SSE / Events 链路读取。  
+为什么这里暂时不用深入阅读：它属于业务执行后的通知机制，不是 `POST /api/tasks` 主调用链的决策核心。  
+建议后续在哪一章重点学习：`GET /api/tasks/{task_id}/events` 与 SSE / Events 章节。
 
 ## 03. GET /api/tasks/{task_id}
 

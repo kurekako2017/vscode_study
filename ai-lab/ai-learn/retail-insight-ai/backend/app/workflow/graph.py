@@ -89,12 +89,13 @@ class AnalysisWorkflow:
         trace_step(
             "POST",
             "/api/tasks",
-            "Workflow",
+            "Route",
             "AnalysisWorkflow._route_node()",
             class_name="AnalysisWorkflow",
             method_name="_route_node",
             file_path="backend/app/workflow/graph.py",
             task_id=state.get("task_id"),
+            phase="background",
         )
         await self._delay()
         return {"route": state["mode"]}
@@ -112,12 +113,14 @@ class AnalysisWorkflow:
         trace_step(
             "POST",
             "/api/tasks",
-            "Workflow",
+            "KPI",
             "FixedKPIWorkflow.run()",
             class_name="FixedKPIWorkflow",
             method_name="run",
             file_path="backend/app/kpi/workflow.py",
             task_id=task_id,
+            label="KPI",
+            phase="background",
         )
         log_event(
             logger,
@@ -155,12 +158,14 @@ class AnalysisWorkflow:
         trace_step(
             "POST",
             "/api/tasks",
-            "Provider",
+            "Research",
             "StaticResearchProvider.research()",
             class_name="StaticResearchProvider",
             method_name="research",
             file_path="backend/app/agents/providers/static_research.py",
             task_id=task_id,
+            label="Research",
+            phase="background",
         )
         log_event(
             logger,
@@ -201,12 +206,14 @@ class AnalysisWorkflow:
         trace_step(
             "POST",
             "/api/tasks",
-            "Workflow",
+            "Report",
             "ReportGenerator.generate()",
             class_name="ReportGenerator",
             method_name="generate",
             file_path="backend/app/reports/generator.py",
             task_id=task_id,
+            label="Report",
+            phase="background",
         )
         log_event(
             logger,

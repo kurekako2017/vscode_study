@@ -12,7 +12,7 @@ from app.errors.exceptions import (
 from app.events.publisher import EventPublisher
 from app.models.report import Report
 from app.models.task import Task, TaskStatus
-from app.core.learning_trace import finalize_learning_trace, trace_step
+from app.core.learning_trace import finalize_learning_trace, trace_request_body, trace_step
 from app.observability.logging import get_logger, log_event
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.task_repository import TaskRepository
@@ -49,16 +49,14 @@ class TaskService:
         """建立 queued 任务并发布首个进度事件。"""
 
         task = Task(task_id=str(uuid4()), question=question.strip(), mode=mode)
-        # 这条学习日志只负责把 request body 的核心字段打到终端，方便新手确认
-        # Router 传进来的 question / mode 没有被业务流程悄悄改写；它不影响 Task、
-        # Workflow 或 Repository，只是给教学调试用的可读痕迹。
-        log_event(
-            logger,
-            "info",
-            "learning_request_body",
-            f"[LEARNING REQUEST BODY]\ntask_id: {task.task_id}\nquestion: {question}\nmode: {mode}",
+        # Request Body 进入 Learning Trace 后，终端会和主调用链一起输出，
+        # 初学者不需要再去读额外一条 JSON 结构化日志。
+        trace_request_body(
+            "POST",
+            "/api/tasks",
+            question=task.question,
+            mode=task.mode,
             task_id=task.task_id,
-            status="received",
         )
         trace_step(
             "POST",
@@ -80,7 +78,6 @@ class TaskService:
             method_name="create",
             file_path="backend/app/repositories/implementations/in_memory/task_repository.py",
             task_id=task.task_id,
-            status=task.status.value,
         )
         log_event(
             logger,
@@ -94,13 +91,13 @@ class TaskService:
         trace_step(
             "POST",
             "/api/tasks",
-            "Service",
+            "Event",
             "publish queued event",
-            class_name="TaskService",
-            method_name="create_task",
-            file_path="backend/app/services/task_service.py",
+            class_name="EventPublisher",
+            method_name="publish",
+            file_path="backend/app/events/publisher.py",
             task_id=task.task_id,
-            status=task.status.value,
+            status="queued",
         )
         log_event(
             logger,
@@ -112,31 +109,35 @@ class TaskService:
         )
         return task
 
-    def get_task(self, task_id: str) -> Task:
+    def get_task(self, task_id: str, *, emit_trace: bool = True, trace_phase: str = "http") -> Task:
         """读取任务，并把 Repository 的 ``None`` 转成明确领域异常。"""
 
-        trace_step(
-            "GET",
-            f"/api/tasks/{task_id}",
-            "Service",
-            "TaskService.get_task()",
-            class_name="TaskService",
-            method_name="get_task",
-            file_path="backend/app/services/task_service.py",
-            task_id=task_id,
-        )
+        if emit_trace:
+            trace_step(
+                "GET",
+                f"/api/tasks/{task_id}",
+                "Service",
+                "TaskService.get_task()",
+                class_name="TaskService",
+                method_name="get_task",
+                file_path="backend/app/services/task_service.py",
+                task_id=task_id,
+                phase=trace_phase,
+            )
         task = self._task_repository.get(task_id)
-        trace_step(
-            "GET",
-            f"/api/tasks/{task_id}",
-            "Repository",
-            "TaskRepository.get()",
-            class_name="TaskRepository",
-            method_name="get",
-            file_path="backend/app/repositories/implementations/in_memory/task_repository.py",
-            task_id=task_id,
-            status="found" if task is not None else "missing",
-        )
+        if emit_trace:
+            trace_step(
+                "GET",
+                f"/api/tasks/{task_id}",
+                "Repository",
+                "TaskRepository.get()",
+                class_name="TaskRepository",
+                method_name="get",
+                file_path="backend/app/repositories/implementations/in_memory/task_repository.py",
+                task_id=task_id,
+                status="found" if task is not None else "missing",
+                phase=trace_phase,
+            )
         if task is None:
             raise TaskNotFoundException(task_id)
         return task
@@ -154,7 +155,7 @@ class TaskService:
         """执行完整分析流程，并保证成功或失败都落到终态和 SSE 事件。"""
 
         started_at = perf_counter()
-        task = self.get_task(task_id)
+        task = self.get_task(task_id, emit_trace=False)
         try:
             task.transition(TaskStatus.RUNNING)
             self._task_repository.save(task)
@@ -168,6 +169,7 @@ class TaskService:
                 file_path="backend/app/repositories/implementations/in_memory/task_repository.py",
                 task_id=task_id,
                 status=task.status.value,
+                phase="background",
             )
             log_event(
                 logger,
@@ -182,6 +184,18 @@ class TaskService:
                 "status",
                 "Task started",
                 {"status": "running"},
+            )
+            trace_step(
+                "POST",
+                "/api/tasks",
+                "Event",
+                "publish running event",
+                class_name="EventPublisher",
+                method_name="publish",
+                file_path="backend/app/events/publisher.py",
+                task_id=task_id,
+                status="running",
+                phase="background",
             )
 
             # Workflow State 只放节点协作需要的数据，任务生命周期仍由 TaskService 持有。
@@ -200,6 +214,7 @@ class TaskService:
                 method_name="stream",
                 file_path="backend/app/workflow/graph.py",
                 task_id=task_id,
+                phase="background",
             )
             messages = {
                 "route": "Route selected",
@@ -224,16 +239,6 @@ class TaskService:
                 provider=self._provider_name,
             )
             self._report_repository.save(report)
-            trace_step(
-                "POST",
-                "/api/tasks",
-                "Repository",
-                "ReportRepository.save()",
-                class_name="ReportRepository",
-                method_name="save",
-                file_path="backend/app/repositories/implementations/in_memory/report_repository.py",
-                task_id=task_id,
-            )
             task.transition(TaskStatus.COMPLETED)
             self._task_repository.save(task)
             trace_step(
@@ -246,6 +251,7 @@ class TaskService:
                 file_path="backend/app/repositories/implementations/in_memory/task_repository.py",
                 task_id=task_id,
                 status=task.status.value,
+                phase="background",
             )
             duration_ms = (perf_counter() - started_at) * 1000
             log_event(
@@ -263,6 +269,18 @@ class TaskService:
                 "Task completed",
                 {"status": "completed", "report_path": f"/api/tasks/{task_id}/report"},
             )
+            trace_step(
+                "POST",
+                "/api/tasks",
+                "Event",
+                "publish completed event",
+                class_name="EventPublisher",
+                method_name="publish",
+                file_path="backend/app/events/publisher.py",
+                task_id=task_id,
+                status="completed",
+                phase="background",
+            )
         except Exception as exc:
             # 所有异常在此收敛为 failed，避免任务永远停留在 running。
             failure = (
@@ -273,7 +291,7 @@ class TaskService:
                     detail={"exception_type": type(exc).__name__},
                 )
             )
-            task = self.get_task(task_id)
+            task = self.get_task(task_id, emit_trace=False)
             task.transition(TaskStatus.FAILED, error=failure.message)
             self._task_repository.save(task)
             trace_step(
@@ -287,6 +305,7 @@ class TaskService:
                 task_id=task_id,
                 status=task.status.value,
                 error_code=failure.error_code.value,
+                phase="background",
             )
             log_event(
                 logger,
