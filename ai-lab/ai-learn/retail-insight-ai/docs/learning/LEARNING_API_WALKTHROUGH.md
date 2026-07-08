@@ -81,7 +81,7 @@ Execute
 
 ## Learning Trace（学习调用链日志）
 
-Learning Trace 是一组可关闭的教学日志，用来把 Swagger、Router、Service、Repository 和 SSE 串成同一条学习链路。
+Learning Trace 是一组可关闭的教学日志，用来把请求阶段、后台阶段和任务生命周期串成同一条学习链路。
 
 什么时候开启：
 
@@ -92,8 +92,8 @@ Learning Trace 是一组可关闭的教学日志，用来把 Swagger、Router、
 为什么存在：
 
 - Swagger 只能告诉我们接口响应结果。
-- Learning Trace 用来补上“请求在后端内部到底走到了哪里”。
-- 它特别适合初学者对照阅读 `Router -> Service -> Repository`，再理解 SSE 这种长连接是怎么持续输出事件的。
+- Learning Trace 用来补上“请求在后端内部到底是怎么被业务步骤处理的”。
+- 它特别适合初学者对照阅读 `Router -> Service -> Repository -> Workflow -> Report`，再理解任务为什么要先返回 `202`，后面又继续异步推进。
 
 如何阅读：
 
@@ -245,164 +245,65 @@ LEARNING_TRACE=false
 
 ### Learning Trace Phase 4
 
-Phase 4 把学习 trace 升级成“源码一眼可读块”。它不是为了增加新业务节点，而是为了让日志顺着源码目录读就能定位到对应文件。
+Phase 4 把学习 trace 升级成“业务调用链块”。它不是为了强调 HTTP，而是为了让初学者一眼看到请求阶段和后台阶段分别做了什么。
 
-现在每个 frame 都会显示：
+现在每个 block 都会显示：
 
-- `node`
-- `class`
-- `method`
-- `file`
+- `request_id`
+- `task_id`
+- `Request Body`
+- 请求阶段
+- 后台阶段
 
-并且会按文件类型自动补出教学节点：
-
-- `backend/app/api/**` -> `Controller File`
-- `backend/app/schemas/**` -> `Schema File`
-- 其他新 Python 文件 -> `Entering File`
-
-这套输出和实际源码阅读顺序保持一致：
+`POST /api/tasks` 的输出示例：
 
 ```text
-LEARNING TRACE
-GET /health
-request_id: ...
+POST /api/tasks
+request_id : ...
+task_id    : ...
 ============================================================
-1. HTTP Request
-   node  : HTTP Request
-   class : FastAPI
-   method: -
-   file  : backend/app/main.py
-↓
-2. Router
-   node  : Router
-   class : health.py
-   method: health()
-   file  : backend/app/api/health.py
-↓
-3. Controller File
-   node  : Entering File
-   class : health.py
-   method: health()
-   file  : backend/app/api/health.py
-↓
-4. Controller Method
-   node  : Controller Method
-   class : health.py
-   method: health()
-   file  : backend/app/api/health.py
-↓
-5. Return
-   node  : Schema(Response Model)
-   class : HealthResponse
-   method: model_construct()
-   file  : backend/app/schemas/health.py
-↓
-6. Schema File
-   node  : Entering Schema File
-   class : HealthResponse
-   method: model_construct()
-   file  : backend/app/schemas/health.py
-↓
-7. Schema
-   node  : Schema
-   class : HealthResponse
-   method: model_construct()
-   file  : backend/app/schemas/health.py
-↓
-8. HTTP Response
-   node  : HTTP Response
-   class : FastAPI
-   method: -
-   file  : backend/app/main.py
-============================================================
-END TRACE
+Request Body
+------------------------------------------------------------
+question : 你好
+mode     : hybrid
+------------------------------------------------------------
+
+============= Request =============
+Router.create_task()
+    ↓
+TaskService.create_task()
+    ↓
+TaskRepository.create()
+    ↓
+EventPublisher.publish(queued)
+    ↓
+BackgroundTasks.add_task()
+
+HTTP 202 返回
+
+============= Background =============
+TaskService.run_task()
+    ↓
+TaskRepository.save(running)
+    ↓
+EventPublisher.publish(running)
+    ↓
+AnalysisWorkflow.stream()
+    ↓
+Route
+    ↓
+KPI
+    ↓
+Research
+    ↓
+Report
+    ↓
+TaskRepository.save(completed)
+    ↓
+EventPublisher.publish(completed)
 ```
 
-`POST /api/tasks` 的顺序同样遵守这个规则，只是后台任务会继续把 Service、Repository、Workflow、Provider、Report 的链路打印完，最后才收口到 `HTTP Response`：
-
-```text
-Swagger Execute
-↓
-HTTP Request
-↓
-Router
-↓
-Controller File
-↓
-Controller Method
-↓
-Entering File
-↓
-Service
-↓
-Entering File
-↓
-Repository
-↓
-Entering File
-↓
-Workflow
-↓
-Entering File
-↓
-Provider
-↓
-Entering File
-↓
-Repository
-↓
-Entering File
-↓
-Return
-↓
-Schema File
-↓
-Schema
-↓
-TaskCreateResponse
-↓
-后台任务继续打印
-↓
-Entering File
-↓
-Service
-↓
-Entering File
-↓
-Repository
-↓
-Repository
-↓
-Entering File
-↓
-Workflow
-↓
-Entering File
-↓
-Workflow
-↓
-Entering File
-↓
-Provider
-↓
-Entering File
-↓
-Provider
-↓
-Entering File
-↓
-Workflow
-↓
-Entering File
-↓
-Repository
-↓
-Entering File
-↓
-Repository
-↓
-HTTP Response
-```
+`GET /health` 仍然会保留同一套开关和 `request_id` 追踪，但它只是一条更短的健康检查链路，不是这一章的重点。
 
 # 后台日志观察（Backend Log Observation Guide）
 
@@ -426,25 +327,23 @@ Swagger Execute
 结束
 ```
 
-统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条链路”。
+统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条业务链路”。
 
 | 后台日志观察项                               | 为什么看                       | 正常意味着什么                           |
 | -------------------------------------------- | ------------------------------ | ---------------------------------------- |
-| `request_id`                               | 关联一次完整请求               | 同一次请求所有日志拥有相同`request_id` |
-| `learning_trace.enter`                     | 请求开始                       | Learning Trace 已开启                    |
-| `HTTP Request`                             | 请求进入 FastAPI               | 请求成功进入应用                         |
-| `Router`                                   | 是否进入 Router                | 路由匹配成功                             |
-| `Controller File` / `Entering File`      | 是否进入控制器文件或业务文件   | 已进入对应 Python 文件                   |
-| `Controller Method`                        | 是否进入控制器方法             | 路由方法已开始阅读                       |
-| `Service`                                  | 是否进入业务层                 | 开始执行业务逻辑                         |
-| `Workflow`                                 | 是否进入工作流                 | Workflow 正常执行（存在时）              |
-| `Provider`                                 | 是否调用 Provider              | 数据来源开始执行（存在时）               |
-| `Repository`                               | 是否访问 Repository            | 已进入数据访问层（存在时）               |
-| `Schema File` / `Schema(Response Model)` | 是否进入返回模型文件并构造对象 | Response Model 创建成功                  |
-| `HTTP Response`                            | 请求结束                       | 返回状态码正常                           |
-| `learning_trace.exit`                      | Trace 结束                     | 整个调用链完成                           |
-| `duration_ms`                              | 性能分析                       | 接口耗时                                 |
-| `error_code`                               | 是否异常                       | `null` 表示正常                        |
+| `request_id`          | 关联一次完整请求             | 同一次请求所有日志拥有相同 `request_id` |
+| `task_id`             | 关联任务生命周期             | 同一条任务链路都能串起来                |
+| `Request Body`        | 观察用户输入                 | 先确认 `question`、`mode` 进入系统      |
+| `Router`              | 是否进入路由层               | 请求已进入 API 入口                     |
+| `Service`             | 是否进入业务层               | 开始执行业务编排                        |
+| `Repository`          | 是否写入或读取状态           | 任务状态开始落库                        |
+| `Workflow`            | 是否进入工作流               | 后台分析已经开始                        |
+| `Provider`            | 是否调用研究来源             | 数据来源开始执行                        |
+| `Report`              | 是否生成最终产物             | 报告已经合成                            |
+| `event`               | 业务事件名称                 | 事件发布顺序正确                        |
+| `status`              | 业务状态                     | `queued` / `running` / `completed`      |
+| `duration_ms`         | 性能分析                     | 接口耗时可观察                          |
+| `error_code`          | 是否异常                     | `null` 表示正常                         |
 
 ## 学习建议
 
@@ -452,21 +351,15 @@ Swagger Execute
 
 ① Execute
 
-② 看 Swagger Response
+② 看后台 Learning Trace
 
-③ 看后台 Learning Trace
+③ 先看 Request Body，再看 Router / Service / Repository
 
-④ 看 Router
+④ 看后台异步阶段的 Workflow / KPI / Research / Report
 
-⑤ 看 Service
+⑤ 看 event 和 status
 
-⑥ 看 Workflow（如果有）
-
-⑦ 看 Provider（如果有）
-
-⑧ 看 Repository（如果有）
-
-⑨ 看 Response Model
+⑥ 看 Response
 
 ⑩ 返回源码继续阅读
 
@@ -562,65 +455,14 @@ HealthResponse
 HTTP Response
 ```
 
-backend/app/main.py —— 理解项目是如何启动、注册中间件和路由的。
-
-backend/app/api/health.py —— 学会一个最简单的接口是如何定义的。
-
-backend/app/schemas/health.py —— 了解返回数据模型（Response Schema）。
-
-再回到 main.py，理解 include_router() 如何把接口接入应用。
-
 ## 源码学习说明
-
-### backend/app/api/tasks.py
-为什么这里开始学习：这是整个业务链路唯一 HTTP 入口。负责接收请求、创建 Task、注册 `BackgroundTasks`、立即返回 HTTP 202。  
-阅读重点：`create_task()`、`get_task()`、`get_task_events()`、`get_report()`
-
-### backend/app/services/task_service.py
-为什么这里学习：这是整个任务生命周期的核心。HTTP 请求阶段负责 `create_task()`，后台异步阶段负责 `run_task()`。  
-阅读重点：`create_task()`、`run_task()`、`get_task()`、`get_report()`
-
-### backend/app/repositories/implementations/in_memory/task_repository.py
-为什么这里学习：Task 第一次创建、状态变化、最终完成，全部保存于这里。  
-阅读重点：`create()`、`get()`、`save()`
-
-### backend/app/events/publisher.py
-说明：Workflow 每推进一步都会发布 Event，SSE 就是读取这里。  
-阅读重点：`publish()`
-
-### backend/app/workflow/graph.py
-为什么这里学习：HTTP 请求已经结束，真正业务分析从这里开始。Workflow 负责 `route -> kpi -> research -> report`。  
-阅读重点：`stream()`、`_route_node()`、`_kpi_node()`、`_research_node()`、`_report_node()`
-
-### backend/app/kpi/workflow.py
-说明：负责 KPI Workflow。  
-阅读重点：`run()`
-
-### backend/app/agents/providers/static_research.py
-说明：负责当前静态 Research。  
-阅读重点：`research()`
-
-### backend/app/reports/generator.py
-说明：负责生成最终 Report。  
-阅读重点：`generate()`
-
-Learning Tip  
-第一次阅读源码建议按照下面顺序：  
-1. Swagger Execute  
-2. Learning Trace  
-3. TaskService.create_task()  
-4. TaskRepository.create()  
-5. BackgroundTasks  
-6. Workflow  
-7. Report
 
 ### backend/app/main.py（项目启动入口）
 作用：创建应用实例，并把路由和依赖接到同一个后端上。  
 为什么现在学习：先知道请求从哪里进入项目，后面读接口才不会迷路。  
 重点关注：
-- `app.include_router(...)`
-- `app.add_middleware(...)`
-- 依赖容器初始化
+- `create_app()`
+- `request_context()`
 
 ### backend/app/api/health.py（接口入口）
 作用：接收 `GET /health`，返回最小可验证的状态结果。  
@@ -636,35 +478,80 @@ Learning Tip
 - `HealthResponse`
 - `status` / `service` / `provider` / `request_id`
 
+再回到 `main.py`，理解 `include_router()` 如何把接口接入应用。
+
 ## 02. POST /api/tasks
 
 | 项目                 | 内容                                                                                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 接口作用             | 创建任务，启动主业务链路                                                                                                                          |
-| 为什么先学习         | 后续状态、SSE、报告都依赖`task_id`                                                                                                              |
-| Swagger 操作         | 打开`POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
+| 为什么先学习         | 后续状态、SSE、报告都依赖 `task_id`                                                                                                              |
+| Swagger 操作         | 打开 `POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
 | 输入（入力）         | `question`、`mode`                                                                                                                            |
-| 预想结果（予想結果） | HTTP`202`，返回 `task_id` 和 `status=queued`                                                                                                |
-| 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、Workflow 主链路日志                                                |
+| 预想结果（予想結果） | HTTP `202`，返回 `task_id` 和 `status=queued`                                                                                                |
+| 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、`Route`、`KPI`、`Research`、`Report` |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                     |
-| 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py` |
+| 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py`、`backend/app/workflow/graph.py`、`backend/app/kpi/workflow.py`、`backend/app/agents/providers/static_research.py`、`backend/app/reports/generator.py` |
 | 下一步               | `GET /api/tasks/{task_id}`                                                                                                                      |
+
+### Learning Trace
+
+```text
+POST /api/tasks
+request_id : xxxx
+task_id    : xxxx
+
+Request Body
+--------------------------
+question : 你好
+mode     : hybrid
+--------------------------
+
+============= Request =============
+Router.create_task()
+    ↓
+TaskService.create_task()
+    ↓
+TaskRepository.create()
+    ↓
+EventPublisher.publish(queued)
+    ↓
+BackgroundTasks.add_task()
+
+HTTP 202 返回
+
+============= Background =============
+TaskService.run_task()
+    ↓
+TaskRepository.save(running)
+    ↓
+EventPublisher.publish(running)
+    ↓
+AnalysisWorkflow.stream()
+    ↓
+Route
+    ↓
+KPI
+    ↓
+Research
+    ↓
+Report
+    ↓
+TaskRepository.save(completed)
+    ↓
+EventPublisher.publish(completed)
+```
 
 ### 程序调用流程
 
 ```text
-HTTP Request
-↓
-Swagger UI
+客户端（Swagger）
 ↓
 POST /api/tasks
 ↓
-tasks.py（Router）
+Router
 ↓
 TaskService.create_task()
-↓
-Request Body
-question / mode
 ↓
 TaskRepository.create()
 ↓
@@ -672,12 +559,12 @@ EventPublisher.publish(queued)
 ↓
 BackgroundTasks.add_task()
 ↓
-HTTP 202 Response
-```
+HTTP 202 返回
 
-```text
-Background Task
-↓
+==========================
+后台异步开始
+==========================
+
 TaskService.run_task()
 ↓
 TaskRepository.save(running)
@@ -699,51 +586,43 @@ TaskRepository.save(completed)
 EventPublisher.publish(completed)
 ```
 
-## 源码学习说明
+### 源码学习说明
 
 ### 主调用链（★★★★★）
 
 ### backend/app/api/tasks.py
-为什么现在学习：这是整个业务链路唯一 HTTP 入口。  
-作用：接收请求、调用 `TaskService.create_task()`、注册 `BackgroundTasks`、立即返回 HTTP 202。  
-阅读重点：`create_task()`
+职责：HTTP 入口，只负责 `create_task()`。  
+重点函数：`create_task()`
 
 ### backend/app/services/task_service.py
-为什么现在学习：它把 HTTP 请求阶段和后台异步阶段连接起来。  
-作用：先执行 `create_task()` 创建任务，再在 `run_task()` 里推进完整生命周期。  
-阅读重点：`create_task()`、`run_task()`
+职责：创建任务、串联后台任务执行。  
+重点函数：`create_task()`、`run_task()`
 
 ### backend/app/repositories/implementations/in_memory/task_repository.py
-为什么现在学习：Task 的创建、进入 running、最终 completed，都先落在这里。  
-作用：保存任务当前状态，支撑主链路最核心的状态变化。  
-阅读重点：`create()`、`save()`
+职责：保存任务状态，承接 queued / running / completed。  
+重点函数：`create()`、`save()`
 
 ### backend/app/workflow/graph.py
-为什么现在学习：HTTP 生命周期结束后，真正的业务分析从这里开始。  
-作用：把 `Route -> KPI -> Research -> Report` 串成可执行的 Workflow。  
-阅读重点：`stream()`、`_route_node()`、`_kpi_node()`、`_research_node()`、`_report_node()`
+职责：后台 Workflow，推进 `Route -> KPI -> Research -> Report`。  
+重点函数：`stream()`
 
 ### backend/app/kpi/workflow.py
-为什么现在学习：它对应主链路里的 KPI 节点。  
-作用：执行确定性的 KPI 计算。  
-阅读重点：`run()`
+职责：KPI Workflow。  
+重点函数：`run()`
 
 ### backend/app/agents/providers/static_research.py
-为什么现在学习：它对应主链路里的 Research 节点。  
-作用：提供当前本地静态 Research 结果。  
-阅读重点：`research()`
+职责：Research。  
+重点函数：`research()`
 
 ### backend/app/reports/generator.py
-为什么现在学习：主链路最后的目标不是状态变更，而是生成报告。  
-作用：把 KPI 和 Research 结果组合成最终 Markdown Report。  
-阅读重点：`generate()`
+职责：生成最终 Report。  
+重点函数：`generate()`
 
 ### 相关模块（了解即可）
 
 ### backend/app/events/publisher.py
-作用：把任务推进结果发布成 Event，供后续 SSE / Events 链路读取。  
-为什么这里暂时不用深入阅读：它属于业务执行后的通知机制，不是 `POST /api/tasks` 主调用链的决策核心。  
-建议后续在哪一章重点学习：`GET /api/tasks/{task_id}/events` 与 SSE / Events 章节。
+说明：负责发布任务生命周期事件。供 SSE/Event Stream 使用。本章节不用深入阅读。  
+建议在 `GET /api/tasks/{task_id}/events` 章节再学习。
 
 ## 03. GET /api/tasks/{task_id}
 

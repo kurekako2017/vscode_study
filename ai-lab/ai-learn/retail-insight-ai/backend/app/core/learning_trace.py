@@ -21,6 +21,8 @@ _current_trace: ContextVar["LearningTraceSession | None"] = ContextVar(
 )
 _BANNER = "=" * 60
 _ARROW = "↓"
+_REQUEST_SECTION = "============= Request ============="
+_BACKGROUND_SECTION = "============= Background ============="
 
 
 @dataclass
@@ -140,6 +142,31 @@ def _render_steps(steps: list[TraceStep]) -> list[str]:
     return lines
 
 
+def _request_phase_steps(session: LearningTraceSession) -> list[TraceStep]:
+    """提取请求阶段的业务步骤，保留 Router / Service / Repository / Event 链路。"""
+
+    return [
+        step
+        for step in session.steps
+        if step.phase == "http" and step.node not in {"HTTP Request", "HTTP Response"}
+    ]
+
+
+def _background_phase_steps(session: LearningTraceSession) -> list[TraceStep]:
+    """提取后台阶段的业务步骤，让异步链路单独成块。"""
+
+    return [step for step in session.steps if step.phase == "background"]
+
+
+def _response_status(session: LearningTraceSession) -> str | None:
+    """从会话里提取最终 HTTP 状态码，便于在请求块尾部轻量展示。"""
+
+    for step in reversed(session.steps):
+        if step.node == "HTTP Response" and step.status is not None:
+            return step.status
+    return None
+
+
 def _render_session(session: LearningTraceSession) -> str:
     """把整条调用链渲染成终端可读块。"""
 
@@ -163,17 +190,20 @@ def _render_session(session: LearningTraceSession) -> str:
         )
 
     if session.defer_flush:
-        http_steps = [step for step in session.steps if step.phase == "http"]
-        background_steps = [step for step in session.steps if step.phase == "background"]
-        lines.append("HTTP Request")
-        http_chain_steps = http_steps[1:] if http_steps and http_steps[0].node == "HTTP Request" else http_steps
-        lines.extend([f"    {line}" if line != f"    {_ARROW}" else line for line in _render_steps(http_chain_steps)])
+        # POST /api/tasks 这类长任务，把“请求阶段”和“后台阶段”拆开看最容易理解。
+        request_steps = _request_phase_steps(session)
+        background_steps = _background_phase_steps(session)
+        lines.append(_REQUEST_SECTION)
+        lines.extend(
+            [f"    {line}" if line != f"    {_ARROW}" else line for line in _render_steps(request_steps)]
+        )
+        response_status = _response_status(session)
+        if response_status is not None:
+            lines.extend(["", f"HTTP {response_status} 返回", ""])
         if background_steps:
             lines.extend(
                 [
-                    "",
-                    "---------------- Background Task ----------------",
-                    "",
+                    _BACKGROUND_SECTION,
                     *[
                         f"    {line}" if line != f"    {_ARROW}" else line
                         for line in _render_steps(background_steps)
