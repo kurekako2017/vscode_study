@@ -1,6 +1,31 @@
 # 接口学习走读
 
-这份文档用于按 `总览 -> 详细` 的顺序学习 API。总览表负责快速定位，接口章节负责保留 Swagger 操作、输入、输出、后台 Log、源码位置、对应测试、下一步和程序调用流程。
+---
+
+Status
+
+Version：V1.0
+
+Status：Frozen
+
+Last Updated：2026-07-09
+
+说明：
+
+本学习文档已进入 Frozen 状态。
+
+除以下情况外，不再修改：
+
+- 修正文档错误（Bug Fix）
+- 新增 API 学习章节
+- 业务流程发生变化
+- 架构发生重大调整
+
+其余格式、美观、日志风格、章节顺序不再调整。
+
+---
+
+这份文档用于按 `总览 -> 详细` 的顺序学习 API。总览表负责快速定位，接口章节负责保留 Swagger 操作、输入、输出、后台 Log、源码位置、对应测试、下一步和程序执行阶段（Execution Flow）。
 
 ## 先认识三个入口
 
@@ -48,8 +73,8 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000
 | `HTTP method/path` | `GET` / `POST` 和 URL                             | 判断请求是否进入后端     |
 | `status code`      | `200` / `201` / `400` / `404` / `500`       | 判断接口成功还是失败     |
 | `event`            | 业务事件名称                                          | 判断程序执行到哪个阶段   |
-| `task_id`          | 任务 ID                                               | 跟踪任务链路             |
-| `document_id`      | 文档 ID                                               | 跟踪文档链路             |
+| `task_id`          | 任务 ID                                               | 跟踪任务流程             |
+| `document_id`      | 文档 ID                                               | 跟踪文档流程             |
 | `status`           | `queued` / `running` / `completed` / `failed` | 判断业务状态变化         |
 | `error_code`       | 错误码                                                | 定位失败原因             |
 | `duration_ms`      | 耗时                                                  | 判断性能问题             |
@@ -79,9 +104,9 @@ Execute
 - Swagger 只告诉我们接口响应结果。
 - Backend Log 能告诉我们请求是否真正进入后端，以及执行到了哪个业务阶段。
 
-## Learning Trace（学习调用链日志）
+## 程序执行阶段（Execution Flow，也就是 Learning Trace）
 
-Learning Trace 是一组可关闭的教学日志，用来把请求阶段、后台阶段和任务生命周期串成同一条学习链路。
+程序执行阶段（Execution Flow）是一组可关闭的教学说明，用来把请求阶段、后台阶段和任务生命周期串成同一条执行视角。
 
 什么时候开启：
 
@@ -92,7 +117,7 @@ Learning Trace 是一组可关闭的教学日志，用来把请求阶段、后�
 为什么存在：
 
 - Swagger 只能告诉我们接口响应结果。
-- Learning Trace 用来补上“请求在后端内部到底是怎么被业务步骤处理的”。
+- 程序执行阶段（Execution Flow）用来补上“请求在后端内部到底是怎么被业务步骤处理的”。
 - 它特别适合初学者对照阅读 `Router -> Service -> Repository -> Workflow -> Report`，再理解任务为什么要先返回 `202`，后面又继续异步推进。
 
 如何阅读：
@@ -116,9 +141,9 @@ Execute
 和 Swagger 配合的方法：
 
 - 先在 Swagger 里执行一次接口。
-- 再回到后端终端看 Learning Trace。
+- 再回到后端终端看程序执行阶段（Execution Flow）。
 - 用 `request_id` 串联同一次请求。
-- `task_id` 适合任务链路，`document_id` 适合文档链路。
+- `task_id` 适合任务流程，`document_id` 适合文档流程。
 - 这套方法目前先覆盖 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events`。
 
 开启步骤：
@@ -152,11 +177,11 @@ python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
   - 或者后端没有重启
   - 或者当前启动命令没有读取项目根目录 `.env`
 
-### Learning Trace Phase 2
+### 程序执行阶段（Execution Flow）Phase 2
 
-> 这是旧版学习链路说明，当前实际输出以下面的 Phase 4 为准。
+> 这是旧版执行视角说明，当前实际输出以下面的 Phase 4 为准。
 
-Phase 2 目标是把学习日志升级成更像企业项目的调用链视图。
+Phase 2 目标是把学习日志升级成更像企业项目的执行视图。
 
 默认仍然关闭：
 
@@ -164,7 +189,7 @@ Phase 2 目标是把学习日志升级成更像企业项目的调用链视图。
 LEARNING_TRACE=false
 ```
 
-开启后，在终端里可以看到类似这样的学习链路：
+开启后，在终端里可以看到类似这样的程序执行阶段：
 
 ```text
 HTTP Request
@@ -184,9 +209,9 @@ Schema(Response Model)
 HTTP Response
 ```
 
-这套日志用于学习程序调用流程，不会改变 Swagger、OpenAPI、API Response、SSE 或任何业务逻辑。
+这套日志用于学习程序执行阶段，不会改变 Swagger、OpenAPI、API Response、SSE 或任何业务逻辑。
 
-对 `POST /api/tasks` 来说，这条学习链路会在后台任务完成后统一打印完整 block，方便你按源码顺序把 main.py、API 路由、Service、Workflow、Provider、Repository 和 Response 串起来看。
+对 `POST /api/tasks` 来说，这条程序执行阶段会在后台任务完成后统一打印完整 block，方便你按源码顺序把 main.py、API 路由、Service、Workflow、Provider、Repository 和 Response 串起来看。
 
 每个节点的含义：
 
@@ -258,9 +283,9 @@ LEARNING_TRACE=false
 
 然后重启后端即可。
 
-### Learning Trace Phase 4
+### 程序执行阶段（Execution Flow）Phase 4
 
-Phase 4 把学习 trace 升级成“业务调用链块”。它不是为了强调 HTTP，而是为了让初学者一眼看到请求阶段和后台阶段分别做了什么。
+Phase 4 把程序执行阶段升级成“业务执行块”。它不是为了强调 HTTP，而是为了让初学者一眼看到请求阶段和后台阶段分别做了什么。
 
 现在每个 block 都会显示：
 
@@ -334,7 +359,7 @@ TaskRepository.save(completed)
 EventPublisher.publish(completed)
 ```
 
-`GET /health` 也会走同一套 Source Chain 风格，只是链路更短，重点是先读 `main.py`、再读 `health.py`，最后读 `HealthResponse`。
+`GET /health` 也会走同一套 程序执行阶段风格，只是流程更短，重点是先读 `main.py`、再读 `health.py`，最后读 `HealthResponse`。
 
 # 后台日志观察（Backend Log Observation Guide）
 
@@ -347,7 +372,7 @@ Swagger Execute
 ↓
 查看 request_id
 ↓
-查看 Learning Trace
+查看程序执行阶段（Execution Flow）
 ↓
 查看业务事件（event）
 ↓
@@ -358,12 +383,12 @@ Swagger Execute
 结束
 ```
 
-统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条业务链路”。
+统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条业务流程”。
 
 | 后台日志观察项                               | 为什么看                       | 正常意味着什么                           |
 | -------------------------------------------- | ------------------------------ | ---------------------------------------- |
 | `request_id`          | 关联一次完整请求             | 同一次请求所有日志拥有相同 `request_id` |
-| `task_id`             | 关联任务生命周期             | 同一条任务链路都能串起来                |
+| `task_id`             | 关联任务生命周期             | 同一条任务流程都能串起来                |
 | `Request Body`        | 观察用户输入                 | 先确认 `question`、`mode` 进入系统      |
 | `Router`              | 是否进入路由层               | 请求已进入 API 入口                     |
 | `Service`             | 是否进入业务层               | 开始执行业务编排                        |
@@ -382,7 +407,7 @@ Swagger Execute
 
 ① Execute
 
-② 看后台 Learning Trace
+② 看后台程序执行阶段（Execution Flow）
 
 ③ 先看 Request Body，再看 Router / Service / Repository
 
@@ -414,9 +439,9 @@ Swagger Execute
 > ↓
 > HTTP Response
 >
-> Learning Trace 正是为了帮助理解这一完整调用过程。
+> 程序执行阶段（Execution Flow）正是为了帮助理解这一完整调用过程。
 
-# 主链路接口总览
+# 主流程接口总览
 
 | 序号 | API                                                | 功能          | Swagger 操作                      | 输入                   | 返回                           | 对应测试                           | Service                                       | 下一步学习                                         |
 | ---- | -------------------------------------------------- | ------------- | --------------------------------- | ---------------------- | ------------------------------ | ---------------------------------- | --------------------------------------------- | -------------------------------------------------- |
@@ -458,7 +483,7 @@ Swagger Execute
 | 对应源码             | `backend/app/main.py`、`backend/app/api/health.py`、`backend/app/schemas/health.py`           |
 | 下一步               | `POST /api/tasks`                                                                                 |
 
-### 程序调用流程
+### Console Log 示例
 
 ```text
 Swagger UI
@@ -481,6 +506,15 @@ JSON
 ↓
 HTTP Response
 ```
+
+说明：
+
+GET /health 没有 Background（异步执行）阶段。
+
+整个接口会在一次 HTTP Request 内完成。
+
+当返回 HTTP 200 时，
+说明本次请求已经全部执行结束。
 
 ## 源码学习说明
 
@@ -511,7 +545,7 @@ HTTP Response
 
 | 项目                 | 内容                                                                                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 创建任务，启动主业务链路                                                                                                                          |
+| 接口作用             | 创建任务，启动主业务流程                                                                                                                          |
 | 为什么先学习         | 后续状态、SSE、报告都依赖 `task_id`                                                                                                              |
 | Swagger 操作         | 打开 `POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
 | 输入（入力）         | `question`、`mode`                                                                                                                            |
@@ -521,7 +555,7 @@ HTTP Response
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py`、`backend/app/workflow/graph.py`、`backend/app/kpi/workflow.py`、`backend/app/agents/providers/static_research.py`、`backend/app/reports/generator.py` |
 | 下一步               | `GET /api/tasks/{task_id}`                                                                                                                      |
 
-### Learning Trace
+### Console Log 示例
 
 ```text
 POST /api/tasks
@@ -569,69 +603,56 @@ TaskRepository.save(completed)
 EventPublisher.publish(completed)
 ```
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
-客户端（Swagger）
-↓
 POST /api/tasks
-↓
-backend/app/main.py
-create_app()
-（路由已注册）
-↓
-backend/app/api/tasks.py
-router = APIRouter(prefix="/api/tasks")
-↓
-@router.post("")
-↓
-create_task()
-↓
-backend/app/services/task_service.py
-TaskService.create_task()
-↓
-backend/app/repositories/implementations/in_memory/task_repository.py
-TaskRepository.create()
-↓
-backend/app/events/publisher.py
-EventPublisher.publish(queued)
-↓
-BackgroundTasks.add_task()
-↓
-HTTP 202 返回
+┌──────────────────────────────┐
+│ Request（同步执行）          │
+├──────────────────────────────┤
+│ backend/app/main.py          │
+│ ↓                            │
+│ Router                       │
+│ ↓                            │
+│ Service                      │
+│ ↓                            │
+│ Repository.create()          │
+│ ↓                            │
+│ BackgroundTasks.add_task()   │
+│ ↓                            │
+│ HTTP 202 + task_id           │
+└──────────────────────────────┘
 
-==========================
-后台异步开始
-==========================
+说明：
+HTTP 202 表示 `POST /api/tasks` 这个 HTTP 请求已经结束。
+浏览器 / Swagger 已经收到 `task_id`。
+此时不会等待后台 Workflow 完成。
 
-backend/app/services/task_service.py
-TaskService.run_task()
-↓
-backend/app/repositories/implementations/in_memory/task_repository.py
-TaskRepository.save(running)
-↓
-backend/app/events/publisher.py
-EventPublisher.publish(running)
-↓
-backend/app/workflow/graph.py
-AnalysisWorkflow.stream()
-↓
-Route
-↓
-KPI
-↓
-Research
-↓
-Report
-↓
-TaskRepository.save(completed)
-↓
-EventPublisher.publish(completed)
+┌──────────────────────────────┐
+│ Background（异步执行）       │
+├──────────────────────────────┤
+│ Repository.save()            │
+│ ↓                            │
+│ Workflow                     │
+│ ↓                            │
+│ KPI                          │
+│ ↓                            │
+│ Research                     │
+│ ↓                            │
+│ Report                       │
+│ ↓                            │
+│ Repository.save()            │
+└──────────────────────────────┘
+
+说明：
+Background 阶段在 HTTP 202 返回后继续执行。
+最终结果保存到 Repository。
+前端后续通过 `GET /api/tasks/{task_id}` 或 `GET /api/tasks/{task_id}/events` 获取结果。
 ```
 
 ### 源码学习说明
 
-### 主调用链（★★★★★）
+### 主执行阶段（★★★★★）
 
 ### backend/app/api/tasks.py
 职责：HTTP 入口，只负责 `create_task()`。  
@@ -681,7 +702,7 @@ EventPublisher.publish(completed)
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py` |
 | 下一步               | `GET /api/tasks/{task_id}/events`                                                                                                               |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -732,7 +753,7 @@ Response
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/events/sse.py`、`backend/app/repositories/implementations/in_memory/event_repository.py` |
 | 下一步               | `GET /api/tasks/{task_id}/report`                                                                                                     |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI / Browser
@@ -775,7 +796,7 @@ Response Stream
 | 项目                 | 内容                                                                                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 接口作用             | 读取任务最终生成的报告                                                                                                                              |
-| 为什么先学习         | 主链路最终目标是拿到报告，而不是只看状态变化                                                                                                        |
+| 为什么先学习         | 主流程最终目标是拿到报告，而不是只看状态变化                                                                                                        |
 | Swagger 操作         | 打开`GET /api/tasks/{task_id}/report` → `Try it out` → 填 `task_id` → `Execute`                                                          |
 | 输入（入力）         | `task_id`                                                                                                                                         |
 | 预想结果（予想結果） | HTTP`200`，返回 `status=generated` 和 Markdown 报告                                                                                             |
@@ -784,7 +805,7 @@ Response Stream
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/report_repository.py` |
 | 下一步               | `POST /api/v1/documents`                                                                                                                          |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -805,7 +826,7 @@ Response
 
 ### backend/app/api/tasks.py（报告读取入口）
 作用：接收报告读取请求，并把 `task_id` 交给任务服务查询最终结果。  
-为什么现在学习：任务链路走完以后，用户真正关心的是报告能不能拿到。  
+为什么现在学习：任务流程走完以后，用户真正关心的是报告能不能拿到。  
 重点关注：
 - `get_report()`
 
@@ -836,7 +857,7 @@ Response
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_upload_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `GET /api/v1/documents`                                                                                                                                           |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -857,7 +878,7 @@ Response
 
 ### backend/app/api/documents.py（文档上传入口）
 作用：接收上传文件和 metadata，并把原始输入交给上传服务处理。  
-为什么现在学习：Document 链路的第一步就是把事实先送进系统。  
+为什么现在学习：Document 流程的第一步就是把事实先送进系统。  
 重点关注：
 - `upload_document()`
 
@@ -890,7 +911,7 @@ Response
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_read_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `GET /api/v1/documents/{document_id}`                                                                                                                            |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -942,7 +963,7 @@ Response
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_read_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `DELETE /api/v1/documents/{document_id}`                                                                                                                         |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -993,7 +1014,7 @@ Response
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_archive_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `POST /api/v1/documents/{document_id}/import`                                                                                                                       |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1044,7 +1065,7 @@ Response
 | 对应源码             | `backend/app/api/document_imports.py`、`backend/app/services/document_import_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `POST /api/v1/documents/{document_id}/chunks`                                                                                                                             |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1098,7 +1119,7 @@ Response
 | 对应源码             | `backend/app/api/document_chunks.py`、`backend/app/services/document_chunk_service.py`、`backend/app/repositories/implementations/in_memory/document_chunk_repository.py` |
 | 下一步               | `GET /api/v1/documents/{document_id}/chunks`                                                                                                                                  |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1119,7 +1140,7 @@ Response
 
 ### backend/app/api/document_chunks.py（切分入口）
 作用：接收切分请求，并把目标文档交给 chunk 服务。  
-为什么现在学习：chunk 是文档链路里第一次把正文改造成可检索结构。  
+为什么现在学习：chunk 是文档流程里第一次把正文改造成可检索结构。  
 重点关注：
 - `chunk_document()`
 
@@ -1151,7 +1172,7 @@ Response
 | 对应源码             | `backend/app/api/document_chunks.py`、`backend/app/services/document_chunk_service.py`、`backend/app/repositories/implementations/in_memory/document_chunk_repository.py` |
 | 下一步               | `POST /api/v1/document-retrieval/search`                                                                                                                                      |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1202,7 +1223,7 @@ Response
 | 对应源码             | `backend/app/api/document_retrieval.py`、`backend/app/services/document_retrieval_service.py`、`backend/app/repositories/implementations/in_memory/document_retrieval.py` |
 | 下一步               | `POST /api/v1/internal-rag/answer`                                                                                                                                            |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1256,7 +1277,7 @@ Response
 | 对应源码             | `backend/app/api/internal_rag.py`、`backend/app/services/internal_rag_service.py`、`backend/app/services/rag_answer_generator.py`       |
 | 下一步               | `POST /api/v1/reports/{task_id}/submit-approval`                                                                                            |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1313,7 +1334,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/repositories/implementations/in_memory/approval_repository.py` |
 | 下一步               | `GET /api/v1/approvals`                                                                                                                                     |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1366,7 +1387,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/repositories/implementations/in_memory/approval_repository.py` |
 | 下一步               | `GET /api/v1/approvals/{approval_id}`                                                                                                                       |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1417,7 +1438,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/repositories/implementations/in_memory/approval_repository.py` |
 | 下一步               | `POST /api/v1/approvals/{approval_id}/approve`                                                                                                              |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1468,7 +1489,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/services/audit_service.py` |
 | 下一步               | `POST /api/v1/approvals/{approval_id}/reject`                                                                           |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1524,7 +1545,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/services/audit_service.py` |
 | 下一步               | `GET /api/v1/users/me`                                                                                                  |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1580,7 +1601,7 @@ Response
 | 对应源码             | `backend/app/api/security.py`、`backend/app/services/security_service.py` |
 | 下一步               | `GET /api/v1/security/roles`                                                |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1598,7 +1619,7 @@ Response
 
 ### backend/app/api/security.py（当前用户入口）
 作用：返回当前请求上下文里的占位用户信息。  
-为什么现在学习：当前项目没有真实登录，但很多权限链路都要先经过这个边界。  
+为什么现在学习：当前项目没有真实登录，但很多权限流程都要先经过这个边界。  
 重点关注：
 - `get_current_user()`
 
@@ -1622,7 +1643,7 @@ Response
 | 对应源码             | `backend/app/api/security.py`、`backend/app/services/security_service.py` |
 | 下一步               | `GET /api/v1/security/permissions`                                          |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1664,7 +1685,7 @@ Response
 | 对应源码             | `backend/app/api/security.py`、`backend/app/services/security_service.py` |
 | 下一步               | `GET /api/v1/audit-logs`                                                    |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1707,7 +1728,7 @@ Response
 | 对应源码             | `backend/app/api/audit_logs.py`、`backend/app/services/audit_service.py`、`backend/app/repositories/implementations/in_memory/audit_repository.py` |
 | 下一步               | `docs/learning/TEST_CASES.md`                                                                                                                          |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1751,7 +1772,7 @@ Response
 | 项目                 | 内容                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
 | 接口作用             | 修订报告并形成新的审批相关版本语义                                                               |
-| 为什么先学习         | 这是审批链路的补充动作，不属于本轮 23 个主学习接口，但属于现有 Approval 能力                     |
+| 为什么先学习         | 这是审批流程的补充动作，不属于本轮 23 个主学习接口，但属于现有 Approval 能力                     |
 | Swagger 操作         | 打开`POST /api/v1/reports/{task_id}/revise` → `Try it out` → 填 `task_id` → `Execute` |
 | 输入（入力）         | `task_id`、可选 revision reason                                                                |
 | 预想结果（予想結果） | 返回 revision 结果                                                                               |
@@ -1760,7 +1781,7 @@ Response
 | 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`                   |
 | 下一步               | 回看 approval 状态机                                                                             |
 
-### 程序调用流程
+### 程序执行阶段（Execution Flow）
 
 ```text
 Swagger UI
@@ -1781,7 +1802,7 @@ Response
 
 ### backend/app/api/approvals.py（报告修订入口）
 作用：接收报告修订请求，并把修订动作交给审批服务生成新版本语义。  
-为什么现在学习：这能补齐审批链路里“不是批准也不是拒绝”的第三种处理方式。  
+为什么现在学习：这能补齐审批流程里“不是批准也不是拒绝”的第三种处理方式。  
 重点关注：
 - `revise()`
 
