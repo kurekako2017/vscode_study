@@ -18,7 +18,12 @@ from app.api.internal_rag import router as internal_rag_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
-from app.core.learning_trace import configure_learning_trace, trace_enter, trace_exit
+from app.core.learning_trace import (
+    configure_learning_trace,
+    trace_enter,
+    trace_exit,
+    trace_source_chain,
+)
 from app.errors.handlers import register_exception_handlers
 from app.observability.logging import (
     bind_request_id,
@@ -92,6 +97,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 file_path="backend/app/main.py",
                 defer_flush=request.method == "POST" and request.url.path == "/api/tasks",
             )
+            # 这里先把应用入口和“路由已经注册”这两层固定下来，
+            # 初学者在终端里会先读到 main.py，再进入具体 API 文件。
+            if request.url.path == "/health":
+                trace_source_chain(
+                    request.method,
+                    request.url.path,
+                    [
+                        ("backend/app/main.py", "create_app()"),
+                        ("", "（路由已注册）"),
+                    ],
+                )
+            elif request.url.path == "/api/tasks":
+                trace_source_chain(
+                    request.method,
+                    request.url.path,
+                    [
+                        ("backend/app/main.py", "create_app()"),
+                        ("", "（路由已注册）"),
+                    ],
+                )
             response = await call_next(request)  # 调用下一个中间件或路由处理请求。
             trace_exit(
                 request.method,

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from collections.abc import Sequence
 import sys
 
 from app.observability.logging import get_request_id
@@ -23,6 +24,7 @@ _BANNER = "=" * 60
 _ARROW = "↓"
 _REQUEST_SECTION = "============= Request ============="
 _BACKGROUND_SECTION = "============= Background ============="
+SourceChainItem = tuple[str, str]
 
 
 @dataclass
@@ -103,40 +105,127 @@ def _task_id(session: LearningTraceSession) -> str:
     return "-"
 
 
+def format_source_chain(source_chain: Sequence[SourceChainItem]) -> str:
+    """把源码调用链整理成终端里一眼能读懂的文本块。
+
+    这个函数只负责“怎么排版”，不负责把内容塞进 session。
+    这样 API 文件只需要传 Source Chain 数据，学习格式就仍然集中在这里。
+    """
+
+    lines: list[str] = []
+    for index, (file_path, snippet) in enumerate(source_chain):
+        if file_path:
+            lines.append(file_path)
+        if snippet:
+            lines.append(snippet)
+        if index != len(source_chain) - 1:
+            lines.append(f"    {_ARROW}")
+    return "\n".join(lines)
+
+
+def trace_source_chain(
+    http_method: str,
+    http_path: str,
+    source_chain: Sequence[SourceChainItem],
+    *,
+    title: str | None = None,
+    task_id: str | None = None,
+    document_id: str | None = None,
+    phase: str = "http",
+) -> None:
+    """把一组源码调用链节点写入当前会话。
+
+    这里不直接打印，而是把 Source Chain 当成普通步骤收进 session，
+    最终由统一渲染器一次性输出。这样每个接口只提供数据，不重复写打印逻辑。
+    """
+
+    session = _ensure_session(http_method, http_path, title=title)
+    for file_path, snippet in source_chain:
+        session.add(
+            TraceStep(
+                node="Source Chain",
+                label=snippet or None,
+                file_path=file_path or None,
+                http_method=http_method,
+                http_path=http_path,
+                task_id=task_id,
+                document_id=document_id,
+                phase=phase,
+            )
+        )
+
+
 def _step_label(step: TraceStep) -> str:
     """把学习节点收敛成终端里一眼可读的业务调用链。"""
 
     if step.label is not None:
         return step.label
+    if step.node == "Source Chain":
+        return ""
     if step.node == "HTTP Request":
+        if step.method_name:
+            return step.method_name
         return "HTTP Request"
     if step.node == "HTTP Response":
         response_status = step.status or "-"
         return f"HTTP {response_status} Response"
     if step.node == "Router":
-        return f"Router.{step.method_name or 'handle'}()"
+        if step.method_name:
+            return f"{step.method_name}()"
+        return "Router.handle()"
     if step.node == "Service":
-        return f"TaskService.{step.method_name or 'handle'}()"
+        if step.class_name and step.method_name:
+            return f"{step.class_name}.{step.method_name}()"
+        if step.method_name:
+            return f"{step.method_name}()"
+        return "TaskService.handle()"
     if step.node == "Repository":
-        repository_name = step.class_name or "Repository"
-        method_name = step.method_name or "save"
-        if step.status:
-            return f"{repository_name}.{method_name}({step.status})"
-        return f"{repository_name}.{method_name}()"
+        if step.class_name and step.method_name:
+            return f"{step.class_name}.{step.method_name}()"
+        if step.method_name:
+            return f"{step.method_name}()"
+        return step.class_name or "Repository.save()"
     if step.node == "Event":
+        if step.class_name and step.method_name:
+            return f"{step.class_name}.{step.method_name}()"
+        if step.method_name:
+            return f"{step.method_name}()"
         return f"EventPublisher.publish({step.status or 'event'})"
     if step.node == "Workflow":
-        return f"{step.class_name or 'Workflow'}.{step.method_name or 'run'}()"
+        if step.class_name and step.method_name:
+            return f"{step.class_name}.{step.method_name}()"
+        if step.method_name:
+            return f"{step.method_name}()"
+        return f"{step.class_name or 'Workflow'}.run()"
+    if step.node == "Schema(Response Model)":
+        if step.class_name and step.method_name:
+            return f"{step.class_name}.{step.method_name}()"
+        if step.method_name:
+            schema_name = step.class_name or "Schema"
+            return f"{schema_name}.{step.method_name}()"
+        return step.class_name or "Schema"
     return step.node
+
+
+def _step_lines(step: TraceStep) -> list[str]:
+    """把单个学习节点展开成“文件 -> 代码”的阅读块。"""
+
+    lines: list[str] = []
+    if step.file_path and step.node != "HTTP Response":
+        lines.append(step.file_path)
+    body = _step_label(step)
+    if body:
+        lines.append(body)
+    return lines
 
 
 def _render_steps(steps: list[TraceStep]) -> list[str]:
     """将步骤列表渲染成单列学习链路。"""
 
-    visible_steps = [step for step in steps if step.node != "Schema(Response Model)"]
+    visible_steps = [step for step in steps if step.node != "HTTP Request"]
     lines: list[str] = []
     for index, step in enumerate(visible_steps):
-        lines.append(_step_label(step))
+        lines.extend(_step_lines(step))
         if index != len(visible_steps) - 1:
             lines.append(f"    {_ARROW}")
     return lines
@@ -233,6 +322,7 @@ def trace_enter(
     class_name: str | None = None,
     method_name: str | None = None,
     file_path: str | None = None,
+    label: str | None = None,
     defer_flush: bool = False,
     task_id: str | None = None,
     document_id: str | None = None,
@@ -244,6 +334,7 @@ def trace_enter(
     session.add(
         TraceStep(
             node=node,
+            label=label,
             class_name=class_name,
             method_name=method_name,
             file_path=file_path,

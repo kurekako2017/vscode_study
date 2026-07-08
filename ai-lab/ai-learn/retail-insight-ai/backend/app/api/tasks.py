@@ -4,7 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
 from fastapi.responses import StreamingResponse
 
 from app.api.dependencies import get_event_repository, get_task_service
-from app.core.learning_trace import trace_step
+from app.core.learning_trace import trace_source_chain, trace_step
 from app.events.sse import stream_task_events
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.event_repository import EventRepository
@@ -36,14 +36,16 @@ async def create_task(
 ) -> ApiResponse[TaskCreateResponse]:
     """创建任务并把执行安排到响应后的 BackgroundTasks。"""
 
-    trace_step(
+    # API 文件只提供 Source Chain 数据，不再自己拼接打印格式。
+    # 终端会先读 main.py，再读这里的路由定义，随后进入 Service 和 Workflow。
+    trace_source_chain(
         "POST",
         "/api/tasks",
-        "Router",
-        "create_task()",
-        class_name="tasks.py",
-        method_name="create_task",
-        file_path="backend/app/api/tasks.py",
+        [
+            ("backend/app/api/tasks.py", 'router = APIRouter(prefix="/api/tasks")'),
+            ("", '@router.post("")'),
+            ("", "create_task()"),
+        ],
     )
     task = service.create_task(payload.question, payload.mode)
     # 先返回 202，再执行分析，避免长流程占用创建任务的 HTTP 请求。

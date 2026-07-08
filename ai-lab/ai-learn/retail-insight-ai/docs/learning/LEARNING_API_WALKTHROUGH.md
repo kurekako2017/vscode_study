@@ -186,7 +186,7 @@ HTTP Response
 
 这套日志用于学习程序调用流程，不会改变 Swagger、OpenAPI、API Response、SSE 或任何业务逻辑。
 
-对 `POST /api/tasks` 来说，这条学习链路会在后台任务完成后统一打印完整 block，方便你把 Router、Service、Workflow、Provider、Repository 和 Response 串起来看。
+对 `POST /api/tasks` 来说，这条学习链路会在后台任务完成后统一打印完整 block，方便你按源码顺序把 main.py、API 路由、Service、Workflow、Provider、Repository 和 Response 串起来看。
 
 每个节点的含义：
 
@@ -204,13 +204,21 @@ HTTP Response
 对于 `GET /health`，你会看到：
 
 ```text
-HTTP Request
+backend/app/main.py
+create_app()
+（路由已注册）
 ↓
-Router
+backend/app/api/health.py
+router = APIRouter()
+↓
+@router.get("/health")
 ↓
 health()
 ↓
+backend/app/schemas/health.py
 HealthResponse
+↓
+JSON
 ↓
 HTTP Response
 ```
@@ -218,11 +226,18 @@ HTTP Response
 对于 `POST /api/tasks`，你会看到：
 
 ```text
-HTTP Request
+backend/app/main.py
+create_app()
+（路由已注册）
 ↓
-Router
+backend/app/api/tasks.py
+router = APIRouter(prefix="/api/tasks")
 ↓
-Service
+@router.post("")
+↓
+create_task()
+↓
+TaskService.create_task()
 ↓
 Workflow
 ↓
@@ -269,12 +284,24 @@ mode     : hybrid
 ------------------------------------------------------------
 
 ============= Request =============
-Router.create_task()
+backend/app/main.py
+create_app()
+（路由已注册）
     ↓
+backend/app/api/tasks.py
+router = APIRouter(prefix="/api/tasks")
+    ↓
+@router.post("")
+    ↓
+create_task()
+    ↓
+backend/app/services/task_service.py
 TaskService.create_task()
     ↓
+backend/app/repositories/implementations/in_memory/task_repository.py
 TaskRepository.create()
     ↓
+backend/app/events/publisher.py
 EventPublisher.publish(queued)
     ↓
 BackgroundTasks.add_task()
@@ -282,12 +309,16 @@ BackgroundTasks.add_task()
 HTTP 202 返回
 
 ============= Background =============
+backend/app/services/task_service.py
 TaskService.run_task()
     ↓
+backend/app/repositories/implementations/in_memory/task_repository.py
 TaskRepository.save(running)
     ↓
+backend/app/events/publisher.py
 EventPublisher.publish(running)
     ↓
+backend/app/workflow/graph.py
 AnalysisWorkflow.stream()
     ↓
 Route
@@ -303,7 +334,7 @@ TaskRepository.save(completed)
 EventPublisher.publish(completed)
 ```
 
-`GET /health` 仍然会保留同一套开关和 `request_id` 追踪，但它只是一条更短的健康检查链路，不是这一章的重点。
+`GET /health` 也会走同一套 Source Chain 风格，只是链路更短，重点是先读 `main.py`、再读 `health.py`，最后读 `HealthResponse`。
 
 # 后台日志观察（Backend Log Observation Guide）
 
@@ -432,25 +463,21 @@ Swagger Execute
 ```text
 Swagger UI
 ↓
-HTTP Request
+backend/app/main.py
+create_app()
+（路由已注册）
 ↓
 backend/app/api/health.py
-Router
+router = APIRouter()
 ↓
-Controller File
-↓
-Controller Method
+@router.get("/health")
 ↓
 health()
 ↓
-Return
-↓
 backend/app/schemas/health.py
-Schema File
-↓
-Schema
-↓
 HealthResponse
+↓
+JSON
 ↓
 HTTP Response
 ```
@@ -549,12 +576,24 @@ EventPublisher.publish(completed)
 ↓
 POST /api/tasks
 ↓
-Router
+backend/app/main.py
+create_app()
+（路由已注册）
 ↓
+backend/app/api/tasks.py
+router = APIRouter(prefix="/api/tasks")
+↓
+@router.post("")
+↓
+create_task()
+↓
+backend/app/services/task_service.py
 TaskService.create_task()
 ↓
+backend/app/repositories/implementations/in_memory/task_repository.py
 TaskRepository.create()
 ↓
+backend/app/events/publisher.py
 EventPublisher.publish(queued)
 ↓
 BackgroundTasks.add_task()
@@ -565,12 +604,16 @@ HTTP 202 返回
 后台异步开始
 ==========================
 
+backend/app/services/task_service.py
 TaskService.run_task()
 ↓
+backend/app/repositories/implementations/in_memory/task_repository.py
 TaskRepository.save(running)
 ↓
+backend/app/events/publisher.py
 EventPublisher.publish(running)
 ↓
+backend/app/workflow/graph.py
 AnalysisWorkflow.stream()
 ↓
 Route
