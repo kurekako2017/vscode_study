@@ -28,7 +28,7 @@ class TaskService:
     Service 层负责“先做什么、失败后如何收敛”，但不负责 KPI 公式、Research
     实现或 HTTP 格式。保持这个边界后，未来替换存储或执行器时无需改业务流程。
     """
-
+    # 初始化参数，包括仓库、报告库和事件
     def __init__(
         self,
         task_repository: TaskRepository,
@@ -47,7 +47,7 @@ class TaskService:
 
     def create_task(self, question: str, mode: str) -> Task:
         """建立 queued 任务并发布首个进度事件。"""
-
+        # 生成唯一任务 ID，避免前端重复提交时覆盖已有任务。
         task = Task(task_id=str(uuid4()), question=question.strip(), mode=mode)
         trace_request_body(
             "POST",  # HTTP 方法
@@ -66,6 +66,7 @@ class TaskService:
             file_path="backend/app/services/task_service.py",  # 源码文件
             task_id=task.task_id,  # 当前任务ID
         )
+        # 创建任务并保存到 Repository。
         self._task_repository.create(task)
         trace_step(
             "POST",  # HTTP 方法
@@ -85,6 +86,7 @@ class TaskService:
             task_id=task.task_id,  # 当前任务ID
             status=task.status.value,  # 当前任务状态
         )
+        # 发布 queued 事件给 SSE，方便前端立即显示任务状态。
         self._event_publisher.publish(  # 发布 queued 事件给 SSE。
             task.task_id,  # 当前任务ID
             "status",  # event_type
@@ -156,8 +158,9 @@ class TaskService:
 
     async def run_task(self, task_id: str) -> None:
         """执行完整分析流程，并保证成功或失败都落到终态和 SSE 事件。"""
-
+        # 记录任务开始时间，方便计算耗时。
         started_at = perf_counter()
+        # 读取任务并进入 running 状态，保存到 Repository。
         task = self.get_task(task_id, emit_trace=False)
         try:
             task.transition(TaskStatus.RUNNING)
@@ -224,7 +227,7 @@ class TaskService:
                 "research": "Research completed",
                 "report": "Report generated",
             }
-
+            # 迭代 Workflow 流程，逐步发布进度事件。
             async for node_name, state in self._workflow.stream(initial_state):
                 final_state = state
                 self._event_publisher.publish(
@@ -233,7 +236,7 @@ class TaskService:
                     messages[node_name],  # message
                     {"status": "running", "node": node_name},  # event data
                 )
-
+            # 生成报告并保存到 Repository。
             report = Report(
                 task_id=task_id,
                 markdown=final_state["report_markdown"],
