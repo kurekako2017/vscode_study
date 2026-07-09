@@ -31,11 +31,11 @@ class TaskService:
     # 初始化参数，包括仓库、报告库和事件
     def __init__(
         self,
-        task_repository: TaskRepository,
-        report_repository: ReportRepository,
-        event_publisher: EventPublisher,
-        workflow: AnalysisWorkflow,
-        provider_name: str = "static",
+        task_repository: TaskRepository,         # 任务仓库接口
+        report_repository: ReportRepository,        # 报告仓库接口
+        event_publisher: EventPublisher,         # 事件发布器接口
+        workflow: AnalysisWorkflow,                # 分析工作流接口
+        provider_name: str = "static",              # 分析报告提供者名称
     ) -> None:
         """注入接口依赖，使 Service 不绑定 InMemory Repository 的具体实现。"""
 

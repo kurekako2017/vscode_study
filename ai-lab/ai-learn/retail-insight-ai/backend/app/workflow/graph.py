@@ -32,8 +32,8 @@ class AnalysisWorkflow:
 
     # Workflow 只负责编排，生命周期由 TaskService 处理。
     def __init__(
-        self,
-        kpi_workflow: FixedKPIWorkflow,
+        self,                               # 分析工作流类
+        kpi_workflow: FixedKPIWorkflow,     # KPI 工作流类
         research_agent: ResearchAgent,
         report_generator: ReportGenerator,
         step_delay_seconds: float = 0.05,
