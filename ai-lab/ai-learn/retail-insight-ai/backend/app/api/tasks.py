@@ -13,22 +13,16 @@ from app.schemas.report_api import ReportResponse
 from app.schemas.task_api import TaskCreateRequest, TaskCreateResponse, TaskResponse
 from app.services.task_service import TaskService
 
-# 定义 FastAPI 应用实例
+# 定义 tasks 路由器。
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 logger = get_logger(__name__)
 
 
-# 注册任务服务依赖 `get_task_service`，用于在路由中注入 TaskService 实例,参数是 FastAPI 的 Depends 函数，用于声明依赖关系。
-# router 是 FastAPI 的路由器实例，用于注册路由和处理请求。Post 请求用于创建任务，Get 请求用于查询任务状态和事件流，Get 请求用于获取任务报告。
 @router.post(
     path="",
     response_model=ApiResponse[TaskCreateResponse],
     status_code=status.HTTP_202_ACCEPTED,
 )
-# 调用服务层方法创建任务，并返回响应.
-#  payload 是请求体中的数据，background_tasks 是 FastAPI 提供的后台任务处理器，service 是通过依赖注入获取的 TaskService 实例。
-#  background_tasks是 FastAPI 提供的一个工具，用于在请求处理完成后执行后台任务。它允许你在响应返回给客户端后继续执行一些耗时的操作，而不会阻塞主线程。
-#  service 是通过依赖注入获取的 TaskService 实例，用于处理任务相关的业务逻辑。
 async def create_task(
     payload: TaskCreateRequest,
     background_tasks: BackgroundTasks,
@@ -36,29 +30,26 @@ async def create_task(
 ) -> ApiResponse[TaskCreateResponse]:
     """创建任务并把执行安排到响应后的 BackgroundTasks。"""
 
-    # API 文件只提供 Source Chain 数据，不再自己拼接打印格式。
-    # 终端会先读 main.py，再读这里的路由定义，随后进入 Service 和 Workflow。
     trace_source_chain(
-        "POST",
-        "/api/tasks",
+        "POST",  # HTTP 方法
+        "/api/tasks",  # API 路径
         [
-            ("backend/app/api/tasks.py", 'router = APIRouter(prefix="/api/tasks")'),
-            ("", '@router.post("")'),
-            ("", "create_task()"),
+            ("backend/app/api/tasks.py", 'router = APIRouter(prefix="/api/tasks")'),  # 路由定义
+            ("", '@router.post("")'),  # POST 入口
+            ("", "create_task()"),  # 当前执行步骤
         ],
     )
     task = service.create_task(payload.question, payload.mode)
-    # 先返回 202，再执行分析，避免长流程占用创建任务的 HTTP 请求。
     background_tasks.add_task(service.run_task, task.task_id)
     trace_step(
-        "POST",
-        "/api/tasks",
-        "Router",
-        "BackgroundTasks.add_task()",
-        class_name="BackgroundTasks",
-        method_name="add_task",
-        file_path="backend/app/api/tasks.py",
-        task_id=task.task_id,
+        "POST",  # HTTP 方法
+        "/api/tasks",  # API 路径
+        "Router",  # Learning Trace 分类
+        "BackgroundTasks.add_task()",  # 当前执行步骤
+        class_name="BackgroundTasks",  # 当前执行类
+        method_name="add_task",  # 当前执行方法
+        file_path="backend/app/api/tasks.py",  # 源码文件
+        task_id=task.task_id,  # 当前任务ID
         label="BackgroundTasks.add_task()",
     )
     data = TaskCreateResponse(task_id=task.task_id, status=task.status)
@@ -66,40 +57,37 @@ async def create_task(
     return response
 
 
-# 注册任务状态查询接口
 @router.get(path="/{task_id}", response_model=ApiResponse[TaskResponse])
 async def get_task(
     task_id: str,
     service: TaskService = Depends(get_task_service),
 ) -> ApiResponse[TaskResponse]:
     """读取任务当前状态，任务不存在时转换为稳定的 404。"""
-    # 调用服务层方法获取任务状态，并返回响应
     trace_step(
-        "GET",
-        f"/api/tasks/{task_id}",
-        "Router",
-        "get_task()",
-        class_name="tasks.py",
-        method_name="get_task",
-        file_path="backend/app/api/tasks.py",
-        task_id=task_id,
+        "GET",  # HTTP 方法
+        f"/api/tasks/{task_id}",  # API 路径
+        "Router",  # Learning Trace 分类
+        "get_task()",  # 当前执行步骤
+        class_name="tasks.py",  # 当前执行类
+        method_name="get_task",  # 当前执行方法
+        file_path="backend/app/api/tasks.py",  # 源码文件
+        task_id=task_id,  # 当前任务ID
     )
     data = TaskResponse.from_domain(service.get_task(task_id))
     response = success_response(data, get_request_id())
     trace_step(
-        "GET",
-        f"/api/tasks/{task_id}",
-        "Schema(Response Model)",
-        "TaskResponse.from_domain()",
-        class_name="TaskResponse",
-        method_name="from_domain",
-        file_path="backend/app/schemas/task_api.py",
-        task_id=task_id,
+        "GET",  # HTTP 方法
+        f"/api/tasks/{task_id}",  # API 路径
+        "Schema(Response Model)",  # Learning Trace 分类
+        "TaskResponse.from_domain()",  # 当前执行步骤
+        class_name="TaskResponse",  # 当前执行类
+        method_name="from_domain",  # 当前执行方法
+        file_path="backend/app/schemas/task_api.py",  # 源码文件
+        task_id=task_id,  # 当前任务ID
     )
     return response
 
 
-# 注册任务事件流接口
 @router.get("/{task_id}/events")
 async def get_task_events(
     task_id: str,
@@ -108,18 +96,15 @@ async def get_task_events(
     event_repository: EventRepository = Depends(get_event_repository),
 ) -> StreamingResponse:
     """建立 SSE 连接，从指定事件序号继续发送任务进度。"""
-    # SSE 连接在任务不存在时返回 404，任务已完成时仍然可以继续接收事件流。
-    # SSE 是长连接，客户端可以在任务完成后继续接收事件流，直到连接关闭。
-    # 任务不存在时抛出异常，FastAPI 会自动转换为 404 响应。
     trace_step(
-        "GET",
-        f"/api/tasks/{task_id}/events",
-        "Router",
-        "get_task_events()",
-        class_name="tasks.py",
-        method_name="get_task_events",
-        file_path="backend/app/api/tasks.py",
-        task_id=task_id,
+        "GET",  # HTTP 方法
+        f"/api/tasks/{task_id}/events",  # API 路径
+        "Router",  # Learning Trace 分类
+        "get_task_events()",  # 当前执行步骤
+        class_name="tasks.py",  # 当前执行类
+        method_name="get_task_events",  # 当前执行方法
+        file_path="backend/app/api/tasks.py",  # 源码文件
+        task_id=task_id,  # 当前任务ID
     )
     service.get_task(task_id)
     log_event(
@@ -130,7 +115,6 @@ async def get_task_events(
         task_id=task_id,
         status="connected",
     )
-    # 返回 StreamingResponse，使用 stream_task_events 生成器函数作为响应体，设置媒体类型为 text/event-stream，并添加缓存控制和加速缓冲头。
     return StreamingResponse(
         stream_task_events(event_repository, task_id, after_sequence=after),
         media_type="text/event-stream",
@@ -141,7 +125,6 @@ async def get_task_events(
     )
 
 
-# 注册任务报告查询接口
 @router.get("/{task_id}/report", response_model=ApiResponse[ReportResponse])
 async def get_report(
     task_id: str,

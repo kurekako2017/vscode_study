@@ -8,7 +8,7 @@ from app.schemas.common import ApiResponse, success_response
 from app.schemas.security_api import CurrentUserResponse, PermissionListResponse, RoleListResponse
 from app.services.security_service import SecurityService
 
-# security 路由负责当前用户快照、冻结角色目录和冻结权限目录。
+# security 路由。
 router = APIRouter(prefix="/api/v1", tags=["security"])
 logger = get_logger(__name__)
 
@@ -59,4 +59,3 @@ async def get_permissions(
         status="success",
     )
     return success_response(PermissionListResponse.from_domain(permissions), get_request_id())
-

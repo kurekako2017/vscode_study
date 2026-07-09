@@ -25,6 +25,6 @@ class EventPublisher:
         """追加不可变任务事件，并返回仓库分配了 sequence 的结果。"""
 
         event_data = dict(data or {})
-        # 保存事件产生时的请求 ID；SSE 可能由另一个重连请求稍后读取该事件。
+        # 补 request_id，方便串联 SSE 和日志。
         event_data.setdefault("request_id", get_request_id())
         return self._repository.append(task_id, event_type, message, event_data)

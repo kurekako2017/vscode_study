@@ -30,8 +30,7 @@ class AnalysisWorkflow:
     输入与状态增量，TaskService 则统一处理持久化、终态和对外事件。
     """
 
-    # Workflow 只负责编排，不保存 Task 的 queued/completed 生命周期。这样 Node 可以专注
-    # 输入与状态增量，TaskService 则统一处理持久化、终态和对外事件。
+    # Workflow 只负责编排，生命周期由 TaskService 处理。
     def __init__(
         self,
         kpi_workflow: FixedKPIWorkflow,
@@ -56,23 +55,18 @@ class AnalysisWorkflow:
         builder.add_node("research", self._research_node)
         builder.add_node("report", self._report_node)
 
-        # route 先把 API mode 转成显式路径，避免 Node 内部隐藏复杂 if/else。
         builder.add_edge(START, "route")
-        # route 决定后续路径，KPI-only 直接进入报告，Hybrid 继续调查，Research-only 跳过 KPI。
         builder.add_conditional_edges(
             "route",
             self._after_route,
             {"kpi": "kpi", "research": "research"},
         )
-        # KPI-only 直接进入报告，Hybrid 继续调查，Research-only 跳过 KPI。
         builder.add_conditional_edges(
             "kpi",
             self._after_kpi,
             {"research": "research", "report": "report"},
         )
-        #   Research-only 跳过 KPI，其余模式先执行确定性计算。
         builder.add_edge("research", "report")
-        #   report 节点是最后一步，生成 Markdown 报告并结束。
         builder.add_edge("report", END)
         return builder.compile()
 
@@ -82,20 +76,19 @@ class AnalysisWorkflow:
         if self._step_delay_seconds > 0:
             await asyncio.sleep(self._step_delay_seconds)
 
-    #   node是每个步骤的执行函数，state是当前的分析状态，返回一个字典表示该节点的输出增量。
     async def _route_node(self, state: AnalysisState) -> dict[str, str]:
         """读取 mode 并写入 route；Node 返回增量而不是复制整个 State。"""
 
         trace_step(
-            "POST",
-            "/api/tasks",
-            "Route",
-            "AnalysisWorkflow._route_node()",
-            class_name="AnalysisWorkflow",
-            method_name="_route_node",
-            file_path="backend/app/workflow/graph.py",
-            task_id=state.get("task_id"),
-            phase="background",
+            "POST",  # HTTP 方法
+            "/api/tasks",  # API 路径
+            "Route",  # Learning Trace 分类
+            "AnalysisWorkflow._route_node()",  # 当前执行步骤
+            class_name="AnalysisWorkflow",  # 当前执行类
+            method_name="_route_node",  # 当前执行方法
+            file_path="backend/app/workflow/graph.py",  # 源码文件
+            task_id=state.get("task_id"),  # 当前任务ID
+            phase="background",  # 执行阶段
         )
         await self._delay()
         return {"route": state["mode"]}
@@ -111,16 +104,16 @@ class AnalysisWorkflow:
         task_id = state.get("task_id")
         started_at = perf_counter()
         trace_step(
-            "POST",
-            "/api/tasks",
-            "KPI",
-            "FixedKPIWorkflow.run()",
-            class_name="FixedKPIWorkflow",
-            method_name="run",
-            file_path="backend/app/kpi/workflow.py",
-            task_id=task_id,
-            label="KPI",
-            phase="background",
+            "POST",  # HTTP 方法
+            "/api/tasks",  # API 路径
+            "KPI",  # Learning Trace 分类
+            "FixedKPIWorkflow.run()",  # 当前执行步骤
+            class_name="FixedKPIWorkflow",  # 当前执行类
+            method_name="run",  # 当前执行方法
+            file_path="backend/app/kpi/workflow.py",  # 源码文件
+            task_id=task_id,  # 当前任务ID
+            label="KPI",  # 节点标签
+            phase="background",  # 执行阶段
         )
         log_event(
             logger,
@@ -156,16 +149,16 @@ class AnalysisWorkflow:
         task_id = state.get("task_id")
         started_at = perf_counter()
         trace_step(
-            "POST",
-            "/api/tasks",
-            "Research",
-            "StaticResearchProvider.research()",
-            class_name="StaticResearchProvider",
-            method_name="research",
-            file_path="backend/app/agents/providers/static_research.py",
-            task_id=task_id,
-            label="Research",
-            phase="background",
+            "POST",  # HTTP 方法
+            "/api/tasks",  # API 路径
+            "Research",  # Learning Trace 分类
+            "StaticResearchProvider.research()",  # 当前执行步骤
+            class_name="StaticResearchProvider",  # 当前执行类
+            method_name="research",  # 当前执行方法
+            file_path="backend/app/agents/providers/static_research.py",  # 源码文件
+            task_id=task_id,  # 当前任务ID
+            label="Research",  # 节点标签
+            phase="background",  # 执行阶段
         )
         log_event(
             logger,
@@ -204,16 +197,16 @@ class AnalysisWorkflow:
         task_id = state.get("task_id")
         started_at = perf_counter()
         trace_step(
-            "POST",
-            "/api/tasks",
-            "Report",
-            "ReportGenerator.generate()",
-            class_name="ReportGenerator",
-            method_name="generate",
-            file_path="backend/app/reports/generator.py",
-            task_id=task_id,
-            label="Report",
-            phase="background",
+            "POST",  # HTTP 方法
+            "/api/tasks",  # API 路径
+            "Report",  # Learning Trace 分类
+            "ReportGenerator.generate()",  # 当前执行步骤
+            class_name="ReportGenerator",  # 当前执行类
+            method_name="generate",  # 当前执行方法
+            file_path="backend/app/reports/generator.py",  # 源码文件
+            task_id=task_id,  # 当前任务ID
+            label="Report",  # 节点标签
+            phase="background",  # 执行阶段
         )
         log_event(
             logger,
@@ -251,7 +244,6 @@ class AnalysisWorkflow:
         """按 Node 增量流式执行，并为 TaskService 重建当前完整 State。"""
 
         current_state: AnalysisState = dict(initial_state)
-        # updates 模式只返回 Node patch，适合发布逐节点进度，避免重复传输整个 State。
         try:
             async for update in self._graph.astream(
                 initial_state, stream_mode="updates"

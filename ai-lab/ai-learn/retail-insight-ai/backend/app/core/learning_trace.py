@@ -16,6 +16,7 @@ import sys
 from app.observability.logging import get_request_id
 
 _learning_trace_enabled = False
+# 当前请求会话。
 _current_trace: ContextVar["LearningTraceSession | None"] = ContextVar(
     "learning_trace_session",
     default=None,
@@ -86,6 +87,7 @@ def _ensure_session(http_method: str, http_path: str, title: str | None = None) 
     session = _session()
     expected_title = title or f"{http_method} {http_path}"
     expected_request_id = get_request_id()
+    # 同一 request_id 复用会话。
     if session is not None and session.title == expected_title and session.request_id == expected_request_id:
         return session
     session = LearningTraceSession(
@@ -141,8 +143,8 @@ def trace_source_chain(
 
     session = _ensure_session(http_method, http_path, title=title)
     for file_path, snippet in source_chain:
+        # 跳过重复的 HTTP Response 占位。
         if not file_path and snippet == "HTTP Response":
-            # 终端里已经会用 HTTP 200 Response 表示响应阶段，这里不重复打印同义词。
             continue
         session.add(
             TraceStep(
@@ -282,9 +284,10 @@ def _render_session(session: LearningTraceSession) -> str:
         )
 
     if session.defer_flush:
-        # POST /api/tasks 这类长任务，把“请求阶段”和“后台阶段”拆开看最容易理解。
+        # 长任务拆成请求阶段和后台阶段。
         request_steps = _request_phase_steps(session)
         background_steps = _background_phase_steps(session)
+        # 先看同步阶段。
         lines.append(_REQUEST_SECTION)
         lines.extend(
             [f"    {line}" if line != f"    {_ARROW}" else line for line in _render_steps(request_steps)]
@@ -293,6 +296,7 @@ def _render_session(session: LearningTraceSession) -> str:
         if response_status is not None:
             lines.extend(["", f"HTTP {response_status} 返回", ""])
         if background_steps:
+            # 再看后台阶段。
             lines.extend(
                 [
                     _BACKGROUND_SECTION,
@@ -332,6 +336,7 @@ def trace_enter(
 ) -> None:
     """记录一次请求的学习入口，通常放在 FastAPI middleware 最外层。"""
 
+    # 入口节点先落地。
     session = _ensure_session(http_method, http_path, title=title)
     session.defer_flush = defer_flush
     session.add(
@@ -409,6 +414,7 @@ def trace_exit(
 ) -> None:
     """记录一次请求的学习出口，并在这里统一打印整条链路。"""
 
+    # 出口决定是否延迟打印。
     del detail, error_code, duration_ms
     session = _session()
     if session is None:
@@ -453,6 +459,7 @@ def trace_exit(
 def finalize_learning_trace() -> None:
     """在后台任务完成时手动冲刷延迟的学习会话。"""
 
+    # 只有延迟打印的请求才会走到这里。
     session = _session()
     if session is None:
         return
@@ -467,6 +474,7 @@ def finalize_learning_trace() -> None:
 def trace_request_body(http_method: str, http_path: str, *, question: str, mode: str, task_id: str) -> None:
     """把学习用请求体内容绑定到当前 trace，会在最终 block 里统一显示。"""
 
+    # 保存请求体，便于最终一起展示。
     session = _ensure_session(http_method, http_path)
     session.request_body_lines = [
         f"question : {question}",

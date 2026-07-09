@@ -20,7 +20,7 @@ from app.services.document_archive_service import DocumentArchiveService
 from app.services.document_read_service import DocumentReadService
 from app.services.document_upload_service import DocumentUploadService
 
-# 文档上传路由是当前 Sprint 的后端 MVP 入口，只负责接收 HTTP multipart/form-data。
+# 文档路由。
 router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
 
 

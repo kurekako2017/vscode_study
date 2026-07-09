@@ -13,23 +13,20 @@ logger = get_logger(__name__)
 @router.get("/health", response_model=HealthResponse)
 async def health(container: AppContainer = Depends(get_container)) -> HealthResponse:
     """返回轻量健康状态；不在探针中执行昂贵业务逻辑。"""
-    # 这里不再手写打印格式，只把“源码调用链”数据交给 learning_trace。
-    # 终端里先看 main.py，再看这个路由文件，最后看 schema 文件。
     trace_source_chain(
-        "GET",
-        "/health",
+        "GET",  # HTTP 方法
+        "/health",  # API 路径
         [
-            ("backend/app/api/health.py", "router = APIRouter()"),
-            ("", '@router.get("/health")'),
-            ("", "health()"),
-            ("backend/app/schemas/health.py", ""),
-            ("", "HealthResponse"),
-            ("", "JSON"),
-            ("", "HTTP Response"),
+            ("backend/app/api/health.py", "router = APIRouter()"),  # 路由器
+            ("", '@router.get("/health")'),  # GET 入口
+            ("", "health()"),  # 当前执行步骤
+            ("backend/app/schemas/health.py", ""),  # 响应模型文件
+            ("", "HealthResponse"),  # 响应模型
+            ("", "JSON"),  # 返回格式
+            ("", "HTTP Response"),  # 响应阶段
         ],
     )
     log_event(logger, "info", "health_check", "Health check completed", status="ok")
-    # 构造响应模型，返回健康状态、服务名称、提供者名称和请求 ID
     response = HealthResponse(
         status="ok",
         service=container.settings.service_name,

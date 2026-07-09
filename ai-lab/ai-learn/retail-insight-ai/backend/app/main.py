@@ -33,21 +33,21 @@ from app.observability.logging import (
     reset_request_id,
 )
 
-# logger 是模块级别的全局变量，FastAPI 的依赖注入和中间件可以使用它来记录请求日志。
+# 模块级 logger，供请求中间件和异常处理使用。
 logger = get_logger(__name__)
 
 
-## FastAPI 应用工厂函数
 def create_app(settings: Settings | None = None) -> FastAPI:
     """组装 FastAPI、依赖容器、路由和请求日志上下文。
 
     使用工厂函数而不是直接堆叠全局对象，测试可以为每个用例创建隔离的 InMemory
     Repository，同时生产部署仍然能使用模块末尾的 ``app`` 入口。
     """
+    # 先构建容器。
     container = build_container(settings)  # 创建依赖容器
-    # 配置日志记录器，使用容器中的设置
+    # 配置结构化日志。
     configure_logging(container.settings.service_name, container.settings.log_level)
-    # 学习调用链日志是独立开关，默认关闭，不影响任何业务返回。
+    # 学习调用链默认关闭。
     configure_learning_trace(container.settings.learning_trace)
 
     @asynccontextmanager
@@ -58,18 +58,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
         log_event(logger, "info", "application_stopped", "FastAPI application stopped")
 
-    # 创建 FastAPI 应用实例，注册中间件、路由和异常处理器
-    # FastAPI 的 lifespan 参数允许在应用启动和关闭时执行异步代码，例如初始化数据库连接或清理资源。
+    # 创建 FastAPI 应用。
     application = FastAPI(
         title=container.settings.app_name,
         version="0.1.0",
         description="Retail Insight AI deployable local backend",
         lifespan=lifespan,
     )
-    # 注册中间件，配置 CORS 中间件，允许跨域请求，以后浏览器才能访问
-    # cors 是 Cross-Origin Resource Sharing 的缩写，允许浏览器从不同域名的服务器请求资源。
-    # 例如，前端应用运行在 http://localhost:3000，而后端 API 运行在 http://localhost:8000，浏览器默认会阻止这种跨域请求。
-    # 生成 request_id，打日志，记录请求信息。
+    # 注册 CORS 中间件。
     application.add_middleware(
         CORSMiddleware,
         allow_origins=container.settings.cors_origins,
@@ -81,64 +77,56 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @application.middleware("http")
     async def request_context(request: Request, call_next):
         """为每个 HTTP 请求建立 request_id，便于跨路由关联日志。"""
-        # request_id 可以从请求头中获取，如果没有则生成一个新的 UUID。
-        # request_id 也可以用于追踪请求的生命周期，例如在日志中记录请求的开始和结束。
-        # UUID 是通用唯一标识符（Universally Unique Identifier）的缩写，是一种标准的 128 位长的数字，用于唯一标识信息。
-        # UUID 的格式通常为 8-4-4-4-12 的十六进制字符串，例如：550e8400-e29b-41d4-a716-446655440000。
+        # 为本次 HTTP 请求准备 request_id。
         request_id = request.headers.get("X-Request-ID") or str(uuid4())
-        # bind_request_id(request_id) 将 request_id 绑定到当前上下文，便于日志记录器使用。
+        # 绑定 request_id，便于后续日志串联。
         token = bind_request_id(request_id)
         try:
             trace_enter(
-                request.method,
-                request.url.path,
-                node="HTTP Request",
-                class_name="FastAPI",
-                file_path="backend/app/main.py",
-                defer_flush=request.method == "POST" and request.url.path == "/api/tasks",
+                request.method,  # HTTP 方法
+                request.url.path,  # API 路径
+                node="HTTP Request",  # Learning Trace 分类
+                class_name="FastAPI",  # 当前执行类
+                file_path="backend/app/main.py",  # 源码文件
+                defer_flush=request.method == "POST" and request.url.path == "/api/tasks",  # 仅任务创建延迟打印
             )
-            # 这里先把应用入口和“路由已经注册”这两层固定下来，
-            # 初学者在终端里会先读到 main.py，再进入具体 API 文件。
             if request.url.path == "/health":
                 trace_source_chain(
-                    request.method,
-                    request.url.path,
+                    request.method,  # HTTP 方法
+                    request.url.path,  # API 路径
                     [
-                        ("backend/app/main.py", "create_app()"),
-                        ("", "（路由已注册）"),
+                        ("backend/app/main.py", "create_app()"),  # 应用工厂
+                        ("", "（路由已注册）"),  # 路由已注册
                     ],
                 )
             elif request.url.path == "/api/tasks":
                 trace_source_chain(
-                    request.method,
-                    request.url.path,
+                    request.method,  # HTTP 方法
+                    request.url.path,  # API 路径
                     [
-                        ("backend/app/main.py", "create_app()"),
-                        ("", "（路由已注册）"),
+                        ("backend/app/main.py", "create_app()"),  # 应用工厂
+                        ("", "（路由已注册）"),  # 路由已注册
                     ],
                 )
-            response = await call_next(request)  # 调用下一个中间件或路由处理请求。
+            response = await call_next(request)
             trace_exit(
-                request.method,
-                request.url.path,
-                response_status=response.status_code,
-                node="HTTP Response",
-                class_name="FastAPI",
-                file_path="backend/app/main.py",
+                request.method,  # HTTP 方法
+                request.url.path,  # API 路径
+                response_status=response.status_code,  # HTTP 状态码
+                node="HTTP Response",  # Learning Trace 分类
+                class_name="FastAPI",  # 当前执行类
+                file_path="backend/app/main.py",  # 源码文件
             )
             response.headers["X-Request-ID"] = request_id
             return response
         finally:
-            reset_request_id(
-                token
-            )  # 重置 request_id，以便其他中间件或请求不会受到影响。
+            reset_request_id(token)
 
-    # 容器放在 app.state 中，让 Depends 只负责取依赖，不负责重复创建依赖。
+    # 容器放到 app.state，供 Depends 直接读取。
     application.state.container = container
-    # 注册异常处理器和路由
+    # 注册异常处理器和路由。
     register_exception_handlers(application)
-    # 注册健康检查、任务、文档、审批和安全相关路由。
-    #  注册所有Router
+    # 注册业务路由。
     application.include_router(health_router)
     application.include_router(security_router)
     application.include_router(audit_logs_router)
