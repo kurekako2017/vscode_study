@@ -2,323 +2,694 @@
 
 # Part 02：子系统架构
 
-# 13_Approval_子系统
+# 13_Approval_子系统（源码绑定升级版 V2）
 
 > Enterprise Subsystem Deep Dive
 
-------------------------------------------------------------------------
+---
 
-## 文档信息
+# 文档信息
 
-  ----------------------------------------------------------------------------------------------------------------
-  项目                                内容
-  ----------------------------------- ----------------------------------------------------------------------------
-  系列                                企业源码架构手册
+| 项目     | 内容                                                                       |
+| -------- | -------------------------------------------------------------------------- |
+| 系列     | 企业源码架构手册                                                           |
+| Part     | 02 子系统架构                                                              |
+| 文档     | 13                                                                         |
+| 版本     | V2（Source Binding Edition）                                               |
+| 主题     | Approval Subsystem                                                         |
+| 对应源码 | backend/app/api/approvals.py、backend/app/services/、backend/app/workflow/ |
 
-  Part                                02 子系统架构
-
-  文档                                13
-
-  主题                                Approval 子系统（Approval Workflow）
-
-  对应源码                            backend/app/api/approvals.py、backend/app/services/、backend/app/workflow/
-  ----------------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------
+---
 
 # 学习目标
 
-阅读完本章后，你应该能够回答：
+阅读本章后，你应该能够回答：
 
--   Approval 子系统负责什么？
--   为什么企业 AI 系统需要审批？
--   Approval Workflow 如何与 AI Workflow 协同？
--   Human-in-the-Loop 是什么？
--   为什么审批功能独立成子系统？
+- Approval 子系统为什么存在？
+- Approval Workflow 如何与 AI Workflow 配合？
+- Human-in-the-Loop 是什么？
+- Approval 如何暂停并恢复 Workflow？
+- 为什么企业 AI 必须增加审批机制？
 
-------------------------------------------------------------------------
+---
 
-# 一、Approval 子系统定位
+# 一、子系统定位
 
-Approval（审批）子系统负责管理**需要人工确认的业务流程**。
+Approval 子系统负责企业级审批流程。
 
-它的职责包括：
+主要职责：
 
--   发起审批
--   查询审批状态
--   执行批准（Approve）
--   执行拒绝（Reject）
--   将审批结果反馈给 Workflow
+- 创建审批任务
+- 查询审批状态
+- 人工批准（Approve）
+- 人工拒绝（Reject）
+- 将审批结果返回 Workflow
 
 一句话：
 
-> **AI 可以提出建议，但最终决策可以交由人工完成。**
+> **AI 负责生成建议，人负责最终决策。**
 
-------------------------------------------------------------------------
+---
 
-# 二、源码位置
+# 二、源码目录结构 ⭐
 
-``` text
+```text
 backend/
 └── app/
     ├── api/
-    │   └── approvals.py
+    │      └── approvals.py
+    │
     ├── services/
+    │      └── approval_service.py
+    │
+    ├── repositories/
+    │      └── approval_repository.py
+    │
     ├── workflow/
-    └── repositories/
+    │      └── graph.py
+    │
+    └── events/
+           └── publisher.py
 ```
 
--   `approvals.py`：HTTP 接口入口
--   Service：审批业务逻辑
--   Repository：审批数据存储
--   Workflow：根据审批结果继续执行
+Approval 相关代码主要集中在以上几个模块。
 
-------------------------------------------------------------------------
+---
 
-# 三、整体架构
+# 三、关键源码文件 ⭐
 
-``` text
-Browser
-    │
-Approval API
-    │
-Approval Service
-    │
-Repository
-    │
-Workflow
-    │
-Approved / Rejected
+## approvals.py
+
+HTTP API 入口。
+
+负责：
+
+- 创建审批
+- 查询审批
+- Approve
+- Reject
+
+不负责业务处理。
+
+---
+
+## approval_service.py
+
+负责审批业务。
+
+例如：
+
+- 创建审批记录
+- 修改审批状态
+- 通知 Workflow
+
+---
+
+## approval_repository.py
+
+负责：
+
+保存审批数据。
+
+例如：
+
+```text
+approval_id
+task_id
+status
+approver
+comment
 ```
 
-------------------------------------------------------------------------
+---
 
-# 四、Approval 生命周期
+## graph.py
 
-``` text
-Create Approval
-        │
+Workflow 在需要人工确认时：
+
+进入：
+
+```
 Pending
-        │
-Approve / Reject
-        │
-Workflow Continue
-        │
-Completed
 ```
 
-审批本身也是一个状态机。
+等待：
 
-------------------------------------------------------------------------
+Approval。
 
-# 五、Approval 与 AI Workflow
+---
 
-AI Workflow：
+# 四、关键类与关键函数 ⭐
 
-``` text
-Route
-    │
-Research
-    │
-Approval
-    │
-Report
+## ApprovalService
+
+审批业务核心。
+
+主要函数：
+
+```text
+create_approval()
+
+approve()
+
+reject()
+
+get_status()
 ```
 
-如果需要人工确认：
+---
 
-Workflow 可以暂停等待审批结果。
+## ApprovalRepository
+
+负责数据访问。
+
+主要函数：
+
+```text
+save()
+
+update()
+
+find()
+
+list()
+```
+
+---
+
+## Workflow Resume
 
 审批完成后：
 
-``` text
-Approval Result
-        │
-Workflow Resume
+Workflow：
+
+继续执行。
+
+这是 Approval 与 Workflow 最大的结合点。
+
+---
+
+# 五、调用关系图 ⭐
+
+创建审批：
+
+```text
+Browser
+
+↓
+
+POST /approvals
+
+↓
+
+approvals.py
+
+↓
+
+ApprovalService
+
+↓
+
+ApprovalRepository
+
+↓
+
+Pending
 ```
 
-------------------------------------------------------------------------
+审批完成：
 
-# 六、Human-in-the-Loop
-
-Human-in-the-Loop（HITL）表示：
-
-``` text
-AI
-   │
-生成建议
-   │
-Human Approval
-   │
-继续执行
-```
-
-优点：
-
--   降低 AI 风险
--   满足企业合规要求
--   保留人工最终决策权
-
-------------------------------------------------------------------------
-
-# 七、Approval 与 Repository
-
-Repository 保存：
-
--   approval_id
--   task_id
--   status
--   approver
--   comment
--   timestamp
-
-Service 不直接操作数据库，而通过 Repository 完成数据访问。
-
-------------------------------------------------------------------------
-
-# 八、Approval 与 EventPublisher
-
-审批状态变化：
-
-``` text
+```text
 Approve
-    │
-publish(approved)
 
-Reject
-    │
-publish(rejected)
+↓
+
+ApprovalService
+
+↓
+
+Repository.update()
+
+↓
+
+Workflow Resume
+
+↓
+
+Report
 ```
 
-事件可以通过 SSE 实时推送给前端。
+---
 
-------------------------------------------------------------------------
+# 六、审批生命周期 ⭐
 
-# 九、Approval 与 Learning Trace
+```text
+Create
 
-Learning Trace 可以记录：
+↓
 
-``` text
+Pending
+
+↓
+
+Approve
+     │
+Reject
+
+↓
+
+Workflow Resume
+
+↓
+
+Completed
+```
+
+Approval 本身就是一个状态机。
+
+---
+
+# 七、Learning Trace 对应 ⭐
+
+Learning Trace：
+
+```text
 Approval API
-    │
-Approval Service
-    │
-Repository
-    │
+
+↓
+
+ApprovalService
+
+↓
+
+ApprovalRepository
+
+↓
+
 Workflow Resume
 ```
 
-帮助开发者定位审批流程。
+帮助开发者理解：
 
-------------------------------------------------------------------------
+Workflow 为什么暂停？
 
-# 十、企业为什么这样设计
+什么时候恢复？
 
-如果 Workflow 直接完成所有操作：
+---
 
-``` text
+# 八、Console Log 对应 ⭐
+
+Console：
+
+```text
+Approval Created
+
+↓
+
+Pending
+
+↓
+
+Approved
+
+↓
+
+Workflow Continue
+```
+
+Learning Trace：
+
+记录：
+
+调用链。
+
+Console：
+
+记录：
+
+业务状态。
+
+---
+
+# 九、实际运行示例 ⭐
+
+AI Workflow：
+
+```text
+Research
+
+↓
+
+Need Approval
+```
+
+Workflow：
+
+暂停：
+
+```text
+Pending
+```
+
+用户：
+
+```text
+Approve
+```
+
+随后：
+
+```text
+Workflow Resume
+
+↓
+
+Report
+
+↓
+
+Completed
+```
+
+整个过程：
+
+无需重新执行 Workflow。
+
+---
+
+# 十、项目当前实现（Current Implementation）⭐
+
+Retail Insight AI 当前已经实现：
+
+- Approval API
+- Approval 管理
+- Approval Workflow
+- Workflow 集成
+
+适用于：
+
+企业审批演示。
+
+---
+
+# 十一、企业版扩展（Future Enterprise Architecture）⭐
+
+未来建议扩展：
+
+```text
+Single Approval
+
+↓
+
+Multi Approval
+
+↓
+
+Parallel Approval
+
+↓
+
+Serial Approval
+
+↓
+
+Escalation
+
+↓
+
+Auto Approval
+```
+
+进一步增加：
+
+- 邮件通知
+- Slack
+- Teams
+- 审批超时
+- 自动升级
+
+满足大型企业需求。
+
+---
+
+# 十二、Human-in-the-Loop ⭐
+
+企业 AI：
+
+不是：
+
+```text
 AI
-   │
+
+↓
+
 Final Result
 ```
 
-企业无法审核关键决策。
+而是：
+
+```text
+AI
+
+↓
+
+Pending
+
+↓
+
+Human
+
+↓
+
+Approve
+
+↓
+
+Workflow Continue
+```
+
+这种模式称为：
+
+**Human-in-the-Loop（HITL）**
+
+也是企业 AI 的主流架构。
+
+---
+
+# 十三、为什么采用 Approval（Why）⭐
+
+如果没有 Approval：
+
+```text
+AI
+
+↓
+
+Final Report
+```
+
+风险：
+
+- AI 幻觉
+- 错误决策
+- 合规问题
 
 增加 Approval 后：
 
-``` text
+```text
 AI
-   │
+
+↓
+
 Pending
-   │
+
+↓
+
 Human Review
-   │
+
+↓
+
 Continue
 ```
 
 更符合企业治理要求。
 
-------------------------------------------------------------------------
+---
 
-# 十一、未来扩展
+# 十四、Java / Spring 对照 ⭐
 
-Approval 子系统可以扩展：
+| Retail Insight AI  | Spring Boot           |
+| ------------------ | --------------------- |
+| Approval API       | REST Controller       |
+| ApprovalService    | Service               |
+| ApprovalRepository | Repository            |
+| Approval Workflow  | BPM / Workflow Engine |
+| Human Approval     | Human Task            |
 
--   多级审批
--   并行审批
--   RBAC 权限控制
--   Audit Log
--   邮件通知
--   Slack / Teams 通知
+---
 
-------------------------------------------------------------------------
+# 十五、VS Code 阅读路线 ⭐
 
-# 十二、Java / Spring 对照
+建议：
 
-  Retail Insight AI   Spring Boot
-  ------------------- -----------------------
-  Approval API        REST Controller
-  Approval Service    Service
-  Repository          Repository / DAO
-  Approval Workflow   BPM / Workflow Engine
-  Human Approval      Human Task
+```text
+approvals.py
 
-------------------------------------------------------------------------
+↓
 
-# 十三、VS Code 阅读路线
+ApprovalService
 
-``` text
-backend/app/api/approvals.py
-        │
-Approval Service
-        │
-Repository
-        │
+↓
+
+ApprovalRepository
+
+↓
+
+graph.py
+```
+
+观察：
+
+Workflow：
+
+什么时候：
+
+暂停。
+
+什么时候：
+
+继续。
+
+---
+
+# 十六、阅读源码建议 ⭐
+
+建议阅读：
+
+第一遍：
+
+```text
+approvals.py
+```
+
+第二遍：
+
+```text
+ApprovalService
+```
+
+第三遍：
+
+```text
 Workflow
 ```
 
-建议结合 `workflow/graph.py` 阅读审批节点与业务流程。
+第四遍：
 
-------------------------------------------------------------------------
+Learning Trace。
 
-# 十四、面试回答
+理解：
 
-> Approval 子系统负责企业级人工审批流程。AI Workflow
-> 在需要人工确认时进入 Pending 状态，审批结果通过 Repository 保存，并由
-> Workflow 根据 Approved 或 Rejected 继续执行，实现
-> Human-in-the-Loop，满足企业对风险控制、审计和合规的要求。
+Approval：
 
-------------------------------------------------------------------------
+如何控制：
+
+Workflow。
+
+---
+
+# 十七、企业设计意义 ⭐
+
+Approval 子系统实现：
+
+```text
+Workflow
+
+↓
+
+Pending
+
+↓
+
+Human Review
+
+↓
+
+Workflow Resume
+```
+
+好处：
+
+- 风险控制
+- 合规管理
+- 企业审批
+- AI 可控
+- 审计友好
+
+属于：
+
+企业 AI Agent 的核心能力。
+
+---
+
+# 十八、面试回答
+
+如果面试官问：
+
+> 为什么 AI 系统需要 Approval？
+
+可以回答：
+
+> Retail Insight AI 将审批流程独立为 Approval 子系统。AI Workflow 在关键节点进入 Pending 状态，由人工完成最终审批，再恢复 Workflow 执行。这种 Human-in-the-Loop 架构既保留了 AI 的自动化能力，又满足了企业对风险控制、审计和合规的要求。
+
+---
 
 # 本章总结
 
-``` text
+一句话：
+
+```text
+Workflow
+
+↓
+
+Pending
+
+↓
+
 Approval
 
-=
+↓
 
-企业 AI 的人工决策入口
+Resume
+
+↓
+
+Completed
 ```
+
+Approval 子系统是企业 AI Agent 的人工决策入口。
 
 它负责：
 
--   管理审批流程
--   暂停/恢复 Workflow
--   保存审批状态
--   推送审批事件
--   支持企业治理
+- 管理审批
+- 控制 Workflow
+- 保证 AI 可控
+- 满足企业治理要求
 
-------------------------------------------------------------------------
+---
 
 # 下一章
 
-**14_安全认证子系统.md**
+**14_安全认证子系统（源码绑定升级版 V2）**
 
-将解析：
+将结合：
 
--   Security API
--   Authentication
--   Authorization
--   RBAC
--   Audit Log
--   企业安全架构
+- security.py
+- Authentication
+- Authorization
+- RBAC
+- Audit Log
+- Learning Trace
+
+完整解析企业安全架构。
