@@ -14,7 +14,7 @@ class EventPublisher:
         """保存事件仓库接口，使发布方不关心事件存在哪里。"""
 
         self._repository = repository
-
+    # 为了测试方便，我们直接在 publish 方法里调用 repository.append()，而不是在外部先创建 TaskEvent 再传入。
     def publish(
         self,
         task_id: str,
@@ -23,7 +23,7 @@ class EventPublisher:
         data: dict[str, Any] | None = None,
     ) -> TaskEvent:
         """追加不可变任务事件，并返回仓库分配了 sequence 的结果。"""
-
+        # 生成事件数据，包括 request_id。
         event_data = dict(data or {})
         # 补 request_id，方便串联 SSE 和日志。
         event_data.setdefault("request_id", get_request_id())

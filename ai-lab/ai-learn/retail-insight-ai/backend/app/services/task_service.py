@@ -129,6 +129,7 @@ class TaskService:
                 task_id=task_id,  # 当前任务ID
                 phase=trace_phase,  # 执行阶段
             )
+        # 读取任务，如果不存在则抛出 TaskNotFoundException。    
         task = self._task_repository.get(task_id)
         if emit_trace:
             trace_step(
@@ -163,7 +164,9 @@ class TaskService:
         # 读取任务并进入 running 状态，保存到 Repository。
         task = self.get_task(task_id, emit_trace=False)
         try:
+            # 进入 running 状态，避免前端长时间停留在 queued。
             task.transition(TaskStatus.RUNNING)
+            # 记录任务状态变更到 Repository。
             self._task_repository.save(task)
             trace_step(
                 "POST",  # HTTP 方法
@@ -185,6 +188,7 @@ class TaskService:
                 task_id=task_id,  # 当前任务ID
                 status=task.status.value,  # 当前任务状态
             )
+            # 发布 running 事件给 SSE，方便前端显示任务状态。
             self._event_publisher.publish(
                 task_id,  # 当前任务ID
                 "status",  # event_type

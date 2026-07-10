@@ -39,7 +39,7 @@ class AnalysisWorkflow:
         step_delay_seconds: float = 0.05,
     ) -> None:
         """注入各业务步骤并编译一次 StateGraph，供后续任务复用。"""
-
+        #   
         self._kpi_workflow = kpi_workflow
         self._research_agent = research_agent
         self._report_generator = report_generator
@@ -124,7 +124,9 @@ class AnalysisWorkflow:
             status="running",
             node="kpi",
         )
+        # 模拟延迟
         await self._delay()
+        # 执行 KPI 工作流并返回结果
         result = self._kpi_workflow.run(state["question"])
         log_event(
             logger,
@@ -237,12 +239,12 @@ class AnalysisWorkflow:
             duration_ms=(perf_counter() - started_at) * 1000,
         )
         return {"report_markdown": report_markdown}
-
+    #
     async def stream(
         self, initial_state: AnalysisState
     ) -> AsyncIterator[tuple[str, AnalysisState]]:
         """按 Node 增量流式执行，并为 TaskService 重建当前完整 State。"""
-
+        # 生成初始状态
         current_state: AnalysisState = dict(initial_state)
         try:
             async for update in self._graph.astream(

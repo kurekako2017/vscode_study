@@ -17,16 +17,17 @@ from app.services.task_service import TaskService
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 logger = get_logger(__name__)
 
-
+#   
 @router.post(
     path="",
     response_model=ApiResponse[TaskCreateResponse],
     status_code=status.HTTP_202_ACCEPTED,
 )
+# 创建任务并返回一个响应。
 async def create_task(
-    payload: TaskCreateRequest,
-    background_tasks: BackgroundTasks,
-    service: TaskService = Depends(dependency=get_task_service),
+    payload: TaskCreateRequest,                                 # 请求体中的任务创建请求。
+    background_tasks: BackgroundTasks,                          # FastAPI 提供的 BackgroundTasks，用于安排后台任务。
+    service: TaskService = Depends(dependency=get_task_service),    # 依赖注入获取任务服务。
 ) -> ApiResponse[TaskCreateResponse]:
     """创建任务并把执行安排到响应后的 BackgroundTasks。"""
 
@@ -39,7 +40,9 @@ async def create_task(
             ("", "create_task()"),  # 当前执行步骤
         ],
     )
+    # 创建任务并安排后台执行。  
     task = service.create_task(payload.question, payload.mode)
+    # 安排后台任务执行，避免阻塞响应。
     background_tasks.add_task(service.run_task, task.task_id)
     trace_step(
         "POST",  # HTTP 方法
@@ -106,6 +109,7 @@ async def get_task_events(
         file_path="backend/app/api/tasks.py",  # 源码文件
         task_id=task_id,  # 当前任务ID
     )
+    # 确认任务存在，否则 SSE 连接会一直挂起。
     service.get_task(task_id)
     log_event(
         logger,

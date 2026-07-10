@@ -34,7 +34,7 @@ class FixedKPIWorkflow:
 
     def run(self, question: str) -> KPIResult:
         """从本地 CSV 聚合出 KPI；保留 question 参数以兼容现有 Workflow 接口。"""
-
+        # 加载本地 CSV 数据
         business_data = self._data_loader.load_kpi_data()
         return KPIResult(
             sales_amount_jpy=business_data.revenue_jpy,
