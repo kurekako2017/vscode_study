@@ -1,4 +1,3 @@
-
 # Retail Insight AI 源码精读系列
 
 # 01_TaskService_run_task.md

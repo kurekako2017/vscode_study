@@ -1,25 +1,26 @@
+
 # Retail Insight AI 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 40
+# Chapter 41
 
-# AI Node Execution（AI 节点执行机制）
+# Prompt Engineering（Prompt 工程）
 
-> Understand How AI Workflow Executes Each Node
+> Design Prompts for Enterprise AI Systems
 
 ---
 
 # 文档信息
 
-| 项目     | 内容                          |
-| -------- | ----------------------------- |
-| Volume   | 06                            |
-| Chapter  | 40                            |
-| 技术主题 | AI Node Execution             |
-| 难度     | ⭐⭐⭐⭐⭐                    |
-| 推荐程度 | ⭐⭐⭐⭐⭐                    |
-| 对应源码 | backend/app/workflow/graph.py |
+| 项目     | 内容                                                   |
+| -------- | ------------------------------------------------------ |
+| Volume   | 06                                                     |
+| Chapter  | 41                                                     |
+| 技术主题 | Prompt Engineering                                     |
+| 难度     | ⭐⭐⭐⭐⭐                                             |
+| 推荐程度 | ⭐⭐⭐⭐⭐                                             |
+| 对应源码 | backend/app/workflow/graph.py / backend/app/providers/ |
 
 ---
 
@@ -27,137 +28,67 @@
 
 阅读本章后，你应该能够回答：
 
-- 什么是 Node？
-- Node 与 Workflow 的关系是什么？
-- Node 生命周期包含哪些阶段？
-- Retail Insight AI 如何执行每个 Node？
-- 顺序执行与并行执行有什么区别？
+- Prompt 在 AI Engine 中的作用是什么？
+- System Prompt 与 User Prompt 有什么区别？
+- 为什么企业需要 Prompt Template？
+- 如何设计可维护的 Prompt？
+- Prompt 如何结合 Workflow 与 RAG？
 
 ---
 
-# 一、什么是 Node？
+# 一、什么是 Prompt？
 
-在 AI Workflow 中：
+Prompt 并不是一句简单的话。
 
-**Node（节点）** 表示一个独立的业务处理单元。
+在企业 AI 系统中：
 
-例如：
+Prompt 是：
 
-```text
-Research
+> **AI 的业务规则（Business Rule）。**
 
-↓
+AI 是否输出正确结果，
 
-Report
-
-↓
-
-Approval
-
-↓
-
-Publish
-```
-
-每一个步骤都是一个 Node。
-
-Node 只负责完成自己的工作，不负责控制整个流程。
+很大程度取决于 Prompt 的设计。
 
 ---
 
-# 二、Workflow 与 Node 的关系
+# 二、Retail Insight AI 当前实现（Current）
 
-Workflow 可以理解为：
+当前 AI 调用流程：
 
 ```text
 Workflow
 
 ↓
 
-Node A
+Prepare Context
 
 ↓
 
-Node B
+Generate Prompt
 
 ↓
 
-Node C
+LLM
 
 ↓
 
-Finish
+Structured Result
 ```
 
 Workflow：
 
-负责调度。
+负责组织流程。
 
-Node：
+Prompt：
 
-负责执行。
+负责告诉模型：
 
-Workflow 不关心 Node 的内部实现。
-
-Node 也不知道整个流程。
-
-这就是职责分离（Separation of Concerns）。
+要完成什么任务。
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
-
-当前项目：
-
-Workflow 入口：
-
-```text
-backend/app/workflow/graph.py
-```
-
-主要类：
-
-```text
-AnalysisWorkflow
-```
-
-执行入口：
-
-```python
-stream()
-```
-
-整个执行过程：
-
-```text
-TaskService
-
-↓
-
-AnalysisWorkflow.stream()
-
-↓
-
-Research
-
-↓
-
-Report
-
-↓
-
-Repository
-
-↓
-
-Publisher
-```
-
-每一步都可以理解为一个逻辑 Node。
-
----
-
-# 四、源码目录结构 ⭐
+# 三、源码目录结构 ⭐
 
 建议阅读：
 
@@ -169,25 +100,23 @@ backend/app/workflow/
 graph.py
 ```
 
-同时打开：
+继续阅读：
 
 ```text
-backend/app/services/
-
-↓
-
-task_service.py
+backend/app/providers/
 ```
 
-理解：
+重点关注：
 
-TaskService 如何启动 Workflow。
+Prompt 是在哪里构造，
+
+Provider 如何发送给模型。
 
 ---
 
-# 五、关键源码文件 ⭐
+# 四、关键源码文件 ⭐
 
-重点：
+建议重点阅读：
 
 ```text
 graph.py
@@ -198,177 +127,228 @@ AnalysisWorkflow
 
 ↓
 
-stream()
+Provider
+
+↓
+
+LLM Request
 ```
 
-阅读时重点关注：
+阅读时：
 
-- Node 如何开始？
-- Node 如何结束？
-- Node 完成后谁决定下一步？
+重点观察：
+
+- Prompt 来源
+- Context 来源
+- Model 输入
 
 ---
 
-# 六、关键类与关键函数 ⭐
+# 五、Prompt 生命周期 ⭐
 
-重点函数：
-
-```text
-TaskService.run_task()
-
-↓
-
-AnalysisWorkflow.stream()
-```
-
-建议结合日志观察：
+一个 Prompt 的形成过程：
 
 ```text
-Workflow Start
+User Request
 
 ↓
 
-Research
+Workflow
 
 ↓
 
-Report
+Business Context
 
 ↓
 
-Completed
+Prompt Template
+
+↓
+
+Final Prompt
+
+↓
+
+LLM
 ```
 
-每条日志都对应一个 Node 生命周期。
+企业 Prompt 很少直接拼接字符串。
+
+通常会经过统一模板。
 
 ---
 
-# 七、Node 生命周期 ⭐
+# 六、Prompt 的组成 ⭐
 
-一个典型 Node：
-
-```text
-Created
-
-↓
-
-Executing
-
-↓
-
-Completed
-```
-
-如果发生异常：
+企业 Prompt 一般包含：
 
 ```text
-Executing
+Role
 
 ↓
 
-Failed
+Instruction
+
+↓
+
+Context
+
+↓
+
+Constraints
+
+↓
+
+Output Format
 ```
 
-未来企业版还可以增加：
+例如：
 
 ```text
-Retry
+Role：
 
-↓
+Retail Analyst
 
-Completed
+Instruction：
+
+Analyze KPI
+
+Context：
+
+Sales Data
+
+Output：
+
+JSON
 ```
+
+这样模型输出更加稳定。
 
 ---
 
-# 八、顺序执行（Sequential Execution）
+# 七、Prompt Template ⭐
 
-当前 Retail Insight AI：
+企业项目通常不会：
 
-采用：
-
-```text
-Research
-
-↓
-
-Report
-
-↓
-
-Save
-
-↓
-
-Publish
+```python
+prompt = "...字符串..."
 ```
 
-前一个 Node 完成后，
+而是：
 
-下一个 Node 才开始。
+```text
+Prompt Template
 
-这种方式：
++
 
-逻辑简单、
+Variables
 
-容易调试。
+↓
+
+Final Prompt
+```
+
+例如：
+
+```text
+{company}
+
+{period}
+
+{kpi}
+
+{language}
+```
+
+统一模板，
+
+方便维护。
 
 ---
 
-# 九、并行执行（Parallel Execution）
+# 八、Structured Output
 
-企业 AI 平台可能需要：
+企业 AI：
 
-```text
-Research
-      │
-      ├────► Competitor Analysis
-      │
-      └────► Market Analysis
+通常要求：
 
-↓
+固定输出。
 
-Merge Result
+例如：
 
-↓
-
-Report
+```json
+{
+  "summary":"",
+  "risk":"",
+  "recommendation":""
+}
 ```
 
-多个 Node 可以同时运行。
+而不是：
 
-最终汇总结果。
+一大段自由文本。
 
-这可以明显提升执行效率。
+这样：
+
+方便：
+
+Workflow
+
+继续处理。
+
+---
+
+# 九、Prompt Versioning
+
+企业项目：
+
+Prompt：
+
+也需要版本管理。
+
+例如：
+
+```text
+Prompt v1.0
+
+↓
+
+Prompt v1.1
+
+↓
+
+Prompt v2.0
+```
+
+出现问题：
+
+可以快速回滚。
 
 ---
 
 # 十、Architecture Thinking ⭐
 
-为什么要拆分 Node？
+为什么 Prompt 不直接写在代码里？
 
-如果把所有逻辑写在：
+因为：
 
-```python
-run_task()
-```
+Prompt：
 
-未来增加：
+会不断优化。
 
-- Approval
-- Retry
-- Human Review
-- Multi-Agent
+如果：
 
-整个函数会越来越复杂。
+直接修改源码：
 
-拆分 Node 后：
+维护成本很高。
 
-每个 Node 只负责一个职责，
+企业通常：
 
-Workflow 负责组织。
+Prompt 独立管理。
 
-符合单一职责原则（SRP）。
+Workflow：
+
+负责调用。
 
 ---
 
@@ -381,11 +361,11 @@ Workflow
 
 ↓
 
-Research
+Prompt
 
 ↓
 
-Report
+LLM
 ```
 
 Enterprise：
@@ -395,39 +375,33 @@ Workflow
 
 ↓
 
-Parallel Research
+Prompt Library
 
 ↓
 
-Approval
+Prompt Version
 
 ↓
 
-Retry
+Prompt Validation
 
 ↓
 
-Publish
-
-↓
-
-Audit
+LLM
 ```
 
-Workflow 可以不断扩展，
-
-Node 保持独立。
+形成完整 Prompt 管理体系。
 
 ---
 
 # 十二、Java / Spring 对照 ⭐
 
-| Retail Insight AI | Java BPM        |
-| ----------------- | --------------- |
-| Workflow          | Process Engine  |
-| Node              | Service Task    |
-| Execute           | Task Executor   |
-| State             | Process Context |
+| Retail Insight AI | Java AI        |
+| ----------------- | -------------- |
+| Prompt            | PromptTemplate |
+| Workflow          | AI Flow        |
+| Context           | Context Object |
+| Structured Output | DTO            |
 
 ---
 
@@ -436,166 +410,178 @@ Node 保持独立。
 建议：
 
 ```text
-task_service.py
-
-↓
-
-run_task()
-
-↓
-
 graph.py
 
 ↓
 
-stream()
+Provider
 
 ↓
 
-Node Execute
+Prompt Build
+
+↓
+
+LLM Request
 ```
-
-阅读时：
-
-先理解 Workflow，
-
-再深入 Node。
-
----
-
-# 十四、Debug Guide（调试指南）⭐
-
-建议设置断点：
-
-```text
-① TaskService.run_task()
-
-↓
-
-② AnalysisWorkflow.stream()
-
-↓
-
-③ 第一个 Node
-
-↓
-
-④ Repository.save()
-
-↓
-
-⑤ EventPublisher.publish()
-```
-
-每执行一步，
 
 观察：
 
-- 当前 Node
-- State 是否变化
-- Learning Trace 是否同步更新
+Prompt：
+
+如何生成。
+
+---
+
+# 十四、Debug Guide ⭐
+
+建议断点：
+
+```text
+① Workflow Start
+
+↓
+
+② Prompt Generate
+
+↓
+
+③ Provider Send
+
+↓
+
+④ LLM Response
+
+↓
+
+⑤ Result Parse
+```
+
+调试时：
+
+重点查看：
+
+最终 Prompt 内容。
 
 ---
 
 # 十五、Learning Trace 对应 ⭐
 
-建议：
-
-Learning Trace 增加：
+建议增加：
 
 ```text
 Workflow Started
 
 ↓
 
-Node = Research
+Prompt Generated
 
 ↓
 
-Node Completed
+LLM Request
 
 ↓
 
-Node = Report
+LLM Response
 
 ↓
 
-Node Completed
-
-↓
-
-Workflow Completed
+Workflow Continue
 ```
 
-这样可以快速定位 Workflow 的执行位置。
+这样：
+
+可以快速定位 Prompt 问题。
 
 ---
 
-# 十六、企业扩展（Enterprise）
+# 十六、Prompt Design Checklist ⭐
 
-未来：
+企业 Prompt 建议检查：
 
-Node 可以增加：
+- 是否明确角色（Role）
+- 是否限定任务范围
+- 是否提供 Context
+- 是否定义输出格式
+- 是否避免歧义
+- 是否支持版本管理
+
+每次修改 Prompt，
+
+建议重新验证。
+
+---
+
+# 十七、企业扩展（Enterprise）
+
+未来建议增加：
 
 ```text
-Retry Node
+Prompt Library
 
 ↓
 
-Approval Node
+Prompt Version
 
 ↓
 
-Human Review Node
+Prompt Evaluation
 
 ↓
 
-Tool Calling Node
+A/B Testing
 
 ↓
 
-Multi-Agent Node
+Prompt Audit
 ```
 
-无需修改已有 Node。
+形成完整 Prompt 管理平台。
 
 ---
 
-# 十七、面试回答（中文）
+# 十八、面试回答（中文）
 
-为什么企业 AI Workflow 要拆分为多个 Node？
+为什么企业需要 Prompt Template？
 
-拆分 Node 可以降低业务耦合，每个 Node 负责独立职责，Workflow 负责整体调度。这样便于维护、测试和扩展，也更适合实现 Retry、Approval、Parallel Execution 等高级功能。
-
----
-
-# 十八、面试回答（日文）
-
-なぜ Workflow を複数の Node に分割するのですか。
-
-各 Node が単一責任を持つことで保守性・拡張性が向上します。また Workflow が実行順序を管理するため、Retry や Parallel Execution などの機能も追加しやすくなります。
+Prompt Template 可以把固定规则与业务变量分离，提高 Prompt 的可维护性和复用性。当业务变化时，只需要修改变量或模板，而不用修改 Workflow 代码。
 
 ---
 
-# 十九、日本 SES 常见追问
+# 十九、面试回答（日文）
 
-### Q：Node 和 Service 有什么区别？
+なぜ Prompt Template を利用するのですか。
 
-Service：
-
-关注业务逻辑。
-
-Node：
-
-关注 Workflow 中的一个执行步骤。
-
-一个 Node 内部可以调用多个 Service。
+Prompt Template を利用することで、固定部分と変数部分を分離できます。保守性・再利用性が向上し、業務変更にも柔軟に対応できます。
 
 ---
 
-# 二十、本章练习 ⭐
+# 二十、日本 SES 常见追问
 
-请完成：
+### Q：Prompt 越长越好吗？
+
+回答：
+
+不是。
+
+好的 Prompt：
+
+应该：
+
+- 清晰
+- 明确
+- 可维护
+- 可复用
+
+而不是：
+
+越长越好。
+
+---
+
+# 二十一、本章练习 ⭐
+
+完成下面练习：
 
 ① 阅读：
 
@@ -607,50 +593,46 @@ backend/app/workflow/graph.py
 
 ② 找出：
 
-Workflow 中有哪些逻辑 Node？
+Prompt 是在哪里生成？
 
 ↓
 
-③ 画出：
+③ 设计：
 
-Node 生命周期图。
+一个 KPI 分析 Prompt Template。
 
 ↓
 
 ④ 思考：
 
-哪些 Node 可以改为并行执行？
+哪些内容应该作为变量？
 
 ---
 
-# 二十一、本章核心记忆图 ⭐
+# 二十二、本章核心记忆图 ⭐
 
 ```text
-TaskService
+Workflow
 
 ↓
 
-AnalysisWorkflow
+Context
 
 ↓
 
-Research Node
+Prompt Template
 
 ↓
 
-Report Node
+Final Prompt
 
 ↓
 
-Repository
+LLM
 
 ↓
 
-Publisher
-
-↓
-
-Completed
+Structured Result
 ```
 
 ---
@@ -662,32 +644,38 @@ Completed
 ```text
 Workflow
 
-负责调度
+组织流程
 
 ↓
 
-Node
+Prompt
 
-负责执行
+定义任务
+
+↓
+
+LLM
+
+完成推理
 ```
 
-AI Node Execution 的核心思想是：
+Prompt Engineering 的核心目标是：
 
-**将复杂 AI Workflow 拆分为多个独立节点，由 Workflow 统一调度执行。**
+**将 AI 指令标准化、模板化、可维护化。**
 
-这种设计能够提高系统的可维护性、可测试性和可扩展性，也是现代企业 AI 平台普遍采用的架构模式。
+企业 AI 系统不会把 Prompt 当作普通字符串，而是将其作为一种可管理、可版本化、可持续优化的重要资产。
 
 ---
 
 # 下一章
 
-**Chapter 41：Prompt Engineering（Prompt 工程）**
+**Chapter 42：RAG Architecture（检索增强生成）**
 
 学习：
 
-- System Prompt
-- User Prompt
-- Prompt Template
-- Structured Output
-- Prompt Versioning
-- 企业 Prompt 管理
+- Retriever
+- Embedding
+- Chunk
+- Hybrid Search
+- Knowledge Base
+- 企业知识库架构
