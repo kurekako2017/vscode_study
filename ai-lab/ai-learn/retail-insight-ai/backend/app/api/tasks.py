@@ -119,7 +119,9 @@ async def get_task_events(
         task_id=task_id,
         status="connected",
     )
+    #
     return StreamingResponse(
+        #
         stream_task_events(event_repository, task_id, after_sequence=after),
         media_type="text/event-stream",
         headers={

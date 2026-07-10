@@ -5,13 +5,13 @@ import json
 from collections.abc import AsyncIterator
 
 from app.core.learning_trace import trace_exit, trace_step
-from app.repositories.interfaces.event_repository import EventRepository
 from app.observability.logging import get_logger, log_event
+from app.repositories.interfaces.event_repository import EventRepository
 from app.schemas.events import TaskEventResponse
 
 logger = get_logger(__name__)
 
-
+#
 async def stream_task_events(
     repository: EventRepository,
     task_id: str,
@@ -23,24 +23,82 @@ async def stream_task_events(
     当前轮询只适合教学版 Memory Repository，生产环境应替换为可等待的新事件机制。
     """
 
-    trace_step("GET", f"/api/tasks/{task_id}/events", "SSE", "SSE Connected", task_id=task_id, status="connected")
+    # 记录已经进入 SSE 事件流函数，方便初学者从 Router 继续追踪到 SSE 层。
+    trace_step(
+        "GET",
+        f"/api/tasks/{task_id}/events",
+        "SSE",
+        "stream_task_events()",
+        class_name="sse.py",
+        method_name="stream_task_events",
+        file_path="backend/app/events/sse.py",
+        task_id=task_id,
+        status="connected",
+        label="stream_task_events()",
+    )
+
+    # cursor 保存客户端已经读取到的最后一个事件序号，避免重复发送旧事件。
     cursor = after_sequence
+
+    # Repository 查询位于轮询循环内，但源码链只需要打印一次，避免每 0.05 秒刷屏。
+    repository_trace_printed = False
+
     while True:
+        # 第一次轮询时记录 EventRepository.list_after()，之后不再重复打印。
+        if not repository_trace_printed:
+            trace_step(
+                "GET",
+                f"/api/tasks/{task_id}/events",
+                "Repository",
+                "InMemoryEventRepository.list_after()",
+                class_name=repository.__class__.__name__,
+                method_name="list_after",
+                file_path=(
+                    "backend/app/repositories/implementations/"
+                    "in_memory/event_repository.py"
+                ),
+                task_id=task_id,
+                status="running",
+                label="InMemoryEventRepository.list_after()",
+            )
+            repository_trace_printed = True
+
+        # 只读取 sequence 大于 cursor 的新事件，实现最小断线续传。
         events = repository.list_after(task_id, cursor)
+
+        # 按事件序号逐条转换并发送给 SSE 客户端。
         for event in events:
+            # 更新 cursor，下一轮只查询当前事件之后的新事件。
             cursor = event.sequence
+
+            # 把领域事件转换成对外返回的 SSE 数据结构。
             payload = TaskEventResponse.from_domain(event).model_dump(mode="json")
+
+            # error 事件使用 error 日志级别，其他事件使用 info。
             level = "error" if event.event_type == "error" else "info"
+            event_status = str(event.data.get("status", event.event_type))
+
+            # 记录当前发送的是哪一个 SSE 事件，便于观察任务状态变化。
             trace_step(
                 "GET",
                 f"/api/tasks/{task_id}/events",
                 "SSE",
-                f"event {str(event.data.get('status', event.event_type))}",
+                f"event {event_status}",
+                class_name="sse.py",
+                method_name="stream_task_events",
+                file_path="backend/app/events/sse.py",
                 task_id=task_id,
                 status=str(event.data.get("status", "unknown")),
                 sequence=event.sequence,
-                error_code=event.data.get("error_code") if event.event_type == "error" else None,
+                error_code=(
+                    event.data.get("error_code")
+                    if event.event_type == "error"
+                    else None
+                ),
+                label=f"SSE event {event.sequence}",
             )
+
+            # 写入结构化日志，方便后续排查某个 task_id 的事件发送情况。
             log_event(
                 logger,
                 level,
@@ -48,15 +106,22 @@ async def stream_task_events(
                 "SSE task event sent",
                 task_id=task_id,
                 status=str(event.data.get("status", "unknown")),
-                error_code=event.data.get("error_code") if event.event_type == "error" else None,
+                error_code=(
+                    event.data.get("error_code")
+                    if event.event_type == "error"
+                    else None
+                ),
                 sequence=event.sequence,
             )
-            # SSE 使用空行分隔事件；id 让客户端能记录最后成功接收的位置。
+
+            # SSE 使用空行分隔事件；id 让客户端记录最后成功接收的事件序号。
             yield (
                 f"id: {event.sequence}\n"
                 f"event: {event.event_type}\n"
                 f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
             )
+
+            # done 和 error 都表示任务已经进入终态，此时主动结束 SSE 连接。
             if event.event_type in {"done", "error"}:
                 trace_exit(
                     "GET",
@@ -64,8 +129,14 @@ async def stream_task_events(
                     response_status=200,
                     task_id=task_id,
                     detail="SSE stream closed",
-                    status=str(event.data.get("status", event.event_type)),
-                    error_code=event.data.get("error_code") if event.event_type == "error" else None,
+                    status=event_status,
+                    error_code=(
+                        event.data.get("error_code")
+                        if event.event_type == "error"
+                        else None
+                    ),
                 )
                 return
+
+        # 当前没有新事件时短暂等待，避免 while True 持续空转占用 CPU。
         await asyncio.sleep(0.05)
