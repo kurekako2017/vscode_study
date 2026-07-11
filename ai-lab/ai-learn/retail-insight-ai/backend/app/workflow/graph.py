@@ -23,6 +23,7 @@ from app.workflow.state import AnalysisState
 logger = get_logger(__name__)
 
 
+# #AnalysisWorkflow 定义了 4 个业务 Node，7 条执行 Edge（其中 4 条是条件 Edge，3 条是普通 Edge）。
 class AnalysisWorkflow:
     """用 LangGraph 显式表达分析流程的 State、Node、Edge 和条件路由。
 
@@ -39,17 +40,24 @@ class AnalysisWorkflow:
         step_delay_seconds: float = 0.05,
     ) -> None:
         """注入各业务步骤并编译一次 StateGraph，供后续任务复用。"""
-        #   
-        self._kpi_workflow = kpi_workflow
-        self._research_agent = research_agent
-        self._report_generator = report_generator
-        self._step_delay_seconds = step_delay_seconds
-        self._graph = self._build_graph()
+        #  
+        self._kpi_workflow = kpi_workflow                   # KPI 工作流类
+        self._research_agent = research_agent               # 研究代理类
+        self._report_generator = report_generator           #  报告生成器类
+        self._step_delay_seconds = step_delay_seconds       # 模拟节点耗时，让教学界面能够观察流式进度；生产实现不需要此延迟。
+        self._graph = self._build_graph()                   # 编译一次 StateGraph，供后续任务复用。
 
+    # 构建工作流图  
     def _build_graph(self) -> Any:
         """声明 Node 与 Edge；图结构集中在一处便于 Review 实际执行路径。"""
 
-        builder = StateGraph(AnalysisState)
+# add_node()：声明一个节点，并绑定到某个方法。
+# add_edge()：声明两个节点之间的执行顺序。
+# add_conditional_edges()：声明条件分支，由返回值决定下一步走哪个节点。
+# astream()：真正按照这些 Node 和 Edge 开始执行整个 Workflow。
+
+
+        builder = StateGraph(AnalysisState)                     # 声明 Node 与 Edge；图结构集中在一处便于 Review 实际执行路径。
         builder.add_node("route", self._route_node)
         builder.add_node("kpi", self._kpi_node)
         builder.add_node("research", self._research_node)
@@ -61,11 +69,13 @@ class AnalysisWorkflow:
             self._after_route,
             {"kpi": "kpi", "research": "research"},
         )
+        # 
         builder.add_conditional_edges(
             "kpi",
             self._after_kpi,
             {"research": "research", "report": "report"},
         )
+        # 
         builder.add_edge("research", "report")
         builder.add_edge("report", END)
         return builder.compile()

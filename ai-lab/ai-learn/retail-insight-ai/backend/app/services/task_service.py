@@ -39,11 +39,11 @@ class TaskService:
     ) -> None:
         """注入接口依赖，使 Service 不绑定 InMemory Repository 的具体实现。"""
 
-        self._task_repository = task_repository
-        self._report_repository = report_repository
-        self._event_publisher = event_publisher
-        self._workflow = workflow
-        self._provider_name = provider_name
+        self._task_repository = task_repository             # 任务仓库接口
+        self._report_repository = report_repository         # 报告仓库接口
+        self._event_publisher = event_publisher             # 事件发布器接口
+        self._workflow = workflow                           # 分析工作流接口
+        self._provider_name = provider_name                 # 分析报告提供者名称
 
     def create_task(self, question: str, mode: str) -> Task:
         """建立 queued 任务并发布首个进度事件。"""
@@ -207,7 +207,7 @@ class TaskService:
                 status="running",  # 当前任务状态
                 phase="background",  # 执行阶段
             )
-
+            # 运行 Workflow 流程，逐步发布进度事件。
             initial_state: AnalysisState = {
                 "task_id": task.task_id,
                 "question": task.question,
