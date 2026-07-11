@@ -113,7 +113,7 @@ class TaskService:
             status=task.status.value,  # 当前任务状态
         )
         return task
-
+    # 
     def get_task(self, task_id: str, *, emit_trace: bool = True, trace_phase: str = "http") -> Task:
         """读取任务，并把 Repository 的 ``None`` 转成明确领域异常。"""
 
@@ -147,7 +147,7 @@ class TaskService:
         if task is None:
             raise TaskNotFoundException(task_id)
         return task
-
+    # 
     def get_report(self, task_id: str) -> Report:
         """读取报告，同时区分“任务不存在”和“报告未就绪”。"""
 
@@ -163,6 +163,7 @@ class TaskService:
             task_id=task_id,
             label="TaskService.get_report()",
         )
+        # 先确认任务存在，否则报告查询可能会误导前端。
         self.get_task(task_id)
         # 记录真正读取报告仓库的步骤，避免日志只显示 TaskRepository.get()。
         trace_step(

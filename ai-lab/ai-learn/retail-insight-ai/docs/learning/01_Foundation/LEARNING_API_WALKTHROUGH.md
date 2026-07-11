@@ -826,22 +826,37 @@ get_report()
 backend/app/services/task_service.py
 TaskService.get_report()
 ↓
-backend/app/services/task_service.py
-TaskService.get_task()
+调用 TaskService.get_task()
+    │
+    ▼
+    backend/app/services/task_service.py
+    TaskService.get_task()
+    │
+    ├─ 调用 TaskRepository.get(task_id)
+    │     │
+    │     ▼
+    │   返回 Task 或 None
+    │
+    ├─ if task is None
+    │   ├─ 是 → raise TaskNotFoundException(task_id)
+    │   │        ↓
+    │   │      HTTP 404 Response
+    │   └─ 否 → return task
+    │
+    └─ 返回到 TaskService.get_report()
+         ↓
+backend/app/repositories/implementations/in_memory/report_repository.py
+InMemoryReportRepository.get(task_id)
 ↓
-backend/app/repositories/implementations/in_memory/task_repository.py
-TaskRepository.get()
+返回 Report 或 None
 ↓
-任务是否存在？
-├─ 否 → HTTP 404 Response
-└─ 是
-   ↓
-   backend/app/repositories/implementations/in_memory/report_repository.py
-   InMemoryReportRepository.get()
-   ↓
-   报告是否存在？
-   ├─ 否 → HTTP 409 Response
-   └─ 是 → HTTP 200 Response
+if report is None
+├─ 是 → raise ReportNotFoundException(task_id)
+│        ↓
+│      HTTP 409 Response
+└─ 否 → return report
+         ↓
+       HTTP 200 Response
 ```
 
 ## 源码学习说明
@@ -872,7 +887,7 @@ TaskRepository.get()
 | 接口作用             | 上传文件和 metadata，创建文档记录                                                                                                                                    |
 | 为什么先学习         | 上传是 import、chunk、retrieval、internal RAG 的入口                                                                                                                 |
 | Swagger 操作         | 打开`POST /api/v1/documents` → `Try it out` → 选择文件并填写 `metadata` → `Execute`                                                                       |
-| 输入（入力）         | `file`、`metadata`                                                                                                                                               |
+| 输入（入力）         | `file`、`metadata{"title":"2025资金","owner":"victor"}`                                                                                                          |
 | 预想结果（予想結果） | HTTP`201`，返回 `document_id`、文档状态、checksum、metadata                                                                                                      |
 | 后台日志观察         | upload 开始、checksum、重复文件命中、metadata 校验结果                                                                                                               |
 | 对应测试             | `backend/tests/test_document_upload_api.py`                                                                                                                        |

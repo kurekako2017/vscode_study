@@ -58,7 +58,7 @@ class PostgresTaskRepository:
 
     def get(self, task_id: str) -> Task | None:
         """按 ID 读取任务。"""
-
+        # 使用锁保护并发访问
         with self._connection_factory.connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
