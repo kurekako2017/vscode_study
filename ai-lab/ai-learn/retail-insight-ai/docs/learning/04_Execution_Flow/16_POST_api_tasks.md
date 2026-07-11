@@ -1,4 +1,3 @@
-
 # Retail Insight AI 企业源码架构手册
 
 # Volume 04：Execution Flow（源码执行流程）
@@ -427,6 +426,14 @@ Failed
 
 # 八、调用关系图 ⭐⭐⭐⭐⭐
 
+
+
+* **AnalysisWorkflow** ：总导演（负责调度，不负责计算）
+* **FixedKPIWorkflow** ：负责 KPI 计算
+* **ResearchAgent** ：负责 Research
+* **ReportGenerator** ：负责生成报告
+* **`stream()`** ：按 LangGraph 的节点顺序执行整个流程，并通过 `yield` 将每一步的执行结果返回给 `TaskService`，实现流式执行。
+
 ```text
 Browser
     │
@@ -435,38 +442,98 @@ POST /api/tasks
     │
     ▼
 tasks.py
+create_task()
     │
-    ▼
-TaskService.create_task()
-    │
-    ├───────────────┐
-    ▼               ▼
-Repository     BackgroundTasks
-                    │
-                    ▼
-             TaskService.run_task()
-                    │
-                    ▼
-       AnalysisWorkflow.stream()
-                    │
-      ┌─────────────┼────────────┐
-      ▼             ▼            ▼
-    Route         KPI       Research
-                                  │
-                                  ▼
-                           Report Generator
-                                  │
-                                  ▼
-                         Repository.save()
-                                  │
-                                  ▼
-                     EventPublisher.publish()
-                                  │
-                                  ▼
-                                SSE
-                                  │
-                                  ▼
-                         React Dashboard
+    ├─────────────────────────────────────┐
+    │                                     │
+    ▼                                     ▼
+TaskService.create_task()        BackgroundTasks.add_task(
+    │                                service.run_task,
+    ▼                                task.task_id
+TaskRepository.save()                  )
+    │                                     │
+    ▼                                     │
+HTTP 202 Accepted                        │
+响应先返回 Browser                       │
+                                          ▼
+                               TaskService.run_task()
+                                          │
+                                          │ 调用
+                                          ▼
+                         self._workflow.stream(initial_state)
+                                          │
+                                          ▼
+                             AnalysisWorkflow.stream()
+                             backend/app/workflow/graph.py
+                                          │
+                                          ▼
+                            LangGraph._graph.astream()
+                                          │
+                                          ▼
+                                      Route Node
+                                          │
+                         ┌────────────────┴────────────────┐
+                         │                                 │
+                  research 模式                      其他模式
+                         │                                 │
+                         ▼                                 ▼
+                  Research Node                         KPI Node
+                         │                                 │
+                         │                    ┌────────────┴────────────┐
+                         │                    │                         │
+                         │              hybrid 模式                kpi 模式
+                         │                    │                         │
+                         │                    ▼                         │
+                         │             Research Node                    │
+                         │                    │                         │
+                         └────────────────────┴─────────────────────────┘
+                                              │
+                                              ▼
+                                         Report Node
+                                              │
+                                              ▼
+                                     ReportGenerator.generate()
+                                              │
+                                              ▼
+                                  yield node_name, current_state
+                                              │
+                                              ▼
+                                  返回 TaskService.run_task()
+                                              │
+                         ┌────────────────────┴────────────────────┐
+                         │                                         │
+                         ▼                                         ▼
+             EventPublisher.publish()                  最终 ReportRepository.save()
+                         │
+                         ▼
+              EventRepository.append()
+                         │
+                         ▼
+                 SSE 接口读取事件
+                         │
+                         ▼
+GET /api/tasks/{task_id}/events
+                         │
+                         ▼
+tasks.py
+get_task_events()
+                         │
+                         ▼
+StreamingResponse(
+    stream_task_events(...)
+)
+                         │
+                         ▼
+stream_task_events()
+                         │
+                         ▼
+EventRepository.list_after()
+                         │
+                         ▼
+yield SSE 数据
+                         │
+                         ▼
+React Dashboard
 ```
 
 ---

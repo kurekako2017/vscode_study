@@ -124,7 +124,7 @@ def format_source_chain(source_chain: Sequence[SourceChainItem]) -> str:
             lines.append(f"    {_ARROW}")
     return "\n".join(lines)
 
-
+# 
 def trace_source_chain(
     http_method: str,
     http_path: str,

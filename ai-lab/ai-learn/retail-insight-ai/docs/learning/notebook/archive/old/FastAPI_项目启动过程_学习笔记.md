@@ -2,17 +2,17 @@
 
 ## 启动命令
 
-``` bash
+```bash
 cd backend
 
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 启动过程（项目真实流程）
 
-``` text
+```text
 执行：
 
 uvicorn app.main:app
@@ -104,7 +104,7 @@ Repository
 HTTP Response
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 为什么 Learning Trace 要从 main.py 开始？
 
@@ -115,7 +115,7 @@ HTTP Response
 
 因此学习源码时，建议按照下面的顺序阅读：
 
-``` text
+```text
 Uvicorn
     ↓
 backend/app/main.py
@@ -133,12 +133,14 @@ Repository
 Response
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Java 对照理解
 
   Java                    FastAPI
-  ----------------------- --------------------
+
+---
+
   Tomcat                  Uvicorn
   SpringBootApplication   main.py
   DispatcherServlet       FastAPI Router
