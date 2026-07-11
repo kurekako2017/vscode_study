@@ -90,7 +90,7 @@ async def get_task(
     )
     return response
 
-
+#   Router（接口）、StreamingResponse（建立连接） 和 stream_task_events（发送事件）
 @router.get("/{task_id}/events")
 async def get_task_events(
     task_id: str,
@@ -119,9 +119,9 @@ async def get_task_events(
         task_id=task_id,
         status="connected",
     )
-    #
+    # 发送 SSE 消息  
     return StreamingResponse(
-        #
+        # stream_task_events() 是一个生成器函数，返回一个异步迭代器，用于逐条发送任务事件。
         stream_task_events(event_repository, task_id, after_sequence=after),
         media_type="text/event-stream",
         headers={

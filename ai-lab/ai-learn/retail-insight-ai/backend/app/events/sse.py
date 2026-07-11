@@ -11,7 +11,7 @@ from app.schemas.events import TaskEventResponse
 
 logger = get_logger(__name__)
 
-#
+#stream_task_events() 就是真正负责发送 SSE 数据的函数
 async def stream_task_events(
     repository: EventRepository,
     task_id: str,
@@ -113,8 +113,19 @@ async def stream_task_events(
                 ),
                 sequence=event.sequence,
             )
+            #yield 可以理解成　"先把当前这条数据交给 StreamingResponse 发给浏览器，然后函数停在这里；下次有新事件时，再从这里继续执行，而不是重新从函数开头执行。"
 
             # SSE 使用空行分隔事件；id 让客户端记录最后成功接收的事件序号。
+            #  event: 指定事件类型，客户端可通过 event.type 过滤事件。
+            #  data: 事件数据，必须是 JSON 字符串，客户端可通过 JSON.parse() 解析。
+            #  SSE 规范要求每条消息必须以两个换行符结尾，表示事件结束。
+            #  https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#sending_events
+            #  yield 语句将事件数据发送给 StreamingResponse，StreamingResponse 会把数据写入 HTTP 响应流。
+            #  这里使用 f-string 格式化字符串，确保 JSON 数据中包含中文时不会被转义。
+            #  例如，payload = {"message": "你好"}，json.dumps(payload, ensure_ascii=False) 会返回 '{"message": "你好"}'，而不是 '{"message": "\u4f60\u597d"}'。
+            #  这样客户端接收到的 SSE 数据就可以直接解析为原始的中文字符串，而不会出现乱码。
+            #  SSE 规范要求每条消息必须以两个换行符结尾，表示事件结束。
+            #  yield 把这一条数据交给 StreamingResponse 的 `stream` 方法，这样客户端就可以接收到完整的 SSE 消息。 ※todo
             yield (
                 f"id: {event.sequence}\n"
                 f"event: {event.event_type}\n"
