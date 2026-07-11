@@ -49,6 +49,7 @@ from app.models.document import (
     Language,
 )
 from app.observability.logging import get_logger, get_request_id, log_event
+from app.core.learning_trace import trace_step
 from app.repositories.interfaces.document_repository import DocumentRepository
 from app.schemas.document_api import DocumentUploadSessionResponse, UploadSessionStatus
 from app.models.task import utc_now
@@ -125,6 +126,20 @@ class DocumentUploadService:
         accepted_at = utc_now()
         normalized_content_type = (content_type or "").split(";", 1)[0].strip().lower()
 
+        # 记录进入上传业务方法，说明 Router 已把文件交给 Service。
+        trace_step(
+            "POST",
+            "/api/v1/documents",
+            "Service",
+            "DocumentUploadService.upload_document()",
+            class_name="DocumentUploadService",
+            method_name="upload_document",
+            file_path="backend/app/services/document_upload_service.py",
+            document_id=document_id,
+            status=UploadSessionStatus.ACCEPTED.value,
+            label="DocumentUploadService.upload_document()",
+        )
+
         self._publish(
             upload_id,
             "document.upload.accepted",
@@ -150,6 +165,20 @@ class DocumentUploadService:
             extra={"filename": filename},
         )
 
+        # 将 metadata 与文件规则分开记录，便于初学者理解校验发生的位置。
+        trace_step(
+            "POST",
+            "/api/v1/documents",
+            "Validation",
+            "DocumentUploadService._parse_metadata()",
+            class_name="DocumentUploadService",
+            method_name="_parse_metadata",
+            file_path="backend/app/services/document_upload_service.py",
+            document_id=document_id,
+            status=UploadSessionStatus.VALIDATING.value,
+            label="metadata/file validation",
+        )
+        # 解析 metadata JSON，提取 title、owner、description、tags、language、document_type、checksum。
         metadata_payload = self._parse_metadata(metadata_json)
         title = self._require_title(metadata_payload)
         owner = self._require_owner(metadata_payload)
@@ -220,9 +249,35 @@ class DocumentUploadService:
             extra={"filename": filename, "document_type": document_type.value},
         )
 
+        # 单独记录 checksum 查询，避免把重复判断误认为新文档保存。
+        trace_step(
+            "POST",
+            "/api/v1/documents",
+            "Upload",
+            "DocumentUploadService._lookup_cached_result()",
+            class_name="DocumentUploadService",
+            method_name="_lookup_cached_result",
+            file_path="backend/app/services/document_upload_service.py",
+            document_id=document_id,
+            status="checking",
+            label="checksum duplicate check",
+        )
         cached_response = self._lookup_cached_result(idempotency_key, checksum)
         if cached_response is not None:
             self._cache_result(idempotency_key, checksum, cached_response)
+            # 重复文件只返回已有结果，因此这里不能打印新文档保存节点。
+            trace_step(
+                "POST",
+                "/api/v1/documents",
+                "Upload",
+                "Existing document result returned",
+                class_name="DocumentUploadService",
+                method_name="upload_document",
+                file_path="backend/app/services/document_upload_service.py",
+                document_id=cached_response.document_id,
+                status=UploadSessionStatus.COMPLETED.value,
+                label="Existing document returned",
+            )
             self._publish(
                 upload_id,
                 "document.upload.duplicate_detected",
@@ -268,14 +323,53 @@ class DocumentUploadService:
         )
 
         try:
+            # 记录真正执行的新文档保存调用，节点必须对应实际 Repository 方法。
+            trace_step(
+                "POST",
+                "/api/v1/documents",
+                "Repository",
+                "InMemoryDocumentRepository.create()",
+                class_name=self._repository.__class__.__name__,
+                method_name="create",
+                file_path="backend/app/repositories/implementations/in_memory/document_repository.py",
+                document_id=document_id,
+                status=UploadSessionStatus.STORING.value,
+                label="InMemoryDocumentRepository.create()",
+            )
             self._repository.create(document)
         except ValidationAppException as exc:
             detail = exc.detail or {}
             if detail.get("field") == "checksum":
+                # 竞争条件下再次查询真实仓库，单独记录该重复分支节点。
+                trace_step(
+                    "POST",
+                    "/api/v1/documents",
+                    "Repository",
+                    "InMemoryDocumentRepository.find_by_checksum()",
+                    class_name=self._repository.__class__.__name__,
+                    method_name="find_by_checksum",
+                    file_path="backend/app/repositories/implementations/in_memory/document_repository.py",
+                    document_id=document_id,
+                    status="duplicate_check",
+                    label="InMemoryDocumentRepository.find_by_checksum()",
+                )
                 existing = self._repository.find_by_checksum(checksum)
                 if existing is not None:
                     response = self._build_response(upload_id, existing.document_id, accepted_at)
                     self._cache_result(idempotency_key, checksum, response)
+                    # 重复文件没有完成保存，Learning Trace 只显示已有文档读取结果。
+                    trace_step(
+                        "POST",
+                        "/api/v1/documents",
+                        "Upload",
+                        "Existing document result returned",
+                        class_name="DocumentUploadService",
+                        method_name="upload_document",
+                        file_path="backend/app/services/document_upload_service.py",
+                        document_id=existing.document_id,
+                        status=UploadSessionStatus.COMPLETED.value,
+                        label="Existing document returned",
+                    )
                     self._publish(
                         upload_id,
                         "document.upload.duplicate_detected",
@@ -322,12 +416,12 @@ class DocumentUploadService:
             extra={"filename": filename, "checksum": checksum},
         )
         return response
-
+    # ---------------------------- 辅助方法 ----------------------------
     def _parse_metadata(self, metadata_json: str) -> dict[str, Any]:
         """把 multipart metadata JSON 转成字典。"""
 
         try:
-            payload = json.loads(metadata_json)
+            payload = json.loads(metadata_json)             # 
         except json.JSONDecodeError as exc:
             self._raise_upload_error(
                 ErrorCode.INVALID_METADATA,
@@ -456,7 +550,7 @@ class DocumentUploadService:
                     cause=exc,
                 )
         return f"[binary {document_type.value} upload placeholder: {filename}]"
-
+    # 把上传结果整理成接口响应
     def _build_metadata(
         self,
         *,

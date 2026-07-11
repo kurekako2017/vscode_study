@@ -2,6 +2,12 @@
 
 # CHANGELOG
 
+## 2026-07-11 API Case Input and Learning Trace Alignment
+
+- 对齐 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的 24 个 API Case 输入参数说明。
+- 为 `GET /api/v1/documents` 补齐 Router、Service、Repository 的最小 Learning Trace。
+- 未修改 API 业务逻辑、Schema、测试、Learning Trace 核心框架或 Repository 查询逻辑。
+
 ## 2026-07-09
 
 ### Documentation

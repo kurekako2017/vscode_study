@@ -2,6 +2,18 @@
 
 最后更新：2026-07-08
 
+## 2026-07-11 API Case Input and Learning Trace Alignment
+
+- [x] 核对学习文档中的 23 个主 Case 与 1 个补充 Case
+- [x] 同步 API Case 的 Path / Query / Header / Body / Form / File 输入说明、默认值和约束
+- [x] 修正 `GET /api/v1/documents` 的 include_archived、limit、cursor 以及真实 Learning Trace
+- [x] 在 `documents.py` 与 `document_read_service.py` 补充 Router / Service / Repository 学习节点
+- [x] 保持 API 行为、Repository 查询逻辑、Schema、测试和 Learning Trace 核心框架不变
+
+### 完成记录
+
+- 2026-07-11：完成 API Case 输入参数和文档列表 Learning Trace 对齐；保留工作区中已有的上传相关用户修改。
+
 ## 2026-07-08 Learning Request Body Trace
 
 - [x] 在 `TaskService.create_task()` 追加学习日志，终端可直接看到 `request.question`、`request.mode` 和 `task_id`

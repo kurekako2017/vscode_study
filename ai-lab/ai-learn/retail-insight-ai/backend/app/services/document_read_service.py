@@ -25,6 +25,7 @@
 
 from __future__ import annotations
 
+from app.core.learning_trace import trace_step
 from app.errors.exceptions import DocumentNotFoundException
 from app.models.document import Document, DocumentStatus, DocumentType, Language
 from app.repositories.interfaces.document_repository import DocumentRepository
@@ -53,6 +54,31 @@ class DocumentReadService:
     ) -> DocumentListResponse:
         """返回符合过滤条件的文档列表。"""
 
+        # 记录读取 Service，方便初学者看到过滤参数即将交给 Repository 查询。
+        trace_step(
+            "GET",
+            "/api/v1/documents",
+            "Service",
+            "DocumentReadService.list_documents()",
+            class_name="DocumentReadService",
+            method_name="list_documents",
+            file_path="backend/app/services/document_read_service.py",
+            label="DocumentReadService.list_documents()",
+        )
+        # 记录实际读取仓库的节点，下一步进入 InMemoryDocumentRepository.list_all()。
+        trace_step(
+            "GET",
+            "/api/v1/documents",
+            "Repository",
+            "InMemoryDocumentRepository.list_all()",
+            class_name=self._repository.__class__.__name__,
+            method_name="list_all",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/document_repository.py"
+            ),
+            label="InMemoryDocumentRepository.list_all()",
+        )
         documents = self._repository.list_all()
         filtered = [
             document

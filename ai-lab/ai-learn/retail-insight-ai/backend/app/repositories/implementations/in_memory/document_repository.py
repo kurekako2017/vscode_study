@@ -40,7 +40,7 @@ class InMemoryDocumentRepository:
 
         self._documents: dict[str, Document] = {}
         self._lock = RLock()
-
+    # 创建文档
     def create(self, document: Document) -> None:
         """创建文档并拒绝重复 ID / 重复 checksum。"""
 

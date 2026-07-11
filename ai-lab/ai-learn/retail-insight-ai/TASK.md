@@ -2,6 +2,14 @@
 
 最后更新：2026-07-08
 
+## 2026-07-11 API Case 输入参数与 Learning Trace 对齐
+
+- [x] 核对 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的 24 个 API Case
+- [x] 按 Router 签名补齐 Path、Query、Header、Body、Form、File、默认值和约束
+- [x] 修正 `GET /api/v1/documents` 的文档列表输入、日志观察和执行链路
+- [x] 为文档列表 Router / Service 补充最小 Learning Trace，不改变业务逻辑
+- [x] 仅保留真实源码中的方法与 Repository 调用，不虚构 Structured Log
+
 ## 2026-07-08 Learning Request Body Trace
 
 - [x] 在 `TaskService.create_task()` 追加学习日志，终端可直接看到 `request.question`、`request.mode` 和 `task_id`

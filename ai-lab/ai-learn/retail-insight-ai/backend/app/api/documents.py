@@ -7,6 +7,7 @@ from app.api.dependencies import (
     get_document_read_service,
     get_document_upload_service,
 )
+from app.core.learning_trace import trace_step
 from app.observability.logging import get_request_id
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.document_api import (
@@ -29,6 +30,7 @@ router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
     response_model=ApiResponse[DocumentUploadSessionResponse],
     status_code=status.HTTP_201_CREATED,
 )
+
 async def upload_document(
     file: UploadFile = File(...),
     metadata: str = Form(...),
@@ -37,6 +39,17 @@ async def upload_document(
 ) -> ApiResponse[DocumentUploadSessionResponse]:
     """接收上传文件与 metadata JSON，交给 service 执行同步冻结流程。"""
 
+    # 记录进入文档上传接口，方便从 Router 继续追踪到上传 Service。
+    trace_step(
+        "POST",
+        "/api/v1/documents",
+        "Router",
+        "upload_document()",
+        class_name="documents.py",
+        method_name="upload_document",
+        file_path="backend/app/api/documents.py",
+        label="upload_document()",
+    )
     content = await file.read()
     data = service.upload_document(
         filename=file.filename or "uploaded-file",
