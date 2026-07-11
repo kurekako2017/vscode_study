@@ -385,21 +385,21 @@ Swagger Execute
 
 统一观察时，重点不是“某一行日志长什么样”，而是“同一次请求在后端内部有没有按顺序走完整条业务流程”。
 
-| 后台日志观察项                               | 为什么看                       | 正常意味着什么                           |
-| -------------------------------------------- | ------------------------------ | ---------------------------------------- |
-| `request_id`          | 关联一次完整请求             | 同一次请求所有日志拥有相同 `request_id` |
-| `task_id`             | 关联任务生命周期             | 同一条任务流程都能串起来                |
-| `Request Body`        | 观察用户输入                 | 先确认 `question`、`mode` 进入系统      |
-| `Router`              | 是否进入路由层               | 请求已进入 API 入口                     |
-| `Service`             | 是否进入业务层               | 开始执行业务编排                        |
-| `Repository`          | 是否写入或读取状态           | 任务状态开始落库                        |
-| `Workflow`            | 是否进入工作流               | 后台分析已经开始                        |
-| `Provider`            | 是否调用研究来源             | 数据来源开始执行                        |
-| `Report`              | 是否生成最终产物             | 报告已经合成                            |
-| `event`               | 业务事件名称                 | 事件发布顺序正确                        |
-| `status`              | 业务状态                     | `queued` / `running` / `completed`      |
-| `duration_ms`         | 性能分析                     | 接口耗时可观察                          |
-| `error_code`          | 是否异常                     | `null` 表示正常                         |
+| 后台日志观察项   | 为什么看           | 正常意味着什么                           |
+| ---------------- | ------------------ | ---------------------------------------- |
+| `request_id`   | 关联一次完整请求   | 同一次请求所有日志拥有相同`request_id` |
+| `task_id`      | 关联任务生命周期   | 同一条任务流程都能串起来                 |
+| `Request Body` | 观察用户输入       | 先确认`question`、`mode` 进入系统    |
+| `Router`       | 是否进入路由层     | 请求已进入 API 入口                      |
+| `Service`      | 是否进入业务层     | 开始执行业务编排                         |
+| `Repository`   | 是否写入或读取状态 | 任务状态开始落库                         |
+| `Workflow`     | 是否进入工作流     | 后台分析已经开始                         |
+| `Provider`     | 是否调用研究来源   | 数据来源开始执行                         |
+| `Report`       | 是否生成最终产物   | 报告已经合成                             |
+| `event`        | 业务事件名称       | 事件发布顺序正确                         |
+| `status`       | 业务状态           | `queued` / `running` / `completed` |
+| `duration_ms`  | 性能分析           | 接口耗时可观察                           |
+| `error_code`   | 是否异常           | `null` 表示正常                        |
 
 ## 学习建议
 
@@ -519,23 +519,23 @@ GET /health 没有 Background（异步执行）阶段。
 ## 源码学习说明
 
 ### backend/app/main.py（项目启动入口）
-作用：创建应用实例，并把路由和依赖接到同一个后端上。  
-为什么现在学习：先知道请求从哪里进入项目，后面读接口才不会迷路。  
-重点关注：
+
+作用：创建应用实例，并把路由和依赖接到同一个后端上。为什么现在学习：先知道请求从哪里进入项目，后面读接口才不会迷路。重点关注：
+
 - `create_app()`：创建 FastAPI 应用并注册路由与中间件。
 - `request_context()`：为每次请求提供追踪上下文，方便串联日志。
 
 ### backend/app/api/health.py（接口入口）
-作用：接收 `GET /health`，返回最小可验证的状态结果。  
-为什么现在学习：这是最短的入口，适合先建立 Router→Schema 的直觉。  
-重点关注：
+
+作用：接收 `GET /health`，返回最小可验证的状态结果。为什么现在学习：这是最短的入口，适合先建立 Router→Schema 的直觉。重点关注：
+
 - `health()`：返回健康检查结果和基础服务状态。
 - `HealthResponse`：定义健康检查的响应结构。
 
 ### backend/app/schemas/health.py（响应模型）
-作用：固定健康检查返回字段，让接口输出稳定可读。  
-为什么现在学习：先理解返回结构，再看更复杂的业务响应。  
-重点关注：
+
+作用：固定健康检查返回字段，让接口输出稳定可读。为什么现在学习：先理解返回结构，再看更复杂的业务响应。重点关注：
+
 - `HealthResponse`：定义健康检查的响应结构。
 - `status` / `service` / `provider` / `request_id`
 
@@ -543,17 +543,17 @@ GET /health 没有 Background（异步执行）阶段。
 
 ## 02. POST /api/tasks
 
-| 项目                 | 内容                                                                                                                                              |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 创建任务，启动主业务流程                                                                                                                          |
-| 为什么先学习         | 后续状态、SSE、报告都依赖 `task_id`                                                                                                              |
-| Swagger 操作         | 打开 `POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                           |
-| 输入（入力）         | `question`、`mode`                                                                                                                            |
-| 预想结果（予想結果） | HTTP `202`，返回 `task_id` 和 `status=queued`                                                                                                |
-| 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、`Route`、`KPI`、`Research`、`Report` |
-| 对应测试             | `backend/tests/test_api.py`                                                                                                                     |
+| 项目                 | 内容                                                                                                                                                                                                                                                                                                             |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接口作用             | 创建任务，启动主业务流程                                                                                                                                                                                                                                                                                         |
+| 为什么先学习         | 后续状态、SSE、报告都依赖`task_id`                                                                                                                                                                                                                                                                             |
+| Swagger 操作         | 打开`POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                                                                                                                                                                                          |
+| 输入（入力）         | `question`、`mode`                                                                                                                                                                                                                                                                                           |
+| 预想结果（予想結果） | HTTP`202`，返回 `task_id` 和 `status=queued`                                                                                                                                                                                                                                                               |
+| 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、`Route`、`KPI`、`Research`、`Report`                                                                                                                                                                              |
+| 对应测试             | `backend/tests/test_api.py`                                                                                                                                                                                                                                                                                    |
 | 对应源码             | `backend/app/api/tasks.py`、`backend/app/services/task_service.py`、`backend/app/repositories/implementations/in_memory/task_repository.py`、`backend/app/workflow/graph.py`、`backend/app/kpi/workflow.py`、`backend/app/agents/providers/static_research.py`、`backend/app/reports/generator.py` |
-| 下一步               | `GET /api/tasks/{task_id}`                                                                                                                      |
+| 下一步               | `GET /api/tasks/{task_id}`                                                                                                                                                                                                                                                                                     |
 
 ### Console Log 示例
 
@@ -655,42 +655,50 @@ Background 阶段在 HTTP 202 返回后继续执行。
 ### 主执行阶段（★★★★★）
 
 ### backend/app/api/tasks.py
-职责：HTTP 入口，只负责 `create_task()`。  
+
+职责：HTTP 入口，只负责 `create_task()`。
 重点函数：`create_task()`：创建任务，并把后台执行任务加入 BackgroundTasks。
 
 ### backend/app/services/task_service.py
-职责：创建任务、串联后台任务执行。  
-重点函数：`create_task()`：创建任务事实，并返回初始任务状态。  
+
+职责：创建任务、串联后台任务执行。
+重点函数：`create_task()`：创建任务事实，并返回初始任务状态。
 重点函数：`run_task()`：执行后台任务流程，推动任务状态继续前进。
 
 ### backend/app/repositories/implementations/in_memory/task_repository.py
-职责：保存任务状态，承接 queued / running / completed。  
-重点函数：`create()`：创建新的任务记录并写入仓库。  
+
+职责：保存任务状态，承接 queued / running / completed。
+重点函数：`create()`：创建新的任务记录并写入仓库。
 重点函数：`save()`：保存任务当前状态快照。
 
 ### backend/app/workflow/graph.py
-职责：后台 Workflow，推进 `Route -> KPI -> Research -> Report`。  
+
+职责：后台 Workflow，推进 `Route -> KPI -> Research -> Report`。
 重点函数：`stream()`：按流程推进后台工作流并产出执行步骤。
 
 ### backend/app/kpi/workflow.py
-职责：KPI Workflow。  
+
+职责：KPI Workflow。
 重点函数：`run()`：执行 KPI 核心计算流程。
 
 ### backend/app/agents/providers/static_research.py
-职责：Research。  
+
+职责：Research。
 重点函数：`research()`：获取研究结果或静态业务资料。
 
 ### backend/app/reports/generator.py
-职责：生成最终 Report。  
+
+职责：生成最终 Report。
 重点函数：`generate()`：把研究与 KPI 结果整理成最终报告。
 
 ### 相关模块（了解即可）
 
 ### backend/app/events/publisher.py
-说明：负责发布任务生命周期事件。供 SSE/Event Stream 使用。本章节不用深入阅读。  
+
+说明：负责发布任务生命周期事件。供 SSE/Event Stream 使用。本章节不用深入阅读。
 建议在 `GET /api/tasks/{task_id}/events` 章节再学习。
 
-## 03. GET /api/tasks/{task_id}
+## 03. GET /api/tasks/
 
 | 项目                 | 内容                                                                                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -724,24 +732,24 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/tasks.py（任务查询入口）
-作用：接收按 `task_id` 读取状态的请求，并返回当前任务快照。  
-为什么现在学习：创建任务后，最先要学会的是如何确认它现在跑到哪一步。  
-重点关注：
+
+作用：接收按 `task_id` 读取状态的请求，并返回当前任务快照。为什么现在学习：创建任务后，最先要学会的是如何确认它现在跑到哪一步。重点关注：
+
 - `get_task()`：根据 task_id 查询当前任务状态。
 
 ### backend/app/services/task_service.py（任务状态读取）
-作用：负责从任务仓库读取任务，并统一处理不存在等状态边界。  
-为什么现在学习：这里能看清“查状态”和“跑任务”是两件分开的事。  
-重点关注：
+
+作用：负责从任务仓库读取任务，并统一处理不存在等状态边界。为什么现在学习：这里能看清“查状态”和“跑任务”是两件分开的事。重点关注：
+
 - `get_task()`：根据 task_id 读取任务并处理不存在等边界。
 
 ### backend/app/repositories/implementations/in_memory/task_repository.py（任务状态存储）
-作用：按 `task_id` 返回当前任务事实对象。  
-为什么现在学习：状态查询最终都会落到这里读取真实存储结果。  
-重点关注：
+
+作用：按 `task_id` 返回当前任务事实对象。为什么现在学习：状态查询最终都会落到这里读取真实存储结果。重点关注：
+
 - `get()`：按 task_id 返回当前任务事实对象。
 
-## 04. GET /api/tasks/{task_id}/events
+## 04. GET /api/tasks//events
 
 | 项目                 | 内容                                                                                                                                    |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -775,25 +783,25 @@ Response Stream
 ## 源码学习说明
 
 ### backend/app/api/tasks.py（任务事件入口）
-作用：暴露任务事件订阅接口，把同一个 `task_id` 交给 SSE 层继续处理。  
-为什么现在学习：这里能看出任务接口不只负责创建，还负责实时观察过程。  
-重点关注：
+
+作用：暴露任务事件订阅接口，把同一个 `task_id` 交给 SSE 层继续处理。为什么现在学习：这里能看出任务接口不只负责创建，还负责实时观察过程。重点关注：
+
 - `get_task_events()`：建立任务事件订阅入口，返回 SSE 流。
 
 ### backend/app/events/sse.py（SSE 输出）
-作用：把事件仓库里的任务事件持续转换成 `text/event-stream` 响应。  
-为什么现在学习：这是理解“前端为什么能边跑边看”的关键文件。  
-重点关注：
+
+作用：把事件仓库里的任务事件持续转换成 `text/event-stream` 响应。为什么现在学习：这是理解“前端为什么能边跑边看”的关键文件。重点关注：
+
 - `stream_task_events()`：把事件仓库中的记录转换成 SSE 响应。
 
 ### backend/app/repositories/implementations/in_memory/event_repository.py（事件存储）
-作用：按顺序保存并读取任务事件。  
-为什么现在学习：SSE 不是直接读 Workflow，而是读这里已经落下来的事件事实。  
-重点关注：
+
+作用：按顺序保存并读取任务事件。为什么现在学习：SSE 不是直接读 Workflow，而是读这里已经落下来的事件事实。重点关注：
+
 - `append()`：追加一条事件记录到事件仓库。
 - `list_after()`：读取指定事件之后的新事件。
 
-## 05. GET /api/tasks/{task_id}/report
+## 05. GET /api/tasks//report
 
 | 项目                 | 内容                                                                                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -818,30 +826,42 @@ get_report()
 backend/app/services/task_service.py
 TaskService.get_report()
 ↓
-backend/app/repositories/implementations/in_memory/report_repository.py
-InMemoryReportRepository.get()
+backend/app/services/task_service.py
+TaskService.get_task()
 ↓
-Response
+backend/app/repositories/implementations/in_memory/task_repository.py
+TaskRepository.get()
+↓
+任务是否存在？
+├─ 否 → HTTP 404 Response
+└─ 是
+   ↓
+   backend/app/repositories/implementations/in_memory/report_repository.py
+   InMemoryReportRepository.get()
+   ↓
+   报告是否存在？
+   ├─ 否 → HTTP 409 Response
+   └─ 是 → HTTP 200 Response
 ```
 
 ## 源码学习说明
 
 ### backend/app/api/tasks.py（报告读取入口）
-作用：接收报告读取请求，并把 `task_id` 交给任务服务查询最终结果。  
-为什么现在学习：任务流程走完以后，用户真正关心的是报告能不能拿到。  
-重点关注：
+
+作用：接收报告读取请求，并把 `task_id` 交给任务服务查询最终结果。为什么现在学习：任务流程走完以后，用户真正关心的是报告能不能拿到。重点关注：
+
 - `get_report()`：根据 task_id 读取最终报告内容。
 
 ### backend/app/services/task_service.py（报告读取服务）
-作用：负责根据任务 ID 找到最终报告，并处理未生成的边界。  
-为什么现在学习：这里能看懂“任务状态”和“任务产物”是分开保存的。  
-重点关注：
+
+作用：负责根据任务 ID 找到最终报告，并处理未生成的边界。为什么现在学习：这里能看懂“任务状态”和“任务产物”是分开保存的。重点关注：
+
 - `get_report()`：根据 task_id 读取最终报告并处理未生成边界。
 
 ### backend/app/repositories/implementations/in_memory/report_repository.py（报告存储）
-作用：保存和读取任务报告正文。  
-为什么现在学习：最终 Markdown 报告就是从这里被取出来返回给接口的。  
-重点关注：
+
+作用：保存和读取任务报告正文。为什么现在学习：最终 Markdown 报告就是从这里被取出来返回给接口的。重点关注：
+
 - `save()`：保存报告正文到仓库。
 - `get()`：按 task_id 读取已保存的报告正文。
 
@@ -851,13 +871,13 @@ Response
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 接口作用             | 上传文件和 metadata，创建文档记录                                                                                                                                    |
 | 为什么先学习         | 上传是 import、chunk、retrieval、internal RAG 的入口                                                                                                                 |
-| Swagger 操作         | 打开`POST /api/v1/documents` → `Try it out` → 选择文件并填写 `metadata` → `Execute`                                                                            |
-| 输入（入力）         | `file`、`metadata`                                                                                                                                                 |
-| 预想结果（予想結果） | HTTP`201`，返回 `document_id`、文档状态、checksum、metadata                                                                                                       |
-| 后台日志观察         | upload 开始、checksum、重复文件命中、metadata 校验结果                                                                                                              |
-| 对应测试             | `backend/tests/test_document_upload_api.py`                                                                                                                         |
+| Swagger 操作         | 打开`POST /api/v1/documents` → `Try it out` → 选择文件并填写 `metadata` → `Execute`                                                                       |
+| 输入（入力）         | `file`、`metadata`                                                                                                                                               |
+| 预想结果（予想結果） | HTTP`201`，返回 `document_id`、文档状态、checksum、metadata                                                                                                      |
+| 后台日志观察         | upload 开始、checksum、重复文件命中、metadata 校验结果                                                                                                               |
+| 对应测试             | `backend/tests/test_document_upload_api.py`                                                                                                                        |
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_upload_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
-| 下一步               | `GET /api/v1/documents`                                                                                                                                           |
+| 下一步               | `GET /api/v1/documents`                                                                                                                                            |
 
 ### 程序执行阶段（Execution Flow）
 
@@ -879,33 +899,33 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/documents.py（文档上传入口）
-作用：接收上传文件和 metadata，并把原始输入交给上传服务处理。  
-为什么现在学习：Document 流程的第一步就是把事实先送进系统。  
-重点关注：
+
+作用：接收上传文件和 metadata，并把原始输入交给上传服务处理。为什么现在学习：Document 流程的第一步就是把事实先送进系统。重点关注：
+
 - `upload_document()`：接收文件和 metadata 并创建文档记录。
 
 ### backend/app/services/document_upload_service.py（文档上传服务）
-作用：校验 metadata、生成 checksum、处理重复上传，再创建文档记录。  
-为什么现在学习：上传不是简单存文件，这里决定文档能否进入后续流程。  
-重点关注：
+
+作用：校验 metadata、生成 checksum、处理重复上传，再创建文档记录。为什么现在学习：上传不是简单存文件，这里决定文档能否进入后续流程。重点关注：
+
 - `upload_document()`：校验上传内容并创建文档记录。
 - `_parse_metadata()`：解析并校验上传时的 metadata。
 - `_build_response()`：把上传结果整理成接口响应。
 
 ### backend/app/repositories/implementations/in_memory/document_repository.py（文档事实存储）
-作用：保存上传后的文档事实对象。  
-为什么现在学习：导入、切分、检索都会先依赖这里的文档记录。  
-重点关注：
+
+作用：保存上传后的文档事实对象。为什么现在学习：导入、切分、检索都会先依赖这里的文档记录。重点关注：
+
 - `create()`：创建文档事实并写入仓库。
 - `find_by_checksum()`：按 checksum 查找是否已存在同一文档。
 
 ## 07. GET /api/v1/documents
 
-| 项目                 | 内容                                                                                                                                                              |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 查看文档列表                                                                                                                                                      |
-| 为什么先学习         | 先看集合，最容易理解文档领域对象当前有哪些状态和过滤条件                                                                                                          |
-| Swagger 操作         | 打开`GET /api/v1/documents` → `Try it out` → 可选填写过滤条件 → `Execute`                                                                                    |
+| 项目                 | 内容                                                                                                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 接口作用             | 查看文档列表                                                                                                                                                       |
+| 为什么先学习         | 先看集合，最容易理解文档领域对象当前有哪些状态和过滤条件                                                                                                           |
+| Swagger 操作         | 打开`GET /api/v1/documents` → `Try it out` → 可选填写过滤条件 → `Execute`                                                                                 |
 | 输入（入力）         | `status`、`document_type`、`language`、`tag`、`owner`                                                                                                    |
 | 预想结果（予想結果） | HTTP`200`，返回文档列表，默认不含 archived                                                                                                                       |
 | 后台日志观察         | 过滤条件、命中文档数量、archived 默认排除行为                                                                                                                      |
@@ -933,25 +953,25 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/documents.py（文档列表入口）
-作用：接收过滤条件，并返回当前可见的文档集合。  
-为什么现在学习：读集合最适合先认识文档模型里的状态和基础字段。  
-重点关注：
+
+作用：接收过滤条件，并返回当前可见的文档集合。为什么现在学习：读集合最适合先认识文档模型里的状态和基础字段。重点关注：
+
 - `list_documents()`：接收过滤条件并返回文档集合。
 
 ### backend/app/services/document_read_service.py（文档读取服务）
-作用：负责过滤文档列表，并组装列表响应。  
-为什么现在学习：这里能看出哪些筛选逻辑属于业务层，而不是 Router。  
-重点关注：
+
+作用：负责过滤文档列表，并组装列表响应。为什么现在学习：这里能看出哪些筛选逻辑属于业务层，而不是 Router。重点关注：
+
 - `list_documents()`：整理文档列表并组装响应。
 - `_matches()`：判断单个文档是否满足过滤条件。
 
 ### backend/app/repositories/implementations/in_memory/document_repository.py（文档列表存储）
-作用：返回当前仓库中的全部文档事实，供上层再做过滤。  
-为什么现在学习：列表查询最终还是从同一份文档事实集合开始。  
-重点关注：
+
+作用：返回当前仓库中的全部文档事实，供上层再做过滤。为什么现在学习：列表查询最终还是从同一份文档事实集合开始。重点关注：
+
 - `list_all()`：返回仓库中的全部文档事实。
 
-## 08. GET /api/v1/documents/{document_id}
+## 08. GET /api/v1/documents/
 
 | 项目                 | 内容                                                                                                                                                               |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -985,24 +1005,24 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/documents.py（文档详情入口）
-作用：接收 `document_id` 并发起单文档详情查询。  
-为什么现在学习：看详情比看列表更容易理解一个 Document 实体完整长什么样。  
-重点关注：
+
+作用：接收 `document_id` 并发起单文档详情查询。为什么现在学习：看详情比看列表更容易理解一个 Document 实体完整长什么样。重点关注：
+
 - `get_document()`：根据 document_id 查询单个文档。
 
 ### backend/app/services/document_read_service.py（文档详情读取）
-作用：负责读取单个文档，并处理不存在的情况。  
-为什么现在学习：这里能帮助初学者看懂“列表查询”和“单体查询”的分工。  
-重点关注：
+
+作用：负责读取单个文档，并处理不存在的情况。为什么现在学习：这里能帮助初学者看懂“列表查询”和“单体查询”的分工。重点关注：
+
 - `get_document()`：读取单个文档并处理不存在边界。
 
 ### backend/app/repositories/implementations/in_memory/document_repository.py（文档详情存储）
-作用：按 `document_id` 返回对应文档事实。  
-为什么现在学习：详情接口最终就是从这里拿到真实文档对象。  
-重点关注：
+
+作用：按 `document_id` 返回对应文档事实。为什么现在学习：详情接口最终就是从这里拿到真实文档对象。重点关注：
+
 - `get()`：按 document_id 返回对应文档事实。
 
-## 09. DELETE /api/v1/documents/{document_id}
+## 09. DELETE /api/v1/documents/
 
 | 项目                 | 内容                                                                                                                                                                  |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1036,24 +1056,24 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/documents.py（文档归档入口）
-作用：接收归档请求，把目标文档交给归档服务处理。  
-为什么现在学习：这里能建立“删除并不一定是物理删除”的企业项目直觉。  
-重点关注：
+
+作用：接收归档请求，把目标文档交给归档服务处理。为什么现在学习：这里能建立“删除并不一定是物理删除”的企业项目直觉。重点关注：
+
 - `archive_document()`：接收归档请求并推进文档归档。
 
 ### backend/app/services/document_archive_service.py（文档归档服务）
-作用：把文档状态改成 archived，并发布对应领域事件。  
-为什么现在学习：归档的重点不是删文件，而是稳定保存状态变化。  
-重点关注：
+
+作用：把文档状态改成 archived，并发布对应领域事件。为什么现在学习：归档的重点不是删文件，而是稳定保存状态变化。重点关注：
+
 - `archive_document()`：把文档状态改成 archived 并发布事件。
 
 ### backend/app/repositories/implementations/in_memory/document_repository.py（文档归档存储）
-作用：持久化归档后的文档状态。  
-为什么现在学习：归档动作最终还是通过更新文档事实来完成。  
-重点关注：
+
+作用：持久化归档后的文档状态。为什么现在学习：归档动作最终还是通过更新文档事实来完成。重点关注：
+
 - `update()`：更新归档后的文档状态。
 
-## 10. POST /api/v1/documents/{document_id}/import
+## 10. POST /api/v1/documents//import
 
 | 项目                 | 内容                                                                                                                                                                        |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1087,27 +1107,27 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/document_imports.py（文档导入入口）
-作用：接收导入请求，并把指定文档推进到导入服务。  
-为什么现在学习：导入是上传之后的独立一步，不要把两者看成同一件事。  
-重点关注：
+
+作用：接收导入请求，并把指定文档推进到导入服务。为什么现在学习：导入是上传之后的独立一步，不要把两者看成同一件事。重点关注：
+
 - `import_document()`：接收导入请求并推进文档导入。
 - `get_document_import()`：获取导入接口需要的文档上下文。
 
 ### backend/app/services/document_import_service.py（文档导入服务）
-作用：校验文档状态和类型，再把文档推进到可切分的阶段。  
-为什么现在学习：后续 chunk 和 retrieval 都只接受已经过导入校验的文档。  
-重点关注：
+
+作用：校验文档状态和类型，再把文档推进到可切分的阶段。为什么现在学习：后续 chunk 和 retrieval 都只接受已经过导入校验的文档。重点关注：
+
 - `import_document()`：校验文档状态后推进导入流程。
 - `get_import()`：读取导入所需的文档导入状态。
 
 ### backend/app/repositories/implementations/in_memory/document_repository.py（文档导入存储）
-作用：保存导入后的文档状态变化。  
-为什么现在学习：导入结果不会凭空存在，最终还是落回文档事实本身。  
-重点关注：
+
+作用：保存导入后的文档状态变化。为什么现在学习：导入结果不会凭空存在，最终还是落回文档事实本身。重点关注：
+
 - `update()`：保存导入后的文档状态变化。
 - `get()`：读取当前文档事实，辅助导入状态判断。
 
-## 11. POST /api/v1/documents/{document_id}/chunks
+## 11. POST /api/v1/documents//chunks
 
 | 项目                 | 内容                                                                                                                                                                            |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1141,26 +1161,26 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/document_chunks.py（切分入口）
-作用：接收切分请求，并把目标文档交给 chunk 服务。  
-为什么现在学习：chunk 是文档流程里第一次把正文改造成可检索结构。  
-重点关注：
+
+作用：接收切分请求，并把目标文档交给 chunk 服务。为什么现在学习：chunk 是文档流程里第一次把正文改造成可检索结构。重点关注：
+
 - `chunk_document()`：接收切分请求并进入 chunk 服务。
 
 ### backend/app/services/document_chunk_service.py（文档切分服务）
-作用：读取文档、校验状态、构造 chunk，再替换当前版本切分结果。  
-为什么现在学习：这里决定 chunk 长什么样，以及为什么会有版本语义。  
-重点关注：
+
+作用：读取文档、校验状态、构造 chunk，再替换当前版本切分结果。为什么现在学习：这里决定 chunk 长什么样，以及为什么会有版本语义。重点关注：
+
 - `chunk_document()`：读取文档并生成新的切分结果。
 - `_build_chunks()`：按规则把文档正文拆成 chunk 列表。
 - `_chunk_id()`：为 chunk 生成稳定的唯一标识。
 
 ### backend/app/repositories/implementations/in_memory/document_chunk_repository.py（chunk 存储）
-作用：按文档和版本保存切分结果。  
-为什么现在学习：检索和 citation 依赖的不是原文，而是这里保存的 chunk 集。  
-重点关注：
+
+作用：按文档和版本保存切分结果。为什么现在学习：检索和 citation 依赖的不是原文，而是这里保存的 chunk 集。重点关注：
+
 - `replace_for_document()`：替换指定文档的切分结果集合。
 
-## 12. GET /api/v1/documents/{document_id}/chunks
+## 12. GET /api/v1/documents//chunks
 
 | 项目                 | 内容                                                                                                                                                                            |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1194,21 +1214,21 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/document_chunks.py（chunk 读取入口）
-作用：接收 chunk 读取请求，并返回当前文档版本的切分结果。  
-为什么现在学习：写入 chunk 以后，最好立刻看它是怎样被重新读出来的。  
-重点关注：
+
+作用：接收 chunk 读取请求，并返回当前文档版本的切分结果。为什么现在学习：写入 chunk 以后，最好立刻看它是怎样被重新读出来的。重点关注：
+
 - `get_document_chunks()`：接收 chunk 读取请求并返回结果。
 
 ### backend/app/services/document_chunk_service.py（chunk 读取服务）
-作用：负责读取当前文档版本的 chunk 列表。  
-为什么现在学习：这一步能帮助初学者理解“切分”和“读取切分结果”是分开的。  
-重点关注：
+
+作用：负责读取当前文档版本的 chunk 列表。为什么现在学习：这一步能帮助初学者理解“切分”和“读取切分结果”是分开的。重点关注：
+
 - `get_chunks()`：读取当前文档版本的 chunk 列表。
 
 ### backend/app/repositories/implementations/in_memory/document_chunk_repository.py（chunk 读取存储）
-作用：按文档和版本返回 chunk 列表。  
-为什么现在学习：后续 retrieval 实际上就是在读取这里的结果。  
-重点关注：
+
+作用：按文档和版本返回 chunk 列表。为什么现在学习：后续 retrieval 实际上就是在读取这里的结果。重点关注：
+
 - `list_for_document()`：按文档和版本返回 chunk 列表。
 
 ## 13. POST /api/v1/document-retrieval/search
@@ -1245,22 +1265,22 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/document_retrieval.py（检索入口）
-作用：接收查询词和过滤条件，并把请求送进检索服务。  
-为什么现在学习：RAG 不是直接回答问题，而是先从这里找证据。  
-重点关注：
+
+作用：接收查询词和过滤条件，并把请求送进检索服务。为什么现在学习：RAG 不是直接回答问题，而是先从这里找证据。重点关注：
+
 - `search_documents()`：接收查询词和过滤条件并发起检索。
 
 ### backend/app/services/document_retrieval_service.py（文档检索服务）
-作用：整理检索请求边界，再把真正检索交给当前检索后端。  
-为什么现在学习：这里是以后升级语义检索前最重要的服务边界。  
-重点关注：
+
+作用：整理检索请求边界，再把真正检索交给当前检索后端。为什么现在学习：这里是以后升级语义检索前最重要的服务边界。重点关注：
+
 - `search()`：整理检索请求并调用当前检索后端。
 - `_normalize_query()`：把检索词规范化成更稳定的查询串。
 
 ### backend/app/repositories/implementations/in_memory/document_retrieval.py（当前检索后端）
-作用：执行当前项目的 keyword-only 检索、过滤和排序。  
-为什么现在学习：能直接看懂现阶段检索为什么是可运行但仍非语义化。  
-重点关注：
+
+作用：执行当前项目的 keyword-only 检索、过滤和排序。为什么现在学习：能直接看懂现阶段检索为什么是可运行但仍非语义化。重点关注：
+
 - `search()`：执行关键词检索、过滤和排序。
 - `_matches_document()`：判断文档是否满足检索条件。
 - `_score_chunk()`：给单个 chunk 计算检索分数。
@@ -1302,27 +1322,27 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/internal_rag.py（内部回答入口）
-作用：接收内部问答请求，并把问题和检索参数交给回答服务。  
-为什么现在学习：这是 Retrieval 之后真正进入“生成回答”阶段的入口。  
-重点关注：
+
+作用：接收内部问答请求，并把问题和检索参数交给回答服务。为什么现在学习：这是 Retrieval 之后真正进入“生成回答”阶段的入口。重点关注：
+
 - `answer_internal_rag()`：接收内部 RAG 问题并转给回答服务。
 
 ### backend/app/services/internal_rag_service.py（回答编排服务）
-作用：先做检索，再校验结果，最后交给答案生成器组装输出。  
-为什么现在学习：它说明当前项目的 RAG 仍然是“检索优先、回答随后”。  
-重点关注：
+
+作用：先做检索，再校验结果，最后交给答案生成器组装输出。为什么现在学习：它说明当前项目的 RAG 仍然是“检索优先、回答随后”。重点关注：
+
 - `answer()`：先检索再回答，组装内部问答结果。
 - `_request_summary()`：整理本次回答请求的摘要信息。
 
 ### backend/app/services/rag_answer_generator.py（答案生成器）
-作用：把检索片段整理成 answer、citations 和 confidence。  
-为什么现在学习：当前 no-LLM 模式下，回答是如何被确定性拼装出来的，都在这里。  
-重点关注：
+
+作用：把检索片段整理成 answer、citations 和 confidence。为什么现在学习：当前 no-LLM 模式下，回答是如何被确定性拼装出来的，都在这里。重点关注：
+
 - `generate()`：把检索片段整理成最终回答结果。
 - `_build_citations()`：把引用片段整理成 citations 列表。
 - `_build_deterministic_result()`：拼装当前无 LLM 模式下的确定性结果。
 
-## 15. POST /api/v1/reports/{task_id}/submit-approval
+## 15. POST /api/v1/reports//submit-approval
 
 | 项目                 | 内容                                                                                                                                                          |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1356,22 +1376,22 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（审批提交入口）
-作用：接收报告提审请求，并把它交给审批服务创建审批记录。  
-为什么现在学习：报告不是生成完就结束，企业流程往往从这里才进入治理阶段。  
-重点关注：
+
+作用：接收报告提审请求，并把它交给审批服务创建审批记录。为什么现在学习：报告不是生成完就结束，企业流程往往从这里才进入治理阶段。重点关注：
+
 - `submit_approval()`：接收提审请求并创建审批记录。
 
 ### backend/app/services/approval_service.py（审批提交服务）
-作用：冻结报告版本、创建审批请求，并记录审批起点。  
-为什么现在学习：这一步最能体现“审批的是某个版本”，不是审批一段临时文本。  
-重点关注：
+
+作用：冻结报告版本、创建审批请求，并记录审批起点。为什么现在学习：这一步最能体现“审批的是某个版本”，不是审批一段临时文本。重点关注：
+
 - `submit_approval()`：冻结报告版本并创建审批请求。
 - `_create_version_snapshot()`：保存当前报告版本快照。
 
 ### backend/app/repositories/implementations/in_memory/approval_repository.py（审批数据存储）
-作用：保存审批请求和报告版本快照。  
-为什么现在学习：审批资源能被后续查询、批准、拒绝，靠的就是这里先落事实。  
-重点关注：
+
+作用：保存审批请求和报告版本快照。为什么现在学习：审批资源能被后续查询、批准、拒绝，靠的就是这里先落事实。重点关注：
+
 - `save_report_version()`：保存报告版本快照。
 - `save_approval_request()`：保存审批请求事实。
 
@@ -1409,24 +1429,24 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（审批列表入口）
-作用：接收审批列表查询，并把过滤条件交给审批服务。  
-为什么现在学习：先读集合，最容易建立当前系统里有哪些审批实例的直觉。  
-重点关注：
+
+作用：接收审批列表查询，并把过滤条件交给审批服务。为什么现在学习：先读集合，最容易建立当前系统里有哪些审批实例的直觉。重点关注：
+
 - `list_approvals()`：接收审批列表查询并返回结果。
 
 ### backend/app/services/approval_service.py（审批列表服务）
-作用：负责整理查询条件，并返回审批列表结果。  
-为什么现在学习：这里能看清审批资源是如何被当作独立业务对象读取的。  
-重点关注：
+
+作用：负责整理查询条件，并返回审批列表结果。为什么现在学习：这里能看清审批资源是如何被当作独立业务对象读取的。重点关注：
+
 - `list_approvals()`：整理查询条件并返回审批列表。
 
 ### backend/app/repositories/implementations/in_memory/approval_repository.py（审批列表存储）
-作用：返回当前保存的审批请求集合。  
-为什么现在学习：审批列表最终来自这里，而不是实时重新计算。  
-重点关注：
+
+作用：返回当前保存的审批请求集合。为什么现在学习：审批列表最终来自这里，而不是实时重新计算。重点关注：
+
 - `list_approval_requests()`：返回当前保存的审批请求集合。
 
-## 17. GET /api/v1/approvals/{approval_id}
+## 17. GET /api/v1/approvals/
 
 | 项目                 | 内容                                                                                                                                                          |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1460,24 +1480,24 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（审批详情入口）
-作用：接收 `approval_id`，查询单个审批实例的当前状态。  
-为什么现在学习：当你已经看到审批列表，下一步自然是理解单个审批怎么看。  
-重点关注：
+
+作用：接收 `approval_id`，查询单个审批实例的当前状态。为什么现在学习：当你已经看到审批列表，下一步自然是理解单个审批怎么看。重点关注：
+
 - `get_approval()`：接收 approval_id 并查询单个审批状态。
 
 ### backend/app/services/approval_service.py（审批详情服务）
-作用：读取单个审批并处理不存在等错误边界。  
-为什么现在学习：这里能直接看到审批状态机当前停在哪个状态。  
-重点关注：
+
+作用：读取单个审批并处理不存在等错误边界。为什么现在学习：这里能直接看到审批状态机当前停在哪个状态。重点关注：
+
 - `get_approval()`：读取单个审批并处理不存在等边界。
 
 ### backend/app/repositories/implementations/in_memory/approval_repository.py（审批详情存储）
-作用：按 `approval_id` 返回审批请求事实。  
-为什么现在学习：详情读取最终就是从这里拿到唯一那条审批记录。  
-重点关注：
+
+作用：按 `approval_id` 返回审批请求事实。为什么现在学习：详情读取最终就是从这里拿到唯一那条审批记录。重点关注：
+
 - `get_approval_request()`：按 approval_id 返回审批请求事实。
 
-## 18. POST /api/v1/approvals/{approval_id}/approve
+## 18. POST /api/v1/approvals//approve
 
 | 项目                 | 内容                                                                                                                      |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -1514,26 +1534,26 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（批准入口）
-作用：接收批准动作，并把审批决定交给审批服务与审计逻辑处理。  
-为什么现在学习：这里最适合观察“业务动作 + 权限 + 审计”是如何一起出现的。  
-重点关注：
+
+作用：接收批准动作，并把审批决定交给审批服务与审计逻辑处理。为什么现在学习：这里最适合观察“业务动作 + 权限 + 审计”是如何一起出现的。重点关注：
+
 - `approve()`：接收批准动作并交给审批和审计逻辑。
 - `_run_audited_operation()`：把审批动作包进审计执行流程。
 
 ### backend/app/services/approval_service.py（批准服务）
-作用：推进审批状态到 `approved`，并记录对应审批事件。  
-为什么现在学习：真正改变审批状态的地方在这里，不在 Router。  
-重点关注：
+
+作用：推进审批状态到 `approved`，并记录对应审批事件。为什么现在学习：真正改变审批状态的地方在这里，不在 Router。重点关注：
+
 - `approve()`：推进审批状态到 approved 并记录事件。
 - `_record_event()`：记录审批状态变化事件。
 
 ### backend/app/services/audit_service.py（审批审计服务）
-作用：把批准动作写成可追踪的审计记录。  
-为什么现在学习：企业审批不仅要成功，还要能解释是谁批准了什么。  
-重点关注：
+
+作用：把批准动作写成可追踪的审计记录。为什么现在学习：企业审批不仅要成功，还要能解释是谁批准了什么。重点关注：
+
 - `record_audit_log()`：把批准动作写成可追踪审计记录。
 
-## 19. POST /api/v1/approvals/{approval_id}/reject
+## 19. POST /api/v1/approvals//reject
 
 | 项目                 | 内容                                                                                                                      |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -1570,23 +1590,23 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（拒绝入口）
-作用：接收拒绝动作，并把理由和目标审批交给后续服务。  
-为什么现在学习：批准路径看完以后，再看拒绝路径更容易理解状态机完整性。  
-重点关注：
+
+作用：接收拒绝动作，并把理由和目标审批交给后续服务。为什么现在学习：批准路径看完以后，再看拒绝路径更容易理解状态机完整性。重点关注：
+
 - `reject()`：接收拒绝动作并交给审批和审计逻辑。
 - `_run_audited_operation()`：把拒绝动作包进审计执行流程。
 
 ### backend/app/services/approval_service.py（拒绝服务）
-作用：推进审批状态到 `rejected`，并记录拒绝事件。  
-为什么现在学习：企业项目必须把负向结果也当成正式业务状态来处理。  
-重点关注：
+
+作用：推进审批状态到 `rejected`，并记录拒绝事件。为什么现在学习：企业项目必须把负向结果也当成正式业务状态来处理。重点关注：
+
 - `reject()`：推进审批状态到 rejected 并记录事件。
 - `_record_event()`：记录拒绝状态变化事件。
 
 ### backend/app/services/audit_service.py（拒绝审计服务）
-作用：把拒绝动作写入审计日志。  
-为什么现在学习：拒绝通常比批准更需要留下理由和追踪证据。  
-重点关注：
+
+作用：把拒绝动作写入审计日志。为什么现在学习：拒绝通常比批准更需要留下理由和追踪证据。重点关注：
+
 - `record_audit_log()`：把拒绝动作写入审计日志。
 
 ## 20. GET /api/v1/users/me
@@ -1620,15 +1640,15 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/security.py（当前用户入口）
-作用：返回当前请求上下文里的占位用户信息。  
-为什么现在学习：当前项目没有真实登录，但很多权限流程都要先经过这个边界。  
-重点关注：
+
+作用：返回当前请求上下文里的占位用户信息。为什么现在学习：当前项目没有真实登录，但很多权限流程都要先经过这个边界。重点关注：
+
 - `get_current_user()`：返回当前请求上下文里的占位用户。
 
 ### backend/app/services/security_service.py（当前用户读模型）
-作用：提供当前用户对象，供权限检查和安全接口读取。  
-为什么现在学习：先理解占位用户从哪里来，后面读 RBAC 会更轻松。  
-重点关注：
+
+作用：提供当前用户对象，供权限检查和安全接口读取。为什么现在学习：先理解占位用户从哪里来，后面读 RBAC 会更轻松。重点关注：
+
 - `get_current_user()`：提供当前用户对象给权限检查使用。
 
 ## 21. GET /api/v1/security/roles
@@ -1662,15 +1682,15 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/security.py（角色目录入口）
-作用：接收角色目录读取请求，并返回当前系统冻结的角色集合。  
-为什么现在学习：先理解“有哪些角色”，后面看权限目录更自然。  
-重点关注：
+
+作用：接收角色目录读取请求，并返回当前系统冻结的角色集合。为什么现在学习：先理解“有哪些角色”，后面看权限目录更自然。重点关注：
+
 - `get_roles()`：返回当前冻结的角色集合。
 
 ### backend/app/services/security_service.py（角色目录服务）
-作用：提供系统当前可用的角色定义。  
-为什么现在学习：RBAC 的第一层就是角色目录，这里最适合建立基础概念。  
-重点关注：
+
+作用：提供系统当前可用的角色定义。为什么现在学习：RBAC 的第一层就是角色目录，这里最适合建立基础概念。重点关注：
+
 - `list_roles()`：提供系统当前可用的角色定义。
 
 ## 22. GET /api/v1/security/permissions
@@ -1704,15 +1724,15 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/security.py（权限目录入口）
-作用：接收权限目录读取请求，并返回当前系统暴露的权限名集合。  
-为什么现在学习：审批动作最后会落到具体权限名，所以这里是 RBAC 的第二层。  
-重点关注：
+
+作用：接收权限目录读取请求，并返回当前系统暴露的权限名集合。为什么现在学习：审批动作最后会落到具体权限名，所以这里是 RBAC 的第二层。重点关注：
+
 - `get_permissions()`：返回当前系统暴露的权限名集合。
 
 ### backend/app/services/security_service.py（权限目录服务）
-作用：提供权限目录，并承接后续权限判断逻辑。  
-为什么现在学习：读完这个文件，后面看审批接口的权限检查会更顺。  
-重点关注：
+
+作用：提供权限目录，并承接后续权限判断逻辑。为什么现在学习：读完这个文件，后面看审批接口的权限检查会更顺。重点关注：
+
 - `list_permissions()`：提供权限目录列表。
 - `require_permission()`：检查当前用户是否拥有指定权限。
 
@@ -1750,26 +1770,26 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/audit_logs.py（审计日志入口）
-作用：接收审计日志读取请求，并返回系统已记录的审计事实。  
-为什么现在学习：所有安全和审批动作最后都能回到这里做事后追踪。  
-重点关注：
+
+作用：接收审计日志读取请求，并返回系统已记录的审计事实。为什么现在学习：所有安全和审批动作最后都能回到这里做事后追踪。重点关注：
+
 - `get_audit_logs()`：接收审计日志读取请求并返回结果。
 
 ### backend/app/services/audit_service.py（审计日志服务）
-作用：提供审计记录写入和读取的统一边界。  
-为什么现在学习：这里能帮助初学者区分“普通日志”和“审计事实”不是一回事。  
-重点关注：
+
+作用：提供审计记录写入和读取的统一边界。为什么现在学习：这里能帮助初学者区分“普通日志”和“审计事实”不是一回事。重点关注：
+
 - `record_audit_log()`：提供审计记录写入与读取边界。
 - `list_audit_logs()`：读取全部审计日志事实。
 
 ### backend/app/repositories/implementations/in_memory/audit_repository.py（审计事实存储）
-作用：以 append-only 方式保存并读取审计日志。  
-为什么现在学习：审计可追溯的前提，就是底层不允许随意改写历史。  
-重点关注：
+
+作用：以 append-only 方式保存并读取审计日志。为什么现在学习：审计可追溯的前提，就是底层不允许随意改写历史。重点关注：
+
 - `append()`：以追加方式保存一条审计日志。
 - `list_all()`：返回全部审计日志集合。
 
-## 补充接口：POST /api/v1/reports/{task_id}/revise
+## 补充接口：POST /api/v1/reports//revise
 
 | 项目                 | 内容                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
@@ -1803,14 +1823,14 @@ Response
 ## 源码学习说明
 
 ### backend/app/api/approvals.py（报告修订入口）
-作用：接收报告修订请求，并把修订动作交给审批服务生成新版本语义。  
-为什么现在学习：这能补齐审批流程里“不是批准也不是拒绝”的第三种处理方式。  
-重点关注：
+
+作用：接收报告修订请求，并把修订动作交给审批服务生成新版本语义。为什么现在学习：这能补齐审批流程里“不是批准也不是拒绝”的第三种处理方式。重点关注：
+
 - `revise()`：接收报告修订请求并生成新版本语义。
 
 ### backend/app/services/approval_service.py（报告修订服务）
-作用：创建新的报告版本快照，并返回修订结果。  
-为什么现在学习：它说明审批流里的修订本质上仍然是版本管理问题。  
-重点关注：
+
+作用：创建新的报告版本快照，并返回修订结果。为什么现在学习：它说明审批流里的修订本质上仍然是版本管理问题。重点关注：
+
 - `revise()`：创建新的报告版本快照并返回修订结果。
 - `_create_version_snapshot()`：保存修订前后的版本快照。

@@ -138,5 +138,17 @@ async def get_report(
 ) -> ApiResponse[ReportResponse]:
     """返回已完成报告；尚未生成时用 409 表示资源状态冲突。"""
 
+    # 记录进入报告查询接口，方便从 Router 层继续追踪到 Service 层。
+    trace_step(
+        "GET",
+        f"/api/tasks/{task_id}/report",
+        "Router",
+        "get_report()",
+        class_name="tasks.py",
+        method_name="get_report",
+        file_path="backend/app/api/tasks.py",
+        task_id=task_id,
+        label="get_report()",
+    )
     data = ReportResponse.from_domain(service.get_report(task_id))
     return success_response(data, get_request_id())

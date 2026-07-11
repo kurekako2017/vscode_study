@@ -151,7 +151,34 @@ class TaskService:
     def get_report(self, task_id: str) -> Report:
         """读取报告，同时区分“任务不存在”和“报告未就绪”。"""
 
+        # 记录进入报告查询业务方法，区分普通任务查询和报告查询。
+        trace_step(
+            "GET",
+            f"/api/tasks/{task_id}/report",
+            "Service",
+            "TaskService.get_report()",
+            class_name="TaskService",
+            method_name="get_report",
+            file_path="backend/app/services/task_service.py",
+            task_id=task_id,
+            label="TaskService.get_report()",
+        )
         self.get_task(task_id)
+        # 记录真正读取报告仓库的步骤，避免日志只显示 TaskRepository.get()。
+        trace_step(
+            "GET",
+            f"/api/tasks/{task_id}/report",
+            "Repository",
+            "InMemoryReportRepository.get()",
+            class_name=self._report_repository.__class__.__name__,
+            method_name="get",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/report_repository.py"
+            ),
+            task_id=task_id,
+            label="InMemoryReportRepository.get()",
+        )
         report = self._report_repository.get(task_id)
         if report is None:
             raise ReportNotFoundException(task_id)
