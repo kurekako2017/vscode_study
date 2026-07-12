@@ -1,14 +1,17 @@
 # 项目结构
 
-> 当前运行时学习层已新增 `src/learning/`，页面右侧的 `Learning Panel` 会显示 Trace、Component Tree、Source Files 和 Test File。
+> 当前运行时学习层已包含 `src/learning/`，页面右侧的 `Learning Panel` 会显示 Trace、Component Tree、Source Files 和 Test File。
+
+## 仓库结构
 
 ```text
 react-modern-learning/
 ├─ index.html（页面挂载入口）
 ├─ package.json（项目依赖与脚本）
 ├─ vite.config.js（Vite 构建配置）
-├─ README.md（快速学习入口）
+├─ README.md（项目定位与学习入口）
 ├─ LEARN.md（详细学习说明）
+├─ FRONTEND_LEARNING_GUIDE.md（源码导读与 Trace 说明）
 └─ src/
    ├─ main.jsx（React 应用入口）
    ├─ App.jsx（应用主页面）
@@ -112,7 +115,50 @@ AppShell（公共外壳）
          └─ 简述功能：验证点击按钮后计数是否正确增加
 ```
 
-### 怎么读这张图
+## React 在企业项目中的位置
+
+```text
+Browser
+↓
+React
+↓
+Router
+↓
+Component
+↓
+Hooks
+↓
+HTTP
+↓
+Backend
+↓
+Database
+↓
+Response
+↓
+React Render
+```
+
+在这个链路里：
+
+- React 负责页面和交互
+- Router 负责页面组织和切换
+- Component 负责 UI 拆分
+- Hooks 负责状态和副作用
+- HTTP 负责前后端数据交换
+- Backend 负责业务逻辑和数据
+
+## 章节的企业应用映射
+
+| 章节 | 企业应用 |
+| --- | --- |
+| `Hooks` | 状态管理、输入框、分页、Loading、Modal、Form、Task 创建、搜索条件 |
+| `Router` | 企业菜单、后台路由、详情页、用户中心、权限页面、审批页面 |
+| `Context` | 登录用户、`JWT`、`Token`、`RBAC`、主题、国际化、全局配置 |
+| `API` | `HTTP`、`CRUD`、上传、下载、审批、`LLM` 请求 |
+| `Test` | 自动测试、回归验证、`CI` |
+
+## 怎么读这张图
 
 - `AppShell` 是所有页面共享的外壳，负责导航和整体布局
 - `/` 是首页，负责把所有章节卡片列出来
@@ -126,3 +172,4 @@ AppShell（公共外壳）
 - 每个章节一个目录
 - 每个子例子一个文件
 - 测试文件和组件文件并排放
+- 文档和源码要互相对照，不要只看其中一边

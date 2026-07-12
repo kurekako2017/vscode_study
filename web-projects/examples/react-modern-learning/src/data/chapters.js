@@ -26,4 +26,10 @@ export const chapters = [
     title: 'Test',
     summary: '组件行为测试与断言',
   },
+
+  {
+    path: '/myLearning',
+    title: 'My Learning',
+    summary: '我的学习路径',
+  },
 ]
