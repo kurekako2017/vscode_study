@@ -548,7 +548,7 @@ GET /health 没有 Background（异步执行）阶段。
 | 接口作用             | 创建任务，启动主业务流程                                                                                                                                                                                                                                                                                         |
 | 为什么先学习         | 后续状态、SSE、报告都依赖`task_id`                                                                                                                                                                                                                                                                             |
 | Swagger 操作         | 打开`POST /api/tasks` → `Try it out` → 输入 `question`、`mode` → `Execute`                                                                                                                                                                                                                          |
-| 输入（入力）         | Body JSON：`question`（必填，1～1000 字符）：任务问题；`mode`（可选，默认 `hybrid`，可选 `hybrid` / `kpi` / `research`）：执行模式。 |
+| 输入（入力）         | Body JSON：`question`（必填，1～1000 字符）：任务问题；`mode`（可选，默认 `hybrid`，可选 `hybrid` / `kpi` / `research`）：执行模式。                                                                                                                                                                 |
 | 预想结果（予想結果） | HTTP`202`，返回 `task_id` 和 `status=queued`                                                                                                                                                                                                                                                               |
 | 后台日志观察         | `request_id`、`task_id`、`Request Body`、`queued`、`running`、`completed`、`Route`、`KPI`、`Research`、`Report`                                                                                                                                                                              |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                                                                                                                                                                                    |
@@ -705,7 +705,7 @@ Background 阶段在 HTTP 202 返回后继续执行。
 | 接口作用             | 按`task_id` 查询任务状态                                                                                                                        |
 | 为什么先学习         | 创建任务后先确认状态快照，比直接看 SSE 更容易理解生命周期                                                                                         |
 | Swagger 操作         | 打开`GET /api/tasks/{task_id}` → `Try it out` → 填 `task_id` → `Execute`                                                               |
-| 输入（入力）         | `task_id`（Path，必填）：要查询的任务 ID。 |
+| 输入（入力）         | `task_id`（Path，必填）：要查询的任务 ID。                                                                                                      |
 | 预想结果（予想結果） | HTTP`200`，返回 `queued/running/completed/failed` 等状态                                                                                      |
 | 后台日志观察         | 同一个`task_id` 的状态读取和状态推进日志                                                                                                        |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                     |
@@ -756,7 +756,7 @@ Response
 | 接口作用             | 通过 SSE 订阅任务过程事件                                                                                                               |
 | 为什么先学习         | 体现长任务不是同步短请求，而是有状态推进和实时事件                                                                                      |
 | Swagger 操作         | 打开`GET /api/tasks/{task_id}/events` → `Try it out` → 填 `task_id` → `Execute`                                              |
-| 输入（入力）         | `task_id`（Path，必填）：任务 ID；`after`（Query，可选，默认 `0`，最小 `0`）：从该事件序号之后继续读取。 |
+| 输入（入力）         | `task_id`（Path，必填）：任务 ID；`after`（Query，可选，默认 `0`，最小 `0`）：从该事件序号之后继续读取。                        |
 | 预想结果（予想結果） | HTTP`200`，返回 `text/event-stream`，包含 `status/done/error`                                                                     |
 | 后台日志观察         | SSE 连接、事件名称、任务状态、断连或重连现象                                                                                            |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                           |
@@ -808,7 +808,7 @@ Response Stream
 | 接口作用             | 读取任务最终生成的报告                                                                                                                              |
 | 为什么先学习         | 主流程最终目标是拿到报告，而不是只看状态变化                                                                                                        |
 | Swagger 操作         | 打开`GET /api/tasks/{task_id}/report` → `Try it out` → 填 `task_id` → `Execute`                                                          |
-| 输入（入力）         | `task_id`（Path，必填）：要读取报告的任务 ID。 |
+| 输入（入力）         | `task_id`（Path，必填）：要读取报告的任务 ID。                                                                                                    |
 | 预想结果（予想結果） | HTTP`200`，返回 `status=generated` 和 Markdown 报告                                                                                             |
 | 后台日志观察         | 报告保存、报告读取、`report_not_found` 失败线索                                                                                                   |
 | 对应测试             | `backend/tests/test_api.py`                                                                                                                       |
@@ -886,8 +886,8 @@ if report is None
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 接口作用             | 上传文件和 metadata，创建文档记录                                                                                                                                    |
 | 为什么先学习         | 上传是 import、chunk、retrieval、internal RAG 的入口                                                                                                                 |
-| Swagger 操作         | 打开`POST /api/v1/documents` → `Try it out` → 选择文件并填写 `metadata` → `Execute`                                                                       |
-| 输入（入力）         | `file`（File，必填）：上传文件；`metadata`（Form，必填）：metadata JSON 字符串；`Idempotency-Key`（Header，可选）：幂等键。 |
+| Swagger 操作         | 打开`POST /api/v1/documents` → `Try it out` → 选择文件并填写 `metadata` → `Execute`<br />{"title":"2025资金","owner":"victor"}                            |
+| 输入（入力）         | `file`（File，必填）：上传文件；`metadata`（Form，必填）：metadata JSON 字符串；`Idempotency-Key`（Header，可选）：幂等键。                                    |
 | 预想结果（予想結果） | HTTP`201`，返回 `document_id`、文档状态、checksum、metadata                                                                                                      |
 | 后台日志观察         | upload 开始、checksum、重复文件命中、metadata 校验结果                                                                                                               |
 | 对应测试             | `backend/tests/test_document_upload_api.py`                                                                                                                        |
@@ -936,17 +936,17 @@ Response
 
 ## 07. GET /api/v1/documents
 
-| 项目                 | 内容                                                                                                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 接口作用             | 查看文档列表                                                                                                                                                       |
-| 为什么先学习         | 先看集合，最容易理解文档领域对象当前有哪些状态和过滤条件                                                                                                           |
-| Swagger 操作         | 打开`GET /api/v1/documents` → `Try it out` → 可选填写过滤条件 → `Execute`                                                                                 |
+| 项目                 | 内容                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接口作用             | 查看文档列表                                                                                                                                                                                                                                                                                                                                                           |
+| 为什么先学习         | 先看集合，最容易理解文档领域对象当前有哪些状态和过滤条件                                                                                                                                                                                                                                                                                                               |
+| Swagger 操作         | 打开`GET /api/v1/documents` → `Try it out` → 可选填写过滤条件 → `Execute`                                                                                                                                                                                                                                                                                     |
 | 输入（入力）         | `status`（Query，可选）：状态过滤；`document_type`（Query，可选）：类型过滤；`language`（Query，可选）：语言过滤；`owner`（Query，可选）：所有者过滤；`tag`（Query，可选）：标签过滤；`include_archived`（Query，可选，默认 `false`）：是否包含 archived；`limit`（Query，可选，范围 `1～100`）：最多返回数量；`cursor`（Query，可选）：分页游标。 |
-| 预想结果（予想結果） | HTTP`200`，返回文档列表，默认不含 archived                                                                                                                       |
-| 后台日志观察         | Learning Trace：`list_documents()` → `DocumentReadService.list_documents()` → `InMemoryDocumentRepository.list_all()` → HTTP 200 Response；该接口没有真实 `log_event()`，不记录 Structured Log。 |
-| 对应测试             | `backend/tests/test_document_read_api.py`                                                                                                                        |
-| 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_read_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
-| 下一步               | `GET /api/v1/documents/{document_id}`                                                                                                                            |
+| 预想结果（予想結果） | HTTP`200`，返回文档列表，默认不含 archived                                                                                                                                                                                                                                                                                                                           |
+| 后台日志观察         | Learning Trace：`list_documents()` → `DocumentReadService.list_documents()` → `InMemoryDocumentRepository.list_all()` → HTTP 200 Response；该接口没有真实 `log_event()`，不记录 Structured Log。                                                                                                                                                            |
+| 对应测试             | `backend/tests/test_document_read_api.py`                                                                                                                                                                                                                                                                                                                            |
+| 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_read_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py`                                                                                                                                                                                                     |
+| 下一步               | `GET /api/v1/documents/{document_id}`                                                                                                                                                                                                                                                                                                                                |
 
 ### 程序执行阶段（Execution Flow）
 
@@ -993,7 +993,7 @@ Response
 | 接口作用             | 读取单个文档详情                                                                                                                                                   |
 | 为什么先学习         | 详情接口能展示文档领域对象的完整字段和状态                                                                                                                         |
 | Swagger 操作         | 打开`GET /api/v1/documents/{document_id}` → `Try it out` → 填 `document_id` → `Execute`                                                                 |
-| 输入（入力）         | `document_id`（Path，必填）：要读取的文档 ID。 |
+| 输入（入力）         | `document_id`（Path，必填）：要读取的文档 ID。                                                                                                                   |
 | 预想结果（予想結果） | HTTP`200`，返回文档详情；不存在时返回 `document_not_found`                                                                                                     |
 | 后台日志观察         | 文档命中、缺失日志、响应字段是否齐全                                                                                                                               |
 | 对应测试             | `backend/tests/test_document_read_api.py`                                                                                                                        |
@@ -1044,9 +1044,9 @@ Response
 | 接口作用             | 归档文档，不做物理删除                                                                                                                                                |
 | 为什么先学习         | 理解 archive 语义、可追溯删除和企业审计边界                                                                                                                           |
 | Swagger 操作         | 打开`DELETE /api/v1/documents/{document_id}` → `Try it out` → 填 `document_id` → `Execute`                                                                 |
-| 输入（入力）         | `document_id`（Path，必填）：要归档的文档 ID。 |
-| 预想结果（予想結果） | HTTP`202 Accepted`，文档进入 archived，列表默认不再显示                                                                                                               |
-| 后台日志观察         | Learning Trace：`archive_document()` → `DocumentArchiveService.archive_document()` → `InMemoryDocumentRepository.get()` → `InMemoryDocumentRepository.update()` → `Document archived: <title>` → HTTP 202 Response；404 分支显示 `Document not found`。Structured Log：真实事件 `document.archive.completed`。 |
+| 输入（入力）         | `document_id`（Path，必填）：要归档的文档 ID。                                                                                                                      |
+| 预想结果（予想結果） | HTTP`200`，文档进入 archived，列表默认不再显示                                                                                                                      |
+| 后台日志观察         | 归档状态变化、列表变化、重复归档边界                                                                                                                                  |
 | 对应测试             | `backend/tests/test_document_archive_api.py`                                                                                                                        |
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_archive_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `POST /api/v1/documents/{document_id}/import`                                                                                                                       |
@@ -1063,17 +1063,9 @@ backend/app/services/document_archive_service.py
 DocumentArchiveService.archive_document()
 ↓
 backend/app/repositories/implementations/in_memory/document_repository.py
-InMemoryDocumentRepository.get()
-↓
-backend/app/services/document_archive_service.py
-if document exists and status is not archived
-↓
-backend/app/repositories/implementations/in_memory/document_repository.py
 InMemoryDocumentRepository.update()
 ↓
-Document archived: <title>
-↓
-HTTP 202 Response
+Response
 ```
 
 ## 源码学习说明
@@ -1103,7 +1095,7 @@ HTTP 202 Response
 | 接口作用             | 启动文档导入流程，把上传文档推进到可处理状态                                                                                                                                |
 | 为什么先学习         | 上传完成不代表可检索，导入决定文档是否能进入后续 pipeline                                                                                                                   |
 | Swagger 操作         | 打开`POST /api/v1/documents/{document_id}/import` → `Try it out` → 填 `document_id` → `Execute`                                                                  |
-| 输入（入力）         | `document_id`（Path，必填）：要导入的文档 ID。 |
+| 输入（入力）         | `document_id`（Path，必填）：要导入的文档 ID。                                                                                                                            |
 | 预想结果（予想結果） | 返回 import 结果，文档状态推进到 validated 等后续状态                                                                                                                       |
 | 后台日志观察         | import 状态、失败原因、文档类型支持与否                                                                                                                                     |
 | 对应测试             | `backend/tests/test_document_import_api.py`                                                                                                                               |
@@ -1157,7 +1149,7 @@ Response
 | 接口作用             | 把 validated 文档切成 chunk                                                                                                                                                     |
 | 为什么先学习         | chunk 是 retrieval 和 citation 的基础数据层                                                                                                                                     |
 | Swagger 操作         | 打开`POST /api/v1/documents/{document_id}/chunks` → `Try it out` → 填 `document_id` → `Execute`                                                                      |
-| 输入（入力）         | `document_id`（Path，必填）：要切分的文档 ID。 |
+| 输入（入力）         | `document_id`（Path，必填）：要切分的文档 ID。                                                                                                                                |
 | 预想结果（予想結果） | HTTP`201`，返回 chunk 列表、chunk 数量和元数据                                                                                                                                |
 | 后台日志观察         | chunk 数量、`chunk_index`、切分策略、replace 行为                                                                                                                             |
 | 对应测试             | `backend/tests/test_document_chunk_api.py`                                                                                                                                    |
@@ -1210,7 +1202,7 @@ Response
 | 接口作用             | 读取当前版本 chunk 列表                                                                                                                                                         |
 | 为什么先学习         | 验证切分结果不仅写入成功，而且可以再次读取                                                                                                                                      |
 | Swagger 操作         | 打开`GET /api/v1/documents/{document_id}/chunks` → `Try it out` → 填 `document_id` → `Execute`                                                                       |
-| 输入（入力）         | `document_id`（Path，必填）：要读取 chunk 的文档 ID。 |
+| 输入（入力）         | `document_id`（Path，必填）：要读取 chunk 的文档 ID。                                                                                                                         |
 | 预想结果（予想結果） | HTTP`200`，返回 `chunk_id`、`chunk_index`、内容片段和元数据                                                                                                               |
 | 后台日志观察         | chunk 读取数量、空结果、读取与写入是否一致                                                                                                                                      |
 | 对应测试             | `backend/tests/test_document_chunk_api.py`                                                                                                                                    |
@@ -1256,17 +1248,17 @@ Response
 
 ## 13. POST /api/v1/document-retrieval/search
 
-| 项目                 | 内容                                                                                                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 从 chunk 集合中检索相关片段                                                                                                                                                     |
-| 为什么先学习         | answer 和 citation 必须建立在检索证据上                                                                                                                                         |
-| Swagger 操作         | 打开`POST /api/v1/document-retrieval/search` → `Try it out` → 输入 `query` 和过滤条件 → `Execute`                                                                    |
+| 项目                 | 内容                                                                                                                                                                                                        |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接口作用             | 从 chunk 集合中检索相关片段                                                                                                                                                                                 |
+| 为什么先学习         | answer 和 citation 必须建立在检索证据上                                                                                                                                                                     |
+| Swagger 操作         | 打开`POST /api/v1/document-retrieval/search` → `Try it out` → 输入 `query` 和过滤条件 → `Execute`                                                                                                |
 | 输入（入力）         | Body JSON：`query`（必填，非空字符串）：检索词；`limit`（可选，默认 `10`）：最多返回数量；`include_archived`（可选，默认 `false`）；`document_type`、`language`、`tags`（可选）：过滤条件。 |
-| 预想结果（予想結果） | HTTP`200`，返回 ranked chunks、score、source、metadata                                                                                                                        |
-| 后台日志观察         | query、过滤条件、命中 chunk、archived 排除、排序                                                                                                                                |
-| 对应测试             | `backend/tests/test_document_retrieval_api.py`                                                                                                                                |
-| 对应源码             | `backend/app/api/document_retrieval.py`、`backend/app/services/document_retrieval_service.py`、`backend/app/repositories/implementations/in_memory/document_retrieval.py` |
-| 下一步               | `POST /api/v1/internal-rag/answer`                                                                                                                                            |
+| 预想结果（予想結果） | HTTP`200`，返回 ranked chunks、score、source、metadata                                                                                                                                                    |
+| 后台日志观察         | query、过滤条件、命中 chunk、archived 排除、排序                                                                                                                                                            |
+| 对应测试             | `backend/tests/test_document_retrieval_api.py`                                                                                                                                                            |
+| 对应源码             | `backend/app/api/document_retrieval.py`、`backend/app/services/document_retrieval_service.py`、`backend/app/repositories/implementations/in_memory/document_retrieval.py`                             |
+| 下一步               | `POST /api/v1/internal-rag/answer`                                                                                                                                                                        |
 
 ### 程序执行阶段（Execution Flow）
 
@@ -1310,17 +1302,17 @@ Response
 
 ## 14. POST /api/v1/internal-rag/answer
 
-| 项目                 | 内容                                                                                                                                          |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 基于检索结果生成确定性内部回答                                                                                                                |
-| 为什么先学习         | 体现当前不接真实 LLM 也能做可解释 answer + citation                                                                                           |
-| Swagger 操作         | 打开`POST /api/v1/internal-rag/answer` → `Try it out` → 输入 `question` 和检索参数 → `Execute`                                     |
+| 项目                 | 内容                                                                                                                                                                                                                                                                        |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接口作用             | 基于检索结果生成确定性内部回答                                                                                                                                                                                                                                              |
+| 为什么先学习         | 体现当前不接真实 LLM 也能做可解释 answer + citation                                                                                                                                                                                                                         |
+| Swagger 操作         | 打开`POST /api/v1/internal-rag/answer` → `Try it out` → 输入 `question` 和检索参数 → `Execute`                                                                                                                                                                   |
 | 输入（入力）         | Body JSON：`question`（必填，非空字符串）：问题；`limit`（可选，默认 `5`，范围 `1～100`）；`include_archived`（可选，默认 `false`）；`document_type`、`language`、`tags`（可选）；`answer_mode`（必填）；`require_citations`（可选，默认 `true`）。 |
-| 预想结果（予想結果） | HTTP`200`，返回 `answer`、`citations`、`confidence`、`warnings`                                                                     |
-| 后台日志观察         | retrieval 是否成功、citation 是否齐全、warning、deterministic fallback                                                                        |
-| 对应测试             | `backend/tests/test_internal_rag_api.py`、`backend/tests/test_internal_rag_evaluation.py`、`backend/tests/test_rag_answer_generator.py` |
-| 对应源码             | `backend/app/api/internal_rag.py`、`backend/app/services/internal_rag_service.py`、`backend/app/services/rag_answer_generator.py`       |
-| 下一步               | `POST /api/v1/reports/{task_id}/submit-approval`                                                                                            |
+| 预想结果（予想結果） | HTTP`200`，返回 `answer`、`citations`、`confidence`、`warnings`                                                                                                                                                                                                   |
+| 后台日志观察         | retrieval 是否成功、citation 是否齐全、warning、deterministic fallback                                                                                                                                                                                                      |
+| 对应测试             | `backend/tests/test_internal_rag_api.py`、`backend/tests/test_internal_rag_evaluation.py`、`backend/tests/test_rag_answer_generator.py`                                                                                                                               |
+| 对应源码             | `backend/app/api/internal_rag.py`、`backend/app/services/internal_rag_service.py`、`backend/app/services/rag_answer_generator.py`                                                                                                                                     |
+| 下一步               | `POST /api/v1/reports/{task_id}/submit-approval`                                                                                                                                                                                                                          |
 
 ### 程序执行阶段（Execution Flow）
 
@@ -1372,7 +1364,7 @@ Response
 | 接口作用             | 把任务报告提交到审批流                                                                                                                                        |
 | 为什么先学习         | 这是分析结果进入治理流程的边界                                                                                                                                |
 | Swagger 操作         | 打开`POST /api/v1/reports/{task_id}/submit-approval` → `Try it out` → 填 `task_id` → `Execute`                                                     |
-| 输入（入力）         | `task_id`（Path，必填）：报告任务 ID；Body JSON `comment`（可选）：提交说明。 |
+| 输入（入力）         | `task_id`（Path，必填）：报告任务 ID；Body JSON `comment`（可选）：提交说明。                                                                             |
 | 预想结果（予想結果） | HTTP`200`，返回 approval request 和状态                                                                                                                     |
 | 后台日志观察         | RBAC 检查、审批创建、报告版本快照、审计记录                                                                                                                   |
 | 对应测试             | `backend/tests/test_approval_api.py`、`backend/tests/test_rbac_guard.py`                                                                                  |
@@ -1420,17 +1412,17 @@ Response
 
 ## 16. GET /api/v1/approvals
 
-| 项目                 | 内容                                                                                                                                                          |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接口作用             | 查看审批列表                                                                                                                                                  |
-| 为什么先学习         | 先看集合，再看单体详情，容易理解审批是独立资源                                                                                                                |
-| Swagger 操作         | 打开`GET /api/v1/approvals` → `Try it out` → 可选过滤 → `Execute`                                                                                    |
+| 项目                 | 内容                                                                                                                                                                          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接口作用             | 查看审批列表                                                                                                                                                                  |
+| 为什么先学习         | 先看集合，再看单体详情，容易理解审批是独立资源                                                                                                                                |
+| Swagger 操作         | 打开`GET /api/v1/approvals` → `Try it out` → 可选过滤 → `Execute`                                                                                                    |
 | 输入（入力）         | `task_id`（Query，可选）：任务过滤；`status`（Query，可选）：审批状态过滤；`limit`（Query，可选，范围 `1～100`）：最多返回数量；`cursor`（Query，可选）：分页游标。 |
-| 预想结果（予想結果） | HTTP`200`，返回 approval list                                                                                                                               |
-| 后台日志观察         | RBAC 检查、列表过滤、审批数量和状态分布                                                                                                                       |
-| 对应测试             | `backend/tests/test_approval_api.py`                                                                                                                        |
-| 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/repositories/implementations/in_memory/approval_repository.py` |
-| 下一步               | `GET /api/v1/approvals/{approval_id}`                                                                                                                       |
+| 预想结果（予想結果） | HTTP`200`，返回 approval list                                                                                                                                               |
+| 后台日志观察         | RBAC 检查、列表过滤、审批数量和状态分布                                                                                                                                       |
+| 对应测试             | `backend/tests/test_approval_api.py`                                                                                                                                        |
+| 对应源码             | `backend/app/api/approvals.py`、`backend/app/services/approval_service.py`、`backend/app/repositories/implementations/in_memory/approval_repository.py`                 |
+| 下一步               | `GET /api/v1/approvals/{approval_id}`                                                                                                                                       |
 
 ### 程序执行阶段（Execution Flow）
 
@@ -1476,7 +1468,7 @@ Response
 | 接口作用             | 查看单个审批详情                                                                                                                                              |
 | 为什么先学习         | 详情接口能解释审批状态机当前位置                                                                                                                              |
 | Swagger 操作         | 打开`GET /api/v1/approvals/{approval_id}` → `Try it out` → 填 `approval_id` → `Execute`                                                            |
-| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID。 |
+| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID。                                                                                                                  |
 | 预想结果（予想結果） | HTTP`200`，返回审批状态、版本、事件或关联信息                                                                                                               |
 | 后台日志观察         | RBAC 检查、状态读取、不存在时的错误分支                                                                                                                       |
 | 对应测试             | `backend/tests/test_approval_api.py`                                                                                                                        |
@@ -1527,7 +1519,7 @@ Response
 | 接口作用             | 批准审批请求                                                                                                              |
 | 为什么先学习         | 正向审批动作同时体现状态推进、权限检查和审计                                                                              |
 | Swagger 操作         | 打开`POST /api/v1/approvals/{approval_id}/approve` → `Try it out` → 填 `approval_id` → `Execute`               |
-| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID；Body JSON `comment`（可选）：批准说明。 |
+| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID；Body JSON `comment`（可选）：批准说明。                                     |
 | 预想结果（予想結果） | HTTP`200`，审批状态变为 `approved`                                                                                    |
 | 后台日志观察         | `approval.approve` 权限检查、审计写入、状态变化                                                                         |
 | 对应测试             | `backend/tests/test_approval_api.py`、`backend/tests/test_rbac_guard.py`、`backend/tests/test_audit_middleware.py`  |
@@ -1583,7 +1575,7 @@ Response
 | 接口作用             | 拒绝审批请求                                                                                                              |
 | 为什么先学习         | 企业项目必须验证拒绝、失败原因和负向状态                                                                                  |
 | Swagger 操作         | 打开`POST /api/v1/approvals/{approval_id}/reject` → `Try it out` → 填 `approval_id` → `Execute`                |
-| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID；Body JSON `reason`（可选）：拒绝原因。 |
+| 输入（入力）         | `approval_id`（Path，必填）：审批记录 ID；Body JSON `reason`（可选）：拒绝原因。                                      |
 | 预想结果（予想結果） | HTTP`200`，审批状态变为 `rejected`                                                                                    |
 | 后台日志观察         | `approval.reject` 权限检查、拒绝动作、审计日志、状态稳定性                                                              |
 | 对应测试             | `backend/tests/test_approval_api.py`、`backend/tests/test_rbac_guard.py`、`backend/tests/test_audit_middleware.py`  |
@@ -1819,7 +1811,7 @@ Response
 | 接口作用             | 修订报告并形成新的审批相关版本语义                                                               |
 | 为什么先学习         | 这是审批流程的补充动作，不属于本轮 23 个主学习接口，但属于现有 Approval 能力                     |
 | Swagger 操作         | 打开`POST /api/v1/reports/{task_id}/revise` → `Try it out` → 填 `task_id` → `Execute` |
-| 输入（入力）         | `task_id`（Path，必填）：报告任务 ID；Body JSON `revision_reason`（可选）：修订原因。 |
+| 输入（入力）         | `task_id`（Path，必填）：报告任务 ID；Body JSON `revision_reason`（可选）：修订原因。        |
 | 预想结果（予想結果） | 返回 revision 结果                                                                               |
 | 后台日志观察         | revision 日志、新快照记录、审批状态关系                                                          |
 | 对应测试             | `backend/tests/test_approval_api.py`                                                           |
