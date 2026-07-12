@@ -5,226 +5,216 @@ interface LearningSidebarProps {
   latestEvent: LearningEvent | null;
 }
 
+interface SourceLocation {
+  label: string;
+  path: string;
+  reason: string;
+}
+
+interface LifecycleStep {
+  name: string;
+  detail: string;
+}
+
 interface PageLearningInfo {
   navigation: string;
   component: string;
   step: string;
-  purpose: string;
-  tree: string[];
-  props: string;
-  inputs: string[];
-  apiOverview: string[];
-  backendOverview: string[];
-  resultExplanation: string[];
-  relationship: string[];
-  sources: string[];
-  test: string;
-  cases: string;
-  casePurpose: string;
+  businessObject: string;
+  whyNeeded: string;
+  initialState: string;
+  lifecycle: LifecycleStep[];
+  sources: SourceLocation[];
 }
-
-const workflowSteps: Array<{ page: LearningPage; label: string; connection: string }> = [
-  { page: "documents", label: "文書管理", connection: "→ RAG検索：Backend 数据层已连接，页面条件手动输入" },
-  { page: "rag", label: "RAG検索", connection: "→ 分析依頼：当前手动衔接" },
-  { page: "tasks", label: "分析依頼", connection: "→ 承認管理：手动复制 task_id" },
-  { page: "approval", label: "承認管理", connection: "→ 最终报告汇总：当前未连接" },
-];
 
 const pageInfo: Record<LearningPage, PageLearningInfo> = {
   dashboard: {
     navigation: "学习总览",
     component: "DashboardPage",
-    step: "总览 / 4",
-    purpose: "查看 ERIP 当前实现、能力边界，以及文書管理到承認管理的业务学习顺序。",
-    tree: ["App", "└─ DashboardPage", "   ├─ PageHeader", "   ├─ 企业业务流程区（页面内部区域）", "   └─ 系统概览与能力边界（页面内部区域）"],
-    props: "App → DashboardPage → onNavigate、onLearningEvent",
-    inputs: ["无业务表单输入", "入口按钮：文書管理 / RAG検索 / 分析依頼 / 承認管理"],
-    apiOverview: ["入口按钮 → openBusinessStep() → App changeView()", "不调用 Backend API；仅更新 activeView。"],
-    backendOverview: ["没有 Backend 调用。", "Dashboard 只展示当前前端已经确认的本地实现事实。"],
-    resultExplanation: ["点击入口后切换页面，不创建文档、任务或审批记录。"],
-    relationship: ["业务起点：学习总览", "顺序：文書管理 → RAG検索 → 分析依頼 → 承認管理"],
-    sources: ["frontend/src/App.tsx", "frontend/src/pages/DashboardPage.tsx"],
-    test: "frontend/src/pages/DashboardPage.test.tsx",
-    cases: "ERIP-E2E-001",
-    casePurpose: "用一个经营分析案例串联四个业务页面，并明确当前仍需手动衔接 ID。",
+    step: "总览",
+    businessObject: "Scenario01 的关东地区饮料销售下降。此页只提供文書、RAG、分析与承認四个业务入口，不创建业务记录。",
+    whyNeeded: "业务人员先确认当前 MVP 的可用能力和边界，再按正确顺序进入页面，避免把本地固定数据误当作生产结论。",
+    initialState: "渲染当前能力边界与业务流程卡片；不读取 Backend。",
+    lifecycle: [
+      { name: "Render", detail: "App 根据 activeView 渲染 DashboardPage。" },
+      { name: "Choose", detail: "openBusinessStep() 记录学习操作，并请求 App 切换目标 tab。" },
+      { name: "Switch", detail: "App.changeView() 更新 activeView，React 卸载总览并渲染目标页面。" },
+    ],
+    sources: [
+      { label: "页面入口", path: "frontend/src/App.tsx", reason: "持有 activeView，并渲染当前业务页与 LearningSidebar。" },
+      { label: "业务总览", path: "frontend/src/pages/DashboardPage.tsx", reason: "定义 Scenario01 的页面顺序、能力边界和入口事件。" },
+    ],
   },
   documents: {
     navigation: "文書管理",
     component: "DocumentsPage",
     step: "1 / 4",
-    purpose: "上传、查看并处理企业内部资料，为后续检索提供 document_id 与 Chunk。",
-    tree: ["App", "└─ DocumentsPage", "   ├─ PageHeader", "   ├─ 文書アップロード Form（页面内部区域）", "   ├─ 文書一覧 / 文書詳細（页面内部区域）", "   └─ BusinessLearningPanel"],
-    props: "App → DocumentsPage → onLearningEvent；当前没有业务数据 Props 传递。",
-    inputs: ["file", "title", "description", "owner", "language", "tags"],
-    apiOverview: ["submitUpload() → uploadDocument() → POST /api/v1/documents → 创建上传会话", "loadDocuments() → listDocuments() → GET /api/v1/documents → 更新列表", "runDocumentAction(\"import\") → importDocument() → POST /api/v1/documents/{document_id}/import", "runDocumentAction(\"chunk\") → chunkDocument() → POST /api/v1/documents/{document_id}/chunks", "runDocumentAction(\"archive\") → archiveDocument() → DELETE /api/v1/documents/{document_id}"],
-    backendOverview: ["backend/app/api/documents.py / document_imports.py / document_chunks.py：接收文书请求", "DocumentUploadService / DocumentReadService / DocumentImportService / DocumentChunkService：处理上传、读取、导入和分块", "InMemoryDocumentRepository / InMemoryDocumentChunkRepository：保存文书与 Chunk"],
-    resultExplanation: ["上传成功后刷新列表。", "Import 与 Chunk 的结果来自后端真实状态；页面不伪造 Chunk 数量。", "Archive 只改变文书状态。"],
-    relationship: ["前一步：无，企业资料入口", "后一步：RAG検索", "传递对象：document_id、Chunk", "连接方式：Backend 数据层已连接，页面不自动传 document_id。"],
-    sources: ["frontend/src/pages/DocumentsPage.tsx", "frontend/src/api.ts", "backend/app/api/documents.py", "backend/app/services/document_read_service.py", "backend/app/repositories/implementations/in_memory/document_repository.py", "backend/app/schemas/document_api.py"],
-    test: "frontend/src/pages/DocumentsPage.test.tsx",
-    cases: "DOC-BIZ-001 ～ DOC-BIZ-005",
-    casePurpose: "验证上传、列表、详情、导入、Chunk 与归档均由真实 API 结果驱动。",
+    businessObject: "Scenario01 的销售、库存、促销、顾客和竞品内部资料，以及由资料生成的 document_id 与 Chunk。",
+    whyNeeded: "企业分析必须先把可追溯的内部资料登记并分块；RAG 才能返回证据，而不是让前端编造业务事实。",
+    initialState: "mount 后通过 useEffect() 加载文书列表；选中文书变化时读取详情和 Chunk。",
+    lifecycle: [
+      { name: "Mount", detail: "useEffect() 调用 loadDocuments(true)，用 showArchived 决定列表范围。" },
+      { name: "Select", detail: "selectedDocumentId 变化后，refreshSelectedDocument() 并行刷新详情与 Chunk。" },
+      { name: "Operate", detail: "上传、Import、Chunk 或 Archive 成功后，刷新列表与当前文书。" },
+      { name: "Render", detail: "React 根据 loading、error、selectedDocument 与 chunkData 重绘页面。" },
+    ],
+    sources: [
+      { label: "页面状态", path: "frontend/src/pages/DocumentsPage.tsx", reason: "管理列表、选择、上传和文书操作的 React state。" },
+      { label: "API 适配", path: "frontend/src/api.ts", reason: "封装 document HTTP 请求与响应解析。" },
+      { label: "Router", path: "backend/app/api/documents.py", reason: "接收上传、读取和归档请求。" },
+      { label: "业务服务", path: "backend/app/services/document_read_service.py", reason: "读取文书详情的服务边界。" },
+    ],
   },
   rag: {
     navigation: "RAG検索",
     component: "RagPage",
     step: "2 / 4",
-    purpose: "用当前 Keyword Retrieval 检索内部 Chunk，并生成带 Citation 的固定逻辑 RAG 回答。",
-    tree: ["App", "└─ RagPage", "   ├─ PageHeader", "   ├─ 文書検索 Form（页面内部区域）", "   ├─ Internal RAG 回答 Form（页面内部区域）", "   ├─ 检索结果 / Citation 区（页面内部区域）", "   └─ BusinessLearningPanel"],
-    props: "App → RagPage → onLearningEvent；当前没有业务数据 Props 传递。",
-    inputs: ["query", "question", "limit", "language", "tags", "answer_mode", "require_citations"],
-    apiOverview: ["submitRetrieval() → searchDocumentRetrieval() → POST /api/v1/document-retrieval/search → 更新 retrievalResult", "submitInternalRag() → answerInternalRag() → POST /api/v1/internal-rag/answer → 更新 ragResult", "clearRetrievalResult() / clearRagResult() → 不发送 API，仅清除 React state"],
-    backendOverview: ["backend/app/api/document_retrieval.py search_documents()：接收检索请求", "DocumentRetrievalService.search() → InMemoryKeywordRetrieval.search()：按关键词检索 Chunk", "backend/app/api/internal_rag.py answer_internal_rag() → InternalRagService.answer()：用检索证据生成固定逻辑回答", "Schemas：document_retrieval_api.py、internal_rag_api.py"],
-    resultExplanation: ["results / score / citation 是后端返回的检索依据。", "insufficient_context（422）表示证据不足，不是页面故障。", "当前未启用真实 LLM、Embedding 或 pgvector。"],
-    relationship: ["前一步：文書管理", "后一步：分析依頼", "传递对象：citation、检索结论", "连接方式：当前手动衔接。"],
-    sources: ["frontend/src/pages/RagPage.tsx", "frontend/src/api.ts", "backend/app/api/document_retrieval.py", "backend/app/api/internal_rag.py", "backend/app/services/document_retrieval_service.py", "backend/app/services/internal_rag_service.py", "backend/app/schemas/document_retrieval_api.py", "backend/app/schemas/internal_rag_api.py"],
-    test: "frontend/src/pages/RagPage.test.tsx",
-    cases: "RAG-BIZ-001 ～ RAG-BIZ-005",
-    casePurpose: "验证检索、Citation、固定逻辑回答、空结果与证据不足的真实边界。",
+    businessObject: "Scenario01 已完成 Chunk 的内部资料、检索结果和 Citation；当前为 Keyword Retrieval 与固定逻辑回答。",
+    whyNeeded: "业务人员需要先检查结论是否有内部证据支撑，才能把销售下降原因带入分析依頼和审批。",
+    initialState: "页面初始只显示表单；没有自动检索，也不会自动继承文書管理页的条件。",
+    lifecycle: [
+      { name: "Input", detail: "用户填写检索条件或业务问题，React 保存在本页 state。" },
+      { name: "Request", detail: "submitRetrieval() 或 submitInternalRag() 调用 api.ts，并设置 loading。" },
+      { name: "Resolve", detail: "成功写入 results / citations；证据不足时保留 Backend 的 422 业务结果。" },
+      { name: "Clear", detail: "清除按钮只重置 React result state，不发送 API 请求。" },
+    ],
+    sources: [
+      { label: "页面状态", path: "frontend/src/pages/RagPage.tsx", reason: "管理检索表单、回答表单、结果、错误与清除操作。" },
+      { label: "API 适配", path: "frontend/src/api.ts", reason: "封装检索与 Internal RAG HTTP 调用。" },
+      { label: "检索 Router", path: "backend/app/api/document_retrieval.py", reason: "接收 Keyword Retrieval 请求。" },
+      { label: "RAG Router", path: "backend/app/api/internal_rag.py", reason: "接收带 Citation 的内部问答请求。" },
+    ],
   },
   tasks: {
     navigation: "分析依頼",
     component: "TasksPage",
     step: "3 / 4",
-    purpose: "创建经营分析任务，观察 SSE 执行状态，并在完成后读取最终 report。",
-    tree: ["App", "└─ TasksPage", "   ├─ PageHeader", "   ├─ 分析依頼 Form（页面内部区域）", "   ├─ 実行状態 Panel（页面内部区域）", "   ├─ SSE Event View（页面内部区域）", "   ├─ Report View（页面内部区域）", "   └─ BusinessLearningPanel"],
-    props: "App → TasksPage → onLearningEvent；当前没有业务数据 Props 传递。",
-    inputs: ["経営課題（question state）", "分析モード（mode state）"],
-    apiOverview: ["初始：IDLE，尚未提交任务。", "submit() → createTask() → POST /api/tasks → 202 Accepted → taskId / status 更新 → subscribeToTask(task_id)", "subscribeToTask() → GET /api/tasks/{task_id}/events → SSE → events / status 更新", "done → loadReport() → getReport() → GET /api/tasks/{task_id}/report → 200 → report 更新"],
-    backendOverview: ["backend/app/api/tasks.py create_task()：接收 HTTP 请求", "backend/app/services/task_service.py TaskService.create_task()：创建 queued Task 数据", "backend/app/repositories/implementations/in_memory/task_repository.py InMemoryTaskRepository.create()：保存 Task", "backend/app/api/tasks.py BackgroundTasks.add_task()：注册响应后的后台执行", "backend/app/services/task_service.py TaskService.run_task()：执行任务", "backend/app/workflow/graph.py AnalysisWorkflow.stream()：执行 LangGraph", "Workflow nodes：route → kpi → research → report", "backend/app/repositories/implementations/in_memory/report_repository.py InMemoryReportRepository.save()：保存报告", "backend/app/repositories/implementations/in_memory/event_repository.py InMemoryEventRepository：记录事件；SSE 将事件推送到页面"],
-    resultExplanation: ["IDLE：还没有提交任务。", "queued：Backend 已接受任务；202 不代表 report 已完成。", "running：BackgroundTasks 中的 Workflow 正在执行。", "done：Workflow 已完成，页面随后读取 report。", "409：任务存在，但 report 尚未生成。", "404：task_id 不存在。"],
-    relationship: ["前一步：RAG検索", "后一步：承認管理", "传递对象：task_id、report", "连接方式：当前手动复制 task_id。"],
-    sources: ["frontend/src/pages/TasksPage.tsx", "frontend/src/api.ts", "backend/app/api/tasks.py", "backend/app/services/task_service.py", "backend/app/repositories/implementations/in_memory/task_repository.py", "backend/app/repositories/implementations/in_memory/report_repository.py", "backend/app/repositories/implementations/in_memory/event_repository.py", "backend/app/workflow/graph.py", "backend/app/schemas/task_api.py", "backend/app/schemas/report_api.py"],
-    test: "frontend/src/pages/TasksPage.test.tsx",
-    cases: "TASK-BIZ-001 ～ TASK-BIZ-005",
-    casePurpose: "验证 202 受理、SSE queued/running/node/done、报告读取和未就绪／不存在错误。",
+    businessObject: "Scenario01 的关东饮料销售下降经营课题、task_id、SSE 事件和最终 report。",
+    whyNeeded: "企业把可确认的问题转成可追踪任务，以异步执行避免 HTTP 请求一直等待，并把执行过程和报告分开读取。",
+    initialState: "初始为 idle；没有 task_id、SSE 事件或 report。",
+    lifecycle: [
+      { name: "Submit", detail: "submit() 清空旧状态，POST /api/tasks 后保存 task_id 与 queued 状态。" },
+      { name: "Stream", detail: "subscribeToTask() 用 EventSource 接收 queued / running / done 等 SSE 事件。" },
+      { name: "Complete", detail: "收到 done 后取消订阅，并调用 loadReport() 读取最终 report。" },
+      { name: "Unmount", detail: "useEffect cleanup 调用取消订阅，防止旧 SSE 继续写入已离开的页面。" },
+    ],
+    sources: [
+      { label: "页面状态", path: "frontend/src/pages/TasksPage.tsx", reason: "管理 taskId、status、events、report 和 SSE cleanup。" },
+      { label: "API / SSE", path: "frontend/src/api.ts", reason: "创建任务、读取报告并建立 EventSource 订阅。" },
+      { label: "Task Router", path: "backend/app/api/tasks.py", reason: "接受任务、注册后台执行并提供 SSE 与 report。" },
+      { label: "Workflow", path: "backend/app/workflow/graph.py", reason: "执行 route → kpi → research → report 工作流。" },
+    ],
   },
   approval: {
     navigation: "承認管理",
     component: "ApprovalPage",
     step: "4 / 4",
-    purpose: "基于已完成 report 的 task_id 创建审批，并执行承認、却下或修正依頼。",
-    tree: ["App", "└─ ApprovalPage", "   ├─ PageHeader", "   ├─ 承認待ち一覧（页面内部区域）", "   ├─ 承認依頼 Form（页面内部区域）", "   ├─ 承認詳細 / 操作区（页面内部区域）", "   └─ BusinessLearningPanel"],
-    props: "App → ApprovalPage → onLearningEvent；当前没有业务数据 Props 传递。",
-    inputs: ["task_id", "approval_id", "decision comment", "revision instruction"],
-    apiOverview: ["loadApprovals() → listApprovals() → GET /api/v1/approvals", "submitApproval() → POST /api/v1/reports/{task_id}/submit-approval", "handleApprove() → approveApproval() → POST /api/v1/approvals/{approval_id}/approve", "handleReject() → rejectApproval() → POST /api/v1/approvals/{approval_id}/reject", "handleRevise() → requestApprovalRevision() → POST /api/v1/reports/{task_id}/revise"],
-    backendOverview: ["backend/app/api/approvals.py：接收审批列表、提交、批准、拒绝和修正请求", "AuditMiddleware.run()：在 approval API 上执行当前权限与审计边界", "ApprovalService：处理审批状态迁移与报告版本", "InMemoryApprovalRepository / InMemoryAuditRepository：保存审批与审计事实", "Schema：backend/app/schemas/approval_api.py"],
-    resultExplanation: ["pending 表示等待审批。", "approved / rejected / revision_requested 是后端状态迁移结果。", "403 表示权限边界拒绝；409 表示当前状态不允许该操作。"],
-    relationship: ["前一步：分析依頼", "后一步：最终审计报告", "传递对象：approval_id、report_version_id、审批事件", "连接方式：当前无最终汇总页。"],
-    sources: ["frontend/src/pages/ApprovalPage.tsx", "frontend/src/api.ts", "backend/app/api/approvals.py", "backend/app/services/approval_service.py", "backend/app/repositories/implementations/in_memory/approval_repository.py", "backend/app/repositories/implementations/in_memory/audit_repository.py", "backend/app/schemas/approval_api.py"],
-    test: "frontend/src/pages/ApprovalPage.test.tsx",
-    cases: "APR-BIZ-001 ～ APR-BIZ-005",
-    casePurpose: "验证提交审批、状态变化、403 权限拒绝与 409 状态冲突。",
+    businessObject: "Scenario01 已完成 report 的 task_id、approval_id、report_version_id 与审批审计事件。",
+    whyNeeded: "经营结论需要经过责任人审批、拒绝或修正，并保留版本和审计事实，才能成为可追溯的企业决策依据。",
+    initialState: "mount 后读取审批列表；提交审批需要用户手动输入已完成报告的 task_id。",
+    lifecycle: [
+      { name: "Mount", detail: "useEffect() 读取 approval 列表，并选择当前可见记录。" },
+      { name: "Submit", detail: "提交 task_id 后由 Backend 创建 report version 与 approval request。" },
+      { name: "Decide", detail: "承認、却下或修正依頼触发状态迁移，并刷新列表与详情。" },
+      { name: "Audit", detail: "Approval API 经 AuditMiddleware 与权限边界；403、409 是业务结果而非页面故障。" },
+    ],
+    sources: [
+      { label: "页面状态", path: "frontend/src/pages/ApprovalPage.tsx", reason: "管理列表、详情、提交和三种审批操作。" },
+      { label: "API 适配", path: "frontend/src/api.ts", reason: "封装 approval HTTP 调用与错误解析。" },
+      { label: "Approval Router", path: "backend/app/api/approvals.py", reason: "处理列表、提交、决定与修正请求。" },
+      { label: "业务服务", path: "backend/app/services/approval_service.py", reason: "执行审批状态迁移、报告版本和审计边界。" },
+    ],
   },
 };
 
+function eventSummary(event: LearningEvent | null) {
+  if (event === null) {
+    return { title: "尚未操作", detail: "当前显示页面初始状态。执行一次页面操作后，这里会替换为本次真实 handler、API 与 state 变化。" };
+  }
+
+  const transport = event.apiPath
+    ? `${event.apiMethod ?? "API"} ${event.apiPath} · ${event.apiStatus ?? "请求中"}`
+    : "本次操作不发送 API 请求";
+  return { title: event.eventName, detail: transport };
+}
+
 /**
- * LearningSidebar 固定显示当前页面的真实学习入口、当前事件和已核对的源码链路。
- * App 只传入页面名与最近一次页面 handler 的结果；本组件不发请求、不保存业务数据。
+ * LearningSidebar V2 只负责当前 React 页面和最近一次操作的即时学习信息。
+ *
+ * 谁调用它：
+ * - App.tsx 将 activeView 对应的 page 与页面 handler 上报的 LearningEvent 传入。
+ *
+ * 它不做什么：
+ * - 不发送请求、不保存业务数据、不复制 Scenario01 原文，也不展示业务测试 Case。
+ * - 测试 Case 继续由 BusinessLearningPanel 展示，避免侧栏变成静态说明书。
+ *
+ * 日本现场面试可以这样讲：
+ * - 该组件把 UI 行为、状态变化、调用链和源码入口放在同一屏，但保持为纯展示组件，
+ *   所以不会影响既有业务请求或页面生命周期。
  */
 export function LearningSidebar({ page, latestEvent }: LearningSidebarProps) {
   const info = pageInfo[page];
+  const currentEvent = eventSummary(latestEvent);
 
   return (
     <aside className="learning-sidebar" aria-label="固定学习面板">
       <div className="learning-sidebar-scroll">
-        <p className="page-eyebrow">ERIP LEARNING PANEL</p>
-        <h2>实时学习面板</h2>
+        <div className="learning-sidebar-heading">
+          <p className="page-eyebrow">ERIP / REACT MODERN LEARNING</p>
+          <h2>实时学习面板</h2>
+          <p>{info.navigation} · {info.component} · {info.step}</p>
+        </div>
 
-        <section>
-          <h3>01 当前页面</h3>
-          <p>当前导航：<strong>{info.navigation}</strong></p>
-          <p>当前组件：<code>{info.component}</code></p>
-          <p>当前业务步骤：{info.step}</p>
-          <p>页面用途：{info.purpose}</p>
+        <section className="learning-live" aria-live="polite">
+          <h3>01 实时操作</h3>
+          <strong>{currentEvent.title}</strong>
+          <p>{currentEvent.detail}</p>
+          {latestEvent?.stateChanges.map((change) => <code key={change}>{change}</code>)}
+          {latestEvent?.note && <p className="learning-note">{latestEvent.note}</p>}
         </section>
 
         <section>
-          <h3>02 当前路由与页面切换</h3>
-          <pre>App.tsx → changeView() → setActiveView() → activeView → {info.component}</pre>
-          <p>页面导航不调用 Backend API；这里只改变 React state。</p>
+          <h3>02 当前业务对象</h3>
+          <p>{info.businessObject}</p>
         </section>
 
         <section>
-          <h3>03 企业业务流程</h3>
-          <ol className="sidebar-flow" aria-label="企业业务流程">
-            {workflowSteps.map((item, index) => (
-              <li key={item.page} className={item.page === page ? "active" : ""}>
-                <strong>{index + 1}. {item.label}</strong>
-                <small>{item.connection}</small>
+          <h3>03 企业为什么需要当前页面</h3>
+          <p>{info.whyNeeded}</p>
+        </section>
+
+        <section>
+          <h3>04 页面生命周期</h3>
+          <p className="learning-initial-state"><strong>初始：</strong>{info.initialState}</p>
+          <ol className="learning-lifecycle">
+            {info.lifecycle.map((item, index) => (
+              <li key={item.name}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div><strong>{item.name}</strong><small>{item.detail}</small></div>
               </li>
             ))}
           </ol>
         </section>
 
         <section>
-          <h3>04 组件树</h3>
-          <pre>{info.tree.join("\n")}</pre>
-        </section>
-
-        <section>
-          <h3>05 Props 传递</h3>
-          <p>{info.props}</p>
-        </section>
-
-        <section>
-          <h3>06 当前页面输入</h3>
-          <ul>{info.inputs.map((input) => <li key={input}>{input}</li>)}</ul>
-        </section>
-
-        <section>
-          <h3>07 最近事件与 State 变化</h3>
-          <p><strong>{latestEvent?.eventName ?? "尚未操作。"}</strong></p>
-          {latestEvent?.stateChanges.map((change) => <small key={change}>{change}</small>)}
-        </section>
-
-        <section>
-          <h3>08 API 调用流程</h3>
-          {latestEvent?.apiPath ? (
-            <p><code>{latestEvent.eventName} → {latestEvent.apiMethod} {latestEvent.apiPath}</code><br />Response Status：{latestEvent.apiStatus ?? "请求中"}<br />真实 Backend API</p>
-          ) : (
-            <p>最近操作没有 API 请求，或尚未操作。</p>
+          <h3>05 源码定位</h3>
+          <p className="source-hint">先读页面 handler，再顺着 API 适配层进入 Router 与业务边界。</p>
+          <ul className="learning-source-list">
+            {info.sources.map((source) => (
+              <li key={source.path}>
+                <strong>{source.label}</strong>
+                <code>{source.path}</code>
+                <small>{source.reason}</small>
+              </li>
+            ))}
+          </ul>
+          {latestEvent?.backendFlow && (
+            <div className="learning-current-flow">
+              <strong>本次操作链路</strong>
+              <code>{latestEvent.backendFlow.join(" → ")}</code>
+            </div>
           )}
-          <h4>本页主要 API</h4>
-          {info.apiOverview.map((api) => <code key={api}>{api}</code>)}
         </section>
-
-        <section>
-          <h3>09 Backend 调用流程</h3>
-          <pre>{info.backendOverview.join("\n↓\n")}</pre>
-          {latestEvent?.backendFlow && <><h4>最近操作实际链路</h4><pre>{latestEvent.backendFlow.join("\n→ ")}</pre></>}
-          {latestEvent?.note && <p className="learning-note">{latestEvent.note}</p>}
-        </section>
-
-        <section>
-          <h3>10 页面结果解释</h3>
-          <ul>{info.resultExplanation.map((item) => <li key={item}>{item}</li>)}</ul>
-        </section>
-
-        <section>
-          <h3>11 企业业务关系</h3>
-          <ul>{info.relationship.map((item) => <li key={item}>{item}</li>)}</ul>
-        </section>
-
-        <section>
-          <h3>12 对应源码与测试</h3>
-          {info.sources.map((source) => <code key={source}>{source}</code>)}
-          <code>{info.test}</code>
-        </section>
-
-        <section>
-          <h3>13 当前业务测试 Case</h3>
-          <p><strong>{info.cases}</strong></p>
-          <p>{info.casePurpose}</p>
-        </section>
-
-        {page === "rag" && (
-          <section>
-            <h3>RAG 当前边界</h3>
-            <p>可用：Keyword Retrieval、Chunk 检索、Citation、Deterministic Internal RAG Answer。</p>
-            <p>未启用／未实现：真实 LLM、Embedding、pgvector 向量检索。</p>
-          </section>
-        )}
       </div>
     </aside>
   );

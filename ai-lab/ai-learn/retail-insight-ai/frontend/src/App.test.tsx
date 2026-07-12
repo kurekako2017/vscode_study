@@ -21,8 +21,8 @@ describe("App navigation", () => {
     expect(screen.getAllByText("真实 LLM").length).toBeGreaterThan(0);
     expect(screen.getAllByText("未启用").length).toBeGreaterThan(0);
     expect(screen.getByLabelText("固定学习面板")).toHaveClass("learning-sidebar");
-    expect(screen.getByText("1. 文書管理")).toBeInTheDocument();
-    expect(screen.getByText("4. 承認管理")).toBeInTheDocument();
+    expect(screen.getByText("实时学习面板")).toBeInTheDocument();
+    expect(screen.getByText("尚未操作")).toBeInTheDocument();
   });
 
   it("highlights the current page in top navigation", async () => {
@@ -49,34 +49,50 @@ describe("App navigation", () => {
       "分析依頼を開く",
       "承認管理を開く",
     ]);
-    expect(within(screen.getByLabelText("企业业务流程")).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
-      expect.stringContaining("1. 文書管理"),
-      expect.stringContaining("2. RAG検索"),
-      expect.stringContaining("3. 分析依頼"),
-      expect.stringContaining("4. 承認管理"),
-    ]);
   });
 
-  it("explains each page step and the initial Tasks IDLE state", () => {
+  it("shows each page's business object, lifecycle, and source locations", () => {
     const { rerender } = render(<LearningSidebar page="documents" latestEvent={null} />);
-    expect(screen.getByText("当前业务步骤：1 / 4")).toBeInTheDocument();
-    expect(screen.getByText("DocumentsPage")).toBeInTheDocument();
+    expect(screen.getByText(/文書管理 · DocumentsPage · 1 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText("02 当前业务对象")).toBeInTheDocument();
+    expect(screen.getByText(/Scenario01 的销售、库存、促销、顾客和竞品内部资料/)).toBeInTheDocument();
+    expect(screen.getByText("04 页面生命周期")).toBeInTheDocument();
+    expect(screen.getByText("05 源码定位")).toBeInTheDocument();
+    expect(screen.getByText("frontend/src/pages/DocumentsPage.tsx")).toBeInTheDocument();
 
     rerender(<LearningSidebar page="rag" latestEvent={null} />);
-    expect(screen.getByText("当前业务步骤：2 / 4")).toBeInTheDocument();
-    expect(screen.getByText("RagPage")).toBeInTheDocument();
+    expect(screen.getByText(/RAG検索 · RagPage · 2 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText(/固定逻辑回答/)).toBeInTheDocument();
 
     rerender(<LearningSidebar page="tasks" latestEvent={null} />);
-    expect(screen.getByText("当前业务步骤：3 / 4")).toBeInTheDocument();
-    expect(screen.getByText("TasksPage")).toBeInTheDocument();
-    expect(screen.getByText("IDLE：还没有提交任务。")).toBeInTheDocument();
-    expect(screen.getByText(/submit\(\) → createTask\(\) → POST \/api\/tasks → 202 Accepted/)).toBeInTheDocument();
-    expect(screen.getByText(/GET \/api\/tasks\/\{task_id\}\/events → SSE/)).toBeInTheDocument();
-    expect(screen.getByText(/GET \/api\/tasks\/\{task_id\}\/report → 200/)).toBeInTheDocument();
+    expect(screen.getByText(/分析依頼 · TasksPage · 3 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText(/初始为 idle；没有 task_id、SSE 事件或 report/)).toBeInTheDocument();
+    expect(screen.getByText("Stream")).toBeInTheDocument();
+    expect(screen.getByText("frontend/src/pages/TasksPage.tsx")).toBeInTheDocument();
 
     rerender(<LearningSidebar page="approval" latestEvent={null} />);
-    expect(screen.getByText("当前业务步骤：4 / 4")).toBeInTheDocument();
-    expect(screen.getByText("ApprovalPage")).toBeInTheDocument();
+    expect(screen.getByText(/承認管理 · ApprovalPage · 4 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText(/report_version_id 与审批审计事件/)).toBeInTheDocument();
+  });
+
+  it("shows the latest handler, state changes, and backend flow without owning business state", () => {
+    render(<LearningSidebar
+      page="tasks"
+      latestEvent={{
+        eventName: "submit()",
+        apiMethod: "POST",
+        apiPath: "/api/tasks",
+        apiStatus: "202 Accepted",
+        stateChanges: ["taskId: null → task-learning-1", "status: queued"],
+        backendFlow: ["tasks.py create_task()", "TaskService.create_task()"],
+      }}
+    />);
+
+    expect(screen.getByText("submit()")).toBeInTheDocument();
+    expect(screen.getByText("POST /api/tasks · 202 Accepted")).toBeInTheDocument();
+    expect(screen.getByText("taskId: null → task-learning-1")).toBeInTheDocument();
+    expect(screen.getByText("本次操作链路")).toBeInTheDocument();
+    expect(screen.getByText("tasks.py create_task() → TaskService.create_task()")).toBeInTheDocument();
   });
 
   it("records the Tasks submit, SSE, and report API flow in the learning sidebar", async () => {
@@ -99,7 +115,7 @@ describe("App navigation", () => {
 
     await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-learning-1/events"));
     expect(screen.getAllByText("submit()").length).toBeGreaterThan(0);
-    expect(screen.getByText(/Response Status：202 Accepted/)).toBeInTheDocument();
+    expect(screen.getByText("POST /api/tasks · 202 Accepted")).toBeInTheDocument();
 
     FakeEventSource.instance.emit("done", {
       task_id: "task-learning-1", sequence: 1, event: "done", message: "Task completed",
@@ -140,7 +156,7 @@ describe("App navigation", () => {
     fireEvent.click(screen.getByRole("button", { name: "RAG検索を開く" }));
 
     expect(screen.getByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
-    expect(screen.getByText("RagPage")).toBeInTheDocument();
+    expect(screen.getByText(/RAG検索 · RagPage · 2 \/ 4/)).toBeInTheDocument();
     expect(screen.getAllByText("POST /api/v1/internal-rag/answer").length).toBeGreaterThan(0);
   });
 
@@ -151,7 +167,7 @@ describe("App navigation", () => {
     fireEvent.click(screen.getByRole("button", { name: "結果をクリア" }));
 
     expect(screen.getByText("clearRetrievalResult()")).toBeInTheDocument();
-    expect(screen.getByText(/没有 API 请求/)).toBeInTheDocument();
+    expect(screen.getByText("本次操作不发送 API 请求")).toBeInTheDocument();
   });
 
   it("explains insufficient_context as a backend evidence result in the learning sidebar", async () => {
