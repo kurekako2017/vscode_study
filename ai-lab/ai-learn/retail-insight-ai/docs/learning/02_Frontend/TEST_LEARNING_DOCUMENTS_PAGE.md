@@ -10,14 +10,19 @@
 
 因为本轮目标是先把一个页面看懂。
 
+补充说明：
+
+- 本文保留了原来的讲解结构。
+- 但当前真实测试文件已经迁移到 `frontend/src/pages/DocumentsPage.test.tsx`。
+- 所以下面凡是涉及“当前真实测试文件”的地方，都应以 `frontend/src/pages/DocumentsPage.test.tsx` 为准。
+
 ## 1. DocumentsPage 测试文件在哪里
 
 当前真实测试文件在：
 
-- `frontend/src/App.test.tsx`
+- `frontend/src/pages/DocumentsPage.test.tsx`
 
-注意：现在项目还没有把 `DocumentsPage` 单独拆成 `DocumentsPage.test.tsx`。
-也就是说，DocumentsPage 的测试是放在整个 App 的集成测试文件里一起跑的。
+也就是说，DocumentsPage 的主要页面测试现在已经从 `App.test.tsx` 拆出来了。
 
 ## 2. 测试从哪个入口开始执行
 
@@ -35,14 +40,14 @@ npm test -- --run
 
 实际上就是 Vitest 去执行 `frontend/src/` 下面匹配到的测试文件。
 
-当前 DocumentsPage 测试会随着 `frontend/src/App.test.tsx` 一起执行。
+当前 DocumentsPage 测试会随着 `frontend/src/pages/DocumentsPage.test.tsx` 一起执行。
 
 ## 3. describe / it / test 的作用
 
-在 `frontend/src/App.test.tsx` 里可以看到：
+在 `frontend/src/pages/DocumentsPage.test.tsx` 里可以看到：
 
 ```ts
-describe("App", () => {
+describe("DocumentsPage", () => {
   it("shows document list, detail, and chunk count", async () => {
 ```
 
@@ -59,7 +64,7 @@ describe("App", () => {
 测试里会写：
 
 ```ts
-render(<App />);
+render(<DocumentsPage />);
 ```
 
 这一步的意思是：
@@ -68,16 +73,15 @@ render(<App />);
 - 让我们可以像用户一样查找按钮、输入框、文本
 - 然后触发点击、输入、提交等动作
 
-因为 `DocumentsPage` 是通过 App 导航进去的，所以当前真实测试不是直接 `render(<DocumentsPage />)`，而是：
+当前真实测试已经直接渲染 `DocumentsPage`，不是先经过 `App.tsx` 导航。
 
 ```ts
-render(<App />);
-fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+render(<DocumentsPage />);
 ```
 
 也就是：
 
-先渲染 App → 再点导航进入 Documents 页面。
+直接渲染页面组件 → 直接测试这一页自己的行为。
 
 ## 5. screen 是什么
 
@@ -88,7 +92,6 @@ fireEvent.click(screen.getByRole("button", { name: "Documents" }));
 例如：
 
 ```ts
-screen.getByRole("button", { name: "Documents" })
 screen.findByText("Monthly Policy")
 screen.getByLabelText("ファイル")
 ```
@@ -136,7 +139,14 @@ vi.stubGlobal("fetch", fetchMock);
 
 这和 `vi.mock()` 的核心思路一样，都是为了把“真实依赖”替换成“测试里的可控实现”。
 
-当前文件没有大量直接写 `vi.mock("module-name")`，而是直接替换全局 `fetch` 和 `EventSource`。
+当前 `DocumentsPage.test.tsx` 没有大量直接写 `vi.mock("module-name")`，
+而是直接替换全局 `fetch`：
+
+```ts
+vi.stubGlobal("fetch", fetchMock);
+```
+
+DocumentsPage 不使用 SSE，因此本文件不需要 Mock `EventSource`。
 
 ## 8. Mock API 为什么不调用真实后端
 
@@ -160,32 +170,33 @@ vi.stubGlobal("fetch", fetchMock);
 
 ## 9. beforeEach() 的作用
 
-在 `frontend/src/App.test.tsx` 里有：
+当前真实 `DocumentsPage.test.tsx` 没有单独写 `beforeEach()`。
 
-```ts
-beforeEach(() => {
-  vi.stubGlobal("EventSource", FakeEventSource);
-});
-```
+这个文件的真实清理方式是每个测试结束后统一执行：
 
-这表示每个测试开始前，都会先把浏览器里的 `EventSource` 换成测试版。
+- `cleanup()`
+- `vi.unstubAllGlobals()`
+- `vi.restoreAllMocks()`
 
-虽然 DocumentsPage 本身不用 SSE，但因为整个文件是 App 集成测试，所以统一做了这个准备。
+也就是说：
+
+- 当前文件不会在 `beforeEach()` 里预置 `EventSource`
+- 当前文件的重点是替换 `fetch`
+- 每条测试跑完后再把 DOM 和 Mock 状态清干净
 
 ## 10. act() / waitFor() 的作用
 
-当前文件里真实使用了 `waitFor()`，例如 Task 的 SSE 测试：
+当前真实 `DocumentsPage.test.tsx` 主要使用的是：
 
-```ts
-await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-1/events"));
-```
+- `findByText()`
+- `findByRole()`
 
-可以这样理解：
+如果以后你在别的页面测试里看到 `waitFor()`，可以这样理解：
 
 - `waitFor()`：反复等待，直到断言成立或超时
 - `act()`：保证 React 状态更新已经完成后再断言
 
-当前这个文件没有显式写很多 `act()`，因为 Testing Library 的很多异步方法本身已经帮你包了一层常见场景。
+当前这个文件没有显式写很多 `waitFor()` 或 `act()`，因为 Testing Library 的很多异步查询本身已经覆盖了常见等待场景。
 
 对 DocumentsPage 来说，更常见的是：
 
@@ -216,8 +227,7 @@ DocumentsPage 本身有 loading 状态，例如首次读取列表时会先发请
 ```ts
 vi.stubGlobal("fetch", vi.fn().mockResolvedValue(documentList()));
 
-render(<App />);
-fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+render(<DocumentsPage />);
 
 expect(await screen.findByText("No documents yet. Upload a file to start the document workflow.")).toBeInTheDocument();
 ```
@@ -225,9 +235,8 @@ expect(await screen.findByText("No documents yet. Upload a file to start the doc
 意思是：
 
 1. Mock 一个空文档列表
-2. 渲染 App
-3. 点击 Documents 导航
-4. 等页面显示空状态文案
+2. 直接渲染 DocumentsPage
+3. 等页面显示空状态文案
 
 ## 13. 如何测试列表显示
 
@@ -313,7 +322,7 @@ expect(await screen.findByRole("status")).toHaveTextContent("Archive accepted: d
 当前真实数据流是：
 
 `fetchMock`
-→ `App` 里的导航切换
+→ `DocumentsPage`
 → `DocumentsPage` 调用 `api.ts`
 → `api.ts` 调用被 mock 的 `fetch`
 → mock response 返回
@@ -357,17 +366,15 @@ vi.stubGlobal("fetch", fetchMock);
 
 这样页面里的真实 `fetch()` 就不会发网络请求了。
 
-### 第 3 步：渲染 App
+### 第 3 步：渲染 DocumentsPage
 
 ```ts
-render(<App />);
+render(<DocumentsPage />);
 ```
 
-### 第 4 步：进入 Documents 页面
+### 第 4 步：页面启动后自动加载 Documents 列表
 
-```ts
-fireEvent.click(screen.getByRole("button", { name: "Documents" }));
-```
+这里不需要再点导航按钮。
 
 ### 第 5 步：构造一个真实 File 对象
 
@@ -422,18 +429,18 @@ expect((await screen.findAllByText("budget.csv")).length).toBeGreaterThan(0);
 
 ## 20. 如何单独运行 DocumentsPage 测试
 
-因为当前 DocumentsPage 测试仍在 `frontend/src/App.test.tsx` 里，所以最稳妥的单独运行命令是：
+当前真实 DocumentsPage 测试文件已经是独立文件，所以最稳妥的单独运行命令是：
 
 ```bash
 cd frontend
-npm test -- --run src/App.test.tsx -t "uploads a document successfully and refreshes the list"
+npm test -- --run src/pages/DocumentsPage.test.tsx -t "uploads a document successfully and refreshes the list"
 ```
 
-如果你想跑 App.test.tsx 里所有测试，可以用：
+如果你想跑 DocumentsPage.test.tsx 里所有测试，可以用：
 
 ```bash
 cd frontend
-npm test -- --run src/App.test.tsx
+npm test -- --run src/pages/DocumentsPage.test.tsx
 ```
 
 ## 21. 初学者建议怎么读这份测试

@@ -22,6 +22,8 @@
 - [Appendix H: Interview Demo Startup](#appendix-h-interview-demo-startup)
 - [Appendix I: Startup Decision Tree](#appendix-i-startup-decision-tree)
 - [Appendix J: FAQ](#appendix-j-faq)
+- [Appendix K: Frontend 页面学习路线](#appendix-k-frontend-页面学习路线)
+- [Appendix L: Frontend 启动、验证、测试与停止](#appendix-l-frontend-启动验证测试与停止)
 
 ## 三个文档入口不是同一个用途
 
@@ -56,12 +58,17 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 
 ## 推荐启动顺序
 
-1. 在 `<project_root>` 执行 `./scripts/check_env.sh`。
-2. 在 `<project_root>` 执行 `./scripts/start_backend.sh`。
-3. 打开 `http://127.0.0.1:8000/docs` 看 Swagger。
-4. 打开 `http://127.0.0.1:8000/redoc` 看 ReDoc。
-5. 打开 `http://127.0.0.1:8000/openapi.json` 看 OpenAPI JSON。
-6. 如需前端联调，再执行 `./scripts/start_frontend.sh`。
+1. Terminal 1 在 `<project_root>` 执行 `./scripts/check_env.sh`。
+2. Terminal 1 在 `<project_root>` 执行 `./scripts/start_backend.sh`。
+3. 保持 Terminal 1 中的 Backend 持续运行，不关闭，不按 `Ctrl+C`。
+4. 验证：
+   - `http://127.0.0.1:8000/health`
+   - `http://127.0.0.1:8000/docs`
+   - `http://127.0.0.1:8000/redoc`
+   - `http://127.0.0.1:8000/openapi.json`
+5. 另开 Terminal 2，在 `<project_root>` 执行 `./scripts/start_frontend.sh`。
+6. 保持 Terminal 2 中的 Frontend 持续运行。
+7. 浏览器打开 `http://127.0.0.1:5173`。
 
 ## 如果要直接看后端原始输出
 
@@ -140,7 +147,7 @@ Swagger
 为什么这样做：
 
 - 所有相对路径命令都以项目根目录为基准。
-- `backend/requirements.txt`、`docs/learning/RUNBOOK_LOCAL.md`、`scripts/` 都是在 `<project_root>` 下组织的。
+- `backend/requirements.txt`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`、`scripts/` 都是在 `<project_root>` 下组织的。
 
 ## 2. 创建 `.venv`
 
@@ -612,3 +619,553 @@ NO
 ## Q6. 为什么先跑 Health，再看 Swagger？
 
 `/health` 是最轻量的启动验证点，能最快确认服务已经活着。只有服务真正启动后，再打开 Swagger 才有意义。这个顺序可以帮助你快速判断问题是在“服务没起来”还是“接口文档没注册”。
+
+# Appendix K: Frontend 页面学习路线
+
+这一章是新增的 Frontend 学习入口。
+
+注意：
+
+- 这一章是追加内容
+- 不替换原来的 Backend API 学习入口
+- 原来的 `Health → Swagger → Task API` 路线继续保留
+
+也就是说，当前项目有两条长期并存的学习路线：
+
+第一条：
+
+```text
+Backend
+→ Health
+→ Swagger
+→ Task API
+→ API 调试
+```
+
+第二条：
+
+```text
+Backend
+→ 确认 Health
+→ 确认 Swagger
+→ Frontend
+→ Dashboard
+→ Analysis / Tasks
+→ Documents
+→ RAG
+→ Approval
+```
+
+## K-1. Frontend 页面学习总顺序
+
+```text
+Backend 启动
+↓
+确认 Health
+↓
+确认 Swagger
+↓
+启动 Frontend
+↓
+打开浏览器 http://127.0.0.1:5173
+↓
+Dashboard
+↓
+Analysis / Tasks
+↓
+Documents
+↓
+RAG
+↓
+Approval
+```
+
+## K-2. Dashboard
+
+页面操作：
+
+- 打开首页
+- 点击 `Open Tasks`
+- 点击 `Open Documents`
+- 点击 `Open RAG`
+- 点击 `Open Approval`
+
+对应 API：
+
+- 无
+
+预期结果：
+
+- 默认先显示 Dashboard
+- 点击快捷按钮后切换到对应页面
+
+如何确认成功：
+
+- 顶部导航高亮变化
+- Network 中没有新的 API 请求
+- 页面内容已经切换
+
+## K-3. Analysis / Tasks
+
+页面操作：
+
+- 输入问题
+- 选择 `hybrid` / `kpi` / `research`
+- 点击 `分析を開始`
+
+对应 API：
+
+- `POST /api/tasks`
+- `GET /api/tasks/{task_id}/events`
+- `GET /api/tasks/{task_id}/report`
+
+预期结果：
+
+- 成功创建任务
+- 页面显示状态流转
+- 最终显示报告
+
+如何确认成功：
+
+- Network 中先看到 `POST /api/tasks`
+- 再看到 SSE `GET /api/tasks/{task_id}/events`
+- 最后看到 `GET /api/tasks/{task_id}/report`
+- 页面出现报告内容
+
+## K-4. Documents
+
+页面操作：
+
+- 查看列表
+- 上传文件
+- 查看详情
+- 点击 `Archive`
+- 点击 `Import`
+- 点击 `Chunk`
+
+对应 API：
+
+- `GET /api/v1/documents`
+- `POST /api/v1/documents`
+- `GET /api/v1/documents/{document_id}`
+- `DELETE /api/v1/documents/{document_id}`
+- `POST /api/v1/documents/{document_id}/import`
+- `POST /api/v1/documents/{document_id}/chunks`
+- `GET /api/v1/documents/{document_id}/chunks`
+
+预期结果：
+
+- 列表能显示真实文档
+- 上传后能刷新列表
+- 详情与 chunk 预览能刷新
+
+如何确认成功：
+
+- 上传后看到成功 Banner
+- Network 中看到上传成功后再次请求文档列表
+- 点击单条文档后能看到详情和 chunks 请求
+
+补充学习文档：
+
+- `docs/learning/02_Frontend/FRONTEND_SOURCE_LEARNING_GUIDE.md`
+- `docs/learning/02_Frontend/TEST_LEARNING_DOCUMENTS_PAGE.md`
+
+## K-5. RAG
+
+页面操作：
+
+- 输入 Query，点击 `Search Retrieval`
+- 输入 Question，点击 `Generate Answer`
+
+对应 API：
+
+- `POST /api/v1/document-retrieval/search`
+- `POST /api/v1/internal-rag/answer`
+
+预期结果：
+
+- Retrieval 返回结果列表
+- Internal RAG 返回 grounded answer、citations、confidence、warnings
+
+如何确认成功：
+
+- Network 中看到两个真实 POST 请求
+- 页面显示 `retrieval_mode`
+- 页面显示 citations 和 warnings
+
+## K-6. Approval
+
+页面操作：
+
+- 查看审批列表
+- 查看详情
+- 提交审批
+- Approve
+- Reject
+- Request Revision
+
+对应 API：
+
+- `GET /api/v1/approvals`
+- `GET /api/v1/approvals/{approval_id}`
+- `POST /api/v1/reports/{task_id}/submit-approval`
+- `POST /api/v1/approvals/{approval_id}/approve`
+- `POST /api/v1/approvals/{approval_id}/reject`
+- `POST /api/v1/reports/{task_id}/revise`
+
+预期结果：
+
+- 列表与详情可读
+- 提交与审批后页面会刷新
+- 403 / 409 错误能显示在页面
+
+如何确认成功：
+
+- 页面出现成功或错误 Banner
+- Network 中看到刷新后的列表和详情请求
+- 页面状态 badge 变化
+
+# Appendix L: Frontend 启动、验证、测试与停止
+
+## L-0. 先区分两种操作
+
+这一章最容易混的，是下面两件事其实不是同一回事：
+
+第一种：
+
+```text
+页面学习启动
+=
+启动 Backend + 启动 Frontend + 打开浏览器
+```
+
+第二种：
+
+```text
+自动化测试启动
+=
+运行 unittest / vitest / build / compileall
+```
+
+请先分清：
+
+- 想手动点页面，就走“页面学习启动”
+- 想验证回归结果，就走“自动化测试启动”
+
+当前这一轮 Frontend Phase 3 的权威入口建议是：
+
+页面学习：
+
+```bash
+./scripts/start_backend.sh
+./scripts/start_frontend.sh
+```
+
+自动化测试：
+
+```bash
+./scripts/run_tests.sh
+```
+
+前面 Appendix A ~ J 保留的是原有学习路径和手动命令说明。
+这一章补的是当前双终端联调和前端阶段收尾时最直接的权威入口。
+
+## L-1. 环境准备
+
+当前项目 Frontend 本地运行至少需要：
+
+- `python3`
+- `pip`
+- `node`
+- `npm`
+
+真实检查脚本：
+
+```bash
+./scripts/check_env.sh
+```
+
+## L-2. Python 环境
+
+Backend 启动脚本会使用：
+
+- `backend/.venv`
+
+真实脚本：
+
+- `scripts/start_backend.sh`
+
+## L-3. Node 环境
+
+Frontend 启动依赖：
+
+- `node`
+- `npm`
+
+真实脚本：
+
+- `scripts/start_frontend.sh`
+
+## L-4. 安装依赖
+
+Backend 依赖：
+
+```bash
+./scripts/start_backend.sh
+```
+
+这个脚本会自动执行：
+
+- 创建 `backend/.venv`
+- 安装 `backend/requirements.txt`
+
+Frontend 依赖：
+
+```bash
+./scripts/start_frontend.sh
+```
+
+这个脚本会自动检查 `frontend/node_modules`，不存在时执行 `npm install`。
+
+## L-5. Backend 启动
+
+推荐：
+
+```bash
+./scripts/start_backend.sh
+```
+
+手动方式：
+
+```bash
+cd backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+## L-6. Backend 验证
+
+Health：
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Swagger：
+
+```bash
+curl -I http://127.0.0.1:8000/docs
+```
+
+OpenAPI：
+
+```bash
+curl -sS http://127.0.0.1:8000/openapi.json | head
+```
+
+## L-7. Frontend 启动
+
+推荐：
+
+```bash
+./scripts/start_frontend.sh
+```
+
+手动方式：
+
+```bash
+cd frontend
+npm run dev -- --host 127.0.0.1
+```
+
+双终端学习时建议这样开：
+
+终端 1：
+
+```bash
+./scripts/start_backend.sh
+```
+
+终端 2：
+
+```bash
+./scripts/start_frontend.sh
+```
+
+## L-8. Frontend 验证
+
+浏览器地址：
+
+- `http://127.0.0.1:5173`
+
+成功标志：
+
+- 能看到 Dashboard
+- 顶部导航包含 `Dashboard / Analysis / Tasks / Documents / RAG / Approval`
+
+## L-9. 浏览器地址总表
+
+- Backend Health: `http://127.0.0.1:8000/health`
+- Backend Swagger: `http://127.0.0.1:8000/docs`
+- Backend ReDoc: `http://127.0.0.1:8000/redoc`
+- Backend OpenAPI: `http://127.0.0.1:8000/openapi.json`
+- Frontend: `http://127.0.0.1:5173`
+
+## L-10. 自动化测试
+
+这一节不是“启动页面”，而是“跑自动化验证”。
+
+也就是说：
+
+- 页面学习时，不需要先跑这一节
+- 收尾验证、提交前检查时，再跑这一节
+
+全部检查：
+
+```bash
+./scripts/run_tests.sh
+```
+
+Backend tests：
+
+```bash
+cd backend
+python3 -m unittest discover -s tests -v
+```
+
+Frontend 全部测试：
+
+```bash
+cd frontend
+npm test
+```
+
+Frontend build：
+
+```bash
+cd frontend
+npm run build
+```
+
+Python compileall：
+
+```bash
+cd backend
+python3 -m compileall app
+```
+
+单页面测试命令：
+
+```bash
+cd frontend
+npm test -- --run src/pages/DashboardPage.test.tsx
+npm test -- --run src/pages/TasksPage.test.tsx
+npm test -- --run src/pages/DocumentsPage.test.tsx
+npm test -- --run src/pages/RagPage.test.tsx
+npm test -- --run src/pages/ApprovalPage.test.tsx
+```
+
+API Client 测试：
+
+```bash
+cd frontend
+npm test -- --run src/api.test.ts
+```
+
+## L-11. 停止项目
+
+如果你是直接运行：
+
+- `./scripts/start_backend.sh`
+- `./scripts/start_frontend.sh`
+
+最直接的停止方法就是在对应终端按：
+
+```text
+Ctrl+C
+```
+
+如果你在 WSL / VSCode 终端中关闭了窗口，开发服务也会一起退出。
+
+## L-12. 常见错误
+
+### Backend 无法启动
+
+优先检查：
+
+- `python3` 是否存在
+- `backend/.venv` 是否创建成功
+- `backend/requirements.txt` 是否安装成功
+- `8000` 端口是否被占用
+
+### Frontend 无法启动
+
+优先检查：
+
+- `node` / `npm` 是否存在
+- `frontend/node_modules` 是否安装成功
+- `5173` 端口是否被占用
+
+### Health 失败
+
+说明 Backend 还没有正常启动，先不要继续查 Frontend。
+
+### Swagger 打不开
+
+先确认：
+
+- `http://127.0.0.1:8000/health` 是否已经成功
+
+### Task Pending 很久
+
+先检查：
+
+- Backend 终端是否仍在运行
+- SSE 请求是否建立
+- 是否收到了 `done` 事件
+
+### Documents 上传失败
+
+先检查：
+
+- 上传的是不是当前支持的文件类型
+- metadata 是否填写完整
+- 页面错误 Banner 里的错误码
+
+### RAG `insufficient_context`
+
+这通常表示：
+
+- 当前检索没有找到足够证据
+
+这不是 Frontend 启动失败，而是业务返回结果为空或证据不足。
+
+### Approval 403
+
+这表示：
+
+- 当前审批动作被权限边界拒绝
+
+页面应显示错误 Banner。
+
+### Approval 409
+
+这表示：
+
+- 当前审批状态冲突
+- 比如重复提交、重复决策或状态不允许
+
+### PostgreSQL skipped
+
+当前自动化测试基线里存在：
+
+- Backend `115 passed, 1 skipped`
+
+这一轮学习文档不把 PostgreSQL 写成已完成能力。
+
+### Docker 未验证
+
+如果本地没有 Docker CLI，就不要假装 Docker 验证通过。
+
+### WSL 关闭导致服务退出
+
+如果你关闭了 WSL 终端或 VSCode 远程会话，正在运行的本地开发服务通常也会结束。

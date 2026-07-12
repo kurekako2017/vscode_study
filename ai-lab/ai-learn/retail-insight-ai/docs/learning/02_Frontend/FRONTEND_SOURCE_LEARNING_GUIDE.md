@@ -1927,11 +1927,24 @@ Dashboard 页面中的运行时说明也反映了这些边界，所以不要把�
 推荐顺序：
 
 1. `frontend/src/App.test.tsx`
-2. `frontend/src/pages/TasksPage.test.tsx`
+2. `frontend/src/pages/DashboardPage.test.tsx`
 3. `frontend/src/pages/DocumentsPage.test.tsx`
-4. `frontend/src/pages/RagPage.test.tsx`
-5. `frontend/src/pages/ApprovalPage.test.tsx`
-6. `frontend/src/api.test.ts`
+4. `frontend/src/pages/TasksPage.test.tsx`
+5. `frontend/src/pages/RagPage.test.tsx`
+6. `frontend/src/pages/ApprovalPage.test.tsx`
+7. `frontend/src/api.test.ts`
+8. 全部前端测试
+9. `./scripts/run_tests.sh`
+
+原因：
+
+- App：先看页面切换
+- Dashboard：再看 props 和回调
+- Documents：先熟悉表单、文件、Mock fetch、刷新
+- Tasks：再进入异步、SSE、Report
+- RAG：再看结果展示和 Citation
+- Approval：最后看状态变化、403、409
+- api.test：最后单独看 HTTP Client 边界
 
 ---
 
@@ -2087,4 +2100,800 @@ TasksPage.tsx
 → task_service.py
 → workflow/graph.py
 → TasksPage.test.tsx
+```
+
+---
+
+## 18. 页面学习路线
+
+如果你是第一次学这套 Frontend，建议按天拆开。
+
+### Day 1
+
+```text
+Dashboard
+↓
+Tasks
+```
+
+目标：
+
+- 先看懂页面切换
+- 再看懂 Task → SSE → Report 主链路
+
+### Day 2
+
+```text
+Documents
+```
+
+目标：
+
+- 看懂列表、上传、详情、Archive、Import、Chunk 的完整页面闭环
+
+### Day 3
+
+```text
+RAG
+```
+
+目标：
+
+- 先区分 Retrieval
+- 再区分 Internal RAG Answer
+
+### Day 4
+
+```text
+Approval
+```
+
+目标：
+
+- 看懂审批状态变化
+- 看懂 Audit / Permission / Refresh 的关系
+
+---
+
+## 19. 页面源码对应关系统一模板
+
+以后你读任何一个页面，都建议固定按这条链路看：
+
+```text
+页面操作
+↓
+React Component
+↓
+frontend/src/api.ts
+↓
+Backend Router
+↓
+Service
+↓
+Repository
+↓
+Workflow（存在时）
+↓
+Response
+↓
+React 更新
+```
+
+如果某一层不存在，就明确写：
+
+- 本功能不经过 `api.ts`
+- 本功能不经过 Workflow
+
+这样你不会把所有页面都误看成同一类架构。
+
+---
+
+## 20. 页面对应测试学习入口
+
+这一章按页面整理“应该看哪个测试文件、测什么、mock 什么、怎么单独运行”。
+
+### 20.1 Dashboard
+
+测试文件：
+
+- `frontend/src/App.test.tsx`
+- `frontend/src/pages/DashboardPage.test.tsx`
+
+测试目标：
+
+- Dashboard 默认显示
+- 顶部导航切换
+- 快捷入口按钮是否正确触发页面跳转
+
+Mock 内容：
+
+- 无需后端 API
+
+如何单独运行：
+
+```bash
+cd frontend
+npm test -- --run src/App.test.tsx
+npm test -- --run src/pages/DashboardPage.test.tsx
+```
+
+### 20.2 Tasks
+
+测试文件：
+
+- `frontend/src/pages/TasksPage.test.tsx`
+- `frontend/src/api.test.ts`
+
+测试目标：
+
+- 创建 Task
+- 连接 SSE
+- 收到 done 事件后拉取 report
+
+Mock 内容：
+
+- `fetch`
+- `EventSource`
+
+如何单独运行：
+
+```bash
+cd frontend
+npm test -- --run src/pages/TasksPage.test.tsx
+```
+
+### 20.3 Documents
+
+测试文件：
+
+- `frontend/src/pages/DocumentsPage.test.tsx`
+- `frontend/src/api.test.ts`
+- 补充专题笔记：`docs/learning/02_Frontend/TEST_LEARNING_DOCUMENTS_PAGE.md`
+
+测试目标：
+
+- 列表
+- 空状态
+- API 错误
+- 上传成功
+- 上传失败
+- Archive 后刷新
+
+Mock 内容：
+
+- `fetch`
+
+如何单独运行：
+
+```bash
+cd frontend
+npm test -- --run src/pages/DocumentsPage.test.tsx
+```
+
+### 20.4 RAG
+
+测试文件：
+
+- `frontend/src/pages/RagPage.test.tsx`
+- `frontend/src/api.test.ts`
+
+测试目标：
+
+- Retrieval 结果显示
+- Retrieval 空结果
+- Internal RAG Answer 成功
+- Internal RAG API 错误
+
+Mock 内容：
+
+- `fetch`
+
+如何单独运行：
+
+```bash
+cd frontend
+npm test -- --run src/pages/RagPage.test.tsx
+```
+
+### 20.5 Approval
+
+测试文件：
+
+- `frontend/src/pages/ApprovalPage.test.tsx`
+- `frontend/src/api.test.ts`
+
+测试目标：
+
+- 列表与详情
+- Submit Approval
+- Approve
+- Reject
+- Request Revision
+- 403 / 409 错误
+
+Mock 内容：
+
+- `fetch`
+
+如何单独运行：
+
+```bash
+cd frontend
+npm test -- --run src/pages/ApprovalPage.test.tsx
+```
+
+---
+
+## 21. 页面学习实践
+
+最实用的练习方法不是死读文档，而是边点页面边对源码。
+
+真实建议步骤：
+
+```text
+启动 Backend
+↓
+启动 Frontend
+↓
+浏览器打开 http://127.0.0.1:5173
+↓
+按 F12
+↓
+打开 Network
+↓
+点击页面按钮
+↓
+查看 Request
+↓
+查看 Response
+↓
+找到 frontend/src/api.ts
+↓
+找到 Router
+↓
+找到 Service
+↓
+找到 Repository
+↓
+运行对应 Test
+```
+
+如果你这样练三遍，通常就能把“页面操作”和“源码调用”真正连起来。
+
+---
+
+## 22. 新增页面完整案例
+
+这一章补的是“每个页面至少一个完整案例”的学习入口。
+
+### 22.1 Dashboard 案例：点击 Open Tasks
+
+① 页面操作
+
+```text
+Dashboard 页面
+↓
+点击 Open Tasks
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/DashboardPage.tsx
+↓
+onNavigate("analysis")
+↓
+frontend/src/App.tsx
+↓
+setActiveView("analysis")
+```
+
+③ api.ts
+
+- 本案例不经过 `api.ts`
+
+④ Router
+
+- 本案例不经过 Backend Router
+
+⑤ Service
+
+- 本案例不经过 Service
+
+⑥ Repository
+
+- 本案例不经过 Repository
+
+⑦ Workflow
+
+- 本案例不经过 Workflow
+
+⑧ Response
+
+- 无后端 Response
+
+⑨ 页面更新
+
+- `TasksPage` 被渲染出来
+
+⑩ 对应测试
+
+- `frontend/src/App.test.tsx`
+- `frontend/src/pages/DashboardPage.test.tsx`
+
+⑪ 如何验证
+
+- 页面标题从 Dashboard 变成 Analysis / Tasks
+- Network 中没有新请求
+
+### 22.2 Tasks 案例：创建任务并显示报告
+
+① 页面操作
+
+```text
+输入问题
+↓
+点击 分析を開始
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/TasksPage.tsx
+↓
+submit()
+```
+
+③ api.ts
+
+```text
+createTask()
+↓
+subscribeToTask()
+↓
+getReport()
+```
+
+④ Router
+
+```text
+backend/app/api/tasks.py
+↓
+create_task()
+↓
+get_task_events()
+↓
+get_report()
+```
+
+⑤ Service
+
+```text
+TaskService.create_task()
+↓
+TaskService.run_task()
+↓
+TaskService.get_report()
+```
+
+⑥ Repository
+
+```text
+TaskRepository.create()
+↓
+TaskRepository.save()
+↓
+ReportRepository.get()
+```
+
+⑦ Workflow
+
+```text
+AnalysisWorkflow
+↓
+route / kpi / research / report
+```
+
+⑧ Response
+
+```text
+HTTP 202
+↓
+SSE status / done
+↓
+HTTP 200 report
+```
+
+⑨ 页面更新
+
+- 事件时间线增加
+- 状态变化
+- 最后显示 Markdown 报告
+
+⑩ 对应测试
+
+- `frontend/src/pages/TasksPage.test.tsx`
+
+⑪ 如何验证
+
+- Network 中先看到 `POST /api/tasks`
+- 再看到 SSE
+- 最后看到 report 请求
+
+### 22.3 RAG 案例 A：Retrieval Search
+
+① 页面操作
+
+```text
+输入 Query
+↓
+点击 Search Retrieval
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/RagPage.tsx
+```
+
+③ api.ts
+
+```text
+searchDocumentRetrieval()
+```
+
+④ Router
+
+```text
+backend/app/api/document_retrieval.py
+↓
+search_documents()
+```
+
+⑤ Service
+
+```text
+DocumentRetrievalService.search()
+```
+
+⑥ Repository
+
+```text
+InMemoryKeywordRetrieval.search()
+```
+
+⑦ Workflow
+
+- 本案例不经过 Workflow
+
+⑧ Response
+
+```text
+DocumentRetrievalSearchResponse
+```
+
+⑨ 页面更新
+
+- 显示 results / total / retrieval_mode
+
+⑩ 对应测试
+
+- `frontend/src/pages/RagPage.test.tsx`
+
+⑪ 如何验证
+
+- 页面显示 excerpt 和 score
+- Network 中看到 `POST /api/v1/document-retrieval/search`
+
+### 22.4 RAG 案例 B：Internal RAG Answer
+
+① 页面操作
+
+```text
+输入 Question
+↓
+点击 Generate Answer
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/RagPage.tsx
+```
+
+③ api.ts
+
+```text
+answerInternalRag()
+```
+
+④ Router
+
+```text
+backend/app/api/internal_rag.py
+↓
+answer_internal_rag()
+```
+
+⑤ Service
+
+```text
+InternalRagService.answer()
+```
+
+⑥ Repository
+
+```text
+DocumentRetrievalProvider.search()
+↓
+RAGAnswerGenerator.generate()
+```
+
+⑦ Workflow
+
+- 本案例不经过 LangGraph Workflow
+
+⑧ Response
+
+```text
+answer
+↓
+citations
+↓
+confidence
+↓
+warnings
+```
+
+⑨ 页面更新
+
+- 显示 grounded answer 和 citations
+
+⑩ 对应测试
+
+- `frontend/src/pages/RagPage.test.tsx`
+
+⑪ 如何验证
+
+- 页面显示 citations
+- 页面显示 warnings 或 `no_warnings`
+
+### 22.5 Approval 案例 A：Submit Approval
+
+① 页面操作
+
+```text
+输入 Task ID
+↓
+点击 Submit Approval
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/ApprovalPage.tsx
+↓
+handleSubmitApproval()
+```
+
+③ api.ts
+
+```text
+submitApproval()
+```
+
+④ Router
+
+```text
+backend/app/api/approvals.py
+↓
+submit_approval()
+```
+
+⑤ Service
+
+```text
+ApprovalService.submit_approval()
+```
+
+⑥ Repository
+
+```text
+ApprovalRepository.save_report_version()
+↓
+ApprovalRepository.save_approval_request()
+↓
+ReportRepository.save()
+```
+
+⑦ Workflow
+
+- 本案例不经过 LangGraph Workflow
+
+⑧ Response
+
+```text
+HTTP 201
+↓
+ApprovalResponse
+```
+
+⑨ 页面更新
+
+- 显示 `Approval submitted: <approval_id>`
+- 列表和详情刷新
+
+⑩ 对应测试
+
+- `frontend/src/pages/ApprovalPage.test.tsx`
+
+⑪ 如何验证
+
+- 页面出现 success Banner
+- Network 中后续出现 approval list / detail 刷新请求
+
+### 22.6 Approval 案例 B：Approve
+
+① 页面操作
+
+```text
+在 pending_approval 状态下
+↓
+点击 Approve
+```
+
+② 前端组件
+
+```text
+frontend/src/pages/ApprovalPage.tsx
+↓
+handleApprove()
+```
+
+③ api.ts
+
+```text
+approveApproval()
+```
+
+④ Router
+
+```text
+backend/app/api/approvals.py
+↓
+approve()
+```
+
+⑤ Service
+
+```text
+ApprovalService.approve()
+```
+
+⑥ Repository
+
+```text
+ApprovalRepository.save_approval_request()
+↓
+ReportRepository.save()
+```
+
+⑦ Workflow
+
+- 本案例不经过 Workflow
+
+⑧ Response
+
+```text
+HTTP 200
+↓
+ApprovalResponse
+```
+
+⑨ 页面更新
+
+- 列表状态变化
+- 详情状态变化
+- 决策原因显示
+
+⑩ 对应测试
+
+- `frontend/src/pages/ApprovalPage.test.tsx`
+
+⑪ 如何验证
+
+- 页面显示 `Approval approved: ...`
+- 再次打开详情可看到新状态
+
+---
+
+## 23. 推荐学习顺序（扩展版）
+
+这是在本文已有推荐顺序基础上的“项目全学习路线版”。
+
+```text
+Dashboard
+↓
+Tasks
+↓
+Documents
+↓
+RAG
+↓
+Approval
+↓
+Backend
+↓
+Workflow
+↓
+Repository
+↓
+PostgreSQL
+↓
+真实 LLM
+```
+
+注意：
+
+- `PostgreSQL`
+- `真实 LLM`
+
+在当前仓库里不是 Frontend 已完成内容。
+
+这里把它们放进来，是为了告诉学习者未来该怎么往后学，不是说这两项已经实现完成。
+
+---
+
+## 24. 当前学习体系
+
+这一章说明 Frontend 文档在整个项目学习体系里的位置。
+
+当前建议按下面顺序理解整个项目：
+
+```text
+01_Foundation
+↓
+基础知识
+
+02_Frontend
+↓
+页面学习
+
+03_Backend
+↓
+Router / Service / Repository
+
+04_Workflow
+↓
+LangGraph
+
+05_RAG
+↓
+Retrieval / Answer
+
+06_Approval
+↓
+审批流程
+
+07_PostgreSQL
+↓
+数据库
+
+08_LLM
+↓
+真实 AI Provider
+```
+
+这里的 `03_Backend ~ 08_LLM` 是整个项目未来学习路线的分层说明。
+
+它表示“推荐你这样学”，不表示当前 `docs/learning/` 已经严格按这些目录全部拆完。
+
+如果你现在只想先把页面与源码关系读懂，可以先停在：
+
+```text
+01_Foundation
+↓
+02_Frontend
+↓
+Tasks / Documents / RAG / Approval
 ```
