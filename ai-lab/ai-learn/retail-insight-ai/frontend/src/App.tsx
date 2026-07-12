@@ -1,16 +1,17 @@
 import { useState } from "react";
 
+import { ApprovalPage } from "./pages/ApprovalPage";
 import { DocumentsPage } from "./pages/DocumentsPage";
 import { RagPage } from "./pages/RagPage";
 import { TasksPage } from "./pages/TasksPage";
 
-type ViewTab = "analysis" | "documents" | "rag";
+type ViewTab = "analysis" | "documents" | "rag" | "approval";
 
 /**
  * App 现在只负责顶层导航和页面切换。
  *
  * 为什么这样拆：
- * - Tasks、Documents、RAG 已经是三个独立业务区，继续堆在一个文件里会让学习成本快速上升。
+ * - Tasks、Documents、RAG、Approval 已经是四个独立业务区，继续堆在一个文件里会让学习成本快速上升。
  * - 当前仍然不引入 Router，先保持 tab 切换的最小结构。
  */
 export default function App() {
@@ -46,11 +47,19 @@ export default function App() {
         >
           RAG
         </button>
+        <button
+          type="button"
+          className={activeView === "approval" ? "nav-chip selected" : "nav-chip"}
+          onClick={() => setActiveView("approval")}
+        >
+          Approval
+        </button>
       </nav>
 
       {activeView === "analysis" && <TasksPage />}
       {activeView === "documents" && <DocumentsPage />}
       {activeView === "rag" && <RagPage />}
+      {activeView === "approval" && <ApprovalPage />}
     </main>
   );
 }

@@ -95,7 +95,10 @@ button:disabled { opacity: .5; cursor: wait; }
 .documents-shell { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 18px; }
 .documents-main { display: grid; gap: 18px; }
 .rag-shell { display: grid; gap: 18px; }
+.approval-shell { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 18px; }
+.approval-main { display: grid; gap: 18px; }
 .rag-panel { padding: 28px; }
+.approval-sidebar, .approval-submit-panel, .approval-detail-panel { padding: 28px; }
 .stack-form { display: grid; gap: 14px; }
 .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .action-row { display: flex; gap: 10px; }
@@ -158,20 +161,51 @@ button:disabled { opacity: .5; cursor: wait; }
 .chunk-head small { color: var(--muted); font: 11px ui-monospace, monospace; }
 .chunk-list pre { margin: 0; white-space: pre-wrap; color: #cbd8d7; font: 12px/1.7 ui-monospace, "Noto Sans JP", monospace; }
 .empty-block { display: grid; gap: 12px; justify-items: start; }
+.approval-table { margin-top: 18px; }
+.approval-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.status-pill-pending_approval {
+  border-color: rgba(255, 181, 71, .35);
+  color: #f2d6a8;
+  background: rgba(255, 181, 71, .08);
+}
+.status-pill-approved {
+  border-color: rgba(104, 216, 193, .35);
+  color: #d7fff6;
+  background: rgba(104, 216, 193, .1);
+}
+.status-pill-rejected {
+  border-color: rgba(255, 107, 107, .35);
+  color: #ffc4c4;
+  background: rgba(255, 107, 107, .08);
+}
+.status-pill-revised,
+.status-pill-published,
+.status-pill-archived {
+  border-color: rgba(127, 150, 151, .35);
+  color: #d7e0e0;
+  background: rgba(127, 150, 151, .08);
+}
 
 @media (max-width: 760px) {
   .shell { width: min(100% - 24px, 1180px); padding-top: 38px; }
   .workspace { grid-template-columns: 1fr; }
   .documents-shell { grid-template-columns: 1fr; }
+  .approval-shell { grid-template-columns: 1fr; }
   .filter-grid { grid-template-columns: 1fr; }
   .action-row { flex-direction: column; }
   .action-grid { grid-template-columns: 1fr 1fr; }
+  .approval-actions { grid-template-columns: 1fr; }
   .detail-grid { grid-template-columns: 1fr; }
   .toolbar, .top-nav { flex-direction: column; align-items: stretch; }
   .document-row { flex-direction: column; align-items: flex-start; }
   .row-meta { justify-content: flex-start; }
   .mode-grid { grid-template-columns: 1fr; }
-  .task-form, .timeline, .report, .upload-panel, .list-panel, .detail-panel { padding: 20px; }
+  .task-form, .timeline, .report, .upload-panel, .list-panel, .detail-panel, .approval-sidebar, .approval-submit-panel, .approval-detail-panel { padding: 20px; }
   .panel-heading { flex-wrap: wrap; }
   .panel-heading small { width: 100%; margin-left: 24px; }
 }

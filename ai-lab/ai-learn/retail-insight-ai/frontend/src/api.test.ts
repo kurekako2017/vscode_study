@@ -3,13 +3,19 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ApiClientError,
   answerInternalRag,
+  approveApproval,
   archiveDocument,
   createTask,
+  getApproval,
   getDocument,
   getDocumentChunks,
   importDocument,
+  listApprovals,
+  rejectApproval,
+  requestApprovalRevision,
   listDocuments,
   searchDocumentRetrieval,
+  submitApproval,
   uploadDocument,
 } from "./api";
 
@@ -238,5 +244,125 @@ describe("API Client", () => {
 
     expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/internal-rag/answer");
     expect((fetchMock.mock.calls[0][1] as RequestInit).method).toBe("POST");
+  });
+
+  it("calls approval list and detail endpoints", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-approval-list",
+        data: {
+          items: [],
+          next_cursor: null,
+        },
+        error: null,
+      }, 200))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-approval-detail",
+        data: {
+          approval_id: "approval-1",
+          task_id: "task-1",
+          report_version_id: "report-version-1",
+          status: "pending_approval",
+          requested_at: "2026-07-12T00:00:00Z",
+          requested_by: "user-test",
+          decided_at: null,
+          decided_by: null,
+          decision_reason: null,
+          revision_no: 1,
+          revised_from_version_id: null,
+        },
+        error: null,
+      }, 200));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await listApprovals({ task_id: "task-1", status: "pending_approval" });
+    await getApproval("approval-1");
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/approvals?task_id=task-1&status=pending_approval");
+    expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/approvals/approval-1");
+  });
+
+  it("calls approval submit, approve, reject, and revise endpoints", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-submit-approval",
+        data: {
+          approval_id: "approval-1",
+          task_id: "task-1",
+          report_version_id: "report-version-1",
+          status: "pending_approval",
+          requested_at: "2026-07-12T00:00:00Z",
+          requested_by: "user-test",
+          decided_at: null,
+          decided_by: null,
+          decision_reason: null,
+          revision_no: 1,
+          revised_from_version_id: null,
+        },
+        error: null,
+      }, 201))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-approve-approval",
+        data: {
+          approval_id: "approval-1",
+          task_id: "task-1",
+          report_version_id: "report-version-1",
+          status: "approved",
+          requested_at: "2026-07-12T00:00:00Z",
+          requested_by: "user-test",
+          decided_at: "2026-07-12T00:10:00Z",
+          decided_by: "reviewer-1",
+          decision_reason: "Approved",
+          revision_no: 1,
+          revised_from_version_id: null,
+        },
+        error: null,
+      }, 200))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-reject-approval",
+        data: {
+          approval_id: "approval-2",
+          task_id: "task-2",
+          report_version_id: "report-version-2",
+          status: "rejected",
+          requested_at: "2026-07-12T00:00:00Z",
+          requested_by: "user-test",
+          decided_at: "2026-07-12T00:12:00Z",
+          decided_by: "reviewer-2",
+          decision_reason: "Need clearer trace",
+          revision_no: 1,
+          revised_from_version_id: null,
+        },
+        error: null,
+      }, 200))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-revise-approval",
+        data: {
+          task_id: "task-2",
+          report_version_id: "report-version-3",
+          status: "revised",
+          revision_no: 2,
+          revised_from_version_id: "report-version-2",
+        },
+        error: null,
+      }, 201));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await submitApproval("task-1", { comment: "Ready" });
+    await approveApproval("approval-1", { comment: "Approved" });
+    await rejectApproval("approval-2", { reason: "Need clearer trace" });
+    await requestApprovalRevision("task-2", { revision_reason: "Clarify trace" });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/reports/task-1/submit-approval");
+    expect((fetchMock.mock.calls[0][1] as RequestInit).method).toBe("POST");
+    expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/approvals/approval-1/approve");
+    expect(fetchMock.mock.calls[2][0]).toBe("/api/v1/approvals/approval-2/reject");
+    expect(fetchMock.mock.calls[3][0]).toBe("/api/v1/reports/task-2/revise");
   });
 });

@@ -1,6 +1,12 @@
 import type {
   AnalysisMode,
   ApiResponse,
+  ApprovalListResponse,
+  ApprovalRejectRequest,
+  ApprovalResponse,
+  ApprovalRevisionRequest,
+  ApprovalRevisionResponse,
+  ApprovalSubmitRequest,
   DocumentArchiveResponse,
   DocumentChunkListResponse,
   DocumentImportResponse,
@@ -50,6 +56,13 @@ interface UploadDocumentInput {
     document_type?: string;
   };
   idempotencyKey?: string;
+}
+
+interface ApprovalListParams {
+  task_id?: string;
+  status?: string;
+  limit?: number;
+  cursor?: string;
 }
 
 /** 统一处理 fetch 的网络层失败，避免组件中散落 try/catch 文案。 */
@@ -190,6 +203,77 @@ export async function answerInternalRag(
     body: JSON.stringify(payload),
   });
   return unwrapResponse<InternalRagAnswerResponse>(response);
+}
+
+/** Approval 列表查询参数统一在 API Client 里拼接，页面只管理筛选表单。 */
+export async function listApprovals(params: ApprovalListParams = {}): Promise<ApprovalListResponse> {
+  const search = new URLSearchParams();
+  if (params.task_id) search.set("task_id", params.task_id);
+  if (params.status) search.set("status", params.status);
+  if (typeof params.limit === "number") search.set("limit", String(params.limit));
+  if (params.cursor) search.set("cursor", params.cursor);
+
+  const query = search.toString();
+  const response = await request(query.length > 0 ? `/api/v1/approvals?${query}` : "/api/v1/approvals");
+  return unwrapResponse<ApprovalListResponse>(response);
+}
+
+/** 详情读取单独拆开，方便列表刷新后继续保留当前选中项。 */
+export async function getApproval(approvalId: string): Promise<ApprovalResponse> {
+  const response = await request(`/api/v1/approvals/${approvalId}`);
+  return unwrapResponse<ApprovalResponse>(response);
+}
+
+/** Submit Approval 会创建新的 pending 记录，因此返回 approval 明细。 */
+export async function submitApproval(
+  taskId: string,
+  payload: ApprovalSubmitRequest,
+): Promise<ApprovalResponse> {
+  const response = await request(`/api/v1/reports/${taskId}/submit-approval`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<ApprovalResponse>(response);
+}
+
+/** 批准动作仍然走 comment 合同，前端不能擅自改字段名。 */
+export async function approveApproval(
+  approvalId: string,
+  payload: ApprovalSubmitRequest,
+): Promise<ApprovalResponse> {
+  const response = await request(`/api/v1/approvals/${approvalId}/approve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<ApprovalResponse>(response);
+}
+
+/** Reject 动作必须把 reason 交给后端校验，前端只做最小表单控制。 */
+export async function rejectApproval(
+  approvalId: string,
+  payload: ApprovalRejectRequest,
+): Promise<ApprovalResponse> {
+  const response = await request(`/api/v1/approvals/${approvalId}/reject`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<ApprovalResponse>(response);
+}
+
+/** Revise 返回的是新的 report version 快照，便于页面提示版本变化。 */
+export async function requestApprovalRevision(
+  taskId: string,
+  payload: ApprovalRevisionRequest,
+): Promise<ApprovalRevisionResponse> {
+  const response = await request(`/api/v1/reports/${taskId}/revise`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<ApprovalRevisionResponse>(response);
 }
 
 /**

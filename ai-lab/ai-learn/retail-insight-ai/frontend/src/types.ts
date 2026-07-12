@@ -195,3 +195,58 @@ export interface InternalRagAnswerResponse {
   confidence: number;
   warnings: string[];
 }
+
+/** Approval workflow 当前复用 report status 作为审批状态。 */
+export type ApprovalStatus =
+  | "generated"
+  | "pending_approval"
+  | "approved"
+  | "rejected"
+  | "revised"
+  | "published"
+  | "archived";
+
+/** Approval 列表和详情当前使用同一个后端响应结构。 */
+export interface ApprovalResponse {
+  approval_id: string;
+  task_id: string;
+  report_version_id: string;
+  status: ApprovalStatus;
+  requested_at: string;
+  requested_by: string | null;
+  decided_at: string | null;
+  decided_by: string | null;
+  decision_reason: string | null;
+  revision_no: number;
+  revised_from_version_id: string | null;
+}
+
+/** Approval 列表接口当前返回 items + next_cursor。 */
+export interface ApprovalListResponse {
+  items: ApprovalResponse[];
+  next_cursor: string | null;
+}
+
+/** 提交审批和批准接口都复用 comment 字段。 */
+export interface ApprovalSubmitRequest {
+  comment?: string;
+}
+
+/** Reject 接口要求 reason 字段。 */
+export interface ApprovalRejectRequest {
+  reason?: string;
+}
+
+/** Revise 接口要求 revision_reason 字段。 */
+export interface ApprovalRevisionRequest {
+  revision_reason?: string;
+}
+
+/** Report revise 成功后返回的是新版本快照，而不是 approval 明细。 */
+export interface ApprovalRevisionResponse {
+  task_id: string;
+  report_version_id: string;
+  status: ApprovalStatus;
+  revision_no: number;
+  revised_from_version_id: string | null;
+}
