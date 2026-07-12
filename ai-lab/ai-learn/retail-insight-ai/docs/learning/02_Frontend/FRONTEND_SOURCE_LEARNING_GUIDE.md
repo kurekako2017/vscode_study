@@ -51,7 +51,7 @@ RAG検索
 页面入口：`frontend/src/App.tsx`。
 
 页面看到什么
-→ 顶部导航的「学习总览」「分析依頼」「文書管理」「RAG検索」「承認管理」。
+→ 顶部导航的「学习总览」「文書管理」「RAG検索」「分析依頼」「承認管理」。
 
 点击后发生什么
 → `setActiveView()` 改变本地 `useState`。
@@ -416,7 +416,15 @@ backend/app/api/approvals.py list_approvals() / get_approval() / submit_approval
 
 桌面宽屏下，`App.tsx` 将当前业务页和 `LearningSidebar` 放入 `app-learning-layout`。侧栏以 `position: sticky` 保持可见，窄屏（1100px 以下）降级为主内容下方。
 
-页面只通过 `onLearningEvent` 上报最近一次已有 handler 的操作，例如 `submitRetrieval()`、`submit()`、`handleApprove()`。LearningSidebar 显示该操作的关键 State、真实 API Path、Backend 调用链和源码位置；它不拦截全局 fetch、不保存历史，也不改变业务状态。
+页面只通过 `onLearningEvent` 上报最近一次已有 handler 的操作，例如 `submitUpload()`、`submitRetrieval()`、`submit()`、`handleApprove()`。LearningSidebar 显示当前页面用途、组件树、Props、输入、最近事件与关键 State、主要 API、Backend 调用链、结果解释、业务关系、源码和测试 Case；它不拦截全局 fetch、不保存历史，也不改变业务状态。
+
+业务页面与学习面板统一使用以下顺序：
+
+```text
+文書管理 → RAG検索 → 分析依頼 → 承認管理
+```
+
+其中顶部导航只经过 `App.tsx → changeView() → setActiveView() → activeView`，不发送 Backend API。分析依頼的初始 `IDLE` 表示尚未提交；`POST /api/tasks` 的 `202 Accepted` 表示 BackgroundTasks 已受理，SSE 收到 `done` 后才由 `loadReport()` 请求最终 report。
 
 RAG 的 `insufficient_context` 在面板中解释为：Backend 未找到足够相关 Chunk，可能是输入不匹配或文档尚未 Chunk；这不是页面故障。
 

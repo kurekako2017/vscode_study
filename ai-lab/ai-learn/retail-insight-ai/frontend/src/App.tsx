@@ -12,9 +12,9 @@ type ViewTab = "dashboard" | "analysis" | "documents" | "rag" | "approval";
 
 const navItems: Array<{ value: ViewTab; label: string }> = [
   { value: "dashboard", label: "学习总览" },
-  { value: "analysis", label: "分析依頼" },
   { value: "documents", label: "文書管理" },
   { value: "rag", label: "RAG検索" },
+  { value: "analysis", label: "分析依頼" },
   { value: "approval", label: "承認管理" },
 ];
 

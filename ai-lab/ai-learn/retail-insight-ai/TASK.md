@@ -1,6 +1,13 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-08
+最后更新：2026-07-12
+
+## 2026-07-12 Scenario01 Business Sample Data
+
+- [x] 生成 `docs/learning/sample-data/Scenario01_Sales_Decline/` 的 10 份企业业务学习文档
+- [x] 统一关东地区饮料销售下降的业务背景、数值口径和后续学习用途
+- [x] 保持 Scenario01 单一背景，不新增 Scenario02 或其他散乱主题
+- [x] 完成记录：这批文档用于 Documents、RAG、Analysis、Approval 与业务测试学习
 
 ## 2026-07-11 API Case 输入参数与 Learning Trace 对齐
 

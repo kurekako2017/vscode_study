@@ -1,7 +1,9 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
+import { LearningSidebar } from "./components/LearningSidebar";
+import { FakeEventSource, jsonResponse } from "./test/page-test-helpers";
 
 describe("App navigation", () => {
   afterEach(() => {
@@ -29,6 +31,85 @@ describe("App navigation", () => {
     expect(screen.getByRole("button", { name: "学习总览" })).toHaveAttribute("aria-current", "page");
     fireEvent.click(screen.getByRole("button", { name: "文書管理" }));
     expect(screen.getByRole("button", { name: "文書管理" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("uses the document-first enterprise navigation order", () => {
+    render(<App />);
+
+    expect(within(screen.getByRole("navigation", { name: "主要ページ" })).getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "学习总览",
+      "文書管理",
+      "RAG検索",
+      "分析依頼",
+      "承認管理",
+    ]);
+    expect(within(screen.getByLabelText("企业业务流程卡片")).getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "文書管理を開く",
+      "RAG検索を開く",
+      "分析依頼を開く",
+      "承認管理を開く",
+    ]);
+    expect(within(screen.getByLabelText("企业业务流程")).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      expect.stringContaining("1. 文書管理"),
+      expect.stringContaining("2. RAG検索"),
+      expect.stringContaining("3. 分析依頼"),
+      expect.stringContaining("4. 承認管理"),
+    ]);
+  });
+
+  it("explains each page step and the initial Tasks IDLE state", () => {
+    const { rerender } = render(<LearningSidebar page="documents" latestEvent={null} />);
+    expect(screen.getByText("当前业务步骤：1 / 4")).toBeInTheDocument();
+    expect(screen.getByText("DocumentsPage")).toBeInTheDocument();
+
+    rerender(<LearningSidebar page="rag" latestEvent={null} />);
+    expect(screen.getByText("当前业务步骤：2 / 4")).toBeInTheDocument();
+    expect(screen.getByText("RagPage")).toBeInTheDocument();
+
+    rerender(<LearningSidebar page="tasks" latestEvent={null} />);
+    expect(screen.getByText("当前业务步骤：3 / 4")).toBeInTheDocument();
+    expect(screen.getByText("TasksPage")).toBeInTheDocument();
+    expect(screen.getByText("IDLE：还没有提交任务。")).toBeInTheDocument();
+    expect(screen.getByText(/submit\(\) → createTask\(\) → POST \/api\/tasks → 202 Accepted/)).toBeInTheDocument();
+    expect(screen.getByText(/GET \/api\/tasks\/\{task_id\}\/events → SSE/)).toBeInTheDocument();
+    expect(screen.getByText(/GET \/api\/tasks\/\{task_id\}\/report → 200/)).toBeInTheDocument();
+
+    rerender(<LearningSidebar page="approval" latestEvent={null} />);
+    expect(screen.getByText("当前业务步骤：4 / 4")).toBeInTheDocument();
+    expect(screen.getByText("ApprovalPage")).toBeInTheDocument();
+  });
+
+  it("records the Tasks submit, SSE, and report API flow in the learning sidebar", async () => {
+    vi.stubGlobal("EventSource", FakeEventSource);
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(jsonResponse({
+        success: true, request_id: "request-task-create", data: { task_id: "task-learning-1", status: "queued" }, error: null,
+      }, 202))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-task-report",
+        data: { task_id: "task-learning-1", markdown: "# 学习报告", provider: "static", created_at: "2026-07-12T00:00:00Z" },
+        error: null,
+      }, 200)));
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "分析依頼" }));
+    fireEvent.change(screen.getByLabelText("確認したい経営課題"), { target: { value: "関東飲料の売上を確認" } });
+    fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
+
+    await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-learning-1/events"));
+    expect(screen.getAllByText("submit()").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Response Status：202 Accepted/)).toBeInTheDocument();
+
+    FakeEventSource.instance.emit("done", {
+      task_id: "task-learning-1", sequence: 1, event: "done", message: "Task completed",
+      status: "completed", request_id: "request-task-create", error_code: null,
+      node: null, report_path: "/api/tasks/task-learning-1/report", created_at: "2026-07-12T00:00:01Z",
+    });
+
+    expect(await screen.findByText("# 学习报告")).toBeInTheDocument();
+    expect(screen.getByText("loadReport()")).toBeInTheDocument();
+    expect(screen.getByText(/GET \/api\/tasks\/task-learning-1\/report/)).toBeInTheDocument();
   });
 
   it("navigates to tasks from dashboard shortcut", async () => {

@@ -1,6 +1,13 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-08
+最后更新：2026-07-12
+
+## 2026-07-12 Scenario01 Business Sample Data
+
+- [x] 为 ERIP 新增 `docs/learning/sample-data/Scenario01_Sales_Decline/` 企业业务学习样本文档
+- [x] 统一 2026 年 6 月关东饮料销售下降场景的销售、库存、促销、顾客、竞品、KPI、RAG、Analysis、Approval 与测试脚本口径
+- [x] 保持 Scenario01 背景一致，不扩展 Scenario02
+- [x] 完成记录：样本文档可直接用于 Documents 上传、RAG 检索、Analysis 输入、Approval 学习和业务流程测试
 
 ## 2026-07-11 API Case Input and Learning Trace Alignment
 

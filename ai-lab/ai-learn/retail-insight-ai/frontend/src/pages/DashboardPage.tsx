@@ -106,7 +106,7 @@ export function DashboardPage({ onNavigate, onLearningEvent }: DashboardPageProp
             <h2>企业业务流程</h2>
             <small>关东地区饮料分类销售额下降案例</small>
           </div>
-          <div className="dashboard-card-grid">
+          <div className="dashboard-card-grid" aria-label="企业业务流程卡片">
             {businessFlow.map((step) => (
               <article key={step.title} className="result-card dashboard-card">
                 <strong>{step.title}</strong>

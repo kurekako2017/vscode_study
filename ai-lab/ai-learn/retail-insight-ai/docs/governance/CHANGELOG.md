@@ -2,6 +2,12 @@
 
 # CHANGELOG
 
+## 2026-07-12 Scenario01 Business Sample Data
+
+- 新增 `docs/learning/sample-data/Scenario01_Sales_Decline/` 企业业务学习样本文档集。
+- 统一关东地区饮料销售下降场景的销售、库存、促销、顾客、竞品、KPI、RAG、Analysis、Approval 与业务测试脚本口径。
+- 仅补充学习资料，不修改 backend、frontend、API、Workflow 或业务逻辑。
+
 ## 2026-07-11 API Case Input and Learning Trace Alignment
 
 - 对齐 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的 24 个 API Case 输入参数说明。
