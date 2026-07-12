@@ -37,6 +37,9 @@ describe("TasksPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<TasksPage />);
+    expect(screen.getByText("TASK-BIZ-001")).toBeInTheDocument();
+    expect(screen.getByText("POST /api/tasks")).toBeInTheDocument();
+    expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
 
     await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-1/events"));

@@ -62,6 +62,9 @@ describe("DocumentsPage", () => {
     expect(await screen.findByText("Monthly Policy")).toBeInTheDocument();
     expect(await screen.findByText("Chunk 数")).toBeInTheDocument();
     expect(await screen.findByText("Paragraph one")).toBeInTheDocument();
+    expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
+    expect(screen.getByText("DOC-BIZ-001")).toBeInTheDocument();
+    expect(screen.getAllByText(/POST \/api\/v1\/documents/).length).toBeGreaterThan(0);
   });
 
   it("shows empty state when there are no documents", async () => {

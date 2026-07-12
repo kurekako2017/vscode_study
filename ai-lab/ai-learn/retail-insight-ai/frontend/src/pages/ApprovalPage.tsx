@@ -9,6 +9,7 @@ import {
   requestApprovalRevision,
   submitApproval,
 } from "../api";
+import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
@@ -421,6 +422,36 @@ export function ApprovalPage() {
         </section>
       </section>
       </section>
+
+      <BusinessLearningPanel
+        pageName="承認管理"
+        purpose="将已完成的经营分析报告提交给负责人审批，并保留 approval_id、报告版本和审批审计事实。"
+        scenario="关东饮料销售下降分析完成后，负责人手动输入 task_id 提交承认依赖，再根据审核结果执行承認、却下或修正依頼。"
+        prerequisites="分析依頼已经完成并生成 report。当前用户是系统既定用户；Approval API 的 RBAC 已生效，权限不足会返回 403。"
+        relationship="本页使用分析依頼产生的 task_id，创建 approval_id 和 report_version_id。task_id 当前不从 TasksPage 自动传入，必须手动复制；批准结果不自动回写到 Documents 或 RAG 页面。"
+        cases={[
+          { id: "APR-BIZ-001", purpose: "正常提交关东饮料报告审批。", input: "输入已完成报告的 Task ID，填写可选コメント，点击「承認依頼を送信」。", expected: "POST 返回 approval_id、report_version_id、pending_approval；列表和详情刷新。" },
+          { id: "APR-BIZ-002", purpose: "确认提交必填项。", input: "清空 Task ID。", expected: "提交按钮不可点击，不发送请求。" },
+          { id: "APR-BIZ-003", purpose: "确认不存在或未完成报告。", input: "输入不存在 task_id 或尚未完成任务。", expected: "Backend 返回实际 404／409 等业务错误，页面显示结构化错误。" },
+          { id: "APR-BIZ-004", purpose: "确认审批状态机和权限错误。", input: "对 pending_approval 点击「承認」或「却下」；或用无权限用户调用。", expected: "成功时状态刷新；重复决策返回实际 409，权限不足返回 403 permission_denied。" },
+          { id: "APR-BIZ-005", purpose: "确认修正依頼与刷新。", input: "对 rejected 记录输入修正理由并点击「修正依頼」，或点击「再試行 / 更新」。", expected: "修正成功返回新的 report_version_id；刷新只重新读取列表／详情，不改变审批状态。" },
+        ]}
+        flows={[
+          {
+            title: "审批列表、详情与提交",
+            api: "GET /api/v1/approvals；GET /api/v1/approvals/{approval_id}；POST /api/v1/reports/{task_id}/submit-approval",
+            frontend: ["ApprovalPage loadApprovals() / loadApprovalDetail() / handleSubmitApproval()", "listApprovals() / getApproval() / submitApproval()", "setApprovals / setSelectedApproval / banner"],
+            backend: ["approvals.py list_approvals() / get_approval() / submit_approval()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.list_approvals() / get_approval() / submit_approval()", "InMemoryApprovalRepository"],
+          },
+          {
+            title: "承認、却下与修正依頼",
+            api: "POST /api/v1/approvals/{approval_id}/approve；POST /api/v1/approvals/{approval_id}/reject；POST /api/v1/reports/{task_id}/revise",
+            frontend: ["handleApprove() / handleReject() / handleRevise()", "approveApproval() / rejectApproval() / requestApprovalRevision()", "refreshAfterChange()"],
+            backend: ["approvals.py approve() / reject() / revise()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.approve() / reject() / revise()", "InMemoryApprovalRepository.save_approval_request() / save_report_version() / save_approval_event()"],
+            note: "审批 API 的授权与审计包装在 Router 层；当前页面不显示独立审计日志列表。",
+          },
+        ]}
+      />
     </>
   );
 }

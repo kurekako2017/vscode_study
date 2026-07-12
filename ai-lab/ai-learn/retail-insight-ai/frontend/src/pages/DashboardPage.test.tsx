@@ -26,6 +26,14 @@ describe("DashboardPage", () => {
     expect(screen.getByRole("button", { name: "承認管理を開く" })).toBeInTheDocument();
   });
 
+  it("shows the enterprise business flow and end-to-end learning case", () => {
+    render(<DashboardPage onNavigate={vi.fn()} />);
+
+    expect(screen.getByRole("heading", { name: "企业业务流程" })).toBeInTheDocument();
+    expect(screen.getByText("ERIP-E2E-001")).toBeInTheDocument();
+    expect(screen.getByText("当前未连接：前端没有单独的最终审计报告汇总页面。")).toBeInTheDocument();
+  });
+
   it("sends navigation target when shortcut buttons are clicked", () => {
     const onNavigate = vi.fn();
     render(<DashboardPage onNavigate={onNavigate} />);

@@ -36,6 +36,9 @@ describe("ApprovalPage", () => {
     expect(await screen.findByText("approval-1")).toBeInTheDocument();
     expect(await screen.findByText("report-version-1")).toBeInTheDocument();
     expect(await screen.findByText("監査フィールドはこの API レスポンスに直接含まれません。")).toBeInTheDocument();
+    expect(screen.getByText("APR-BIZ-001")).toBeInTheDocument();
+    expect(screen.getByText(/POST \/api\/v1\/reports\/\{task_id\}\/submit-approval/)).toBeInTheDocument();
+    expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
   });
 
   it("shows approval empty state and list retry error", async () => {

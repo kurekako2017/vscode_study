@@ -1,2899 +1,425 @@
-# 页面操作与源码对应学习指南
+# ERIP 前端页面、企业业务测试与源码学习指南
 
-这份文档只回答一个问题：
+## 1. 这份文档解决什么问题
 
-“我在浏览器里点了一个按钮以后，程序到底依次经过哪些源码文件？”
+本指南把浏览器中的实际操作，连接到 React、API Client 和 FastAPI 源码。
 
-它不是 React 教程，也不是 FastAPI 教程，更不是 API 字段手册。
-
-它面向三类读者：
-
-- 前端初学者
-- 后端初学者
-- 刚进入项目的新成员
-
-本文所有函数名、路径、调用顺序，都以当前源码为准。
-
----
-
-## 1. 文档使用方法
-
-推荐你一边打开页面，一边对照本文阅读。
-
-最有效的学习顺序是：
-
-1. 先看页面上能点什么
-2. 再看对应的 React 事件入口
-3. 再看 `frontend/src/api.ts`
-4. 再看 FastAPI Router
-5. 再看 Service
-6. 再看 Repository / Workflow
-7. 最后看对应测试
-
-如果你看不懂某个页面，先不要从后端开始钻。先在页面里找到按钮，再回到源码找这个按钮绑定了哪个函数。
-
----
-
-## 2. 启动系统并打开页面
-
-推荐按项目已有脚本启动。
-
-Backend：
-
-```bash
-./scripts/start_backend.sh
-```
-
-Frontend：
-
-```bash
-./scripts/start_frontend.sh
-```
-
-上面两个命令来自真实脚本：
-
-- `scripts/start_backend.sh`
-- `scripts/start_frontend.sh`
-
-Backend 手动启动命令在当前 Runbook 中也有明确写法：
-
-```bash
-cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-相关源码路径：
-
-- `scripts/start_backend.sh`
-- `scripts/start_frontend.sh`
-- `docs/learning/01_Foundation/RUNBOOK_LOCAL.md`
-- `frontend/package.json`
-
-打开地址：
-
-- Backend Swagger: `http://127.0.0.1:8000/docs`
-- Frontend: `http://127.0.0.1:5173`
-
----
-
-## 3. 前端整体结构
-
-当前前端不是 React Router 架构。
-
-它是最小页面切换结构：
+学习目标不是记住页面文案，而是能回答：
 
 ```text
-App.tsx
-→ 顶部导航按钮
-→ 根据 activeView 渲染不同页面组件
+用户在什么页面输入什么？
+→ React 哪个事件处理函数接收输入？
+→ frontend/src/api.ts 发出哪个 HTTP 请求？
+→ Backend 的 Router、Service、Repository / Workflow 如何处理？
+→ 页面最终显示哪些真实字段或错误？
 ```
 
-真实入口：
+当前系统正式名称是 **Enterprise Retail Intelligence Platform（ERIP）**。Dashboard 是中文的学习总览；业务操作 UI 保持日语。技术名词如 React、FastAPI、SSE、RAG、InMemory、LLM 保持英文。
 
-- `frontend/src/App.tsx`
+## 2. ERIP 页面与企业业务流程总览
 
-真实页面组件：
-
-- `frontend/src/pages/DashboardPage.tsx`
-- `frontend/src/pages/TasksPage.tsx`
-- `frontend/src/pages/DocumentsPage.tsx`
-- `frontend/src/pages/RagPage.tsx`
-- `frontend/src/pages/ApprovalPage.tsx`
-
-公共组件：
-
-- `frontend/src/components/PageHeader.tsx`
-- `frontend/src/components/StatusBadge.tsx`
-- `frontend/src/components/StatusBanner.tsx`
-
-统一 API Client：
-
-- `frontend/src/api.ts`
-
-统一类型定义：
-
-- `frontend/src/types.ts`
-
-整体页面图：
-
-```mermaid
-flowchart LR
-    A[Browser] --> B[frontend/src/App.tsx]
-    B --> C[DashboardPage]
-    B --> D[TasksPage]
-    B --> E[DocumentsPage]
-    B --> F[RagPage]
-    B --> G[ApprovalPage]
-    C --> H[PageHeader / StatusBadge]
-    D --> I[api.ts]
-    E --> I
-    F --> I
-    G --> I
-    I --> J[FastAPI Routers]
-```
-
----
-
-## 4. Dashboard 页面
-
-### 4.1 页面操作
-
-你在顶部默认先看到 Dashboard。
-
-你可以点击：
-
-- Open Tasks
-- Open Documents
-- Open RAG
-- Open Approval
-
-### 4.2 用户在页面看到什么
-
-当前 Dashboard 显示的是“当前系统能力说明”，不是实时监控大屏。
-
-真实展示重点包括：
-
-- Repository: InMemory
-- Research Provider: Static
-- Retrieval: Keyword
-- RAG Answer: Deterministic
-- Identity: System placeholder user
-- Real LLM: Disabled
-- PostgreSQL: Not verified
-- pgvector: Not implemented
-
-所以这页的作用是“先告诉你当前系统边界”，不是去后端拉统计数据。
-
-### 4.3 React 事件入口
-
-默认显示 Dashboard 的入口在：
-
-- `frontend/src/App.tsx`
-
-真实逻辑：
+统一案例：某零售企业发现**关东地区饮料分类销售额下降**，需要登记资料、验证内部检索、生成经营分析、提交负责人审批，并保留可追踪依据。
 
 ```text
-useState<ViewTab>("dashboard")
+文書管理
+  产生：document_id、import_id、Chunk
+  ↓ 手动衔接（输入相同的检索条件）
+RAG検索
+  读取：Chunk；返回：document_id、chunk_id、citation
+  ↓ 手动衔接（把结论写入分析问题）
+分析依頼
+  产生：task_id、SSE 进度、report
+  ↓ 手动衔接（复制已完成的 task_id）
+承認管理
+  产生：approval_id、report_version_id、审批事件
+  ↓
+最终可审计报告
+  当前未连接：没有单独的前端汇总页
 ```
 
-快捷入口的点击处理也在 `App.tsx`，通过 `setActiveView()` 切页。
+这里的“手动衔接”非常重要：当前前端没有自动把 `document_id`、RAG citation 或 `task_id` 带到下一页。不要把四个独立 API 页面误解为已实现的端到端自动编排。
 
-### 4.4 页面组件调用的函数
+| 页面     | 主要对象                                    | 当前连接状态                             |
+| -------- | ------------------------------------------- | ---------------------------------------- |
+| 文書管理 | `document_id`、`import_id`、Chunk       | 文档和 Chunk 在 Backend 内已连接         |
+| RAG検索  | `document_id`、`chunk_id`、`citation` | 与文档通过存储数据连接；前端条件手动输入 |
+| 分析依頼 | `task_id`、`report`                     | 当前不读取 RAG 的答案或 citation         |
+| 承認管理 | `approval_id`、`report_version_id`      | 手动输入 TasksPage 产生的`task_id`     |
+
+## 3. App.tsx 如何决定显示哪个页面
+
+页面入口：`frontend/src/App.tsx`。
+
+页面看到什么
+→ 顶部导航的「学习总览」「分析依頼」「文書管理」「RAG検索」「承認管理」。
+
+点击后发生什么
+→ `setActiveView()` 改变本地 `useState`。
+
+调用哪个 API
+→ 不调用 API。导航只是 React 本地状态切换。
+
+Backend 经过什么
+→ 不经过 Backend。
+
+返回后页面怎么变化
+→ `App` 根据 `activeView` 渲染对应 Page Component。各页面自己的 `useEffect` 或提交动作才可能发请求。
+
+关键代码：
+
+```tsx
+const [activeView, setActiveView] = useState<ViewTab>("dashboard");
+{activeView === "documents" && <DocumentsPage />}
+```
+
+源码阅读顺序：
+
+1. `frontend/src/App.tsx`
+2. `frontend/src/pages/DashboardPage.tsx`
+3. `frontend/src/pages/DocumentsPage.tsx`
+4. `frontend/src/pages/RagPage.tsx`
+5. `frontend/src/pages/TasksPage.tsx`
+6. `frontend/src/pages/ApprovalPage.tsx`
+7. `frontend/src/api.ts`
+
+## 4. DashboardPage 学习什么
+
+文件：`frontend/src/pages/DashboardPage.tsx`
+
+页面看到什么
+→ 「企业业务流程」「推荐学习顺序」「企业综合测试案例 ERIP-E2E-001」以及当前能力边界。
+
+点击后发生什么
+→ 流程卡片调用 `onNavigate(target)`，由 `App.tsx` 切换到业务页面。
+
+调用哪个 API
+→ Dashboard 本身不调用 API。
+
+Backend 经过什么
+→ 不经过 Backend。
+
+返回后页面怎么变化
+→ 跳转到对应页面；真正的数据请求由目标页面发起。
+
+应确认的真实边界：
+
+- 数据存储是 `InMemory`。
+- 检索方式是 Keyword Retrieval。
+- Internal RAG 回答是 deterministic assembly。
+- 真实 LLM 未启用。
+- PostgreSQL 在当前运行环境尚未验证，`pgvector` 尚未实现。
+
+## 5. DocumentsPage：页面操作 → React → API → Backend → 结果
+
+文件：`frontend/src/pages/DocumentsPage.tsx`
+
+### 5.1 在页面做什么
+
+1. 在「文書アップロード」选择 `関東飲料売上分析.md`。
+2. 填写タイトル、担当者、言語，点击「文書をアップロード」。
+3. 确认列表出现标题与 `document_id`。
+4. 对选中的文档执行 Import、Chunk，确认 Chunk 预览。
+5. 必要时执行「アーカイブ」。
+
+### 5.2 上传流程
+
+页面看到什么
+→ 文件、标题、担当者、标签和上传结果。
+
+点击后发生什么
+→ `submitUpload()` 读取 `File` 和 metadata，调用 `uploadDocument()`；成功后调用 `loadDocuments(false)` 并选中返回的 `document_id`。
+
+调用哪个 API
 
 ```text
-Browser
-→ App.tsx
-→ DashboardPage.tsx
-→ onNavigate("analysis" | "documents" | "rag" | "approval")
-→ App.tsx setActiveView()
-→ React 重新渲染目标页面
+POST /api/v1/documents
+multipart: file、metadata、可选 Idempotency-Key
+成功：201，data.upload_id、data.document_id、data.status
 ```
 
-### 4.5 api.ts 调用
-
-本功能不调用 `api.ts`。
-
-### 4.6 HTTP Method 和 API Path
-
-本功能没有 HTTP 请求。
-
-### 4.7 FastAPI Router
-
-本功能不经过 Router。
-
-### 4.8 Service
-
-本功能不经过 Service。
-
-### 4.9 Repository
-
-本功能不经过 Repository。
-
-### 4.10 Workflow
-
-本功能不经过 Workflow。
-
-### 4.11 Response 返回
-
-本功能没有后端 Response。
-
-### 4.12 React State 更新
-
-`App.tsx` 中的 `activeView` 变化后，React 重新渲染目标页面。
-
-### 4.13 页面重新渲染
-
-渲染结果来自：
-
-- `frontend/src/pages/DashboardPage.tsx`
-- `frontend/src/components/PageHeader.tsx`
-- `frontend/src/components/StatusBadge.tsx`
-
-### 4.14 对应测试
-
-- `frontend/src/App.test.tsx`
-- `frontend/src/pages/DashboardPage.test.tsx`
-
-重点测试：
-
-- `shows dashboard by default with current runtime facts`
-- `highlights the current page in top navigation`
-- `sends navigation target when shortcut buttons are clicked`
-
-### 4.15 完整源码路径
-
-- `frontend/src/App.tsx`
-- `frontend/src/pages/DashboardPage.tsx`
-- `frontend/src/components/PageHeader.tsx`
-- `frontend/src/components/StatusBadge.tsx`
-
-### 4.16 如何在浏览器 Network 中验证
-
-这个功能没有网络请求。
-
-你应该在 Network 里看到“没有新请求，但页面已经切换”。这正是前端本地状态切换的证据。
-
----
-
-## 5. Analysis / Tasks 页面
-
-这一页是当前前端最重要的主链路页面。
-
-它展示的是：
+Backend 经过什么
 
 ```text
-Create Task
-→ BackgroundTasks
-→ Workflow
-→ SSE
-→ Get Report
+backend/app/api/documents.py upload_document()
+→ backend/app/services/document_upload_service.py DocumentUploadService.upload_document()
+→ backend/app/repositories/implementations/in_memory/document_repository.py InMemoryDocumentRepository.create()
+→ DocumentUploadSessionResponse
 ```
 
-### 5.1 创建 Task
+返回后页面怎么变化
+→ 成功提示显示真实 `document_id`，列表刷新。后端错误经 `ApiClientError` 显示 code 和 message。
 
-#### 页面操作
+### 5.3 列表、详情、Import、Chunk、归档
 
-输入问题，选择 mode，点击“分析を開始”。
+| 页面操作   | React / API                                               | 实际 Backend 链                                                                                                                                    |
+| ---------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 加载列表   | `loadDocuments()` → `listDocuments()`                | `documents.py list_documents()` → `DocumentReadService.list_documents()` → `InMemoryDocumentRepository.list_all()`                         |
+| 选择详情   | `refreshSelectedDocument()` → `getDocument()`        | `documents.py get_document()` → `DocumentReadService.get_document()` → `InMemoryDocumentRepository.get()`                                  |
+| Import     | `runDocumentAction("import")` → `importDocument()`   | `document_imports.py import_document()` → `DocumentImportService.import_document()` → 文档 Repository 的真实 get/update                      |
+| Chunk      | `runDocumentAction("chunk")` → `chunkDocument()`     | `document_chunks.py chunk_document()` → `DocumentChunkService.chunk_document()` → `InMemoryDocumentChunkRepository.replace_for_document()` |
+| 读取 Chunk | `refreshSelectedDocument()` → `getDocumentChunks()`  | `document_chunks.py get_document_chunks()` → `DocumentChunkService.get_chunks()` → `InMemoryDocumentChunkRepository.list_for_document()`   |
+| 归档       | `runDocumentAction("archive")` → `archiveDocument()` | `documents.py archive_document()` → `DocumentArchiveService.archive_document()` → `InMemoryDocumentRepository.update()`                    |
 
-#### 用户在页面看到什么
+注意：Chunk 当前要求 `validated` 的 markdown/text。文档不存在是实际 404；已归档、未验证或不支持的类型会走 Backend 的真实业务错误。
 
-页面会进入执行中状态。
+### 5.4 建议企业测试 Case
 
-你会看到：
+- `DOC-BIZ-001`：上传关东饮料销售资料，确认 `upload_id`、`document_id` 和列表刷新。
+- `DOC-BIZ-002`：清空必填项，确认按钮不可点击或显示 Backend 校验错误。
+- `DOC-BIZ-003`：读取不存在 `document_id`，确认 404 错误显示。
+- `DOC-BIZ-004`：对不满足前置条件的文档 Chunk，确认业务错误。
+- `DOC-BIZ-005`：归档后勾选「アーカイブ済みを含める」，确认 202 的状态变化。
 
-- 任务状态从 `queued` / `running` 变化
-- 事件时间线逐步增加
-- 最后出现报告
+## 6. RagPage：页面操作 → React → API → Backend → 结果
 
-#### React 事件入口
+文件：`frontend/src/pages/RagPage.tsx`
 
-- `frontend/src/pages/TasksPage.tsx`
-- 函数：`submit()`
+### 6.1 页面操作
 
-#### 页面组件调用的函数
+先在 DocumentsPage 准备可检索 Chunk，再输入：
 
 ```text
-TasksPage.submit()
-→ createTask(question, mode)
-→ subscribeToTask(taskId, handlers)
+検索語：関東地域の飲料カテゴリの売上減少
+取得件数：5
+質問：関東地域の飲料カテゴリの売上減少の主な原因は何ですか。
+回答方式：extractive
+引用を必須にする：true
 ```
 
-#### api.ts 调用
+### 6.2 Document Retrieval
 
-- `createTask()`
-- `subscribeToTask()`
-- `getReport()`
+页面看到什么
+→ 文書 ID、Chunk ID、score、source、metadata 和 retrieval mode。
 
-#### HTTP Method 和 API Path
+点击后发生什么
+→ `submitRetrieval()` 读取表单，调用 `searchDocumentRetrieval()`，然后 `setRetrievalResult(response)`。
 
-- `POST /api/tasks`
-- `GET /api/tasks/{task_id}/events`
-- `GET /api/tasks/{task_id}/report`
-
-#### FastAPI Router
-
-- `backend/app/api/tasks.py`
-  - `create_task()`
-  - `get_task_events()`
-  - `get_report()`
-
-#### Service
-
-- `backend/app/services/task_service.py`
-  - `TaskService.create_task()`
-  - `TaskService.run_task()`
-  - `TaskService.get_report()`
-
-#### Repository
-
-- `backend/app/repositories/implementations/in_memory/task_repository.py`
-  - `create()`
-  - `save()`
-  - `get()`
-- `backend/app/repositories/implementations/in_memory/event_repository.py`
-  - SSE 事件存储
-- `backend/app/repositories/implementations/in_memory/report_repository.py`
-  - `get()`
-
-#### Workflow
-
-本功能经过 Workflow。
-
-真实 Workflow 入口：
-
-- `backend/app/workflow/graph.py`
-  - `AnalysisWorkflow`
-  - `_route_node()`
-  - `_kpi_node()`
-  - `_research_node()`
-  - `_report_node()`
-
-节点顺序不是固定四步直线，而是按 `mode` 决定分支：
-
-- `research` 模式：`route → research → report`
-- `kpi` 模式：`route → kpi → report`
-- `hybrid` 模式：`route → kpi → research → report`
-
-#### Response 返回
-
-`POST /api/tasks` 返回 `202 Accepted`。
-
-这说明：
-
-- 后端已经接受任务
-- 但报告还没有准备好
-
-不是一个请求直接把最终 Markdown 报告返回给前端。
-
-#### React State 更新
-
-`TasksPage` 会更新：
-
-- `taskId`
-- `status`
-- `events`
-- `report`
-- `error`
-
-#### 页面重新渲染
-
-SSE 每来一条事件，时间线就刷新一次。
-
-收到 `done` 事件后，前端会再调用 `getReport()` 取最终报告。
-
-这也是为什么“done 事件后还要再请求 report”：
-
-- SSE 只负责进度事件
-- 最终大段报告通过普通 GET 获取
-
-#### 对应测试
-
-- `frontend/src/pages/TasksPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-重点测试：
-
-- `creates a task, consumes SSE, and renders the report`
-
-#### 完整源码路径
-
-- `frontend/src/pages/TasksPage.tsx`
-- `frontend/src/api.ts`
-- `backend/app/api/tasks.py`
-- `backend/app/services/task_service.py`
-- `backend/app/workflow/graph.py`
-- `backend/app/workflow/state.py`
-
-#### 如何在浏览器 Network 中验证
-
-1. 打开 Tasks 页面
-2. 点击“分析を開始”
-3. 在 Network 中看见 `POST /api/tasks`
-4. 再看见 `GET /api/tasks/{task_id}/events`
-5. 最后看见 `GET /api/tasks/{task_id}/report`
-
-你会发现：
-
-- SSE 请求会一直保持打开一段时间
-- report 请求只在 done 之后出现
-
-### 5.2 Task → SSE → Report 主链路图
-
-```mermaid
-sequenceDiagram
-    participant U as Browser
-    participant T as TasksPage.tsx
-    participant A as frontend/src/api.ts
-    participant R as backend/app/api/tasks.py
-    participant S as TaskService
-    participant W as AnalysisWorkflow
-    participant E as SSE / EventRepository
-    participant P as ReportRepository
-
-    U->>T: 点击 分析を開始
-    T->>A: createTask(question, mode)
-    A->>R: POST /api/tasks
-    R->>S: create_task()
-    S->>S: 保存 Task
-    R->>S: BackgroundTasks.add_task(run_task)
-    R-->>T: HTTP 202
-    T->>A: subscribeToTask(taskId)
-    A->>R: GET /api/tasks/{task_id}/events
-    S->>W: run_task()
-    W->>E: route / kpi / research / report 事件
-    E-->>T: status / done / error
-    T->>A: getReport(taskId)
-    A->>R: GET /api/tasks/{task_id}/report
-    R->>S: get_report()
-    S->>P: get(taskId)
-    P-->>T: markdown report
-```
-
-### 5.3 SSE 与普通 GET 的区别
-
-SSE：
-
-- 长连接
-- 连续接收事件
-- 适合进度更新
-
-普通 GET：
-
-- 一次请求拿一次结果
-- 适合最终报告、详情页、列表页
-
-当前源码里，`subscribeToTask()` 使用的是：
-
-- `new EventSource(/api/tasks/${taskId}/events)`
-
-这不是普通 `fetch()`。
-
----
-
-## 6. Documents 页面
-
-这一页负责文档主链路：
-
-- 列表
-- 上传
-- 详情
-- Archive
-- Import
-- Chunk
-- Chunk 预览
-
-### 6.1 Document 列表
-
-#### 页面操作
-
-进入 Documents 页面，页面会自动加载列表。
-
-#### 用户在页面看到什么
-
-你会看到：
-
-- 文档标题
-- document_id
-- 状态
-- 文档类型
-- 更新时间
-
-#### React 事件入口
-
-- `frontend/src/pages/DocumentsPage.tsx`
-- `useEffect(() => { void loadDocuments(true); }, [showArchived])`
-
-#### 页面组件调用的函数
+调用哪个 API
 
 ```text
-DocumentsPage
-→ loadDocuments()
-→ listDocuments({ include_archived: showArchived })
+POST /api/v1/document-retrieval/search
+JSON：query、limit、include_archived、document_type、language、tags
+成功：200，results、total、query、retrieval_mode
 ```
 
-#### api.ts 调用
-
-- `listDocuments()`
-
-#### HTTP Method 和 API Path
-
-- `GET /api/v1/documents`
-
-#### FastAPI Router
-
-- `backend/app/api/documents.py`
-  - `list_documents()`
-
-#### Service
-
-- `backend/app/services/document_read_service.py`
-  - `DocumentReadService.list_documents()`
-
-#### Repository
-
-- `backend/app/repositories/implementations/in_memory/document_repository.py`
-  - `list_all()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Response 返回
-
-返回 `DocumentListResponse`：
-
-- `items`
-- `next_cursor`
-
-#### React State 更新
-
-更新：
-
-- `documents`
-- `selectedDocumentId`
-- `documentsLoading`
-- `documentsError`
-
-#### 页面重新渲染
-
-列表区域刷新。
-
-#### 对应测试
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-  - `shows document list, detail, and chunk count`
-  - `shows empty state when there are no documents`
-  - `shows document list API error and allows refresh retry`
-
-#### 完整源码路径
-
-- `frontend/src/pages/DocumentsPage.tsx`
-- `frontend/src/api.ts`
-- `backend/app/api/documents.py`
-- `backend/app/services/document_read_service.py`
-- `backend/app/repositories/implementations/in_memory/document_repository.py`
-
-#### 如何在浏览器 Network 中验证
-
-打开 Documents 页面后，直接看：
-
-- `GET /api/v1/documents`
-
----
-
-### 6.2 Document 详情
-
-#### 页面操作
-
-点击列表中的某一条文档。
-
-#### 用户在页面看到什么
-
-详情区会显示真实后端返回的文档字段。
-
-同时页面还会单独加载 chunk 列表。
-
-#### React 事件入口
-
-- `setSelectedDocumentId(document.document_id)`
-- `useEffect(() => { void refreshSelectedDocument(selectedDocumentId); }, [selectedDocumentId])`
-
-#### 页面组件调用的函数
+Backend 经过什么
 
 ```text
-DocumentsPage
-→ refreshSelectedDocument(documentId)
-→ getDocument(documentId)
-→ getDocumentChunks(documentId)
+backend/app/api/document_retrieval.py search_documents()
+→ backend/app/services/document_retrieval_service.py DocumentRetrievalService.search()
+→ DocumentRetrievalProvider.search()
+→ backend/app/repositories/implementations/in_memory/document_retrieval.py InMemoryKeywordRetrieval.search()
 ```
 
-#### api.ts 调用
+返回后页面怎么变化
+→ 有结果时显示真实 Chunk 摘要；无结果时 `results` 是空数组，页面显示「検索結果はありません。」。
 
-- `getDocument()`
-- `getDocumentChunks()`
+### 6.3 Internal RAG Answer
 
-#### HTTP Method 和 API Path
+页面看到什么
+→ answer、confidence、warnings、citation。
 
-- `GET /api/v1/documents/{document_id}`
-- `GET /api/v1/documents/{document_id}/chunks`
+点击后发生什么
+→ `submitInternalRag()` 调用 `answerInternalRag()`，再 `setRagResult(response)`。
 
-#### FastAPI Router
-
-- `backend/app/api/documents.py`
-  - `get_document()`
-- `backend/app/api/document_chunks.py`
-  - `get_document_chunks()`
-
-#### Service
-
-- `backend/app/services/document_read_service.py`
-  - `get_document()`
-- `backend/app/services/document_chunk_service.py`
-  - `get_chunks()`
-
-#### Repository
-
-- `InMemoryDocumentRepository.get()`
-- `InMemoryDocumentChunkRepository.list_for_document()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Response 返回
-
-详情和 chunk 数量来自两个真实接口，不是前端拼出来的假数据。
-
-#### React State 更新
-
-更新：
-
-- `selectedDocument`
-- `chunkData`
-- `detailError`
-- `chunkError`
-
-#### 页面重新渲染
-
-详情区和 chunk 预览区一起刷新。
-
-#### 对应测试
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-  - `shows document list, detail, and chunk count`
-
-#### 如何在浏览器 Network 中验证
-
-点击列表项后，观察两个请求：
-
-- `GET /api/v1/documents/{document_id}`
-- `GET /api/v1/documents/{document_id}/chunks`
-
-### 6.3 Document 上传
-
-这是 Documents 页面里最值得重点学习的一条链路。
-
-#### 页面操作
-
-1. 选择文件
-2. 填写标题、Owner、Language、Tags
-3. 点击 `Upload Document`
-
-#### 用户在页面看到什么
-
-上传中按钮会禁用。
-
-成功后会看到：
-
-- `Upload completed: <document_id>`
-
-然后列表刷新，刚上传的文档会出现在列表里。
-
-#### React 事件入口
-
-- `frontend/src/pages/DocumentsPage.tsx`
-- 函数：`submitUpload()`
-
-#### 页面组件调用的函数
+调用哪个 API
 
 ```text
-用户选择文件
-→ DocumentsPage submitUpload()
-→ uploadDocument(...)
-→ listDocuments(...)
-→ setSelectedDocumentId(session.document_id)
-→ refreshSelectedDocument(document_id)
+POST /api/v1/internal-rag/answer
+JSON：question、limit、filters、answer_mode、require_citations
+成功：200，answer、citations、retrieval_mode、answer_mode、confidence、warnings
 ```
 
-#### api.ts 调用
-
-- `uploadDocument()`
-- `listDocuments()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/documents`
-- 上传成功后再次请求 `GET /api/v1/documents`
-
-#### FastAPI Router
-
-- `backend/app/api/documents.py`
-  - `upload_document()`
-
-#### Service
-
-- `backend/app/services/document_upload_service.py`
-  - `DocumentUploadService.upload_document()`
-
-#### Repository
-
-- `InMemoryDocumentRepository.find_by_checksum()`
-- `InMemoryDocumentRepository.create()`
-
-上传后刷新列表时还会再走：
-
-- `DocumentReadService.list_documents()`
-- `InMemoryDocumentRepository.list_all()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Response 返回
-
-上传接口返回的是：
-
-- `DocumentUploadSessionResponse`
-
-当前前端只用它来拿：
-
-- `document_id`
-- `status`
-
-然后立刻刷新列表。
-
-#### React State 更新
-
-更新：
-
-- `uploading`
-- `uploadError`
-- `bannerMessage`
-- `documents`
-- `selectedDocumentId`
-
-#### 页面重新渲染
-
-成功后至少会看到三次 UI 变化：
-
-1. 按钮变成上传中
-2. 成功 banner 出现
-3. 列表刷新并出现新文档
-
-#### 对应测试
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-  - `uploads a document successfully and refreshes the list`
-- `frontend/src/api.test.ts`
-  - `uploads document with multipart form data`
-
-#### 完整源码路径
-
-- `frontend/src/pages/DocumentsPage.tsx`
-- `frontend/src/api.ts`
-- `backend/app/api/documents.py`
-- `backend/app/services/document_upload_service.py`
-- `backend/app/repositories/implementations/in_memory/document_repository.py`
-
-#### 如何在浏览器 Network 中验证
-
-1. 打开 Network
-2. 上传文件
-3. 看 `POST /api/v1/documents`
-4. 点开 Request Payload
-5. 你会看到它不是 JSON，而是 `multipart/form-data`
-6. 上传成功后，再看一次 `GET /api/v1/documents`
-
-#### 为什么 metadata 用 multipart，不用 JSON 上传文件
-
-因为这里既要传文件二进制，也要传结构化 metadata。
-
-当前真实前端实现是：
+Backend 经过什么
 
 ```text
-FormData
-├── file
-└── metadata(JSON string)
+backend/app/api/internal_rag.py answer_internal_rag()
+→ backend/app/services/internal_rag_service.py InternalRagService.answer()
+→ DocumentRetrievalProvider.search()
+→ RAGAnswerGenerator.generate()
+→ InternalRagEvaluationService
 ```
 
-这正对应后端 Router 的真实签名：
+返回后页面怎么变化
+→ 页面只渲染 Backend 返回的 answer/citations，不自行拼装答案。资料不足时显示实际 `insufficient_context` 等错误。
 
-- `file: UploadFile = File(...)`
-- `metadata: str = Form(...)`
-
-#### 为什么列表没有伪造 chunk count
-
-因为文档列表接口没有直接返回 chunk 数量。
-
-当前页面选择的做法是：
-
-- 先显示真实文档列表
-- 进入详情后，再调用 chunk 接口拿真实 chunk 数据
-
-这比在前端“猜一个 chunk 数”更可靠。
-
-### 6.4 Archive
-
-#### 页面操作
-
-点击 `Archive`。
-
-#### 用户在页面看到什么
-
-成功后会看到：
-
-- `Archive accepted: <document_id> (archived)`
-
-然后列表和详情都会刷新。
-
-#### React 事件入口
-
-- `runDocumentAction("archive")`
-
-#### 页面组件调用的函数
+### 6.4 清除按钮为什么没有 Network 请求
 
 ```text
-DocumentsPage
-→ runDocumentAction("archive")
-→ archiveDocument(document_id)
-→ loadDocuments(false)
-→ refreshSelectedDocument(document_id)
+「結果をクリア」 → setRetrievalResult(null) → 不请求 Backend
+「回答をクリア」 → setRagResult(null) → 不请求 Backend
 ```
 
-#### api.ts 调用
+这是页面状态操作，不是业务数据删除。
 
-- `archiveDocument()`
+### 6.5 建议企业测试 Case
 
-#### HTTP Method 和 API Path
+- `RAG-BIZ-001`：检索关东饮料资料，确认 `results`、`score` 与 `document_id`。
+- `RAG-BIZ-002`：清空搜索词，确认不能提交。
+- `RAG-BIZ-003`：输入无匹配词，确认空结果而非伪造答案。
+- `RAG-BIZ-004`：资料不足且引用必需时，确认实际业务错误。
+- `RAG-BIZ-005`：清除结果，确认只改 React state。
 
-- `DELETE /api/v1/documents/{document_id}`
+## 7. TasksPage：页面操作 → React → API → Backend → 结果
 
-#### FastAPI Router
+文件：`frontend/src/pages/TasksPage.tsx`
 
-- `backend/app/api/documents.py`
-  - `archive_document()`
+### 7.1 页面操作
 
-#### Service
-
-- `backend/app/services/document_archive_service.py`
-  - `archive_document()`
-
-#### Repository
-
-- `InMemoryDocumentRepository.get()`
-- `InMemoryDocumentRepository.update()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### 对应测试
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-  - `archives a document and refreshes current detail`
-
-### 6.5 Import
-
-#### 页面操作
-
-点击 `Import`。
-
-#### 页面组件调用的函数
+输入：
 
 ```text
-DocumentsPage
-→ runDocumentAction("import")
-→ importDocument(document_id)
-→ loadDocuments(false)
-→ refreshSelectedDocument(document_id)
+確認したい経営課題：関東地域の飲料カテゴリの売上減少を分析してください
+分析モード：hybrid
 ```
 
-#### api.ts 调用
+点击「分析を開始」，观察执行状态与分析报告。
 
-- `importDocument()`
+### 7.2 创建任务和 SSE
 
-#### HTTP Method 和 API Path
+页面看到什么
+→ `task_id`、queued/running/completed 状态、SSE 事件与最终报告。
 
-- `POST /api/v1/documents/{document_id}/import`
+点击后发生什么
+→ `submit()` 调用 `createTask()`；成功后 `subscribeToTask(task_id)`；收到 done 事件时调用 `loadReport()`。
 
-#### FastAPI Router
-
-- `backend/app/api/document_imports.py`
-  - `import_document()`
-
-#### Service
-
-- `backend/app/services/document_import_service.py`
-  - `import_document()`
-
-#### Repository
-
-- `InMemoryDocumentRepository.get()`
-- `InMemoryDocumentRepository.update()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Response 返回
-
-当前成功状态码是：
-
-- `201 Created`
-
-当前真实业务里，Service 会把文档状态推进到：
-
-- `validated`
-
-前端成功提示显示的是后端真实 `status`：
-
-- `Import result: <status>`
-
-不是前端写死的“imported”。
-
-### 6.6 Create Chunks
-
-#### 页面操作
-
-点击 `Chunk`。
-
-#### 页面组件调用的函数
+调用哪个 API
 
 ```text
-DocumentsPage
-→ runDocumentAction("chunk")
-→ chunkDocument(document_id)
-→ loadDocuments(false)
-→ refreshSelectedDocument(document_id)
+POST /api/tasks                     → 202，task_id、status
+GET /api/tasks/{task_id}/events     → text/event-stream
+GET /api/tasks/{task_id}/report     → 200，task_id、markdown、provider、created_at
 ```
 
-#### api.ts 调用
-
-- `chunkDocument()`
-- `getDocumentChunks()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/documents/{document_id}/chunks`
-- `GET /api/v1/documents/{document_id}/chunks`
-
-#### FastAPI Router
-
-- `backend/app/api/document_chunks.py`
-  - `chunk_document()`
-  - `get_document_chunks()`
-
-#### Service
-
-- `backend/app/services/document_chunk_service.py`
-  - `chunk_document()`
-  - `get_chunks()`
-
-#### Repository
-
-- `InMemoryDocumentRepository.get()`
-- `InMemoryDocumentChunkRepository.replace_for_document()`
-- `InMemoryDocumentChunkRepository.list_for_document()`
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Chunk 预览
-
-chunk 成功后，详情区会重新读取 chunk 列表，所以你能在页面里看到真实 chunk 内容预览。
-
-### 6.7 Document Upload 调用图
-
-```mermaid
-sequenceDiagram
-    participant U as Browser
-    participant D as DocumentsPage.tsx
-    participant A as frontend/src/api.ts
-    participant R as backend/app/api/documents.py
-    participant S as DocumentUploadService
-    participant Repo as InMemoryDocumentRepository
-    participant Read as DocumentReadService
-
-    U->>D: 选择文件 + 点击 Upload Document
-    D->>A: uploadDocument(FormData)
-    A->>R: POST /api/v1/documents
-    R->>S: upload_document()
-    S->>Repo: find_by_checksum() / create()
-    R-->>D: HTTP 201
-    D->>A: listDocuments()
-    A->>R: GET /api/v1/documents
-    R->>Read: list_documents()
-    Read->>Repo: list_all()
-    Repo-->>D: refreshed list
-```
-
----
-
-## 7. RAG 页面
-
-当前 RAG 页面分成两个真实功能：
-
-- Document Retrieval
-- Internal RAG Answer
-
-当前一定要记住的系统边界：
-
-- 已实现：Keyword Retrieval
-- 已实现：Deterministic Grounded Answer
-- 未实现：Embedding
-- 未实现：pgvector
-- 未实现：Hybrid Retrieval
-- 未实现：Reranker
-- 未实现：真实 LLM
-
-### 7.1 A. Document Retrieval
-
-#### 页面操作
-
-输入 Query，点击 `Search Retrieval`。
-
-#### 用户在页面看到什么
-
-页面会显示：
-
-- Retrieval mode
-- Total matches
-- 每条结果的 excerpt
-- document_id
-- chunk_id
-- score
-- metadata
-- source
-
-#### React 事件入口
-
-- `frontend/src/pages/RagPage.tsx`
-- 检索提交函数
-
-#### 页面组件调用的函数
+Backend 经过什么
 
 ```text
-RagPage
-→ searchDocumentRetrieval(payload)
-→ React 渲染 results
+tasks.py create_task()
+→ TaskService.create_task()
+→ InMemoryTaskRepository.create()
+→ BackgroundTasks.add_task(TaskService.run_task)
+→ AnalysisWorkflow.stream()
+→ route → kpi / research → report
+→ InMemoryReportRepository.save()
+→ SSE EventRepository
 ```
 
-#### api.ts 调用
+`POST /api/tasks` 的 202 表示任务已受理，不表示报告已完成。报告尚未生成时，`TaskService.get_report()` 使用实际 409 表示状态冲突。
 
-- `searchDocumentRetrieval()`
+### 7.3 建议企业测试 Case
 
-#### HTTP Method 和 API Path
+- `TASK-BIZ-001`：hybrid 分析关东饮料销售下降，确认 SSE 与 report。
+- `TASK-BIZ-002`：清空问题，确认按钮不可点击。
+- `TASK-BIZ-003`：读取不存在 task 的报告，确认实际 404。
+- `TASK-BIZ-004`：任务未完成时读取报告，确认实际 409。
+- `TASK-BIZ-005`：再次提交，确认旧报告和旧 SSE 状态被清理。
 
-- `POST /api/v1/document-retrieval/search`
+## 8. ApprovalPage：页面操作 → React → API → Backend → 结果
 
-#### FastAPI Router
+文件：`frontend/src/pages/ApprovalPage.tsx`
 
-- `backend/app/api/document_retrieval.py`
-  - `search_documents()`
+### 8.1 页面操作
 
-#### Service
+完成分析后，手动复制 `task_id` 到「承認依頼を送信」。成功后选择审批记录，执行「承認」「却下」或「修正依頼」。
 
-- `backend/app/services/document_retrieval_service.py`
-  - `DocumentRetrievalService.search()`
+### 8.2 列表、详情和提交
 
-#### Repository
+页面看到什么
+→ `approval_id`、`task_id`、`report_version_id`、status、决策信息。
 
-这里不是普通 CRUD Repository。
+点击后发生什么
+→ `loadApprovals()`、`loadApprovalDetail()` 或 `handleSubmitApproval()` 调用 API Client；成功后 `refreshAfterChange()` 同时刷新列表和详情。
 
-真实检索提供者是：
-
-- `backend/app/repositories/implementations/in_memory/document_retrieval.py`
-  - `InMemoryKeywordRetrieval.search()`
-
-它会从文档和 chunk 数据中做当前阶段的关键词检索。
-
-#### Workflow
-
-本功能不经过 Workflow。
-
-#### Response 返回
-
-返回：
-
-- `results`
-- `total`
-- `query`
-- `retrieval_mode`
-
-当前前端展示的 `retrieval_mode` 应该理解为真实后端返回的检索模式，而不是前端自己写死的假标签。
-
-#### 对应测试
-
-- `frontend/src/pages/RagPage.test.tsx`
-  - `shows retrieval results`
-  - `shows empty retrieval state from backend`
-- `frontend/src/api.test.ts`
-  - `calls document retrieval search with JSON body`
-
-#### 如何在浏览器 Network 中验证
-
-观察：
-
-- `POST /api/v1/document-retrieval/search`
-
-重点看 Request Body 是否和页面筛选一致。
-
-### 7.2 B. Internal RAG Answer
-
-#### 页面操作
-
-输入 Question，点击 `Generate Answer`。
-
-#### 用户在页面看到什么
-
-页面会显示：
-
-- grounded answer
-- citations
-- confidence
-- warnings
-- retrieval_mode
-- answer_mode
-
-#### React 事件入口
-
-- `frontend/src/pages/RagPage.tsx`
-- 问答提交函数
-
-#### 页面组件调用的函数
+调用哪个 API
 
 ```text
-RagPage
-→ answerInternalRag(payload)
-→ 渲染 answer / citations / warnings
+GET  /api/v1/approvals
+GET  /api/v1/approvals/{approval_id}
+POST /api/v1/reports/{task_id}/submit-approval     → 201
 ```
 
-#### api.ts 调用
-
-- `answerInternalRag()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/internal-rag/answer`
-
-#### FastAPI Router
-
-- `backend/app/api/internal_rag.py`
-  - `answer_internal_rag()`
-
-#### Service
-
-- `backend/app/services/internal_rag_service.py`
-  - `InternalRagService.answer()`
-
-#### Repository
-
-真实源码里，这一步不会直接调用普通文档 CRUD Router。
-
-它走的是：
-
-- `DocumentRetrievalProvider.search()`
-
-也就是先检索，再用 deterministic answer generator 组装答案。
-
-#### Workflow
-
-本功能不经过 LangGraph Workflow。
-
-#### Response 返回
-
-返回：
-
-- `answer`
-- `citations`
-- `retrieval_mode`
-- `answer_mode`
-- `confidence`
-- `warnings`
-
-#### 对应测试
-
-- `frontend/src/pages/RagPage.test.tsx`
-  - `shows grounded internal rag answer and citations`
-  - `shows internal rag API error`
-- `frontend/src/api.test.ts`
-  - `calls internal rag answer with deterministic request body`
-
-### 7.3 Retrieval / Internal RAG 调用图
-
-```mermaid
-flowchart TD
-    A[Browser / RagPage.tsx] --> B[frontend/src/api.ts]
-    B --> C[POST /api/v1/document-retrieval/search]
-    C --> D[backend/app/api/document_retrieval.py]
-    D --> E[DocumentRetrievalService.search()]
-    E --> F[InMemoryKeywordRetrieval.search()]
-    F --> G[results rendered in React]
-
-    A --> H[frontend/src/api.ts]
-    H --> I[POST /api/v1/internal-rag/answer]
-    I --> J[backend/app/api/internal_rag.py]
-    J --> K[InternalRagService.answer()]
-    K --> L[DocumentRetrievalProvider.search()]
-    K --> M[RAGAnswerGenerator.generate()]
-    M --> N[citations / confidence / warnings]
-    N --> O[React render]
-```
-
----
-
-## 8. Approval 页面
-
-这一页要同时理解三件事：
-
-1. Approval 状态机
-2. Audit 边界
-3. 权限边界
-
-当前真实身份展示是：
-
-- `System placeholder user`
-
-这表示现在前端能学习审批流程，但还不是真实登录系统。
-
-### 8.1 Approval 列表
-
-#### 页面操作
-
-进入 Approval 页面，或点 `Apply Filter` / `Retry / Refresh`。
-
-#### 页面组件调用的函数
+Backend 经过什么
 
 ```text
-ApprovalPage
-→ loadApprovals()
-→ listApprovals(...)
-```
-
-#### api.ts 调用
-
-- `listApprovals()`
-
-#### HTTP Method 和 API Path
-
-- `GET /api/v1/approvals`
-
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `list_approvals()`
-
-#### Service
-
-- `backend/app/services/approval_service.py`
-  - `list_approvals()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.list_approval_requests()`
-
-#### Audit Boundary / RBAC Guard
-
-Approval Router 不是直接调用 Service。
-
-它先经过：
-
-- `_run_audited_operation(...)`
-- `AuditMiddleware.run(...)`
-
-也就是：
-
-```text
-ApprovalPage
-→ api.ts
-→ approvals.py Router
+backend/app/api/approvals.py list_approvals() / get_approval() / submit_approval()
 → _run_audited_operation()
 → AuditMiddleware.run()
-→ ApprovalService
+→ ApprovalService.list_approvals() / get_approval() / submit_approval()
+→ InMemoryApprovalRepository
 ```
 
-这就是当前源码里的真实“审计边界”。
+### 8.3 审批决策和修正
 
-### 8.2 Approval 详情
+| 操作     | API                                              | 实际 Service                  |
+| -------- | ------------------------------------------------ | ----------------------------- |
+| 承認     | `POST /api/v1/approvals/{approval_id}/approve` | `ApprovalService.approve()` |
+| 却下     | `POST /api/v1/approvals/{approval_id}/reject`  | `ApprovalService.reject()`  |
+| 修正依頼 | `POST /api/v1/reports/{task_id}/revise`        | `ApprovalService.revise()`  |
 
-#### 页面操作
+这三条 Router 都先经过 `_run_audited_operation()` 与 `AuditMiddleware.run()`，再写入 `InMemoryApprovalRepository` 的审批请求、报告版本或审批事件。当前 API 需要权限；权限不足会返回实际 403 `permission_denied`。对已决策的审批重复操作会返回实际 409。
 
-点击某一条 approval。
+### 8.4 建议企业测试 Case
 
-#### 页面组件调用的函数
+- `APR-BIZ-001`：为完成任务提交审批，确认 201、`approval_id` 和 `report_version_id`。
+- `APR-BIZ-002`：清空 Task ID，确认不能提交。
+- `APR-BIZ-003`：使用不存在或未完成 task，确认真实 Backend 业务错误。
+- `APR-BIZ-004`：审批、重复审批、权限不足，确认成功、409、403 三类结果。
+- `APR-BIZ-005`：对 rejected 记录修正，确认新 report version；刷新不改变状态。
 
-```text
-ApprovalPage
-→ setSelectedApprovalId()
-→ loadApprovalDetail(approvalId)
-→ getApproval(approvalId)
-```
+## 9. 页面之间的数据关系
 
-#### api.ts 调用
+| 对象            | 产生页面        | 使用页面                                    | 自动传递？                                |
+| --------------- | --------------- | ------------------------------------------- | ----------------------------------------- |
+| `document_id` | 文書管理        | 文書管理详情、Import、Chunk；RAG 结果会返回 | 否                                        |
+| `import_id`   | 文書管理 Import | 当前页面仅显示 import 状态                  | 否，前端未调用 import detail API          |
+| Chunk           | 文書管理 Chunk  | RAG検索的 Backend retrieval                 | Backend 存储层已连接；页面条件手动输入    |
+| `citation`    | RAG検索         | 当前只在 RAG 页面显示                       | 否                                        |
+| `task_id`     | 分析依頼        | 承認管理提交审批                            | 否，手动复制                              |
+| `report`      | 分析依頼        | 承認管理通过`task_id` 读取报告版本        | Backend 通过 task_id 连接；页面未自动传递 |
+| `approval_id` | 承認管理        | 承認管理详情与决策                          | 是，页面内部选中状态                      |
 
-- `getApproval()`
+## 10. 推荐实际操作顺序
 
-#### HTTP Method 和 API Path
+1. 打开「文書管理」，上传 markdown/text 文档并确认 `document_id`。
+2. 按真实文档状态执行 Import、Chunk；若 Backend 拒绝，先读错误 code。
+3. 打开「RAG検索」，用与文档内容有关的日语检索词确认 `results` 和 citation。
+4. 打开「分析依頼」，以关东饮料销售下降为问题，选择 hybrid，等待 SSE done 和 report。
+5. 复制已完成的 `task_id` 到「承認管理」，提交审批并验证状态机。
+6. 展开各页面的「业务测试与源码学习」，对照 API Path、函数名和 Backend 文件。
 
-- `GET /api/v1/approvals/{approval_id}`
+## 11. 如何对照源码学习
 
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `get_approval()`
-
-#### Service
-
-- `ApprovalService.get_approval()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.get_approval_request()`
-
-#### 特别说明
-
-当前详情页里明确写着：
-
-`Audit fields are not returned directly by this API response.`
-
-这句话很重要。
-
-它表示：
-
-- 审计存在
-- 但审计字段不是直接塞进 Approval Response 里
-
-### 8.3 Submit Approval
-
-#### 页面操作
-
-输入 Task ID，点击 `Submit Approval`。
-
-#### 页面组件调用的函数
+每次只沿一条请求走读：
 
 ```text
-ApprovalPage
-→ handleSubmitApproval()
-→ submitApproval(taskId, payload)
-→ refreshAfterChange(created.approval_id)
-```
-
-#### api.ts 调用
-
-- `submitApproval()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/reports/{task_id}/submit-approval`
-
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `submit_approval()`
-
-#### Service
-
-- `ApprovalService.submit_approval()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.get_latest_report_version()`
-- `InMemoryApprovalRepository.save_report_version()`
-- `InMemoryApprovalRepository.save_approval_request()`
-- `InMemoryReportRepository.save()`
-
-### 8.4 Approve
-
-#### 页面操作
-
-在 `pending_approval` 状态下点击 `Approve`。
-
-#### 页面组件调用的函数
-
-```text
-ApprovalPage
-→ handleApprove()
-→ approveApproval(approvalId, payload)
-→ refreshAfterChange(updated.approval_id)
-```
-
-#### api.ts 调用
-
-- `approveApproval()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/approvals/{approval_id}/approve`
-
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `approve()`
-
-#### Service
-
-- `ApprovalService.approve()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.get_approval_request()`
-- `InMemoryApprovalRepository.save_approval_request()`
-- `InMemoryReportRepository.save()`
-
-### 8.5 Reject
-
-#### 页面操作
-
-在 `pending_approval` 状态下点击 `Reject`。
-
-#### 页面组件调用的函数
-
-```text
-ApprovalPage
-→ handleReject()
-→ rejectApproval(approvalId, payload)
-→ refreshAfterChange(updated.approval_id)
-```
-
-#### api.ts 调用
-
-- `rejectApproval()`
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/approvals/{approval_id}/reject`
-
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `reject()`
-
-#### Service
-
-- `ApprovalService.reject()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.save_approval_request()`
-- `InMemoryReportRepository.save()`
-
-### 8.6 Request Revision
-
-这里最容易写错。
-
-当前前端不是调用“某个 approval 专属 revise API”。
-
-它调用的是真实源码中的：
-
-- `requestApprovalRevision(taskId, payload)`
-- `POST /api/v1/reports/{task_id}/revise`
-
-也就是说，revise 是对 `task_id` 发起，不是假造的 `/approvals/{approval_id}/revise`。
-
-#### 页面组件调用的函数
-
-```text
-ApprovalPage
-→ handleRevise()
-→ requestApprovalRevision(selectedApproval.task_id, payload)
-→ refreshAfterChange(selectedApproval.approval_id)
-```
-
-#### HTTP Method 和 API Path
-
-- `POST /api/v1/reports/{task_id}/revise`
-
-#### FastAPI Router
-
-- `backend/app/api/approvals.py`
-  - `revise()`
-
-#### Service
-
-- `ApprovalService.revise()`
-
-#### Repository
-
-- `InMemoryApprovalRepository.get_latest_report_version()`
-- `InMemoryApprovalRepository.save_report_version()`
-- `InMemoryReportRepository.save()`
-
-### 8.7 哪些状态允许操作
-
-当前前端源码中的真实判断：
-
-- `Approve / Reject` 只允许 `pending_approval`
-- `Revise` 只允许 `rejected`
-
-对应前端判断变量：
-
-- `canApproveOrReject`
-- `canRevise`
-
-### 8.8 403 和 409 应该怎么理解
-
-403：
-
-- 权限错误
-- 当前 Approval 测试里有真实覆盖
-
-409：
-
-- 状态冲突
-- 比如已经提交、已经决策、状态不允许重复推进
-
-### 8.9 Approval 调用图
-
-```mermaid
-flowchart TD
-    A[ApprovalPage.tsx] --> B[frontend/src/api.ts]
-    B --> C[backend/app/api/approvals.py]
-    C --> D[_run_audited_operation]
-    D --> E[AuditMiddleware.run]
-    E --> F[ApprovalService]
-    F --> G[ApprovalRepository]
-    F --> H[ReportRepository]
-    G --> I[Response]
-    H --> I
-    I --> J[React refresh list/detail]
-```
-
----
-
-## 9. 页面测试学习
-
-这一章很重要。
-
-如果你只会点页面，不会看测试，你很难快速理解这个项目。
-
-当前前端测试技术栈：
-
-- Vitest
-- React Testing Library
-
-常见测试工具在本项目里的意思：
-
-- `render()`：把组件渲染到测试 DOM
-- `screen`：查页面元素
-- `fireEvent`：模拟点击、输入、change
-- `vi.stubGlobal()`：替换全局对象，比如 `fetch`、`EventSource`
-- `waitFor()`：等待异步状态完成
-- `expect()`：断言结果
-
-当前真实测试文件：
-
-- `frontend/src/App.test.tsx`
-- `frontend/src/pages/DashboardPage.test.tsx`
-- `frontend/src/pages/TasksPage.test.tsx`
-- `frontend/src/pages/DocumentsPage.test.tsx`
-- `frontend/src/pages/RagPage.test.tsx`
-- `frontend/src/pages/ApprovalPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-### 9.1 先看测试覆盖什么
-
-#### App.test.tsx
-
-主要测：
-
-- Dashboard 默认显示
-- 顶部导航切换
-- Dashboard 快捷入口跳转
-
-#### DashboardPage.test.tsx
-
-主要测：
-
-- 运行时能力说明是否渲染
-- 快捷入口按钮是否存在
-- `onNavigate` 是否正确发出目标页
-
-#### TasksPage.test.tsx
-
-主要测：
-
-- 创建 Task
-- 订阅 SSE
-- done 后读取 report
-
-#### DocumentsPage.test.tsx
-
-主要测：
-
-- 列表显示
-- 空状态
-- 列表错误 + Retry
-- 上传成功后刷新
-- 上传失败
-- Archive 后刷新
-
-#### RagPage.test.tsx
-
-主要测：
-
-- Retrieval 结果显示
-- Retrieval 空结果
-- Internal RAG Answer
-- RAG API 错误
-
-#### ApprovalPage.test.tsx
-
-主要测：
-
-- 列表 + 详情
-- Submit Approval
-- Submit 失败
-- 按钮禁用
-- Approve
-- Reject
-- Revise
-- 409/403 错误
-
-#### api.test.ts
-
-主要测：
-
-- API Client 是否发出正确 URL
-- method 是否正确
-- body 是否正确
-- multipart / JSON 是否正确
-
-### 9.2 逐行理解一个真实测试：
-
-`uploads a document successfully and refreshes the list`
-
-真实文件：
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-
-你应该按下面顺序理解。
-
-#### 第 1 步：Mock 哪些 API
-
-这个测试连续 mock 了多次 `fetch`：
-
-1. 第一次：初始 `GET /api/v1/documents`
-2. 第二次：`POST /api/v1/documents`
-3. 第三次：上传成功后的再次 `GET /api/v1/documents`
-4. 第四次：`GET /api/v1/documents/{document_id}`
-5. 第五次：`GET /api/v1/documents/{document_id}/chunks`
-
-这正好对应真实页面行为。
-
-#### 第 2 步：render 哪个组件
-
-测试直接：
-
-```text
-render(<DocumentsPage />)
-```
-
-这说明它不是先从 Router 进页面，而是直接测试单页组件。
-
-#### 第 3 步：如何构造 File
-
-测试里用了真实浏览器风格的 `File`：
-
-```text
-new File(["month,sales"], "budget.csv", { type: "text/csv" })
-```
-
-这能真实模拟用户选文件。
-
-#### 第 4 步：如何上传
-
-测试通过 `fireEvent.change()` 模拟文件选择和输入框填写，再点：
-
-- `Upload Document`
-
-#### 第 5 步：如何等待异步调用
-
-上传后不会立刻同步更新页面。
-
-测试使用：
-
-- `await screen.findByRole(...)`
-- `await screen.findAllByText(...)`
-
-这表示它在等待异步渲染完成。
-
-#### 第 6 步：如何验证上传成功
-
-它验证页面出现：
-
-- `Upload completed: doc-9`
-
-这说明上传接口结果已经回到页面。
-
-#### 第 7 步：如何验证列表再次调用
-
-这个测试没有直接去断言“fetch 第几次一定是 listDocuments”这种实现细节，而是用页面结果证明刷新发生了：
-
-- 页面里出现新文档 `budget.csv`
-
-这就是更稳的 UI 级验证。
-
-#### 第 8 步：为什么测试不访问真实后端
-
-因为组件测试的目标是：
-
-- 验证页面逻辑
-- 验证状态更新
-- 验证按钮和反馈
-
-不是验证 FastAPI 真服务是否启动。
-
-如果组件测试直接打真实后端，会让测试：
-
-- 慢
-- 不稳定
-- 难定位
-
-### 9.3 再看一个 Approval 测试
-
-推荐看：
-
-- `approves a pending approval and refreshes detail`
-
-它展示的真实顺序是：
-
-1. 先 mock 列表
-2. 再 mock 详情
-3. 点击 `Approve`
-4. mock approve 返回
-5. 再次刷新列表
-6. 再次刷新详情
-7. 最终页面显示新状态和审批意见
-
-也就是说，Approval 页面不是“点一下就地改个前端状态”。
-
-它是：
-
-```text
-请求后端
-→ 用真实响应刷新页面
-```
-
----
-
-## 10. 浏览器 Network 学习方法
-
-这是把“页面点击”和“源码调用链”连起来的最实用方法。
-
-建议每次都按这个顺序做：
-
-1. 启动 Backend
-2. 启动 Frontend
-3. 打开浏览器
-4. 打开 DevTools
-5. 打开 Network
-6. 在页面点击一个动作
-7. 看 Request URL
-8. 看 Method
-9. 看 Payload / Form Data
-10. 看 Response
-11. 回到 `frontend/src/api.ts`
-12. 找到对应函数
-13. 再找 Backend Router
-14. 再找 Service
-15. 再找 Repository / Workflow
-16. 最后找测试
-
-你可以把这套方法理解成：
-
-```text
-Browser
-→ Network
-→ api.ts
-→ Router
-→ Service
-→ Repository / Workflow
-→ Test
-```
-
----
-
-## 11. 前端到后端总调用图
-
-```mermaid
-flowchart TD
-    A[Browser Page Action] --> B[frontend/src/pages/*.tsx]
-    B --> C[frontend/src/api.ts]
-    C --> D[backend/app/api/*.py]
-    D --> E[backend/app/services/*.py]
-    E --> F[backend/app/repositories/implementations/in_memory/*.py]
-    E --> G[backend/app/workflow/graph.py]
-    F --> H[ApiResponse / SSE]
-    G --> H
-    H --> I[React State Update]
-    I --> J[Page Re-render]
-```
-
----
-
-## 12. 源码路径表
-
-| 页面操作 | 前端组件 | API Client | Backend Router | Service | Repository / Workflow | Test |
-|---|---|---|---|---|---|---|
-| Dashboard 快捷入口 | `frontend/src/App.tsx` / `frontend/src/pages/DashboardPage.tsx` | 无 | 无 | 无 | 无 | `frontend/src/App.test.tsx`, `frontend/src/pages/DashboardPage.test.tsx` |
-| Create Task | `frontend/src/pages/TasksPage.tsx` | `createTask()` | `backend/app/api/tasks.py#create_task` | `TaskService.create_task()` | `InMemoryTaskRepository.create()` | `frontend/src/pages/TasksPage.test.tsx`, `frontend/src/api.test.ts` |
-| SSE | `frontend/src/pages/TasksPage.tsx` | `subscribeToTask()` | `backend/app/api/tasks.py#get_task_events` | `TaskService.run_task()` | `AnalysisWorkflow`, `EventRepository` | `frontend/src/pages/TasksPage.test.tsx` |
-| Get Report | `frontend/src/pages/TasksPage.tsx` | `getReport()` | `backend/app/api/tasks.py#get_report` | `TaskService.get_report()` | `InMemoryReportRepository.get()` | `frontend/src/pages/TasksPage.test.tsx` |
-| Upload Document | `frontend/src/pages/DocumentsPage.tsx` | `uploadDocument()` | `backend/app/api/documents.py#upload_document` | `DocumentUploadService.upload_document()` | `InMemoryDocumentRepository.create()` | `frontend/src/pages/DocumentsPage.test.tsx`, `frontend/src/api.test.ts` |
-| Read Document Detail | `frontend/src/pages/DocumentsPage.tsx` | `getDocument()` | `backend/app/api/documents.py#get_document` | `DocumentReadService.get_document()` | `InMemoryDocumentRepository.get()` | `frontend/src/pages/DocumentsPage.test.tsx` |
-| Read Chunks | `frontend/src/pages/DocumentsPage.tsx` | `getDocumentChunks()` | `backend/app/api/document_chunks.py#get_document_chunks` | `DocumentChunkService.get_chunks()` | `InMemoryDocumentChunkRepository.list_for_document()` | `frontend/src/pages/DocumentsPage.test.tsx` |
-| Archive Document | `frontend/src/pages/DocumentsPage.tsx` | `archiveDocument()` | `backend/app/api/documents.py#archive_document` | `DocumentArchiveService.archive_document()` | `InMemoryDocumentRepository.get()/update()` | `frontend/src/pages/DocumentsPage.test.tsx`, `frontend/src/api.test.ts` |
-| Import Document | `frontend/src/pages/DocumentsPage.tsx` | `importDocument()` | `backend/app/api/document_imports.py#import_document` | `DocumentImportService.import_document()` | `InMemoryDocumentRepository.get()/update()` | `frontend/src/api.test.ts` |
-| Create Chunks | `frontend/src/pages/DocumentsPage.tsx` | `chunkDocument()` | `backend/app/api/document_chunks.py#chunk_document` | `DocumentChunkService.chunk_document()` | `DocumentRepository + DocumentChunkRepository` | `frontend/src/api.test.ts` |
-| Retrieval Search | `frontend/src/pages/RagPage.tsx` | `searchDocumentRetrieval()` | `backend/app/api/document_retrieval.py#search_documents` | `DocumentRetrievalService.search()` | `InMemoryKeywordRetrieval.search()` | `frontend/src/pages/RagPage.test.tsx`, `frontend/src/api.test.ts` |
-| Internal RAG Answer | `frontend/src/pages/RagPage.tsx` | `answerInternalRag()` | `backend/app/api/internal_rag.py#answer_internal_rag` | `InternalRagService.answer()` | `DocumentRetrievalProvider + RAGAnswerGenerator` | `frontend/src/pages/RagPage.test.tsx`, `frontend/src/api.test.ts` |
-| Submit Approval | `frontend/src/pages/ApprovalPage.tsx` | `submitApproval()` | `backend/app/api/approvals.py#submit_approval` | `ApprovalService.submit_approval()` | `ApprovalRepository + ReportRepository` | `frontend/src/pages/ApprovalPage.test.tsx`, `frontend/src/api.test.ts` |
-| Approve | `frontend/src/pages/ApprovalPage.tsx` | `approveApproval()` | `backend/app/api/approvals.py#approve` | `ApprovalService.approve()` | `ApprovalRepository + ReportRepository` | `frontend/src/pages/ApprovalPage.test.tsx` |
-| Reject | `frontend/src/pages/ApprovalPage.tsx` | `rejectApproval()` | `backend/app/api/approvals.py#reject` | `ApprovalService.reject()` | `ApprovalRepository + ReportRepository` | `frontend/src/pages/ApprovalPage.test.tsx` |
-| Revise | `frontend/src/pages/ApprovalPage.tsx` | `requestApprovalRevision()` | `backend/app/api/approvals.py#revise` | `ApprovalService.revise()` | `ApprovalRepository + ReportRepository` | `frontend/src/pages/ApprovalPage.test.tsx`, `frontend/src/api.test.ts` |
-
----
-
-## 13. 当前实现边界
-
-这部分一定要和真实源码保持一致。
-
-当前已经存在的能力：
-
-- Dashboard 页面切换
-- Task 创建、SSE、Report 展示
-- Document 列表、上传、详情、Archive、Import、Chunk
-- Retrieval 搜索
-- Internal RAG deterministic answer
-- Approval 列表、详情、提交、批准、拒绝、修订
-
-当前明确未实现或未接入的能力：
-
-- 真实 LLM
-- Embedding 检索
-- pgvector
-- Hybrid Retrieval
-- Reranker
-- 真实登录身份
-- 前端 Router 框架
-
-Dashboard 页面中的运行时说明也反映了这些边界，所以不要把当前项目误读成“已经完成生产级智能检索平台”。
-
----
-
-## 14. 推荐学习顺序
-
-建议你按下面顺序学。
-
-### 第 1 步：先学页面切换
-
-- `frontend/src/App.tsx`
-- `frontend/src/pages/DashboardPage.tsx`
-
-目的：
-
-先看懂当前前端到底有哪几页。
-
-### 第 2 步：学 Tasks 主链路
-
-- `frontend/src/pages/TasksPage.tsx`
-- `frontend/src/api.ts`
-- `backend/app/api/tasks.py`
-- `backend/app/services/task_service.py`
-- `backend/app/workflow/graph.py`
-
-目的：
-
-看懂最完整的一条“前端 → 后端 → Workflow → SSE → 前端”的闭环。
-
-### 第 3 步：学 Documents 页面
-
-先看上传，再看详情，再看 Archive / Import / Chunk。
-
-重点：
-
-- 为什么上传后要刷新列表
-- 为什么详情要单独读 chunk
-
-### 第 4 步：学 RAG 页面
-
-先看 Retrieval，再看 Internal RAG。
-
-目的：
-
-先区分“检索”和“问答组装”不是同一个概念。
-
-### 第 5 步：学 Approval 页面
-
-重点：
-
-- 状态边界
-- 审计边界
-- 权限边界
-
-### 第 6 步：最后补测试
-
-推荐顺序：
-
-1. `frontend/src/App.test.tsx`
-2. `frontend/src/pages/DashboardPage.test.tsx`
-3. `frontend/src/pages/DocumentsPage.test.tsx`
-4. `frontend/src/pages/TasksPage.test.tsx`
-5. `frontend/src/pages/RagPage.test.tsx`
-6. `frontend/src/pages/ApprovalPage.test.tsx`
-7. `frontend/src/api.test.ts`
-8. 全部前端测试
-9. `./scripts/run_tests.sh`
-
-原因：
-
-- App：先看页面切换
-- Dashboard：再看 props 和回调
-- Documents：先熟悉表单、文件、Mock fetch、刷新
-- Tasks：再进入异步、SSE、Report
-- RAG：再看结果展示和 Citation
-- Approval：最后看状态变化、403、409
-- api.test：最后单独看 HTTP Client 边界
-
----
-
-## 15. 常见排查方法
-
-### 15.1 点了按钮没反应
-
-先查：
-
-1. 浏览器 Console
-2. Network 有没有请求
-3. 组件事件函数有没有被触发
-4. `api.ts` 有没有发请求
-
-### 15.2 页面报错但看不懂
-
-优先看页面里的错误 banner。
-
-当前很多页面都统一用：
-
-- `StatusBanner`
-- `ApiClientError`
-
-所以页面上出现的 `[ERROR_CODE] message` 一般已经能告诉你是后端错误还是网络错误。
-
-### 15.3 看不懂列表为什么刷新
-
-去搜页面里的：
-
-- `loadDocuments()`
-- `refreshAfterChange()`
-- `refreshSelectedDocument()`
-
-很多刷新不是浏览器自动做的，而是组件主动再次请求接口。
-
-### 15.4 为什么测试里不用真实后端
-
-因为页面测试关注的是：
-
-- 点击后调用了什么
-- 状态怎么更新
-- 页面怎么重渲染
-
-不是验证 FastAPI 服务能不能启动。
-
-### 15.5 为什么 Tasks 页面要同时用 POST、SSE、GET
-
-因为这是一个典型异步任务链路：
-
-- `POST` 负责创建任务
-- `SSE` 负责持续拿进度
-- `GET report` 负责拿最终结果
-
-如果把这三件事混成一个请求，前端体验和后端结构都会更差。
-
----
-
-## 16. 全系统页面到源码总图
-
-```mermaid
-flowchart LR
-    A[Dashboard] --> A1[App.tsx / DashboardPage.tsx]
-    B[Tasks] --> B1[TasksPage.tsx]
-    C[Documents] --> C1[DocumentsPage.tsx]
-    D[RAG] --> D1[RagPage.tsx]
-    E[Approval] --> E1[ApprovalPage.tsx]
-
-    B1 --> F[frontend/src/api.ts]
-    C1 --> F
-    D1 --> F
-    E1 --> F
-
-    F --> G[backend/app/api/tasks.py]
-    F --> H[backend/app/api/documents.py]
-    F --> I[backend/app/api/document_imports.py]
-    F --> J[backend/app/api/document_chunks.py]
-    F --> K[backend/app/api/document_retrieval.py]
-    F --> L[backend/app/api/internal_rag.py]
-    F --> M[backend/app/api/approvals.py]
-
-    G --> N[TaskService + AnalysisWorkflow]
-    H --> O[DocumentReadService / DocumentUploadService / DocumentArchiveService]
-    I --> P[DocumentImportService]
-    J --> Q[DocumentChunkService]
-    K --> R[DocumentRetrievalService]
-    L --> S[InternalRagService]
-    M --> T[ApprovalService + AuditMiddleware]
-
-    N --> U[Repositories / SSE / Report]
-    O --> U
-    P --> U
-    Q --> U
-    R --> U
-    S --> U
-    T --> U
-```
-
----
-
-## 17. 本文对应的核心源码入口清单
-
-前端：
-
-- `frontend/src/App.tsx`
-- `frontend/src/api.ts`
-- `frontend/src/types.ts`
-- `frontend/src/pages/DashboardPage.tsx`
-- `frontend/src/pages/TasksPage.tsx`
-- `frontend/src/pages/DocumentsPage.tsx`
-- `frontend/src/pages/RagPage.tsx`
-- `frontend/src/pages/ApprovalPage.tsx`
-- `frontend/src/components/PageHeader.tsx`
-- `frontend/src/components/StatusBadge.tsx`
-- `frontend/src/components/StatusBanner.tsx`
-
-后端：
-
-- `backend/app/main.py`
-- `backend/app/api/tasks.py`
-- `backend/app/api/documents.py`
-- `backend/app/api/document_imports.py`
-- `backend/app/api/document_chunks.py`
-- `backend/app/api/document_retrieval.py`
-- `backend/app/api/internal_rag.py`
-- `backend/app/api/approvals.py`
-- `backend/app/services/task_service.py`
-- `backend/app/services/document_read_service.py`
-- `backend/app/services/document_upload_service.py`
-- `backend/app/services/document_archive_service.py`
-- `backend/app/services/document_import_service.py`
-- `backend/app/services/document_chunk_service.py`
-- `backend/app/services/document_retrieval_service.py`
-- `backend/app/services/internal_rag_service.py`
-- `backend/app/services/approval_service.py`
-- `backend/app/workflow/graph.py`
-
-测试：
-
-- `frontend/src/App.test.tsx`
-- `frontend/src/pages/DashboardPage.test.tsx`
-- `frontend/src/pages/TasksPage.test.tsx`
-- `frontend/src/pages/DocumentsPage.test.tsx`
-- `frontend/src/pages/RagPage.test.tsx`
-- `frontend/src/pages/ApprovalPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-如果你只想找一条最值得先读的链路，请先读：
-
-```text
-TasksPage.tsx
-→ api.ts
-→ backend/app/api/tasks.py
-→ task_service.py
-→ workflow/graph.py
-→ TasksPage.test.tsx
-```
-
----
-
-## 18. 页面学习路线
-
-如果你是第一次学这套 Frontend，建议按天拆开。
-
-### Day 1
-
-```text
-Dashboard
-↓
-Tasks
-```
-
-目标：
-
-- 先看懂页面切换
-- 再看懂 Task → SSE → Report 主链路
-
-### Day 2
-
-```text
-Documents
-```
-
-目标：
-
-- 看懂列表、上传、详情、Archive、Import、Chunk 的完整页面闭环
-
-### Day 3
-
-```text
-RAG
-```
-
-目标：
-
-- 先区分 Retrieval
-- 再区分 Internal RAG Answer
-
-### Day 4
-
-```text
-Approval
-```
-
-目标：
-
-- 看懂审批状态变化
-- 看懂 Audit / Permission / Refresh 的关系
-
----
-
-## 19. 页面源码对应关系统一模板
-
-以后你读任何一个页面，都建议固定按这条链路看：
-
-```text
-页面操作
-↓
-React Component
-↓
-frontend/src/api.ts
-↓
-Backend Router
-↓
-Service
-↓
-Repository
-↓
-Workflow（存在时）
-↓
-Response
-↓
-React 更新
-```
-
-如果某一层不存在，就明确写：
-
-- 本功能不经过 `api.ts`
-- 本功能不经过 Workflow
-
-这样你不会把所有页面都误看成同一类架构。
-
----
-
-## 20. 页面对应测试学习入口
-
-这一章按页面整理“应该看哪个测试文件、测什么、mock 什么、怎么单独运行”。
-
-### 20.1 Dashboard
-
-测试文件：
-
-- `frontend/src/App.test.tsx`
-- `frontend/src/pages/DashboardPage.test.tsx`
-
-测试目标：
-
-- Dashboard 默认显示
-- 顶部导航切换
-- 快捷入口按钮是否正确触发页面跳转
-
-Mock 内容：
-
-- 无需后端 API
-
-如何单独运行：
-
-```bash
-cd frontend
-npm test -- --run src/App.test.tsx
-npm test -- --run src/pages/DashboardPage.test.tsx
-```
-
-### 20.2 Tasks
-
-测试文件：
-
-- `frontend/src/pages/TasksPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-测试目标：
-
-- 创建 Task
-- 连接 SSE
-- 收到 done 事件后拉取 report
-
-Mock 内容：
-
-- `fetch`
-- `EventSource`
-
-如何单独运行：
-
-```bash
-cd frontend
-npm test -- --run src/pages/TasksPage.test.tsx
-```
-
-### 20.3 Documents
-
-测试文件：
-
-- `frontend/src/pages/DocumentsPage.test.tsx`
-- `frontend/src/api.test.ts`
-- 补充专题笔记：`docs/learning/02_Frontend/TEST_LEARNING_DOCUMENTS_PAGE.md`
-
-测试目标：
-
-- 列表
-- 空状态
-- API 错误
-- 上传成功
-- 上传失败
-- Archive 后刷新
-
-Mock 内容：
-
-- `fetch`
-
-如何单独运行：
-
-```bash
-cd frontend
-npm test -- --run src/pages/DocumentsPage.test.tsx
-```
-
-### 20.4 RAG
-
-测试文件：
-
-- `frontend/src/pages/RagPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-测试目标：
-
-- Retrieval 结果显示
-- Retrieval 空结果
-- Internal RAG Answer 成功
-- Internal RAG API 错误
-
-Mock 内容：
-
-- `fetch`
-
-如何单独运行：
-
-```bash
-cd frontend
-npm test -- --run src/pages/RagPage.test.tsx
-```
-
-### 20.5 Approval
-
-测试文件：
-
-- `frontend/src/pages/ApprovalPage.test.tsx`
-- `frontend/src/api.test.ts`
-
-测试目标：
-
-- 列表与详情
-- Submit Approval
-- Approve
-- Reject
-- Request Revision
-- 403 / 409 错误
-
-Mock 内容：
-
-- `fetch`
-
-如何单独运行：
-
-```bash
-cd frontend
-npm test -- --run src/pages/ApprovalPage.test.tsx
-```
-
----
-
-## 21. 页面学习实践
-
-最实用的练习方法不是死读文档，而是边点页面边对源码。
-
-真实建议步骤：
-
-```text
-启动 Backend
-↓
-启动 Frontend
-↓
-浏览器打开 http://127.0.0.1:5173
-↓
-按 F12
-↓
-打开 Network
-↓
-点击页面按钮
-↓
-查看 Request
-↓
-查看 Response
-↓
-找到 frontend/src/api.ts
-↓
-找到 Router
-↓
-找到 Service
-↓
-找到 Repository
-↓
-运行对应 Test
-```
-
-如果你这样练三遍，通常就能把“页面操作”和“源码调用”真正连起来。
-
----
-
-## 22. 新增页面完整案例
-
-这一章补的是“每个页面至少一个完整案例”的学习入口。
-
-### 22.1 Dashboard 案例：点击 Open Tasks
-
-① 页面操作
-
-```text
-Dashboard 页面
-↓
-点击 Open Tasks
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/DashboardPage.tsx
-↓
-onNavigate("analysis")
-↓
-frontend/src/App.tsx
-↓
-setActiveView("analysis")
-```
-
-③ api.ts
-
-- 本案例不经过 `api.ts`
-
-④ Router
-
-- 本案例不经过 Backend Router
-
-⑤ Service
-
-- 本案例不经过 Service
-
-⑥ Repository
-
-- 本案例不经过 Repository
-
-⑦ Workflow
-
-- 本案例不经过 Workflow
-
-⑧ Response
-
-- 无后端 Response
-
-⑨ 页面更新
-
-- `TasksPage` 被渲染出来
-
-⑩ 对应测试
-
-- `frontend/src/App.test.tsx`
-- `frontend/src/pages/DashboardPage.test.tsx`
-
-⑪ 如何验证
-
-- 页面标题从 Dashboard 变成 Analysis / Tasks
-- Network 中没有新请求
-
-### 22.2 Tasks 案例：创建任务并显示报告
-
-① 页面操作
-
-```text
-输入问题
-↓
-点击 分析を開始
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/TasksPage.tsx
-↓
-submit()
-```
-
-③ api.ts
-
-```text
-createTask()
-↓
-subscribeToTask()
-↓
-getReport()
-```
-
-④ Router
-
-```text
-backend/app/api/tasks.py
-↓
-create_task()
-↓
-get_task_events()
-↓
-get_report()
-```
-
-⑤ Service
-
-```text
-TaskService.create_task()
-↓
-TaskService.run_task()
-↓
-TaskService.get_report()
-```
-
-⑥ Repository
-
-```text
-TaskRepository.create()
-↓
-TaskRepository.save()
-↓
-ReportRepository.get()
-```
-
-⑦ Workflow
-
-```text
-AnalysisWorkflow
-↓
-route / kpi / research / report
-```
-
-⑧ Response
-
-```text
-HTTP 202
-↓
-SSE status / done
-↓
-HTTP 200 report
-```
-
-⑨ 页面更新
-
-- 事件时间线增加
-- 状态变化
-- 最后显示 Markdown 报告
-
-⑩ 对应测试
-
-- `frontend/src/pages/TasksPage.test.tsx`
-
-⑪ 如何验证
-
-- Network 中先看到 `POST /api/tasks`
-- 再看到 SSE
-- 最后看到 report 请求
-
-### 22.3 RAG 案例 A：Retrieval Search
-
-① 页面操作
-
-```text
-输入 Query
-↓
-点击 Search Retrieval
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/RagPage.tsx
-```
-
-③ api.ts
-
-```text
-searchDocumentRetrieval()
-```
-
-④ Router
-
-```text
-backend/app/api/document_retrieval.py
-↓
-search_documents()
-```
-
-⑤ Service
-
-```text
-DocumentRetrievalService.search()
-```
-
-⑥ Repository
-
-```text
-InMemoryKeywordRetrieval.search()
-```
-
-⑦ Workflow
-
-- 本案例不经过 Workflow
-
-⑧ Response
-
-```text
-DocumentRetrievalSearchResponse
-```
-
-⑨ 页面更新
-
-- 显示 results / total / retrieval_mode
-
-⑩ 对应测试
-
-- `frontend/src/pages/RagPage.test.tsx`
-
-⑪ 如何验证
-
-- 页面显示 excerpt 和 score
-- Network 中看到 `POST /api/v1/document-retrieval/search`
-
-### 22.4 RAG 案例 B：Internal RAG Answer
-
-① 页面操作
-
-```text
-输入 Question
-↓
-点击 Generate Answer
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/RagPage.tsx
-```
-
-③ api.ts
-
-```text
-answerInternalRag()
-```
-
-④ Router
-
-```text
-backend/app/api/internal_rag.py
-↓
-answer_internal_rag()
-```
-
-⑤ Service
-
-```text
-InternalRagService.answer()
-```
-
-⑥ Repository
-
-```text
-DocumentRetrievalProvider.search()
-↓
-RAGAnswerGenerator.generate()
-```
-
-⑦ Workflow
-
-- 本案例不经过 LangGraph Workflow
-
-⑧ Response
-
-```text
-answer
-↓
-citations
-↓
-confidence
-↓
-warnings
-```
-
-⑨ 页面更新
-
-- 显示 grounded answer 和 citations
-
-⑩ 对应测试
-
-- `frontend/src/pages/RagPage.test.tsx`
-
-⑪ 如何验证
-
-- 页面显示 citations
-- 页面显示 warnings 或 `no_warnings`
-
-### 22.5 Approval 案例 A：Submit Approval
-
-① 页面操作
-
-```text
-输入 Task ID
-↓
-点击 Submit Approval
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/ApprovalPage.tsx
-↓
-handleSubmitApproval()
-```
-
-③ api.ts
-
-```text
-submitApproval()
-```
-
-④ Router
-
-```text
-backend/app/api/approvals.py
-↓
-submit_approval()
-```
-
-⑤ Service
-
-```text
-ApprovalService.submit_approval()
-```
-
-⑥ Repository
-
-```text
-ApprovalRepository.save_report_version()
-↓
-ApprovalRepository.save_approval_request()
-↓
-ReportRepository.save()
-```
-
-⑦ Workflow
-
-- 本案例不经过 LangGraph Workflow
-
-⑧ Response
-
-```text
-HTTP 201
-↓
-ApprovalResponse
-```
-
-⑨ 页面更新
-
-- 显示 `Approval submitted: <approval_id>`
-- 列表和详情刷新
-
-⑩ 对应测试
-
-- `frontend/src/pages/ApprovalPage.test.tsx`
-
-⑪ 如何验证
-
-- 页面出现 success Banner
-- Network 中后续出现 approval list / detail 刷新请求
-
-### 22.6 Approval 案例 B：Approve
-
-① 页面操作
-
-```text
-在 pending_approval 状态下
-↓
-点击 Approve
-```
-
-② 前端组件
-
-```text
-frontend/src/pages/ApprovalPage.tsx
-↓
-handleApprove()
-```
-
-③ api.ts
-
-```text
-approveApproval()
-```
-
-④ Router
-
-```text
-backend/app/api/approvals.py
-↓
-approve()
-```
-
-⑤ Service
-
-```text
-ApprovalService.approve()
-```
-
-⑥ Repository
-
-```text
-ApprovalRepository.save_approval_request()
-↓
-ReportRepository.save()
-```
-
-⑦ Workflow
-
-- 本案例不经过 Workflow
-
-⑧ Response
-
-```text
-HTTP 200
-↓
-ApprovalResponse
-```
-
-⑨ 页面更新
-
-- 列表状态变化
-- 详情状态变化
-- 决策原因显示
-
-⑩ 对应测试
-
-- `frontend/src/pages/ApprovalPage.test.tsx`
-
-⑪ 如何验证
-
-- 页面显示 `Approval approved: ...`
-- 再次打开详情可看到新状态
-
----
-
-## 23. 推荐学习顺序（扩展版）
-
-这是在本文已有推荐顺序基础上的“项目全学习路线版”。
-
-```text
-Dashboard
-↓
-Tasks
-↓
-Documents
-↓
-RAG
-↓
-Approval
-↓
-Backend
-↓
-Workflow
-↓
-Repository
-↓
-PostgreSQL
-↓
-真实 LLM
-```
-
-注意：
-
-- `PostgreSQL`
-- `真实 LLM`
-
-在当前仓库里不是 Frontend 已完成内容。
-
-这里把它们放进来，是为了告诉学习者未来该怎么往后学，不是说这两项已经实现完成。
-
----
-
-## 24. 当前学习体系
-
-这一章说明 Frontend 文档在整个项目学习体系里的位置。
-
-当前建议按下面顺序理解整个项目：
-
-```text
-01_Foundation
-↓
-基础知识
-
-02_Frontend
-↓
-页面学习
-
-03_Backend
-↓
-Router / Service / Repository
-
-04_Workflow
-↓
-LangGraph
-
-05_RAG
-↓
-Retrieval / Answer
-
-06_Approval
-↓
-审批流程
-
-07_PostgreSQL
-↓
-数据库
-
-08_LLM
-↓
-真实 AI Provider
-```
-
-这里的 `03_Backend ~ 08_LLM` 是整个项目未来学习路线的分层说明。
-
-它表示“推荐你这样学”，不表示当前 `docs/learning/` 已经严格按这些目录全部拆完。
-
-如果你现在只想先把页面与源码关系读懂，可以先停在：
-
-```text
-01_Foundation
-↓
-02_Frontend
-↓
-Tasks / Documents / RAG / Approval
-```
+页面按钮
+→ frontend/src/pages/<Page>.tsx 的 handler
+→ frontend/src/api.ts 的 API Client 函数
+→ backend/app/api 的 Router 函数
+→ backend/app/services 的 Service 方法
+→ backend/app/repositories 或 backend/app/workflow
+→ schemas response
+→ React state 与页面显示
+```
+
+建议打开浏览器 DevTools：
+
+- **Network**：确认 Method、Path、status、request body 与 response envelope。
+- **Console**：确认没有前端异常。
+- **Elements**：查看业务测试说明不改变日语操作 UI。
+
+清除按钮或顶部导航没有 Network 请求时，不是故障：它们只修改 React state。
+
+## 12. 常见错误定位
+
+| 现象         | 先看哪里                                     | 常见含义                                       |
+| ------------ | -------------------------------------------- | ---------------------------------------------- |
+| 文档列表为空 | DocumentsPage 的`loadDocuments()`、Network | 当前 InMemory 中没有匹配文档，或归档过滤未勾选 |
+| Chunk 失败   | `DocumentChunkService` 错误 code           | 文档不存在、已归档、未 validated 或类型不支持  |
+| RAG 无结果   | `DocumentRetrievalService.search()`        | 没有匹配的 Chunk；不是前端生成错误             |
+| RAG 422      | `InternalRagService.answer()`              | 问题为空、资料不足或 citation 要求无法满足     |
+| 任务没有报告 | TasksPage SSE、`TaskService.get_report()`  | 任务仍在运行或失败；未完成报告是 409           |
+| 审批 403     | `AuditMiddleware.run()`                    | 当前用户没有 approval API 所需权限             |
+| 审批 409     | `ApprovalService`                          | 已提交、已决策或状态机不允许当前动作           |
+
+当前学习边界：不接真实 LLM、Embedding、PostgreSQL、pgvector 或自动跨页面编排。页面展示的链路以现有源码为准，不代表未来目标架构已经实现。

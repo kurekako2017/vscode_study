@@ -50,6 +50,9 @@ describe("RagPage", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("検索方式: keyword / 一致件数: 1");
     expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
+    expect(screen.getByText("RAG-BIZ-001")).toBeInTheDocument();
+    expect(screen.getByText("POST /api/v1/document-retrieval/search")).toBeInTheDocument();
+    expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
   });
 
   it("shows empty retrieval state from backend", async () => {
