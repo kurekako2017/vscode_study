@@ -131,72 +131,6 @@ Upload → Import → Chunk → RAG検索
 
 `Archive` 是维护操作，不是上述标准步骤。用于资料过期、内容错误或新版替换旧版；不能把它理解为 `Upload → Archive → Import → Chunk`。
 
-#### 标准状态流补充
-
-第一次操作时，不要只记住按钮名称，还要确认每一步留下的真实状态和结果：
-
-```text
-Upload
-↓
-status = uploaded
-↓
-Import
-↓
-status = validated
-↓
-Chunk
-↓
-Chunk Count > 0
-↓
-RAG Retrieval
-↓
-results > 0
-↓
-Internal RAG
-↓
-Analysis
-↓
-Approval
-```
-
-只有 `validated` 文档才能执行 Chunk。只有 `Chunk Count > 0`，RAG 才可能命中资料；即使已经有 Chunk，输入问题与资料内容不匹配时，`results` 仍可能为 0，或 Internal RAG 返回 `insufficient_context`。
-
-#### Archive 维护补充
-
-Archive 不属于企业标准业务流程。企业标准流程是：
-
-```text
-Upload
-↓
-Import
-↓
-Chunk
-↓
-RAG
-↓
-Analysis
-↓
-Approval
-```
-
-Archive 仅用于：
-
-- 资料过期。
-- 上传错误。
-- 新版本替换旧版本。
-
-不要理解为：
-
-```text
-Upload
-↓
-Archive
-↓
-Import
-↓
-Chunk
-```
-
 ### 5.2 上传流程
 
 页面看到什么
@@ -368,113 +302,15 @@ Upload → Import → Chunk
 
 三个 API 如何逐步推进，同一份文档如何从“上传完成”进入“可检索状态”。
 
-#### Import 的业务角色补充
-
-Import 不一定由管理员执行。企业通常有三种模式：
-
-1. 上传人确认 Import。
-2. 部门负责人确认 Import。
-3. 系统 Auto Import。
-
-Learning Mode 当前设计采用手动 Import，目的不是增加业务人员的固定工作量，而是让学习者看清：
-
-```text
-Upload API
-↓
-Import API
-↓
-Chunk API
-```
-
-这三个接口如何组成完整生命周期。Enterprise Mode 推荐实现中，Import 可以由企业流程自动执行。
-
-#### 为什么 Learning Mode 保留 Chunk
-
-Chunk 是 AI 内部知识切分。真实企业通常不会让业务人员查看 Chunk；业务人员更关心资料是否可用、检索是否有依据、分析结论是什么。
-
-例如 ChatGPT Enterprise、Microsoft Copilot、Notion AI、Confluence AI 的内部知识处理可概念化为：
-
-```text
-Document
-↓
-Chunk
-↓
-Embedding
-↓
-Vector
-↓
-Retrieval
-↓
-LLM
-```
-
-页面通常不暴露 Chunk。Learning Mode 当前设计保留 Chunk，是为了学习：
-
-- Document Processing。
-- Chunk Generation。
-- Retrieval。
-- Citation。
-- RAG 生命周期。
-
-同时方便阅读 `DocumentChunk`、`ChunkRepository` 与 Chunk API，直接确认“文档如何变成可检索知识”。
-
-#### Learning Mode 与 Enterprise Mode 流程补充
-
-Learning Mode（当前）：
-
-```text
-Upload
-↓
-Import
-↓
-Chunk
-↓
-Keyword Retrieval
-↓
-Internal RAG
-↓
-Analysis
-↓
-Approval
-```
-
-Enterprise Mode（推荐实现）：
-
-```text
-Upload
-↓
-Auto Import
-↓
-Auto Chunk
-↓
-Embedding
-↓
-Vector Search
-↓
-LLM
-↓
-Analysis
-↓
-Approval
-```
-
-| 对比项 | Learning Mode（当前） | Enterprise Mode（推荐实现） |
-| --- | --- | --- |
-| 文档进入方式 | Upload | Upload |
-| Import | 手动 Import | Auto Import |
-| Chunk | 手动 Chunk、可查看 Chunk | Auto Chunk、隐藏 Chunk |
-| 学习重点 | 学习 API 与完整生命周期 | 用户无需了解技术细节 |
-| 业务流程 | 学习完整生命周期 | 企业自动化流程 |
-
 #### 两种模式对比
 
-| 维度 | Learning Mode（当前） | Enterprise Mode（推荐实现） |
-|---|---|---|
-| 上传后处理 | Upload 后手动 Import、手动 Chunk | Upload 后自动 Import、自动 Chunk |
-| Chunk 可见性 | 页面可查看 Chunk、Chunk API、Chunk List | 页面隐藏 Chunk，作为内部处理 |
-| 学习目标 | 学习 API、Repository、RAG、LangGraph 的完整生命周期 | 面向真实业务用户的自动化体验 |
-| 用户认知 | 需要理解文档如何变成知识 | 只需要理解文档已可检索、可分析 |
-| 适用场景 | 学习、源码阅读、调试、面试讲解 | 企业正式使用、规模化运维 |
+| 维度         | Learning Mode（当前）                               | Enterprise Mode（推荐实现）      |
+| ------------ | --------------------------------------------------- | -------------------------------- |
+| 上传后处理   | Upload 后手动 Import、手动 Chunk                    | Upload 后自动 Import、自动 Chunk |
+| Chunk 可见性 | 页面可查看 Chunk、Chunk API、Chunk List             | 页面隐藏 Chunk，作为内部处理     |
+| 学习目标     | 学习 API、Repository、RAG、LangGraph 的完整生命周期 | 面向真实业务用户的自动化体验     |
+| 用户认知     | 需要理解文档如何变成知识                            | 只需要理解文档已可检索、可分析   |
+| 适用场景     | 学习、源码阅读、调试、面试讲解                      | 企业正式使用、规模化运维         |
 
 #### 读者需要明确的边界
 
@@ -491,23 +327,6 @@ Approval
 ## 6. RagPage：页面操作 → React → API → Backend → 结果
 
 文件：`frontend/src/pages/RagPage.tsx`
-
-### RAG 输入规则
-
-当前 RAG 不是 ChatGPT，不是联网搜索，不会根据常识回答，也不会自己推理企业业务。它只能围绕完成 Upload、Import、Chunk 后的内部资料回答。
-
-因此，上传什么文档，就必须围绕该文档提问。问题超出已上传资料的范围时，Backend 返回 `insufficient_context` 属于正常业务行为，不是程序故障。
-
-| 已上传文档 | 推荐输入问题 | 为什么这样问 |
-| --- | --- | --- |
-| `01_関東地域飲料売上分析.md` | 关东地区饮料销售下降原因是什么？<br />销量下降最多的是哪些商品？ | 文档记录销售变化。 |
-| `02_関東地域在庫レポート.md` | 哪些门店库存不足？<br />库存周转是否异常？<br />哪些商品缺货？ | 文档只包含库存数据。 |
-| `03_販促キャンペーン結果.md` | 促销效果如何？<br />ROI 是否下降？ | 文档记录促销结果。 |
-| `04_顧客アンケート集計.md` | 顾客为什么减少购买？<br />主要投诉有哪些？ | 文档记录客户意见。 |
-| `05_競合店舗調査.md` | 竞争店有哪些促销？<br />竞争店降价了吗？ | 文档记录竞争店调查。 |
-| `06_KPI月次報告.md` | 哪些 KPI 出现异常？<br />营业额是否下降？ | 文档记录 KPI。 |
-
-例如上传的是 `02_関東地域在庫レポート.md`，却提问“竞争店为什么降价？”，Backend 应返回 `insufficient_context`。原因是库存资料没有竞争店信息；这是正常业务结果。
 
 ### 6.1 页面操作
 
