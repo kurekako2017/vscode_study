@@ -1,12 +1,17 @@
 import { NavLink, Outlet, useParams } from 'react-router-dom'
+import { traceCall, traceEvent, useLearningHookSnapshot, useLearningLifecycle } from '../../learning'
 
 export function RouterHome() {
+  useLearningLifecycle('RouterHome')
+
   // 默认子路由页面，用户进入 /router 时会先看到它。
   // 也就是说，这个组件相当于“Router 章节的首页内容”。
   return <p>这里是站内路由示例首页。可以切到 About 或用户详情页。</p>
 }
 
 export function AboutPage() {
+  useLearningLifecycle('AboutPage')
+
   // 普通静态子页面，用来演示切换路由后内容会改变。
   return <p>About 页面演示了简单的页面切换。</p>
 }
@@ -15,6 +20,8 @@ export function UserProfile() {
   // useParams 可以读取 URL 里的动态参数，比如 users/42 的 42。
   // 这个值是从地址栏里解析出来的，不是手写死在组件里的。
   const { id } = useParams()
+  useLearningLifecycle('UserProfile')
+  useLearningHookSnapshot('UserProfile', 'useParams()', id, `id=${id}`)
   return (
     <p>
       当前用户 ID: <strong>{id}</strong>
@@ -23,6 +30,8 @@ export function UserProfile() {
 }
 
 export default function RouterPage() {
+  useLearningLifecycle('RouterPage')
+
   // 这个父页面负责：
   // 1. 展示路由章节说明
   // 2. 提供子路由切换按钮
@@ -41,15 +50,37 @@ export default function RouterPage() {
         {/* 这组三个按钮只是示例入口，帮助你观察不同路径对应的页面变化。 */}
         <nav className="button-row">
           {/* to="." 代表当前章节首页，也就是 /router */}
-          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="." end>
+          <NavLink
+            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+            to="."
+            end
+            onClick={() => {
+              traceEvent('Navigation click')
+              traceCall('navigateHome()')
+            }}
+          >
             Home
           </NavLink>
           {/* to="about" 会跳到 /router/about */}
-          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="about">
+          <NavLink
+            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+            to="about"
+            onClick={() => {
+              traceEvent('Navigation click')
+              traceCall('navigateAbout()')
+            }}
+          >
             About
           </NavLink>
           {/* 动态参数示例：/router/users/42 */}
-          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="users/42">
+          <NavLink
+            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+            to="users/42"
+            onClick={() => {
+              traceEvent('Navigation click')
+              traceCall('navigateUserProfile()')
+            }}
+          >
             User 42
           </NavLink>
         </nav>

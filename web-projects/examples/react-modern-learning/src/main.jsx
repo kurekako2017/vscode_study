@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { LearningBootTracker } from './learning'
 import './style.css'
 
 // 入口文件的职责很单纯：
@@ -11,6 +12,7 @@ import './style.css'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
+      <LearningBootTracker />
       <App />
     </BrowserRouter>
   </React.StrictMode>,

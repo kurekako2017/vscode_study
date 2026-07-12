@@ -1,6 +1,9 @@
 import Counter from './Counter'
+import { useLearningLifecycle } from '../../learning'
 
 export default function TestPage() {
+  useLearningLifecycle('TestPage')
+
   // 这个页面负责把“组件”和“测试文件”放在同一个章节里，方便对照学习。
   // 这样你既能看到组件如何工作，也能立刻知道它对应的测试怎么写。
   return (

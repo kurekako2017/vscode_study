@@ -1,7 +1,10 @@
 import CounterDemo from './useState/CounterDemo'
 import TimerDemo from './useEffect/TimerDemo'
+import { useLearningLifecycle } from '../../learning'
 
 export default function HooksPage() {
+  useLearningLifecycle('HooksPage')
+
   // 这个页面本身不放复杂逻辑，只做章节封面和内容容器。
   // 真正的练习点放在下面两个 demo。
   // 这样可以把“解释页面”和“练习组件”分开，结构更清晰。

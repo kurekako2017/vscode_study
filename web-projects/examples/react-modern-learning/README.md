@@ -1,24 +1,34 @@
 # React Modern Learning
 
-这是一个面向初学者的现代 React 学习项目。它把常见主题拆成独立页面，方便你按顺序一点点看懂、改懂、练懂。
+一个用于学习 React 架构、路由、Hook、状态流和测试配对的练习项目。
 
-## 快速入口
-
-- 先看 [LEARN.md](./LEARN.md)，按页面顺序学习
-- 再看 [project-structure.md](./project-structure.md)，对照文件树和页面名称
-- 打开首页 `/`，从章节入口开始练习
-
-## 运行方式
+## 安装
 
 ```bash
 npm install
+```
+
+## 启动
+
+```bash
 npm run dev
 ```
 
-## 项目特点
+## 学习顺序
 
-- 首页只负责导航
-- 每个章节一个页面
-- 每个章节下面放对应 demo
-- `Router` 章节包含子页面，适合学习嵌套路由
-- `Test` 章节把组件和测试文件放在一起，方便对照学习
+1. `Home`
+2. `Hooks`
+3. `Router`
+4. `Context`
+5. `API`
+6. `Test`
+
+## Learning Trace
+
+页面右侧的 `Learning Panel` 默认开启，打开页面就能看到 Trace、Component Tree、Source Files 和 Test File。
+
+## 学习文档
+
+FRONTEND_LEARNING_GUIDE.md
+
+leran.md

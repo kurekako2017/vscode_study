@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useLearningEffect, useLearningLifecycle, useLearningState, traceCall, traceEvent } from '../../../learning'
 
 export default function TimerDemo() {
+  useLearningLifecycle('TimerDemo')
+
   // seconds 记录这个组件已经“运行了多久”。
-  const [seconds, setSeconds] = useState(0)
+  const [seconds, setSeconds] = useLearningState('TimerDemo', 'seconds', 0)
 
   // useEffect 用来演示副作用：
   // 组件挂载后启动定时器，卸载时清理定时器。
   // 这类“开始一个外部动作 + 结束时收尾”的逻辑，很适合放进 useEffect。
-  useEffect(() => {
+  useLearningEffect('TimerDemo', 'useEffect()', () => {
     // setInterval 每 1 秒执行一次回调。
     const id = window.setInterval(() => {
       // 同样使用函数式更新，避免拿到旧状态。
@@ -27,7 +29,15 @@ export default function TimerDemo() {
         已运行：<strong>{seconds}</strong> 秒
       </p>
       <div className="button-row">
-        <button onClick={() => setSeconds(0)}>归零</button>
+        <button
+          onClick={() => {
+            traceEvent('Button click')
+            traceCall('handleResetTimer()')
+            setSeconds(0)
+          }}
+        >
+          归零
+        </button>
       </div>
     </article>
   )

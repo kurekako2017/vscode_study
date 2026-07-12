@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react'
+import { traceError, useLearningEffect, useLearningLifecycle, useLearningState } from '../../learning'
 
 // 测试用公共接口，返回一小批帖子数据。
 // 初学者可以把它理解成“后端返回列表”的模拟示例。
 const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=5'
 
 export default function PostsDemo() {
+  useLearningLifecycle('PostsDemo')
+
   // loading 表示“请求还在进行中”。
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useLearningState('PostsDemo', 'loading', true)
   // error 保存错误信息，方便把失败状态单独展示出来。
-  const [error, setError] = useState('')
+  const [error, setError] = useLearningState('PostsDemo', 'error', '')
   // posts 保存成功拿到的数据。
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useLearningState('PostsDemo', 'posts', [])
 
   // useEffect 在组件挂载后发起请求。
   // 这里还演示了：请求完成后，如果组件卸载，要取消请求。
-  useEffect(() => {
+  useLearningEffect('PostsDemo', 'fetch posts', () => {
     // 每次进入这个组件时都会创建一个新的控制器。
     // 它的作用是：如果组件提前卸载，就能把未完成的请求取消掉。
     // AbortController 可以在请求未完成时主动取消 fetch。
@@ -37,8 +39,10 @@ export default function PostsDemo() {
         setPosts(data)
       } catch (err) {
         // AbortError 代表组件卸载导致的取消，不应该当成真正错误。
-        if (err.name !== 'AbortError') {
-          setError(err.message)
+        const message = err?.message ?? '请求失败'
+        if (err?.name !== 'AbortError') {
+          traceError(message)
+          setError(message)
         }
       } finally {
         // 不管成功还是失败，请求结束后都关闭 loading。

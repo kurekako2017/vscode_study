@@ -1,5 +1,7 @@
 # 项目结构
 
+> 当前运行时学习层已新增 `src/learning/`，页面右侧的 `Learning Panel` 会显示 Trace、Component Tree、Source Files 和 Test File。
+
 ```text
 react-modern-learning/
 ├─ index.html（页面挂载入口）

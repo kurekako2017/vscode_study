@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { chapters } from '../../data/chapters'
+import { useLearningLifecycle } from '../../learning'
 
 export default function HomePage() {
+  useLearningLifecycle('HomePage')
+
   // 首页负责做“章节总入口”。
   // 每个章节都被做成卡片，点击后跳转到对应路由。
   // 这里尽量不写复杂逻辑，只负责把章节目录展示给用户。

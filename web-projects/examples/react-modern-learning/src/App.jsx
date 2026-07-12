@@ -7,12 +7,16 @@ import { AboutPage, RouterHome, UserProfile } from './chapters/router/RouterPage
 import ContextPage from './chapters/context/ContextPage'
 import ApiPage from './chapters/api/ApiPage'
 import TestPage from './chapters/test/TestPage'
+import { LearningPanel, LearningRouteBridge, useLearningLifecycle } from './learning'
 
 // AppShell 是整个学习站点的“公共外壳”。
 // 所有章节都会共用这层结构，所以把标题、导航、内容容器统一放在这里最合适。
 function AppShell({ children }) {
+  useLearningLifecycle('Layout')
+
   return (
     <div className="app-shell">
+      <LearningRouteBridge />
       {/* 顶部区域负责展示项目标题和章节导航。 */}
       <header className="topbar">
         <div>
@@ -34,12 +38,19 @@ function AppShell({ children }) {
           ))}
         </nav>
       </header>
-      <main className="content">{children}</main>
+      <div className="workspace">
+        <main className="content">{children}</main>
+        <aside className="learning-rail">
+          <LearningPanel />
+        </aside>
+      </div>
     </div>
   )
 }
 
 export default function App() {
+  useLearningLifecycle('App')
+
   // Routes 根据地址栏中的路径决定显示哪个章节。
   // 这样每个学习主题都能单独访问、单独分享、单独练习。
   // 你可以把它理解成“地址栏 = 当前该看哪一页”。
