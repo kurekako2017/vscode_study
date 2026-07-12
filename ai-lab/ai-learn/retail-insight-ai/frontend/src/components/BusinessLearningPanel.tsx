@@ -5,6 +5,11 @@ interface LearningCase {
   input: string;
   expected: string;
   steps?: string[];
+  prerequisite?: string;
+  operation?: string;
+  expectedApi?: string;
+  pageOutput?: string;
+  businessCheck?: string;
 }
 
 interface LearningFlow {
@@ -44,6 +49,11 @@ interface OperationGuide {
   prerequisite: string;
   action: string;
   expected: string;
+  input?: string;
+  settings?: string;
+  verification?: string;
+  troubleshooting?: string;
+  next?: string;
 }
 
 interface BusinessLearningPanelProps {
@@ -57,6 +67,7 @@ interface BusinessLearningPanelProps {
   flows: LearningFlow[];
   standardSop?: { title: string; scenarioFile: string; summary: string; steps: SopStep[] };
   operationGuides?: OperationGuide[];
+  operationGuideTitle?: string;
 }
 
 /**
@@ -79,6 +90,7 @@ export function BusinessLearningPanel({
   flows,
   standardSop,
   operationGuides,
+  operationGuideTitle,
 }: BusinessLearningPanelProps) {
   const standardCases = cases.filter((item) => item.group === "标准业务 Case");
   const exceptionCases = cases.filter((item) => item.group === "异常与维护测试 Case");
@@ -131,13 +143,18 @@ export function BusinessLearningPanel({
 
           {operationGuides && (
             <section className="operation-guides" aria-label={`${pageName} 操作说明`}>
-              <h3>页面操作说明</h3>
+              <h3>{operationGuideTitle ?? "页面操作说明"}</h3>
               {operationGuides.map((guide) => (
                 <article key={guide.title} className="learning-flow">
                   <h4>{guide.title}</h4>
                   <p><strong>前置条件：</strong>{guide.prerequisite}</p>
+                  {guide.input && <p><strong>输入：</strong>{guide.input}</p>}
+                  {guide.settings && <p><strong>设置：</strong>{guide.settings}</p>}
                   <p><strong>操作：</strong>{guide.action}</p>
                   <p><strong>预期：</strong>{guide.expected}</p>
+                  {guide.verification && <p><strong>验证点：</strong>{guide.verification}</p>}
+                  {guide.troubleshooting && <p><strong>insufficient_context 检查：</strong>{guide.troubleshooting}</p>}
+                  {guide.next && <p><strong>下一步：</strong>{guide.next}</p>}
                 </article>
               ))}
             </section>
@@ -171,7 +188,12 @@ function CaseGrid({ cases }: { cases: LearningCase[] }) {
         <article key={item.id} className="learning-case">
           <strong>{item.id}</strong>
           <p><b>业务目的：</b>{item.purpose}</p>
+          {item.prerequisite && <p><b>前置条件：</b>{item.prerequisite}</p>}
           <p><b>输入／操作：</b>{item.input}</p>
+          {item.operation && <p><b>操作：</b>{item.operation}</p>}
+          {item.expectedApi && <p><b>预期 API：</b><code>{item.expectedApi}</code></p>}
+          {item.pageOutput && <p><b>预期页面输出：</b>{item.pageOutput}</p>}
+          {item.businessCheck && <p><b>业务确认点：</b>{item.businessCheck}</p>}
           {item.steps && <ol>{item.steps.map((step) => <li key={step}>{step}</li>)}</ol>}
           <p><b>预期结果与确认点：</b>{item.expected}</p>
         </article>

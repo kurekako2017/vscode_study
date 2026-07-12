@@ -55,8 +55,16 @@ describe("RagPage", () => {
     expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
     expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("上一步：文書管理");
     expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("下一步：分析依頼");
-    expect(screen.getByText("A. Document Retrieval")).toBeInTheDocument();
-    expect(screen.getByText("C. insufficient_context")).toBeInTheDocument();
+    expect(screen.getByText("如何选择 RAG 输入")).toBeInTheDocument();
+    expect(screen.getAllByText(/02_関東地域在庫レポート\.md/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/検索語：神奈川 配送遅延 夕方欠品/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/神奈川で夕方欠品が増加した理由は何ですか。/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/不推荐：競合店舗はなぜ値下げしましたか。/)).toBeInTheDocument();
+    expect(screen.getByText(/Retrieval 成功后才执行 Answer/)).toBeInTheDocument();
+    expect(screen.getByText(/results=0 时不建议直接生成 Internal RAG Answer/)).toBeInTheDocument();
+    expect(screen.getAllByText(/insufficient_context/).length).toBeGreaterThan(0);
+    expect(screen.getByText("综合经营问题的前置资料")).toBeInTheDocument();
+    expect(screen.getByText("RAG-BIZ-005")).toBeInTheDocument();
   });
 
   it("shows empty retrieval state from backend", async () => {

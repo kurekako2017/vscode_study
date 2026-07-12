@@ -328,19 +328,58 @@ Upload → Import → Chunk
 
 文件：`frontend/src/pages/RagPage.tsx`
 
-### 6.1 页面操作
+### 6.1 RAG 输入规则
 
-先在 DocumentsPage 准备可检索 Chunk，再输入：
+第一次实际操作时，优先看 RAG 页面底部的「业务测试与源码学习」。该区域提供当前推荐上传文档、可直接复制的検索語与質問、不推荐问题、预期结果和 `insufficient_context` 排查顺序。
+
+需要理解完整规则、六份文档的对应关系和源码调用链时，再查看本章。Scenario01 的 `07_RAG質問集.md` 是更多可选问题的扩展问题库，不是第一次测试时唯一入口。
+
+当前 ERIP RAG 不是联网搜索，不是通用 ChatGPT，不会根据外部常识补充企业数据，也不会自行推理企业业务。它只从已经完成 Upload、Import、Chunk 的内部文档中检索；当前使用 Keyword Retrieval，Internal RAG 是 Deterministic Answer，真实 LLM、Embedding、pgvector 和 Vector Search 均未接入。
+
+核心规则是：上传什么文档，就围绕该文档正文中真实存在的主题、关键词和事实提问。如果问题涉及的事实不存在于任何已完成 Chunk 的文档中，Backend 返回 `insufficient_context` 属于正常结果，不是系统故障。
+
+| 已上传并完成 Chunk 的文档 | 文档主题 | 推荐検索語 | 推荐質問 | 不适合单独询问的主题 |
+| --- | --- | --- | --- | --- |
+| `01_関東地域飲料売上分析.md` | 关东地区销售、地区别销售、商品分类、同比和环比变化 | `関東地区 飲料売上 前年比`、`炭酸飲料 無糖飲料 欠品` | `関東地区の飲料売上が前年同月比で低下した主な要因は何ですか。`<br />`炭酸飲料と無糖飲料の売上変化を教えてください。` | 详细库存配送原因、顾客投诉、竞争店价格、促销 ROI。 |
+| `02_関東地域在庫レポート.md` | 库存、缺货率、库存日数、补充达成率、配送延迟 | `神奈川 配送遅延 夕方欠品`、`炭酸飲料 欠品率 補充達成率` | `神奈川で夕方欠品が増加した理由は何ですか。`<br />`関東地域の飲料在庫における主な問題を要約してください。` | 顾客满意度、竞争店促销、促销 ROI。 |
+| `03_販促キャンペーン結果.md` | 初夏水分补给活动、店头 POP、应用优惠券、SNS 广告、参加率 | `初夏の水分補給フェア クーポン 利用率`、`SNS広告 CTR 店頭POP` | `初夏の水分補給フェア 2026 の実績は目標と比べてどうでしたか。`<br />`アプリクーポンの利用率が低かった理由は何ですか。` | 门店配送延迟详情、顾客满意度、竞争店单品价格。 |
+| `04_顧客アンケート集計.md` | 购买和未购买理由、满意度、自由意见、顾客年龄层 | `未購入理由 棚 競合店`、`満足度 品揃え クーポン` | `買わなかった理由の上位は何ですか。`<br />`顧客満足度はどの項目が低いですか。` | 具体配送计划、竞争店的单品价格、促销活动 CTR。 |
+| `05_競合店舗調査.md` | 竞争店价格、促销、会员活动、广告、新品和市场变化 | `競合C店 箱買い 価格`、`会員活動 新商品 無糖炭酸` | `競合店はどの販促で集客していますか。`<br />`競合C店の価格と販促の特徴は何ですか。` | 自社顾客满意度、库存周转率、优惠券实际利用率。 |
+| `06_KPI月次報告.md` | 销售额、客数、客单价、库存周转率、缺货率、促销参加率和投诉率 | `欠品率 在庫回転率 客単価`、`売上額 販促参加率 苦情率` | `6月のKPIで目標未達となった指標は何ですか。`<br />`客数の落ち幅より売上低下が大きい理由は何ですか。` | 单店配送细节、竞争店新品细节、顾客自由意见全文。 |
+
+例如只上传 `02_関東地域在庫レポート.md`，却提问“競合店舗はなぜ値下げしましたか。”，当前 Chunk 没有竞争店价格或促销证据，Backend 应返回 `insufficient_context`。这是正常业务结果。
+
+单文档问题只要求回答一份文档覆盖的内容。例如只上传库存报告，可以询问库存、缺货和配送问题。综合经营问题则需要完成相关资料的 Chunk：
 
 ```text
-検索語：関東地域の飲料カテゴリの売上減少
+関東地域の飲料カテゴリの売上減少原因を、
+売上、在庫、販促、顧客、競合、KPIの観点から整理してください。
+```
+
+执行该问题前，应将 `01` 销售分析、`02` 库存报告、`03` 促销结果、`04` 顾客调查、`05` 竞争店调查、`06` KPI 月报全部或至少相关资料完成 Chunk。一份库存报告不能独立证明全部销售下降原因；当前 RAG 只能根据已存在证据回答，不应补造缺失资料。
+
+### 6.2 页面操作
+
+先在 DocumentsPage 准备可检索 Chunk。推荐操作顺序是：
+
+1. 确认相关文档已完成 `Upload → Import → Chunk`。
+2. 先执行 Document Retrieval，使用与正文直接相关的短关键词。
+3. 确认 `results > 0`、`document_id` 正确、存在 `chunk_id`、Chunk 内容相关且有 `score`。
+4. Retrieval 成功后，再执行 Internal RAG Answer。
+5. 确认 `answer`、`citations`、`confidence`、`warnings`、`retrieval_mode`、`answer_mode`。
+6. 如果 `results = 0`，不建议直接执行 Internal RAG Answer；当前没有相关 Chunk，回答大概率返回 `insufficient_context`。
+
+库存报告的首次测试可输入：
+
+```text
+検索語：神奈川 配送遅延 夕方欠品
 取得件数：5
-質問：関東地域の飲料カテゴリの売上減少の主な原因は何ですか。
+質問：神奈川で夕方欠品が増加した理由は何ですか。
 回答方式：extractive
 引用を必須にする：true
 ```
 
-### 6.2 Document Retrieval
+### 6.3 Document Retrieval
 
 页面看到什么
 → 文書 ID、Chunk ID、score、source、metadata 和 retrieval mode。
@@ -368,7 +407,7 @@ backend/app/api/document_retrieval.py search_documents()
 返回后页面怎么变化
 → 有结果时显示真实 Chunk 摘要；无结果时 `results` 是空数组，页面显示「検索結果はありません。」。
 
-### 6.3 Internal RAG Answer
+### 6.4 Internal RAG Answer
 
 页面看到什么
 → answer、confidence、warnings、citation。
@@ -397,7 +436,7 @@ backend/app/api/internal_rag.py answer_internal_rag()
 返回后页面怎么变化
 → 页面只渲染 Backend 返回的 answer/citations，不自行拼装答案。资料不足时显示实际 `insufficient_context` 等错误。
 
-### 6.4 清除按钮为什么没有 Network 请求
+### 6.5 清除按钮为什么没有 Network 请求
 
 ```text
 「結果をクリア」 → setRetrievalResult(null) → 不请求 Backend
@@ -406,13 +445,13 @@ backend/app/api/internal_rag.py answer_internal_rag()
 
 这是页面状态操作，不是业务数据删除。
 
-### 6.5 建议企业测试 Case
+### 6.6 建议企业测试 Case
 
-- `RAG-BIZ-001`：检索关东饮料资料，确认 `results`、`score` 与 `document_id`。
-- `RAG-BIZ-002`：清空搜索词，确认不能提交。
-- `RAG-BIZ-003`：输入无匹配词，确认空结果而非伪造答案。
-- `RAG-BIZ-004`：资料不足且引用必需时，确认实际业务错误。
-- `RAG-BIZ-005`：清除结果，确认只改 React state。
+- `RAG-BIZ-001`：库存报告的正常 Retrieval → Internal RAG 流程，确认 `results`、`score`、`document_id`、`answer` 与 citation。
+- `RAG-BIZ-002`：在无 filter 的首次成功检索后，逐个测试真实支持的 `document_type`、`language` 或 `tags` filter。
+- `RAG-BIZ-003`：输入与任何 Chunk 不匹配的关键词，确认 Retrieval 空结果而非伪造答案。
+- `RAG-BIZ-004`：以库存资料询问竞争店主题，确认 `insufficient_context` 是正常证据不足结果。
+- `RAG-BIZ-005`：清除 Retrieval 和 Answer，确认只改 React state，不发送 API。
 
 ## 7. TasksPage：页面操作 → React → API → Backend → 结果
 
