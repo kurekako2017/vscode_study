@@ -41,7 +41,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--mint); box-shado
 .eyebrow { color: var(--mint); font: 500 12px/1.4 ui-monospace, monospace; letter-spacing: .16em; }
 h1 { margin: 12px 0; color: #f4f8f6; font-size: clamp(44px, 7vw, 82px); line-height: .98; letter-spacing: -.055em; }
 .lead { max-width: 620px; color: #9db0b0; font-size: 17px; line-height: 1.8; }
-.top-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+.top-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
 .nav-chip {
   width: auto;
   border: 1px solid #294048;
@@ -50,7 +50,11 @@ h1 { margin: 12px 0; color: #f4f8f6; font-size: clamp(44px, 7vw, 82px); line-hei
   background: #0a171e;
   font-weight: 600;
 }
-.nav-chip.selected { border-color: var(--accent); color: #f2d6a8; background: rgba(255, 181, 71, .08); }
+.nav-chip.selected, .nav-chip[aria-current="page"] { border-color: var(--accent); color: #f2d6a8; background: rgba(255, 181, 71, .08); }
+.page-header { margin: 0 0 20px; }
+.page-eyebrow { margin: 0 0 10px; color: var(--mint); font: 500 12px/1.4 ui-monospace, monospace; letter-spacing: .16em; }
+.page-header h2 { margin: 0 0 10px; color: #f4f8f6; font-size: clamp(24px, 3vw, 36px); }
+.page-description { margin: 0; max-width: 760px; color: #9db0b0; line-height: 1.8; }
 .workspace { display: grid; grid-template-columns: 1.08fr .92fr; gap: 18px; }
 .panel { border: 1px solid var(--line); background: var(--panel); box-shadow: 0 24px 80px rgba(0, 0, 0, .22); }
 .task-form, .timeline, .report { padding: 28px; }
@@ -90,6 +94,7 @@ button:disabled { opacity: .5; cursor: wait; }
 .event-list small { margin-top: 5px; color: var(--muted); font: 11px ui-monospace, monospace; }
 .error { margin-top: 20px; border-left: 3px solid #ff6b6b; padding: 12px; color: #ffc4c4; background: rgba(255, 107, 107, .08); font-size: 13px; }
 .success-banner { margin: 16px 0; border-left: 3px solid var(--mint); padding: 12px; color: #d7fff6; background: rgba(104, 216, 193, .1); font-size: 13px; }
+.info-banner { margin: 16px 0; border-left: 3px solid #6db8ff; padding: 12px; color: #d8ecff; background: rgba(109, 184, 255, .1); font-size: 13px; }
 .report { margin-top: 18px; }
 .report pre { overflow-x: auto; margin: 0; padding: 24px; color: #cbd8d7; background: #09151c; white-space: pre-wrap; font: 13px/1.9 ui-monospace, "Noto Sans JP", monospace; }
 .documents-shell { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 18px; }
@@ -97,6 +102,8 @@ button:disabled { opacity: .5; cursor: wait; }
 .rag-shell { display: grid; gap: 18px; }
 .approval-shell { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 18px; }
 .approval-main { display: grid; gap: 18px; }
+.dashboard-shell { display: grid; gap: 18px; }
+.dashboard-panel { padding: 28px; }
 .rag-panel { padding: 28px; }
 .approval-sidebar, .approval-submit-panel, .approval-detail-panel { padding: 28px; }
 .stack-form { display: grid; gap: 14px; }
@@ -162,11 +169,33 @@ button:disabled { opacity: .5; cursor: wait; }
 .chunk-list pre { margin: 0; white-space: pre-wrap; color: #cbd8d7; font: 12px/1.7 ui-monospace, "Noto Sans JP", monospace; }
 .empty-block { display: grid; gap: 12px; justify-items: start; }
 .approval-table { margin-top: 18px; }
+.dashboard-card-grid, .dashboard-boundary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.dashboard-card button { margin-top: 14px; }
+.runtime-grid dd, .runtime-grid dt, .card-description { overflow-wrap: anywhere; }
 .approval-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-top: 24px;
+}
+.status-pill-Available,
+.status-pill-available,
+.status-pill-no_warnings {
+  border-color: rgba(104, 216, 193, .35);
+  color: #d7fff6;
+  background: rgba(104, 216, 193, .1);
+}
+.status-pill-Not_Connected,
+.status-pill-Not_Available,
+.status-pill-disabled,
+.status-pill-weak_match {
+  border-color: rgba(255, 181, 71, .35);
+  color: #f2d6a8;
+  background: rgba(255, 181, 71, .08);
 }
 .status-pill-pending_approval {
   border-color: rgba(255, 181, 71, .35);
@@ -196,6 +225,7 @@ button:disabled { opacity: .5; cursor: wait; }
   .workspace { grid-template-columns: 1fr; }
   .documents-shell { grid-template-columns: 1fr; }
   .approval-shell { grid-template-columns: 1fr; }
+  .dashboard-card-grid, .dashboard-boundary-grid { grid-template-columns: 1fr; }
   .filter-grid { grid-template-columns: 1fr; }
   .action-row { flex-direction: column; }
   .action-grid { grid-template-columns: 1fr 1fr; }

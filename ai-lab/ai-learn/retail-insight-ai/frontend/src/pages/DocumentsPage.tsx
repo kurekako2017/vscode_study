@@ -10,6 +10,9 @@ import {
   listDocuments,
   uploadDocument,
 } from "../api";
+import { PageHeader } from "../components/PageHeader";
+import { StatusBadge } from "../components/StatusBadge";
+import { StatusBanner } from "../components/StatusBanner";
 import type { DisplayError, DocumentChunkListResponse, DocumentListResponse, DocumentResponse } from "../types";
 
 const defaultOwner = "analysis-team";
@@ -192,8 +195,15 @@ export function DocumentsPage() {
   const selectedDocumentBusy = activeDocumentAction !== null;
 
   return (
-    <section className="documents-shell" aria-label="文档管理页面">
-      <aside className="panel upload-panel">
+    <>
+      <PageHeader
+        eyebrow="DOCUMENT WORKSPACE"
+        title="Documents"
+        description="Manage document upload, detail, archive, import, and chunk actions through the current backend contract without inventing local-only data."
+      />
+
+      <section className="documents-shell" aria-label="文档管理页面">
+        <aside className="panel upload-panel">
         <div className="panel-heading">
           <span>01</span>
           <h2>Document Upload</h2>
@@ -252,11 +262,11 @@ export function DocumentsPage() {
           >
             {uploading ? "アップロード中…" : "Upload Document"}
           </button>
-          {uploadError && <div className="error" role="alert">[{uploadError.code}] {uploadError.message}</div>}
+          {uploadError && <StatusBanner tone="error">[{uploadError.code}] {uploadError.message}</StatusBanner>}
         </form>
-      </aside>
+        </aside>
 
-      <section className="documents-main">
+        <section className="documents-main">
         <section className="panel list-panel" aria-live="polite">
           <div className="panel-heading">
             <span>02</span>
@@ -274,8 +284,8 @@ export function DocumentsPage() {
             </button>
           </div>
 
-          {bannerMessage && <div className="success-banner" role="status">{bannerMessage}</div>}
-          {documentsError && <div className="error" role="alert">[{documentsError.code}] {documentsError.message}</div>}
+          {bannerMessage && <StatusBanner tone="success">{bannerMessage}</StatusBanner>}
+          {documentsError && <StatusBanner tone="error">[{documentsError.code}] {documentsError.message}</StatusBanner>}
 
           {documentsLoading ? (
             <p className="empty">Loading documents…</p>
@@ -298,7 +308,7 @@ export function DocumentsPage() {
                       <small>{document.document_id}</small>
                     </div>
                     <div className="row-meta">
-                      <span className="pill">{document.status}</span>
+                      <StatusBadge value={document.status} />
                       <span>{document.document_type}</span>
                       <span>{formatDate(document.updated_at)}</span>
                     </div>
@@ -316,7 +326,7 @@ export function DocumentsPage() {
             {selectedDocument && <small>{selectedDocument.document_id}</small>}
           </div>
 
-          {detailError && <div className="error" role="alert">[{detailError.code}] {detailError.message}</div>}
+          {detailError && <StatusBanner tone="error">[{detailError.code}] {detailError.message}</StatusBanner>}
 
           {selectedDocumentId === null ? (
             <p className="empty">Select a document from the list to view detail and actions.</p>
@@ -371,7 +381,7 @@ export function DocumentsPage() {
                 </button>
               </div>
 
-              {chunkError && <div className="error" role="alert">[{chunkError.code}] {chunkError.message}</div>}
+              {chunkError && <StatusBanner tone="error">[{chunkError.code}] {chunkError.message}</StatusBanner>}
 
               <div className="chunk-panel">
                 <div className="subheading">
@@ -405,7 +415,8 @@ export function DocumentsPage() {
           )}
         </section>
       </section>
-    </section>
+      </section>
+    </>
   );
 }
 

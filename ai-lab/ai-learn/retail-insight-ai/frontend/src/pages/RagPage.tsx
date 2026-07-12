@@ -1,6 +1,9 @@
 import { FormEvent, useState } from "react";
 
 import { ApiClientError, answerInternalRag, searchDocumentRetrieval } from "../api";
+import { PageHeader } from "../components/PageHeader";
+import { StatusBadge } from "../components/StatusBadge";
+import { StatusBanner } from "../components/StatusBanner";
 import type {
   DisplayError,
   DocumentRetrievalSearchResponse,
@@ -94,8 +97,15 @@ export function RagPage() {
   }
 
   return (
-    <section className="rag-shell" aria-label="RAG workspace">
-      <section className="panel rag-panel">
+    <>
+      <PageHeader
+        eyebrow="RETRIEVAL + GROUNDED ANSWER"
+        title="RAG"
+        description="Run the current deterministic retrieval and grounded answer flows: keyword retrieval is available, while vector search and real LLM generation are intentionally not connected."
+      />
+
+      <section className="rag-shell" aria-label="RAG workspace">
+        <section className="panel rag-panel">
         <div className="panel-heading">
           <span>01</span>
           <h2>Document Retrieval</h2>
@@ -154,7 +164,7 @@ export function RagPage() {
 
         {retrievalError && (
           <div className="error-block">
-            <div className="error" role="alert">[{retrievalError.code}] {retrievalError.message}</div>
+            <StatusBanner tone="error">[{retrievalError.code}] {retrievalError.message}</StatusBanner>
             <button type="button" className="secondary-button" onClick={() => setRetrievalError(null)}>
               Dismiss
             </button>
@@ -174,9 +184,9 @@ export function RagPage() {
           </div>
         ) : (
           <div className="result-stack">
-            <div className="success-banner" role="status">
+            <StatusBanner tone="success">
               Retrieval mode: {retrievalResult.retrieval_mode} / Total matches: {retrievalResult.total}
-            </div>
+            </StatusBanner>
             {retrievalResult.results.map((item, index) => (
               <article key={item.chunk_id} className="result-card">
                 <div className="subheading">
@@ -267,7 +277,7 @@ export function RagPage() {
 
         {ragError && (
           <div className="error-block">
-            <div className="error" role="alert">[{ragError.code}] {ragError.message}</div>
+            <StatusBanner tone="error">[{ragError.code}] {ragError.message}</StatusBanner>
             <button type="button" className="secondary-button" onClick={() => setRagError(null)}>
               Dismiss
             </button>
@@ -280,9 +290,9 @@ export function RagPage() {
           <p className="empty">Ask a question to see the grounded answer, confidence, warnings, and citations from the backend.</p>
         ) : (
           <div className="result-stack">
-            <div className="success-banner" role="status">
+            <StatusBanner tone="success">
               Retrieval mode: {ragResult.retrieval_mode} / Answer mode: {ragResult.answer_mode} / Confidence: {ragResult.confidence.toFixed(2)}
-            </div>
+            </StatusBanner>
             <article className="result-card">
               <div className="subheading">
                 <strong>Answer</strong>
@@ -291,9 +301,9 @@ export function RagPage() {
               <pre className="answer-block">{ragResult.answer}</pre>
               <div className="warning-list">
                 {ragResult.warnings.length === 0 ? (
-                  <span className="pill">no warnings</span>
+                  <StatusBadge value="no_warnings" />
                 ) : (
-                  ragResult.warnings.map((warning) => <span key={warning} className="pill">{warning}</span>)
+                  ragResult.warnings.map((warning) => <StatusBadge key={warning} value={warning} />)
                 )}
               </div>
             </article>
@@ -319,7 +329,8 @@ export function RagPage() {
           </div>
         )}
       </section>
-    </section>
+      </section>
+    </>
   );
 }
 

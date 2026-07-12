@@ -1,6 +1,8 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiClientError, createTask, getReport, subscribeToTask } from "../api";
+import { PageHeader } from "../components/PageHeader";
+import { StatusBanner } from "../components/StatusBanner";
 import type { AnalysisMode, DisplayError, ReportResponse, TaskEvent, TaskStatus } from "../types";
 
 const defaultQuestion = "売上と在庫の状況を分析し、市場トレンドと競合も確認してください";
@@ -95,6 +97,12 @@ export function TasksPage() {
 
   return (
     <>
+      <PageHeader
+        eyebrow="TASK WORKFLOW"
+        title="Analysis / Tasks"
+        description="Create a deterministic analysis task, observe SSE progress, and inspect the final generated report from the current local workflow."
+      />
+
       <section className="workspace" aria-label="分析ワークスペース">
         <form className="task-form panel" onSubmit={submit}>
           <div className="panel-heading">
@@ -158,7 +166,7 @@ export function TasksPage() {
               ))}
             </ol>
           )}
-          {error && <div className="error" role="alert">[{error.code}] {error.message}</div>}
+          {error && <StatusBanner tone="error">[{error.code}] {error.message}</StatusBanner>}
         </section>
       </section>
 

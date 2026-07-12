@@ -9,6 +9,9 @@ import {
   requestApprovalRevision,
   submitApproval,
 } from "../api";
+import { PageHeader } from "../components/PageHeader";
+import { StatusBadge } from "../components/StatusBadge";
+import { StatusBanner } from "../components/StatusBanner";
 import type {
   ApprovalListResponse,
   ApprovalResponse,
@@ -225,8 +228,15 @@ export function ApprovalPage() {
   }
 
   return (
-    <section className="approval-shell" aria-label="Approval workspace">
-      <aside className="panel approval-sidebar">
+    <>
+      <PageHeader
+        eyebrow="APPROVAL WORKFLOW"
+        title="Approval"
+        description="Review the current approval queue, inspect immutable approval detail, and run approve, reject, or revise actions through the real backend state machine."
+      />
+
+      <section className="approval-shell" aria-label="Approval workspace">
+        <aside className="panel approval-sidebar">
         <div className="panel-heading">
           <span>01</span>
           <h2>Approval Queue</h2>
@@ -262,7 +272,7 @@ export function ApprovalPage() {
           </div>
         </form>
 
-        {listError && <div className="error" role="alert">[{listError.code}] {listError.message}</div>}
+        {listError && <StatusBanner tone="error">[{listError.code}] {listError.message}</StatusBanner>}
 
         {listLoading ? (
           <p className="empty">Loading approvals…</p>
@@ -282,16 +292,16 @@ export function ApprovalPage() {
                   <small>Task {item.task_id}</small>
                 </div>
                 <div className="row-meta">
-                  <span className={`pill status-pill status-pill-${item.status}`}>{item.status}</span>
+                  <StatusBadge value={item.status} />
                   <span>v{item.revision_no}</span>
                 </div>
               </button>
             ))}
           </div>
         )}
-      </aside>
+        </aside>
 
-      <section className="approval-main">
+        <section className="approval-main">
         <section className="panel approval-submit-panel">
           <div className="panel-heading">
             <span>02</span>
@@ -316,7 +326,7 @@ export function ApprovalPage() {
             <button type="submit" disabled={submitLoading || submitTaskId.trim().length === 0}>
               {submitLoading ? "Submitting…" : "Submit Approval"}
             </button>
-            {submitError && <div className="error" role="alert">[{submitError.code}] {submitError.message}</div>}
+            {submitError && <StatusBanner tone="error">[{submitError.code}] {submitError.message}</StatusBanner>}
           </form>
         </section>
 
@@ -327,8 +337,8 @@ export function ApprovalPage() {
             <small>Status: {selectedStatusLabel}</small>
           </div>
 
-          {bannerMessage && <div className="success-banner" role="status">{bannerMessage}</div>}
-          {detailError && <div className="error" role="alert">[{detailError.code}] {detailError.message}</div>}
+          {bannerMessage && <StatusBanner tone="success">{bannerMessage}</StatusBanner>}
+          {detailError && <StatusBanner tone="error">[{detailError.code}] {detailError.message}</StatusBanner>}
 
           {detailLoading ? (
             <p className="empty">Loading approval detail…</p>
@@ -340,7 +350,7 @@ export function ApprovalPage() {
                 <div><dt>Approval ID</dt><dd>{selectedApproval.approval_id}</dd></div>
                 <div><dt>Task ID</dt><dd>{selectedApproval.task_id}</dd></div>
                 <div><dt>Report Version ID</dt><dd>{selectedApproval.report_version_id}</dd></div>
-                <div><dt>Status</dt><dd><span className={`pill status-pill status-pill-${selectedApproval.status}`}>{selectedApproval.status}</span></dd></div>
+                <div><dt>Status</dt><dd><StatusBadge value={selectedApproval.status} /></dd></div>
                 <div><dt>Requested At</dt><dd>{formatDateTime(selectedApproval.requested_at)}</dd></div>
                 <div><dt>Requested By</dt><dd>{selectedApproval.requested_by ?? "system placeholder user"}</dd></div>
                 <div><dt>Decided At</dt><dd>{selectedApproval.decided_at ? formatDateTime(selectedApproval.decided_at) : "Not decided yet"}</dd></div>
@@ -410,7 +420,8 @@ export function ApprovalPage() {
           )}
         </section>
       </section>
-    </section>
+      </section>
+    </>
   );
 }
 

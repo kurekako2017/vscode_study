@@ -16,7 +16,7 @@
 
 - `frontend/src/App.test.tsx`
 
-注意：现在项目还没有把 `DocumentsPage` 单独拆成 `DocumentsPage.test.tsx`。  
+注意：现在项目还没有把 `DocumentsPage` 单独拆成 `DocumentsPage.test.tsx`。
 也就是说，DocumentsPage 的测试是放在整个 App 的集成测试文件里一起跑的。
 
 ## 2. 测试从哪个入口开始执行
@@ -198,8 +198,7 @@ await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-1
 
 DocumentsPage 本身有 loading 状态，例如首次读取列表时会先发请求。
 
-当前测试文件没有专门写一条 “DocumentsPage loading 文案出现” 的单独用例，  
-但写法通常会是：
+当前测试文件没有专门写一条 “DocumentsPage loading 文案出现” 的单独用例，但写法通常会是：
 
 - 先让 `fetch` 延迟返回
 - 然后断言页面出现 loading 文案
@@ -313,13 +312,13 @@ expect(await screen.findByRole("status")).toHaveTextContent("Archive accepted: d
 
 当前真实数据流是：
 
-`fetchMock`  
-→ `App` 里的导航切换  
-→ `DocumentsPage` 调用 `api.ts`  
-→ `api.ts` 调用被 mock 的 `fetch`  
-→ mock response 返回  
-→ `DocumentsPage` 更新 React state  
-→ DOM 刷新  
+`fetchMock`
+→ `App` 里的导航切换
+→ `DocumentsPage` 调用 `api.ts`
+→ `api.ts` 调用被 mock 的 `fetch`
+→ mock response 返回
+→ `DocumentsPage` 更新 React state
+→ DOM 刷新
 → `screen` / `expect` 做断言
 
 也就是说：
@@ -376,7 +375,7 @@ fireEvent.click(screen.getByRole("button", { name: "Documents" }));
 const file = new File(["month,sales"], "budget.csv", { type: "text/csv" });
 ```
 
-这里很重要。  
+这里很重要。
 因为上传测试不能只改字符串，必须模拟真实文件。
 
 ### 第 6 步：选择文件
@@ -416,8 +415,7 @@ expect(await screen.findByRole("status")).toHaveTextContent("Upload completed: d
 expect((await screen.findAllByText("budget.csv")).length).toBeGreaterThan(0);
 ```
 
-这一步非常关键。  
-它证明：
+这一步非常关键。它证明：
 
 - 不只是接口成功了
 - 而是页面刷新后真的拿到了新数据
@@ -449,9 +447,9 @@ npm test -- --run src/App.test.tsx
 
 这样会比较容易建立感觉：
 
-空状态  
-→ 列表显示  
-→ 错误显示  
+空状态
+→ 列表显示
+→ 错误显示
 → 完整成功链路
 
 ## 22. 当前这份学习文档的边界
