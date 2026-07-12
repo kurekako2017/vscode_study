@@ -1045,8 +1045,8 @@ Response
 | 为什么先学习         | 理解 archive 语义、可追溯删除和企业审计边界                                                                                                                           |
 | Swagger 操作         | 打开`DELETE /api/v1/documents/{document_id}` → `Try it out` → 填 `document_id` → `Execute`                                                                 |
 | 输入（入力）         | `document_id`（Path，必填）：要归档的文档 ID。 |
-| 预想结果（予想結果） | HTTP`200`，文档进入 archived，列表默认不再显示                                                                                                                      |
-| 后台日志观察         | 归档状态变化、列表变化、重复归档边界                                                                                                                                  |
+| 预想结果（予想結果） | HTTP`202 Accepted`，文档进入 archived，列表默认不再显示                                                                                                               |
+| 后台日志观察         | Learning Trace：`archive_document()` → `DocumentArchiveService.archive_document()` → `InMemoryDocumentRepository.get()` → `InMemoryDocumentRepository.update()` → `Document archived: <title>` → HTTP 202 Response；404 分支显示 `Document not found`。Structured Log：真实事件 `document.archive.completed`。 |
 | 对应测试             | `backend/tests/test_document_archive_api.py`                                                                                                                        |
 | 对应源码             | `backend/app/api/documents.py`、`backend/app/services/document_archive_service.py`、`backend/app/repositories/implementations/in_memory/document_repository.py` |
 | 下一步               | `POST /api/v1/documents/{document_id}/import`                                                                                                                       |
@@ -1063,9 +1063,17 @@ backend/app/services/document_archive_service.py
 DocumentArchiveService.archive_document()
 ↓
 backend/app/repositories/implementations/in_memory/document_repository.py
+InMemoryDocumentRepository.get()
+↓
+backend/app/services/document_archive_service.py
+if document exists and status is not archived
+↓
+backend/app/repositories/implementations/in_memory/document_repository.py
 InMemoryDocumentRepository.update()
 ↓
-Response
+Document archived: <title>
+↓
+HTTP 202 Response
 ```
 
 ## 源码学习说明

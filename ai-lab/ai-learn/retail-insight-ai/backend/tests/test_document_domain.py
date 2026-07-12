@@ -140,17 +140,17 @@ class DocumentMetadataValidationTest(unittest.TestCase):
 
 class InMemoryDocumentRepositoryTest(unittest.TestCase):
     """验证文档仓库 CRUD 和 checksum 去重。"""
-
+    # 设置测试环境
     def setUp(self) -> None:
         self.repository = InMemoryDocumentRepository()
-
+    # 测试仓库实现
     def test_repository_implements_protocol(self) -> None:
         self.assertIsInstance(self.repository, DocumentRepository)
-
+    # 测试仓库 CRUD
     def test_repository_crud(self) -> None:
         document = self._build_document("doc-100", "sha256:repo-100")
         self.repository.create(document)
-
+        # 测试文档加载
         loaded = self.repository.get("doc-100")
         self.assertIsNotNone(loaded)
         self.assertEqual(loaded.document_id, "doc-100")
@@ -174,7 +174,7 @@ class InMemoryDocumentRepositoryTest(unittest.TestCase):
         archived_again = self.repository.get("doc-100")
         self.assertIsNotNone(archived_again)
         self.assertEqual(archived_again.status, DocumentStatus.ARCHIVED)
-
+    # 
     def test_repository_rejects_duplicate_checksum(self) -> None:
         first = self._build_document("doc-200", "sha256:dup-200")
         second = self._build_document("doc-201", "sha256:dup-200")

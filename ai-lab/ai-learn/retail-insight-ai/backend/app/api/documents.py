@@ -75,6 +75,18 @@ async def list_documents(
 ) -> ApiResponse[DocumentListResponse]:
     """列出文档并支持低风险过滤，不改变上传事实。"""
 
+    # 记录进入文档列表 Router，方便初学者继续追踪到读取 Service。
+    trace_step(
+        "GET",
+        "/api/v1/documents",
+        "Router",
+        "list_documents()",
+        class_name="documents.py",
+        method_name="list_documents",
+        file_path="backend/app/api/documents.py",
+        label="list_documents()",
+    )
+    # 记录进入文档列表 Service，方便初学者继续追踪到仓库实现。
     data = service.list_documents(
         status=status_filter,
         document_type=document_type,
@@ -95,6 +107,18 @@ async def get_document(
 ) -> ApiResponse[DocumentResponse]:
     """读取单个文档与其冻结元数据快照。"""
 
+    # 记录进入单文档查询 Router，方便初学者继续追踪到读取 Service。
+    trace_step(
+        "GET",
+        f"/api/v1/documents/{document_id}",
+        "Router",
+        "get_document()",
+        class_name="documents.py",
+        method_name="get_document",
+        file_path="backend/app/api/documents.py",
+        document_id=document_id,
+        label="get_document()",
+    )
     data = service.get_document(document_id)
     return success_response(data, get_request_id())
 
@@ -110,5 +134,17 @@ async def archive_document(
 ) -> ApiResponse[DocumentArchiveResponse]:
     """将文档软删除为 archived，同时保留版本与读取能力。"""
 
+    # 记录进入文档归档 Router，方便初学者继续追踪到归档 Service。
+    trace_step(
+        "DELETE",
+        f"/api/v1/documents/{document_id}",
+        "Router",
+        "archive_document()",
+        class_name="documents.py",
+        method_name="archive_document",
+        file_path="backend/app/api/documents.py",
+        document_id=document_id,
+        label="archive_document()",
+    )
     data = service.archive_document(document_id)
     return success_response(data, get_request_id())

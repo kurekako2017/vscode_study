@@ -62,6 +62,7 @@ class InMemoryDocumentRepository:
                         "checksum": document.metadata.checksum,
                     }
                 )
+            # 保存文档的深拷贝，避免调用方绕过 update 修改仓库状态。
             self._documents[document.document_id] = deepcopy(document)
 
     def get(self, document_id: str) -> Document | None:

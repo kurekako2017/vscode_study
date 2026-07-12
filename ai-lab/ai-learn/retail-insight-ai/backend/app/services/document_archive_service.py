@@ -26,6 +26,7 @@
 
 from __future__ import annotations
 
+from app.core.learning_trace import trace_step
 from app.errors.exceptions import DocumentNotFoundException
 from app.events.publisher import EventPublisher
 from app.models.document import DocumentStatus
@@ -48,13 +49,75 @@ class DocumentArchiveService:
     def archive_document(self, document_id: str) -> DocumentArchiveResponse:
         """将文档软删除为 archived，不物理删除事实数据。"""
 
+        # 记录进入归档 Service，区分 Router 接收请求和归档业务处理。
+        trace_step(
+            "DELETE",
+            f"/api/v1/documents/{document_id}",
+            "Service",
+            "DocumentArchiveService.archive_document()",
+            class_name="DocumentArchiveService",
+            method_name="archive_document",
+            file_path="backend/app/services/document_archive_service.py",
+            document_id=document_id,
+            label="DocumentArchiveService.archive_document()",
+        )
+        # 记录读取归档目标的 Repository 步骤，404 分支也需要保留这条链路。
+        trace_step(
+            "DELETE",
+            f"/api/v1/documents/{document_id}",
+            "Repository",
+            "InMemoryDocumentRepository.get()",
+            class_name=self._repository.__class__.__name__,
+            method_name="get",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/document_repository.py"
+            ),
+            document_id=document_id,
+            label="InMemoryDocumentRepository.get()",
+        )
         document = self._repository.get(document_id)
         if document is None:
+            # 单独记录未命中，帮助初学者区分查询完成和业务 404。
+            trace_step(
+                "DELETE",
+                f"/api/v1/documents/{document_id}",
+                "Result",
+                "Document not found",
+                document_id=document_id,
+                status="404",
+                label="Document not found",
+            )
             raise DocumentNotFoundException(document_id)
 
         if document.status is not DocumentStatus.ARCHIVED:
             document.archive()
+            # 记录真正写回归档状态的 Repository 步骤。
+            trace_step(
+                "DELETE",
+                f"/api/v1/documents/{document_id}",
+                "Repository",
+                "InMemoryDocumentRepository.update()",
+                class_name=self._repository.__class__.__name__,
+                method_name="update",
+                file_path=(
+                    "backend/app/repositories/implementations/"
+                    "in_memory/document_repository.py"
+                ),
+                document_id=document_id,
+                label="InMemoryDocumentRepository.update()",
+            )
             self._repository.update(document)
+            # 只记录真实标题，不输出正文、路径、checksum 或敏感 metadata。
+            trace_step(
+                "DELETE",
+                f"/api/v1/documents/{document_id}",
+                "Result",
+                f"Document archived: {document.metadata.title}",
+                document_id=document_id,
+                status="202",
+                label=f"Document archived: {document.metadata.title}",
+            )
             self._event_publisher.publish(
                 document_id,
                 "document.archive.completed",

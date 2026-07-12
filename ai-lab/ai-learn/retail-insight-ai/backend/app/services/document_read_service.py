@@ -39,7 +39,7 @@ class DocumentReadService:
         """保存仓储接口引用。"""
 
         self._repository = repository
-
+    # 列表过滤
     def list_documents(
         self,
         *,
@@ -95,14 +95,89 @@ class DocumentReadService:
         ]
         if limit is not None:
             filtered = filtered[:limit]
-        return DocumentListResponse.from_domain(filtered)
+        response = DocumentListResponse.from_domain(filtered)
+
+        # 记录本次真实返回数量，帮助初学者判断过滤和 limit 的最终结果。
+        trace_step(
+            "GET",
+            "/api/v1/documents",
+            "Result Summary",
+            f"Documents found: {len(response.items)}",
+            label=f"Documents found: {len(response.items)}",
+        )
+        # 只记录响应中的 title，最多展示前 10 个，避免输出正文或敏感元数据。
+        for item in response.items[:10]:
+            trace_step(
+                "GET",
+                "/api/v1/documents",
+                "Result Summary",
+                f"Document: {item.title}",
+                label=f"Document: {item.title}",
+            )
+        if len(response.items) > 10:
+            remaining = len(response.items) - 10
+            trace_step(
+                "GET",
+                "/api/v1/documents",
+                "Result Summary",
+                f"Documents remaining: {remaining}",
+                label=f"Documents remaining: {remaining}",
+            )
+        return response
 
     def get_document(self, document_id: str) -> DocumentResponse:
         """按 ID 读取单个文档，不存在时返回稳定 404。"""
 
+        # 记录进入单文档读取 Service，区分 Router 接收请求和业务查询。
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}",
+            "Service",
+            "DocumentReadService.get_document()",
+            class_name="DocumentReadService",
+            method_name="get_document",
+            file_path="backend/app/services/document_read_service.py",
+            document_id=document_id,
+            label="DocumentReadService.get_document()",
+        )
+        # 记录真正读取文档仓库的步骤，确认 document_id 进入哪个 Repository 方法。
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}",
+            "Repository",
+            "InMemoryDocumentRepository.get()",
+            class_name=self._repository.__class__.__name__,
+            method_name="get",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/document_repository.py"
+            ),
+            document_id=document_id,
+            label="InMemoryDocumentRepository.get()",
+        )
         document = self._repository.get(document_id)
         if document is None:
+            # 单独记录未命中，帮助初学者区分查询完成和业务 404。
+            trace_step(
+                "GET",
+                f"/api/v1/documents/{document_id}",
+                "Result",
+                "Document not found",
+                document_id=document_id,
+                status="404",
+                label="Document not found",
+            )
             raise DocumentNotFoundException(document_id)
+        # 只记录真实元数据标题，不输出正文、路径、checksum 或敏感 metadata。
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}",
+            "Result",
+            f"Document found: {document.metadata.title}",
+            document_id=document_id,
+            status="200",
+            label=f"Document found: {document.metadata.title}",
+        )
         return DocumentResponse.from_domain(document)
 
     def _matches(
