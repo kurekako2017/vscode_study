@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies import get_document_import_service
+from app.core.learning_trace import trace_step
 from app.observability.logging import get_request_id
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.document_import_api import DocumentImportResponse
@@ -23,6 +24,18 @@ async def import_document(
 ) -> ApiResponse[DocumentImportResponse]:
     """把已上传文档送入导入流水线，并返回最终导入记录。"""
 
+    # 记录进入文档导入 Router，方便初学者继续追踪到 Import Service。
+    trace_step(
+        "POST",
+        f"/api/v1/documents/{document_id}/import",
+        "Router",
+        "import_document()",
+        class_name="document_imports.py",
+        method_name="import_document",
+        file_path="backend/app/api/document_imports.py",
+        document_id=document_id,
+        label="import_document()",
+    )
     data = service.import_document(document_id)
     return success_response(data, get_request_id())
 
@@ -38,5 +51,16 @@ async def get_document_import(
 ) -> ApiResponse[DocumentImportResponse]:
     """读取某次文档导入记录。"""
 
+    # 记录进入导入记录查询 Router，方便初学者继续追踪到 Import Service。
+    trace_step(
+        "GET",
+        f"/api/v1/document-imports/{import_id}",
+        "Router",
+        "get_document_import()",
+        class_name="document_imports.py",
+        method_name="get_document_import",
+        file_path="backend/app/api/document_imports.py",
+        label="get_document_import()",
+    )
     data = service.get_import(import_id)
     return success_response(data, get_request_id())

@@ -30,6 +30,7 @@ from __future__ import annotations
 from threading import RLock
 from uuid import uuid4
 
+from app.core.learning_trace import trace_step
 from app.errors.base import AppException
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import (
@@ -70,6 +71,18 @@ class DocumentImportService:
     def import_document(self, document_id: str) -> DocumentImportResponse:
         """执行同步导入：校验、验证、状态更新和事件发布。"""
 
+        # 记录进入导入 Service，区分 Router 接收请求和导入业务流程。
+        trace_step(
+            "POST",
+            f"/api/v1/documents/{document_id}/import",
+            "Service",
+            "DocumentImportService.import_document()",
+            class_name="DocumentImportService",
+            method_name="import_document",
+            file_path="backend/app/services/document_import_service.py",
+            document_id=document_id,
+            label="DocumentImportService.import_document()",
+        )
         with self._lock:
             existing = self._imports_by_document_id.get(document_id)
             if existing is not None:
@@ -91,12 +104,47 @@ class DocumentImportService:
 
             self._publish(record, "document.import.validated", "Document import validated")
             document.transition_status(DocumentStatus.VALIDATED)
+            # 记录导入状态写回仓库的步骤，帮助初学者理解状态如何持久化。
+            trace_step(
+                "POST",
+                f"/api/v1/documents/{document_id}/import",
+                "Repository",
+                "InMemoryDocumentRepository.update()",
+                class_name=self._repository.__class__.__name__,
+                method_name="update",
+                file_path=(
+                    "backend/app/repositories/implementations/"
+                    "in_memory/document_repository.py"
+                ),
+                document_id=document_id,
+                label="InMemoryDocumentRepository.update()",
+            )
             self._repository.update(document)
 
             with self._lock:
                 record.mark_completed()
 
             self._publish(record, "document.import.completed", "Document import completed")
+            # 记录真实导入状态，帮助初学者确认状态推进已完成。
+            trace_step(
+                "POST",
+                f"/api/v1/documents/{document_id}/import",
+                "Result",
+                f"Import result: {document.status.value}",
+                document_id=document_id,
+                status="201",
+                label=f"Import result: {document.status.value}",
+            )
+            # 只记录真实标题，避免输出正文、checksum 或敏感 metadata。
+            trace_step(
+                "POST",
+                f"/api/v1/documents/{document_id}/import",
+                "Result",
+                f"Document: {document.metadata.title}",
+                document_id=document_id,
+                status="201",
+                label=f"Document: {document.metadata.title}",
+            )
             return DocumentImportResponse.from_domain(record)
         except AppException as exc:
             with self._lock:
@@ -118,17 +166,79 @@ class DocumentImportService:
     def get_import(self, import_id: str) -> DocumentImportResponse:
         """按 import_id 读取导入记录。"""
 
+        # 记录进入导入记录查询 Service，说明下一步读取本地导入会话缓存。
+        trace_step(
+            "GET",
+            f"/api/v1/document-imports/{import_id}",
+            "Service",
+            "DocumentImportService.get_import()",
+            class_name="DocumentImportService",
+            method_name="get_import",
+            file_path="backend/app/services/document_import_service.py",
+            label="DocumentImportService.get_import()",
+        )
         with self._lock:
             record = self._imports_by_id.get(import_id)
             if record is None:
+                # 单独记录未命中，帮助初学者区分查询完成和业务 404。
+                trace_step(
+                    "GET",
+                    f"/api/v1/document-imports/{import_id}",
+                    "Result",
+                    "Import not found",
+                    status="404",
+                    label="Import not found",
+                )
                 raise DocumentImportNotFoundException(import_id)
+            # 记录真实导入状态和 ID，不输出正文或敏感 metadata。
+            trace_step(
+                "GET",
+                f"/api/v1/document-imports/{import_id}",
+                "Result",
+                f"Import status: {record.status.value}",
+                status="200",
+                label=f"Import status: {record.status.value}",
+            )
+            trace_step(
+                "GET",
+                f"/api/v1/document-imports/{import_id}",
+                "Result",
+                f"Import ID: {record.import_id}",
+                status="200",
+                label=f"Import ID: {record.import_id}",
+            )
             return DocumentImportResponse.from_domain(record)
 
     def _load_document(self, document_id: str) -> Document:
         """从仓储读取文档，不存在时映射为稳定 404。"""
 
+        # 记录导入前读取目标文档的 Repository 步骤，404 也保留完整链路。
+        trace_step(
+            "POST",
+            f"/api/v1/documents/{document_id}/import",
+            "Repository",
+            "InMemoryDocumentRepository.get()",
+            class_name=self._repository.__class__.__name__,
+            method_name="get",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/document_repository.py"
+            ),
+            document_id=document_id,
+            label="InMemoryDocumentRepository.get()",
+        )
         document = self._repository.get(document_id)
         if document is None:
+            # 单独记录未命中，帮助初学者区分查询完成和业务 404。
+            trace_step(
+                "POST",
+                f"/api/v1/documents/{document_id}/import",
+                "Result",
+                "Document not found",
+                document_id=document_id,
+                status="404",
+                label="Document not found",
+            )
             raise DocumentNotFoundException(document_id)
         return document
 

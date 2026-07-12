@@ -84,6 +84,7 @@ class InMemoryDocumentRepository:
         with self._lock:
             if document.document_id not in self._documents:
                 raise KeyError(document.document_id)
+            # 验证文档状态和 checksum 去重，避免调用方绕过 create 修改仓库状态。
             document.validate_for_storage()
             duplicate = self.find_by_checksum(document.metadata.checksum)
             if duplicate is not None and duplicate.document_id != document.document_id:

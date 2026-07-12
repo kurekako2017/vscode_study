@@ -32,6 +32,7 @@ import hashlib
 import re
 from threading import RLock
 
+from app.core.learning_trace import trace_step
 from app.errors.base import AppException
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import DocumentArchivedException, DocumentNotFoundException, DocumentNotValidatedException
@@ -71,6 +72,18 @@ class DocumentChunkService:
     def chunk_document(self, document_id: str) -> DocumentChunkListResponse:
         """对 validated 文档生成确定性的 chunk 列表，并替换旧结果。"""
 
+        # 记录进入 chunk Service，下一步读取文档并执行切分流程。
+        trace_step(
+            "POST",
+            f"/api/v1/documents/{document_id}/chunks",
+            "Service",
+            "DocumentChunkService.chunk_document()",
+            class_name="DocumentChunkService",
+            method_name="chunk_document",
+            file_path="backend/app/services/document_chunk_service.py",
+            document_id=document_id,
+            label="DocumentChunkService.chunk_document()",
+        )
         with self._lock:
             self._publish(
                 document_id,
@@ -81,13 +94,59 @@ class DocumentChunkService:
 
             document: Document | None = None
             try:
-                document = self._load_document(document_id)
+                document = self._load_document(
+                    document_id,
+                    http_method="POST",
+                    http_path=f"/api/v1/documents/{document_id}/chunks",
+                )
                 self._validate_document_state(document)
                 self._validate_document_type(document)
 
                 chunks = self._build_chunks(document)
+                # 记录 chunk 结果写入 Repository，下一步返回生成后的列表。
+                trace_step(
+                    "POST",
+                    f"/api/v1/documents/{document_id}/chunks",
+                    "Repository",
+                    "InMemoryDocumentChunkRepository.replace_for_document()",
+                    class_name=self._chunk_repository.__class__.__name__,
+                    method_name="replace_for_document",
+                    file_path=(
+                        "backend/app/repositories/implementations/"
+                        "in_memory/document_chunk_repository.py"
+                    ),
+                    document_id=document_id,
+                    label="InMemoryDocumentChunkRepository.replace_for_document()",
+                )
                 self._chunk_repository.replace_for_document(document.document_id, document.version, chunks)
                 response = DocumentChunkListResponse.from_domain(document, chunks)
+                # 只记录数量和前 10 个 chunk 标识，不输出 chunk 正文。
+                trace_step(
+                    "POST",
+                    f"/api/v1/documents/{document_id}/chunks",
+                    "Result",
+                    f"Chunks created: {len(response.items)}",
+                    status="201",
+                    label=f"Chunks created: {len(response.items)}",
+                )
+                for item in response.items[:10]:
+                    trace_step(
+                        "POST",
+                        f"/api/v1/documents/{document_id}/chunks",
+                        "Result",
+                        f"Chunk: {item.chunk_id} (index {item.chunk_index})",
+                        document_id=document_id,
+                        label=f"Chunk: {item.chunk_id} (index {item.chunk_index})",
+                    )
+                if len(response.items) > 10:
+                    trace_step(
+                        "POST",
+                        f"/api/v1/documents/{document_id}/chunks",
+                        "Result",
+                        f"... remaining: {len(response.items) - 10}",
+                        document_id=document_id,
+                        label=f"... remaining: {len(response.items) - 10}",
+                    )
                 self._publish(
                     document.document_id,
                     "document.chunk.completed",
@@ -129,17 +188,97 @@ class DocumentChunkService:
     def get_chunks(self, document_id: str) -> DocumentChunkListResponse:
         """按 document_id 读取当前版本的 chunk 列表。"""
 
-        document = self._load_document(document_id)
+        # 记录进入 chunk 查询 Service，下一步读取文档和 chunk Repository。
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}/chunks",
+            "Service",
+            "DocumentChunkService.get_chunks()",
+            class_name="DocumentChunkService",
+            method_name="get_chunks",
+            file_path="backend/app/services/document_chunk_service.py",
+            document_id=document_id,
+            label="DocumentChunkService.get_chunks()",
+        )
+        document = self._load_document(
+            document_id,
+            http_method="GET",
+            http_path=f"/api/v1/documents/{document_id}/chunks",
+        )
         self._validate_document_state(document)
         self._validate_document_type(document)
         chunks = self._chunk_repository.list_for_document(document.document_id, document.version)
-        return DocumentChunkListResponse.from_domain(document, chunks)
+        response = DocumentChunkListResponse.from_domain(document, chunks)
+        # 记录查询结果数量和最多 10 个非敏感 chunk 标识。
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}/chunks",
+            "Repository",
+            "InMemoryDocumentChunkRepository.list_for_document()",
+            class_name=self._chunk_repository.__class__.__name__,
+            method_name="list_for_document",
+            file_path=(
+                "backend/app/repositories/implementations/"
+                "in_memory/document_chunk_repository.py"
+            ),
+            document_id=document_id,
+            label="InMemoryDocumentChunkRepository.list_for_document()",
+        )
+        trace_step(
+            "GET",
+            f"/api/v1/documents/{document_id}/chunks",
+            "Result",
+            f"Chunks found: {len(response.items)}",
+            status="200",
+            label=f"Chunks found: {len(response.items)}",
+        )
+        for item in response.items[:10]:
+            trace_step(
+                "GET",
+                f"/api/v1/documents/{document_id}/chunks",
+                "Result",
+                f"Chunk: {item.chunk_id} (index {item.chunk_index})",
+                document_id=document_id,
+                label=f"Chunk: {item.chunk_id} (index {item.chunk_index})",
+            )
+        if len(response.items) > 10:
+            trace_step(
+                "GET",
+                f"/api/v1/documents/{document_id}/chunks",
+                "Result",
+                f"... remaining: {len(response.items) - 10}",
+                document_id=document_id,
+                label=f"... remaining: {len(response.items) - 10}",
+            )
+        return response
 
-    def _load_document(self, document_id: str) -> Document:
+    def _load_document(self, document_id: str, *, http_method: str, http_path: str) -> Document:
         """从仓储读取文档，不存在时映射为稳定 404。"""
 
+        # 记录文档 Repository 查询，404 分支也保留完整调用链。
+        trace_step(
+            http_method,
+            http_path,
+            "Repository",
+            "InMemoryDocumentRepository.get()",
+            class_name=self._document_repository.__class__.__name__,
+            method_name="get",
+            file_path="backend/app/repositories/implementations/in_memory/document_repository.py",
+            document_id=document_id,
+            label="InMemoryDocumentRepository.get()",
+        )
         document = self._document_repository.get(document_id)
         if document is None:
+            # 单独记录未命中，帮助初学者区分查询完成和业务 404。
+            trace_step(
+                http_method,
+                http_path,
+                "Result",
+                "Document not found",
+                document_id=document_id,
+                status="404",
+                label="Document not found",
+            )
             raise DocumentNotFoundException(document_id)
         return document
 
