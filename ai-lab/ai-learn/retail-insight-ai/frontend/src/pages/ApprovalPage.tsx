@@ -442,12 +442,13 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
         scenario="关东饮料销售下降分析完成后，负责人手动输入 task_id 提交承认依赖，再根据审核结果执行承認、却下或修正依頼。"
         prerequisites="分析依頼已经完成并生成 report。当前用户是系统既定用户；Approval API 的 RBAC 已生效，权限不足会返回 403。"
         relationship="本页使用分析依頼产生的 task_id，创建 approval_id 和 report_version_id。task_id 当前不从 TasksPage 自动传入，必须手动复制；批准结果不自动回写到 Documents 或 RAG 页面。"
+        journey={{ previous: "分析依頼", current: "4 / 4 承認管理", completion: "执行承認、却下或修正依頼，并记录审批结果。", next: "最终可审计报告", recommendedCase: "APR-BIZ-001", transferredObjects: "approval_id、report_version_id、approval event", connection: "当前没有独立的最终汇总页面。" }}
         cases={[
-          { id: "APR-BIZ-001", purpose: "正常提交关东饮料报告审批。", input: "输入已完成报告的 Task ID，填写可选コメント，点击「承認依頼を送信」。", expected: "POST 返回 approval_id、report_version_id、pending_approval；列表和详情刷新。" },
-          { id: "APR-BIZ-002", purpose: "确认提交必填项。", input: "清空 Task ID。", expected: "提交按钮不可点击，不发送请求。" },
-          { id: "APR-BIZ-003", purpose: "确认不存在或未完成报告。", input: "输入不存在 task_id 或尚未完成任务。", expected: "Backend 返回实际 404／409 等业务错误，页面显示结构化错误。" },
-          { id: "APR-BIZ-004", purpose: "确认审批状态机和权限错误。", input: "对 pending_approval 点击「承認」或「却下」；或用无权限用户调用。", expected: "成功时状态刷新；重复决策返回实际 409，权限不足返回 403 permission_denied。" },
-          { id: "APR-BIZ-005", purpose: "确认修正依頼与刷新。", input: "对 rejected 记录输入修正理由并点击「修正依頼」，或点击「再試行 / 更新」。", expected: "修正成功返回新的 report_version_id；刷新只重新读取列表／详情，不改变审批状态。" },
+          { id: "APR-BIZ-001", group: "标准业务 Case", purpose: "正常提交关东饮料报告审批。", input: "输入已完成报告的 Task ID，填写可选コメント，点击「承認依頼を送信」。", expected: "POST 返回 approval_id、report_version_id、pending_approval；列表和详情刷新。" },
+          { id: "APR-BIZ-002", group: "异常与维护测试 Case", purpose: "确认提交必填项。", input: "清空 Task ID。", expected: "提交按钮不可点击，不发送请求。" },
+          { id: "APR-BIZ-003", group: "异常与维护测试 Case", purpose: "确认不存在或未完成报告。", input: "输入不存在 task_id 或尚未完成任务。", expected: "Backend 返回实际 404／409 等业务错误，页面显示结构化错误。" },
+          { id: "APR-BIZ-004", group: "异常与维护测试 Case", purpose: "确认审批状态机和权限错误。", input: "对 pending_approval 点击「承認」或「却下」；或用无权限用户调用。", expected: "成功时状态刷新；重复决策返回实际 409，权限不足返回 403 permission_denied。" },
+          { id: "APR-BIZ-005", group: "异常与维护测试 Case", purpose: "确认修正依頼与刷新。", input: "对 rejected 记录输入修正理由并点击「修正依頼」，或点击「再試行 / 更新」。", expected: "修正成功返回新的 report_version_id；刷新只重新读取列表／详情，不改变审批状态。" },
         ]}
         flows={[
           {

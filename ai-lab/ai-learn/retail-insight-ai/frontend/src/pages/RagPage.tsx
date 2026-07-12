@@ -380,12 +380,19 @@ export function RagPage({ onLearningEvent }: RagPageProps = {}) {
         scenario="资料已在文書管理完成 Chunk 后，分析人员查询“関東地域の飲料カテゴリの売上減少”，再询问主要原因并检查 citation。"
         prerequisites="存在 validated 的 markdown／text Chunk；查询或问题不能为空。当前只有 Keyword Retrieval 与 deterministic answer，不使用真实 LLM 或 pgvector。"
         relationship="本页读取文书产生的 Chunk，并返回 document_id、chunk_id、citation。当前检索结果不会自动填入分析依頼；用户需手动把结论或问题带到下一页。"
+        journey={{ previous: "文書管理", current: "2 / 4 RAG検索", completion: "检索到相关 Chunk，或生成带 citation 的 Internal RAG 回答。", next: "分析依頼", recommendedCase: "TASK-BIZ-001", transferredObjects: "检索结论、citation", connection: "当前手动整理分析问题，不自动传递 citation。" }}
+        operationGuides={[
+          { title: "A. Document Retrieval", prerequisite: "Documents 中已有 validated 的 markdown/text Chunk。", action: "输入与 Scenario01 文档内容真实匹配的 query，不使用 nih、test 等无意义文本。", expected: "返回 results，并显示 document_id、chunk_id、score、source 与 metadata。" },
+          { title: "B. Internal RAG Answer", prerequisite: "已有足够相关 Chunk。", action: "输入 Scenario01 的 RAG 问题，保持引用必須为 true。", expected: "成功时显示 answer、citations、confidence、warnings 等当前 API 返回字段。" },
+          { title: "C. insufficient_context", prerequisite: "无。", action: "理解 422 insufficient_context，而不是把它当页面故障。", expected: "常见原因是问题与资料不匹配、文档尚未 Chunk，或 citation 必需但证据不足。" },
+          { title: "D. 清除操作", prerequisite: "已有检索或回答结果。", action: "点击「結果をクリア」或「回答をクリア」。", expected: "只修改 React state，不调用 Backend；可再次执行请求。" },
+        ]}
         cases={[
-          { id: "RAG-BIZ-001", purpose: "检索关东饮料销售下降资料。", input: "検索語：関東地域の飲料カテゴリの売上減少；取得件数：5。", expected: "POST 搜索返回 results、total、retrieval_mode；页面显示文書 ID、Chunk ID、score 与来源。" },
-          { id: "RAG-BIZ-002", purpose: "确认搜索必填项。", input: "清空検索語。", expected: "「検索する」不可点击，不发送请求；空白 query 直接请求时 Backend 返回实际校验错误。" },
-          { id: "RAG-BIZ-003", purpose: "确认无资料命中。", input: "输入不存在的业务关键词。", expected: "HTTP 成功但 results 为 0，页面显示「検索結果はありません。」。" },
-          { id: "RAG-BIZ-004", purpose: "确认资料不足的 RAG 业务错误。", input: "質問输入无法由现有 Chunk 支撑的问题，引用必須为 true。", expected: "Backend 返回实际 insufficient_context 或 citation 相关错误，页面显示 error code 与 message。" },
-          { id: "RAG-BIZ-005", purpose: "确认清除只影响页面。", input: "点击「結果をクリア」或「回答をクリア」。", expected: "仅 setRetrievalResult(null)／setRagResult(null)，不发起 Backend 请求，可重新执行搜索或回答。" },
+          { id: "RAG-BIZ-001", group: "标准业务 Case", purpose: "检索关东饮料销售下降资料。", input: "検索語：関東地域の飲料カテゴリの売上減少；取得件数：5。", expected: "POST 搜索返回 results、total、retrieval_mode；页面显示文書 ID、Chunk ID、score 与来源。" },
+          { id: "RAG-BIZ-002", group: "异常与维护测试 Case", purpose: "确认搜索必填项。", input: "清空検索語。", expected: "「検索する」不可点击，不发送请求；空白 query 直接请求时 Backend 返回实际校验错误。" },
+          { id: "RAG-BIZ-003", group: "异常与维护测试 Case", purpose: "确认无资料命中。", input: "输入不存在的业务关键词。", expected: "HTTP 成功但 results 为 0，页面显示「検索結果はありません。」。" },
+          { id: "RAG-BIZ-004", group: "异常与维护测试 Case", purpose: "确认资料不足的 RAG 业务错误。", input: "質問输入无法由现有 Chunk 支撑的问题，引用必須为 true。", expected: "Backend 返回实际 insufficient_context 或 citation 相关错误，页面显示 error code 与 message。" },
+          { id: "RAG-BIZ-005", group: "异常与维护测试 Case", purpose: "确认清除只影响页面。", input: "点击「結果をクリア」或「回答をクリア」。", expected: "仅 setRetrievalResult(null)／setRagResult(null)，不发起 Backend 请求，可重新执行搜索或回答。" },
         ]}
         flows={[
           {

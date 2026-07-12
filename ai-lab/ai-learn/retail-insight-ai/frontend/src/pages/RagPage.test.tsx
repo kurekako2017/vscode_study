@@ -53,6 +53,10 @@ describe("RagPage", () => {
     expect(screen.getByText("RAG-BIZ-001")).toBeInTheDocument();
     expect(screen.getByText("POST /api/v1/document-retrieval/search")).toBeInTheDocument();
     expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
+    expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("上一步：文書管理");
+    expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("下一步：分析依頼");
+    expect(screen.getByText("A. Document Retrieval")).toBeInTheDocument();
+    expect(screen.getByText("C. insufficient_context")).toBeInTheDocument();
   });
 
   it("shows empty retrieval state from backend", async () => {

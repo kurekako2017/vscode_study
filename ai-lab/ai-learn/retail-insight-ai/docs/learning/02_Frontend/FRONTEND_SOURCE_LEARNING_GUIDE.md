@@ -115,11 +115,21 @@ Backend 经过什么
 
 ### 5.1 在页面做什么
 
-1. 在「文書アップロード」选择 `関東飲料売上分析.md`。
-2. 填写タイトル、担当者、言語，点击「文書をアップロード」。
-3. 确认列表出现标题与 `document_id`。
-4. 对选中的文档执行 Import、Chunk，确认 Chunk 预览。
-5. 必要时执行「アーカイブ」。
+标准业务流程是：
+
+```text
+Upload → Import → Chunk → RAG検索
+```
+
+以 `docs/learning/sample-data/Scenario01_Sales_Decline/02_関東地域在庫レポート.md` 为例：
+
+1. 在「文書アップロード」选择 markdown/text 文件，填写タイトル、担当者、言語；tags 是可选项。
+2. 点击「文書をアップロード」，确认 HTTP `201`、`upload_id`、`document_id`、上传会话 `status=completed`，再确认文档详情的实际状态是 `uploaded`。
+3. 选择该文档并点击 Import。Import 没有独立 validate 按钮；它在内部校验后，成功时返回 `import_id`、`status=completed`，并把文档状态更新为 `validated`。
+4. 确认文档为 `validated` 且类型为 markdown/text 后点击「Chunk実行」，确认 HTTP `201`、`items`、`chunk_id` 和 Chunk 数量。
+5. 进入 RAG検索 执行 `RAG-BIZ-001`，确认检索结果引用当前 Chunk。
+
+`Archive` 是维护操作，不是上述标准步骤。用于资料过期、内容错误或新版替换旧版；不能把它理解为 `Upload → Archive → Import → Chunk`。
 
 ### 5.2 上传流程
 
@@ -134,8 +144,10 @@ Backend 经过什么
 ```text
 POST /api/v1/documents
 multipart: file、metadata、可选 Idempotency-Key
-成功：201，data.upload_id、data.document_id、data.status
+成功：201，data.upload_id、data.document_id、data.status=completed
 ```
+
+注意：`completed` 是上传会话状态。成功创建的文档实体初始状态是 `uploaded`；只有 Import 成功后才会成为 `validated`。
 
 Backend 经过什么
 
@@ -160,15 +172,157 @@ backend/app/api/documents.py upload_document()
 | 读取 Chunk | `refreshSelectedDocument()` → `getDocumentChunks()`  | `document_chunks.py get_document_chunks()` → `DocumentChunkService.get_chunks()` → `InMemoryDocumentChunkRepository.list_for_document()`   |
 | 归档       | `runDocumentAction("archive")` → `archiveDocument()` | `documents.py archive_document()` → `DocumentArchiveService.archive_document()` → `InMemoryDocumentRepository.update()`                    |
 
-注意：Chunk 当前要求 `validated` 的 markdown/text。文档不存在是实际 404；已归档、未验证或不支持的类型会走 Backend 的真实业务错误。
+Import 允许未归档的 `uploaded` 或 `validated` markdown/text/csv/json；Chunk 当前严格要求未归档的 `validated` markdown/text。文档不存在是实际 `404 document_not_found`；归档文档 Import/Chunk 返回 `409 document_archived`，未验证 Chunk 返回 `409 document_not_validated`，不支持类型返回 `415 unsupported_document_type`。
+
+默认 `GET /api/v1/documents` 与 RAG 检索都排除 `archived`。勾选「アーカイブ済みを含める」会让列表请求带上 `include_archived=true`；RAG 请求也只有 `include_archived=true` 才会包含归档资料。归档后仍可读取历史详情和 Chunk，但不能继续 Import 或 Chunk。
 
 ### 5.4 建议企业测试 Case
 
-- `DOC-BIZ-001`：上传关东饮料销售资料，确认 `upload_id`、`document_id` 和列表刷新。
+- `DOC-BIZ-001`：完整标准流程，确认 Upload → Import → Chunk → RAG検索。
 - `DOC-BIZ-002`：清空必填项，确认按钮不可点击或显示 Backend 校验错误。
-- `DOC-BIZ-003`：读取不存在 `document_id`，确认 404 错误显示。
-- `DOC-BIZ-004`：对不满足前置条件的文档 Chunk，确认业务错误。
-- `DOC-BIZ-005`：归档后勾选「アーカイブ済みを含める」，确认 202 的状态变化。
+- `DOC-BIZ-003`：对 uploaded 文档直接 Chunk，或对 archived 文档 Import/Chunk，确认实际 409 错误。
+- `DOC-BIZ-004`：读取或操作不存在 `document_id`，确认 `404 document_not_found`。
+- `DOC-BIZ-005`：Archive 维护场景。确认 `202 archived`、默认列表/RAG 排除，以及 `include_archived=true` 的显式包含。
+
+### 5.5 Design Decision：Learning Mode 与 Enterprise Mode
+
+#### 为什么当前采用 Learning Mode
+
+当前 ERIP 是学习环境，因此故意保留完整知识库生命周期：
+
+```text
+Upload
+↓
+Import
+↓
+Chunk
+↓
+RAG
+↓
+Analysis
+↓
+Approval
+```
+
+这样设计的目的，是让学习者可以完整观察并理解以下内容：
+
+- 学习 Upload API
+- 学习 Import API
+- 学习 Chunk API
+- 学习 RAG API
+- 学习完整 Backend 数据流
+- 学习 Repository Pattern
+- 学习 LangGraph Workflow
+
+因此，Import 和 Chunk 被设计成可观察、可操作的独立步骤。
+这属于 Learning Mode 当前设计，不是企业唯一实现方式。
+换句话说，当前并不是因为企业一定要这样做，而是为了让学习者能看见 API、RAG、FastAPI、LangGraph 的完整生命周期。
+
+#### Enterprise Mode（推荐实现）
+
+未来企业模式推荐采用自动流程：
+
+```text
+Upload
+↓
+Auto Import
+↓
+Auto Chunk
+↓
+RAG
+↓
+Analysis
+↓
+Approval
+```
+
+在 Enterprise Mode 推荐实现中，最终用户通常不会直接看到以下技术步骤：
+
+- Import
+- Chunk
+- Chunk List
+- Chunk API
+
+这些步骤属于系统内部处理，页面不需要暴露给业务用户。
+
+#### 为什么企业通常隐藏 Chunk
+
+Chunk 属于 AI 系统内部的知识切分步骤。
+企业用户通常只关心“上传了什么文档、能不能检索到、分析结果是什么”，而不会关心每个文档被切成了多少段。
+
+例如以下企业 AI 产品，后台都会执行类似流程：
+
+```text
+Document
+↓
+Chunk
+↓
+Embedding
+↓
+Vector
+↓
+Retrieval
+```
+
+但前端页面通常不会直接暴露 Chunk。
+这是因为 Chunk 是内部实现细节，属于系统能力，不属于用户业务语言。
+
+#### 为什么学习项目保留 Chunk
+
+Learning Mode 保留 Chunk，是为了帮助学习者理解：
+
+- Document Processing
+- Chunk Generation
+- Retrieval
+- Citation
+- RAG 生命周期
+
+同时也方便阅读源码中的以下模块：
+
+- `DocumentChunk`
+- `ChunkRepository`
+- `Chunk API`
+
+如果不保留 Chunk，学习者会很难看清“文档进入系统以后，如何变成可检索知识”的完整路径。
+
+#### 为什么 Import 单独存在
+
+Import 不一定由管理员执行。企业里通常有三种方式：
+
+1. 上传人自己确认 Import
+2. 部门负责人确认 Import
+3. 系统自动 Import
+
+当前学习项目采用的是手动 Import。
+这样做的目的是让学习者能清楚观察：
+
+```text
+Upload → Import → Chunk
+```
+
+三个 API 如何逐步推进，同一份文档如何从“上传完成”进入“可检索状态”。
+
+#### 两种模式对比
+
+| 维度 | Learning Mode（当前） | Enterprise Mode（推荐实现） |
+|---|---|---|
+| 上传后处理 | Upload 后手动 Import、手动 Chunk | Upload 后自动 Import、自动 Chunk |
+| Chunk 可见性 | 页面可查看 Chunk、Chunk API、Chunk List | 页面隐藏 Chunk，作为内部处理 |
+| 学习目标 | 学习 API、Repository、RAG、LangGraph 的完整生命周期 | 面向真实业务用户的自动化体验 |
+| 用户认知 | 需要理解文档如何变成知识 | 只需要理解文档已可检索、可分析 |
+| 适用场景 | 学习、源码阅读、调试、面试讲解 | 企业正式使用、规模化运维 |
+
+#### 读者需要明确的边界
+
+当前 Learning Mode 的设计决策是：
+
+- 保留 Import
+- 保留 Chunk
+- 保留 Chunk 的可视化与可操作性
+- 保留完整后台数据流的可观察性
+
+这不是说企业一定要这样实现。
+而是为了让学习者在 ERIP 中把 API、RAG、FastAPI、LangGraph 的生命周期一次看完整。
 
 ## 6. RagPage：页面操作 → React → API → Backend → 结果
 

@@ -197,12 +197,13 @@ export function TasksPage({ onLearningEvent }: TasksPageProps = {}) {
         scenario="内部资料已登记后，经营企划人员输入“関東地域の飲料カテゴリの売上減少を分析してください”，以 hybrid 模式取得 KPI 与静态调研结果。"
         prerequisites="Backend 已启动；任务问题不能为空。当前报告使用本地固定数据，不会自动引用 Documents 或 RAG 的结果。"
         relationship="本页产生 task_id 和 report。任务完成后，需要用户手动复制 task_id 到承認管理提交审批；与 RAG検索 当前未自动连接。"
+        journey={{ previous: "RAG検索", current: "3 / 4 分析依頼", completion: "任务达到 completed 并取得 report。", next: "承認管理", recommendedCase: "APR-BIZ-001", transferredObjects: "task_id、report", connection: "当前手动复制 task_id。" }}
         cases={[
-          { id: "TASK-BIZ-001", purpose: "正常创建关东饮料销售下降分析。", input: "输入业务问题，选择 hybrid，点击「分析を開始」。", expected: "收到 queued 状态，SSE 显示 route／kpi／research／report，最终显示 Markdown 报告。" },
-          { id: "TASK-BIZ-002", purpose: "确认必填校验。", input: "清空问题输入框。", expected: "「分析を開始」不可点击，不发送 POST 请求。" },
-          { id: "TASK-BIZ-003", purpose: "确认不存在 task 的读取错误。", input: "使用不存在 task_id 请求报告。", expected: "Backend 返回实际 404；页面当前只在已创建任务完成后读取报告。" },
-          { id: "TASK-BIZ-004", purpose: "确认未完成报告的业务错误。", input: "在 queued／running 阶段读取 report。", expected: "Backend 的 get_report 以实际 409 表示报告尚未生成。" },
-          { id: "TASK-BIZ-005", purpose: "确认重新分析会清理旧页面状态。", input: "任务完成后再次点击「分析を開始」。", expected: "旧 task_id、SSE 列表和报告先清空，再订阅新任务；旧 SSE 会关闭。" },
+          { id: "TASK-BIZ-001", group: "标准业务 Case", purpose: "正常创建关东饮料销售下降分析。", input: "输入业务问题，选择 hybrid，点击「分析を開始」。", expected: "收到 queued 状态，SSE 显示 route／kpi／research／report，最终显示 Markdown 报告。" },
+          { id: "TASK-BIZ-002", group: "异常与维护测试 Case", purpose: "确认必填校验。", input: "清空问题输入框。", expected: "「分析を開始」不可点击，不发送 POST 请求。" },
+          { id: "TASK-BIZ-003", group: "异常与维护测试 Case", purpose: "确认不存在 task 的读取错误。", input: "使用不存在 task_id 请求报告。", expected: "Backend 返回实际 404；页面当前只在已创建任务完成后读取报告。" },
+          { id: "TASK-BIZ-004", group: "异常与维护测试 Case", purpose: "确认未完成报告的业务错误。", input: "在 queued／running 阶段读取 report。", expected: "Backend 的 get_report 以实际 409 表示报告尚未生成。" },
+          { id: "TASK-BIZ-005", group: "异常与维护测试 Case", purpose: "确认重新分析会清理旧页面状态。", input: "任务完成后再次点击「分析を開始」。", expected: "旧 task_id、SSE 列表和报告先清空，再订阅新任务；旧 SSE 会关闭。" },
         ]}
         flows={[
           {

@@ -65,6 +65,15 @@ describe("DocumentsPage", () => {
     expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
     expect(screen.getByText("DOC-BIZ-001")).toBeInTheDocument();
     expect(screen.getAllByText(/POST \/api\/v1\/documents/).length).toBeGreaterThan(0);
+    expect(screen.getByText("标准操作流程：将企业资料准备为可检索 Chunk")).toBeInTheDocument();
+    expect(screen.getByText("步骤 2：上传文档")).toBeInTheDocument();
+    expect(screen.getByText("步骤 3：执行 Import")).toBeInTheDocument();
+    expect(screen.getByText("步骤 4：执行 Chunk")).toBeInTheDocument();
+    expect(screen.getByText("步骤 5：进入 RAG検索")).toBeInTheDocument();
+    expect(screen.getByText("Archive 维护场景，不是标准上传流程。")).toBeInTheDocument();
+    expect(screen.getAllByText(/409 document_archived/).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("文書管理 上一步下一步")).toHaveTextContent("下一步：RAG検索");
+    expect(screen.getByLabelText("文書管理 上一步下一步")).toHaveTextContent("推荐 Case：RAG-BIZ-001");
   });
 
   it("shows empty state when there are no documents", async () => {
