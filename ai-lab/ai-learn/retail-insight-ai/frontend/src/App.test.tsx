@@ -68,11 +68,14 @@ describe("App navigation", () => {
     expect(screen.getByText(/分析依頼 · TasksPage · 3 \/ 4/)).toBeInTheDocument();
     expect(screen.getByText(/初始为 idle；没有 task_id、SSE 事件或 report/)).toBeInTheDocument();
     expect(screen.getByText("Stream")).toBeInTheDocument();
+    expect(screen.getByText(/【BackgroundTasks】.*【LangGraph】/)).toBeInTheDocument();
+    expect(screen.getAllByText(/【SSE \/ EventSource】/)).toHaveLength(2);
     expect(screen.getByText("frontend/src/pages/TasksPage.tsx")).toBeInTheDocument();
 
     rerender(<LearningSidebar page="approval" latestEvent={null} />);
     expect(screen.getByText(/承認管理 · ApprovalPage · 4 \/ 4/)).toBeInTheDocument();
     expect(screen.getByText(/report_version_id 与审批审计事件/)).toBeInTheDocument();
+    expect(screen.getByText(/【AuditMiddleware】/)).toBeInTheDocument();
   });
 
   it("shows the latest handler, state changes, and backend flow without owning business state", () => {

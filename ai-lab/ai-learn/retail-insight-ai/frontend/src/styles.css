@@ -62,6 +62,7 @@ h1 { margin: 12px 0; color: #f4f8f6; font-size: clamp(44px, 7vw, 82px); line-hei
 .learning-lifecycle li > span { display: grid; place-items: start center; color: #9fded2; font: 11px/1.5 ui-monospace, monospace; }
 .learning-lifecycle li div, .learning-source-list li { display: grid; gap: 2px; }
 .learning-lifecycle small, .learning-source-list small { color: var(--muted); font-size: 11px; }
+.learning-technology { color: #9fded2 !important; font: 10px/1.6 ui-monospace, monospace; }
 .learning-source-list { border-left: 1px solid #38565b; padding-left: 10px; }
 .learning-source-list strong, .learning-current-flow > strong { color: #f2d6a8; font-size: 11px; }
 .learning-current-flow { display: grid; gap: 4px; margin-top: 4px; border-top: 1px dashed #38565b; padding-top: 10px; }

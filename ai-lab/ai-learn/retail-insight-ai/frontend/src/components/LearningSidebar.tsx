@@ -14,6 +14,7 @@ interface SourceLocation {
 interface LifecycleStep {
   name: string;
   detail: string;
+  technologies: string[];
 }
 
 interface PageLearningInfo {
@@ -36,9 +37,9 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "业务人员先确认当前 MVP 的可用能力和边界，再按正确顺序进入页面，避免把本地固定数据误当作生产结论。",
     initialState: "渲染当前能力边界与业务流程卡片；不读取 Backend。",
     lifecycle: [
-      { name: "Render", detail: "App 根据 activeView 渲染 DashboardPage。" },
-      { name: "Choose", detail: "openBusinessStep() 记录学习操作，并请求 App 切换目标 tab。" },
-      { name: "Switch", detail: "App.changeView() 更新 activeView，React 卸载总览并渲染目标页面。" },
+      { name: "Render", detail: "App 根据 activeView 渲染 DashboardPage。", technologies: ["React Component", "React Render"] },
+      { name: "Choose", detail: "openBusinessStep() 记录学习操作，并请求 App 切换目标 tab。", technologies: ["Event Handler", "React useState"] },
+      { name: "Switch", detail: "App.changeView() 更新 activeView，React 卸载总览并渲染目标页面。", technologies: ["React useState", "React Re-render"] },
     ],
     sources: [
       { label: "页面入口", path: "frontend/src/App.tsx", reason: "持有 activeView，并渲染当前业务页与 LearningSidebar。" },
@@ -53,10 +54,10 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "企业分析必须先把可追溯的内部资料登记并分块；RAG 才能返回证据，而不是让前端编造业务事实。",
     initialState: "mount 后通过 useEffect() 加载文书列表；选中文书变化时读取详情和 Chunk。",
     lifecycle: [
-      { name: "Mount", detail: "useEffect() 调用 loadDocuments(true)，用 showArchived 决定列表范围。" },
-      { name: "Select", detail: "selectedDocumentId 变化后，refreshSelectedDocument() 并行刷新详情与 Chunk。" },
-      { name: "Operate", detail: "上传、Import、Chunk 或 Archive 成功后，刷新列表与当前文书。" },
-      { name: "Render", detail: "React 根据 loading、error、selectedDocument 与 chunkData 重绘页面。" },
+      { name: "Mount", detail: "useEffect() 调用 loadDocuments(true)，用 showArchived 决定列表范围。", technologies: ["React useEffect", "Fetch API", "REST API"] },
+      { name: "Select", detail: "selectedDocumentId 变化后，refreshSelectedDocument() 并行刷新详情与 Chunk。", technologies: ["React useState", "React useEffect", "Fetch API"] },
+      { name: "Operate", detail: "上传、Import、Chunk 或 Archive 成功后，刷新列表与当前文书。", technologies: ["Event Handler", "Fetch API", "REST API", "FastAPI Router", "Service Layer", "Repository Pattern"] },
+      { name: "Render", detail: "React 根据 loading、error、selectedDocument 与 chunkData 重绘页面。", technologies: ["React Re-render"] },
     ],
     sources: [
       { label: "页面状态", path: "frontend/src/pages/DocumentsPage.tsx", reason: "管理列表、选择、上传和文书操作的 React state。" },
@@ -73,10 +74,10 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "业务人员需要先检查结论是否有内部证据支撑，才能把销售下降原因带入分析依頼和审批。",
     initialState: "页面初始只显示表单；没有自动检索，也不会自动继承文書管理页的条件。",
     lifecycle: [
-      { name: "Input", detail: "用户填写检索条件或业务问题，React 保存在本页 state。" },
-      { name: "Request", detail: "submitRetrieval() 或 submitInternalRag() 调用 api.ts，并设置 loading。" },
-      { name: "Resolve", detail: "成功写入 results / citations；证据不足时保留 Backend 的 422 业务结果。" },
-      { name: "Clear", detail: "清除按钮只重置 React result state，不发送 API 请求。" },
+      { name: "Input", detail: "用户填写检索条件或业务问题，React 保存在本页 state。", technologies: ["Event Handler", "React useState"] },
+      { name: "Request", detail: "submitRetrieval() 或 submitInternalRag() 调用 api.ts，并设置 loading。", technologies: ["Event Handler", "React useState", "Fetch API", "REST API", "FastAPI Router"] },
+      { name: "Resolve", detail: "成功写入 results / citations；证据不足时保留 Backend 的 422 业务结果。", technologies: ["Keyword Retrieval", "Deterministic RAG", "Service Layer", "React Re-render"] },
+      { name: "Clear", detail: "清除按钮只重置 React result state，不发送 API 请求。", technologies: ["Event Handler", "React useState", "React Re-render"] },
     ],
     sources: [
       { label: "页面状态", path: "frontend/src/pages/RagPage.tsx", reason: "管理检索表单、回答表单、结果、错误与清除操作。" },
@@ -93,10 +94,10 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "企业把可确认的问题转成可追踪任务，以异步执行避免 HTTP 请求一直等待，并把执行过程和报告分开读取。",
     initialState: "初始为 idle；没有 task_id、SSE 事件或 report。",
     lifecycle: [
-      { name: "Submit", detail: "submit() 清空旧状态，POST /api/tasks 后保存 task_id 与 queued 状态。" },
-      { name: "Stream", detail: "subscribeToTask() 用 EventSource 接收 queued / running / done 等 SSE 事件。" },
-      { name: "Complete", detail: "收到 done 后取消订阅，并调用 loadReport() 读取最终 report。" },
-      { name: "Unmount", detail: "useEffect cleanup 调用取消订阅，防止旧 SSE 继续写入已离开的页面。" },
+      { name: "Submit", detail: "submit() 清空旧状态，POST /api/tasks 后保存 task_id 与 queued 状态。", technologies: ["Event Handler", "React useState", "Fetch API", "REST API", "FastAPI Router", "BackgroundTasks", "LangGraph"] },
+      { name: "Stream", detail: "subscribeToTask() 用 EventSource 接收 queued / running / done 等 SSE 事件。", technologies: ["SSE / EventSource", "React useState"] },
+      { name: "Complete", detail: "收到 done 后取消订阅，并调用 loadReport() 读取最终 report。", technologies: ["Fetch API", "REST API", "React useState", "React Re-render"] },
+      { name: "Unmount", detail: "useEffect cleanup 调用取消订阅，防止旧 SSE 继续写入已离开的页面。", technologies: ["React useEffect", "SSE / EventSource"] },
     ],
     sources: [
       { label: "页面状态", path: "frontend/src/pages/TasksPage.tsx", reason: "管理 taskId、status、events、report 和 SSE cleanup。" },
@@ -113,10 +114,10 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "经营结论需要经过责任人审批、拒绝或修正，并保留版本和审计事实，才能成为可追溯的企业决策依据。",
     initialState: "mount 后读取审批列表；提交审批需要用户手动输入已完成报告的 task_id。",
     lifecycle: [
-      { name: "Mount", detail: "useEffect() 读取 approval 列表，并选择当前可见记录。" },
-      { name: "Submit", detail: "提交 task_id 后由 Backend 创建 report version 与 approval request。" },
-      { name: "Decide", detail: "承認、却下或修正依頼触发状态迁移，并刷新列表与详情。" },
-      { name: "Audit", detail: "Approval API 经 AuditMiddleware 与权限边界；403、409 是业务结果而非页面故障。" },
+      { name: "Mount", detail: "useEffect() 读取 approval 列表，并选择当前可见记录。", technologies: ["React useEffect", "Fetch API", "REST API"] },
+      { name: "Submit", detail: "提交 task_id 后由 Backend 创建 report version 与 approval request。", technologies: ["Event Handler", "Fetch API", "REST API", "FastAPI Router", "Service Layer", "Repository Pattern"] },
+      { name: "Decide", detail: "承認、却下或修正依頼触发状态迁移，并刷新列表与详情。", technologies: ["Event Handler", "React useState", "FastAPI Router", "Service Layer", "Repository Pattern"] },
+      { name: "Audit", detail: "Approval API 经 AuditMiddleware 与权限边界；403、409 是业务结果而非页面故障。", technologies: ["AuditMiddleware", "FastAPI Router", "Service Layer"] },
     ],
     sources: [
       { label: "页面状态", path: "frontend/src/pages/ApprovalPage.tsx", reason: "管理列表、详情、提交和三种审批操作。" },
@@ -190,7 +191,11 @@ export function LearningSidebar({ page, latestEvent }: LearningSidebarProps) {
             {info.lifecycle.map((item, index) => (
               <li key={item.name}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <div><strong>{item.name}</strong><small>{item.detail}</small></div>
+                <div>
+                  <strong>{item.name}</strong>
+                  <small>{item.detail}</small>
+                  <small className="learning-technology">{item.technologies.map((technology) => `【${technology}】`).join(" ")}</small>
+                </div>
               </li>
             ))}
           </ol>
