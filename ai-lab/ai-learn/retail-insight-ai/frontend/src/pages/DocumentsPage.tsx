@@ -10,6 +10,7 @@ import {
   listDocuments,
   uploadDocument,
 } from "../api";
+import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
@@ -149,7 +150,7 @@ export function DocumentsPage() {
       setUploadTitle("");
       setUploadDescription("");
       setUploadTags("");
-      showBanner(`Upload completed: ${session.document_id}`);
+      showBanner(`アップロードが完了しました: ${session.document_id}`);
     } catch (reason) {
       setUploadError(toDisplayError(reason, "DOCUMENT_UPLOAD_ERROR", "ドキュメントのアップロードに失敗しました"));
     } finally {
@@ -168,15 +169,15 @@ export function DocumentsPage() {
     try {
       if (action === "archive") {
         const result = await archiveDocument(selectedDocument.document_id);
-        showBanner(`Archive accepted: ${result.document_id} (${result.status})`);
+        showBanner(`アーカイブを受け付けました: ${result.document_id} (${result.status})`);
       }
       if (action === "import") {
         const result = await importDocument(selectedDocument.document_id);
-        showBanner(`Import result: ${result.status}`);
+        showBanner(`Import 結果: ${result.status}`);
       }
       if (action === "chunk") {
         const result = await chunkDocument(selectedDocument.document_id);
-        showBanner(`Chunk completed: ${result.items.length} chunks`);
+        showBanner(`Chunk 処理が完了しました: ${result.items.length} 件`);
       }
       await loadDocuments(false);
       await refreshSelectedDocument(selectedDocument.document_id);
@@ -197,16 +198,16 @@ export function DocumentsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="DOCUMENT WORKSPACE"
-        title="Documents"
-        description="Manage document upload, detail, archive, import, and chunk actions through the current backend contract without inventing local-only data."
+        eyebrow="文書ワークスペース"
+        title="文書管理"
+        description="現在の Backend API を使用して、文書のアップロード、詳細確認、アーカイブ、Import、Chunk 操作を行います。"
       />
 
       <section className="documents-shell" aria-label="文档管理页面">
         <aside className="panel upload-panel">
         <div className="panel-heading">
           <span>01</span>
-          <h2>Document Upload</h2>
+          <h2>文書アップロード</h2>
         </div>
         <form onSubmit={submitUpload} className="stack-form">
           <label htmlFor="upload-file">ファイル</label>
@@ -222,7 +223,7 @@ export function DocumentsPage() {
             }}
             disabled={uploading}
           />
-          {uploadFile && <p className="selection">Selected: {uploadFile.name}</p>}
+          {uploadFile && <p className="selection">選択済み: {uploadFile.name}</p>}
 
           <label htmlFor="upload-title">タイトル</label>
           <input id="upload-title" value={uploadTitle} onChange={(event) => setUploadTitle(event.target.value)} disabled={uploading} />
@@ -236,10 +237,10 @@ export function DocumentsPage() {
             disabled={uploading}
           />
 
-          <label htmlFor="upload-owner">Owner</label>
+          <label htmlFor="upload-owner">担当者</label>
           <input id="upload-owner" value={uploadOwner} onChange={(event) => setUploadOwner(event.target.value)} disabled={uploading} />
 
-          <label htmlFor="upload-language">Language</label>
+          <label htmlFor="upload-language">言語</label>
           <input
             id="upload-language"
             value={uploadLanguage}
@@ -247,7 +248,7 @@ export function DocumentsPage() {
             disabled={uploading}
           />
 
-          <label htmlFor="upload-tags">Tags (comma separated)</label>
+          <label htmlFor="upload-tags">タグ（カンマ区切り）</label>
           <input id="upload-tags" value={uploadTags} onChange={(event) => setUploadTags(event.target.value)} disabled={uploading} />
 
           <button
@@ -260,7 +261,7 @@ export function DocumentsPage() {
               || uploadLanguage.trim().length === 0
             }
           >
-            {uploading ? "アップロード中…" : "Upload Document"}
+            {uploading ? "アップロード中…" : "文書をアップロード"}
           </button>
           {uploadError && <StatusBanner tone="error">[{uploadError.code}] {uploadError.message}</StatusBanner>}
         </form>
@@ -270,17 +271,17 @@ export function DocumentsPage() {
         <section className="panel list-panel" aria-live="polite">
           <div className="panel-heading">
             <span>02</span>
-            <h2>Document List</h2>
-            <small>{documentsRefreshing ? "refreshing" : `${documents.length} items`}</small>
+            <h2>文書一覧</h2>
+            <small>{documentsRefreshing ? "更新中" : `${documents.length} 件`}</small>
           </div>
 
           <div className="toolbar">
             <label className="checkbox-row">
               <input type="checkbox" checked={showArchived} onChange={(event) => setShowArchived(event.target.checked)} />
-              Include archived
+              アーカイブ済みを含める
             </label>
             <button type="button" className="secondary-button" onClick={() => void loadDocuments(false)}>
-              Retry / Refresh
+              再試行 / 更新
             </button>
           </div>
 
@@ -288,9 +289,9 @@ export function DocumentsPage() {
           {documentsError && <StatusBanner tone="error">[{documentsError.code}] {documentsError.message}</StatusBanner>}
 
           {documentsLoading ? (
-            <p className="empty">Loading documents…</p>
+            <p className="empty">文書を読み込み中…</p>
           ) : documents.length === 0 ? (
-            <p className="empty">No documents yet. Upload a file to start the document workflow.</p>
+            <p className="empty">文書はまだありません。ファイルをアップロードして文書ワークフローを開始してください。</p>
           ) : (
             <div className="document-table" role="list" aria-label="document-list">
               {documents.map((document) => {
@@ -322,54 +323,54 @@ export function DocumentsPage() {
         <section className="panel detail-panel" aria-live="polite">
           <div className="panel-heading">
             <span>03</span>
-            <h2>Document Detail</h2>
+            <h2>文書詳細</h2>
             {selectedDocument && <small>{selectedDocument.document_id}</small>}
           </div>
 
           {detailError && <StatusBanner tone="error">[{detailError.code}] {detailError.message}</StatusBanner>}
 
           {selectedDocumentId === null ? (
-            <p className="empty">Select a document from the list to view detail and actions.</p>
+            <p className="empty">一覧から文書を選択すると、詳細と操作を確認できます。</p>
           ) : detailLoading && selectedDocument === null ? (
-            <p className="empty">Loading document detail…</p>
+            <p className="empty">文書詳細を読み込み中…</p>
           ) : selectedDocument === null ? (
             <div className="empty-block">
-              <p className="empty">Document detail is unavailable.</p>
+              <p className="empty">文書詳細を取得できません。</p>
               <button type="button" className="secondary-button" onClick={() => void refreshSelectedDocument(selectedDocumentId)}>
-                Retry
+                再試行
               </button>
             </div>
           ) : (
             <>
               <dl className="detail-grid">
-                <div><dt>Title</dt><dd>{selectedDocument.title}</dd></div>
-                <div><dt>Status</dt><dd>{selectedDocument.status}</dd></div>
-                <div><dt>Type</dt><dd>{selectedDocument.document_type}</dd></div>
-                <div><dt>Language</dt><dd>{selectedDocument.language}</dd></div>
-                <div><dt>Owner</dt><dd>{selectedDocument.owner}</dd></div>
-                <div><dt>Version</dt><dd>{selectedDocument.version}</dd></div>
-                <div><dt>Created</dt><dd>{formatDate(selectedDocument.created_at)}</dd></div>
-                <div><dt>Updated</dt><dd>{formatDate(selectedDocument.updated_at)}</dd></div>
-                <div><dt>Chunk Count</dt><dd>{chunkData ? chunkData.items.length : chunkLoading ? "Loading…" : "—"}</dd></div>
-                <div><dt>Tags</dt><dd>{selectedDocument.tags.length > 0 ? selectedDocument.tags.join(", ") : "—"}</dd></div>
+                <div><dt>タイトル</dt><dd>{selectedDocument.title}</dd></div>
+                <div><dt>ステータス</dt><dd>{selectedDocument.status}</dd></div>
+                <div><dt>種類</dt><dd>{selectedDocument.document_type}</dd></div>
+                <div><dt>言語</dt><dd>{selectedDocument.language}</dd></div>
+                <div><dt>担当者</dt><dd>{selectedDocument.owner}</dd></div>
+                <div><dt>バージョン</dt><dd>{selectedDocument.version}</dd></div>
+                <div><dt>作成日時</dt><dd>{formatDate(selectedDocument.created_at)}</dd></div>
+                <div><dt>更新日時</dt><dd>{formatDate(selectedDocument.updated_at)}</dd></div>
+                <div><dt>Chunk 数</dt><dd>{chunkData ? chunkData.items.length : chunkLoading ? "読み込み中…" : "—"}</dd></div>
+                <div><dt>タグ</dt><dd>{selectedDocument.tags.length > 0 ? selectedDocument.tags.join(", ") : "—"}</dd></div>
               </dl>
 
               {selectedDocument.description && (
                 <div className="detail-note">
-                  <strong>Description</strong>
+                  <strong>説明</strong>
                   <p>{selectedDocument.description}</p>
                 </div>
               )}
 
               <div className="action-grid">
                 <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("archive")}>
-                  {activeDocumentAction === "archive" ? "Archiving…" : "Archive"}
+                  {activeDocumentAction === "archive" ? "アーカイブ中…" : "アーカイブ"}
                 </button>
                 <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("import")}>
-                  {activeDocumentAction === "import" ? "Importing…" : "Import"}
+                  {activeDocumentAction === "import" ? "Import 中…" : "Import"}
                 </button>
                 <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("chunk")}>
-                  {activeDocumentAction === "chunk" ? "Chunking…" : "Chunk"}
+                  {activeDocumentAction === "chunk" ? "Chunk 処理中…" : "Chunk 実行"}
                 </button>
                 <button
                   type="button"
@@ -377,7 +378,7 @@ export function DocumentsPage() {
                   disabled={selectedDocumentBusy}
                   onClick={() => void refreshSelectedDocument(selectedDocument.document_id)}
                 >
-                  Reload Detail
+                  詳細を再読み込み
                 </button>
               </div>
 
@@ -385,25 +386,25 @@ export function DocumentsPage() {
 
               <div className="chunk-panel">
                 <div className="subheading">
-                  <strong>Chunk Preview</strong>
-                  {chunkLoading && <small>loading…</small>}
+                  <strong>Chunk プレビュー</strong>
+                  {chunkLoading && <small>読み込み中…</small>}
                 </div>
                 {chunkData === null ? (
                   <div className="empty-block">
-                    <p className="empty">No chunk data yet, or the backend rejected the current state.</p>
+                    <p className="empty">Chunk データがまだないか、Backend が現在の状態を受け付けませんでした。</p>
                     <button type="button" className="secondary-button" onClick={() => void refreshSelectedDocument(selectedDocument.document_id)}>
-                      Retry
+                      再試行
                     </button>
                   </div>
                 ) : chunkData.items.length === 0 ? (
-                  <p className="empty">Chunk API returned zero items.</p>
+                  <p className="empty">Chunk API は 0 件を返しました。</p>
                 ) : (
                   <ol className="chunk-list">
                     {chunkData.items.slice(0, 3).map((chunk) => (
                       <li key={chunk.chunk_id}>
                         <div className="chunk-head">
                           <strong>#{chunk.chunk_index}</strong>
-                          <small>{chunk.character_count} chars</small>
+                          <small>{chunk.character_count} 文字</small>
                         </div>
                         <pre>{chunk.content}</pre>
                       </li>
@@ -416,6 +417,36 @@ export function DocumentsPage() {
         </section>
       </section>
       </section>
+
+      <BusinessLearningPanel
+        pageName="文書管理"
+        purpose="登记关东地区饮料销售资料，并以 document_id、import_id 与 Chunk 为后续检索留下可追踪依据。"
+        scenario="经营企划人员上传“関東飲料売上分析.md”，确认文档状态后执行 Import 和 Chunk，为 RAG検索准备内部资料。"
+        prerequisites="准备 markdown 或 text 文件、标题、担当者和语言。Chunk 仅支持 validated 的 markdown／text；页面不自动把 document_id 传给 RAG検索。"
+        relationship="本页产生 document_id、import_id 和 Chunk。RAG検索 使用已完成 Chunk 的内部资料，但当前只能由用户手动输入相同检索条件，未传递 document_id。"
+        cases={[
+          { id: "DOC-BIZ-001", purpose: "正常登记关东饮料销售资料。", input: "选择文件、填写タイトル／担当者／言語，点击「文書をアップロード」。", expected: "实际 POST 返回 upload_id、document_id、status；列表刷新并选中该文档。" },
+          { id: "DOC-BIZ-002", purpose: "确认上传必填项。", input: "不选择文件，或清空タイトル／担当者／言語。", expected: "上传按钮不可点击；Backend 返回的校验错误会显示在页面。" },
+          { id: "DOC-BIZ-003", purpose: "确认不存在文档。", input: "选择已不存在的 document_id 或刷新详情。", expected: "GET 文档／Chunk 接口实际返回 404，页面显示结构化错误并允许再试。" },
+          { id: "DOC-BIZ-004", purpose: "确认 Import 与 Chunk 的业务前置条件。", input: "对文档点击 Import、Chunk。", expected: "Import 返回真实 import_id／status；Chunk 对非 validated、archived 或不支持类型返回 Backend 业务错误。" },
+          { id: "DOC-BIZ-005", purpose: "确认归档和重新读取。", input: "点击「アーカイブ」，然后勾选「アーカイブ済みを含める」。", expected: "DELETE 返回 202 与 archived 状态；列表与详情刷新，查询条件只改变页面读取结果。" },
+        ]}
+        flows={[
+          {
+            title: "上传、列表与详情",
+            api: "POST /api/v1/documents；GET /api/v1/documents；GET /api/v1/documents/{document_id}",
+            frontend: ["DocumentsPage submitUpload() / loadDocuments() / refreshSelectedDocument()", "uploadDocument() / listDocuments() / getDocument()", "setDocuments / setSelectedDocument"],
+            backend: ["documents.py upload_document() / list_documents() / get_document()", "DocumentUploadService.upload_document()", "DocumentReadService.list_documents() / get_document()", "InMemoryDocumentRepository.create() / list_all() / get()"],
+          },
+          {
+            title: "Import、Chunk 与归档",
+            api: "POST /api/v1/documents/{document_id}/import；POST|GET /api/v1/documents/{document_id}/chunks；DELETE /api/v1/documents/{document_id}",
+            frontend: ["runDocumentAction()", "importDocument() / chunkDocument() / archiveDocument() / getDocumentChunks()", "刷新列表、详情和 Chunk 预览"],
+            backend: ["document_imports.py import_document() → DocumentImportService.import_document()", "document_chunks.py chunk_document() / get_document_chunks() → DocumentChunkService", "documents.py archive_document() → DocumentArchiveService.archive_document()", "InMemoryDocumentRepository.get() / update()；InMemoryDocumentChunkRepository.replace_for_document() / list_for_document()"],
+            note: "「詳細を再読み込み」只更新 React 数据状态并重新发起 GET；不是新的业务流程。",
+          },
+        ]}
+      />
     </>
   );
 }

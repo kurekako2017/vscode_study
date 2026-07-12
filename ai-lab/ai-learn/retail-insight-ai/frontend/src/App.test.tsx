@@ -13,28 +13,28 @@ describe("App navigation", () => {
   it("shows dashboard by default with current runtime facts", async () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
-    expect(screen.getByText("Repository")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Enterprise Retail Intelligence Platform" })).toBeInTheDocument();
+    expect(screen.getByText("数据存储")).toBeInTheDocument();
     expect(screen.getByText("InMemory")).toBeInTheDocument();
-    expect(screen.getAllByText("Real LLM").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Disabled").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("真实 LLM").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("未启用").length).toBeGreaterThan(0);
   });
 
   it("highlights the current page in top navigation", async () => {
     render(<App />);
 
-    expect(screen.getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
-    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
-    expect(screen.getByRole("button", { name: "Documents" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "学习总览" })).toHaveAttribute("aria-current", "page");
+    fireEvent.click(screen.getByRole("button", { name: "文書管理" }));
+    expect(screen.getByRole("button", { name: "文書管理" })).toHaveAttribute("aria-current", "page");
   });
 
   it("navigates to tasks from dashboard shortcut", async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Open Tasks" }));
+    fireEvent.click(screen.getByRole("button", { name: "分析依頼を開く" }));
 
-    expect(screen.getByRole("heading", { name: "Analysis / Tasks" })).toBeInTheDocument();
-    expect(screen.getByText("Create a deterministic analysis task, observe SSE progress, and inspect the final generated report from the current local workflow.")).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "分析依頼" }).length).toBeGreaterThan(0);
+    expect(screen.getByText("分析依頼を作成し、SSE の進捗と現在のローカルワークフローが生成したレポートを確認します。")).toBeInTheDocument();
   });
 
   it("navigates to documents from dashboard shortcut", async () => {
@@ -46,16 +46,16 @@ describe("App navigation", () => {
     }), { status: 200 })));
 
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Open Documents" }));
+    fireEvent.click(screen.getByRole("button", { name: "文書管理を開く" }));
 
-    expect(await screen.findByRole("heading", { name: "Documents" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "文書管理" })).toBeInTheDocument();
   });
 
   it("navigates to rag from dashboard shortcut", async () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Open RAG" }));
+    fireEvent.click(screen.getByRole("button", { name: "RAG検索を開く" }));
 
-    expect(screen.getByRole("heading", { name: "RAG" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
   });
 
   it("navigates to approval from dashboard shortcut", async () => {
@@ -67,8 +67,8 @@ describe("App navigation", () => {
     }), { status: 200 })));
 
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Open Approval" }));
+    fireEvent.click(screen.getByRole("button", { name: "承認管理を開く" }));
 
-    expect(await screen.findByRole("heading", { name: "Approval" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "承認管理" })).toBeInTheDocument();
   });
 });

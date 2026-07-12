@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 
 import { ApiClientError, answerInternalRag, searchDocumentRetrieval } from "../api";
+import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
@@ -64,7 +65,7 @@ export function RagPage() {
       });
       setRetrievalResult(response);
     } catch (reason) {
-      setRetrievalError(toDisplayError(reason, "DOCUMENT_RETRIEVAL_ERROR", "Retrieval request failed"));
+      setRetrievalError(toDisplayError(reason, "DOCUMENT_RETRIEVAL_ERROR", "検索リクエストに失敗しました"));
       setRetrievalResult(null);
     } finally {
       setRetrievalLoading(false);
@@ -89,7 +90,7 @@ export function RagPage() {
       });
       setRagResult(response);
     } catch (reason) {
-      setRagError(toDisplayError(reason, "INTERNAL_RAG_ERROR", "Internal RAG request failed"));
+      setRagError(toDisplayError(reason, "INTERNAL_RAG_ERROR", "Internal RAG リクエストに失敗しました"));
       setRagResult(null);
     } finally {
       setRagLoading(false);
@@ -99,20 +100,20 @@ export function RagPage() {
   return (
     <>
       <PageHeader
-        eyebrow="RETRIEVAL + GROUNDED ANSWER"
-        title="RAG"
-        description="Run the current deterministic retrieval and grounded answer flows: keyword retrieval is available, while vector search and real LLM generation are intentionally not connected."
+        eyebrow="RAG 検索と回答"
+        title="RAG検索"
+        description="現在はキーワード検索と固定ロジックによる回答を利用できます。ベクトル検索と実際の LLM 生成は未接続です。"
       />
 
-      <section className="rag-shell" aria-label="RAG workspace">
+      <section className="rag-shell" aria-label="RAG 検索ワークスペース">
         <section className="panel rag-panel">
         <div className="panel-heading">
           <span>01</span>
-          <h2>Document Retrieval</h2>
+          <h2>文書検索</h2>
           <small>Keyword Retrieval / Deterministic Retrieval</small>
         </div>
         <form className="stack-form" onSubmit={submitRetrieval}>
-          <label htmlFor="retrieval-query">Query</label>
+          <label htmlFor="retrieval-query">検索語</label>
           <textarea
             id="retrieval-query"
             rows={4}
@@ -122,11 +123,11 @@ export function RagPage() {
           />
           <div className="filter-grid">
             <div>
-              <label htmlFor="retrieval-limit">Limit</label>
+              <label htmlFor="retrieval-limit">取得件数</label>
               <input id="retrieval-limit" value={retrievalLimit} onChange={(event) => setRetrievalLimit(event.target.value)} disabled={retrievalLoading} />
             </div>
             <div>
-              <label htmlFor="retrieval-document-type">Document Type</label>
+              <label htmlFor="retrieval-document-type">文書種別</label>
               <input
                 id="retrieval-document-type"
                 value={retrievalDocumentType}
@@ -135,11 +136,11 @@ export function RagPage() {
               />
             </div>
             <div>
-              <label htmlFor="retrieval-language">Language</label>
+              <label htmlFor="retrieval-language">言語</label>
               <input id="retrieval-language" value={retrievalLanguage} onChange={(event) => setRetrievalLanguage(event.target.value)} disabled={retrievalLoading} />
             </div>
             <div>
-              <label htmlFor="retrieval-tags">Tags (comma separated)</label>
+              <label htmlFor="retrieval-tags">タグ（カンマ区切り）</label>
               <input id="retrieval-tags" value={retrievalTags} onChange={(event) => setRetrievalTags(event.target.value)} disabled={retrievalLoading} />
             </div>
           </div>
@@ -150,14 +151,14 @@ export function RagPage() {
               onChange={(event) => setRetrievalIncludeArchived(event.target.checked)}
               disabled={retrievalLoading}
             />
-            Include archived
+            アーカイブ済みを含める
           </label>
           <div className="action-row">
             <button type="submit" disabled={retrievalLoading || retrievalQuery.trim().length === 0}>
-              {retrievalLoading ? "Searching…" : "Search Retrieval"}
+              {retrievalLoading ? "検索中…" : "検索する"}
             </button>
             <button type="button" className="secondary-button" onClick={() => setRetrievalResult(null)}>
-              Clear Result
+              結果をクリア
             </button>
           </div>
         </form>
@@ -166,43 +167,43 @@ export function RagPage() {
           <div className="error-block">
             <StatusBanner tone="error">[{retrievalError.code}] {retrievalError.message}</StatusBanner>
             <button type="button" className="secondary-button" onClick={() => setRetrievalError(null)}>
-              Dismiss
+              閉じる
             </button>
           </div>
         )}
 
         {retrievalLoading ? (
-          <p className="empty">Loading retrieval result…</p>
+          <p className="empty">検索結果を読み込み中…</p>
         ) : retrievalResult === null ? (
-          <p className="empty">Run a keyword retrieval request to see real chunk matches from the backend.</p>
+          <p className="empty">キーワード検索を実行すると、Backend が返す実際の Chunk 一致結果を確認できます。</p>
         ) : retrievalResult.results.length === 0 ? (
           <div className="empty-block">
-            <p className="empty">No retrieval results found.</p>
+            <p className="empty">検索結果はありません。</p>
             <button type="button" className="secondary-button" onClick={() => setRetrievalResult(null)}>
-              Retry with another query
+              別の検索語で再試行
             </button>
           </div>
         ) : (
           <div className="result-stack">
             <StatusBanner tone="success">
-              Retrieval mode: {retrievalResult.retrieval_mode} / Total matches: {retrievalResult.total}
+              検索方式: {retrievalResult.retrieval_mode} / 一致件数: {retrievalResult.total}
             </StatusBanner>
             {retrievalResult.results.map((item, index) => (
               <article key={item.chunk_id} className="result-card">
                 <div className="subheading">
-                  <strong>Rank {index + 1}</strong>
-                  <small>Score {item.score.toFixed(3)}</small>
+                  <strong>順位 {index + 1}</strong>
+                  <small>スコア {item.score.toFixed(3)}</small>
                 </div>
                 <pre className="excerpt-block">{item.content_excerpt}</pre>
                 <dl className="detail-grid result-meta-grid">
-                  <div><dt>Document ID</dt><dd>{item.document_id}</dd></div>
+                  <div><dt>文書 ID</dt><dd>{item.document_id}</dd></div>
                   <div><dt>Chunk ID</dt><dd>{item.chunk_id}</dd></div>
-                  <div><dt>Chunk Index</dt><dd>{item.chunk_index}</dd></div>
-                  <div><dt>Mode</dt><dd>{retrievalResult.retrieval_mode}</dd></div>
-                  <div><dt>Source Type</dt><dd>{item.source.source_type}</dd></div>
-                  <div><dt>Source URI</dt><dd>{item.source.uri}</dd></div>
-                  <div><dt>Metadata Title</dt><dd>{item.metadata.title}</dd></div>
-                  <div><dt>Metadata Status</dt><dd>{item.metadata.status}</dd></div>
+                  <div><dt>Chunk 番号</dt><dd>{item.chunk_index}</dd></div>
+                  <div><dt>検索方式</dt><dd>{retrievalResult.retrieval_mode}</dd></div>
+                  <div><dt>ソース種別</dt><dd>{item.source.source_type}</dd></div>
+                  <div><dt>ソース URI</dt><dd>{item.source.uri}</dd></div>
+                  <div><dt>文書タイトル</dt><dd>{item.metadata.title}</dd></div>
+                  <div><dt>文書ステータス</dt><dd>{item.metadata.status}</dd></div>
                 </dl>
               </article>
             ))}
@@ -213,11 +214,11 @@ export function RagPage() {
       <section className="panel rag-panel">
         <div className="panel-heading">
           <span>02</span>
-          <h2>Internal RAG Answer</h2>
+          <h2>Internal RAG 回答</h2>
           <small>Deterministic Grounded Answer</small>
         </div>
         <form className="stack-form" onSubmit={submitInternalRag}>
-          <label htmlFor="rag-question">Question</label>
+          <label htmlFor="rag-question">質問</label>
           <textarea
             id="rag-question"
             rows={4}
@@ -227,25 +228,25 @@ export function RagPage() {
           />
           <div className="filter-grid">
             <div>
-              <label htmlFor="rag-limit">Limit</label>
+              <label htmlFor="rag-limit">取得件数</label>
               <input id="rag-limit" value={ragLimit} onChange={(event) => setRagLimit(event.target.value)} disabled={ragLoading} />
             </div>
             <div>
-              <label htmlFor="rag-document-type">Document Type</label>
+              <label htmlFor="rag-document-type">文書種別</label>
               <input id="rag-document-type" value={ragDocumentType} onChange={(event) => setRagDocumentType(event.target.value)} disabled={ragLoading} />
             </div>
             <div>
-              <label htmlFor="rag-language">Language</label>
+              <label htmlFor="rag-language">言語</label>
               <input id="rag-language" value={ragLanguage} onChange={(event) => setRagLanguage(event.target.value)} disabled={ragLoading} />
             </div>
             <div>
-              <label htmlFor="rag-tags">Tags (comma separated)</label>
+              <label htmlFor="rag-tags">タグ（カンマ区切り）</label>
               <input id="rag-tags" value={ragTags} onChange={(event) => setRagTags(event.target.value)} disabled={ragLoading} />
             </div>
           </div>
           <div className="filter-grid">
             <div>
-              <label htmlFor="rag-answer-mode">Answer Mode</label>
+              <label htmlFor="rag-answer-mode">回答方式</label>
               <select
                 id="rag-answer-mode"
                 value={ragAnswerMode}
@@ -259,18 +260,18 @@ export function RagPage() {
           </div>
           <label className="checkbox-row">
             <input type="checkbox" checked={ragIncludeArchived} onChange={(event) => setRagIncludeArchived(event.target.checked)} disabled={ragLoading} />
-            Include archived
+            アーカイブ済みを含める
           </label>
           <label className="checkbox-row">
             <input type="checkbox" checked={ragRequireCitations} onChange={(event) => setRagRequireCitations(event.target.checked)} disabled={ragLoading} />
-            Require citations
+            引用を必須にする
           </label>
           <div className="action-row">
             <button type="submit" disabled={ragLoading || ragQuestion.trim().length === 0}>
-              {ragLoading ? "Answering…" : "Generate Answer"}
+              {ragLoading ? "回答を生成中…" : "回答を生成"}
             </button>
             <button type="button" className="secondary-button" onClick={() => setRagResult(null)}>
-              Clear Answer
+              回答をクリア
             </button>
           </div>
         </form>
@@ -279,24 +280,24 @@ export function RagPage() {
           <div className="error-block">
             <StatusBanner tone="error">[{ragError.code}] {ragError.message}</StatusBanner>
             <button type="button" className="secondary-button" onClick={() => setRagError(null)}>
-              Dismiss
+              閉じる
             </button>
           </div>
         )}
 
         {ragLoading ? (
-          <p className="empty">Loading internal RAG answer…</p>
+          <p className="empty">Internal RAG 回答を読み込み中…</p>
         ) : ragResult === null ? (
-          <p className="empty">Ask a question to see the grounded answer, confidence, warnings, and citations from the backend.</p>
+          <p className="empty">質問を入力すると、Backend が返す回答、信頼度、警告、引用を確認できます。</p>
         ) : (
           <div className="result-stack">
             <StatusBanner tone="success">
-              Retrieval mode: {ragResult.retrieval_mode} / Answer mode: {ragResult.answer_mode} / Confidence: {ragResult.confidence.toFixed(2)}
+              検索方式: {ragResult.retrieval_mode} / 回答方式: {ragResult.answer_mode} / 信頼度: {ragResult.confidence.toFixed(2)}
             </StatusBanner>
             <article className="result-card">
               <div className="subheading">
-                <strong>Answer</strong>
-                <small>{ragResult.citations.length} citations</small>
+                <strong>回答</strong>
+                <small>引用 {ragResult.citations.length} 件</small>
               </div>
               <pre className="answer-block">{ragResult.answer}</pre>
               <div className="warning-list">
@@ -312,16 +313,16 @@ export function RagPage() {
               {ragResult.citations.map((citation, index) => (
                 <article key={citation.chunk_id} className="result-card">
                   <div className="subheading">
-                    <strong>Citation {index + 1}</strong>
-                    <small>Score {citation.score.toFixed(3)}</small>
+                    <strong>引用 {index + 1}</strong>
+                    <small>スコア {citation.score.toFixed(3)}</small>
                   </div>
                   <pre className="excerpt-block">{citation.excerpt}</pre>
                   <dl className="detail-grid result-meta-grid">
-                    <div><dt>Document ID</dt><dd>{citation.document_id}</dd></div>
+                    <div><dt>文書 ID</dt><dd>{citation.document_id}</dd></div>
                     <div><dt>Chunk ID</dt><dd>{citation.chunk_id}</dd></div>
-                    <div><dt>Chunk Index</dt><dd>{citation.chunk_index}</dd></div>
-                    <div><dt>Source Type</dt><dd>{citation.source.source_type}</dd></div>
-                    <div><dt>Source URI</dt><dd>{citation.source.uri}</dd></div>
+                    <div><dt>Chunk 番号</dt><dd>{citation.chunk_index}</dd></div>
+                    <div><dt>ソース種別</dt><dd>{citation.source.source_type}</dd></div>
+                    <div><dt>ソース URI</dt><dd>{citation.source.uri}</dd></div>
                   </dl>
                 </article>
               ))}
@@ -330,6 +331,37 @@ export function RagPage() {
         )}
       </section>
       </section>
+
+      <BusinessLearningPanel
+        pageName="RAG検索"
+        purpose="确认关东地区饮料销售资料已能被关键词检索，并以可引用结果生成固定逻辑的 Internal RAG 回答。"
+        scenario="资料已在文書管理完成 Chunk 后，分析人员查询“関東地域の飲料カテゴリの売上減少”，再询问主要原因并检查 citation。"
+        prerequisites="存在 validated 的 markdown／text Chunk；查询或问题不能为空。当前只有 Keyword Retrieval 与 deterministic answer，不使用真实 LLM 或 pgvector。"
+        relationship="本页读取文书产生的 Chunk，并返回 document_id、chunk_id、citation。当前检索结果不会自动填入分析依頼；用户需手动把结论或问题带到下一页。"
+        cases={[
+          { id: "RAG-BIZ-001", purpose: "检索关东饮料销售下降资料。", input: "検索語：関東地域の飲料カテゴリの売上減少；取得件数：5。", expected: "POST 搜索返回 results、total、retrieval_mode；页面显示文書 ID、Chunk ID、score 与来源。" },
+          { id: "RAG-BIZ-002", purpose: "确认搜索必填项。", input: "清空検索語。", expected: "「検索する」不可点击，不发送请求；空白 query 直接请求时 Backend 返回实际校验错误。" },
+          { id: "RAG-BIZ-003", purpose: "确认无资料命中。", input: "输入不存在的业务关键词。", expected: "HTTP 成功但 results 为 0，页面显示「検索結果はありません。」。" },
+          { id: "RAG-BIZ-004", purpose: "确认资料不足的 RAG 业务错误。", input: "質問输入无法由现有 Chunk 支撑的问题，引用必須为 true。", expected: "Backend 返回实际 insufficient_context 或 citation 相关错误，页面显示 error code 与 message。" },
+          { id: "RAG-BIZ-005", purpose: "确认清除只影响页面。", input: "点击「結果をクリア」或「回答をクリア」。", expected: "仅 setRetrievalResult(null)／setRagResult(null)，不发起 Backend 请求，可重新执行搜索或回答。" },
+        ]}
+        flows={[
+          {
+            title: "关键词文书搜索",
+            api: "POST /api/v1/document-retrieval/search",
+            frontend: ["RagPage submitRetrieval()", "searchDocumentRetrieval()", "setRetrievalResult", "结果／空状态显示"],
+            backend: ["document_retrieval.py search_documents()", "DocumentRetrievalService.search()", "DocumentRetrievalProvider.search()", "InMemoryKeywordRetrieval.search()"],
+            note: "检索实现按 Chunk 的关键词匹配排序；当前没有向量检索或 reranker。",
+          },
+          {
+            title: "Internal RAG 回答",
+            api: "POST /api/v1/internal-rag/answer",
+            frontend: ["RagPage submitInternalRag()", "answerInternalRag()", "setRagResult", "回答、warnings、citations 显示"],
+            backend: ["internal_rag.py answer_internal_rag()", "InternalRagService.answer()", "DocumentRetrievalProvider.search()", "RAGAnswerGenerator.generate()", "InternalRagEvaluationService"],
+            note: "回答是基于检索结果的 deterministic assembly；citation 来自 Backend response，不由前端拼装。",
+          },
+        ]}
+      />
     </>
   );
 }

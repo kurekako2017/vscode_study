@@ -15,54 +15,54 @@ const capabilityCards: Array<{
   actionLabel: string;
 }> = [
   {
-    title: "Analysis / Tasks",
-    description: "Create a task, watch SSE progress, and read the generated report in one place.",
-    status: "Available",
+    title: "分析依頼",
+    description: "分析依頼を作成し、SSE の進捗と生成されたレポートを確認します。",
+    status: "可用",
     target: "analysis",
-    actionLabel: "Open Tasks",
+    actionLabel: "分析依頼を開く",
   },
   {
-    title: "Documents",
-    description: "Upload documents, inspect detail, archive, import, and chunk with real backend APIs.",
-    status: "Available",
+    title: "文書管理",
+    description: "文書のアップロード、詳細確認、アーカイブ、Import、Chunk 操作を行います。",
+    status: "可用",
     target: "documents",
-    actionLabel: "Open Documents",
+    actionLabel: "文書管理を開く",
   },
   {
     title: "RAG",
-    description: "Run keyword retrieval and deterministic internal RAG answer flows using current backend capabilities.",
-    status: "Available",
+    description: "キーワード検索と固定ロジックによる Internal RAG 回答を実行します。",
+    status: "可用",
     target: "rag",
-    actionLabel: "Open RAG",
+    actionLabel: "RAG検索を開く",
   },
   {
-    title: "Approval",
-    description: "Review approval queue, inspect detail, and submit approve / reject / revise actions.",
-    status: "Available",
+    title: "承認管理",
+    description: "承認待ち一覧と詳細を確認し、承認、却下、修正依頼を実行します。",
+    status: "可用",
     target: "approval",
-    actionLabel: "Open Approval",
+    actionLabel: "承認管理を開く",
   },
 ];
 
 const runtimeFacts = [
-  ["Repository", "InMemory"],
-  ["Research Provider", "Static"],
-  ["Retrieval", "Keyword"],
-  ["RAG Answer", "Deterministic"],
-  ["Identity", "System placeholder user"],
-  ["Real LLM", "Disabled"],
-  ["PostgreSQL", "Not verified in current runtime"],
-  ["pgvector", "Not implemented"],
+  ["数据存储", "InMemory"],
+  ["调研数据源", "静态数据"],
+  ["检索方式", "关键词检索"],
+  ["RAG 回答方式", "固定逻辑生成"],
+  ["当前用户", "系统默认用户"],
+  ["真实 LLM", "未启用"],
+  ["PostgreSQL", "当前运行环境尚未验证"],
+  ["pgvector", "尚未实现"],
 ];
 
 const boundaryFacts = [
-  ["Task Workflow", "Available"],
-  ["Document Management", "Available"],
-  ["Keyword Retrieval", "Available"],
-  ["Deterministic RAG", "Available"],
-  ["Approval Workflow", "Available"],
-  ["Real LLM", "Not Connected"],
-  ["Vector Retrieval", "Not Available"],
+  ["任务工作流", "可用"],
+  ["文书管理", "可用"],
+  ["关键词检索", "可用"],
+  ["固定逻辑 RAG", "可用"],
+  ["审批工作流", "可用"],
+  ["真实 LLM", "未连接"],
+  ["向量检索", "尚未可用"],
 ];
 
 /**
@@ -76,17 +76,17 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   return (
     <>
       <PageHeader
-        eyebrow="LOCAL MVP OVERVIEW"
-        title="Dashboard"
-        description="A single entry point for the current local MVP: workflow, documents, retrieval, and approval are available; real LLM and vector search are intentionally not connected."
+        eyebrow="当前实现总览"
+        title="Enterprise Retail Intelligence Platform"
+        description="通过当前系统状态、功能边界和 API 连接情况，理解 ERIP 的整体实现。"
       />
 
-      <section className="dashboard-shell" aria-label="Dashboard overview">
+      <section className="dashboard-shell" aria-label="ERIP 学习总览">
         <section className="panel dashboard-panel">
           <div className="panel-heading">
             <span>01</span>
-            <h2>System Overview</h2>
-            <small>Current local implementation only</small>
+            <h2>系统概览</h2>
+            <small>当前本地实现</small>
           </div>
           <dl className="detail-grid runtime-grid">
             {runtimeFacts.map(([label, value]) => (
@@ -101,8 +101,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         <section className="panel dashboard-panel">
           <div className="panel-heading">
             <span>02</span>
-            <h2>Capability Boundary</h2>
-            <small>Real features vs not connected yet</small>
+            <h2>当前能力边界</h2>
+            <small>已实现功能与尚未连接的能力</small>
           </div>
           <div className="dashboard-boundary-grid">
             {boundaryFacts.map(([label, value]) => (
@@ -120,8 +120,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         <section className="panel dashboard-panel">
           <div className="panel-heading">
             <span>03</span>
-            <h2>Feature Entry</h2>
-            <small>Shortcut cards for demo and learning</small>
+            <h2>功能入口</h2>
+            <small>用于演示与学习的快捷入口</small>
           </div>
           <div className="dashboard-card-grid">
             {capabilityCards.map((card) => (

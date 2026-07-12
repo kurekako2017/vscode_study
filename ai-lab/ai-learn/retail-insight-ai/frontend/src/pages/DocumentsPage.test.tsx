@@ -60,7 +60,7 @@ describe("DocumentsPage", () => {
     render(<DocumentsPage />);
 
     expect(await screen.findByText("Monthly Policy")).toBeInTheDocument();
-    expect(await screen.findByText("Chunk Count")).toBeInTheDocument();
+    expect(await screen.findByText("Chunk 数")).toBeInTheDocument();
     expect(await screen.findByText("Paragraph one")).toBeInTheDocument();
   });
 
@@ -69,7 +69,7 @@ describe("DocumentsPage", () => {
 
     render(<DocumentsPage />);
 
-    expect(await screen.findByText("No documents yet. Upload a file to start the document workflow.")).toBeInTheDocument();
+    expect(await screen.findByText("文書はまだありません。ファイルをアップロードして文書ワークフローを開始してください。")).toBeInTheDocument();
   });
 
   it("shows document list API error and allows refresh retry", async () => {
@@ -86,8 +86,8 @@ describe("DocumentsPage", () => {
     render(<DocumentsPage />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[DOCUMENT_LIST_ERROR] List failed");
-    fireEvent.click(screen.getByRole("button", { name: "Retry / Refresh" }));
-    expect(await screen.findByText("No documents yet. Upload a file to start the document workflow.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "再試行 / 更新" }));
+    expect(await screen.findByText("文書はまだありません。ファイルをアップロードして文書ワークフローを開始してください。")).toBeInTheDocument();
   });
 
   it("uploads a document successfully and refreshes the list", async () => {
@@ -150,10 +150,10 @@ describe("DocumentsPage", () => {
 
     const file = new File(["month,sales"], "budget.csv", { type: "text/csv" });
     fireEvent.change(screen.getByLabelText("ファイル"), { target: { files: [file] } });
-    fireEvent.change(screen.getByLabelText("Tags (comma separated)"), { target: { value: "finance" } });
-    fireEvent.click(screen.getByRole("button", { name: "Upload Document" }));
+    fireEvent.change(screen.getByLabelText("タグ（カンマ区切り）"), { target: { value: "finance" } });
+    fireEvent.click(screen.getByRole("button", { name: "文書をアップロード" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Upload completed: doc-9");
+    expect(await screen.findByRole("status")).toHaveTextContent("アップロードが完了しました: doc-9");
     expect((await screen.findAllByText("budget.csv")).length).toBeGreaterThan(0);
   });
 
@@ -173,7 +173,7 @@ describe("DocumentsPage", () => {
     const file = new File(["# doc"], "missing.md", { type: "text/markdown" });
     fireEvent.change(screen.getByLabelText("ファイル"), { target: { files: [file] } });
     fireEvent.change(screen.getByLabelText("タイトル"), { target: { value: "Missing" } });
-    fireEvent.click(screen.getByRole("button", { name: "Upload Document" }));
+    fireEvent.click(screen.getByRole("button", { name: "文書をアップロード" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[missing_title] Title required");
   });
@@ -211,8 +211,8 @@ describe("DocumentsPage", () => {
     render(<DocumentsPage />);
 
     expect(await screen.findByText("Monthly Policy")).toBeInTheDocument();
-    fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
+    fireEvent.click(await screen.findByRole("button", { name: "アーカイブ" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Archive accepted: doc-1 (archived)");
+    expect(await screen.findByRole("status")).toHaveTextContent("アーカイブを受け付けました: doc-1 (archived)");
   });
 });

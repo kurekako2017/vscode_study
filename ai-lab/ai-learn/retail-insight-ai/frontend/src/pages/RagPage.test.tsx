@@ -45,10 +45,10 @@ describe("RagPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<RagPage />);
-    fireEvent.change(screen.getByLabelText("Query"), { target: { value: "monthly policy" } });
-    fireEvent.click(screen.getByRole("button", { name: "Search Retrieval" }));
+    fireEvent.change(screen.getByLabelText("検索語"), { target: { value: "monthly policy" } });
+    fireEvent.click(screen.getByRole("button", { name: "検索する" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Retrieval mode: keyword / Total matches: 1");
+    expect(await screen.findByRole("status")).toHaveTextContent("検索方式: keyword / 一致件数: 1");
     expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
   });
 
@@ -56,20 +56,20 @@ describe("RagPage", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(retrievalResponse()));
 
     render(<RagPage />);
-    fireEvent.change(screen.getByLabelText("Query"), { target: { value: "no match" } });
-    fireEvent.click(screen.getByRole("button", { name: "Search Retrieval" }));
+    fireEvent.change(screen.getByLabelText("検索語"), { target: { value: "no match" } });
+    fireEvent.click(screen.getByRole("button", { name: "検索する" }));
 
-    expect(await screen.findByText("No retrieval results found.")).toBeInTheDocument();
+    expect(await screen.findByText("検索結果はありません。")).toBeInTheDocument();
   });
 
   it("shows grounded internal rag answer and citations", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(ragAnswerResponse()));
 
     render(<RagPage />);
-    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "What is the monthly policy?" } });
-    fireEvent.click(screen.getByRole("button", { name: "Generate Answer" }));
+    fireEvent.change(screen.getByLabelText("質問"), { target: { value: "What is the monthly policy?" } });
+    fireEvent.click(screen.getByRole("button", { name: "回答を生成" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Answer mode: extractive");
+    expect(await screen.findByRole("status")).toHaveTextContent("回答方式: extractive");
     expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
     expect(await screen.findByText("weak_match")).toBeInTheDocument();
   });
@@ -83,8 +83,8 @@ describe("RagPage", () => {
     }, 422)));
 
     render(<RagPage />);
-    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "rare token" } });
-    fireEvent.click(screen.getByRole("button", { name: "Generate Answer" }));
+    fireEvent.change(screen.getByLabelText("質問"), { target: { value: "rare token" } });
+    fireEvent.click(screen.getByRole("button", { name: "回答を生成" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[insufficient_context] No usable evidence");
   });

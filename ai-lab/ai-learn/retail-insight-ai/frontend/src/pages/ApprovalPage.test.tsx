@@ -35,7 +35,7 @@ describe("ApprovalPage", () => {
 
     expect(await screen.findByText("approval-1")).toBeInTheDocument();
     expect(await screen.findByText("report-version-1")).toBeInTheDocument();
-    expect(await screen.findByText("Audit fields are not returned directly by this API response.")).toBeInTheDocument();
+    expect(await screen.findByText("監査フィールドはこの API レスポンスに直接含まれません。")).toBeInTheDocument();
   });
 
   it("shows approval empty state and list retry error", async () => {
@@ -52,8 +52,8 @@ describe("ApprovalPage", () => {
     render(<ApprovalPage />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[permission_denied] Approval review denied");
-    fireEvent.click(screen.getByRole("button", { name: "Retry / Refresh" }));
-    expect(await screen.findByText("No approvals found. Submit an approval request to begin the workflow.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "再試行 / 更新" }));
+    expect(await screen.findByText("承認依頼はありません。承認依頼を送信してワークフローを開始してください。")).toBeInTheDocument();
   });
 
   it("submits approval successfully and refreshes list plus detail", async () => {
@@ -101,9 +101,9 @@ describe("ApprovalPage", () => {
 
     render(<ApprovalPage />);
     fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-9" } });
-    fireEvent.click(screen.getByRole("button", { name: "Submit Approval" }));
+    fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Approval submitted: approval-9");
+    expect(await screen.findByRole("status")).toHaveTextContent("承認依頼を送信しました: approval-9");
   });
 
   it("shows submit approval failure from backend", async () => {
@@ -119,7 +119,7 @@ describe("ApprovalPage", () => {
 
     render(<ApprovalPage />);
     fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-1" } });
-    fireEvent.click(screen.getByRole("button", { name: "Submit Approval" }));
+    fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[approval_already_submitted] Already submitted");
   });
@@ -157,9 +157,9 @@ describe("ApprovalPage", () => {
 
     render(<ApprovalPage />);
     fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-10" } });
-    fireEvent.click(screen.getByRole("button", { name: "Submit Approval" }));
+    fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
-    expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "送信中…" })).toBeDisabled();
     submitGate.resolve(jsonResponse({
       success: true,
       request_id: "request-submit-approval",
@@ -179,7 +179,7 @@ describe("ApprovalPage", () => {
       error: null,
     }, 201));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Approval submitted: approval-10");
+    expect(await screen.findByRole("status")).toHaveTextContent("承認依頼を送信しました: approval-10");
   });
 
   it("approves a pending approval and refreshes detail", async () => {
@@ -231,11 +231,11 @@ describe("ApprovalPage", () => {
 
     render(<ApprovalPage />);
 
-    const approveButton = await screen.findByRole("button", { name: "Approve" });
-    fireEvent.change(screen.getByLabelText("Approval Comment"), { target: { value: "Approved after review" } });
+    const approveButton = await screen.findByRole("button", { name: "承認" });
+    fireEvent.change(screen.getByLabelText("承認コメント"), { target: { value: "Approved after review" } });
     fireEvent.click(approveButton);
 
-    expect(await screen.findByRole("status")).toHaveTextContent("Approval approved: approval-1");
+    expect(await screen.findByRole("status")).toHaveTextContent("承認しました: approval-1");
     expect(await screen.findByText("Approved after review")).toBeInTheDocument();
   });
 
@@ -321,13 +321,13 @@ describe("ApprovalPage", () => {
 
     render(<ApprovalPage />);
 
-    fireEvent.change(await screen.findByLabelText("Reject Reason"), { target: { value: "Need clearer source trace" } });
-    fireEvent.click(screen.getByRole("button", { name: "Reject" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Approval rejected: approval-1");
+    fireEvent.change(await screen.findByLabelText("却下理由"), { target: { value: "Need clearer source trace" } });
+    fireEvent.click(screen.getByRole("button", { name: "却下" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("却下しました: approval-1");
 
-    fireEvent.change(screen.getByLabelText("Revision Reason"), { target: { value: "Clarify trace" } });
-    fireEvent.click(screen.getByRole("button", { name: "Request Revision" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Revision created: report-version-2 (revised / v2)");
+    fireEvent.change(screen.getByLabelText("修正理由"), { target: { value: "Clarify trace" } });
+    fireEvent.click(screen.getByRole("button", { name: "修正依頼" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("改訂を作成しました: report-version-2 (revised / v2)");
   });
 
   it("shows approval conflict error from approve API", async () => {
@@ -357,7 +357,7 @@ describe("ApprovalPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ApprovalPage />);
-    fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
+    fireEvent.click(await screen.findByRole("button", { name: "承認" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[approval_already_decided] Already decided");
   });
@@ -389,8 +389,8 @@ describe("ApprovalPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ApprovalPage />);
-    fireEvent.change(await screen.findByLabelText("Reject Reason"), { target: { value: "Need clearer source trace" } });
-    fireEvent.click(screen.getByRole("button", { name: "Reject" }));
+    fireEvent.change(await screen.findByLabelText("却下理由"), { target: { value: "Need clearer source trace" } });
+    fireEvent.click(screen.getByRole("button", { name: "却下" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[permission_denied] Reject denied");
   });

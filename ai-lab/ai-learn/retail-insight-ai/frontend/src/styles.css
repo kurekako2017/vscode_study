@@ -175,6 +175,14 @@ button:disabled { opacity: .5; cursor: wait; }
   gap: 16px;
 }
 .dashboard-card button { margin-top: 14px; }
+.business-learning { margin-top: 18px; border: 1px solid rgba(148, 177, 176, .2); background: rgba(15, 33, 42, .45); }
+.business-learning summary { padding: 16px 18px; color: #f2d6a8; font-weight: 700; cursor: pointer; }
+.business-learning-content { display: grid; gap: 12px; padding: 0 18px 18px; color: #cbd8d7; }
+.business-learning-content h3, .business-learning-content h4, .business-learning-content p { margin: 0; }
+.learning-case-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.learning-case, .learning-flow { display: grid; gap: 8px; padding: 14px; border: 1px solid rgba(148, 177, 176, .15); background: rgba(9, 21, 28, .5); }
+.learning-case strong { color: var(--accent); }
+.learning-flow code { overflow-wrap: anywhere; color: #f2d6a8; }
 .runtime-grid dd, .runtime-grid dt, .card-description { overflow-wrap: anywhere; }
 .approval-actions {
   display: grid;
@@ -226,6 +234,7 @@ button:disabled { opacity: .5; cursor: wait; }
   .documents-shell { grid-template-columns: 1fr; }
   .approval-shell { grid-template-columns: 1fr; }
   .dashboard-card-grid, .dashboard-boundary-grid { grid-template-columns: 1fr; }
+  .learning-case-grid { grid-template-columns: 1fr; }
   .filter-grid { grid-template-columns: 1fr; }
   .action-row { flex-direction: column; }
   .action-grid { grid-template-columns: 1fr 1fr; }

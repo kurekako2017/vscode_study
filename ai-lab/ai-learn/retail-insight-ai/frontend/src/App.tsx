@@ -9,11 +9,11 @@ import { TasksPage } from "./pages/TasksPage";
 type ViewTab = "dashboard" | "analysis" | "documents" | "rag" | "approval";
 
 const navItems: Array<{ value: ViewTab; label: string }> = [
-  { value: "dashboard", label: "Dashboard" },
-  { value: "analysis", label: "Analysis / Tasks" },
-  { value: "documents", label: "Documents" },
-  { value: "rag", label: "RAG" },
-  { value: "approval", label: "Approval" },
+  { value: "dashboard", label: "学习总览" },
+  { value: "analysis", label: "分析依頼" },
+  { value: "documents", label: "文書管理" },
+  { value: "rag", label: "RAG検索" },
+  { value: "approval", label: "承認管理" },
 ];
 
 /**
@@ -29,9 +29,9 @@ export default function App() {
   return (
     <main className="shell">
       <header className="hero">
-        <p className="eyebrow">RETAIL OPERATIONS / LOCAL STATIC ENVIRONMENT</p>
-        <h1>Retail Insight AI</h1>
-        <p className="lead">KPI の確定計算と調査結果を、監査可能な一つの分析レポートへ。</p>
+        <p className="eyebrow">ERIP 本地学习环境</p>
+        <h1>Enterprise Retail Intelligence Platform</h1>
+        <p className="lead">当前本地实现将 KPI 计算、调研数据和审批流程连接为可追踪的经营分析平台。</p>
       </header>
 
       <nav className="top-nav" aria-label="主要ページ">

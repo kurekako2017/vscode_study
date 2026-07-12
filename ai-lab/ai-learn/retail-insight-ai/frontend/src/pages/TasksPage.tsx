@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiClientError, createTask, getReport, subscribeToTask } from "../api";
+import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBanner } from "../components/StatusBanner";
 import type { AnalysisMode, DisplayError, ReportResponse, TaskEvent, TaskStatus } from "../types";
@@ -98,9 +99,9 @@ export function TasksPage() {
   return (
     <>
       <PageHeader
-        eyebrow="TASK WORKFLOW"
-        title="Analysis / Tasks"
-        description="Create a deterministic analysis task, observe SSE progress, and inspect the final generated report from the current local workflow."
+        eyebrow="分析ワークフロー"
+        title="分析依頼"
+        description="分析依頼を作成し、SSE の進捗と現在のローカルワークフローが生成したレポートを確認します。"
       />
 
       <section className="workspace" aria-label="分析ワークスペース">
@@ -178,6 +179,37 @@ export function TasksPage() {
         </div>
         {report ? <pre>{report.markdown}</pre> : <p className="empty">完了したレポートがここに表示されます。</p>}
       </section>
+
+      <BusinessLearningPanel
+        pageName="分析依頼"
+        purpose="关东地区饮料分类销售下降时，创建经营分析任务并确认报告生成过程。"
+        scenario="内部资料已登记后，经营企划人员输入“関東地域の飲料カテゴリの売上減少を分析してください”，以 hybrid 模式取得 KPI 与静态调研结果。"
+        prerequisites="Backend 已启动；任务问题不能为空。当前报告使用本地固定数据，不会自动引用 Documents 或 RAG 的结果。"
+        relationship="本页产生 task_id 和 report。任务完成后，需要用户手动复制 task_id 到承認管理提交审批；与 RAG検索 当前未自动连接。"
+        cases={[
+          { id: "TASK-BIZ-001", purpose: "正常创建关东饮料销售下降分析。", input: "输入业务问题，选择 hybrid，点击「分析を開始」。", expected: "收到 queued 状态，SSE 显示 route／kpi／research／report，最终显示 Markdown 报告。" },
+          { id: "TASK-BIZ-002", purpose: "确认必填校验。", input: "清空问题输入框。", expected: "「分析を開始」不可点击，不发送 POST 请求。" },
+          { id: "TASK-BIZ-003", purpose: "确认不存在 task 的读取错误。", input: "使用不存在 task_id 请求报告。", expected: "Backend 返回实际 404；页面当前只在已创建任务完成后读取报告。" },
+          { id: "TASK-BIZ-004", purpose: "确认未完成报告的业务错误。", input: "在 queued／running 阶段读取 report。", expected: "Backend 的 get_report 以实际 409 表示报告尚未生成。" },
+          { id: "TASK-BIZ-005", purpose: "确认重新分析会清理旧页面状态。", input: "任务完成后再次点击「分析を開始」。", expected: "旧 task_id、SSE 列表和报告先清空，再订阅新任务；旧 SSE 会关闭。" },
+        ]}
+        flows={[
+          {
+            title: "创建任务与后台执行",
+            api: "POST /api/tasks",
+            frontend: ["frontend/src/pages/TasksPage.tsx submit()", "frontend/src/api.ts createTask()", "setTaskId / setStatus", "subscribeToTask()"],
+            backend: ["backend/app/api/tasks.py create_task()", "TaskService.create_task()", "InMemoryTaskRepository.create()", "BackgroundTasks.add_task()", "TaskService.run_task()", "AnalysisWorkflow.stream()", "FixedKPIWorkflow / ResearchAgent / ReportGenerator"],
+            note: "HTTP 202 只表示已受理；实际分析在 BackgroundTasks 中执行。",
+          },
+          {
+            title: "SSE 与最终报告",
+            api: "GET /api/tasks/{task_id}/events；GET /api/tasks/{task_id}/report",
+            frontend: ["subscribeToTask()", "onEvent setEvents / setStatus", "done 后 loadReport()", "getReport()", "setReport"],
+            backend: ["tasks.py get_task_events()", "stream_task_events()", "EventRepository", "tasks.py get_report()", "TaskService.get_report()", "InMemoryReportRepository.get()"],
+            note: "SSE 是事件流，不使用普通 JSON envelope；报告接口返回已完成的 report。",
+          },
+        ]}
+      />
     </>
   );
 }

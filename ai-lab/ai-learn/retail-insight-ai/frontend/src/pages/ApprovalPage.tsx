@@ -61,7 +61,7 @@ export function ApprovalPage() {
   const [revisionReason, setRevisionReason] = useState("");
   const [decisionLoading, setDecisionLoading] = useState<DecisionAction>(null);
 
-  const currentIdentity = "System placeholder user";
+  const currentIdentity = "システム既定ユーザー";
 
   useEffect(() => {
     void loadApprovals(true);
@@ -80,7 +80,7 @@ export function ApprovalPage() {
   const canRevise = selectedApproval?.status === "rejected";
 
   const selectedStatusLabel = useMemo(
-    () => (selectedApproval ? selectedApproval.status.replaceAll("_", " ") : "not selected"),
+    () => (selectedApproval ? selectedApproval.status.replaceAll("_", " ") : "未選択"),
     [selectedApproval],
   );
 
@@ -111,7 +111,7 @@ export function ApprovalPage() {
         return response.items[0]?.approval_id ?? null;
       });
     } catch (reason) {
-      setListError(toDisplayError(reason, "APPROVAL_LIST_ERROR", "Approval list request failed"));
+      setListError(toDisplayError(reason, "APPROVAL_LIST_ERROR", "承認一覧の取得に失敗しました"));
     } finally {
       setListLoading(false);
       setListRefreshing(false);
@@ -127,7 +127,7 @@ export function ApprovalPage() {
       setSelectedApproval(detail);
     } catch (reason) {
       setSelectedApproval(null);
-      setDetailError(toDisplayError(reason, "APPROVAL_DETAIL_ERROR", "Approval detail request failed"));
+      setDetailError(toDisplayError(reason, "APPROVAL_DETAIL_ERROR", "承認詳細の取得に失敗しました"));
     } finally {
       setDetailLoading(false);
     }
@@ -160,9 +160,9 @@ export function ApprovalPage() {
       });
       await refreshAfterChange(created.approval_id);
       setSubmitComment("");
-      setBannerMessage(`Approval submitted: ${created.approval_id}`);
+      setBannerMessage(`承認依頼を送信しました: ${created.approval_id}`);
     } catch (reason) {
-      setSubmitError(toDisplayError(reason, "APPROVAL_SUBMIT_ERROR", "Submit approval failed"));
+      setSubmitError(toDisplayError(reason, "APPROVAL_SUBMIT_ERROR", "承認依頼の送信に失敗しました"));
     } finally {
       setSubmitLoading(false);
     }
@@ -180,9 +180,9 @@ export function ApprovalPage() {
       // 批准后要刷新列表和详情，这样状态 badge 与决策信息会一起更新。
       await refreshAfterChange(updated.approval_id);
       setApproveComment("");
-      setBannerMessage(`Approval approved: ${updated.approval_id}`);
+      setBannerMessage(`承認しました: ${updated.approval_id}`);
     } catch (reason) {
-      setDetailError(toDisplayError(reason, "APPROVAL_APPROVE_ERROR", "Approve request failed"));
+      setDetailError(toDisplayError(reason, "APPROVAL_APPROVE_ERROR", "承認処理に失敗しました"));
     } finally {
       setDecisionLoading(null);
     }
@@ -199,9 +199,9 @@ export function ApprovalPage() {
       });
       await refreshAfterChange(updated.approval_id);
       setRejectReason("");
-      setBannerMessage(`Approval rejected: ${updated.approval_id}`);
+      setBannerMessage(`却下しました: ${updated.approval_id}`);
     } catch (reason) {
-      setDetailError(toDisplayError(reason, "APPROVAL_REJECT_ERROR", "Reject request failed"));
+      setDetailError(toDisplayError(reason, "APPROVAL_REJECT_ERROR", "却下処理に失敗しました"));
     } finally {
       setDecisionLoading(null);
     }
@@ -221,7 +221,7 @@ export function ApprovalPage() {
       setRevisionReason("");
       setBannerMessage(buildRevisionMessage(result));
     } catch (reason) {
-      setDetailError(toDisplayError(reason, "APPROVAL_REVISE_ERROR", "Revision request failed"));
+      setDetailError(toDisplayError(reason, "APPROVAL_REVISE_ERROR", "修正依頼に失敗しました"));
     } finally {
       setDecisionLoading(null);
     }
@@ -230,44 +230,44 @@ export function ApprovalPage() {
   return (
     <>
       <PageHeader
-        eyebrow="APPROVAL WORKFLOW"
-        title="Approval"
-        description="Review the current approval queue, inspect immutable approval detail, and run approve, reject, or revise actions through the real backend state machine."
+        eyebrow="承認ワークフロー"
+        title="承認管理"
+        description="承認待ち一覧と不変の承認詳細を確認し、Backend の状態遷移に従って承認、却下、修正依頼を実行します。"
       />
 
-      <section className="approval-shell" aria-label="Approval workspace">
+      <section className="approval-shell" aria-label="承認管理ワークスペース">
         <aside className="panel approval-sidebar">
         <div className="panel-heading">
           <span>01</span>
-          <h2>Approval Queue</h2>
+          <h2>承認待ち一覧</h2>
         </div>
-        <p className="boundary">Current identity: {currentIdentity}</p>
+        <p className="boundary">現在のユーザー: {currentIdentity}</p>
         <form className="stack-form" onSubmit={handleFilterSubmit}>
-          <label htmlFor="approval-filter-task-id">Task ID Filter</label>
+          <label htmlFor="approval-filter-task-id">Task ID 絞り込み</label>
           <input
             id="approval-filter-task-id"
             value={filterTaskId}
             onChange={(event) => setFilterTaskId(event.target.value)}
             disabled={listLoading || listRefreshing}
           />
-          <label htmlFor="approval-filter-status">Status Filter</label>
+          <label htmlFor="approval-filter-status">ステータス絞り込み</label>
           <select
             id="approval-filter-status"
             value={filterStatus}
             onChange={(event) => setFilterStatus(event.target.value)}
             disabled={listLoading || listRefreshing}
           >
-            <option value="">all</option>
+            <option value="">すべて</option>
             {approvalStatuses.map((status) => (
               <option key={status} value={status}>{status}</option>
             ))}
           </select>
           <div className="action-row">
             <button type="submit" disabled={listLoading || listRefreshing}>
-              {listLoading || listRefreshing ? "Loading…" : "Apply Filter"}
+              {listLoading || listRefreshing ? "読み込み中…" : "絞り込む"}
             </button>
             <button type="button" className="secondary-button" onClick={() => void loadApprovals(false)} disabled={listLoading || listRefreshing}>
-              Retry / Refresh
+              再試行 / 更新
             </button>
           </div>
         </form>
@@ -275,9 +275,9 @@ export function ApprovalPage() {
         {listError && <StatusBanner tone="error">[{listError.code}] {listError.message}</StatusBanner>}
 
         {listLoading ? (
-          <p className="empty">Loading approvals…</p>
+          <p className="empty">承認一覧を読み込み中…</p>
         ) : approvals.length === 0 ? (
-          <p className="empty">No approvals found. Submit an approval request to begin the workflow.</p>
+          <p className="empty">承認依頼はありません。承認依頼を送信してワークフローを開始してください。</p>
         ) : (
           <div className="document-table approval-table">
             {approvals.map((item) => (
@@ -289,7 +289,7 @@ export function ApprovalPage() {
               >
                 <div>
                   <strong>{item.approval_id}</strong>
-                  <small>Task {item.task_id}</small>
+                  <small>Task ID: {item.task_id}</small>
                 </div>
                 <div className="row-meta">
                   <StatusBadge value={item.status} />
@@ -305,7 +305,7 @@ export function ApprovalPage() {
         <section className="panel approval-submit-panel">
           <div className="panel-heading">
             <span>02</span>
-            <h2>Submit Approval</h2>
+            <h2>承認依頼を送信</h2>
           </div>
           <form className="stack-form" onSubmit={handleSubmitApproval}>
             <label htmlFor="approval-submit-task-id">Task ID</label>
@@ -315,7 +315,7 @@ export function ApprovalPage() {
               onChange={(event) => setSubmitTaskId(event.target.value)}
               disabled={submitLoading}
             />
-            <label htmlFor="approval-submit-comment">Comment</label>
+            <label htmlFor="approval-submit-comment">コメント</label>
             <textarea
               id="approval-submit-comment"
               rows={3}
@@ -324,7 +324,7 @@ export function ApprovalPage() {
               disabled={submitLoading}
             />
             <button type="submit" disabled={submitLoading || submitTaskId.trim().length === 0}>
-              {submitLoading ? "Submitting…" : "Submit Approval"}
+              {submitLoading ? "送信中…" : "承認依頼を送信"}
             </button>
             {submitError && <StatusBanner tone="error">[{submitError.code}] {submitError.message}</StatusBanner>}
           </form>
@@ -333,41 +333,41 @@ export function ApprovalPage() {
         <section className="panel detail-panel approval-detail-panel" aria-live="polite">
           <div className="panel-heading">
             <span>03</span>
-            <h2>Approval Detail</h2>
-            <small>Status: {selectedStatusLabel}</small>
+            <h2>承認詳細</h2>
+            <small>ステータス: {selectedStatusLabel}</small>
           </div>
 
           {bannerMessage && <StatusBanner tone="success">{bannerMessage}</StatusBanner>}
           {detailError && <StatusBanner tone="error">[{detailError.code}] {detailError.message}</StatusBanner>}
 
           {detailLoading ? (
-            <p className="empty">Loading approval detail…</p>
+            <p className="empty">承認詳細を読み込み中…</p>
           ) : selectedApproval === null ? (
-            <p className="empty">Select an approval to inspect its status, version snapshot, and decision data.</p>
+            <p className="empty">承認依頼を選択すると、ステータス、バージョンスナップショット、判断情報を確認できます。</p>
           ) : (
             <>
               <dl className="detail-grid">
-                <div><dt>Approval ID</dt><dd>{selectedApproval.approval_id}</dd></div>
+                <div><dt>承認 ID</dt><dd>{selectedApproval.approval_id}</dd></div>
                 <div><dt>Task ID</dt><dd>{selectedApproval.task_id}</dd></div>
-                <div><dt>Report Version ID</dt><dd>{selectedApproval.report_version_id}</dd></div>
-                <div><dt>Status</dt><dd><StatusBadge value={selectedApproval.status} /></dd></div>
-                <div><dt>Requested At</dt><dd>{formatDateTime(selectedApproval.requested_at)}</dd></div>
-                <div><dt>Requested By</dt><dd>{selectedApproval.requested_by ?? "system placeholder user"}</dd></div>
-                <div><dt>Decided At</dt><dd>{selectedApproval.decided_at ? formatDateTime(selectedApproval.decided_at) : "Not decided yet"}</dd></div>
-                <div><dt>Decided By</dt><dd>{selectedApproval.decided_by ?? "Not decided yet"}</dd></div>
-                <div><dt>Decision Reason</dt><dd>{selectedApproval.decision_reason ?? "None"}</dd></div>
-                <div><dt>Revision No</dt><dd>{selectedApproval.revision_no}</dd></div>
-                <div><dt>Revised From</dt><dd>{selectedApproval.revised_from_version_id ?? "None"}</dd></div>
-                <div><dt>Audit Summary</dt><dd>Audit fields are not returned directly by this API response.</dd></div>
+                <div><dt>レポートバージョン ID</dt><dd>{selectedApproval.report_version_id}</dd></div>
+                <div><dt>ステータス</dt><dd><StatusBadge value={selectedApproval.status} /></dd></div>
+                <div><dt>依頼日時</dt><dd>{formatDateTime(selectedApproval.requested_at)}</dd></div>
+                <div><dt>依頼者</dt><dd>{selectedApproval.requested_by ?? "システム既定ユーザー"}</dd></div>
+                <div><dt>判断日時</dt><dd>{selectedApproval.decided_at ? formatDateTime(selectedApproval.decided_at) : "未判断"}</dd></div>
+                <div><dt>判断者</dt><dd>{selectedApproval.decided_by ?? "未判断"}</dd></div>
+                <div><dt>判断理由</dt><dd>{selectedApproval.decision_reason ?? "なし"}</dd></div>
+                <div><dt>改訂番号</dt><dd>{selectedApproval.revision_no}</dd></div>
+                <div><dt>改訂元</dt><dd>{selectedApproval.revised_from_version_id ?? "なし"}</dd></div>
+                <div><dt>監査情報</dt><dd>監査フィールドはこの API レスポンスに直接含まれません。</dd></div>
               </dl>
 
               <div className="approval-actions">
                 <section className="result-card">
                   <div className="subheading">
-                    <strong>Approve</strong>
-                    <small>Allowed only in pending_approval</small>
+                    <strong>承認</strong>
+                    <small>pending_approval の場合のみ実行できます</small>
                   </div>
-                  <label htmlFor="approval-approve-comment">Approval Comment</label>
+                  <label htmlFor="approval-approve-comment">承認コメント</label>
                   <textarea
                     id="approval-approve-comment"
                     rows={3}
@@ -376,16 +376,16 @@ export function ApprovalPage() {
                     disabled={!canApproveOrReject || decisionLoading !== null}
                   />
                   <button type="button" disabled={!canApproveOrReject || decisionLoading !== null} onClick={() => void handleApprove()}>
-                    {decisionLoading === "approve" ? "Approving…" : "Approve"}
+                    {decisionLoading === "approve" ? "承認中…" : "承認"}
                   </button>
                 </section>
 
                 <section className="result-card">
                   <div className="subheading">
-                    <strong>Reject</strong>
-                    <small>Allowed only in pending_approval</small>
+                    <strong>却下</strong>
+                    <small>pending_approval の場合のみ実行できます</small>
                   </div>
-                  <label htmlFor="approval-reject-reason">Reject Reason</label>
+                  <label htmlFor="approval-reject-reason">却下理由</label>
                   <textarea
                     id="approval-reject-reason"
                     rows={3}
@@ -394,16 +394,16 @@ export function ApprovalPage() {
                     disabled={!canApproveOrReject || decisionLoading !== null}
                   />
                   <button type="button" disabled={!canApproveOrReject || decisionLoading !== null} onClick={() => void handleReject()}>
-                    {decisionLoading === "reject" ? "Rejecting…" : "Reject"}
+                    {decisionLoading === "reject" ? "却下中…" : "却下"}
                   </button>
                 </section>
 
                 <section className="result-card">
                   <div className="subheading">
-                    <strong>Request Revision / Revise</strong>
-                    <small>Allowed only in rejected</small>
+                    <strong>修正依頼</strong>
+                    <small>rejected の場合のみ実行できます</small>
                   </div>
-                  <label htmlFor="approval-revision-reason">Revision Reason</label>
+                  <label htmlFor="approval-revision-reason">修正理由</label>
                   <textarea
                     id="approval-revision-reason"
                     rows={3}
@@ -412,7 +412,7 @@ export function ApprovalPage() {
                     disabled={!canRevise || decisionLoading !== null}
                   />
                   <button type="button" disabled={!canRevise || decisionLoading !== null} onClick={() => void handleRevise()}>
-                    {decisionLoading === "revise" ? "Revising…" : "Request Revision"}
+                    {decisionLoading === "revise" ? "修正依頼中…" : "修正依頼"}
                   </button>
                 </section>
               </div>
@@ -430,5 +430,5 @@ function formatDateTime(value: string) {
 }
 
 function buildRevisionMessage(result: ApprovalRevisionResponse) {
-  return `Revision created: ${result.report_version_id} (${result.status} / v${result.revision_no})`;
+  return `改訂を作成しました: ${result.report_version_id} (${result.status} / v${result.revision_no})`;
 }
