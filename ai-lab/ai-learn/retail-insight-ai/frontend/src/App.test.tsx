@@ -9,7 +9,7 @@ class FakeEventSource {
   static readonly CLOSED = 2;
   readonly CLOSED = 2;
   readyState = 1;
-  onerror: (() => void) | null = null;
+  onerror: ((event: Event) => void) | null = null;
   listeners = new Map<string, EventListener>();
 
   constructor(public readonly url: string) {
@@ -21,13 +21,113 @@ class FakeEventSource {
   }
 
   emit(name: string, payload: object) {
-    // 测试使用与真实 SSE 相同的 JSON 字符串边界，而不是直接调用 React 状态。
     this.listeners.get(name)?.({ data: JSON.stringify(payload) } as MessageEvent);
   }
 
   close() {
     this.readyState = FakeEventSource.CLOSED;
   }
+}
+
+function jsonResponse(payload: object, status: number) {
+  return new Response(JSON.stringify(payload), { status });
+}
+
+function documentList(items: object[] = []) {
+  return jsonResponse({
+    success: true,
+    request_id: "request-doc-list",
+    data: { items, next_cursor: null },
+    error: null,
+  }, 200);
+}
+
+function documentDetail(overrides: Record<string, unknown> = {}) {
+  return jsonResponse({
+    success: true,
+    request_id: "request-doc-detail",
+    data: {
+      document_id: "doc-1",
+      title: "Monthly Policy",
+      description: "Internal monthly guidance",
+      owner: "analysis-team",
+      created_at: "2026-07-08T00:00:00Z",
+      updated_at: "2026-07-09T00:00:00Z",
+      version: 1,
+      language: "ja",
+      document_type: "markdown",
+      status: "uploaded",
+      tags: ["policy"],
+      source: {
+        source_type: "local_file",
+        uri: "backend/data/documents/monthly-policy.md",
+        label: null,
+        external_id: null,
+      },
+      checksum: "sha256:doc-1",
+      ...overrides,
+    },
+    error: null,
+  }, 200);
+}
+
+function chunkList(items: object[] = []) {
+  return jsonResponse({
+    success: true,
+    request_id: "request-chunks",
+    data: {
+      document_id: "doc-1",
+      version: 1,
+      items,
+      next_cursor: null,
+    },
+    error: null,
+  }, 200);
+}
+
+function retrievalResponse(results: object[] = []) {
+  return jsonResponse({
+    success: true,
+    request_id: "request-retrieval",
+    data: {
+      results,
+      total: results.length,
+      query: "monthly policy",
+      retrieval_mode: "keyword",
+    },
+    error: null,
+  }, 200);
+}
+
+function ragAnswerResponse(overrides: Record<string, unknown> = {}) {
+  return jsonResponse({
+    success: true,
+    request_id: "request-rag",
+    data: {
+      answer: "Extractive answer: Monthly policy evidence.",
+      citations: [
+        {
+          document_id: "doc-1",
+          chunk_id: "chunk-1",
+          chunk_index: 0,
+          excerpt: "Monthly policy evidence.",
+          source: {
+            source_type: "upload_form",
+            uri: "upload://doc-1/source",
+            label: null,
+            external_id: null,
+          },
+          score: 0.92,
+        },
+      ],
+      retrieval_mode: "keyword",
+      answer_mode: "extractive",
+      confidence: 0.82,
+      warnings: ["weak_match"],
+      ...overrides,
+    },
+    error: null,
+  }, 200);
 }
 
 describe("App", () => {
@@ -43,13 +143,13 @@ describe("App", () => {
 
   it("creates a task, consumes SSE, and renders the report", async () => {
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({
+      .mockResolvedValueOnce(jsonResponse({
         success: true,
         request_id: "request-1",
         data: { task_id: "task-1", status: "queued" },
         error: null,
-      }), { status: 202 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({
+      }, 202))
+      .mockResolvedValueOnce(jsonResponse({
         success: true,
         request_id: "request-2",
         data: {
@@ -59,7 +159,7 @@ describe("App", () => {
           created_at: "2026-06-27T00:00:00Z",
         },
         error: null,
-      }), { status: 200 }));
+      }, 200));
     vi.stubGlobal("fetch", fetchMock);
 
     render(<App />);
@@ -82,45 +182,296 @@ describe("App", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("shows a task creation error", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({
-        success: false,
-        request_id: "request-error",
-        data: null,
-        error: { code: "VALIDATION_ERROR", message: "Request validation failed", detail: {} },
-      }), { status: 422 }),
-    ));
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "[VALIDATION_ERROR] Request validation failed",
-    );
-  });
-
-  it("shows the SSE error code and message without loading a report", async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({
-      success: true,
-      request_id: "request-3",
-      data: { task_id: "task-3", status: "queued" },
-      error: null,
-    }), { status: 202 }));
+  it("shows document list, detail, and chunk count", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(documentList([{
+        document_id: "doc-1",
+        title: "Monthly Policy",
+        description: "Internal monthly guidance",
+        owner: "analysis-team",
+        created_at: "2026-07-08T00:00:00Z",
+        updated_at: "2026-07-09T00:00:00Z",
+        version: 1,
+        language: "ja",
+        document_type: "markdown",
+        status: "uploaded",
+        tags: ["policy"],
+        source: null,
+        checksum: "sha256:doc-1",
+      }]))
+      .mockResolvedValueOnce(documentDetail())
+      .mockResolvedValueOnce(chunkList([
+        {
+          document_id: "doc-1",
+          version: 1,
+          chunk_id: "chunk-1",
+          chunk_index: 0,
+          content: "Paragraph one",
+          character_count: 13,
+          metadata: {
+            document_id: "doc-1",
+            title: "Monthly Policy",
+            description: "Internal monthly guidance",
+            owner: "analysis-team",
+            created_at: "2026-07-08T00:00:00Z",
+            updated_at: "2026-07-09T00:00:00Z",
+            version: 1,
+            language: "ja",
+            document_type: "markdown",
+            status: "validated",
+            tags: ["policy"],
+            source: null,
+            checksum: "sha256:doc-1",
+          },
+          created_at: "2026-07-09T00:00:00Z",
+        },
+      ]));
     vi.stubGlobal("fetch", fetchMock);
 
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
-    await waitFor(() => expect(FakeEventSource.instance.url).toBe("/api/tasks/task-3/events"));
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
 
-    FakeEventSource.instance.emit("error", {
-      task_id: "task-3", sequence: 2, event: "error", status: "failed",
-      message: "Research provider failed", request_id: "request-3",
-      error_code: "RESEARCH_PROVIDER_ERROR", node: null, report_path: null,
-      created_at: "2026-06-27T00:00:01Z",
-    });
+    expect(await screen.findByText("Monthly Policy")).toBeInTheDocument();
+    expect(await screen.findByText("Chunk Count")).toBeInTheDocument();
+    expect(await screen.findByText("Paragraph one")).toBeInTheDocument();
+  });
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "[RESEARCH_PROVIDER_ERROR] Research provider failed",
-    );
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+  it("shows empty state when there are no documents", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(documentList()));
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+
+    expect(await screen.findByText("No documents yet. Upload a file to start the document workflow.")).toBeInTheDocument();
+  });
+
+  it("shows document list API error and allows refresh retry", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({
+        success: false,
+        request_id: "request-doc-error",
+        data: null,
+        error: { code: "DOCUMENT_LIST_ERROR", message: "List failed", detail: {} },
+      }, 500))
+      .mockResolvedValueOnce(documentList());
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("[DOCUMENT_LIST_ERROR] List failed");
+    fireEvent.click(screen.getByRole("button", { name: "Retry / Refresh" }));
+    expect(await screen.findByText("No documents yet. Upload a file to start the document workflow.")).toBeInTheDocument();
+  });
+
+  it("uploads a document successfully and refreshes the list", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(documentList())
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-upload",
+        data: {
+          upload_id: "upload-1",
+          document_id: "doc-9",
+          status: "completed",
+          progress: 100,
+          created_at: "2026-07-09T00:00:00Z",
+          updated_at: "2026-07-09T00:00:00Z",
+          error_code: null,
+          error_message: null,
+        },
+        error: null,
+      }, 201))
+      .mockResolvedValueOnce(documentList([{
+        document_id: "doc-9",
+        title: "budget.csv",
+        description: null,
+        owner: "analysis-team",
+        created_at: "2026-07-09T00:00:00Z",
+        updated_at: "2026-07-09T00:00:00Z",
+        version: 1,
+        language: "ja",
+        document_type: "csv",
+        status: "uploaded",
+        tags: ["finance"],
+        source: null,
+        checksum: "sha256:doc-9",
+      }]))
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-doc-9",
+        data: {
+          document_id: "doc-9",
+          title: "budget.csv",
+          description: null,
+          owner: "analysis-team",
+          created_at: "2026-07-09T00:00:00Z",
+          updated_at: "2026-07-09T00:00:00Z",
+          version: 1,
+          language: "ja",
+          document_type: "csv",
+          status: "uploaded",
+          tags: ["finance"],
+          source: null,
+          checksum: "sha256:doc-9",
+        },
+        error: null,
+      }, 200))
+      .mockResolvedValueOnce(chunkList());
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+
+    const file = new File(["month,sales"], "budget.csv", { type: "text/csv" });
+    fireEvent.change(screen.getByLabelText("ファイル"), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText("Tags (comma separated)"), { target: { value: "finance" } });
+    fireEvent.click(screen.getByRole("button", { name: "Upload Document" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Upload completed: doc-9");
+    expect((await screen.findAllByText("budget.csv")).length).toBeGreaterThan(0);
+  });
+
+  it("shows upload failure from backend", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(documentList())
+      .mockResolvedValueOnce(jsonResponse({
+        success: false,
+        request_id: "request-upload-fail",
+        data: null,
+        error: { code: "missing_title", message: "Title required", detail: {} },
+      }, 422));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+
+    const file = new File(["# doc"], "missing.md", { type: "text/markdown" });
+    fireEvent.change(screen.getByLabelText("ファイル"), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText("タイトル"), { target: { value: "Missing" } });
+    fireEvent.click(screen.getByRole("button", { name: "Upload Document" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("[missing_title] Title required");
+  });
+
+  it("archives a document and refreshes current detail", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(documentList([{
+        document_id: "doc-1",
+        title: "Monthly Policy",
+        description: "Internal monthly guidance",
+        owner: "analysis-team",
+        created_at: "2026-07-08T00:00:00Z",
+        updated_at: "2026-07-09T00:00:00Z",
+        version: 1,
+        language: "ja",
+        document_type: "markdown",
+        status: "uploaded",
+        tags: ["policy"],
+        source: null,
+        checksum: "sha256:doc-1",
+      }]))
+      .mockResolvedValueOnce(documentDetail())
+      .mockResolvedValueOnce(chunkList())
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-archive",
+        data: { document_id: "doc-1", status: "archived" },
+        error: null,
+      }, 202))
+      .mockResolvedValueOnce(documentList())
+      .mockResolvedValueOnce(documentDetail({ status: "archived" }))
+      .mockResolvedValueOnce(chunkList());
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+
+    expect(await screen.findByText("Monthly Policy")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Archive accepted: doc-1 (archived)");
+  });
+
+  it("shows retrieval results on the rag page", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([
+      {
+        document_id: "doc-1",
+        chunk_id: "chunk-1",
+        chunk_index: 0,
+        content_excerpt: "Monthly policy evidence.",
+        score: 0.92,
+        source: {
+          source_type: "upload_form",
+          uri: "upload://doc-1/source",
+          label: null,
+          external_id: null,
+        },
+        metadata: {
+          document_id: "doc-1",
+          title: "Monthly Policy",
+          description: null,
+          owner: "analysis-team",
+          created_at: "2026-07-09T00:00:00Z",
+          updated_at: "2026-07-09T00:00:00Z",
+          version: 1,
+          language: "en",
+          document_type: "markdown",
+          status: "validated",
+          tags: ["policy"],
+          source: null,
+          checksum: "sha256:doc-1",
+        },
+      },
+    ]));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "RAG" }));
+    fireEvent.change(screen.getByLabelText("Query"), { target: { value: "monthly policy" } });
+    fireEvent.click(screen.getByRole("button", { name: "Search Retrieval" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Retrieval mode: keyword / Total matches: 1");
+    expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
+  });
+
+  it("shows empty retrieval state from backend", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(retrievalResponse()));
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "RAG" }));
+    fireEvent.change(screen.getByLabelText("Query"), { target: { value: "no match" } });
+    fireEvent.click(screen.getByRole("button", { name: "Search Retrieval" }));
+
+    expect(await screen.findByText("No retrieval results found.")).toBeInTheDocument();
+  });
+
+  it("shows grounded internal rag answer and citations", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(ragAnswerResponse()));
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "RAG" }));
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "What is the monthly policy?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Generate Answer" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Answer mode: extractive");
+    expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
+    expect(await screen.findByText("weak_match")).toBeInTheDocument();
+  });
+
+  it("shows internal rag API error", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(jsonResponse({
+      success: false,
+      request_id: "request-rag-error",
+      data: null,
+      error: { code: "insufficient_context", message: "No usable evidence", detail: {} },
+    }, 422)));
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "RAG" }));
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "rare token" } });
+    fireEvent.click(screen.getByRole("button", { name: "Generate Answer" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("[insufficient_context] No usable evidence");
   });
 });

@@ -51,3 +51,147 @@ export interface ReportResponse {
   provider: string;
   created_at: string;
 }
+
+/** 上传接口返回的同步会话结果。 */
+export interface DocumentUploadSessionResponse {
+  upload_id: string;
+  document_id: string;
+  status: "accepted" | "validating" | "storing" | "completed" | "failed";
+  progress: number;
+  created_at: string;
+  updated_at: string;
+  error_code: string | null;
+  error_message: string | null;
+}
+
+/** 文档来源是后端公开给前端的最小来源快照。 */
+export interface DocumentSourceResponse {
+  source_type: string;
+  uri: string;
+  label: string | null;
+  external_id: string | null;
+}
+
+/** 文档详情和列表条目共用同一个后端 schema。 */
+export interface DocumentResponse {
+  document_id: string;
+  title: string;
+  description: string | null;
+  owner: string;
+  created_at: string;
+  updated_at: string;
+  version: number;
+  language: string;
+  document_type: string;
+  status: string;
+  tags: string[];
+  source: DocumentSourceResponse | null;
+  checksum: string;
+}
+
+/** 文档列表接口当前返回 items + next_cursor。 */
+export interface DocumentListResponse {
+  items: DocumentResponse[];
+  next_cursor: string | null;
+}
+
+/** 归档接口只返回最小状态变化结果。 */
+export interface DocumentArchiveResponse {
+  document_id: string;
+  status: string;
+}
+
+/** 导入流水线当前返回同步 import 记录。 */
+export interface DocumentImportResponse {
+  import_id: string;
+  document_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  error_code: string | null;
+  error_message: string | null;
+}
+
+/** chunk 详情包含内容与父文档快照。 */
+export interface DocumentChunkResponse {
+  document_id: string;
+  version: number;
+  chunk_id: string;
+  chunk_index: number;
+  content: string;
+  character_count: number;
+  metadata: DocumentResponse;
+  created_at: string;
+}
+
+/** chunk 列表用于详情页展示数量与预览。 */
+export interface DocumentChunkListResponse {
+  document_id: string;
+  version: number;
+  items: DocumentChunkResponse[];
+  next_cursor: string | null;
+}
+
+/** 检索请求当前只支持后端真实存在的 keyword filters。 */
+export interface DocumentRetrievalSearchRequest {
+  query: string;
+  limit?: number;
+  include_archived?: boolean;
+  document_type?: string;
+  language?: string;
+  tags?: string[];
+}
+
+/** 检索结果当前固定返回 excerpt、score、source 和 metadata。 */
+export interface DocumentRetrievalResultResponse {
+  document_id: string;
+  chunk_id: string;
+  chunk_index: number;
+  content_excerpt: string;
+  score: number;
+  source: DocumentSourceResponse;
+  metadata: DocumentResponse;
+}
+
+/** Retrieval 成功响应没有 evaluation，只有 result list + total + mode。 */
+export interface DocumentRetrievalSearchResponse {
+  results: DocumentRetrievalResultResponse[];
+  total: number;
+  query: string;
+  retrieval_mode: string;
+}
+
+/** Internal RAG 当前只有两种冻结回答模式。 */
+export type InternalRagAnswerMode = "extractive" | "summary";
+
+/** Internal RAG request 与后端 schema 保持一致。 */
+export interface InternalRagAnswerRequest {
+  question: string;
+  limit?: number;
+  include_archived?: boolean;
+  document_type?: string;
+  language?: string;
+  tags?: string[];
+  answer_mode: InternalRagAnswerMode;
+  require_citations: boolean;
+}
+
+/** 引用字段来自真实 citation schema，而不是 retrieval metadata 全量复制。 */
+export interface InternalRagCitationResponse {
+  document_id: string;
+  chunk_id: string;
+  chunk_index: number;
+  excerpt: string;
+  source: DocumentSourceResponse;
+  score: number;
+}
+
+/** Internal RAG 响应对前端公开 answer、citations、confidence、warnings。 */
+export interface InternalRagAnswerResponse {
+  answer: string;
+  citations: InternalRagCitationResponse[];
+  retrieval_mode: string;
+  answer_mode: InternalRagAnswerMode;
+  confidence: number;
+  warnings: string[];
+}
