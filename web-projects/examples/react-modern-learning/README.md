@@ -43,13 +43,9 @@ npm run dev
 
 ## 学习文档说明
 
-`README.md` 负责项目介绍、学习意义、安装、启动、学习路线和文档导航。
-
-`LEARN.md` 负责完整学习路线和章节说明。
-
-`project-structure.md` 负责目录、页面关系和企业应用映射。
-
-`FRONTEND_LEARNING_GUIDE.md` 负责页面学习、源码学习、Trace 和测试导读。
+- [LEARN.md](./LEARN.md)：完整学习路线和章节说明
+- [project-structure.md](./project-structure.md)：目录、页面关系和企业应用映射
+- [FRONTEND_LEARNING_GUIDE.md](./FRONTEND_LEARNING_GUIDE.md)：源码、Trace 和测试导读
 
 ## 下一步推荐项目
 

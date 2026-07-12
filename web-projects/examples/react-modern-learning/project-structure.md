@@ -1,5 +1,7 @@
 # 项目结构
 
+先看 [README.md](./README.md)，再看 [LEARN.md](./LEARN.md)，然后回到这里对照目录和页面关系，最后看 [FRONTEND_LEARNING_GUIDE.md](./FRONTEND_LEARNING_GUIDE.md)。
+
 > 当前运行时学习层已包含 `src/learning/`，页面右侧的 `Learning Panel` 会显示 Trace、Component Tree、Source Files 和 Test File。
 
 ## 仓库结构

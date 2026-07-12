@@ -1,5 +1,7 @@
 # Frontend Learning Guide
 
+先看 [README.md](./README.md) 和 [LEARN.md](./LEARN.md)，再看这里的源码导读。如果你要先看目录关系，可以回到 [project-structure.md](./project-structure.md)。
+
 这个项目的学习路径按真实源码组织，不按概念堆文档。
 
 ## React 在企业项目中的位置
