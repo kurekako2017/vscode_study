@@ -1,10 +1,12 @@
 import { useState } from "react";
 
 import { DashboardPage } from "./pages/DashboardPage";
+import { LearningSidebar } from "./components/LearningSidebar";
 import { ApprovalPage } from "./pages/ApprovalPage";
 import { DocumentsPage } from "./pages/DocumentsPage";
 import { RagPage } from "./pages/RagPage";
 import { TasksPage } from "./pages/TasksPage";
+import type { LearningEvent, LearningPage } from "./learning/learningTypes";
 
 type ViewTab = "dashboard" | "analysis" | "documents" | "rag" | "approval";
 
@@ -16,6 +18,14 @@ const navItems: Array<{ value: ViewTab; label: string }> = [
   { value: "approval", label: "承認管理" },
 ];
 
+const learningPageByView: Record<ViewTab, LearningPage> = {
+  dashboard: "dashboard",
+  analysis: "tasks",
+  documents: "documents",
+  rag: "rag",
+  approval: "approval",
+};
+
 /**
  * App 现在只负责顶层导航和页面切换。
  *
@@ -25,6 +35,17 @@ const navItems: Array<{ value: ViewTab; label: string }> = [
  */
 export default function App() {
   const [activeView, setActiveView] = useState<ViewTab>("dashboard");
+  const [latestLearningEvent, setLatestLearningEvent] = useState<LearningEvent | null>(null);
+
+  function recordLearningEvent(event: LearningEvent) {
+    // 学习面板只保存最近一次操作，避免它演变成影响业务的全局日志系统。
+    setLatestLearningEvent(event);
+  }
+
+  function changeView(nextView: ViewTab) {
+    setActiveView(nextView);
+    setLatestLearningEvent(null);
+  }
 
   return (
     <main className="shell">
@@ -41,18 +62,23 @@ export default function App() {
             type="button"
             aria-current={activeView === item.value ? "page" : undefined}
             className={activeView === item.value ? "nav-chip selected" : "nav-chip"}
-            onClick={() => setActiveView(item.value)}
+            onClick={() => changeView(item.value)}
           >
             {item.label}
           </button>
         ))}
       </nav>
 
-      {activeView === "dashboard" && <DashboardPage onNavigate={setActiveView} />}
-      {activeView === "analysis" && <TasksPage />}
-      {activeView === "documents" && <DocumentsPage />}
-      {activeView === "rag" && <RagPage />}
-      {activeView === "approval" && <ApprovalPage />}
+      <div className="app-learning-layout">
+        <div className="app-learning-main">
+          {activeView === "dashboard" && <DashboardPage onNavigate={changeView} onLearningEvent={recordLearningEvent} />}
+          {activeView === "analysis" && <TasksPage onLearningEvent={recordLearningEvent} />}
+          {activeView === "documents" && <DocumentsPage onLearningEvent={recordLearningEvent} />}
+          {activeView === "rag" && <RagPage onLearningEvent={recordLearningEvent} />}
+          {activeView === "approval" && <ApprovalPage onLearningEvent={recordLearningEvent} />}
+        </div>
+        <LearningSidebar page={learningPageByView[activeView]} latestEvent={latestLearningEvent} />
+      </div>
     </main>
   );
 }

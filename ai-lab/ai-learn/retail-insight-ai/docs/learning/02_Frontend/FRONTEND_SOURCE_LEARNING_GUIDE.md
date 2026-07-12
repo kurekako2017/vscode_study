@@ -412,6 +412,14 @@ backend/app/api/approvals.py list_approvals() / get_approval() / submit_approval
 
 ## 12. 常见错误定位
 
+### 固定右侧学习面板
+
+桌面宽屏下，`App.tsx` 将当前业务页和 `LearningSidebar` 放入 `app-learning-layout`。侧栏以 `position: sticky` 保持可见，窄屏（1100px 以下）降级为主内容下方。
+
+页面只通过 `onLearningEvent` 上报最近一次已有 handler 的操作，例如 `submitRetrieval()`、`submit()`、`handleApprove()`。LearningSidebar 显示该操作的关键 State、真实 API Path、Backend 调用链和源码位置；它不拦截全局 fetch、不保存历史，也不改变业务状态。
+
+RAG 的 `insufficient_context` 在面板中解释为：Backend 未找到足够相关 Chunk，可能是输入不匹配或文档尚未 Chunk；这不是页面故障。
+
 | 现象         | 先看哪里                                     | 常见含义                                       |
 | ------------ | -------------------------------------------- | ---------------------------------------------- |
 | 文档列表为空 | DocumentsPage 的`loadDocuments()`、Network | 当前 InMemory 中没有匹配文档，或归档过滤未勾选 |

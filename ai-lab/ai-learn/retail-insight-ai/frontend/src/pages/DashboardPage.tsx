@@ -1,10 +1,12 @@
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
+import type { RecordLearningEvent } from "../learning/learningTypes";
 
 type DashboardTarget = "analysis" | "documents" | "rag" | "approval";
 
 interface DashboardPageProps {
   onNavigate: (target: DashboardTarget) => void;
+  onLearningEvent?: RecordLearningEvent;
 }
 
 const runtimeFacts = [
@@ -78,7 +80,17 @@ const businessFlow: Array<{
  * - 进入系统的第一屏先给全局地图，比直接落到某个业务页更适合演示和学习。
  * - 这里的内容全部基于当前真实实现事实，不依赖新增后端统计接口。
  */
-export function DashboardPage({ onNavigate }: DashboardPageProps) {
+export function DashboardPage({ onNavigate, onLearningEvent }: DashboardPageProps) {
+  function openBusinessStep(target: DashboardTarget, actionLabel: string) {
+    onLearningEvent?.({
+      eventName: `openBusinessStep(${target})`,
+      stateChanges: ["activeView: dashboard → target", `入口：${actionLabel}`],
+      backendFlow: ["无 Backend 调用", "App.tsx changeView()", "React 重新渲染目标页面"],
+      note: "导航只修改 React 本地状态，不发送 API 请求。",
+    });
+    onNavigate(target);
+  }
+
   return (
     <>
       <PageHeader
@@ -101,7 +113,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
                 <p className="page-description card-description">{step.purpose}</p>
                 <p className="boundary">{step.connection}</p>
                 {step.target !== null && step.actionLabel && (
-                  <button type="button" onClick={() => step.target !== null && onNavigate(step.target)}>{step.actionLabel}</button>
+                  <button type="button" onClick={() => step.target !== null && openBusinessStep(step.target, step.actionLabel!)}>{step.actionLabel}</button>
                 )}
               </article>
             ))}

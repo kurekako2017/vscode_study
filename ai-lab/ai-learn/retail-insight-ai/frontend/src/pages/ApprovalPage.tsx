@@ -20,6 +20,7 @@ import type {
   ApprovalStatus,
   DisplayError,
 } from "../types";
+import type { RecordLearningEvent } from "../learning/learningTypes";
 
 type DecisionAction = "approve" | "reject" | "revise" | null;
 
@@ -39,7 +40,11 @@ const approvalStatuses: ApprovalStatus[] = [
  * - Approval 有自己独立的状态机和错误分支，和 Documents / RAG 放在一起会让学习路径变乱。
  * - 当前仍然保持最小前端结构，不引入 Router 和全局状态框架。
  */
-export function ApprovalPage() {
+interface ApprovalPageProps {
+  onLearningEvent?: RecordLearningEvent;
+}
+
+export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
   const [filterTaskId, setFilterTaskId] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [approvals, setApprovals] = useState<ApprovalListResponse["items"]>([]);
@@ -162,8 +167,10 @@ export function ApprovalPage() {
       await refreshAfterChange(created.approval_id);
       setSubmitComment("");
       setBannerMessage(`承認依頼を送信しました: ${created.approval_id}`);
+      onLearningEvent?.({ eventName: "handleSubmitApproval()", apiMethod: "POST", apiPath: `/api/v1/reports/${created.task_id}/submit-approval`, apiStatus: "201 Created", stateChanges: [`approval_id: ${created.approval_id}`, `report_version_id: ${created.report_version_id}`, "列表与详情刷新"], backendFlow: ["approvals.py submit_approval()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.submit_approval()", "InMemoryApprovalRepository.save_approval_request()"] });
     } catch (reason) {
       setSubmitError(toDisplayError(reason, "APPROVAL_SUBMIT_ERROR", "承認依頼の送信に失敗しました"));
+      onLearningEvent?.({ eventName: "handleSubmitApproval()", apiMethod: "POST", apiPath: `/api/v1/reports/${submitTaskId.trim()}/submit-approval`, apiStatus: "Backend error", stateChanges: ["submitError: null → error"], backendFlow: ["approvals.py submit_approval()", "AuditMiddleware.run()", "ApprovalService.submit_approval()"] });
     } finally {
       setSubmitLoading(false);
     }
@@ -182,8 +189,10 @@ export function ApprovalPage() {
       await refreshAfterChange(updated.approval_id);
       setApproveComment("");
       setBannerMessage(`承認しました: ${updated.approval_id}`);
+      onLearningEvent?.({ eventName: "handleApprove()", apiMethod: "POST", apiPath: `/api/v1/approvals/${updated.approval_id}/approve`, apiStatus: "200 OK", stateChanges: ["decisionLoading: approve → null", "approval status: approved", "列表与详情刷新"], backendFlow: ["approvals.py approve()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.approve()", "InMemoryApprovalRepository.save_approval_request()"] });
     } catch (reason) {
       setDetailError(toDisplayError(reason, "APPROVAL_APPROVE_ERROR", "承認処理に失敗しました"));
+      onLearningEvent?.({ eventName: "handleApprove()", apiMethod: "POST", apiPath: `/api/v1/approvals/${selectedApproval.approval_id}/approve`, apiStatus: "403 / 409 / Backend error", stateChanges: ["detailError: null → error"], backendFlow: ["approvals.py approve()", "AuditMiddleware.run()", "ApprovalService.approve()"] });
     } finally {
       setDecisionLoading(null);
     }
@@ -201,8 +210,10 @@ export function ApprovalPage() {
       await refreshAfterChange(updated.approval_id);
       setRejectReason("");
       setBannerMessage(`却下しました: ${updated.approval_id}`);
+      onLearningEvent?.({ eventName: "handleReject()", apiMethod: "POST", apiPath: `/api/v1/approvals/${updated.approval_id}/reject`, apiStatus: "200 OK", stateChanges: ["decisionLoading: reject → null", "approval status: rejected", "列表与详情刷新"], backendFlow: ["approvals.py reject()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.reject()", "InMemoryApprovalRepository.save_approval_event()"] });
     } catch (reason) {
       setDetailError(toDisplayError(reason, "APPROVAL_REJECT_ERROR", "却下処理に失敗しました"));
+      onLearningEvent?.({ eventName: "handleReject()", apiMethod: "POST", apiPath: `/api/v1/approvals/${selectedApproval.approval_id}/reject`, apiStatus: "403 / 409 / Backend error", stateChanges: ["detailError: null → error"], backendFlow: ["approvals.py reject()", "AuditMiddleware.run()", "ApprovalService.reject()"] });
     } finally {
       setDecisionLoading(null);
     }
@@ -221,8 +232,10 @@ export function ApprovalPage() {
       await refreshAfterChange(selectedApproval.approval_id);
       setRevisionReason("");
       setBannerMessage(buildRevisionMessage(result));
+      onLearningEvent?.({ eventName: "handleRevise()", apiMethod: "POST", apiPath: `/api/v1/reports/${selectedApproval.task_id}/revise`, apiStatus: "201 Created", stateChanges: [`report_version_id: ${result.report_version_id}`, "approval 列表与详情刷新"], backendFlow: ["approvals.py revise()", "_run_audited_operation()", "AuditMiddleware.run()", "ApprovalService.revise()", "InMemoryApprovalRepository.save_report_version()"] });
     } catch (reason) {
       setDetailError(toDisplayError(reason, "APPROVAL_REVISE_ERROR", "修正依頼に失敗しました"));
+      onLearningEvent?.({ eventName: "handleRevise()", apiMethod: "POST", apiPath: `/api/v1/reports/${selectedApproval.task_id}/revise`, apiStatus: "403 / 409 / Backend error", stateChanges: ["detailError: null → error"], backendFlow: ["approvals.py revise()", "AuditMiddleware.run()", "ApprovalService.revise()"] });
     } finally {
       setDecisionLoading(null);
     }

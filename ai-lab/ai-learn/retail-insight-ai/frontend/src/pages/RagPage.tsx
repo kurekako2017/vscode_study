@@ -11,6 +11,7 @@ import type {
   InternalRagAnswerMode,
   InternalRagAnswerResponse,
 } from "../types";
+import type { RecordLearningEvent } from "../learning/learningTypes";
 
 /**
  * RagPage 负责 deterministic Retrieval + Internal RAG 两个真实后端能力。
@@ -19,7 +20,11 @@ import type {
  * - 只接 keyword retrieval / deterministic internal RAG。
  * - 不接真实 LLM、embedding、pgvector 或 hybrid retrieval。
  */
-export function RagPage() {
+interface RagPageProps {
+  onLearningEvent?: RecordLearningEvent;
+}
+
+export function RagPage({ onLearningEvent }: RagPageProps = {}) {
   const [retrievalQuery, setRetrievalQuery] = useState("");
   const [retrievalLimit, setRetrievalLimit] = useState("10");
   const [retrievalDocumentType, setRetrievalDocumentType] = useState("");
@@ -64,9 +69,18 @@ export function RagPage() {
         tags: parseTags(retrievalTags),
       });
       setRetrievalResult(response);
+      onLearningEvent?.({
+        eventName: "submitRetrieval()",
+        apiMethod: "POST",
+        apiPath: "/api/v1/document-retrieval/search",
+        apiStatus: "200 OK",
+        stateChanges: ["retrievalLoading: true → false", `retrievalResult: ${response.total} matches`, "retrievalError: null"],
+        backendFlow: ["document_retrieval.py search_documents()", "DocumentRetrievalService.search()", "DocumentRetrievalProvider.search()", "InMemoryKeywordRetrieval.search()"],
+      });
     } catch (reason) {
       setRetrievalError(toDisplayError(reason, "DOCUMENT_RETRIEVAL_ERROR", "検索リクエストに失敗しました"));
       setRetrievalResult(null);
+      onLearningEvent?.({ eventName: "submitRetrieval()", apiMethod: "POST", apiPath: "/api/v1/document-retrieval/search", apiStatus: "Backend error", stateChanges: ["retrievalLoading: true → false", "retrievalError: null → error", "retrievalResult: null"], backendFlow: ["document_retrieval.py search_documents()", "DocumentRetrievalService.search()"] });
     } finally {
       setRetrievalLoading(false);
     }
@@ -89,12 +103,40 @@ export function RagPage() {
         require_citations: ragRequireCitations,
       });
       setRagResult(response);
+      onLearningEvent?.({
+        eventName: "submitInternalRag()",
+        apiMethod: "POST",
+        apiPath: "/api/v1/internal-rag/answer",
+        apiStatus: "200 OK",
+        stateChanges: ["ragLoading: true → false", "ragResult: null → response", "ragError: null"],
+        backendFlow: ["internal_rag.py answer_internal_rag()", "InternalRagService.answer()", "DocumentRetrievalProvider.search()", "RAGAnswerGenerator.generate()", "InternalRagEvaluationService"],
+      });
     } catch (reason) {
-      setRagError(toDisplayError(reason, "INTERNAL_RAG_ERROR", "Internal RAG リクエストに失敗しました"));
+      const displayError = toDisplayError(reason, "INTERNAL_RAG_ERROR", "Internal RAG リクエストに失敗しました");
+      setRagError(displayError);
       setRagResult(null);
+      onLearningEvent?.({
+        eventName: "submitInternalRag()",
+        apiMethod: "POST",
+        apiPath: "/api/v1/internal-rag/answer",
+        apiStatus: displayError.code === "insufficient_context" ? "422 Unprocessable Entity" : "Backend error",
+        stateChanges: ["ragLoading: true → false", "ragError: null → error", "ragResult: null"],
+        backendFlow: ["internal_rag.py answer_internal_rag()", "InternalRagService.answer()", "DocumentRetrievalProvider.search()"],
+        note: displayError.code === "insufficient_context" ? "Backend 未找到足够的相关 Chunk：输入可能不匹配文档内容，或文档尚未完成 Chunk；这不是 RAG 页面故障。" : undefined,
+      });
     } finally {
       setRagLoading(false);
     }
+  }
+
+  function clearRetrievalResult() {
+    setRetrievalResult(null);
+    onLearningEvent?.({ eventName: "clearRetrievalResult()", stateChanges: ["retrievalResult: response → null"], note: "清除仅修改 React state，不发送 API 请求。" });
+  }
+
+  function clearRagResult() {
+    setRagResult(null);
+    onLearningEvent?.({ eventName: "clearRagResult()", stateChanges: ["ragResult: response → null"], note: "清除仅修改 React state，不发送 API 请求。" });
   }
 
   return (
@@ -157,7 +199,7 @@ export function RagPage() {
             <button type="submit" disabled={retrievalLoading || retrievalQuery.trim().length === 0}>
               {retrievalLoading ? "検索中…" : "検索する"}
             </button>
-            <button type="button" className="secondary-button" onClick={() => setRetrievalResult(null)}>
+            <button type="button" className="secondary-button" onClick={clearRetrievalResult}>
               結果をクリア
             </button>
           </div>
@@ -270,7 +312,7 @@ export function RagPage() {
             <button type="submit" disabled={ragLoading || ragQuestion.trim().length === 0}>
               {ragLoading ? "回答を生成中…" : "回答を生成"}
             </button>
-            <button type="button" className="secondary-button" onClick={() => setRagResult(null)}>
+            <button type="button" className="secondary-button" onClick={clearRagResult}>
               回答をクリア
             </button>
           </div>

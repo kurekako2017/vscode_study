@@ -15,6 +15,7 @@ import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
 import type { DisplayError, DocumentChunkListResponse, DocumentListResponse, DocumentResponse } from "../types";
+import type { RecordLearningEvent } from "../learning/learningTypes";
 
 const defaultOwner = "analysis-team";
 type DocumentAction = "archive" | "import" | "chunk" | null;
@@ -25,7 +26,11 @@ type DocumentAction = "archive" | "import" | "chunk" | null;
  * 为什么独立成页：
  * - 这一页的状态已经和 Tasks 页面没有直接耦合，拆开后更便于继续扩展 RAG / Approval。
  */
-export function DocumentsPage() {
+interface DocumentsPageProps {
+  onLearningEvent?: RecordLearningEvent;
+}
+
+export function DocumentsPage({ onLearningEvent }: DocumentsPageProps = {}) {
   const [documents, setDocuments] = useState<DocumentListResponse["items"]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsRefreshing, setDocumentsRefreshing] = useState(false);
@@ -151,8 +156,17 @@ export function DocumentsPage() {
       setUploadDescription("");
       setUploadTags("");
       showBanner(`アップロードが完了しました: ${session.document_id}`);
+      onLearningEvent?.({
+        eventName: "submitUpload()",
+        apiMethod: "POST",
+        apiPath: "/api/v1/documents",
+        apiStatus: "201 Created",
+        stateChanges: ["uploading: true → false", `selectedDocumentId: ${session.document_id}`, "documents: 刷新"],
+        backendFlow: ["documents.py upload_document()", "DocumentUploadService.upload_document()", "InMemoryDocumentRepository.create()"],
+      });
     } catch (reason) {
       setUploadError(toDisplayError(reason, "DOCUMENT_UPLOAD_ERROR", "ドキュメントのアップロードに失敗しました"));
+      onLearningEvent?.({ eventName: "submitUpload()", apiMethod: "POST", apiPath: "/api/v1/documents", apiStatus: "Backend error", stateChanges: ["uploading: true → false", "uploadError: null → error"], backendFlow: ["documents.py upload_document()", "DocumentUploadService.upload_document()"] });
     } finally {
       setUploading(false);
     }
@@ -170,14 +184,17 @@ export function DocumentsPage() {
       if (action === "archive") {
         const result = await archiveDocument(selectedDocument.document_id);
         showBanner(`アーカイブを受け付けました: ${result.document_id} (${result.status})`);
+        onLearningEvent?.({ eventName: 'runDocumentAction("archive")', apiMethod: "DELETE", apiPath: `/api/v1/documents/${selectedDocument.document_id}`, apiStatus: "202 Accepted", stateChanges: ["activeDocumentAction: archive → null", `status: ${result.status}`, "列表与详情刷新"], backendFlow: ["documents.py archive_document()", "DocumentArchiveService.archive_document()", "InMemoryDocumentRepository.update()"] });
       }
       if (action === "import") {
         const result = await importDocument(selectedDocument.document_id);
         showBanner(`Import 結果: ${result.status}`);
+        onLearningEvent?.({ eventName: 'runDocumentAction("import")', apiMethod: "POST", apiPath: `/api/v1/documents/${selectedDocument.document_id}/import`, apiStatus: "201 Created", stateChanges: ["activeDocumentAction: import → null", `import status: ${result.status}`, "列表与详情刷新"], backendFlow: ["document_imports.py import_document()", "DocumentImportService.import_document()", "InMemoryDocumentRepository.get() / update()"] });
       }
       if (action === "chunk") {
         const result = await chunkDocument(selectedDocument.document_id);
         showBanner(`Chunk 処理が完了しました: ${result.items.length} 件`);
+        onLearningEvent?.({ eventName: 'runDocumentAction("chunk")', apiMethod: "POST", apiPath: `/api/v1/documents/${selectedDocument.document_id}/chunks`, apiStatus: "201 Created", stateChanges: ["activeDocumentAction: chunk → null", `chunkData: ${result.items.length} items`, "列表与详情刷新"], backendFlow: ["document_chunks.py chunk_document()", "DocumentChunkService.chunk_document()", "InMemoryDocumentChunkRepository.replace_for_document()"] });
       }
       await loadDocuments(false);
       await refreshSelectedDocument(selectedDocument.document_id);
@@ -188,6 +205,7 @@ export function DocumentsPage() {
       } else {
         setDetailError(display);
       }
+      onLearningEvent?.({ eventName: `runDocumentAction("${action}")`, apiStatus: "Backend error", stateChanges: ["activeDocumentAction: action → null", "detailError / chunkError: null → error"], backendFlow: ["对应 Document Router", "对应 Document Service", "业务校验或 Repository 错误"] });
     } finally {
       setActiveDocumentAction(null);
     }

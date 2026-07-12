@@ -5,6 +5,7 @@ import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBanner } from "../components/StatusBanner";
 import type { AnalysisMode, DisplayError, ReportResponse, TaskEvent, TaskStatus } from "../types";
+import type { RecordLearningEvent } from "../learning/learningTypes";
 
 const defaultQuestion = "売上と在庫の状況を分析し、市場トレンドと競合も確認してください";
 
@@ -26,7 +27,11 @@ const modeLabels: Record<AnalysisMode, string> = {
  * 日本现场面试可以这样讲：
  * - 这是前端最小 workflow 页面，展示了 request、progress stream 和 final report 三段式数据流。
  */
-export function TasksPage() {
+interface TasksPageProps {
+  onLearningEvent?: RecordLearningEvent;
+}
+
+export function TasksPage({ onLearningEvent }: TasksPageProps = {}) {
   const [question, setQuestion] = useState(defaultQuestion);
   const [mode, setMode] = useState<AnalysisMode>("hybrid");
   const [taskId, setTaskId] = useState<string | null>(null);
@@ -47,9 +52,12 @@ export function TasksPage() {
 
   async function loadReport(id: string) {
     try {
-      setReport(await getReport(id));
+      const nextReport = await getReport(id);
+      setReport(nextReport);
+      onLearningEvent?.({ eventName: "loadReport()", apiMethod: "GET", apiPath: `/api/tasks/${id}/report`, apiStatus: "200 OK", stateChanges: ["report: null → response", "status: completed"], backendFlow: ["tasks.py get_report()", "TaskService.get_report()", "InMemoryReportRepository.get()"] });
     } catch (reason) {
       setError(toDisplayError(reason, "REPORT_LOAD_ERROR", "レポート取得に失敗しました"));
+      onLearningEvent?.({ eventName: "loadReport()", apiMethod: "GET", apiPath: `/api/tasks/${id}/report`, apiStatus: "Backend error / 409 when unfinished", stateChanges: ["error: null → error"], backendFlow: ["tasks.py get_report()", "TaskService.get_report()"] });
     }
   }
 
@@ -66,6 +74,7 @@ export function TasksPage() {
       const created = await createTask(question.trim(), mode);
       setTaskId(created.task_id);
       setStatus(created.status);
+      onLearningEvent?.({ eventName: "submit()", apiMethod: "POST", apiPath: "/api/tasks", apiStatus: "202 Accepted", stateChanges: [`taskId: null → ${created.task_id}`, `status: queued`, "events/report: 清空"], backendFlow: ["tasks.py create_task()", "TaskService.create_task()", "InMemoryTaskRepository.create()", "BackgroundTasks.add_task()", "TaskService.run_task()", "AnalysisWorkflow.stream()"], note: "202 仅表示任务已受理；报告会在 BackgroundTasks 的 Workflow 完成后生成。" });
       // 保存取消订阅函数，防止重复提交后旧 SSE 还继续写入页面状态。
       unsubscribeRef.current = subscribeToTask(created.task_id, {
         onEvent: (taskEvent) => {
@@ -73,6 +82,7 @@ export function TasksPage() {
           setStatus(taskEvent.status);
           if (taskEvent.event === "done") {
             unsubscribeRef.current?.();
+            onLearningEvent?.({ eventName: "subscribeToTask() done", apiMethod: "GET", apiPath: `/api/tasks/${created.task_id}/events`, apiStatus: "SSE done", stateChanges: ["status: running → completed", "events: 追加 done", "下一步 loadReport()"], backendFlow: ["tasks.py get_task_events()", "stream_task_events()", "EventRepository", "TaskService.run_task()"] });
             void loadReport(created.task_id);
           }
           if (taskEvent.event === "error") {
@@ -91,6 +101,7 @@ export function TasksPage() {
     } catch (reason) {
       setStatus("idle");
       setError(toDisplayError(reason, "TASK_CREATE_ERROR", "タスク作成に失敗しました"));
+      onLearningEvent?.({ eventName: "submit()", apiMethod: "POST", apiPath: "/api/tasks", apiStatus: "Backend error", stateChanges: ["status: queued → idle", "error: null → error"], backendFlow: ["tasks.py create_task()", "TaskService.create_task()"] });
     }
   }
 
