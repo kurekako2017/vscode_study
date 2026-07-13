@@ -19,6 +19,8 @@ from app.models.task import utc_now
 from app.observability.logging import get_logger, log_event
 from app.repositories.interfaces.approval_repository import ApprovalRepository
 from app.repositories.interfaces.report_repository import ReportRepository
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.db.unit_of_work import InMemoryUnitOfWork
 from app.schemas.approval_api import ApprovalRevisionResponse
 
 logger = get_logger(__name__)
@@ -36,14 +38,22 @@ class ApprovalService:
         report_repository: ReportRepository,
         approval_repository: ApprovalRepository,
         event_publisher: EventPublisher,
+        unit_of_work: UnitOfWork | None = None,
     ) -> None:
         """注入报告仓库、审批仓库和事件发布器。"""
 
         self._report_repository = report_repository
         self._approval_repository = approval_repository
         self._event_publisher = event_publisher
+        self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
 
     def submit_approval(self, task_id: str, comment: str | None = None) -> ApprovalRequest:
+        """以单一事务提交版本、审批请求、报告状态和事件。"""
+
+        with self._unit_of_work.transaction():
+            return self._submit_approval(task_id, comment)
+
+    def _submit_approval(self, task_id: str, comment: str | None = None) -> ApprovalRequest:
         """把当前 report 快照冻结成待审版本。"""
 
         try:
@@ -113,6 +123,12 @@ class ApprovalService:
         return approval
 
     def approve(self, approval_id: str, comment: str | None = None) -> ApprovalRequest:
+        """以单一事务提交审批决定、报告状态和事件。"""
+
+        with self._unit_of_work.transaction():
+            return self._approve(approval_id, comment)
+
+    def _approve(self, approval_id: str, comment: str | None = None) -> ApprovalRequest:
         """批准待审版本，并把当前 report 推进到 approved。"""
 
         try:
@@ -147,6 +163,12 @@ class ApprovalService:
             raise
 
     def reject(self, approval_id: str, reason: str | None = None) -> ApprovalRequest:
+        """以单一事务提交拒绝决定、原因、报告状态和事件。"""
+
+        with self._unit_of_work.transaction():
+            return self._reject(approval_id, reason)
+
+    def _reject(self, approval_id: str, reason: str | None = None) -> ApprovalRequest:
         """拒绝待审版本，并保留拒绝原因。"""
 
         try:
@@ -184,6 +206,12 @@ class ApprovalService:
             raise
 
     def revise(self, task_id: str, revision_reason: str | None = None) -> ApprovalRevisionResponse:
+        """以单一事务提交修订版本、报告状态和事件。"""
+
+        with self._unit_of_work.transaction():
+            return self._revise(task_id, revision_reason)
+
+    def _revise(self, task_id: str, revision_reason: str | None = None) -> ApprovalRevisionResponse:
         """基于 rejected report 创建新的不可变修订版本。"""
 
         try:
@@ -329,6 +357,22 @@ class ApprovalService:
     def _record_failed_event(self, task_id: str, approval_id: str, exc: AppException) -> None:
         """把失败也记录成 approval.failed，便于审计和回放。"""
 
+        # 申请尚未创建时不能写带外键的 ApprovalEvent，但通用事件流仍可记录失败。
+        if self._approval_repository.get_approval_request(approval_id) is None:
+            self._event_publisher.publish(
+                task_id,
+                "approval.failed",
+                "Approval failed",
+                {
+                    "approval_id": approval_id,
+                    "task_id": task_id,
+                    "actor_id": "system",
+                    "reason": exc.error_code.value,
+                    "error_code": exc.error_code.value,
+                    "message": exc.message,
+                },
+            )
+            return
         self._record_event(
             task_id=task_id,
             approval_id=approval_id,

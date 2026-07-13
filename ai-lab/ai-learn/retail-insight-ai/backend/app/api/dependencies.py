@@ -103,6 +103,7 @@ async def get_audit_service(request: Request) -> AuditService:
 
 
 async def get_audit_middleware(
+    container: AppContainer = Depends(get_container),
     security_service: SecurityService = Depends(get_security_service),
     audit_service: AuditService = Depends(get_audit_service),
 ) -> AuditMiddleware:
@@ -112,6 +113,7 @@ async def get_audit_middleware(
         audit_service=audit_service,
         security_service=security_service,
         rbac_guard=RBACGuard(security_service, audit_service),
+        unit_of_work=container.unit_of_work,
     )
 
 

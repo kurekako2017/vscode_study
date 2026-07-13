@@ -1,9 +1,8 @@
 """ReportRepository 的 PostgreSQL 实现。
 
 文件职责：
-- 保存 reports 当前快照。
-- 追加 report_versions 历史版本。
-- 当前 approval_status 仅保存 `generated`，不接审批 API。
+- 只保存 reports 当前快照。
+- report_versions 由 ApprovalRepository 独占写入，避免出现两个版本事实来源。
 """
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ class PostgresReportRepository:
         self._connection_factory = connection_factory
 
     def save(self, report: Report) -> None:
-        """保存当前报告快照，并记录版本历史。"""
+        """保存当前报告快照，不隐式创建审批版本。"""
 
         with self._connection_factory.connection() as connection:
             with connection.cursor() as cursor:
@@ -44,30 +43,6 @@ class PostgresReportRepository:
                         report.provider,
                         report.status.value,
                         report.created_at,
-                        report.created_at,
-                    ),
-                )
-                cursor.execute(
-                    """
-                    SELECT COALESCE(MAX(version_no), 0) + 1
-                    FROM report_versions
-                    WHERE task_id = %s
-                    """,
-                    (report.task_id,),
-                )
-                next_version = cursor.fetchone()[0]
-                cursor.execute(
-                    """
-                    INSERT INTO report_versions (
-                        task_id, version_no, markdown, status, revision_reason, created_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s)
-                    """,
-                    (
-                        report.task_id,
-                        next_version,
-                        report.markdown,
-                        report.status.value,
-                        None,
                         report.created_at,
                     ),
                 )

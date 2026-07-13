@@ -7,6 +7,12 @@ from app.config.container import build_container
 from app.config.settings import Settings
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.postgres.event_repository import PostgresEventRepository
+from app.repositories.postgres.approval_repository import PostgresApprovalRepository
+from app.repositories.postgres.audit_repository import PostgresAuditRepository
+from app.repositories.postgres.document_repository import PostgresDocumentRepository
+from app.repositories.postgres.document_chunk_repository import PostgresDocumentChunkRepository
+from app.repositories.postgres.document_import_repository import PostgresDocumentImportRepository
+from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
 
 
 class RepositoryBackendSwitchTest(unittest.TestCase):
@@ -25,9 +31,10 @@ class RepositoryBackendSwitchTest(unittest.TestCase):
         self.assertIsInstance(container.event_repository, InMemoryEventRepository)
 
     def test_postgres_backend_builds_postgres_repositories(self) -> None:
-        with patch(
-            "app.config.container.PostgresConnectionFactory.initialize_schema"
-        ) as initialize_schema:
+        with (
+            patch("app.config.container.PostgresConnectionFactory.initialize_schema") as initialize_schema,
+            patch("app.config.container.PostgresConnectionFactory.health_check") as health_check,
+        ):
             container = build_container(
                 Settings(
                     repository_backend="postgres",
@@ -37,8 +44,15 @@ class RepositoryBackendSwitchTest(unittest.TestCase):
             )
 
         initialize_schema.assert_called_once()
+        health_check.assert_called_once()
         self.assertEqual(container.repository_backend, "postgres")
         self.assertIsInstance(container.event_repository, PostgresEventRepository)
+        self.assertIsInstance(container.approval_repository, PostgresApprovalRepository)
+        self.assertIsInstance(container.audit_repository, PostgresAuditRepository)
+        self.assertIsInstance(container.document_repository, PostgresDocumentRepository)
+        self.assertIsInstance(container.document_chunk_repository, PostgresDocumentChunkRepository)
+        self.assertIsInstance(container.document_import_repository, PostgresDocumentImportRepository)
+        self.assertIsInstance(container.upload_session_repository, PostgresUploadSessionRepository)
 
 
 if __name__ == "__main__":

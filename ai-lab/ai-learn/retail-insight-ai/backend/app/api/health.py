@@ -13,6 +13,8 @@ logger = get_logger(__name__)
 @router.get("/health", response_model=HealthResponse)
 async def health(container: AppContainer = Depends(get_container)) -> HealthResponse:
     """返回轻量健康状态；不在探针中执行昂贵业务逻辑。"""
+    # PostgreSQL 模式执行真实 SELECT 1；失败不会静默回退为 InMemory。
+    container.database_health_check()
     trace_source_chain(
         "GET",  # HTTP 方法
         "/health",  # API 路径
@@ -31,6 +33,7 @@ async def health(container: AppContainer = Depends(get_container)) -> HealthResp
         status="ok",
         service=container.settings.service_name,
         provider=container.settings.research_provider,
+        repository_backend=container.repository_backend,
         request_id=get_request_id(),
     )
     return response

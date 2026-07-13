@@ -29,6 +29,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
@@ -43,6 +44,7 @@ class PostgresConfig:
     db: str
     user: str
     password: str
+    database_url: str | None = None
 
 
 class PostgresConnectionFactory:
@@ -52,19 +54,23 @@ class PostgresConnectionFactory:
         """保存配置，真正连接时再导入 psycopg。"""
 
         self._config = config
+        # 同一调用链中的 Repository 共享连接，才能由 Unit of Work 统一提交或回滚。
+        self._active_connection: ContextVar[object | None] = ContextVar(
+            "postgres_active_connection",
+            default=None,
+        )
 
     @contextmanager
     def connection(self) -> Iterator[object]:
         """返回一个带事务控制的连接；成功提交，异常回滚。"""
 
+        active = self._active_connection.get()
+        if active is not None:
+            yield active
+            return
+
         psycopg = self._load_psycopg()
-        connection = psycopg.connect(
-            host=self._config.host,
-            port=self._config.port,
-            dbname=self._config.db,
-            user=self._config.user,
-            password=self._config.password,
-        )
+        connection = self._connect(psycopg)
         try:
             with connection.cursor() as cursor:
                 cursor.execute("SET TIME ZONE 'UTC'")
@@ -75,6 +81,38 @@ class PostgresConnectionFactory:
             raise
         finally:
             connection.close()
+
+    @contextmanager
+    def transaction(self) -> Iterator[None]:
+        """开启可嵌套事务；内部 Repository 自动复用当前连接。"""
+
+        if self._active_connection.get() is not None:
+            yield
+            return
+
+        psycopg = self._load_psycopg()
+        connection = self._connect(psycopg)
+        token = self._active_connection.set(connection)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SET TIME ZONE 'UTC'")
+            yield
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            self._active_connection.reset(token)
+            connection.close()
+
+    def health_check(self) -> None:
+        """执行真实连通性检查；失败直接抛出，禁止静默回退。"""
+
+        with self.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                if cursor.fetchone() != (1,):
+                    raise RuntimeError("PostgreSQL health check returned an unexpected result")
 
     def initialize_schema(self, schema_path: Path) -> None:
         """执行 schema.sql；使用 IF NOT EXISTS 保证可重复执行。"""
@@ -94,3 +132,17 @@ class PostgresConnectionFactory:
                 "psycopg is required when REPOSITORY_BACKEND=postgres"
             ) from exc
         return psycopg
+
+    def _connect(self, psycopg):
+        """兼容 SQLAlchemy 风格 psycopg URL 与离散连接参数。"""
+
+        if self._config.database_url:
+            url = self._config.database_url.replace("postgresql+psycopg://", "postgresql://", 1)
+            return psycopg.connect(url)
+        return psycopg.connect(
+            host=self._config.host,
+            port=self._config.port,
+            dbname=self._config.db,
+            user=self._config.user,
+            password=self._config.password,
+        )

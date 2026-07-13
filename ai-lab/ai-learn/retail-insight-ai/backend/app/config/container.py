@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from app.agents.providers.static_research import StaticResearchProvider
 from app.agents.research_agent import ResearchAgent
 from app.config.settings import Settings
 from app.data_loaders import LocalBusinessDataLoader, LocalResearchDataLoader
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
+from app.db.unit_of_work import InMemoryUnitOfWork, PostgresUnitOfWork
 from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
 from app.providers.llm_provider import LLMProvider
@@ -20,6 +22,8 @@ from app.repositories.implementations.in_memory.document_repository import InMem
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
 from app.repositories.implementations.in_memory.task_repository import InMemoryTaskRepository
+from app.repositories.implementations.in_memory.document_import_repository import InMemoryDocumentImportRepository
+from app.repositories.implementations.in_memory.upload_session_repository import InMemoryUploadSessionRepository
 from app.repositories.interfaces.document_repository import DocumentRepository
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
 from app.repositories.interfaces.document_retrieval_provider import DocumentRetrievalProvider
@@ -28,6 +32,15 @@ from app.repositories.interfaces.approval_repository import ApprovalRepository
 from app.repositories.interfaces.event_repository import EventRepository
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.task_repository import TaskRepository
+from app.repositories.interfaces.document_import_repository import DocumentImportRepository
+from app.repositories.interfaces.upload_session_repository import UploadSessionRepository
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.repositories.postgres.approval_repository import PostgresApprovalRepository
+from app.repositories.postgres.audit_repository import PostgresAuditRepository
+from app.repositories.postgres.document_repository import PostgresDocumentRepository
+from app.repositories.postgres.document_chunk_repository import PostgresDocumentChunkRepository
+from app.repositories.postgres.document_import_repository import PostgresDocumentImportRepository
+from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
 from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
@@ -72,7 +85,28 @@ class AppContainer:
     audit_service: AuditService
     security_service: SecurityService
     event_repository: EventRepository
+    document_import_repository: DocumentImportRepository
+    upload_session_repository: UploadSessionRepository
+    unit_of_work: UnitOfWork
+    database_health_check: Callable[[], None]
     repository_backend: str
+
+
+@dataclass(frozen=True)
+class RepositoryBundle:
+    """保证每种 backend 一次性提供完整 Repository 集合，禁止混用。"""
+
+    task: TaskRepository
+    report: ReportRepository
+    event: EventRepository
+    approval: ApprovalRepository
+    audit: AuditRepository
+    document: DocumentRepository
+    chunk: DocumentChunkRepository
+    document_import: DocumentImportRepository
+    upload_session: UploadSessionRepository
+    unit_of_work: UnitOfWork
+    health_check: Callable[[], None]
 
 #   读取配置，创建Repository，创建Service，创建所有依赖，以后所有Router都会从这里拿Service
 def build_container(settings: Settings | None = None) -> AppContainer:
@@ -80,21 +114,24 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     # 读取配置
     settings = settings or Settings()
     # 根据配置选择 InMemory 或 PostgreSQL Repository
-    task_repository, report_repository, event_repository = _build_repositories(settings)
+    repositories = _build_repositories(settings)
+    task_repository = repositories.task
+    report_repository = repositories.report
+    event_repository = repositories.event
     # 创建事件发布器，注入事件仓库
     event_publisher = EventPublisher(event_repository)
     # 创建 InMemory 实现的仓库和服务
-    approval_repository = InMemoryApprovalRepository()
+    approval_repository = repositories.approval
     # 创建服务，注入仓库和事件发布器
-    audit_repository = InMemoryAuditRepository()
+    audit_repository = repositories.audit
     # 创建服务，注入仓库和事件发布器
     audit_service = AuditService(audit_repository)
     #  创建服务，注入仓库和事件发布器
     security_service = SecurityService()
     #  创建服务，注入仓库和事件发布器
-    document_repository = InMemoryDocumentRepository()
+    document_repository = repositories.document
     #  创建服务，注入仓库和事件发布器
-    document_chunk_repository = InMemoryDocumentChunkRepository()
+    document_chunk_repository = repositories.chunk
     #  创建服务，注入仓库和事件发布器
     document_retrieval_provider = InMemoryKeywordRetrieval(
         document_repository=document_repository,
@@ -104,7 +141,11 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     llm_provider = StubLLMProvider()
     #  创建服务，注入仓库和事件发布器
     rag_answer_generator = RAGAnswerGenerator(provider=llm_provider, use_llm=settings.internal_rag_use_llm)
-    document_import_service = DocumentImportService(document_repository, event_publisher)
+    document_import_service = DocumentImportService(
+        document_repository,
+        event_publisher,
+        repositories.document_import,
+    )
     #  创建服务，注入仓库和事件发布器   
     document_chunk_service = DocumentChunkService(document_repository, document_chunk_repository, event_publisher)
     document_retrieval_service = DocumentRetrievalService(
@@ -121,12 +162,15 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         report_repository=report_repository,
         approval_repository=approval_repository,
         event_publisher=event_publisher,
+        unit_of_work=repositories.unit_of_work,
     )
     document_read_service = DocumentReadService(document_repository)
     document_archive_service = DocumentArchiveService(document_repository, event_publisher)
     document_upload_service = DocumentUploadService(
         repository=document_repository,
         event_publisher=event_publisher,
+        upload_session_repository=repositories.upload_session,
+        unit_of_work=repositories.unit_of_work,
     )
     business_data_loader = LocalBusinessDataLoader()
     research_data_loader = LocalResearchDataLoader()
@@ -148,6 +192,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         event_publisher=event_publisher,
         workflow=workflow,
         provider_name=settings.research_provider,
+        unit_of_work=repositories.unit_of_work,
     )
     return AppContainer(
         settings=settings,
@@ -171,20 +216,32 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         audit_service=audit_service,
         security_service=security_service,
         event_repository=event_repository,
+        document_import_repository=repositories.document_import,
+        upload_session_repository=repositories.upload_session,
+        unit_of_work=repositories.unit_of_work,
+        database_health_check=repositories.health_check,
         repository_backend=settings.repository_backend,
     )
 
 
 def _build_repositories(
     settings: Settings,
-) -> tuple[TaskRepository, ReportRepository, EventRepository]:
+) -> RepositoryBundle:
     """根据配置选择 InMemory 或 PostgreSQL Repository。"""
 
     if settings.repository_backend == "inmemory":
-        return (
-            InMemoryTaskRepository(),
-            InMemoryReportRepository(),
-            InMemoryEventRepository(),
+        return RepositoryBundle(
+            task=InMemoryTaskRepository(),
+            report=InMemoryReportRepository(),
+            event=InMemoryEventRepository(),
+            approval=InMemoryApprovalRepository(),
+            audit=InMemoryAuditRepository(),
+            document=InMemoryDocumentRepository(),
+            chunk=InMemoryDocumentChunkRepository(),
+            document_import=InMemoryDocumentImportRepository(),
+            upload_session=InMemoryUploadSessionRepository(),
+            unit_of_work=InMemoryUnitOfWork(),
+            health_check=lambda: None,
         )
 
     connection_factory = PostgresConnectionFactory(
@@ -194,12 +251,22 @@ def _build_repositories(
             db=settings.postgres_db,
             user=settings.postgres_user,
             password=settings.postgres_password,
+            database_url=settings.database_url,
         )
     )
     schema_path = Path(__file__).resolve().parents[2] / "db" / "schema.sql"
     connection_factory.initialize_schema(schema_path)
-    return (
-        PostgresTaskRepository(connection_factory),
-        PostgresReportRepository(connection_factory),
-        PostgresEventRepository(connection_factory),
+    connection_factory.health_check()
+    return RepositoryBundle(
+        task=PostgresTaskRepository(connection_factory),
+        report=PostgresReportRepository(connection_factory),
+        event=PostgresEventRepository(connection_factory),
+        approval=PostgresApprovalRepository(connection_factory),
+        audit=PostgresAuditRepository(connection_factory),
+        document=PostgresDocumentRepository(connection_factory),
+        chunk=PostgresDocumentChunkRepository(connection_factory),
+        document_import=PostgresDocumentImportRepository(connection_factory),
+        upload_session=PostgresUploadSessionRepository(connection_factory),
+        unit_of_work=PostgresUnitOfWork(connection_factory),
+        health_check=connection_factory.health_check,
     )

@@ -29,6 +29,8 @@ from app.observability.logging import get_logger, get_request_id, log_event
 from app.services.audit_service import AuditService
 from app.services.rbac_guard import RBACGuard
 from app.services.security_service import SecurityService
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.db.unit_of_work import InMemoryUnitOfWork
 
 logger = get_logger(__name__)
 
@@ -60,10 +62,12 @@ class AuditMiddleware:
         audit_service: AuditService,
         security_service: SecurityService,
         rbac_guard: RBACGuard,
+        unit_of_work: UnitOfWork | None = None,
     ) -> None:
         self._audit_service = audit_service
         self._security_service = security_service
         self._rbac_guard = rbac_guard
+        self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
 
     async def run(
         self,
@@ -89,9 +93,18 @@ class AuditMiddleware:
         user = self._security_service.get_current_user()
         metadata: dict[str, Any] = dict(action.metadata or {})
         try:
-            result = operation()
-            if isawaitable(result):
-                result = await result
+            # 成功时业务变更与 AuditLog 共用事务；异常会先回滚业务事实。
+            with self._unit_of_work.transaction():
+                result = operation()
+                if isawaitable(result):
+                    result = await result
+                self._record_audit(
+                    action=action,
+                    user=user,
+                    request_id=request_id,
+                    result=AuditLogResult.SUCCESS,
+                    metadata=metadata,
+                )
         except PermissionDeniedException:
             raise
         except AppException as exc:
@@ -122,13 +135,6 @@ class AuditMiddleware:
             )
             raise
 
-        self._record_audit(
-            action=action,
-            user=user,
-            request_id=request_id,
-            result=AuditLogResult.SUCCESS,
-            metadata=metadata,
-        )
         return result
 
     def _record_audit(

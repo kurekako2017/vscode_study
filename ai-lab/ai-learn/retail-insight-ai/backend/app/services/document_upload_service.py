@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from threading import RLock
@@ -51,6 +50,11 @@ from app.models.document import (
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.core.learning_trace import trace_step
 from app.repositories.interfaces.document_repository import DocumentRepository
+from app.repositories.interfaces.upload_session_repository import UploadSessionRepository
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.repositories.implementations.in_memory.upload_session_repository import InMemoryUploadSessionRepository
+from app.db.unit_of_work import InMemoryUnitOfWork
+from app.models.upload import UploadSessionRecord
 from app.schemas.document_api import DocumentUploadSessionResponse, UploadSessionStatus
 from app.models.task import utc_now
 
@@ -90,27 +94,45 @@ _TEXTUAL_DOCUMENT_TYPES = {
 }
 
 
-@dataclass(frozen=True)
-class _CachedUploadResult:
-    """保存幂等缓存所需的 checksum 和响应体。"""
-
-    checksum: str
-    response: DocumentUploadSessionResponse
-
-
 class DocumentUploadService:
     """同步处理文档上传、重复检测和事件发布。"""
 
-    def __init__(self, repository: DocumentRepository, event_publisher: EventPublisher) -> None:
-        """保存仓储与事件发布器，并初始化进程内缓存。"""
+    def __init__(
+        self,
+        repository: DocumentRepository,
+        event_publisher: EventPublisher,
+        upload_session_repository: UploadSessionRepository | None = None,
+        unit_of_work: UnitOfWork | None = None,
+    ) -> None:
+        """注入文档、上传会话 Repository 与统一事务边界。"""
 
         self._repository = repository
         self._event_publisher = event_publisher
         self._lock = RLock()
-        self._idempotency_cache: dict[str, _CachedUploadResult] = {}
-        self._checksum_cache: dict[str, DocumentUploadSessionResponse] = {}
+        self._upload_session_repository = upload_session_repository or InMemoryUploadSessionRepository()
+        self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
 
     def upload_document(
+        self,
+        *,
+        filename: str,
+        content: bytes,
+        content_type: str | None,
+        metadata_json: str,
+        idempotency_key: str | None = None,
+    ) -> DocumentUploadSessionResponse:
+        """让 Upload Session、Document 与成功事件在 PostgreSQL 中原子提交。"""
+
+        with self._unit_of_work.transaction():
+            return self._upload_document(
+                filename=filename,
+                content=content,
+                content_type=content_type,
+                metadata_json=metadata_json,
+                idempotency_key=idempotency_key,
+            )
+
+    def _upload_document(
         self,
         *,
         filename: str,
@@ -638,7 +660,7 @@ class DocumentUploadService:
     ) -> DocumentUploadSessionResponse | None:
         with self._lock:
             if idempotency_key is not None:
-                cached = self._idempotency_cache.get(idempotency_key)
+                cached = self._upload_session_repository.get_by_idempotency_key(idempotency_key)
                 if cached is not None:
                     if cached.checksum != checksum:
                         self._raise_upload_error(
@@ -647,8 +669,9 @@ class DocumentUploadService:
                             detail={"idempotency_key": idempotency_key},
                             status_code=409,
                         )
-                    return cached.response
-            return self._checksum_cache.get(checksum)
+                    return self._session_to_response(cached)
+            cached = self._upload_session_repository.get_by_checksum(checksum)
+            return self._session_to_response(cached) if cached is not None else None
 
     def _cache_result(
         self,
@@ -657,12 +680,34 @@ class DocumentUploadService:
         response: DocumentUploadSessionResponse,
     ) -> None:
         with self._lock:
-            self._checksum_cache[checksum] = response
-            if idempotency_key is not None:
-                self._idempotency_cache[idempotency_key] = _CachedUploadResult(
+            self._upload_session_repository.save(
+                UploadSessionRecord(
+                    upload_id=response.upload_id,
+                    document_id=response.document_id,
                     checksum=checksum,
-                    response=response,
+                    idempotency_key=idempotency_key,
+                    status=response.status.value,
+                    progress=response.progress,
+                    created_at=response.created_at,
+                    updated_at=response.updated_at,
+                    error_code=response.error_code,
+                    error_message=response.error_message,
                 )
+            )
+
+    def _session_to_response(self, record: UploadSessionRecord) -> DocumentUploadSessionResponse:
+        """把跨进程上传会话恢复为原有 API 响应，不改变字段。"""
+
+        return DocumentUploadSessionResponse(
+            upload_id=record.upload_id,
+            document_id=record.document_id,
+            status=UploadSessionStatus(record.status),
+            progress=record.progress,
+            created_at=record.created_at,
+            updated_at=record.updated_at,
+            error_code=record.error_code,
+            error_message=record.error_message,
+        )
 
     def _publish(
         self,

@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     internal_rag_use_llm: bool = False
     learning_trace: bool = False
     repository_backend: Literal["inmemory", "postgres"] = "inmemory"
+    # PostgreSQL 模式优先使用标准 DATABASE_URL；InMemory 默认模式不会读取或连接它。
+    database_url: str | None = None
     postgres_host: str = "127.0.0.1"
     postgres_port: int = 5432
     postgres_db: str = "retail_insight_ai"

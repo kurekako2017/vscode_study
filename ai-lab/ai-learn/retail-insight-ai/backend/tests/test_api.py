@@ -51,6 +51,7 @@ class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.headers["X-Request-ID"], "health-request")
         self.assertEqual(response.json()["status"], "ok")
         self.assertEqual(response.json()["provider"], "static")
+        self.assertEqual(response.json()["repository_backend"], "inmemory")
         self.assertEqual(response.json()["request_id"], "health-request")
 
     async def test_create_task_uses_success_envelope(self) -> None:

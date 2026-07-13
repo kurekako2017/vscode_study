@@ -1,8 +1,8 @@
 """EventRepository 的 PostgreSQL 实现。
 
 文件职责：
-- 负责 task_events 表的 append / list_after。
-- 当前只保存任务事件，不接审批事件表。
+- 负责通用 events 表的 append / list_after。
+- stream_id 不设 Task 外键，因此上传、文档、导入、检索和 RAG 事件也可持久化。
 """
 
 from __future__ import annotations
@@ -29,30 +29,26 @@ class PostgresEventRepository:
         message: str,
         data: dict[str, Any] | None = None,
     ) -> TaskEvent:
-        """追加事件，并按任务分配顺序号。"""
+        """追加事件，并按 stream_id 分配顺序号。"""
 
         event_data = data or {}
         with self._connection_factory.connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT task_id FROM tasks WHERE task_id = %s FOR UPDATE",
-                    (task_id,),
-                )
-                if cursor.fetchone() is None:
-                    raise KeyError(task_id)
+                # 事务级 advisory lock 防止同一 stream 并发计算出相同 sequence。
+                cursor.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (task_id,))
                 cursor.execute(
                     """
                     SELECT COALESCE(MAX(sequence), 0) + 1
-                    FROM task_events
-                    WHERE task_id = %s
+                    FROM events
+                    WHERE stream_id = %s
                     """,
                     (task_id,),
                 )
                 next_sequence = cursor.fetchone()[0]
                 cursor.execute(
                     """
-                    INSERT INTO task_events (
-                        task_id, sequence, event_type, message, data_json, created_at
+                    INSERT INTO events (
+                        stream_id, sequence, event_type, message, data_json, created_at
                     ) VALUES (%s, %s, %s, %s, %s::jsonb, %s)
                     RETURNING created_at
                     """,
@@ -82,9 +78,9 @@ class PostgresEventRepository:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT task_id, sequence, event_type, message, data_json, created_at
-                    FROM task_events
-                    WHERE task_id = %s AND sequence > %s
+                    SELECT stream_id, sequence, event_type, message, data_json, created_at
+                    FROM events
+                    WHERE stream_id = %s AND sequence > %s
                     ORDER BY sequence ASC
                     """,
                     (task_id, sequence),

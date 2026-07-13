@@ -7,4 +7,5 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     provider: str
+    repository_backend: str
     request_id: str

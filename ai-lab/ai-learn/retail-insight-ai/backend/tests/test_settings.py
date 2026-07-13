@@ -27,7 +27,22 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(settings.app_env, "test")
         self.assertEqual(settings.log_level, "WARNING")
         self.assertEqual(settings.repository_backend, "inmemory")
+        self.assertIsNone(settings.database_url)
         self.assertEqual(settings.cors_origins, ["http://localhost:5173"])
+
+    def test_database_url_is_read_for_explicit_postgres_mode(self) -> None:
+        with patch.dict(
+            os.environ,
+            {
+                "REPOSITORY_BACKEND": "postgres",
+                "DATABASE_URL": "postgresql+psycopg://user:secret@localhost:5432/example",
+            },
+            clear=False,
+        ):
+            settings = Settings(_env_file=None)
+
+        self.assertEqual(settings.repository_backend, "postgres")
+        self.assertTrue(settings.database_url.startswith("postgresql+psycopg://"))
 
     def test_unknown_provider_is_rejected(self) -> None:
         with patch.dict(os.environ, {"RESEARCH_PROVIDER": "unknown"}, clear=False):

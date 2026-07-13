@@ -44,6 +44,8 @@ from app.models.document import Document, DocumentStatus, DocumentType
 from app.models.document_import import DocumentImportRecord, DocumentImportStatus
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.document_repository import DocumentRepository
+from app.repositories.interfaces.document_import_repository import DocumentImportRepository
+from app.repositories.implementations.in_memory.document_import_repository import InMemoryDocumentImportRepository
 from app.schemas.document_import_api import DocumentImportResponse
 
 logger = get_logger(__name__)
@@ -59,14 +61,18 @@ _SUPPORTED_IMPORT_TYPES = {
 class DocumentImportService:
     """封装文档导入会话、状态推进和导入结果缓存。"""
 
-    def __init__(self, repository: DocumentRepository, event_publisher: EventPublisher) -> None:
-        """保存仓储与事件发布器，并初始化导入会话缓存。"""
+    def __init__(
+        self,
+        repository: DocumentRepository,
+        event_publisher: EventPublisher,
+        import_repository: DocumentImportRepository | None = None,
+    ) -> None:
+        """保存文档仓储、事件发布器和可切换的导入会话仓储。"""
 
         self._repository = repository
         self._event_publisher = event_publisher
         self._lock = RLock()
-        self._imports_by_id: dict[str, DocumentImportRecord] = {}
-        self._imports_by_document_id: dict[str, DocumentImportRecord] = {}
+        self._import_repository = import_repository or InMemoryDocumentImportRepository()
 
     def import_document(self, document_id: str) -> DocumentImportResponse:
         """执行同步导入：校验、验证、状态更新和事件发布。"""
@@ -84,21 +90,21 @@ class DocumentImportService:
             label="DocumentImportService.import_document()",
         )
         with self._lock:
-            existing = self._imports_by_document_id.get(document_id)
+            existing = self._import_repository.get_by_document_id(document_id)
             if existing is not None:
                 if existing.status in {DocumentImportStatus.PENDING, DocumentImportStatus.RUNNING}:
                     raise DocumentImportAlreadyRunningException(document_id)
                 return DocumentImportResponse.from_domain(existing)
 
+            # 先确认文档存在，避免 PostgreSQL 外键错误覆盖稳定的 document_not_found API。
+            document = self._load_document(document_id)
             record = DocumentImportRecord(import_id=f"imp-{uuid4().hex}", document_id=document_id)
-            self._imports_by_id[record.import_id] = record
-            self._imports_by_document_id[document_id] = record
             record.mark_running()
+            self._import_repository.save(record)
 
         self._publish(record, "document.import.started", "Document import started")
 
         try:
-            document = self._load_document(document_id)
             self._validate_document_state(document)
             self._validate_document_type(document)
 
@@ -123,6 +129,7 @@ class DocumentImportService:
 
             with self._lock:
                 record.mark_completed()
+                self._import_repository.save(record)
 
             self._publish(record, "document.import.completed", "Document import completed")
             # 记录真实导入状态，帮助初学者确认状态推进已完成。
@@ -149,11 +156,13 @@ class DocumentImportService:
         except AppException as exc:
             with self._lock:
                 record.mark_failed(exc.error_code.value, exc.message)
+                self._import_repository.save(record)
             self._publish(record, "document.import.failed", "Document import failed", error_code=exc.error_code.value)
             raise
         except Exception as exc:  # noqa: BLE001
             with self._lock:
                 record.mark_failed(ErrorCode.REPOSITORY_ERROR.value, "Repository operation failed")
+                self._import_repository.save(record)
             self._publish(record, "document.import.failed", "Document import failed", error_code=ErrorCode.REPOSITORY_ERROR.value)
             raise AppException(
                 ErrorCode.REPOSITORY_ERROR,
@@ -178,7 +187,7 @@ class DocumentImportService:
             label="DocumentImportService.get_import()",
         )
         with self._lock:
-            record = self._imports_by_id.get(import_id)
+            record = self._import_repository.get(import_id)
             if record is None:
                 # 单独记录未命中，帮助初学者区分查询完成和业务 404。
                 trace_step(

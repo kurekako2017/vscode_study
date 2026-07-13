@@ -16,6 +16,8 @@ from app.core.learning_trace import finalize_learning_trace, trace_request_body,
 from app.observability.logging import get_logger, log_event
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.task_repository import TaskRepository
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.db.unit_of_work import InMemoryUnitOfWork
 from app.workflow.graph import AnalysisWorkflow
 from app.workflow.state import AnalysisState
 
@@ -36,6 +38,7 @@ class TaskService:
         event_publisher: EventPublisher,         # 事件发布器接口
         workflow: AnalysisWorkflow,                # 分析工作流接口
         provider_name: str = "static",              # 分析报告提供者名称
+        unit_of_work: UnitOfWork | None = None,       # 跨 Repository 原子事务
     ) -> None:
         """注入接口依赖，使 Service 不绑定 InMemory Repository 的具体实现。"""
 
@@ -44,6 +47,7 @@ class TaskService:
         self._event_publisher = event_publisher             # 事件发布器接口
         self._workflow = workflow                           # 分析工作流接口
         self._provider_name = provider_name                 # 分析报告提供者名称
+        self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
 
     def create_task(self, question: str, mode: str) -> Task:
         """建立 queued 任务并发布首个进度事件。"""
@@ -274,9 +278,17 @@ class TaskService:
                 markdown=final_state["report_markdown"],
                 provider=self._provider_name,
             )
-            self._report_repository.save(report)
             task.transition(TaskStatus.COMPLETED)
-            self._task_repository.save(task)
+            # 报告、Task completed 与 done 事件必须同成同败，避免重启后看到半完成状态。
+            with self._unit_of_work.transaction():
+                self._report_repository.save(report)
+                self._task_repository.save(task)
+                self._event_publisher.publish(
+                    task_id,
+                    "done",
+                    "Task completed",
+                    {"status": "completed", "report_path": f"/api/tasks/{task_id}/report"},
+                )
             trace_step(
                 "POST",  # HTTP 方法
                 "/api/tasks",  # API 路径
@@ -298,12 +310,6 @@ class TaskService:
                 task_id=task_id,  # 当前任务ID
                 status=task.status.value,  # 当前任务状态
                 duration_ms=duration_ms,  # 耗时
-            )
-            self._event_publisher.publish(
-                task_id,  # 当前任务ID
-                "done",  # event_type
-                "Task completed",  # message
-                {"status": "completed", "report_path": f"/api/tasks/{task_id}/report"},  # event data
             )
             trace_step(
                 "POST",  # HTTP 方法
