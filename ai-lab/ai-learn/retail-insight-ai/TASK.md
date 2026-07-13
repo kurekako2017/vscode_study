@@ -1,6 +1,20 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-12
+最后更新：2026-07-13
+
+## 2026-07-13 ERIP Enterprise Phase 2A
+
+- [x] 新增无密码、无建库、无 schema 修改的 PostgreSQL 开发验证脚本
+- [x] 建立不含迁移版本、不会升级数据库的 Alembic Baseline
+- [x] 建立默认关闭且不生成向量、不访问外部 API 的 Embedding Foundation
+- [x] 完成 Backend、Alembic、Embedding、InMemory 与 PostgreSQL 回归
+- 完成记录：Backend 125 tests（默认模式 PostgreSQL suite 跳过）、定向 10 tests、InMemory 14 tests、PostgreSQL 4 tests 与 compileall 均通过。
+
+## 2026-07-13 ERIP Phase 1 Complete PostgreSQL Persistence Bundle
+
+- [x] 保持默认 InMemory，并补齐可显式启用的完整 PostgreSQL Repository Bundle
+- [x] 完成通用事件流、Approval 唯一版本事实源、核心 Unit of Work 与双后端契约测试
+- [x] 全量验证与真实 PostgreSQL Integration Tests 均通过
 
 ## 2026-07-12 Scenario01 Business Sample Data
 

@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     data_provider: Literal["static"] = "static"
     llm_provider: Literal["stub"] = "stub"
     internal_rag_use_llm: bool = False
+    # Phase 2A 只开放 Embedding 配置接缝；默认关闭，任何 Provider 都不会执行向量生成。
+    embedding_provider: Literal["disabled", "local", "openai", "openrouter", "nvidia"] = "disabled"
+    embedding_model: str | None = None
+    embedding_dimensions: int | None = Field(default=None, gt=0)
     learning_trace: bool = False
     repository_backend: Literal["inmemory", "postgres"] = "inmemory"
     # PostgreSQL 模式优先使用标准 DATABASE_URL；InMemory 默认模式不会读取或连接它。

@@ -60,7 +60,7 @@ class PostgresApprovalRepository:
                         status=EXCLUDED.status,approver_id=EXCLUDED.approver_id,
                         decision_at=EXCLUDED.decision_at,decision_reason=EXCLUDED.decision_reason,
                         revision_no=EXCLUDED.revision_no,revised_from_version_id=EXCLUDED.revised_from_version_id,
-                        report_version_id=EXCLUDED.report_version_id
+                        report_version_id=EXCLUDED.report_version_id,updated_at=CURRENT_TIMESTAMP
                     """,
                     (
                         request.id,request.task_id,request.report_version_id,request.status.value,
@@ -72,7 +72,8 @@ class PostgresApprovalRepository:
     def get_approval_request(self, approval_id: str) -> ApprovalRequest | None:
         with self._connection_factory.connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(self._request_select() + " WHERE id=%s", (approval_id,))
+                # 审批决策事务读取时锁定当前请求，防止两个 reviewer 同时覆盖最终结果。
+                cursor.execute(self._request_select() + " WHERE id=%s FOR UPDATE", (approval_id,))
                 row = cursor.fetchone()
         return self._to_request(row) if row else None
 

@@ -377,7 +377,12 @@ class DocumentUploadService:
                 )
                 existing = self._repository.find_by_checksum(checksum)
                 if existing is not None:
-                    response = self._build_response(upload_id, existing.document_id, accepted_at)
+                    stored_session = self._upload_session_repository.get_by_checksum(checksum)
+                    response = (
+                        self._session_to_response(stored_session)
+                        if stored_session is not None
+                        else self._build_response(upload_id, existing.document_id, accepted_at)
+                    )
                     self._cache_result(idempotency_key, checksum, response)
                     # 重复文件没有完成保存，Learning Trace 只显示已有文档读取结果。
                     trace_step(

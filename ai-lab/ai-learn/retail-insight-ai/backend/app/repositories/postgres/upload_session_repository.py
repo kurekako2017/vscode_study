@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from app.db.connection import PostgresConnectionFactory
 from app.models.upload import UploadSessionRecord
+from app.errors.base import AppException
+from app.errors.error_codes import ErrorCode
 
 
 class PostgresUploadSessionRepository:
@@ -32,9 +34,19 @@ class PostgresUploadSessionRepository:
                 if record.idempotency_key is not None:
                     cursor.execute(
                         """INSERT INTO upload_idempotency_keys (idempotency_key,upload_id,checksum)
-                        VALUES (%s,%s,%s) ON CONFLICT (idempotency_key) DO NOTHING""",
+                        VALUES (%s,%s,%s)
+                        ON CONFLICT (idempotency_key) DO UPDATE SET
+                            upload_id=upload_idempotency_keys.upload_id
+                        WHERE upload_idempotency_keys.checksum=EXCLUDED.checksum""",
                         (record.idempotency_key, record.upload_id, record.checksum),
                     )
+                    if cursor.rowcount == 0:
+                        raise AppException(
+                            ErrorCode.IDEMPOTENCY_CONFLICT,
+                            "Same idempotency key was reused with a different file.",
+                            409,
+                            detail={"idempotency_key": record.idempotency_key},
+                        )
 
     def get_by_checksum(self, checksum: str) -> UploadSessionRecord | None:
         return self._get("checksum", checksum)

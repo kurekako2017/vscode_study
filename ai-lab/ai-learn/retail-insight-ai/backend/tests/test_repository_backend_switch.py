@@ -54,6 +54,17 @@ class RepositoryBackendSwitchTest(unittest.TestCase):
         self.assertIsInstance(container.document_import_repository, PostgresDocumentImportRepository)
         self.assertIsInstance(container.upload_session_repository, PostgresUploadSessionRepository)
 
+    def test_postgres_startup_failure_does_not_fallback_to_inmemory(self) -> None:
+        with (
+            patch("app.config.container.PostgresConnectionFactory.initialize_schema"),
+            patch(
+                "app.config.container.PostgresConnectionFactory.health_check",
+                side_effect=RuntimeError("database unavailable"),
+            ),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "database unavailable"):
+                build_container(Settings(repository_backend="postgres", log_level="CRITICAL"))
+
 
 if __name__ == "__main__":
     unittest.main()

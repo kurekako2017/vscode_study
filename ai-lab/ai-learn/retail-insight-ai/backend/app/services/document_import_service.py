@@ -46,6 +46,8 @@ from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.document_repository import DocumentRepository
 from app.repositories.interfaces.document_import_repository import DocumentImportRepository
 from app.repositories.implementations.in_memory.document_import_repository import InMemoryDocumentImportRepository
+from app.repositories.interfaces.unit_of_work import UnitOfWork
+from app.db.unit_of_work import InMemoryUnitOfWork
 from app.schemas.document_import_api import DocumentImportResponse
 
 logger = get_logger(__name__)
@@ -66,6 +68,7 @@ class DocumentImportService:
         repository: DocumentRepository,
         event_publisher: EventPublisher,
         import_repository: DocumentImportRepository | None = None,
+        unit_of_work: UnitOfWork | None = None,
     ) -> None:
         """保存文档仓储、事件发布器和可切换的导入会话仓储。"""
 
@@ -73,8 +76,15 @@ class DocumentImportService:
         self._event_publisher = event_publisher
         self._lock = RLock()
         self._import_repository = import_repository or InMemoryDocumentImportRepository()
+        self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
 
     def import_document(self, document_id: str) -> DocumentImportResponse:
+        """原子提交 ImportRecord、Document 状态与 Import Event。"""
+
+        with self._unit_of_work.transaction():
+            return self._import_document(document_id)
+
+    def _import_document(self, document_id: str) -> DocumentImportResponse:
         """执行同步导入：校验、验证、状态更新和事件发布。"""
 
         # 记录进入导入 Service，区分 Router 接收请求和导入业务流程。

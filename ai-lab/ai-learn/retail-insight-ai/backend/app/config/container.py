@@ -145,6 +145,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         document_repository,
         event_publisher,
         repositories.document_import,
+        repositories.unit_of_work,
     )
     #  创建服务，注入仓库和事件发布器   
     document_chunk_service = DocumentChunkService(document_repository, document_chunk_repository, event_publisher)

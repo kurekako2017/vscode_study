@@ -1,6 +1,30 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-12
+最后更新：2026-07-13
+
+## 2026-07-13 ERIP Enterprise Phase 2A
+
+- [x] 新增统一临时 PostgreSQL 环境与测试入口的 `scripts/dev_postgres.sh`
+- [x] 建立 Alembic 空基线，保留 `schema.sql` 且不生成或执行 migration
+- [x] 建立 Embedding Interface、Configuration、Provider 与 Factory，默认禁用执行
+- [x] 验证 Backend、InMemory 与 PostgreSQL 既有行为不回归
+
+### 完成记录
+
+- 2026-07-13：Phase 2A 验证完成；未生成 migration、未升级数据库、未生成向量、未访问模型 API。
+
+## 2026-07-13 ERIP Phase 1 Complete PostgreSQL Persistence Bundle
+
+- [x] PostgreSQL 完整覆盖 Task、Report、Event、Document、Chunk、Import、Approval、Audit 与 Upload Session
+- [x] PostgreSQL 模式禁止混入 InMemory Repository，连接失败不静默回退
+- [x] Task completion、Approval、Document Upload 接入共享事务边界
+- [x] InMemory/API/Frontend/Build/compileall 全量验证通过
+- [x] 使用隔离的 `DATABASE_URL` 执行真实 PostgreSQL integration suite
+
+### 完成记录
+
+- 2026-07-13：完成 ERIP Phase 1 PostgreSQL Persistence Bundle；未接入 SQLite、Alembic、Docker、pgvector、Embedding 或 LLM。
+- 2026-07-13：真实 PostgreSQL Repository、事务回滚与重启持久化验证通过。
 
 ## 2026-07-12 Scenario01 Business Sample Data
 

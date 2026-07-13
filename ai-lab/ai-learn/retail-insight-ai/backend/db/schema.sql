@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS approval_requests (
     decision_at TIMESTAMPTZ NULL,
     decision_reason TEXT NULL,
     revision_no INTEGER NOT NULL DEFAULT 1 CHECK (revision_no > 0),
-    revised_from_version_id TEXT NULL REFERENCES report_versions(id) ON DELETE RESTRICT
+    revised_from_version_id TEXT NULL REFERENCES report_versions(id) ON DELETE RESTRICT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS approval_events (
