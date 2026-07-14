@@ -1,15 +1,16 @@
-"""InMemoryKeywordRetrieval 的本地实现。
+"""Document Retrieval Provider 的本地编排实现。
 
 文件职责：
-- 提供当前阶段可运行的 keyword-only 文档检索后端。
-- 读取文档与 chunk 仓储，完成过滤、评分、排序和结果组装。
+- 提供 keyword、vector 与 hybrid 三种兼容检索模式。
+- 读取文档与 chunk 仓储，完成过滤、cosine 评分、融合和稳定排序。
 
 谁会调用它：
 - `DocumentRetrievalService` 调用它，而不是直接碰 chunk 仓储。
 
 它调用谁：
-- `DocumentRepository` 读取文档事实。
-- `DocumentChunkRepository` 读取已生成 chunk。
+- `DocumentRepository` 读取文档与当前版本事实。
+- `DocumentChunkRepository` 读取 chunk 或执行 backend-native cosine 查询。
+- `EmbeddingService` 只在 vector/hybrid 需要时生成 query embedding。
 
 输入是什么：
 - `DocumentRetrievalSearchRequest`。
@@ -18,10 +19,10 @@
 - 检索结果列表与总命中数。
 
 为什么需要这一层：
-- 先把检索算法放进 provider 边界，service 只保留 API/事件语义，后续替换 PostgreSQL full-text 或 hybrid search 时可以维持同一合同。
+- 检索算法留在 provider 边界，service 只保留 API/事件语义，SQL 不会上浮到 API。
 
 日本现场面试怎么讲：
-- 这是当前阶段的 InMemoryKeywordRetrieval，核心 service 不依赖 raw chunk storage，未来搜索后端可以无痛替换。
+- 这是 Strategy + Repository 的组合：默认 keyword 不变，vector 使用同一仓储合同，hybrid 负责融合而不做 rerank。
 """
 
 from __future__ import annotations
@@ -29,7 +30,7 @@ from __future__ import annotations
 import re
 
 from app.config.retrieval import HybridRetrievalConfig
-from app.embeddings.service import EmbeddingProviderError, EmbeddingService
+from app.embeddings.service import EmbeddingProviderError, EmbeddingService, EmbeddingValidationError
 from app.errors.base import AppException
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import InvalidQueryException
@@ -64,7 +65,7 @@ class InMemoryKeywordRetrieval(DocumentRetrievalProvider):
     def search(self, request: DocumentRetrievalSearchRequest) -> tuple[list[DocumentRetrievalResultResponse], int]:
         """执行 keyword-only 检索，返回稳定排序后的结果。"""
 
-        self._validate_limit(request.limit)
+        self._validate_limit(request.effective_limit)
         document_type = self._parse_document_type(request.document_type)
         language = self._parse_language(request.language)
 
@@ -273,7 +274,7 @@ class VectorDocumentRetrieval(DocumentRetrievalProvider):
         by_id = {document.document_id: document for document in documents}
         try:
             query_embedding = self._embedding_service.embed_text(query)
-        except EmbeddingProviderError as exc:
+        except (EmbeddingProviderError, EmbeddingValidationError) as exc:
             raise AppException(
                 ErrorCode.RETRIEVAL_UNAVAILABLE,
                 "Embedding provider failed during vector retrieval",
@@ -284,6 +285,7 @@ class VectorDocumentRetrieval(DocumentRetrievalProvider):
             query_embedding,
             limit=request.effective_limit,
             document_ids=list(by_id),
+            document_versions={document.document_id: document.version for document in documents},
         )
         results: list[DocumentRetrievalResultResponse] = []
         for match in matches:

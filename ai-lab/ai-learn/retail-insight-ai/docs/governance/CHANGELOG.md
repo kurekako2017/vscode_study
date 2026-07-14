@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-14 ERIP Embedding + Vector/Hybrid Retrieval
+
+- 新增固定 384 维 Embedding Contract、显式 deterministic test provider 和统一输出验证，不调用外部 API。
+- `DocumentChunkRepository` 双 backend 支持可空向量、更新、读取和 cosine 检索；API 不暴露原始 embedding。
+- Document Retrieval 兼容默认 keyword，并新增 vector/hybrid、top_k、document filter、稳定 score 与 fallback。
+- 新增 `20260714_02_chunk_embeddings` migration 和 cosine HNSW schema 基线，downgrade 不删除共享 vector extension。
+- 默认 Baseline 全绿；真实 pgvector migration 因 PostgreSQL 16 系统未安装 extension 而阻塞，失败事务已完整回滚。
+
 ## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
 
 - 重新执行 `./scripts/run_tests.sh`，确认 Backend tests、Frontend tests、Frontend build 与 Python compileall 可通过。

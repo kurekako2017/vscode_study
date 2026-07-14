@@ -10,7 +10,8 @@
 
 from __future__ import annotations
 
-from app.config.settings import Settings
+from typing import TYPE_CHECKING
+
 from app.embeddings.config import EmbeddingConfig
 from app.embeddings.interface import EmbeddingProvider
 from app.embeddings.provider import (
@@ -18,6 +19,9 @@ from app.embeddings.provider import (
     DeterministicTestEmbeddingProvider,
     DisabledEmbeddingProvider,
 )
+
+if TYPE_CHECKING:
+    from app.config.settings import Settings
 
 
 class EmbeddingProviderFactory:

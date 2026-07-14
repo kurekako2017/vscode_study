@@ -229,6 +229,49 @@ class DocumentRetrievalAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(second.status_code, 200)
         self.assertEqual(first.json()["data"], second.json()["data"])
 
+    async def test_explicit_vector_mode_requires_configured_embedding_provider(self) -> None:
+        response = await self._search_documents(
+            {"query": "vector query", "retrieval_mode": "vector"}
+        )
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json()["error"]["code"], ErrorCode.RETRIEVAL_UNAVAILABLE.value)
+
+    async def test_vector_and_hybrid_modes_run_with_explicit_test_provider(self) -> None:
+        await self.client.aclose()
+        settings = Settings(
+            workflow_step_delay_seconds=0,
+            log_level="CRITICAL",
+            embedding_provider="deterministic_test",
+            embedding_model="deterministic-test-sha256-v1",
+        )
+        self.app = create_app(settings)
+        self.client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=self.app),
+            base_url="http://test",
+        )
+        await self._prepare_searchable_document(
+            filename="vector.txt",
+            content=b"semantic evidence without query terms",
+            title="Vector Evidence",
+            tags=["vector"],
+            content_type="text/plain",
+        )
+
+        vector = await self._search_documents(
+            {"query": "unrelated vector query", "retrieval_mode": "vector", "top_k": 1}
+        )
+        hybrid = await self._search_documents(
+            {"query": "unrelated vector query", "retrieval_mode": "hybrid", "top_k": 1}
+        )
+
+        self.assertEqual(vector.status_code, 200)
+        self.assertEqual(vector.json()["data"]["retrieval_mode"], "vector")
+        self.assertEqual(vector.json()["data"]["results"][0]["retrieval_method"], "vector")
+        self.assertEqual(hybrid.status_code, 200)
+        self.assertEqual(hybrid.json()["data"]["retrieval_mode"], "hybrid")
+        self.assertEqual(hybrid.json()["data"]["results"][0]["retrieval_method"], "hybrid")
+
 
 if __name__ == "__main__":
     unittest.main()

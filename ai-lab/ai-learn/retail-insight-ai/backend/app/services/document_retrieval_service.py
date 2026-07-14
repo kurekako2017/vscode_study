@@ -3,7 +3,7 @@
 文件职责：
 - 提供 POST /api/v1/document-retrieval/search 的应用服务入口。
 - 负责检索事件、错误语义和 HTTP contract 的稳定边界。
-- 把实际 keyword 搜索下放给 retrieval provider，避免 service 直接依赖 raw chunk storage。
+- 把 keyword/vector/hybrid 搜索下放给 retrieval provider，避免 service 依赖 raw chunk storage。
 
 谁会调用它：
 - `backend/app/api/document_retrieval.py` 路由通过依赖注入调用它。
@@ -13,16 +13,16 @@
 - `EventPublisher` 记录检索事件。
 
 输入是什么：
-- keyword 查询、limit、归档过滤、文档类型、语言和标签过滤。
+- query、retrieval mode、top_k/limit 和文档元数据过滤。
 
 输出是什么：
 - `DocumentRetrievalSearchResponse`，或者抛出稳定的应用异常。
 
 为什么需要这一层：
-- 检索 service 只保留 API 和事件边界，未来 full-text search、hybrid search 或 PostgreSQL 后端替换时不需要改 route。
+- 检索 service 只保留 API 和事件边界，向量 SQL、融合权重和 fallback 都留在 provider/repository。
 
 日本现场面试怎么讲：
-- 这是文档检索的应用服务层，真正的 keyword ranking 已经下沉到 provider，service 不再直接碰 chunk storage。
+- 这是文档检索应用层：HTTP contract 稳定，三种检索策略由组合根注入。
 """
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ class DocumentRetrievalService:
         self._lock = RLock()
 
     def search(self, request: DocumentRetrievalSearchRequest) -> DocumentRetrievalSearchResponse:
-        """执行 keyword-only 检索，并返回稳定的结果排序。"""
+        """执行请求指定的检索模式，并返回稳定排序与真实 mode。"""
 
         scope_id = self._scope_id()
         with self._lock:

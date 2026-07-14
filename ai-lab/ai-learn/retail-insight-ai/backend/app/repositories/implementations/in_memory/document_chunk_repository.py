@@ -28,7 +28,7 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import replace
 import math
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from threading import RLock
 
 from app.embeddings.service import validate_embedding_vector
@@ -85,6 +85,7 @@ class InMemoryDocumentChunkRepository:
         *,
         limit: int,
         document_ids: Sequence[str] | None = None,
+        document_versions: Mapping[str, int] | None = None,
     ) -> list[VectorChunkMatch]:
         """在内存中计算 cosine，作为默认 backend 的兼容实现。"""
 
@@ -100,6 +101,11 @@ class InMemoryDocumentChunkRepository:
                     if chunk.embedding is None:
                         continue
                     if allowed is not None and chunk.document_id not in allowed:
+                        continue
+                    if (
+                        document_versions is not None
+                        and document_versions.get(chunk.document_id) != chunk.version
+                    ):
                         continue
                     chunk_norm = math.sqrt(sum(value * value for value in chunk.embedding))
                     if query_norm == 0 or chunk_norm == 0:

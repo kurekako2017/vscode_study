@@ -2,6 +2,16 @@
 
 最后更新：2026-07-14
 
+## 2026-07-14 ERIP Embedding + Vector/Hybrid Retrieval
+
+- [x] 完成固定 384 维 Embedding Contract、deterministic test provider 与输入输出校验
+- [x] 完成 Chunk embedding 的 InMemory/PostgreSQL 持久化合同与 cosine 查询
+- [x] 完成兼容默认 keyword 的 vector/hybrid retrieval、过滤、融合、去重和 fallback
+- [x] 新增独立 `20260714_02_chunk_embeddings` revision，不修改 Initial Revision 文件
+- [x] 默认 InMemory Baseline：Backend 140 tests（PostgreSQL suite 预期 skip 1）、Frontend 47/47、build、compileall 全绿
+- [ ] 安装 PostgreSQL 16 pgvector 系统包后执行 upgrade/downgrade/re-upgrade 与 PostgreSQL 完整回归
+- 阻塞记录：本机缺少 `/usr/share/postgresql/16/extension/vector.control`；migration 已事务回滚，测试库仍为 `20260714_01_initial_schema`，未残留 extension 或 embedding 列。
+
 ## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
 
 - [x] 检查 Git 工作区状态并确认未覆盖用户修改

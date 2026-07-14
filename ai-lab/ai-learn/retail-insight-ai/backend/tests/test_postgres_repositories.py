@@ -8,6 +8,8 @@ from uuid import uuid4
 
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.db.unit_of_work import PostgresUnitOfWork
+from app.embeddings.provider import DeterministicTestEmbeddingProvider
+from app.embeddings.service import EmbeddingService
 from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
 from app.models.audit import AuditLog, AuditLogResult
 from app.models.document import Document, DocumentChunk, DocumentMetadata
@@ -116,6 +118,51 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
         self.assertEqual(self.chunk.list_for_document(document.document_id)[0].content, "persistent keyword")
         self.assertEqual(self.document_import.get(import_record.import_id).status.value, "completed")
         self.assertEqual(self.upload.get_by_idempotency_key("idem-1").upload_id, session.upload_id)
+
+        stored = self.chunk.list_for_document(document.document_id)[0]
+        self.assertIsNone(stored.embedding)
+        embedding = EmbeddingService(DeterministicTestEmbeddingProvider()).embed_text("persistent keyword")
+        self.chunk.update_embedding(chunk.chunk_id, embedding)
+        restarted_chunk_repository = PostgresDocumentChunkRepository(self.connection_factory)
+        persisted = restarted_chunk_repository.list_for_document(document.document_id)[0]
+        self.assertEqual(len(persisted.embedding or ()), len(embedding))
+        for stored_value, expected_value in zip(persisted.embedding or (), embedding, strict=True):
+            self.assertAlmostEqual(stored_value, expected_value, places=6)
+        matches = restarted_chunk_repository.search_by_embedding(
+            embedding,
+            limit=1,
+            document_ids=[document.document_id],
+        )
+        self.assertEqual(matches[0].chunk.chunk_id, chunk.chunk_id)
+        self.assertAlmostEqual(matches[0].cosine_similarity, 1.0, places=6)
+
+    def test_pgvector_schema_contract(self) -> None:
+        """真实数据库必须存在 extension、vector(384) 列和 cosine HNSW 索引。"""
+
+        with self.connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT extversion FROM pg_extension WHERE extname='vector'")
+                self.assertIsNotNone(cursor.fetchone())
+                cursor.execute(
+                    """
+                    SELECT format_type(a.atttypid, a.atttypmod)
+                    FROM pg_attribute a
+                    JOIN pg_class c ON c.oid=a.attrelid
+                    WHERE c.relname='document_chunks' AND a.attname='embedding'
+                      AND a.attnum > 0 AND NOT a.attisdropped
+                    """
+                )
+                self.assertEqual(cursor.fetchone(), ("vector(384)",))
+                cursor.execute(
+                    """
+                    SELECT indexdef FROM pg_indexes
+                    WHERE tablename='document_chunks'
+                      AND indexname='idx_document_chunks_embedding_hnsw'
+                    """
+                )
+                index_row = cursor.fetchone()
+                self.assertIsNotNone(index_row)
+                self.assertIn("vector_cosine_ops", index_row[0])
 
     def test_approval_report_version_and_audit_contract(self) -> None:
         task = self._task()

@@ -16,11 +16,11 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-_SCHEMA_PATH = Path(__file__).resolve().parents[2] / "db" / "schema.sql"
+_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "sql" / "20260714_01_initial_schema.sql"
 
 
 def upgrade() -> None:
-    """把 `schema.sql` 作为初始基线执行，避免 migration 和手写 DDL 分叉。"""
+    """执行冻结的 Phase 2B Schema，确保历史 revision 不随最新 Schema 漂移。"""
 
     op.execute(_SCHEMA_PATH.read_text(encoding="utf-8"))
 

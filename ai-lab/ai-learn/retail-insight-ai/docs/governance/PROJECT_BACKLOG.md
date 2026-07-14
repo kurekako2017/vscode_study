@@ -2,6 +2,22 @@
 
 最后更新：2026-07-14
 
+## 2026-07-14 ERIP Embedding + pgvector + Vector/Hybrid Retrieval
+
+- [x] 建立固定 384 维 Embedding Contract 与基于 SHA-256 的 deterministic test provider
+- [x] 校验空文本、空批次、错误维度、NaN/Infinity 和 Provider 异常
+- [x] 扩展同一 Chunk Repository Contract，支持 NULL、写入、更新、读取与 cosine 检索
+- [x] 保持默认 `REPOSITORY_BACKEND=inmemory` 与默认 keyword contract，新增 vector/hybrid mode
+- [x] Hybrid 完成两路分数归一化、集中权重、chunk_id 去重、稳定 tie-break 与无向量 fallback
+- [x] 新增 `20260714_02_chunk_embeddings`：vector extension、`vector(384)`、cosine HNSW；downgrade 保留共享 extension
+- [x] 默认完整 Baseline 通过：Backend 140（skip 1）、Frontend 47/47、build、compileall
+- [ ] 安装 `postgresql-16-pgvector` 后完成真实 migration 往返与 PostgreSQL skipped=0 回归
+
+### 阻塞记录
+
+- `pg_available_extensions` 中没有 `vector`；`alembic upgrade head` 在 `CREATE EXTENSION` 明确失败并完整回滚。
+- 安装后的唯一继续动作：`sudo apt-get update && sudo apt-get install -y postgresql-16-pgvector`，然后只对 `erip_integration_test` 执行 migration 与 PostgreSQL Baseline。
+
 ## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
 
 - [x] 检查 Git 工作区状态，确认本轮开始前无未提交修改

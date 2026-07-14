@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 
 from app.db.connection import PostgresConnectionFactory
@@ -81,6 +81,7 @@ class PostgresDocumentChunkRepository:
         *,
         limit: int,
         document_ids: Sequence[str] | None = None,
+        document_versions: Mapping[str, int] | None = None,
     ) -> list[VectorChunkMatch]:
         """使用 pgvector `<=>` cosine distance，并以稳定字段完成 tie-break。"""
 
@@ -94,6 +95,14 @@ class PostgresDocumentChunkRepository:
                 return []
             where += " AND document_id = ANY(%s)"
             parameters.append(list(document_ids))
+        if document_versions is not None:
+            if not document_versions:
+                return []
+            version_pairs = list(document_versions.items())
+            placeholders = ",".join(["(%s,%s)"] * len(version_pairs))
+            where += f" AND (document_id,version) IN ({placeholders})"
+            for document_id, version in version_pairs:
+                parameters.extend([document_id, version])
         parameters.extend([literal, limit])
         with self._connection_factory.connection() as connection:
             with connection.cursor() as cursor:

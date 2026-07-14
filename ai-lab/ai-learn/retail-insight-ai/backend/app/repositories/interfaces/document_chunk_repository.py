@@ -25,7 +25,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
@@ -65,6 +65,7 @@ class DocumentChunkRepository(Protocol):
         *,
         limit: int,
         document_ids: Sequence[str] | None = None,
+        document_versions: Mapping[str, int] | None = None,
     ) -> list[VectorChunkMatch]:
         """按 cosine similarity 查询带向量的 chunks。"""
 

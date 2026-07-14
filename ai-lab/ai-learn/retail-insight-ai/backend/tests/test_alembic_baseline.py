@@ -44,7 +44,23 @@ class AlembicBaselineTest(unittest.TestCase):
         source = migration_path.read_text(encoding="utf-8")
         self.assertIn("CREATE EXTENSION IF NOT EXISTS vector", source)
         self.assertIn("USING hnsw (embedding vector_cosine_ops)", source)
+        self.assertIn("DROP COLUMN IF EXISTS embedding", source)
         self.assertNotIn("DROP EXTENSION", source)
+
+    def test_initial_revision_uses_frozen_pre_vector_schema(self) -> None:
+        """历史基线必须固定，pgvector 只能由后续 revision 引入。"""
+
+        backend_dir = Path(__file__).resolve().parents[1]
+        initial_path = backend_dir / "alembic" / "versions" / "20260714_01_initial_schema.py"
+        frozen_schema_path = backend_dir / "alembic" / "sql" / "20260714_01_initial_schema.sql"
+        initial_source = initial_path.read_text(encoding="utf-8")
+        frozen_schema = frozen_schema_path.read_text(encoding="utf-8").lower()
+
+        self.assertIn('"sql" / "20260714_01_initial_schema.sql"', initial_source)
+        self.assertNotIn('"db" / "schema.sql"', initial_source)
+        self.assertNotIn("create extension", frozen_schema)
+        self.assertNotIn("embedding vector", frozen_schema)
+        self.assertNotIn("using hnsw", frozen_schema)
 
     def test_database_url_is_not_persisted_in_alembic_ini(self) -> None:
         backend_dir = Path(__file__).resolve().parents[1]
