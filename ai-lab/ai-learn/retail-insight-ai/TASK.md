@@ -2,6 +2,15 @@
 
 最后更新：2026-07-14
 
+## 2026-07-14 ERIP Enterprise Reranker
+
+- [x] 建立独立 `RerankerProvider` / `RerankerService`，Repository 继续只负责候选召回
+- [x] 建立可配置 Top-N（默认 20）与 Final Top-K，并保持既有 Internal RAG API contract
+- [x] 完成基于关键词覆盖率、retrieval score、位置与 SHA-256 tie-break 的 deterministic reranker
+- [x] 完成 disabled、missing provider、provider exception 的无损 retrieval-order fallback
+- [x] 完成 InMemory 154 tests（skip 1）与 PostgreSQL 159 tests（skip 0）完整回归
+- 完成记录：Frontend 47/47、production build、compileall 全绿；未修改 Repository、Migration、Schema、Frontend、README、learning 或 handbook。
+
 ## 2026-07-14 ERIP Embedding + Vector/Hybrid Retrieval
 
 - [x] 完成固定 384 维 Embedding Contract、deterministic test provider 与输入输出校验

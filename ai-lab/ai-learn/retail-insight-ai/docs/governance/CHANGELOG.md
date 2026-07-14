@@ -2,6 +2,13 @@
 
 # CHANGELOG
 
+## 2026-07-14 ERIP Enterprise Reranker
+
+- 新增独立 Reranker contract、deterministic provider、集中配置与 service，使用关键词覆盖率、原 retrieval score、位置和 SHA-256 稳定排序。
+- Internal RAG 现在按 `DocumentRetrievalService -> Top-N -> RerankerService -> Final Top-K` 编排；不修改 chunk 内容、retrieval score、Repository 或既有 API contract。
+- disabled、provider 缺失或异常时保留 retrieval 顺序并返回正常结果，同时记录 reranker fallback 事件元数据。
+- 新增 13 个 reranker/pipeline/fallback 测试；InMemory 154（skip 1）、PostgreSQL 159（skip 0）、Frontend 47/47、build、compileall 全绿。
+
 ## 2026-07-14 ERIP Embedding + Vector/Hybrid Retrieval
 
 - 新增固定 384 维 Embedding Contract、显式 deterministic test provider 和统一输出验证，不调用外部 API。

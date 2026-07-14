@@ -1,7 +1,7 @@
 """Internal RAG 应用服务。
 
 文件职责：
-- 在 existing DocumentRetrievalProvider 之上组装 grounded answer。
+- 在 existing DocumentRetrievalService 之上组装 grounded answer。
 - 负责 internal_rag.started / retrieval_completed / answer_generated / failed 事件。
 - 维持 answer_mode、citation 和 confidence 的确定性输出。
 
@@ -9,7 +9,7 @@
 - `backend/app/api/internal_rag.py` 路由通过依赖注入调用它。
 
 它调用谁：
-- `DocumentRetrievalProvider` 获取检索结果。
+- `DocumentRetrievalService` 获取 Top-N 检索候选。
 - `RerankerService` 对 retrieval 候选执行独立二阶段排序。
 - `EventPublisher` 记录 internal RAG 事件。
 
@@ -42,13 +42,13 @@ from app.events.publisher import EventPublisher
 from app.models.document import DocumentType, Language
 from app.models.internal_rag import InternalRagWarning
 from app.observability.logging import get_logger, get_request_id, log_event
-from app.repositories.interfaces.document_retrieval_provider import DocumentRetrievalProvider
 from app.schemas.document_retrieval_api import DocumentRetrievalSearchRequest
 from app.schemas.internal_rag_api import (
     InternalRagAnswerRequest,
     InternalRagAnswerResponse,
 )
 from app.services.internal_rag_evaluation_service import InternalRagEvaluationService
+from app.services.document_retrieval_service import DocumentRetrievalService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.reranker_provider import DeterministicRerankerProvider
 from app.services.reranker_service import RerankerService
@@ -61,15 +61,15 @@ class InternalRagService:
 
     def __init__(
         self,
-        retrieval_provider: DocumentRetrievalProvider,
+        retrieval_service: DocumentRetrievalService,
         event_publisher: EventPublisher,
         answer_generator: RAGAnswerGenerator | None = None,
         evaluation_service: InternalRagEvaluationService | None = None,
         reranker_service: RerankerService | None = None,
     ) -> None:
-        """注入 retrieval provider 和事件发布器，保持 service 不直连 chunk storage。"""
+        """注入 retrieval/reranker service，保持 Internal RAG 不直连 Repository。"""
 
-        self._retrieval_provider = retrieval_provider
+        self._retrieval_service = retrieval_service
         self._event_publisher = event_publisher
         self._answer_generator = answer_generator or RAGAnswerGenerator()
         self._evaluation_service = evaluation_service or InternalRagEvaluationService()
@@ -107,7 +107,9 @@ class InternalRagService:
                     tags=request.tags,
                     retrieval_mode=request.retrieval_mode,
                 )
-                results, total_matches = self._retrieval_provider.search(retrieval_request)
+                retrieval_response = self._retrieval_service.search(retrieval_request)
+                results = retrieval_response.results
+                total_matches = retrieval_response.total
                 if not results:
                     raise InsufficientContextException(
                         {

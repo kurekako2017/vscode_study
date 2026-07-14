@@ -21,7 +21,7 @@ from time import perf_counter
 from app.config.reranker import RerankerConfig
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.schemas.document_retrieval_api import DocumentRetrievalResultResponse
-from app.schemas.reranker import RerankedDocumentChunk, RerankerOutcome
+from app.schemas.reranker import RerankedDocumentChunk, RerankerFallbackReason, RerankerOutcome
 from app.services.reranker_provider import RerankerProvider
 
 logger = get_logger(__name__)
@@ -103,7 +103,7 @@ class RerankerService:
         self,
         candidates: list[DocumentRetrievalResultResponse],
         top_k: int,
-        reason: str,
+        reason: RerankerFallbackReason,
     ) -> RerankerOutcome:
         """用独立包装保留 retrieval 顺序，明确本次没有产生 rerank score。"""
 
@@ -120,7 +120,7 @@ class RerankerService:
             chunks=wrapped,
             provider_name=self._provider.name if self._provider is not None else None,
             used_provider=False,
-            fallback_reason=reason,  # type: ignore[arg-type]
+            fallback_reason=reason,
         )
 
 

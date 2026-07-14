@@ -2,6 +2,20 @@
 
 最后更新：2026-07-14
 
+## 2026-07-14 ERIP Enterprise Reranker
+
+- [x] 冻结独立 reranker contract：query + retrieved chunks -> reranked chunks
+- [x] 保留原 chunk content、retrieval score 与 document metadata，独立输出 rerank_score、reason 与 metadata
+- [x] 建立 deterministic provider、集中配置、Top-N/Top-K 和稳定 SHA-256 tie-break
+- [x] Internal RAG 按 `DocumentRetrievalService -> RerankerService` 编排，Repository 与 retrieval API 不承载 rerank
+- [x] disabled、provider 缺失或异常时保留原 retrieval 顺序，不返回 500、不回退 backend
+- [x] 双 backend 回归完成：InMemory 154（skip 1）、PostgreSQL 159（skip 0）、Frontend 47/47、build、compileall
+
+### 完成记录
+
+- 2026-07-14：新增 10 个 reranker 单元测试和 3 个 Internal RAG pipeline/fallback API 测试。
+- 2026-07-14：完整 Baseline 中观察到既有 Frontend Vitest timeout 随机落在不同用例；独立复跑与最终两轮完整 Baseline 均为 47/47，未修改 Frontend。
+
 ## 2026-07-14 ERIP Embedding + pgvector + Vector/Hybrid Retrieval
 
 - [x] 建立固定 384 维 Embedding Contract 与基于 SHA-256 的 deterministic test provider

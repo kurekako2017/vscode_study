@@ -201,7 +201,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     )
     #  创建服务，注入仓库和事件发布器
     internal_rag_service = InternalRagService(
-        retrieval_provider=document_retrieval_provider,
+        retrieval_service=document_retrieval_service,
         event_publisher=event_publisher,
         answer_generator=rag_answer_generator,
         reranker_service=reranker_service,

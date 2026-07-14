@@ -14,11 +14,18 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.document_retrieval_api import DocumentRetrievalResultResponse
+
+RerankerFallbackReason: TypeAlias = Literal[
+    "none",
+    "disabled",
+    "missing_provider",
+    "provider_error",
+]
 
 
 class RerankedDocumentChunk(BaseModel):
@@ -40,7 +47,7 @@ class RerankerOutcome(BaseModel):
     chunks: tuple[RerankedDocumentChunk, ...]
     provider_name: str | None
     used_provider: bool
-    fallback_reason: Literal["none", "disabled", "missing_provider", "provider_error"] = "none"
+    fallback_reason: RerankerFallbackReason = "none"
 
 
-__all__ = ["RerankedDocumentChunk", "RerankerOutcome"]
+__all__ = ["RerankedDocumentChunk", "RerankerFallbackReason", "RerankerOutcome"]

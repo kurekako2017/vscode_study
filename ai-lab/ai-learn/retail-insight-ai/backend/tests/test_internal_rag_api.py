@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from unittest.mock import patch
 
 import httpx
 
@@ -182,6 +183,130 @@ class InternalRagAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(second.status_code, 200)
         self.assertEqual(first.json()["data"], second.json()["data"])
         self.assertTrue(first.json()["data"]["answer"].startswith("Summary:"))
+
+    async def test_hybrid_candidates_are_reranked_before_final_top_k(self) -> None:
+        """双 backend 都验证 Hybrid -> Top-N -> Reranker -> Final Top-K。"""
+
+        await self.client.aclose()
+        settings = Settings(
+            workflow_step_delay_seconds=0,
+            log_level="CRITICAL",
+            embedding_provider="deterministic_test",
+            embedding_model="deterministic-test-sha256-v1",
+            reranker_candidate_limit=20,
+        )
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
+        self.client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=self.app),
+            base_url="http://test",
+        )
+        await self._prepare_searchable_document(
+            filename="hybrid-reranker.md",
+            content=(
+                b"# Monthly Sales Policy\n\n"
+                b"Monthly sales policy includes discount review and approval evidence."
+            ),
+            title="Hybrid Reranker",
+            tags=["sales", "reranker"],
+        )
+
+        response = await self._answer_internal_rag(
+            {
+                "question": "monthly sales policy",
+                "limit": 1,
+                "retrieval_mode": "hybrid",
+                "answer_mode": "extractive",
+                "require_citations": True,
+            },
+            request_id="hybrid-reranker-request",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()["data"]
+        self.assertEqual(payload["retrieval_mode"], "hybrid")
+        self.assertEqual(len(payload["citations"]), 1)
+        events = self.app.state.container.event_repository.list_after(
+            "internal_rag:hybrid-reranker-request"
+        )
+        retrieval_event = next(
+            event for event in events if event.event_type == "internal_rag.retrieval_completed"
+        )
+        self.assertTrue(retrieval_event.data["reranker_used"])
+        self.assertEqual(retrieval_event.data["reranker_provider"], "deterministic")
+        self.assertEqual(retrieval_event.data["reranker_result_count"], 1)
+
+    async def test_disabled_reranker_preserves_retrieval_order_without_api_error(self) -> None:
+        await self.client.aclose()
+        settings = Settings(
+            workflow_step_delay_seconds=0,
+            log_level="CRITICAL",
+            reranker_enabled=False,
+        )
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
+        self.client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=self.app),
+            base_url="http://test",
+        )
+        await self._prepare_searchable_document(
+            filename="reranker-disabled.md",
+            content=b"# Sales Policy\n\nMonthly sales policy evidence.",
+            title="Reranker Disabled",
+            tags=["sales"],
+        )
+
+        response = await self._answer_internal_rag(
+            {
+                "question": "monthly sales policy",
+                "limit": 1,
+                "answer_mode": "extractive",
+                "require_citations": True,
+            },
+            request_id="reranker-disabled-request",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        events = self.app.state.container.event_repository.list_after(
+            "internal_rag:reranker-disabled-request"
+        )
+        retrieval_event = next(
+            event for event in events if event.event_type == "internal_rag.retrieval_completed"
+        )
+        self.assertFalse(retrieval_event.data["reranker_used"])
+        self.assertEqual(retrieval_event.data["reranker_fallback_reason"], "disabled")
+
+    async def test_reranker_provider_exception_falls_back_without_api_error(self) -> None:
+        await self._prepare_searchable_document(
+            filename="reranker-error.md",
+            content=b"# Sales Policy\n\nMonthly sales policy evidence.",
+            title="Reranker Error",
+            tags=["sales"],
+        )
+
+        with patch(
+            "app.services.reranker_provider.DeterministicRerankerProvider.rerank",
+            side_effect=RuntimeError("reranker unavailable"),
+        ):
+            response = await self._answer_internal_rag(
+                {
+                    "question": "monthly sales policy",
+                    "limit": 1,
+                    "answer_mode": "extractive",
+                    "require_citations": True,
+                },
+                request_id="reranker-error-request",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        events = self.app.state.container.event_repository.list_after(
+            "internal_rag:reranker-error-request"
+        )
+        retrieval_event = next(
+            event for event in events if event.event_type == "internal_rag.retrieval_completed"
+        )
+        self.assertFalse(retrieval_event.data["reranker_used"])
+        self.assertEqual(retrieval_event.data["reranker_fallback_reason"], "provider_error")
 
     async def test_no_context_returns_insufficient_context(self) -> None:
         await self._prepare_searchable_document(
