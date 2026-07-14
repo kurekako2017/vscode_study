@@ -10,6 +10,7 @@
 
 它调用谁：
 - `DocumentRetrievalProvider` 获取检索结果。
+- `RerankerService` 对 retrieval 候选执行独立二阶段排序。
 - `EventPublisher` 记录 internal RAG 事件。
 
 输入是什么：
@@ -49,6 +50,8 @@ from app.schemas.internal_rag_api import (
 )
 from app.services.internal_rag_evaluation_service import InternalRagEvaluationService
 from app.services.rag_answer_generator import RAGAnswerGenerator
+from app.services.reranker_provider import DeterministicRerankerProvider
+from app.services.reranker_service import RerankerService
 
 logger = get_logger(__name__)
 
@@ -62,6 +65,7 @@ class InternalRagService:
         event_publisher: EventPublisher,
         answer_generator: RAGAnswerGenerator | None = None,
         evaluation_service: InternalRagEvaluationService | None = None,
+        reranker_service: RerankerService | None = None,
     ) -> None:
         """注入 retrieval provider 和事件发布器，保持 service 不直连 chunk storage。"""
 
@@ -69,6 +73,7 @@ class InternalRagService:
         self._event_publisher = event_publisher
         self._answer_generator = answer_generator or RAGAnswerGenerator()
         self._evaluation_service = evaluation_service or InternalRagEvaluationService()
+        self._reranker_service = reranker_service or RerankerService(DeterministicRerankerProvider())
         # internal RAG 的输出必须稳定，所以这里沿用与 retrieval service 一样的进程内互斥锁。
         self._lock = RLock()
 
@@ -94,7 +99,8 @@ class InternalRagService:
 
                 retrieval_request = DocumentRetrievalSearchRequest(
                     query=question,
-                    limit=request.limit,
+                    # Retrieval 取 Top-N 候选，最终 Top-K 仍由既有 request.limit 决定。
+                    limit=self._reranker_service.candidate_limit_for(request.limit),
                     include_archived=request.include_archived,
                     document_type=self._document_type_filter(request.document_type),
                     language=self._language_filter(request.language),
@@ -110,6 +116,13 @@ class InternalRagService:
                             "total_matches": total_matches,
                         }
                     )
+
+                reranker_outcome = self._reranker_service.rerank(
+                    question,
+                    results,
+                    top_k=request.limit,
+                )
+                results = [item.chunk for item in reranker_outcome.chunks]
 
                 generation = self._answer_generator.generate(
                     request=request,
@@ -164,6 +177,14 @@ class InternalRagService:
                         "completion_tokens": generation.usage.completion_tokens,
                         "estimated_cost": generation.usage.estimated_cost,
                         "latency_ms": generation.usage.latency_ms,
+                        "reranker_provider": reranker_outcome.provider_name,
+                        "reranker_used": reranker_outcome.used_provider,
+                        "reranker_fallback_reason": reranker_outcome.fallback_reason,
+                        "reranker_candidate_count": min(
+                            total_matches,
+                            self._reranker_service.candidate_limit_for(request.limit),
+                        ),
+                        "reranker_result_count": len(results),
                     },
                 )
                 self._publish(
@@ -185,6 +206,9 @@ class InternalRagService:
                         "completion_tokens": generation.usage.completion_tokens,
                         "estimated_cost": generation.usage.estimated_cost,
                         "latency_ms": generation.usage.latency_ms,
+                        "reranker_provider": reranker_outcome.provider_name,
+                        "reranker_used": reranker_outcome.used_provider,
+                        "reranker_fallback_reason": reranker_outcome.fallback_reason,
                     },
                 )
                 return response

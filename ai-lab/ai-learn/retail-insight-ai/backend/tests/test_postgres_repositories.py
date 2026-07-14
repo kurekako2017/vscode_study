@@ -7,6 +7,7 @@ import unittest
 from uuid import uuid4
 
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
+from app.config.settings import Settings
 from app.db.unit_of_work import PostgresUnitOfWork
 from app.embeddings.provider import DeterministicTestEmbeddingProvider
 from app.embeddings.service import EmbeddingService
@@ -26,6 +27,7 @@ from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class PostgresRepositoryIntegrationTest(unittest.TestCase):
@@ -64,13 +66,7 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
         self.approval = PostgresApprovalRepository(factory)
         self.audit = PostgresAuditRepository(factory)
         self.uow = PostgresUnitOfWork(factory)
-        with factory.connection() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """TRUNCATE upload_idempotency_keys,upload_sessions,document_imports,
-                    document_chunks,documents,audit_logs,approval_events,approval_requests,
-                    report_versions,reports,events,tasks RESTART IDENTITY CASCADE"""
-                )
+        reset_postgres_state_if_needed(Settings(log_level="CRITICAL"))
 
     def test_task_report_and_generic_event_contract(self) -> None:
         task = self._task()

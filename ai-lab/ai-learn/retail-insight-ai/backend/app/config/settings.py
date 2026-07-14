@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     embedding_dimensions: int = Field(default=384, gt=0)
     hybrid_keyword_weight: float = Field(default=0.5, ge=0, le=1)
     hybrid_vector_weight: float = Field(default=0.5, ge=0, le=1)
+    # Reranker 只处理 retrieval 候选；Top-N 与默认 Final Top-K 在组合根集中注入。
+    reranker_enabled: bool = True
+    reranker_provider: Literal["deterministic"] = "deterministic"
+    reranker_candidate_limit: int = Field(default=20, ge=1, le=100)
+    reranker_top_k: int = Field(default=5, ge=1, le=100)
     learning_trace: bool = False
     repository_backend: Literal["inmemory", "postgres"] = "inmemory"
     # PostgreSQL 模式优先使用标准 DATABASE_URL；InMemory 默认模式不会读取或连接它。

@@ -8,6 +8,7 @@ from app.agents.providers.static_research import StaticResearchProvider
 from app.agents.research_agent import ResearchAgent
 from app.config.settings import Settings
 from app.config.retrieval import HybridRetrievalConfig
+from app.config.reranker import RerankerConfig
 from app.embeddings.factory import EmbeddingProviderFactory
 from app.embeddings.interface import EmbeddingProvider
 from app.embeddings.service import EmbeddingService
@@ -62,6 +63,8 @@ from app.services.document_import_service import DocumentImportService
 from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
 from app.services.rag_answer_generator import RAGAnswerGenerator
+from app.services.reranker_provider import DeterministicRerankerProvider, RerankerProvider
+from app.services.reranker_service import RerankerService
 from app.services.document_upload_service import DocumentUploadService
 from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
@@ -84,6 +87,8 @@ class AppContainer:
     embedding_service: EmbeddingService
     llm_provider: LLMProvider
     rag_answer_generator: RAGAnswerGenerator
+    reranker_provider: RerankerProvider
+    reranker_service: RerankerService
     document_retrieval_service: DocumentRetrievalService
     internal_rag_service: InternalRagService
     document_import_service: DocumentImportService
@@ -166,6 +171,17 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     llm_provider = StubLLMProvider()
     #  创建服务，注入仓库和事件发布器
     rag_answer_generator = RAGAnswerGenerator(provider=llm_provider, use_llm=settings.internal_rag_use_llm)
+    # Reranker 是 retrieval 之后的独立二阶段排序，不进入 Repository 或 Retrieval Service。
+    reranker_provider = DeterministicRerankerProvider()
+    reranker_service = RerankerService(
+        reranker_provider,
+        RerankerConfig(
+            enabled=settings.reranker_enabled,
+            provider=settings.reranker_provider,
+            candidate_limit=settings.reranker_candidate_limit,
+            top_k=settings.reranker_top_k,
+        ),
+    )
     document_import_service = DocumentImportService(
         document_repository,
         event_publisher,
@@ -188,6 +204,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         retrieval_provider=document_retrieval_provider,
         event_publisher=event_publisher,
         answer_generator=rag_answer_generator,
+        reranker_service=reranker_service,
     )
     approval_service = ApprovalService(
         report_repository=report_repository,
@@ -238,6 +255,8 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         embedding_service=embedding_service,
         llm_provider=llm_provider,
         rag_answer_generator=rag_answer_generator,
+        reranker_provider=reranker_provider,
+        reranker_service=reranker_service,
         document_retrieval_service=document_retrieval_service,
         internal_rag_service=internal_rag_service,
         document_import_service=document_import_service,
