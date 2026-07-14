@@ -15,13 +15,16 @@ from app.observability.logging import bind_request_id, reset_request_id
 from app.services.audit_middleware import AuditAction, AuditMiddleware
 from app.services.rbac_guard import RBACGuard
 from app.services.security_service import SecurityService
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class AuditMiddlewareTest(unittest.IsolatedAsyncioTestCase):
     """验证 approval 专用审计中间层的写入与错误分支。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(Settings(log_level="CRITICAL"))
+        settings = Settings(log_level="CRITICAL")
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
 
     def _set_current_user(
         self,

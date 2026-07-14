@@ -5,6 +5,7 @@ import unittest
 
 import httpx
 
+from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.config.settings import Settings
 from app.errors.error_codes import ErrorCode
 from app.main import create_app
@@ -15,12 +16,31 @@ class DocumentChunkAPITest(unittest.IsolatedAsyncioTestCase):
     """验证文档 chunk 流水线的同步 MVP。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(Settings(workflow_step_delay_seconds=0, log_level="CRITICAL"))
+        settings = Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
+        self._reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()
+
+    def _reset_postgres_state_if_needed(self, settings: Settings) -> None:
+        """PostgreSQL 模式下清理测试库，避免跨用例残留破坏 API 测试隔离。"""
+
+        if settings.repository_backend != "postgres" or not settings.database_url:
+            return
+
+        factory = PostgresConnectionFactory(
+            PostgresConfig(host="", port=5432, db="", user="", password="", database_url=settings.database_url)
+        )
+        with factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """TRUNCATE upload_idempotency_keys,upload_sessions,document_imports,
+                    document_chunks,documents,audit_logs,approval_events,approval_requests,
+                    report_versions,reports,events,tasks RESTART IDENTITY CASCADE"""
+                )
 
     async def _upload_document(
         self,

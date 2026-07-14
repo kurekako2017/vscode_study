@@ -21,7 +21,7 @@ class SettingsTest(unittest.TestCase):
             "REPOSITORY_BACKEND": "inmemory",
             "CORS_ORIGINS": '["http://localhost:5173"]',
         }
-        with patch.dict(os.environ, environment, clear=False):
+        with patch.dict(os.environ, environment, clear=True):
             settings = Settings(_env_file=None)
 
         self.assertEqual(settings.app_env, "test")
@@ -37,7 +37,7 @@ class SettingsTest(unittest.TestCase):
                 "REPOSITORY_BACKEND": "postgres",
                 "DATABASE_URL": "postgresql+psycopg://user:secret@localhost:5432/example",
             },
-            clear=False,
+            clear=True,
         ):
             settings = Settings(_env_file=None)
 
@@ -45,7 +45,7 @@ class SettingsTest(unittest.TestCase):
         self.assertTrue(settings.database_url.startswith("postgresql+psycopg://"))
 
     def test_unknown_provider_is_rejected(self) -> None:
-        with patch.dict(os.environ, {"RESEARCH_PROVIDER": "unknown"}, clear=False):
+        with patch.dict(os.environ, {"RESEARCH_PROVIDER": "unknown"}, clear=True):
             with self.assertRaises(ValidationError):
                 Settings(_env_file=None)
 

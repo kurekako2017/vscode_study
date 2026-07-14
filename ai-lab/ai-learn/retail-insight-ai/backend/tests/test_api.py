@@ -8,15 +8,16 @@ import httpx
 
 from app.config.settings import Settings
 from app.main import create_app
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
     """验证普通 API envelope、Workflow 终态与 SSE 合同。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(
-            Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
-        )
+        self.settings = Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
+        reset_postgres_state_if_needed(self.settings)
+        self.app = create_app(self.settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 
@@ -51,7 +52,7 @@ class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.headers["X-Request-ID"], "health-request")
         self.assertEqual(response.json()["status"], "ok")
         self.assertEqual(response.json()["provider"], "static")
-        self.assertEqual(response.json()["repository_backend"], "inmemory")
+        self.assertEqual(response.json()["repository_backend"], self.app.state.container.repository_backend)
         self.assertEqual(response.json()["request_id"], "health-request")
 
     async def test_create_task_uses_success_envelope(self) -> None:

@@ -9,13 +9,16 @@ from app.errors.exceptions import AuditLogAppendException
 from app.main import create_app
 from app.models.audit import AuditLog, AuditLogResult
 from app.services.audit_service import AuditService
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
     """验证 security read API 与 append-only audit MVP。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(Settings(log_level="CRITICAL"))
+        settings = Settings(log_level="CRITICAL")
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 

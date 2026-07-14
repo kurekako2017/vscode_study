@@ -11,15 +11,16 @@ from app.models.audit import AuditLogResult
 from app.models.report import ReportStatus
 from app.models.security import Department, Organization, User, UserStatus
 from app.services.security_service import SecurityService
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class ApprovalApiTest(unittest.IsolatedAsyncioTestCase):
     """验证 Approval Workflow MVP 的 HTTP contract 和状态机。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(
-            Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
-        )
+        settings = Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 

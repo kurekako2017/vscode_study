@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
 import unittest
 
 import httpx
 
+from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.config.settings import Settings
 from app.errors.error_codes import ErrorCode
 from app.main import create_app
@@ -14,12 +16,31 @@ class DocumentRetrievalAPITest(unittest.IsolatedAsyncioTestCase):
     """验证 POST /api/v1/document-retrieval/search 的 keyword-only MVP。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(Settings(workflow_step_delay_seconds=0, log_level="CRITICAL"))
+        settings = Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
+        self._reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()
+
+    def _reset_postgres_state_if_needed(self, settings: Settings) -> None:
+        """PostgreSQL 模式下主动清理测试库，保持原有 InMemory 级别的用例隔离。"""
+
+        if settings.repository_backend != "postgres" or not settings.database_url:
+            return
+
+        factory = PostgresConnectionFactory(
+            PostgresConfig(host="", port=5432, db="", user="", password="", database_url=settings.database_url)
+        )
+        with factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """TRUNCATE upload_idempotency_keys,upload_sessions,document_imports,
+                    document_chunks,documents,audit_logs,approval_events,approval_requests,
+                    report_versions,reports,events,tasks RESTART IDENTITY CASCADE"""
+                )
 
     async def _upload_document(
         self,

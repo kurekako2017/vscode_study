@@ -1,6 +1,15 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-13
+最后更新：2026-07-14
+
+## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
+
+- [x] 检查 Git 工作区状态并确认未覆盖用户修改
+- [x] 重新执行统一 Baseline，确认 Backend / Frontend / Build / compileall 当前可通过
+- [x] 复核昨天记录的 4 个 Frontend timeout，用现有完整 Baseline 未再次复现
+- [x] 审计 Repository 双后端切换、Contract 对齐、Service 依赖接口和 API 分层边界
+- [x] 明确记录 PostgreSQL integration suite 在无 `DATABASE_URL` 环境下按设计跳过
+- 完成记录：首次 Baseline 出现 `src/App.test.tsx` 的 `insufficient_context` 学习侧栏用例 1 次 timeout；定向复跑和整份 `App.test.tsx` 复跑通过，第二次 `./scripts/run_tests.sh` 全绿。Backend 125 tests passed（skipped=1 for PostgreSQL suite）、Frontend 47 passed、Frontend build passed、Python compileall passed。昨天的 4 个 Frontend timeout 本轮均未复现。当前环境未设置 `DATABASE_URL`，因此真实 PostgreSQL 契约测试未执行，只能确认其跳过机制安全有效。
 
 ## 2026-07-13 ERIP Enterprise Phase 2A
 

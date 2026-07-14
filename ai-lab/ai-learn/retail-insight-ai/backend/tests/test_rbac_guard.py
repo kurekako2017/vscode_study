@@ -10,13 +10,16 @@ from app.models.audit import AuditLogResult
 from app.models.security import Department, Organization, User, UserStatus
 from app.services.rbac_guard import RBACGuard
 from app.services.security_service import SecurityService
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class RBACGuardTest(unittest.TestCase):
     """验证可复用 RBAC guard 的权限、角色和审计行为。"""
 
     def setUp(self) -> None:
-        self.app = create_app(Settings(log_level="CRITICAL"))
+        settings = Settings(log_level="CRITICAL")
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
 
     def _build_guard(
         self,

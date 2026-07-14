@@ -7,13 +7,16 @@ import httpx
 
 from app.config.settings import Settings
 from app.main import create_app
+from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
 class DocumentImportAPITest(unittest.IsolatedAsyncioTestCase):
     """验证文档导入流水线的同步 MVP。"""
 
     async def asyncSetUp(self) -> None:
-        self.app = create_app(Settings(workflow_step_delay_seconds=0, log_level="CRITICAL"))
+        settings = Settings(workflow_step_delay_seconds=0, log_level="CRITICAL")
+        reset_postgres_state_if_needed(settings)
+        self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
 

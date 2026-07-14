@@ -1,6 +1,35 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-13
+最后更新：2026-07-14
+
+## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
+
+- [x] 检查 Git 工作区状态，确认本轮开始前无未提交修改
+- [x] 重新执行统一 Baseline：Backend tests、Frontend tests、Frontend build、Python compileall
+- [x] 复核昨天的 4 个 Frontend 超时用例，本轮未复现稳定失败
+- [x] 审计 InMemory / PostgreSQL Repository Contract、组合根切换和 Service / API 分层边界
+- [x] 明确记录 PostgreSQL integration suite 在无 `DATABASE_URL` 环境下的安全跳过结论
+- [x] 记录新发现问题：`src/App.test.tsx` 存在一次性 flaky timeout 迹象，当前未确认真实功能缺陷
+
+### 完成记录
+
+- 2026-07-14：`git status --short`、`git diff --stat` 均为空，分支为 `main`。
+- 2026-07-14：第二次执行 `./scripts/run_tests.sh` 全绿；Backend 125 passed（PostgreSQL suite skipped=1）、Frontend 47 passed、Frontend build passed、Python compileall passed。
+- 2026-07-14：昨天记录的 4 个 Frontend 超时用例
+  `App navigation > uses the document-first enterprise navigation order`
+  `ApprovalPage > submits approval successfully and refreshes list plus detail`
+  `DocumentsPage > shows empty state when there are no documents`
+  `RagPage > shows empty retrieval state from backend`
+  本轮完整 Baseline 中均通过，未稳定复现。
+- 2026-07-14：本轮新增观察到 `App navigation > explains insufficient_context as a backend evidence result in the learning sidebar` 首次 Baseline 运行出现 1 次 5000ms timeout；单测定向复跑与整份 `src/App.test.tsx` 复跑均通过，当前判断更接近 flaky timeout，而非真实页面功能错误。
+- 2026-07-14：真实 PostgreSQL 契约测试 `backend/tests/test_postgres_repositories.py` 因未设置 `DATABASE_URL` 按设计安全跳过；本轮不能宣称 PostgreSQL 重启持久化、事务回滚与 Retrieval 持久化读取已在本机再次执行验证。
+- 2026-07-14：当前自动化覆盖已明确保护默认 `REPOSITORY_BACKEND=inmemory`、`REPOSITORY_BACKEND=postgres` 显式启用、连接失败不回退、Repository Bundle 不混用、Service 依赖接口、API 经 Service 访问仓储等架构边界。
+
+### 新发现任务
+
+- [ ] 在具备脱敏 `DATABASE_URL` 的环境中重新执行 `backend/tests/test_postgres_repositories.py`，补做 PostgreSQL 重启持久化、事务回滚和持久化 Chunk 读取验证
+- [ ] 继续观察 `frontend/src/App.test.tsx` 的 `insufficient_context` 学习侧栏用例，若再次出现超时，再定向排查异步等待或测试隔离问题
+- [ ] 修复 `../doc-sync.manifest.json` 中失效的 handbook 路径映射；当前 `python3 scripts/sync_retail_handbook_docs.py` 会因缺失 `ai-agent-retail-handbook-v3/README.md` 而失败
 
 ## 2026-07-13 ERIP Enterprise Phase 2A
 

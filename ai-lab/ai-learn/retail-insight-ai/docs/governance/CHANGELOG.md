@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-14 ERIP Enterprise Phase 2B Baseline Gate + Repository Audit
+
+- 重新执行 `./scripts/run_tests.sh`，确认 Backend tests、Frontend tests、Frontend build 与 Python compileall 可通过。
+- 昨天记录的 4 个 Frontend timeout 用例本轮未复现稳定失败。
+- 首次 Baseline 新观察到 `src/App.test.tsx` 中 `insufficient_context` 学习侧栏用例出现一次性 timeout；定向复跑和整份测试文件复跑通过，暂记为 flaky 风险观察，不修改生产代码。
+- 审计 Repository 双后端边界：默认保持 `REPOSITORY_BACKEND=inmemory`，`postgres` 仅显式启用，连接失败不回退，Service 继续依赖接口，API 继续经 Service 访问仓储。
+- 当前环境未设置 `DATABASE_URL`，真实 PostgreSQL integration suite 按设计安全跳过；本轮不宣称 PostgreSQL 重启持久化与持久化 Retrieval 已再次本机验证。
+
 ## 2026-07-12 Scenario01 Business Sample Data
 
 - 新增 `docs/learning/sample-data/Scenario01_Sales_Decline/` 企业业务学习样本文档集。
