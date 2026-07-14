@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+from dataclasses import replace
 from threading import RLock
 
 from app.core.learning_trace import trace_step
@@ -37,6 +38,7 @@ from app.errors.base import AppException
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import DocumentArchivedException, DocumentNotFoundException, DocumentNotValidatedException
 from app.events.publisher import EventPublisher
+from app.embeddings.service import EmbeddingService
 from app.models.document import Document, DocumentChunk, DocumentStatus, DocumentType
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
@@ -61,12 +63,14 @@ class DocumentChunkService:
         document_repository: DocumentRepository,
         chunk_repository: DocumentChunkRepository,
         event_publisher: EventPublisher,
+        embedding_service: EmbeddingService | None = None,
     ) -> None:
         """保存仓储与事件发布器，并初始化进程内互斥锁。"""
 
         self._document_repository = document_repository
         self._chunk_repository = chunk_repository
         self._event_publisher = event_publisher
+        self._embedding_service = embedding_service
         self._lock = RLock()
 
     def chunk_document(self, document_id: str) -> DocumentChunkListResponse:
@@ -332,6 +336,12 @@ class DocumentChunkService:
                     )
                 )
                 chunk_index += 1
+        if self._embedding_service is not None and self._embedding_service.available:
+            vectors = self._embedding_service.embed_batch([chunk.content for chunk in chunks])
+            chunks = [
+                replace(chunk, embedding=vector)
+                for chunk, vector in zip(chunks, vectors, strict=True)
+            ]
         return chunks
 
     def _slice_paragraph(self, paragraph: str) -> list[str]:

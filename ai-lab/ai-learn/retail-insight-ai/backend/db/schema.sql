@@ -1,6 +1,8 @@
 -- ERIP PostgreSQL 完整持久化 Schema。
 -- 所有时间字段使用 TIMESTAMPTZ；可扩展元数据使用 JSONB；事实表通过唯一约束防止重复写入。
 
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TABLE IF NOT EXISTS tasks (
     task_id TEXT PRIMARY KEY,
     question TEXT NOT NULL,
@@ -121,6 +123,7 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     character_count INTEGER NOT NULL CHECK (character_count >= 0),
     metadata JSONB NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
+    embedding vector(384) NULL,
     UNIQUE (document_id, version, chunk_index)
 );
 
@@ -163,6 +166,9 @@ CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created ON approval_even
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource_created ON audit_logs (resource_type, resource_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_documents_status_updated ON documents (status, updated_at);
 CREATE INDEX IF NOT EXISTS idx_document_chunks_document_version ON document_chunks (document_id, version, chunk_index);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding_hnsw
+    ON document_chunks USING hnsw (embedding vector_cosine_ops)
+    WHERE embedding IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_document_imports_status_updated ON document_imports (status, updated_at);
 CREATE INDEX IF NOT EXISTS idx_upload_sessions_document ON upload_sessions (document_id);
 CREATE INDEX IF NOT EXISTS idx_upload_idempotency_upload ON upload_idempotency_keys (upload_id);

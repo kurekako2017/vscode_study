@@ -37,6 +37,7 @@ class InternalRagEvaluationServiceTest(unittest.TestCase):
             document_id="doc-1",
             chunk_id=chunk_id,
             chunk_index=0,
+            content=excerpt,
             content_excerpt=excerpt,
             score=score,
             source=self.source_response,

@@ -13,7 +13,11 @@ from __future__ import annotations
 from app.config.settings import Settings
 from app.embeddings.config import EmbeddingConfig
 from app.embeddings.interface import EmbeddingProvider
-from app.embeddings.provider import ConfiguredEmbeddingProvider, DisabledEmbeddingProvider
+from app.embeddings.provider import (
+    ConfiguredEmbeddingProvider,
+    DeterministicTestEmbeddingProvider,
+    DisabledEmbeddingProvider,
+)
 
 
 class EmbeddingProviderFactory:
@@ -23,6 +27,11 @@ class EmbeddingProviderFactory:
     def build(config: EmbeddingConfig) -> EmbeddingProvider:
         if config.provider == "disabled":
             return DisabledEmbeddingProvider()
+        if config.provider == "deterministic_test":
+            return DeterministicTestEmbeddingProvider(
+                model=config.model or "deterministic-test-sha256-v1",
+                dimensions=config.dimensions,
+            )
         return ConfiguredEmbeddingProvider(config)
 
     @classmethod

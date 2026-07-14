@@ -99,6 +99,7 @@ class InternalRagService:
                     document_type=self._document_type_filter(request.document_type),
                     language=self._language_filter(request.language),
                     tags=request.tags,
+                    retrieval_mode=request.retrieval_mode,
                 )
                 results, total_matches = self._retrieval_provider.search(retrieval_request)
                 if not results:
@@ -139,7 +140,7 @@ class InternalRagService:
                 response = InternalRagAnswerResponse(
                     answer=answer,
                     citations=selected_citations,
-                    retrieval_mode="keyword",
+                    retrieval_mode=request.retrieval_mode,
                     answer_mode=request.answer_mode,
                     confidence=confidence,
                     warnings=warnings,
@@ -282,7 +283,7 @@ class InternalRagService:
             "tags_count": len(request.tags or []),
             "answer_mode": request.answer_mode.value,
             "require_citations": request.require_citations,
-            "retrieval_mode": "keyword",
+            "retrieval_mode": request.retrieval_mode,
         }
 
     def _scope_id(self) -> str:

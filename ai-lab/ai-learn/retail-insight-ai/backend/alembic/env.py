@@ -47,11 +47,22 @@ def _database_url() -> str:
     return database_url
 
 
+def _sqlalchemy_database_url() -> str:
+    """把测试库连接串规范化为 SQLAlchemy 可识别的 psycopg 驱动格式。"""
+
+    database_url = _database_url()
+    if database_url.startswith("postgresql+psycopg://"):
+        return database_url
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return database_url
+
+
 def run_migrations_offline() -> None:
     """生成离线 SQL 上下文；只有显式 Alembic 命令才会进入这里。"""
 
     context.configure(
-        url=_database_url(),
+        url=_sqlalchemy_database_url(),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -65,7 +76,7 @@ def run_migrations_online() -> None:
     """创建一次性连接执行 migration；Phase 2A 不调用 upgrade。"""
 
     # 先交给 Alembic ConfigParser 保存，读取 section 时会还原百分号，避免 URL 被二次转义。
-    config.set_main_option("sqlalchemy.url", _database_url().replace("%", "%%"))
+    config.set_main_option("sqlalchemy.url", _sqlalchemy_database_url().replace("%", "%%"))
     section = config.get_section(config.config_ini_section) or {}
     connectable = engine_from_config(
         section,

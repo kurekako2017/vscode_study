@@ -97,6 +97,7 @@ class DocumentRetrievalService:
                     results=results,
                     total=total_matches,
                     query=query,
+                    retrieval_mode=request.retrieval_mode,
                 )
                 self._publish(
                     scope_id,
@@ -154,6 +155,9 @@ class DocumentRetrievalService:
         return {
             "query_length": len(request.query.strip()),
             "limit": request.limit,
+            "top_k": request.top_k,
+            "retrieval_mode": request.retrieval_mode,
+            "document_id": request.document_id,
             "include_archived": request.include_archived,
             "document_type": request.document_type,
             "language": request.language,

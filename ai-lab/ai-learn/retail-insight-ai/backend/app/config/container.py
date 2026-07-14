@@ -7,6 +7,10 @@ from typing import Callable
 from app.agents.providers.static_research import StaticResearchProvider
 from app.agents.research_agent import ResearchAgent
 from app.config.settings import Settings
+from app.config.retrieval import HybridRetrievalConfig
+from app.embeddings.factory import EmbeddingProviderFactory
+from app.embeddings.interface import EmbeddingProvider
+from app.embeddings.service import EmbeddingService
 from app.data_loaders import LocalBusinessDataLoader, LocalResearchDataLoader
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.db.unit_of_work import InMemoryUnitOfWork, PostgresUnitOfWork
@@ -17,7 +21,11 @@ from app.providers.stub_llm_provider import StubLLMProvider
 from app.repositories.implementations.in_memory.audit_repository import InMemoryAuditRepository
 from app.repositories.implementations.in_memory.approval_repository import InMemoryApprovalRepository
 from app.repositories.implementations.in_memory.document_chunk_repository import InMemoryDocumentChunkRepository
-from app.repositories.implementations.in_memory.document_retrieval import InMemoryKeywordRetrieval
+from app.repositories.implementations.in_memory.document_retrieval import (
+    HybridDocumentRetrieval,
+    InMemoryKeywordRetrieval,
+    VectorDocumentRetrieval,
+)
 from app.repositories.implementations.in_memory.document_repository import InMemoryDocumentRepository
 from app.repositories.implementations.in_memory.event_repository import InMemoryEventRepository
 from app.repositories.implementations.in_memory.report_repository import InMemoryReportRepository
@@ -72,6 +80,8 @@ class AppContainer:
     document_repository: DocumentRepository
     document_chunk_repository: DocumentChunkRepository
     document_retrieval_provider: DocumentRetrievalProvider
+    embedding_provider: EmbeddingProvider
+    embedding_service: EmbeddingService
     llm_provider: LLMProvider
     rag_answer_generator: RAGAnswerGenerator
     document_retrieval_service: DocumentRetrievalService
@@ -133,9 +143,24 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     #  创建服务，注入仓库和事件发布器
     document_chunk_repository = repositories.chunk
     #  创建服务，注入仓库和事件发布器
-    document_retrieval_provider = InMemoryKeywordRetrieval(
+    keyword_retrieval = InMemoryKeywordRetrieval(
         document_repository=document_repository,
         chunk_repository=document_chunk_repository,
+    )
+    embedding_provider = EmbeddingProviderFactory.from_settings(settings)
+    embedding_service = EmbeddingService(embedding_provider)
+    vector_retrieval = VectorDocumentRetrieval(
+        document_repository=document_repository,
+        chunk_repository=document_chunk_repository,
+        embedding_service=embedding_service,
+    )
+    document_retrieval_provider = HybridDocumentRetrieval(
+        keyword_retrieval,
+        vector_retrieval,
+        HybridRetrievalConfig(
+            keyword_weight=settings.hybrid_keyword_weight,
+            vector_weight=settings.hybrid_vector_weight,
+        ),
     )
     #  创建服务，注入仓库和事件发布器
     llm_provider = StubLLMProvider()
@@ -148,7 +173,12 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         repositories.unit_of_work,
     )
     #  创建服务，注入仓库和事件发布器   
-    document_chunk_service = DocumentChunkService(document_repository, document_chunk_repository, event_publisher)
+    document_chunk_service = DocumentChunkService(
+        document_repository,
+        document_chunk_repository,
+        event_publisher,
+        embedding_service,
+    )
     document_retrieval_service = DocumentRetrievalService(
         retrieval_provider=document_retrieval_provider,
         event_publisher=event_publisher,
@@ -204,6 +234,8 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         document_repository=document_repository,
         document_chunk_repository=document_chunk_repository,
         document_retrieval_provider=document_retrieval_provider,
+        embedding_provider=embedding_provider,
+        embedding_service=embedding_service,
         llm_provider=llm_provider,
         rag_answer_generator=rag_answer_generator,
         document_retrieval_service=document_retrieval_service,

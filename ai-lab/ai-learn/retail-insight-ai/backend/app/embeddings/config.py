@@ -17,8 +17,13 @@ if TYPE_CHECKING:
     from app.config.settings import Settings
 
 
-EmbeddingProviderName = Literal["disabled", "local", "openai", "openrouter", "nvidia"]
-SUPPORTED_EMBEDDING_PROVIDERS = frozenset({"disabled", "local", "openai", "openrouter", "nvidia"})
+EMBEDDING_DIMENSIONS = 384
+EmbeddingProviderName = Literal[
+    "disabled", "deterministic_test", "local", "openai", "openrouter", "nvidia"
+]
+SUPPORTED_EMBEDDING_PROVIDERS = frozenset(
+    {"disabled", "deterministic_test", "local", "openai", "openrouter", "nvidia"}
+)
 
 
 @dataclass(frozen=True)
@@ -27,13 +32,13 @@ class EmbeddingConfig:
 
     provider: EmbeddingProviderName = "disabled"
     model: str | None = None
-    dimensions: int | None = None
+    dimensions: int = EMBEDDING_DIMENSIONS
 
     def __post_init__(self) -> None:
         if self.provider not in SUPPORTED_EMBEDDING_PROVIDERS:
             raise ValueError(f"unsupported embedding provider: {self.provider}")
-        if self.dimensions is not None and self.dimensions <= 0:
-            raise ValueError("embedding dimensions must be greater than zero")
+        if self.dimensions != EMBEDDING_DIMENSIONS:
+            raise ValueError(f"embedding dimensions must equal {EMBEDDING_DIMENSIONS}")
         if self.provider != "disabled" and not (self.model or "").strip():
             raise ValueError("embedding model is required when provider is enabled")
 
@@ -48,4 +53,9 @@ class EmbeddingConfig:
         )
 
 
-__all__ = ["EmbeddingConfig", "EmbeddingProviderName", "SUPPORTED_EMBEDDING_PROVIDERS"]
+__all__ = [
+    "EMBEDDING_DIMENSIONS",
+    "EmbeddingConfig",
+    "EmbeddingProviderName",
+    "SUPPORTED_EMBEDDING_PROVIDERS",
+]

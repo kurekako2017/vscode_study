@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import unittest
+import importlib.util
 from pathlib import Path
 
 from alembic.config import Config
 from alembic.script import ScriptDirectory
+from app.embeddings.config import EMBEDDING_DIMENSIONS
 
 
 class AlembicBaselineTest(unittest.TestCase):
-    """验证 Alembic 框架存在且 versions 为空；测试不会连接或升级数据库。"""
+    """验证 Alembic 框架存在，并且正式初始 migration 可以被加载。"""
 
     def test_empty_migration_baseline_is_loadable(self) -> None:
         backend_dir = Path(__file__).resolve().parents[1]
@@ -17,9 +19,32 @@ class AlembicBaselineTest(unittest.TestCase):
         script = ScriptDirectory.from_config(config)
 
         self.assertEqual(Path(script.dir).resolve(), (backend_dir / "alembic").resolve())
-        self.assertEqual(list(script.walk_revisions()), [])
+        self.assertEqual(
+            [revision.revision for revision in script.walk_revisions()],
+            ["20260714_02_chunk_embeddings", "20260714_01_initial_schema"],
+        )
         self.assertTrue((backend_dir / "alembic" / "env.py").is_file())
         self.assertTrue((backend_dir / "db" / "schema.sql").is_file())
+
+    def test_pgvector_revision_matches_application_dimension(self) -> None:
+        """防止 migration 的 vector(N) 与运行时代码维度发生漂移。"""
+
+        migration_path = (
+            Path(__file__).resolve().parents[1]
+            / "alembic"
+            / "versions"
+            / "20260714_02_add_document_chunk_embeddings.py"
+        )
+        spec = importlib.util.spec_from_file_location("erip_chunk_embedding_migration", migration_path)
+        assert spec is not None and spec.loader is not None
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+
+        self.assertEqual(migration.EMBEDDING_DIMENSIONS, EMBEDDING_DIMENSIONS)
+        source = migration_path.read_text(encoding="utf-8")
+        self.assertIn("CREATE EXTENSION IF NOT EXISTS vector", source)
+        self.assertIn("USING hnsw (embedding vector_cosine_ops)", source)
+        self.assertNotIn("DROP EXTENSION", source)
 
     def test_database_url_is_not_persisted_in_alembic_ini(self) -> None:
         backend_dir = Path(__file__).resolve().parents[1]

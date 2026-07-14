@@ -11,7 +11,7 @@ from app.schemas.document_retrieval_api import (
 )
 from app.services.document_retrieval_service import DocumentRetrievalService
 
-# 文档检索路由只承载 keyword-only search 的 HTTP 入口，不负责排序细节或存储实现。
+# 路由只承载 keyword/vector/hybrid 的 HTTP 入口，不负责向量 SQL 或融合排序。
 router = APIRouter(prefix="/api/v1/document-retrieval", tags=["document-retrieval"])
 
 
@@ -24,7 +24,7 @@ async def search_documents(
     request: DocumentRetrievalSearchRequest,
     service: DocumentRetrievalService = Depends(get_document_retrieval_service),
 ) -> ApiResponse[DocumentRetrievalSearchResponse]:
-    """执行 keyword-only 文档检索，并返回稳定的来源追踪结果。"""
+    """按显式 retrieval_mode 检索；省略时继续执行兼容的 keyword 路径。"""
 
     data = service.search(request)
     return success_response(data, get_request_id())

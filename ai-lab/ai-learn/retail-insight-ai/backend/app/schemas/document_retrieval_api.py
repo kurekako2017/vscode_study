@@ -25,21 +25,30 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 from app.schemas.document_api import DocumentResponse, DocumentSourceResponse
 
 
 class DocumentRetrievalSearchRequest(BaseModel):
-    """冻结 keyword-only 检索请求。"""
+    """兼容既有 keyword 默认值，并允许显式选择 vector/hybrid。"""
 
     query: str
     limit: int = Field(default=10)
+    top_k: int | None = Field(default=None, ge=1, le=100)
+    retrieval_mode: Literal["keyword", "vector", "hybrid"] = "keyword"
+    document_id: str | None = None
     include_archived: bool = False
     document_type: str | None = None
     language: str | None = None
     tags: list[str] | None = None
+
+    @property
+    def effective_limit(self) -> int:
+        """top_k 是向量术语；未提供时继续使用旧 contract 的 limit。"""
+
+        return self.top_k if self.top_k is not None else self.limit
 
     @field_validator("query")
     @classmethod
@@ -69,8 +78,10 @@ class DocumentRetrievalResultResponse(BaseModel):
     document_id: str
     chunk_id: str
     chunk_index: int
+    content: str
     content_excerpt: str
     score: float
+    retrieval_method: Literal["keyword", "vector", "hybrid"] = "keyword"
     source: DocumentSourceResponse
     metadata: DocumentResponse
 
@@ -81,7 +92,7 @@ class DocumentRetrievalSearchResponse(BaseModel):
     results: list[DocumentRetrievalResultResponse]
     total: int
     query: str
-    retrieval_mode: str = "keyword"
+    retrieval_mode: Literal["keyword", "vector", "hybrid"] = "keyword"
 
 
 __all__ = [

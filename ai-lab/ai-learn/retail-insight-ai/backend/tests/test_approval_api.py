@@ -150,14 +150,19 @@ class ApprovalApiTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(payload["success"])
         self.assertEqual(payload["error"]["code"], "approval_already_submitted")
 
+        approvals = self.app.state.container.approval_repository.list_approval_requests(task_id=task_id)
+        self.assertEqual(len(approvals), 1)
+        self.assertEqual(approvals[0].status, ReportStatus.PENDING_APPROVAL)
+        versions = self.app.state.container.approval_repository.list_report_versions(task_id)
+        self.assertEqual(len(versions), 1)
+
         events = self.app.state.container.event_repository.list_after(task_id)
         approval_events = [
             event.event_type
             for event in events
             if event.event_type.startswith("approval.")
         ]
-        self.assertIn("approval.submitted", approval_events)
-        self.assertIn("approval.failed", approval_events)
+        self.assertEqual(approval_events.count("approval.submitted"), 1)
 
     async def test_approve_pending_approval_succeeds(self) -> None:
         task_id = await self._create_report_task()

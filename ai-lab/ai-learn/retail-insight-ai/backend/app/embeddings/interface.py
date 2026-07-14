@@ -20,10 +20,20 @@ class EmbeddingProvider(Protocol):
 
     name: str
     model: str | None
-    dimensions: int | None
+    dimensions: int
+
+    def embed_text(self, text: str) -> list[float]:
+        """把单个非空文本转换成固定维度向量。"""
+
+        ...
+
+    def embed_batch(self, texts: Sequence[str]) -> list[list[float]]:
+        """按输入顺序批量生成固定维度向量。"""
+
+        ...
 
     def embed(self, texts: Sequence[str]) -> list[list[float]]:
-        """把文本批次转换成向量；Phase 2A 的 Provider 会明确拒绝执行。"""
+        """保留 Phase 2A 的批量方法别名，兼容既有调用方。"""
 
         ...
 

@@ -259,7 +259,7 @@ class DocumentVersion:
 
 @dataclass(frozen=True)
 class DocumentChunk:
-    """文档切分占位模型，当前仅保留结构，不实现切分算法。"""
+    """保存文档切片事实；embedding 可空，兼容 migration 前的旧数据。"""
 
     document_id: str
     version: int
@@ -269,6 +269,15 @@ class DocumentChunk:
     character_count: int
     metadata: DocumentMetadata
     created_at: datetime = field(default_factory=utc_now)
+    embedding: tuple[float, ...] | None = None
+
+    def __post_init__(self) -> None:
+        """向量存在时立即校验固定维度与有限值，防止坏数据进入仓储。"""
+
+        if self.embedding is not None:
+            from app.embeddings.service import validate_embedding_vector
+
+            object.__setattr__(self, "embedding", validate_embedding_vector(self.embedding))
 
 
 @dataclass

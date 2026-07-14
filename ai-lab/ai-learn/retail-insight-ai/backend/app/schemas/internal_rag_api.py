@@ -28,6 +28,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -53,6 +54,7 @@ class InternalRagAnswerRequest(BaseModel):
     tags: list[str] | None = None
     answer_mode: InternalRagAnswerMode
     require_citations: bool = True
+    retrieval_mode: Literal["keyword", "vector", "hybrid"] = "keyword"
 
     @field_validator("question")
     @classmethod
@@ -92,7 +94,7 @@ class InternalRagAnswerResponse(BaseModel):
 
     answer: str
     citations: list[InternalRagCitationResponse]
-    retrieval_mode: str = "keyword"
+    retrieval_mode: Literal["keyword", "vector", "hybrid"] = "keyword"
     answer_mode: InternalRagAnswerMode
     confidence: float
     warnings: list[str] = Field(default_factory=list)

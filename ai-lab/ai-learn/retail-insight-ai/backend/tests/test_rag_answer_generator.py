@@ -55,6 +55,7 @@ class RAGAnswerGeneratorTest(unittest.TestCase):
             document_id="doc-1",
             chunk_id="chk-1",
             chunk_index=0,
+            content=excerpt,
             content_excerpt=excerpt,
             score=0.91,
             source=source,

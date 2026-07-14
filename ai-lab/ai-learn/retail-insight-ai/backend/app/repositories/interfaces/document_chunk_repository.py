@@ -25,9 +25,19 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
 from app.models.document import DocumentChunk
+
+
+@dataclass(frozen=True)
+class VectorChunkMatch:
+    """Repository 返回的 chunk 与原始 cosine similarity。"""
+
+    chunk: DocumentChunk
+    cosine_similarity: float
 
 
 @runtime_checkable
@@ -44,5 +54,21 @@ class DocumentChunkRepository(Protocol):
 
         ...
 
+    def update_embedding(self, chunk_id: str, embedding: Sequence[float] | None) -> None:
+        """更新单个 chunk 向量；None 用于保留或恢复旧数据兼容状态。"""
 
-__all__ = ["DocumentChunkRepository"]
+        ...
+
+    def search_by_embedding(
+        self,
+        embedding: Sequence[float],
+        *,
+        limit: int,
+        document_ids: Sequence[str] | None = None,
+    ) -> list[VectorChunkMatch]:
+        """按 cosine similarity 查询带向量的 chunks。"""
+
+        ...
+
+
+__all__ = ["DocumentChunkRepository", "VectorChunkMatch"]
