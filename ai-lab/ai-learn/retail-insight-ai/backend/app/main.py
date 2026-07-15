@@ -2,11 +2,11 @@
 
 文件职责：创建应用、请求上下文、异常处理器，并注册匿名与受保护路由。
 谁调用它：Uvicorn 读取模块级 ``app``；测试通过 ``create_app()`` 创建隔离应用。
-它调用谁：AppContainer、日志/错误设施、各 API Router 与 CurrentUser Dependency。
+它调用谁：AppContainer、日志/错误设施、各 API Router 与 Security Dependency。
 输入：可选 Settings，以及运行时 HTTP Request。
 输出：组装完成的 FastAPI application。
-设计理由：认证在路由注册边界统一挂载，业务 API 不重复解析 JWT。
-日本现场面试：组合根明确区分 Health/Login 匿名入口与 Bearer 保护业务入口。
+设计理由：认证统一挂载，授权由 Router 声明 Permission，业务逻辑不解析 JWT 或判断 role。
+日本现场面试：组合根区分匿名入口与 Bearer 业务入口，RBAC 再接在 CurrentUser 后面。
 """
 
 from __future__ import annotations
@@ -144,7 +144,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Health、Login 与 OpenAPI/Swagger 保持匿名可达。
     application.include_router(health_router)
     application.include_router(auth_router)
-    # 所有业务 API 统一经过 CurrentUser Dependency；路由本身不再重复解析 JWT。
+    # 所有业务 API 先统一认证；每个 Router 再声明所需 Permission。
     authentication_dependencies = [Depends(get_current_user)]
     application.include_router(
         security_router, dependencies=authentication_dependencies

@@ -31,7 +31,7 @@ bearer_scheme = HTTPBearer(
 )
 
 
-def get_authorization_service(request: Request) -> AuthorizationService:
+async def get_authorization_service(request: Request) -> AuthorizationService:
     """从应用组合根取得唯一 AuthorizationService。"""
 
     return request.app.state.container.authorization_service
@@ -58,10 +58,11 @@ def require_permission(
     """创建可复用权限 Dependency；Router 只声明能力，不解析 JWT 或判断 role。"""
 
     async def permission_dependency(
-        request: Request,
         current_user: Annotated[CurrentUser, Depends(get_current_user)],
+        service: Annotated[
+            AuthorizationService, Depends(get_authorization_service)
+        ],
     ) -> CurrentUser:
-        service = get_authorization_service(request)
         service.require_permission(current_user, permission)
         return current_user
 

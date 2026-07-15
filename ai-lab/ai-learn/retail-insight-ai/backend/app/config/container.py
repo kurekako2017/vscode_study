@@ -1,12 +1,12 @@
 """应用依赖组合根。
 
-文件职责：根据 Settings 组装 Repository、Provider、Service 与 Authentication 组件。
+文件职责：根据 Settings 组装 Repository、Provider、Service 与 Security 组件。
 谁调用它：``app.main.create_app()``。
 它调用谁：各层稳定接口及当前 InMemory/PostgreSQL/Static/JWT 实现。
 输入：可选 Settings。
 输出：同一 FastAPI App 独享且类型明确的 AppContainer。
-设计理由：构造关系集中，Router 只通过 Dependency 取组件，不自行 new JWT/Service。
-日本现场面试：Authentication 依赖在 composition root 注入，不污染业务 Service 或 Repository。
+设计理由：构造关系集中，Router 只通过 Dependency 取组件，不自行 new Security Service。
+日本现场面试：Authentication/RBAC 在 composition root 注入，不污染业务 Service 或 Repository。
 """
 
 from __future__ import annotations
