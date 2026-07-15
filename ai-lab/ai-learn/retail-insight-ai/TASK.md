@@ -2,6 +2,19 @@
 
 最后更新：2026-07-15
 
+## 2026-07-15 ERIP Enterprise RBAC Authorization
+
+- [x] 建立 `JWT -> CurrentUser -> RBAC -> Business API` 授权链，不修改 JWT Payload
+- [x] 集中定义 admin / manager / employee、10 项 Permission、Role Mapping、Authorization Result 与 Permission Checker
+- [x] 在 `backend/app/security/` 建立 Permission Registry、Resolver、Authorization Service 与 Permission Dependency
+- [x] 所有授权 API 只声明 `Depends(require_permission(...))`，不在 Router/Service 散落 role 判断
+- [x] Documents、Retrieval、Internal RAG、Tasks、Approval、Audit 与 Security Catalog 已挂载明确权限
+- [x] Health、Login、Swagger/OpenAPI 保持匿名；`users/me` 只要求认证
+- [x] 权限不足和未知角色 fail-closed，统一返回 403 `forbidden`、`permission`、`role`，不返回 401/500
+- [x] Swagger 保留 `BearerAuth`，Permission Dependency 复用同一 CurrentUser 认证链
+- [x] 新增 12 个 RBAC 测试；完整回归：InMemory Backend 182 passed / 1 expected skip；PostgreSQL Backend 187 passed / 0 skipped；Frontend 47/47；build、compileall 通过
+- 完成记录：本轮未修改 JWT Contract、Repository、Alembic、Migration、schema、Embedding、pgvector、Retrieval/Reranker 实现、Frontend、README、Learning 或 handbook。
+
 ## 2026-07-15 ERIP Enterprise JWT Authentication
 
 - [x] 建立 Access Token、Token Payload、Current User 与 Authentication Error 统一合同

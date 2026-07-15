@@ -2,6 +2,17 @@
 
 # CHANGELOG
 
+## 2026-07-15 ERIP Enterprise RBAC Authorization
+
+- 新增集中式 RBAC Contract：Role、Permission、Role Mapping、Authorization Result、Permission Checker、Permission Error 与 Forbidden Error。
+- 新增 Permission Registry、Permission Resolver、Authorization Service 与 `require_permission()` FastAPI Dependency；JWT Payload 继续只承载身份，不写入 permission matrix。
+- 冻结 admin / manager / employee 与 10 项能力权限；未知角色使用空权限集 fail-closed，不抛出 ValueError 或返回 500。
+- Documents、Document Chunk/Import、Retrieval、Internal RAG、Tasks、Approval、Audit 与 Security Catalog 使用声明式 Permission Dependency；业务 Router/Service 不写 role if 判断。
+- Health、Login、Swagger/OpenAPI 保持匿名，`GET /api/v1/users/me` 保持 authentication-only；受保护 API 继续使用 Swagger `BearerAuth`。
+- 权限不足统一返回 403 `forbidden`，安全 detail 包含 `permission` 与 `role`，且不错误返回 401 或 `WWW-Authenticate`。
+- 新增 12 个 RBAC 单元/API 测试并更新安全目录契约测试；InMemory 182 passed（skip 1）、PostgreSQL 187 passed（skip 0）、Frontend 47/47、build、compileall 全绿。
+- 本轮未修改 JWT Contract、Repository、Alembic、Migration、schema、Embedding、pgvector、Retrieval/Reranker 实现、Frontend、README、Learning 或 handbook。
+
 ## 2026-07-15 ERIP Enterprise JWT Authentication
 
 - 新增集中式 JWT Authentication Framework：Access Token、Token Payload、Current User、Authentication Error、JWT Config / Provider / Service / Dependency。

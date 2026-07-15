@@ -2,6 +2,32 @@
 
 最后更新：2026-07-15
 
+## 2026-07-15 ERIP Enterprise RBAC Authorization
+
+- [x] 审计 JWT / CurrentUser、API Route、旧审批域 RBAC 与测试，保留冻结 Authentication Contract
+- [x] 建立 Role、Permission、Role Mapping、Authorization Result、Permission Checker 与 403 Error Contract
+- [x] 建立集中 Permission Registry、Permission Resolver、Authorization Service 和 `require_permission()` Dependency
+- [x] 冻结 admin / manager / employee 三角色与 10 项 API 能力权限，JWT 不携带 permissions
+- [x] Documents、Retrieval、Internal RAG、Tasks、Approval、Audit、Security Catalog 全部通过声明式 Dependency 授权
+- [x] Health、Login、Swagger/OpenAPI 保持匿名，Current User 接口保持 authentication-only
+- [x] 统一权限不足与未知角色的 403 fail-closed 响应和安全结构化日志
+- [x] 覆盖 Role Mapping、Resolver、Checker、Dependency、403、Documents、Retrieval、Approval、Audit、Security、匿名入口与 Swagger
+- [x] 双 backend 回归完成：InMemory 182（skip 1）、PostgreSQL 187（skip 0）、Frontend 47/47、build、compileall
+
+### 完成记录
+
+- 2026-07-15：授权链固定为 `JWT -> CurrentUser -> Permission Dependency -> AuthorizationService -> API`；业务 Service 不解析 Token、不判断 role。
+- 2026-07-15：admin 拥有当前全部权限；manager 不含 `security.manage`；employee 不含 archive/review/admin/audit/security 权限。
+- 2026-07-15：权限不足返回 403 `forbidden`，detail 固定包含 `permission` 与 `role`，不携带 `WWW-Authenticate`。
+- 2026-07-15：既有审批域 RBAC/审计兼容层保持不变，新 JWT-RBAC 在进入该业务链之前统一授权。
+- 2026-07-15：首次 PostgreSQL Baseline 被沙箱阻止本机 socket 访问；授权后按指定命令完整重跑通过，0 skipped。
+
+### 后续 Authorization Hardening（不属于本轮）
+
+- [ ] 将静态 Role Mapping 替换为可治理 Policy Store 或外部 Policy Engine
+- [ ] 增加 organization / tenant / resource ownership 等上下文授权，不写入 JWT permission 列表
+- [ ] 在未来独立阶段收敛旧审批域 permission 名称与平台 Permission Registry
+
 ## 2026-07-15 ERIP Enterprise JWT Authentication
 
 - [x] 审计现有 API / config / services / tests，确认无 JWT、Login、Bearer 或 Token 解析实现
