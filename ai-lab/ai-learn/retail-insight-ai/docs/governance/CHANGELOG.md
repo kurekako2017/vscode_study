@@ -2,6 +2,16 @@
 
 # CHANGELOG
 
+## 2026-07-15 ERIP Enterprise JWT Authentication
+
+- 新增集中式 JWT Authentication Framework：Access Token、Token Payload、Current User、Authentication Error、JWT Config / Provider / Service / Dependency。
+- 新增 `POST /api/v1/auth/login`，使用 passlib + bcrypt 校验 admin / manager / employee deterministic test users；密码只以 bcrypt hash 存储。
+- JWT Payload 固定 `sub / user_id / username / role / iat / exp / jti`，默认 30 分钟、唯一 jti，不写入 permissions 或 permission matrix。
+- Health、Login、Swagger/OpenAPI 保持匿名；其余业务 API 统一经 `get_current_user()` Bearer dependency 认证，Swagger 提供 `BearerAuth` Authorize。
+- 缺失 Token、非法 Header、非法签名、非法 Payload、Token Expired 与 Login Failure 全部稳定返回 401，并保留 `WWW-Authenticate: Bearer`。
+- 新增 16 个 Authentication / Settings 测试并为既有 API 回归注入真实测试 JWT；InMemory 170 passed（skip 1）、PostgreSQL 175 passed（skip 0）、Frontend 47/47、build、compileall 全绿。
+- 本轮未实现 Refresh Token、用户数据库或 RBAC 扩展，未修改 Repository、Alembic、Migration、schema、Frontend、README、Learning 或 handbook。
+
 ## 2026-07-14 ERIP Enterprise Reranker
 
 - 新增独立 Reranker contract、deterministic provider、集中配置与 service，使用关键词覆盖率、原 retrieval score、位置和 SHA-256 稳定排序。

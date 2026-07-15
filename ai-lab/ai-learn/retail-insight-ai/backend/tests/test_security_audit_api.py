@@ -10,6 +10,7 @@ from app.main import create_app
 from app.models.audit import AuditLog, AuditLogResult
 from app.services.audit_service import AuditService
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+from tests.auth_test_utils import authorization_headers
 
 
 class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
@@ -20,22 +21,24 @@ class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
         reset_postgres_state_if_needed(settings)
         self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
-        self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
+        self.client = httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(self.app),
+        )
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()
 
-    async def test_current_user_returns_system_placeholder(self) -> None:
+    async def test_current_user_returns_authenticated_jwt_identity(self) -> None:
         response = await self.client.get("/api/v1/users/me")
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertTrue(payload["success"])
         user = payload["data"]
-        self.assertEqual(user["user_id"], "system")
-        self.assertEqual(user["roles"], ["admin"])
-        self.assertIn("system.admin", user["permissions"])
-        self.assertIn("audit.read", user["permissions"])
-        self.assertEqual(user["status"], "active")
+        self.assertEqual(user["user_id"], "user-admin")
+        self.assertEqual(user["username"], "admin")
+        self.assertEqual(user["role"], "admin")
 
     async def test_role_catalog_is_frozen(self) -> None:
         response = await self.client.get("/api/v1/security/roles")

@@ -9,6 +9,7 @@ import httpx
 from app.config.settings import Settings
 from app.main import create_app
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+from tests.auth_test_utils import authorization_headers
 
 
 class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
@@ -19,7 +20,11 @@ class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
         reset_postgres_state_if_needed(self.settings)
         self.app = create_app(self.settings)
         transport = httpx.ASGITransport(app=self.app)
-        self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
+        self.client = httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(self.app),
+        )
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()
@@ -142,7 +147,11 @@ class RetailInsightAPITest(unittest.IsolatedAsyncioTestCase):
             )
         )
         transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(app),
+        ) as client:
             create_response = await client.post(
                 "/api/tasks",
                 headers={"X-Request-ID": "failed-task-request"},

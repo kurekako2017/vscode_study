@@ -1,3 +1,14 @@
+"""Security Read API。
+
+文件职责：返回 JWT 认证后的 Current User，并保留既有角色/权限目录读接口。
+谁调用它：Swagger 或其他 HTTP 客户端。
+它调用谁：CurrentUser Dependency 与既有 SecurityService 目录读取方法。
+输入：Bearer JWT；目录接口无额外业务输入。
+输出：统一 CurrentUser / Role / Permission response envelope。
+设计理由：身份来自 Authentication，权限目录继续独立，避免在 JWT 中写权限逻辑。
+日本现场面试：本轮只替换 current-user seam，不扩展或修改 RBAC 判定。
+"""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
@@ -7,6 +18,8 @@ from app.observability.logging import get_logger, get_request_id, log_event
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.security_api import CurrentUserResponse, PermissionListResponse, RoleListResponse
 from app.services.security_service import SecurityService
+from app.security.contracts import CurrentUser
+from app.security.dependencies import get_current_user as get_authenticated_user
 
 # security 路由。
 router = APIRouter(prefix="/api/v1", tags=["security"])
@@ -14,19 +27,22 @@ logger = get_logger(__name__)
 
 
 @router.get("/users/me", response_model=ApiResponse[CurrentUserResponse])
-async def get_current_user(service: SecurityService = Depends(get_security_service)) -> ApiResponse[CurrentUserResponse]:
-    """返回系统占位用户，后续可由真实认证 middleware 替换。"""
+async def read_current_user(
+    current_user: CurrentUser = Depends(get_authenticated_user),
+) -> ApiResponse[CurrentUserResponse]:
+    """返回 JWT Dependency 已认证的当前用户，不执行权限判断。"""
 
-    user = service.get_current_user()
     log_event(
         logger,
         "info",
         "security_current_user_read",
         "Current user snapshot read",
-        task_id=user.user_id,
-        status=user.status.value,
+        task_id=current_user.user_id,
+        status="authenticated",
     )
-    return success_response(CurrentUserResponse.from_domain(user), get_request_id())
+    return success_response(
+        CurrentUserResponse.from_current_user(current_user), get_request_id()
+    )
 
 
 @router.get("/security/roles", response_model=ApiResponse[RoleListResponse])

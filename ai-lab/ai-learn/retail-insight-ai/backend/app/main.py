@@ -1,12 +1,24 @@
+"""FastAPI 应用组合入口。
+
+文件职责：创建应用、请求上下文、异常处理器，并注册匿名与受保护路由。
+谁调用它：Uvicorn 读取模块级 ``app``；测试通过 ``create_app()`` 创建隔离应用。
+它调用谁：AppContainer、日志/错误设施、各 API Router 与 CurrentUser Dependency。
+输入：可选 Settings，以及运行时 HTTP Request。
+输出：组装完成的 FastAPI application。
+设计理由：认证在路由注册边界统一挂载，业务 API 不重复解析 JWT。
+日本现场面试：组合根明确区分 Health/Login 匿名入口与 Bearer 保护业务入口。
+"""
+
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from uuid import uuid4
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.auth import router as auth_router
 from app.api.audit_logs import router as audit_logs_router
 from app.api.security import router as security_router
 from app.api.document_chunks import router as document_chunks_router
@@ -25,6 +37,8 @@ from app.core.learning_trace import (
     trace_source_chain,
 )
 from app.errors.handlers import register_exception_handlers
+from app.security.dependencies import get_current_user
+from app.security.errors import register_authentication_exception_handler
 from app.observability.logging import (
     bind_request_id,
     configure_logging,
@@ -126,17 +140,39 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.container = container
     # 注册异常处理器和路由。
     register_exception_handlers(application)
-    # 注册业务路由。
+    register_authentication_exception_handler(application)
+    # Health、Login 与 OpenAPI/Swagger 保持匿名可达。
     application.include_router(health_router)
-    application.include_router(security_router)
-    application.include_router(audit_logs_router)
-    application.include_router(documents_router)
-    application.include_router(document_chunks_router)
-    application.include_router(document_retrieval_router)
-    application.include_router(internal_rag_router)
-    application.include_router(approvals_router)
-    application.include_router(document_imports_router)
-    application.include_router(router=tasks_router)
+    application.include_router(auth_router)
+    # 所有业务 API 统一经过 CurrentUser Dependency；路由本身不再重复解析 JWT。
+    authentication_dependencies = [Depends(get_current_user)]
+    application.include_router(
+        security_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        audit_logs_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        documents_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        document_chunks_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        document_retrieval_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        internal_rag_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        approvals_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        document_imports_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        router=tasks_router, dependencies=authentication_dependencies
+    )
     return application
 
 

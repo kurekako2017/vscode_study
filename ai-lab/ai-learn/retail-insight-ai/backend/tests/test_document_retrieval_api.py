@@ -10,6 +10,7 @@ from app.config.settings import Settings
 from app.errors.error_codes import ErrorCode
 from app.main import create_app
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+from tests.auth_test_utils import authorization_headers
 
 
 class DocumentRetrievalAPITest(unittest.IsolatedAsyncioTestCase):
@@ -20,7 +21,11 @@ class DocumentRetrievalAPITest(unittest.IsolatedAsyncioTestCase):
         reset_postgres_state_if_needed(settings)
         self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
-        self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
+        self.client = httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(self.app),
+        )
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()
@@ -232,6 +237,7 @@ class DocumentRetrievalAPITest(unittest.IsolatedAsyncioTestCase):
         self.client = httpx.AsyncClient(
             transport=httpx.ASGITransport(app=self.app),
             base_url="http://test",
+            headers=authorization_headers(self.app),
         )
         await self._prepare_searchable_document(
             filename="vector.txt",

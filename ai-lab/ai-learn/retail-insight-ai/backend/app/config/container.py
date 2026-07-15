@@ -1,3 +1,14 @@
+"""应用依赖组合根。
+
+文件职责：根据 Settings 组装 Repository、Provider、Service 与 Authentication 组件。
+谁调用它：``app.main.create_app()``。
+它调用谁：各层稳定接口及当前 InMemory/PostgreSQL/Static/JWT 实现。
+输入：可选 Settings。
+输出：同一 FastAPI App 独享且类型明确的 AppContainer。
+设计理由：构造关系集中，Router 只通过 Dependency 取组件，不自行 new JWT/Service。
+日本现场面试：Authentication 依赖在 composition root 注入，不污染业务 Service 或 Repository。
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -68,6 +79,12 @@ from app.services.reranker_service import RerankerService
 from app.services.document_upload_service import DocumentUploadService
 from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
+from app.security.authentication import AuthenticationService
+from app.security.config import JWTConfig
+from app.security.jwt_provider import PyJWTProvider
+from app.security.jwt_service import JWTService
+from app.security.password import PasswordService
+from app.security.user_provider import DeterministicTestUserProvider
 from app.workflow.graph import AnalysisWorkflow
 
 
@@ -76,6 +93,8 @@ class AppContainer:
     """保存应用级共享依赖，保证同一个 App 内使用同一组 Repository。"""
 
     settings: Settings
+    authentication_service: AuthenticationService
+    jwt_service: JWTService
     task_service: TaskService
     report_repository: ReportRepository
     approval_repository: ApprovalRepository
@@ -130,6 +149,18 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     settings = settings or Settings()
     # 根据配置选择 InMemory 或 PostgreSQL Repository
     repositories = _build_repositories(settings)
+    # Authentication 只依赖集中配置和 deterministic identity provider，不进入 Repository/RBAC。
+    jwt_config = JWTConfig(
+        secret_key=settings.jwt_secret_key.get_secret_value(),
+        algorithm=settings.jwt_algorithm,
+        access_token_expire_minutes=settings.jwt_access_token_expire_minutes,
+    )
+    jwt_service = JWTService(PyJWTProvider(jwt_config), jwt_config)
+    authentication_service = AuthenticationService(
+        DeterministicTestUserProvider(),
+        PasswordService(),
+        jwt_service,
+    )
     task_repository = repositories.task
     report_repository = repositories.report
     event_repository = repositories.event
@@ -244,6 +275,8 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     )
     return AppContainer(
         settings=settings,
+        authentication_service=authentication_service,
+        jwt_service=jwt_service,
         task_service=task_service,
         report_repository=report_repository,
         approval_repository=approval_repository,

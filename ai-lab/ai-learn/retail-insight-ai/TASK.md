@@ -1,6 +1,19 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-14
+最后更新：2026-07-15
+
+## 2026-07-15 ERIP Enterprise JWT Authentication
+
+- [x] 建立 Access Token、Token Payload、Current User 与 Authentication Error 统一合同
+- [x] 在 `backend/app/security/` 集中实现 JWT Config、Provider、Service、Password、Login 与 CurrentUser Dependency
+- [x] 使用 passlib + bcrypt 校验 admin / manager / employee 三个 deterministic test users，不保存明文密码
+- [x] `POST /api/v1/auth/login` 签发默认 30 分钟 HS256 Access Token，不实现 Refresh Token
+- [x] 除 Health、Login、Swagger/OpenAPI 外，所有现有业务 API 统一要求 Bearer JWT
+- [x] Swagger OpenAPI 生成 `BearerAuth`，受保护 API 可通过 Authorize 测试
+- [x] 缺失、非法签名、非法 payload、过期 Token 和登录失败统一返回 401，不返回 500
+- [x] 保持既有 RBAC permission catalog、permission matrix 与 approval authorization 判定不变
+- [x] 完整回归：InMemory Backend 170 passed / 1 expected skip；PostgreSQL Backend 175 passed / 0 skipped；Frontend 47/47；build、compileall 通过
+- 完成记录：本轮只实现 Authentication；未进入 Refresh Token、用户数据库、RBAC 扩展、Frontend、Repository、Migration、README、Learning 或 handbook。
 
 ## 2026-07-14 ERIP Enterprise Reranker
 

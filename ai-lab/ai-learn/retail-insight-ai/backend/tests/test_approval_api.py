@@ -12,6 +12,7 @@ from app.models.report import ReportStatus
 from app.models.security import Department, Organization, User, UserStatus
 from app.services.security_service import SecurityService
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+from tests.auth_test_utils import authorization_headers
 
 
 class ApprovalApiTest(unittest.IsolatedAsyncioTestCase):
@@ -22,7 +23,11 @@ class ApprovalApiTest(unittest.IsolatedAsyncioTestCase):
         reset_postgres_state_if_needed(settings)
         self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
-        self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
+        self.client = httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(self.app),
+        )
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()

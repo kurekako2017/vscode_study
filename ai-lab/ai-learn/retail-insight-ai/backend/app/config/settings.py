@@ -1,11 +1,22 @@
-"""应用配置入口，统一从环境变量或 .env 读取部署参数。"""
+"""应用配置入口。
+
+文件职责：统一从环境变量或 .env 读取并校验部署参数。
+谁调用它：应用组合根、启动入口和配置测试。
+它调用谁：Pydantic Settings，不调用业务 Service 或 Repository。
+输入：环境变量、.env 或测试显式参数。
+输出：类型安全 Settings，包括集中 JWT 算法、密钥与 30 分钟有效期。
+设计理由：非法或不安全配置在启动时失败，避免运行中才出现认证漏洞。
+日本现场面试：生产环境禁止沿用公开本地 JWT secret，配置校验采用 fail-fast。
+"""
 
 from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_LOCAL_JWT_SECRET = "erip-local-jwt-signing-key-change-before-deployment-2026"
 
 
 class Settings(BaseSettings):
@@ -23,6 +34,10 @@ class Settings(BaseSettings):
     app_env: Literal["local", "development", "test", "staging", "production"] = "local"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     service_name: str = "retail-insight-ai"
+    # JWT 参数集中管理；本地默认密钥只为 deterministic 开发/测试，部署时必须由环境变量覆盖。
+    jwt_secret_key: SecretStr = SecretStr(_LOCAL_JWT_SECRET)
+    jwt_algorithm: Literal["HS256"] = "HS256"
+    jwt_access_token_expire_minutes: int = Field(default=30, ge=1, le=1440)
     task_execution_mode: Literal["background"] = "background"
     research_provider: Literal["static"] = "static"
     data_provider: Literal["static"] = "static"
@@ -60,3 +75,16 @@ class Settings(BaseSettings):
     # 下面两项仅控制本地演示节奏和故障测试，不改变 Provider 类型。
     workflow_step_delay_seconds: float = Field(default=0.05, ge=0, le=10)
     static_research_fail: bool = False
+
+    @model_validator(mode="after")
+    def validate_jwt_deployment_secret(self) -> "Settings":
+        """拒绝短密钥，并禁止 staging/production 沿用公开的本地默认值。"""
+
+        secret = self.jwt_secret_key.get_secret_value()
+        if len(secret) < 32:
+            raise ValueError("JWT_SECRET_KEY must contain at least 32 characters")
+        if self.app_env in {"staging", "production"} and secret == _LOCAL_JWT_SECRET:
+            raise ValueError(
+                "JWT_SECRET_KEY must be overridden outside local/test environments"
+            )
+        return self

@@ -8,6 +8,7 @@ import httpx
 from app.config.settings import Settings
 from app.main import create_app
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+from tests.auth_test_utils import authorization_headers
 
 
 class DocumentUploadAPITest(unittest.IsolatedAsyncioTestCase):
@@ -18,7 +19,11 @@ class DocumentUploadAPITest(unittest.IsolatedAsyncioTestCase):
         reset_postgres_state_if_needed(settings)
         self.app = create_app(settings)
         transport = httpx.ASGITransport(app=self.app)
-        self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
+        self.client = httpx.AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            headers=authorization_headers(self.app),
+        )
 
     async def asyncTearDown(self) -> None:
         await self.client.aclose()

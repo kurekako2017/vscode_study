@@ -49,6 +49,17 @@ class SettingsTest(unittest.TestCase):
             with self.assertRaises(ValidationError):
                 Settings(_env_file=None)
 
+    def test_jwt_defaults_to_30_minutes_and_secret_is_masked(self) -> None:
+        settings = Settings(_env_file=None)
+
+        self.assertEqual(settings.jwt_algorithm, "HS256")
+        self.assertEqual(settings.jwt_access_token_expire_minutes, 30)
+        self.assertEqual(str(settings.jwt_secret_key), "**********")
+
+    def test_production_rejects_local_default_jwt_secret(self) -> None:
+        with self.assertRaises(ValidationError):
+            Settings(app_env="production", _env_file=None)
+
 
 if __name__ == "__main__":
     unittest.main()

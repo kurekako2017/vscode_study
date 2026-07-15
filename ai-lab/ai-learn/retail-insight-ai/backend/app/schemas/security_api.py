@@ -27,34 +27,25 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from app.models.security import Permission, Role, User
+from app.models.security import Permission, Role
+from app.security.contracts import CurrentUser
 
 
 class CurrentUserResponse(BaseModel):
-    """冻结 GET /api/v1/users/me 的响应结构。"""
+    """GET /api/v1/users/me 返回 JWT 认证后的最小身份。"""
 
     user_id: str
     username: str
-    display_name: str
-    organization_id: str
-    department_id: str
-    roles: list[str]
-    permissions: list[str]
-    status: str
+    role: str
 
     @classmethod
-    def from_domain(cls, user: User) -> "CurrentUserResponse":
-        """从领域用户快照生成对外 response。"""
+    def from_current_user(cls, user: CurrentUser) -> "CurrentUserResponse":
+        """从认证 dependency 返回的主体生成对外 response。"""
 
         return cls(
             user_id=user.user_id,
             username=user.username,
-            display_name=user.display_name,
-            organization_id=user.organization.organization_id,
-            department_id=user.department.department_id,
-            roles=list(user.roles),
-            permissions=list(user.permissions),
-            status=user.status.value,
+            role=user.role,
         )
 
 
@@ -114,4 +105,3 @@ class PermissionListResponse(BaseModel):
         """把 frozen permission catalog 转成 response list。"""
 
         return cls(items=[PermissionResponse.from_domain(permission) for permission in permissions], next_cursor=None)
-

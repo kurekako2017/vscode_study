@@ -1,6 +1,29 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-14
+最后更新：2026-07-15
+
+## 2026-07-15 ERIP Enterprise JWT Authentication
+
+- [x] 审计现有 API / config / services / tests，确认无 JWT、Login、Bearer 或 Token 解析实现
+- [x] 冻结 `sub / user_id / username / role / iat / exp / jti` JWT Payload，不写入 permissions
+- [x] 建立集中 JWT Config、JWT Provider、JWT Service、Authentication Service 与 CurrentUser Dependency
+- [x] 使用 passlib + bcrypt 与预生成 hash 提供 admin / manager / employee deterministic test users
+- [x] 建立匿名 Login/Health 边界和统一受保护业务 API Bearer dependency
+- [x] 建立 401 Authentication Error / Unauthorized / Token Expired fallback 与安全结构化日志
+- [x] 覆盖 password、JWT、expired、invalid signature、missing token、current user、login、protected API、Bearer、Swagger
+- [x] 双 backend 回归完成：InMemory 170（skip 1）、PostgreSQL 175（skip 0）、Frontend 47/47、build、compileall
+
+### 完成记录
+
+- 2026-07-15：`POST /api/v1/auth/login` 与 Swagger `BearerAuth` 已落地；Access Token 默认有效期为配置化 30 分钟。
+- 2026-07-15：本地默认 JWT secret 仅允许 local/development/test；staging/production 未覆盖时配置校验直接失败。
+- 2026-07-15：认证后的 Current User 只暴露 `user_id / username / role`；本轮未把权限判断写入 JWT，也未修改既有 RBAC。
+- 2026-07-15：首次 PostgreSQL Baseline 被沙箱阻止本机 socket 访问；授权本机数据库访问后完整重跑通过，0 skipped。
+
+### 后续 Authentication Hardening（不属于本轮）
+
+- [ ] 未来用企业 User Store / IdP 替换 DeterministicTestUserProvider
+- [ ] 未来单独设计 Refresh Token、撤销、密钥轮换与多实例 Token 生命周期治理
 
 ## 2026-07-14 ERIP Enterprise Reranker
 
