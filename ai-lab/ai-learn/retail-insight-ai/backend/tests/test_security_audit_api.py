@@ -47,10 +47,10 @@ class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
         roles = payload["items"]
         self.assertEqual(
             [item["role"] for item in roles],
-            ["admin", "manager", "analyst", "viewer", "approver", "auditor"],
+            ["admin", "manager", "employee"],
         )
         admin_role = roles[0]
-        self.assertIn("system.admin", admin_role["permissions"])
+        self.assertIn("security.manage", admin_role["permissions"])
         self.assertIn("audit.read", admin_role["permissions"])
 
     async def test_permission_catalog_is_frozen(self) -> None:
@@ -59,9 +59,10 @@ class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
         payload = response.json()["data"]
         permissions = payload["items"]
         permission_names = [item["permission"] for item in permissions]
-        self.assertEqual(permission_names[0], "system.admin")
+        self.assertEqual(permission_names[0], "documents.read")
         self.assertIn("audit.read", permission_names)
-        self.assertIn("approval.approve", permission_names)
+        self.assertIn("approval.admin", permission_names)
+        self.assertEqual(len(permission_names), 10)
 
     async def test_audit_log_append_and_read(self) -> None:
         service = self.app.state.container.audit_service

@@ -19,6 +19,8 @@ from app.schemas.approval_api import (
 from app.schemas.common import ApiResponse, success_response
 from app.services.approval_service import ApprovalService
 from app.services.audit_middleware import AuditAction, AuditMiddleware
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 router = APIRouter(prefix="/api/v1", tags=["approvals"])
 T = TypeVar("T")
@@ -54,6 +56,7 @@ async def _run_audited_operation(
     "/reports/{task_id}/submit-approval",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_SUBMIT))],
 )
 async def submit_approval(
     task_id: str,
@@ -82,6 +85,7 @@ async def submit_approval(
     "/approvals",
     response_model=ApiResponse[ApprovalListResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_REVIEW))],
 )
 async def list_approvals(
     task_id: str | None = Query(default=None),
@@ -120,6 +124,7 @@ async def list_approvals(
     "/approvals/{approval_id}",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_REVIEW))],
 )
 async def get_approval(
     approval_id: str,
@@ -147,6 +152,7 @@ async def get_approval(
     "/approvals/{approval_id}/approve",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
 )
 async def approve(
     approval_id: str,
@@ -175,6 +181,7 @@ async def approve(
     "/approvals/{approval_id}/reject",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
 )
 async def reject(
     approval_id: str,
@@ -203,6 +210,7 @@ async def reject(
     "/reports/{task_id}/revise",
     response_model=ApiResponse[ApprovalRevisionResponse],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
 )
 async def revise(
     task_id: str,

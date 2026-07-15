@@ -10,9 +10,15 @@ from app.schemas.document_retrieval_api import (
     DocumentRetrievalSearchResponse,
 )
 from app.services.document_retrieval_service import DocumentRetrievalService
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 # 路由只承载 keyword/vector/hybrid 的 HTTP 入口，不负责向量 SQL 或融合排序。
-router = APIRouter(prefix="/api/v1/document-retrieval", tags=["document-retrieval"])
+router = APIRouter(
+    prefix="/api/v1/document-retrieval",
+    tags=["document-retrieval"],
+    dependencies=[Depends(require_permission(Permission.RETRIEVAL_QUERY))],
+)
 
 
 @router.post(

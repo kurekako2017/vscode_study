@@ -27,8 +27,12 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from app.models.security import Permission, Role
 from app.security.contracts import CurrentUser
+from app.security.rbac_contracts import (
+    Permission,
+    PermissionDefinition,
+    RoleMapping,
+)
 
 
 class CurrentUserResponse(BaseModel):
@@ -57,10 +61,18 @@ class RoleResponse(BaseModel):
     permissions: list[str]
 
     @classmethod
-    def from_domain(cls, role: Role) -> "RoleResponse":
-        """从领域角色生成对外 response。"""
+    def from_contract(cls, role: RoleMapping) -> "RoleResponse":
+        """从集中 Role Mapping 生成稳定排序的对外 response。"""
 
-        return cls(role=role.role, description=role.description, permissions=list(role.permissions))
+        return cls(
+            role=role.role.value,
+            description=role.description,
+            permissions=[
+                permission.value
+                for permission in Permission
+                if permission in role.permissions
+            ],
+        )
 
 
 class RoleListResponse(BaseModel):
@@ -70,10 +82,13 @@ class RoleListResponse(BaseModel):
     next_cursor: str | None = None
 
     @classmethod
-    def from_domain(cls, roles: tuple[Role, ...]) -> "RoleListResponse":
-        """把 frozen role catalog 转成 response list。"""
+    def from_contract(cls, roles: tuple[RoleMapping, ...]) -> "RoleListResponse":
+        """把集中角色目录转成 response list。"""
 
-        return cls(items=[RoleResponse.from_domain(role) for role in roles], next_cursor=None)
+        return cls(
+            items=[RoleResponse.from_contract(role) for role in roles],
+            next_cursor=None,
+        )
 
 
 class PermissionResponse(BaseModel):
@@ -84,11 +99,11 @@ class PermissionResponse(BaseModel):
     category: str
 
     @classmethod
-    def from_domain(cls, permission: Permission) -> "PermissionResponse":
-        """从领域权限生成对外 response。"""
+    def from_contract(cls, permission: PermissionDefinition) -> "PermissionResponse":
+        """从 Permission Registry 定义生成对外 response。"""
 
         return cls(
-            permission=permission.permission,
+            permission=permission.permission.value,
             description=permission.description,
             category=permission.category,
         )
@@ -101,7 +116,15 @@ class PermissionListResponse(BaseModel):
     next_cursor: str | None = None
 
     @classmethod
-    def from_domain(cls, permissions: tuple[Permission, ...]) -> "PermissionListResponse":
-        """把 frozen permission catalog 转成 response list。"""
+    def from_contract(
+        cls, permissions: tuple[PermissionDefinition, ...]
+    ) -> "PermissionListResponse":
+        """把集中权限目录转成 response list。"""
 
-        return cls(items=[PermissionResponse.from_domain(permission) for permission in permissions], next_cursor=None)
+        return cls(
+            items=[
+                PermissionResponse.from_contract(permission)
+                for permission in permissions
+            ],
+            next_cursor=None,
+        )

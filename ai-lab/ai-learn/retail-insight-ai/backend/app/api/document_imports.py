@@ -8,6 +8,8 @@ from app.observability.logging import get_request_id
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.document_import_api import DocumentImportResponse
 from app.services.document_import_service import DocumentImportService
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 # 文档导入路由只承载 Import Pipeline 的 HTTP 入口，不负责解析或持久化细节。
 router = APIRouter(tags=["document-imports"])
@@ -17,6 +19,7 @@ router = APIRouter(tags=["document-imports"])
     path="/api/v1/documents/{document_id}/import",
     response_model=ApiResponse[DocumentImportResponse],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_WRITE))],
 )
 async def import_document(
     document_id: str,
@@ -44,6 +47,7 @@ async def import_document(
     path="/api/v1/document-imports/{import_id}",
     response_model=ApiResponse[DocumentImportResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_READ))],
 )
 async def get_document_import(
     import_id: str,

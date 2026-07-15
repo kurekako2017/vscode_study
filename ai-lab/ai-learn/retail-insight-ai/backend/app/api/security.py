@@ -1,25 +1,29 @@
-"""Security Read API。
+"""Current User 与 Enterprise RBAC Catalog API。
 
 文件职责：返回 JWT 认证后的 Current User，并保留既有角色/权限目录读接口。
 谁调用它：Swagger 或其他 HTTP 客户端。
-它调用谁：CurrentUser Dependency 与既有 SecurityService 目录读取方法。
+它调用谁：CurrentUser Dependency、Permission Dependency 与 AuthorizationService。
 输入：Bearer JWT；目录接口无额外业务输入。
 输出：统一 CurrentUser / Role / Permission response envelope。
-设计理由：身份来自 Authentication，权限目录继续独立，避免在 JWT 中写权限逻辑。
-日本现场面试：本轮只替换 current-user seam，不扩展或修改 RBAC 判定。
+设计理由：身份来自 Authentication，角色/权限目录来自服务端 Registry，不写进 JWT。
+日本现场面试：安全目录本身也受 security.manage 保护，users/me 只要求认证。
 """
 
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
 
-from app.api.dependencies import get_security_service
 from app.observability.logging import get_logger, get_request_id, log_event
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.security_api import CurrentUserResponse, PermissionListResponse, RoleListResponse
-from app.services.security_service import SecurityService
+from app.security.authorization_service import AuthorizationService
 from app.security.contracts import CurrentUser
-from app.security.dependencies import get_current_user as get_authenticated_user
+from app.security.dependencies import (
+    get_authorization_service,
+    get_current_user as get_authenticated_user,
+    require_permission,
+)
+from app.security.rbac_contracts import Permission
 
 # security 路由。
 router = APIRouter(prefix="/api/v1", tags=["security"])
@@ -45,11 +49,17 @@ async def read_current_user(
     )
 
 
-@router.get("/security/roles", response_model=ApiResponse[RoleListResponse])
-async def get_roles(service: SecurityService = Depends(get_security_service)) -> ApiResponse[RoleListResponse]:
-    """返回冻结角色目录，供未来 RBAC 和审计界面直接读取。"""
+@router.get(
+    "/security/roles",
+    response_model=ApiResponse[RoleListResponse],
+    dependencies=[Depends(require_permission(Permission.SECURITY_MANAGE))],
+)
+async def get_roles(
+    service: AuthorizationService = Depends(get_authorization_service),
+) -> ApiResponse[RoleListResponse]:
+    """返回当前集中 Role Mapping。"""
 
-    roles = service.list_roles()
+    roles = service.registry.list_role_mappings()
     log_event(
         logger,
         "info",
@@ -57,16 +67,20 @@ async def get_roles(service: SecurityService = Depends(get_security_service)) ->
         "Role catalog read",
         status="success",
     )
-    return success_response(RoleListResponse.from_domain(roles), get_request_id())
+    return success_response(RoleListResponse.from_contract(roles), get_request_id())
 
 
-@router.get("/security/permissions", response_model=ApiResponse[PermissionListResponse])
+@router.get(
+    "/security/permissions",
+    response_model=ApiResponse[PermissionListResponse],
+    dependencies=[Depends(require_permission(Permission.SECURITY_MANAGE))],
+)
 async def get_permissions(
-    service: SecurityService = Depends(get_security_service),
+    service: AuthorizationService = Depends(get_authorization_service),
 ) -> ApiResponse[PermissionListResponse]:
-    """返回冻结权限目录，方便前端或未来治理工具展示。"""
+    """返回集中 Permission Registry，供治理工具展示。"""
 
-    permissions = service.list_permissions()
+    permissions = service.registry.list_permissions()
     log_event(
         logger,
         "info",
@@ -74,4 +88,6 @@ async def get_permissions(
         "Permission catalog read",
         status="success",
     )
-    return success_response(PermissionListResponse.from_domain(permissions), get_request_id())
+    return success_response(
+        PermissionListResponse.from_contract(permissions), get_request_id()
+    )

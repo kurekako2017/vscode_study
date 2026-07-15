@@ -1,4 +1,4 @@
-"""Authentication Error Contract 与统一 401 响应。
+"""Authentication / Authorization Error Contract 与统一 401/403 响应。
 
 文件职责：区分缺失/非法凭证、登录失败和 Token Expired，全部安全降级为 401。
 谁调用它：Password/JWT Service 与 CurrentUser Dependency。
@@ -53,8 +53,28 @@ class TokenExpiredError(AuthenticationError):
     message = "Access token has expired"
 
 
+class PermissionError(Exception):
+    """所有可预期权限失败的基类；与认证失败严格分离。"""
+
+    error_code = "permission_error"
+    message = "Permission check failed"
+    status_code = 403
+
+    def __init__(self, *, permission: str, role: str) -> None:
+        super().__init__(self.message)
+        self.permission = permission
+        self.role = role
+
+
+class ForbiddenError(PermissionError):
+    """用户已认证但不具备 API 所需权限。"""
+
+    error_code = "forbidden"
+    message = "Current user does not have the required permission"
+
+
 def register_authentication_exception_handler(application: FastAPI) -> None:
-    """注册认证专用处理器，稳定返回 401 而不是 500。"""
+    """注册 Security 专用处理器，稳定返回 401/403 而不是 500。"""
 
     @application.exception_handler(AuthenticationError)
     async def authentication_exception_handler(
@@ -85,4 +105,39 @@ def register_authentication_exception_handler(application: FastAPI) -> None:
             status_code=exception.status_code,
             content=body.model_dump(mode="json"),
             headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    @application.exception_handler(PermissionError)
+    async def permission_exception_handler(
+        _: Request,
+        exception: PermissionError,
+    ) -> JSONResponse:
+        """权限不足返回 403，不伪装成 Token 失效，也不泄露内部策略。"""
+
+        request_id = get_request_id()
+        log_event(
+            logger,
+            "warning",
+            "authorization_denied",
+            exception.message,
+            request_id=request_id,
+            error_code=exception.error_code,
+            status="403",
+        )
+        body = ApiResponse[object](
+            success=False,
+            request_id=request_id,
+            data=None,
+            error=ApiError(
+                code=exception.error_code,
+                message=exception.message,
+                detail={
+                    "permission": exception.permission,
+                    "role": exception.role,
+                },
+            ),
+        )
+        return JSONResponse(
+            status_code=exception.status_code,
+            content=body.model_dump(mode="json"),
         )

@@ -80,10 +80,13 @@ from app.services.document_upload_service import DocumentUploadService
 from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
 from app.security.authentication import AuthenticationService
+from app.security.authorization_service import AuthorizationService
 from app.security.config import JWTConfig
 from app.security.jwt_provider import PyJWTProvider
 from app.security.jwt_service import JWTService
 from app.security.password import PasswordService
+from app.security.permission_registry import PermissionRegistry
+from app.security.permission_resolver import PermissionResolver
 from app.security.user_provider import DeterministicTestUserProvider
 from app.workflow.graph import AnalysisWorkflow
 
@@ -95,6 +98,7 @@ class AppContainer:
     settings: Settings
     authentication_service: AuthenticationService
     jwt_service: JWTService
+    authorization_service: AuthorizationService
     task_service: TaskService
     report_repository: ReportRepository
     approval_repository: ApprovalRepository
@@ -160,6 +164,11 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         DeterministicTestUserProvider(),
         PasswordService(),
         jwt_service,
+    )
+    # RBAC 只消费 CurrentUser.role；权限映射留在服务端，不修改 JWT Contract。
+    permission_registry = PermissionRegistry()
+    authorization_service = AuthorizationService(
+        PermissionResolver(permission_registry), permission_registry
     )
     task_repository = repositories.task
     report_repository = repositories.report
@@ -277,6 +286,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         settings=settings,
         authentication_service=authentication_service,
         jwt_service=jwt_service,
+        authorization_service=authorization_service,
         task_service=task_service,
         report_repository=report_repository,
         approval_repository=approval_repository,

@@ -12,9 +12,15 @@ from app.schemas.common import ApiResponse, success_response
 from app.schemas.report_api import ReportResponse
 from app.schemas.task_api import TaskCreateRequest, TaskCreateResponse, TaskResponse
 from app.services.task_service import TaskService
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 # 定义 tasks 路由器。
-router = APIRouter(prefix="/api/tasks", tags=["tasks"])
+router = APIRouter(
+    prefix="/api/tasks",
+    tags=["tasks"],
+    dependencies=[Depends(require_permission(Permission.ANALYSIS_EXECUTE))],
+)
 logger = get_logger(__name__)
 
 #   

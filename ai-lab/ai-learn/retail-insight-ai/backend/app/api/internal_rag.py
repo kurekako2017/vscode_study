@@ -32,9 +32,15 @@ from app.observability.logging import get_request_id
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.internal_rag_api import InternalRagAnswerRequest, InternalRagAnswerResponse
 from app.services.internal_rag_service import InternalRagService
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 # internal RAG 路由只承载 answer 的 HTTP 入口，不负责检索排名或引用组装细节。
-router = APIRouter(prefix="/api/v1/internal-rag", tags=["internal-rag"])
+router = APIRouter(
+    prefix="/api/v1/internal-rag",
+    tags=["internal-rag"],
+    dependencies=[Depends(require_permission(Permission.ANALYSIS_EXECUTE))],
+)
 
 
 @router.post(

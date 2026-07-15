@@ -20,6 +20,8 @@ from app.models.document import DocumentStatus, DocumentType, Language
 from app.services.document_archive_service import DocumentArchiveService
 from app.services.document_read_service import DocumentReadService
 from app.services.document_upload_service import DocumentUploadService
+from app.security.dependencies import require_permission
+from app.security.rbac_contracts import Permission
 
 # 文档路由。
 router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
@@ -29,6 +31,7 @@ router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
     path="",
     response_model=ApiResponse[DocumentUploadSessionResponse],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_WRITE))],
 )
 
 async def upload_document(
@@ -61,7 +64,12 @@ async def upload_document(
     return success_response(data, get_request_id())
 
 
-@router.get(path="", response_model=ApiResponse[DocumentListResponse], status_code=status.HTTP_200_OK)
+@router.get(
+    path="",
+    response_model=ApiResponse[DocumentListResponse],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_READ))],
+)
 async def list_documents(
     status_filter: DocumentStatus | None = Query(default=None, alias="status"),
     document_type: DocumentType | None = Query(default=None),
@@ -100,7 +108,12 @@ async def list_documents(
     return success_response(data, get_request_id())
 
 
-@router.get(path="/{document_id}", response_model=ApiResponse[DocumentResponse], status_code=status.HTTP_200_OK)
+@router.get(
+    path="/{document_id}",
+    response_model=ApiResponse[DocumentResponse],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_READ))],
+)
 async def get_document(
     document_id: str,
     service: DocumentReadService = Depends(get_document_read_service),
@@ -127,6 +140,7 @@ async def get_document(
     path="/{document_id}",
     response_model=ApiResponse[DocumentArchiveResponse],
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(require_permission(Permission.DOCUMENTS_ARCHIVE))],
 )
 async def archive_document(
     document_id: str,
