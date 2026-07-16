@@ -1,6 +1,20 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-15
+最后更新：2026-07-16
+
+## 2026-07-16 ERIP PostgreSQL Persistent Audit
+
+- [x] InMemory Audit 进入冻结维护状态；默认 `REPOSITORY_BACKEND=inmemory` 与原有测试保持可用
+- [x] PostgreSQL AuditLog 补齐 actor username/role、permission、HTTP method/path/status 和 failure 统一结果
+- [x] 新增 PostgreSQL-only PersistentAuditService 与 FastAPI yield Dependency，集中处理 success/failure
+- [x] JWT Dependency 记录 401，Permission Dependency 记录 `authorization.denied`，actor 只来自 CurrentUser
+- [x] Approval PostgreSQL 旧审计写入关闭，避免同一动作被旧 Middleware 与新 Dependency 重复记录
+- [x] PostgreSQL nested Unit of Work 使用 savepoint，成功业务与 Audit 原子提交，失败业务回滚后保留 failure event/audit
+- [x] Audit API 补齐过滤、时间范围校验、limit/offset 分页和 `created_at DESC, id DESC` 稳定排序
+- [x] 新增 `20260716_03_persistent_audit` migration，旧 `failed` 兼容升级为 `failure`，新增必要索引
+- [x] 验证 login、authentication、authorization、document、retrieval、analysis、approval、audit、security 事件
+- [x] 最终验证：InMemory 183（1 expected skip）、PostgreSQL 191（0 skip）、Frontend 47/47、build、compileall、diff-check
+- 完成记录：本轮未修改 InMemory Repository 实现、默认 backend、冻结角色权限矩阵、JWT permissions、Frontend、README、学习文档或面试文档。
 
 ## 2026-07-15 ERIP Enterprise RBAC Authorization
 

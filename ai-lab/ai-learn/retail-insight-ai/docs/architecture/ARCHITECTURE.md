@@ -1,12 +1,43 @@
 # Enterprise Retail Intelligence Platform (ERIP) Architecture
 
-最后更新：2026-07-05
+最后更新：2026-07-16
 
 本文件记录 `Enterprise Retail Intelligence Platform (ERIP)` 的统一架构口径。当前仓库中的 `Retail Insight AI` 只表示 ERIP 的 Current MVP；未实现的能力必须明确标注，不得把规划写成现状。
 
 Human-readable architecture explanations are trilingual by default.
 本文件中的人类可读架构说明默认采用三语。
 本書の人間向けアーキテクチャ説明は三言語を標準とします。
+
+## PostgreSQL Persistent Audit / PostgreSQL 持久化审计 / PostgreSQL 永続監査
+
+- English: Persistent Audit is enabled only for PostgreSQL; InMemory remains the frozen local learning path.
+- 中文（简体）：Persistent Audit 只在 PostgreSQL 启用；InMemory 保持冻结的本地学习路径。
+- 日本語：Persistent Audit は PostgreSQL のみで有効化し、InMemory は凍結されたローカル学習経路として維持します。
+
+```text
+JWT CurrentUser / Permission Dependency / Business Endpoint
+│
+▼
+Persistent Audit yield Dependency
+│
+├── success -> business savepoint release -> append audit -> request transaction commit
+└── failure -> business savepoint rollback -> append failure audit -> commit audit -> rethrow error
+```
+
+```mermaid
+flowchart LR
+    A[JWT CurrentUser / Permission] --> B[Persistent Audit Dependency]
+    B --> C[Business Service Savepoint]
+    C -->|success| D[Append Success Audit]
+    C -->|failure| E[Rollback Savepoint]
+    E --> F[Append Failure Audit]
+    D --> G[Commit Request Transaction]
+    F --> G
+```
+
+- Audit Log remains append-only and read-only through ordinary APIs.
+- actor identity comes from verified `CurrentUser`; credentials, headers, document bodies, prompts, and full RAG context are excluded.
+- Physical legacy columns (`operation_type`, `actor_id`, `created_at`) remain for data compatibility; the API exposes enterprise aliases such as `action`, `actor_user_id`, and `occurred_at`.
 
 ## Current Verified Capability Envelope / 当前已验证能力边界 / 現在の検証済み能力範囲
 

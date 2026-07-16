@@ -694,6 +694,32 @@
 - 当前未完成能力被固定为：frontend UI、PostgreSQL repository full migration、real authentication、JWT/OAuth、real LLM provider、pgvector、internet search、MCP、production deployment。
 - English / 中文（简体） / 日本語 三语摘要继续作为人类可读文档的默认表达方式。
 
+## ADR-033
+
+日期：2026-07-16
+
+决策：Persistent Audit 只面向 PostgreSQL 启用，InMemory 进入冻结维护；使用 FastAPI yield Dependency、PostgreSQL request transaction 与 nested savepoint 统一 success/failure/denied 审计。
+
+原因：
+
+- 企业审计需要跨进程持久化、稳定查询、真实 CurrentUser actor 和不可绕过的失败语义。
+- 继续要求 InMemory 与 PostgreSQL 对等会扩大本地教学实现并制造两套企业审计逻辑。
+- 单纯在响应后另开事务写 Audit 会出现“业务已成功但审计失败”的不一致，因此成功业务与 Audit 必须同事务提交。
+
+备选方案：
+
+- 继续扩展 InMemory Audit；拒绝，因为本阶段已冻结 InMemory，只要求原有回归。
+- 使用全局 HTTP Middleware 统一记录；拒绝，因为难以保持路由 action/resource 合同，并容易与 Approval 旧审计重复。
+- 业务提交后再异步写 Audit；拒绝，因为审计失败会伪装成业务成功。
+
+影响：
+
+- PostgreSQL 业务 endpoint 通过 yield Dependency 建立请求事务；业务 Service 的 Unit of Work 使用 savepoint。
+- success 时业务事实与 Audit 一起提交；business failure 时回滚业务 savepoint，再提交必要 failure event/audit 并重新抛出错误。
+- Permission Dependency 单独记录 `authorization.denied`；JWT/Login 失败不保存 Token、Password、Authorization Header 或 Cookie。
+- `audit_logs` 保留旧物理列兼容已有数据，只增 nullable 字段和必要索引；普通 API 继续只读，不提供 update/delete。
+- 角色权限矩阵、JWT payload、默认 `REPOSITORY_BACKEND=inmemory` 与 InMemory Repository 实现保持不变。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

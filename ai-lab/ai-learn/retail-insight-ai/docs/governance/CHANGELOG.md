@@ -2,6 +2,16 @@
 
 # CHANGELOG
 
+## 2026-07-16 ERIP PostgreSQL Persistent Audit
+
+- 新增 PostgreSQL-only `PersistentAuditService` 与 FastAPI yield Dependency；InMemory Audit 保持冻结且默认 backend 不变。
+- AuditLog/API 增加 `occurred_at`、actor username/role、action、permission、HTTP method/path/status 等企业审计字段，同时保留旧字段兼容。
+- Login 记录 `login.success/login.failure`；Bearer 401、Permission 403、Document、Retrieval、Analysis、Approval、Audit Read、Security Catalog 纳入统一持久审计。
+- PostgreSQL Unit of Work 增加 nested savepoint；成功业务与审计原子提交，业务失败回滚自身写入后保留 failure event/audit，审计写失败不返回业务成功。
+- Audit 查询支持 actor、action、resource、result、时间、request_id、limit/offset 和稳定倒序；Audit API 仍无修改或删除入口。
+- 新增 `20260716_03_persistent_audit` migration：兼容旧 `failed`、增加 nullable 列与 4 个常用查询索引，不删除历史数据。
+- 最终验证：InMemory 183（1 expected skip）、PostgreSQL 191（0 skip）、Frontend 47/47、production build、compileall、migration round-trip、diff-check 全绿。
+
 ## 2026-07-15 ERIP Enterprise RBAC Authorization
 
 - 新增集中式 RBAC Contract：Role、Permission、Role Mapping、Authorization Result、Permission Checker、Permission Error 与 Forbidden Error。

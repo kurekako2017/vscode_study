@@ -27,8 +27,10 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any, AsyncIterator, Callable
 
+from fastapi.exceptions import RequestValidationError
+
 from app.errors.base import AppException
-from app.errors.exceptions import AuditLogAppendException
+from app.errors.exceptions import AuditLogAppendException, PermissionDeniedException
 from app.models.audit import AuditLog, AuditLogResult
 from app.repositories.interfaces.unit_of_work import UnitOfWork
 from app.security.contracts import CurrentUser
@@ -73,8 +75,13 @@ class PersistentAuditService:
         "apikey",
         "access_token",
         "refresh_token",
+        "token",
         "jwt",
+        "headers",
         "prompt",
+        "body",
+        "content",
+        "context",
         "document_content",
         "document_body",
         "rag_context",
@@ -110,30 +117,41 @@ class PersistentAuditService:
             yield
             return
 
+        business_error: Exception | None = None
+        business_traceback = None
         try:
             with self._unit_of_work.transaction():
-                yield
-                self._record(
-                    spec=spec,
-                    context=context_provider(),
-                    result=AuditLogResult.SUCCESS,
-                    status_code=spec.success_status_code,
-                )
+                try:
+                    yield
+                except PermissionDeniedException as exc:
+                    # 旧 Approval Guard 已经写入 security.permission.denied。
+                    # PostgreSQL 模式只提交该兼容事实，不再追加第二条 approval failure。
+                    business_error = exc
+                    business_traceback = exc.__traceback__
+                except Exception as exc:
+                    business_error = exc
+                    business_traceback = exc.__traceback__
+                    status_code, error_code = self._failure_context(exc)
+                    self._record(
+                        spec=spec,
+                        context=context_provider(),
+                        result=AuditLogResult.FAILURE,
+                        status_code=status_code,
+                        error_code=error_code,
+                        extra_metadata={"exception_type": type(exc).__name__},
+                    )
+                else:
+                    self._record(
+                        spec=spec,
+                        context=context_provider(),
+                        result=AuditLogResult.SUCCESS,
+                        status_code=spec.success_status_code,
+                    )
         except AuditLogAppendException:
             # Repository 不可用时不能再次尝试写“审计失败的审计”，直接让请求失败。
             raise
-        except Exception as exc:
-            status_code, error_code = self._failure_context(exc)
-            with self._unit_of_work.transaction():
-                self._record(
-                    spec=spec,
-                    context=context_provider(),
-                    result=AuditLogResult.FAILURE,
-                    status_code=status_code,
-                    error_code=error_code,
-                    extra_metadata={"exception_type": type(exc).__name__},
-                )
-            raise
+        if business_error is not None:
+            raise business_error.with_traceback(business_traceback)
 
     def record_login_success(
         self,
@@ -309,6 +327,8 @@ class PersistentAuditService:
             return exc.status_code, exc.error_code
         if isinstance(exc, PermissionError):
             return exc.status_code, exc.error_code
+        if isinstance(exc, RequestValidationError):
+            return 422, "validation_error"
         status_code = getattr(exc, "status_code", 500)
         return int(status_code), "internal_error"
 

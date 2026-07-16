@@ -97,10 +97,17 @@ class SecurityAuditAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(payload["success"])
         items = payload["data"]["items"]
         self.assertEqual(len(items), 2)
-        self.assertEqual(items[0]["operation_type"], "security.role.assigned")
+        if self.app.state.container.repository_backend == "postgres":
+            # Persistent Audit 查询按 occurred_at DESC、主键 DESC 稳定倒序。
+            self.assertEqual(items[0]["operation_type"], "audit.read")
+            self.assertEqual(items[1]["operation_type"], "security.role.assigned")
+            self.assertEqual(items[1]["request_id"], "audit-request-001")
+        else:
+            # InMemory 冻结为既有追加顺序，不补齐 PostgreSQL 查询能力。
+            self.assertEqual(items[0]["operation_type"], "security.role.assigned")
+            self.assertEqual(items[0]["request_id"], "audit-request-001")
+            self.assertEqual(items[1]["operation_type"], "audit.read")
         self.assertEqual(items[0]["result"], "success")
-        self.assertEqual(items[0]["request_id"], "audit-request-001")
-        self.assertEqual(items[1]["operation_type"], "audit.read")
         self.assertEqual(payload["data"]["next_cursor"], None)
 
     async def test_audit_repository_is_append_only(self) -> None:

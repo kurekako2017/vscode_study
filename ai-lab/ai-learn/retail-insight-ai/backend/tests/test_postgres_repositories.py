@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 import unittest
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
+
+import httpx
 
 from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.config.settings import Settings
@@ -12,7 +17,9 @@ from app.db.unit_of_work import PostgresUnitOfWork
 from app.embeddings.provider import DeterministicTestEmbeddingProvider
 from app.embeddings.service import EmbeddingService
 from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
-from app.models.audit import AuditLog, AuditLogResult
+from app.errors.exceptions import AuditLogAppendException
+from app.main import create_app
+from app.models.audit import AuditLog, AuditLogFilter, AuditLogResult
 from app.models.document import Document, DocumentChunk, DocumentMetadata
 from app.models.document_import import DocumentImportRecord
 from app.models.report import Report, ReportStatus
@@ -27,6 +34,14 @@ from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
+from app.security.contracts import CurrentUser
+from app.services.audit_service import AuditService
+from app.services.persistent_audit_service import (
+    PersistentAuditContext,
+    PersistentAuditService,
+    PersistentAuditSpec,
+)
+from tests.auth_test_utils import ADMIN_PASSWORD
 from tests.postgres_test_utils import reset_postgres_state_if_needed
 
 
@@ -182,6 +197,402 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
         self.assertEqual(self.approval.get_approval_request(request.id).requested_by, "reviewer-a")
         self.assertEqual(self.approval.list_approval_events(request.id)[0].id, event.id)
         self.assertEqual(self.audit.list_all()[0].metadata, {"comment": "review"})
+
+    def test_persistent_audit_schema_query_and_restart_contract(self) -> None:
+        """验证新增列、索引、过滤、分页、稳定排序与 Repository 重建读取。"""
+
+        occurred_at = datetime(2026, 7, 16, 1, 0, tzinfo=timezone.utc)
+        first = AuditLog(
+            operation_type="retrieval.query",
+            actor_id="user-manager",
+            organization_id=None,
+            department_id=None,
+            resource_type="document_retrieval",
+            resource_id="query-a",
+            result=AuditLogResult.SUCCESS,
+            request_id="audit-query-request",
+            trace_id="audit-query-request",
+            metadata={"mode": "keyword"},
+            audit_log_id="audit-a",
+            timestamp=occurred_at,
+            actor_username="manager",
+            actor_role="manager",
+            permission="retrieval.query",
+            http_method="POST",
+            api_path="/api/v1/document-retrieval/search",
+            status_code=200,
+        )
+        second = AuditLog(
+            operation_type="retrieval.query",
+            actor_id="user-manager",
+            organization_id=None,
+            department_id=None,
+            resource_type="document_retrieval",
+            resource_id="query-b",
+            result=AuditLogResult.FAILURE,
+            request_id="audit-query-request-2",
+            trace_id="audit-query-request-2",
+            metadata={"exception_type": "InvalidQueryException"},
+            error_code="invalid_query",
+            audit_log_id="audit-z",
+            timestamp=occurred_at,
+            actor_username="manager",
+            actor_role="manager",
+            permission="retrieval.query",
+            http_method="POST",
+            api_path="/api/v1/document-retrieval/search",
+            status_code=422,
+        )
+        self.audit.append(first)
+        self.audit.append(second)
+
+        page = self.audit.query(
+            AuditLogFilter(
+                actor_user_id="user-manager",
+                actor_username="manager",
+                actor_role="manager",
+                action="retrieval.query",
+                resource_type="document_retrieval",
+                result=AuditLogResult.FAILURE,
+                start_time=occurred_at - timedelta(seconds=1),
+                end_time=occurred_at + timedelta(seconds=1),
+                request_id="audit-query-request-2",
+                limit=1,
+            )
+        )
+        self.assertEqual([item.audit_log_id for item in page.items], ["audit-z"])
+        self.assertIsNone(page.next_offset)
+
+        stable_first_page = self.audit.query(AuditLogFilter(limit=1))
+        stable_second_page = self.audit.query(AuditLogFilter(limit=1, offset=1))
+        self.assertEqual(stable_first_page.items[0].audit_log_id, "audit-z")
+        self.assertEqual(stable_first_page.next_offset, 1)
+        self.assertEqual(stable_second_page.items[0].audit_log_id, "audit-a")
+
+        restarted = PostgresAuditRepository(self.connection_factory)
+        restored = restarted.query(
+            AuditLogFilter(resource_id="query-b", limit=10)
+        ).items[0]
+        self.assertEqual(restored.actor_username, "manager")
+        self.assertEqual(restored.result, AuditLogResult.FAILURE)
+        self.assertEqual(restored.status_code, 422)
+
+        with self.connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_name = 'audit_logs'
+                      AND column_name IN (
+                          'actor_username','actor_role','permission',
+                          'http_method','api_path','status_code'
+                      )
+                    ORDER BY column_name
+                    """
+                )
+                self.assertEqual(len(cursor.fetchall()), 6)
+                cursor.execute(
+                    """
+                    SELECT indexname
+                    FROM pg_indexes
+                    WHERE tablename = 'audit_logs'
+                      AND indexname IN (
+                          'idx_audit_logs_created_id_desc',
+                          'idx_audit_logs_actor_created',
+                          'idx_audit_logs_action_created',
+                          'idx_audit_logs_request_id'
+                      )
+                    """
+                )
+                self.assertEqual(len(cursor.fetchall()), 4)
+
+    def test_audit_append_failure_rolls_back_successful_business_write(self) -> None:
+        """审计不可用时，业务事实与成功响应都不能被提交。"""
+
+        class FailingAuditRepository:
+            def append(self, log: AuditLog) -> AuditLog:
+                raise RuntimeError("audit unavailable")
+
+            def list_all(self) -> list[AuditLog]:
+                return []
+
+        task = self._task()
+        persistent = PersistentAuditService(
+            AuditService(FailingAuditRepository()),
+            self.uow,
+            enabled=True,
+        )
+        context = PersistentAuditContext(
+            request_id="audit-write-failure",
+            http_method="POST",
+            api_path="/api/tasks",
+            resource_id=task.task_id,
+            current_user=CurrentUser(
+                user_id="user-admin",
+                username="admin",
+                role="admin",
+            ),
+        )
+
+        async def execute() -> None:
+            async with persistent.operation(
+                PersistentAuditSpec(
+                    action="analysis.execute",
+                    resource_type="task",
+                    resource_id=task.task_id,
+                    success_status_code=202,
+                    permission="analysis.execute",
+                ),
+                lambda: context,
+            ):
+                self.task.create(task)
+
+        with self.assertRaises(AuditLogAppendException):
+            asyncio.run(execute())
+        self.assertIsNone(self.task.get(task.task_id))
+
+    def test_persistent_audit_http_chain_and_read_only_api(self) -> None:
+        """验证关键 HTTP 事件、CurrentUser actor、403、敏感信息和去重。"""
+
+        asyncio.run(self._assert_persistent_audit_http_chain())
+
+    async def _assert_persistent_audit_http_chain(self) -> None:
+        settings = Settings(log_level="CRITICAL")
+        app = create_app(settings)
+        client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        )
+        try:
+            login_success = await client.post(
+                "/api/v1/auth/login",
+                headers={"X-Request-ID": "login-success-request"},
+                json={"username": "admin", "password": ADMIN_PASSWORD},
+            )
+            self.assertEqual(login_success.status_code, 200)
+            admin_token = login_success.json()["data"]["access_token"]
+            admin_headers = {
+                "Authorization": f"Bearer {admin_token}",
+                "X-Actor-User-ID": "client-spoofed-user",
+            }
+
+            login_failure = await client.post(
+                "/api/v1/auth/login",
+                headers={"X-Request-ID": "login-failure-request"},
+                json={"username": "admin", "password": "do-not-store-this-password"},
+            )
+            self.assertEqual(login_failure.status_code, 401)
+
+            upload = await client.post(
+                "/api/v1/documents",
+                headers={**admin_headers, "X-Request-ID": "document-upload-request"},
+                files={
+                    "file": ("audit.md", b"# Audit\npersistent audit", "text/markdown"),
+                    "metadata": (
+                        None,
+                        json.dumps(
+                            {
+                                "title": "Audit Document",
+                                "owner": "audit-team",
+                                "password": "must-not-be-audited",
+                            }
+                        ),
+                    ),
+                },
+            )
+            self.assertEqual(upload.status_code, 201)
+            document_id = upload.json()["data"]["document_id"]
+
+            imported = await client.post(
+                f"/api/v1/documents/{document_id}/import",
+                headers={**admin_headers, "X-Request-ID": "document-import-request"},
+            )
+            self.assertEqual(imported.status_code, 201)
+
+            archived = await client.delete(
+                f"/api/v1/documents/{document_id}",
+                headers={**admin_headers, "X-Request-ID": "document-archive-request"},
+            )
+            self.assertEqual(archived.status_code, 202)
+            archive_failure = await client.delete(
+                "/api/v1/documents/missing-audit-document",
+                headers={
+                    **admin_headers,
+                    "X-Request-ID": "document-archive-failure-request",
+                },
+            )
+            self.assertEqual(archive_failure.status_code, 404)
+
+            retrieval = await client.post(
+                "/api/v1/document-retrieval/search",
+                headers={**admin_headers, "X-Request-ID": "retrieval-request"},
+                json={"query": "audit", "retrieval_mode": "keyword"},
+            )
+            self.assertEqual(retrieval.status_code, 200)
+
+            task_response = await client.post(
+                "/api/tasks",
+                headers={**admin_headers, "X-Request-ID": "analysis-request"},
+                json={"question": "監査対象を分析", "mode": "kpi"},
+            )
+            self.assertEqual(task_response.status_code, 202)
+            task_id = task_response.json()["data"]["task_id"]
+
+            submit = await client.post(
+                f"/api/v1/reports/{task_id}/submit-approval",
+                headers={**admin_headers, "X-Request-ID": "approval-submit-request"},
+                json={"comment": "review"},
+            )
+            self.assertEqual(submit.status_code, 201)
+            approval_id = submit.json()["data"]["approval_id"]
+
+            review = await client.get(
+                "/api/v1/approvals",
+                headers={**admin_headers, "X-Request-ID": "approval-review-request"},
+            )
+            self.assertEqual(review.status_code, 200)
+
+            approved = await client.post(
+                f"/api/v1/approvals/{approval_id}/approve",
+                headers={**admin_headers, "X-Request-ID": "approval-admin-request"},
+                json={"comment": "approved"},
+            )
+            self.assertEqual(approved.status_code, 200)
+
+            security = await client.get(
+                "/api/v1/security/roles",
+                headers={**admin_headers, "X-Request-ID": "security-manage-request"},
+            )
+            self.assertEqual(security.status_code, 200)
+
+            employee = CurrentUser(
+                user_id="user-employee",
+                username="employee",
+                role="employee",
+            )
+            employee_token = app.state.container.jwt_service.create_access_token(employee)
+            denied = await client.get(
+                "/api/v1/audit-logs",
+                headers={
+                    "Authorization": f"Bearer {employee_token.access_token}",
+                    "X-Request-ID": "audit-denied-request",
+                },
+            )
+            self.assertEqual(denied.status_code, 403)
+            unauthenticated = await client.get(
+                "/api/tasks/missing",
+                headers={"X-Request-ID": "authentication-failure-request"},
+            )
+            self.assertEqual(unauthenticated.status_code, 401)
+
+            audit_read = await client.get(
+                "/api/v1/audit-logs",
+                headers={**admin_headers, "X-Request-ID": "audit-read-request"},
+                params={"action": "login.success", "actor_username": "admin", "limit": 1},
+            )
+            self.assertEqual(audit_read.status_code, 200)
+            item = audit_read.json()["data"]["items"][0]
+            self.assertEqual(item["action"], "login.success")
+            self.assertEqual(item["actor_user_id"], "user-admin")
+            self.assertEqual(item["actor_role"], "admin")
+            self.assertEqual(item["http_method"], "POST")
+            self.assertEqual(item["api_path"], "/api/v1/auth/login")
+
+            invalid_range = await client.get(
+                "/api/v1/audit-logs",
+                headers=admin_headers,
+                params={
+                    "start_time": "2026-07-17T00:00:00+00:00",
+                    "end_time": "2026-07-16T00:00:00+00:00",
+                },
+            )
+            self.assertEqual(invalid_range.status_code, 422)
+            too_large = await client.get(
+                "/api/v1/audit-logs",
+                headers=admin_headers,
+                params={"limit": 201},
+            )
+            self.assertEqual(too_large.status_code, 422)
+
+            methods = set(app.openapi()["paths"]["/api/v1/audit-logs"])
+            self.assertEqual(methods, {"get"})
+        finally:
+            await client.aclose()
+
+        logs = PostgresAuditRepository(self.connection_factory).query(
+            AuditLogFilter(limit=200)
+        ).items
+        by_request = {log.request_id: log for log in logs}
+        expected = {
+            "login-success-request": ("login.success", AuditLogResult.SUCCESS),
+            "login-failure-request": ("login.failure", AuditLogResult.FAILURE),
+            "document-upload-request": ("document.upload", AuditLogResult.SUCCESS),
+            "document-import-request": ("document.import", AuditLogResult.SUCCESS),
+            "document-archive-request": ("document.archive", AuditLogResult.SUCCESS),
+            "document-archive-failure-request": (
+                "document.archive",
+                AuditLogResult.FAILURE,
+            ),
+            "retrieval-request": ("retrieval.query", AuditLogResult.SUCCESS),
+            "analysis-request": ("analysis.execute", AuditLogResult.SUCCESS),
+            "approval-submit-request": ("approval.submitted", AuditLogResult.SUCCESS),
+            "approval-review-request": ("approval.listed", AuditLogResult.SUCCESS),
+            "approval-admin-request": ("approval.approved", AuditLogResult.SUCCESS),
+            "security-manage-request": ("security.manage", AuditLogResult.SUCCESS),
+            "audit-denied-request": ("authorization.denied", AuditLogResult.DENIED),
+            "authentication-failure-request": (
+                "authentication.failure",
+                AuditLogResult.FAILURE,
+            ),
+            "audit-read-request": ("audit.read", AuditLogResult.SUCCESS),
+        }
+        for request_id, (action, result) in expected.items():
+            with self.subTest(request_id=request_id):
+                self.assertIn(request_id, by_request)
+                self.assertEqual(by_request[request_id].operation_type, action)
+                self.assertEqual(by_request[request_id].result, result)
+
+        self.assertEqual(by_request["retrieval-request"].actor_id, "user-admin")
+        self.assertEqual(by_request["retrieval-request"].actor_username, "admin")
+        self.assertNotEqual(
+            by_request["retrieval-request"].actor_id,
+            "client-spoofed-user",
+        )
+        self.assertEqual(by_request["audit-denied-request"].permission, "audit.read")
+        self.assertEqual(by_request["audit-denied-request"].status_code, 403)
+        self.assertEqual(
+            len(
+                [
+                    log
+                    for log in logs
+                    if log.request_id == "approval-submit-request"
+                    and log.operation_type == "approval.submitted"
+                ]
+            ),
+            1,
+        )
+        serialized = json.dumps(
+            [
+                {
+                    "metadata": log.metadata,
+                    "actor_username": log.actor_username,
+                    "error_code": log.error_code,
+                }
+                for log in logs
+            ],
+            ensure_ascii=False,
+        )
+        self.assertNotIn("do-not-store-this-password", serialized)
+        self.assertNotIn("must-not-be-audited", serialized)
+        self.assertNotIn(admin_token, serialized)
+
+        # 新 App/Repository/连接重新装配后，审计事实仍可读取。
+        restarted_app = create_app(Settings(log_level="CRITICAL"))
+        restarted_logs = restarted_app.state.container.audit_service.query_audit_logs(
+            AuditLogFilter(request_id="login-success-request", limit=10)
+        ).items
+        self.assertEqual(restarted_logs[0].operation_type, "login.success")
 
     def test_unit_of_work_rolls_back_all_task_completion_writes(self) -> None:
         task = self._task()

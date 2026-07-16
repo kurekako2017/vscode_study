@@ -86,8 +86,13 @@ class PostgresConnectionFactory:
     def transaction(self) -> Iterator[None]:
         """开启可嵌套事务；内部 Repository 自动复用当前连接。"""
 
-        if self._active_connection.get() is not None:
-            yield
+        active = self._active_connection.get()
+        if active is not None:
+            # psycopg 的嵌套 transaction 会创建 savepoint。
+            # 这样请求级 Persistent Audit 可以包住业务调用，而业务 Service 自己的
+            # Unit of Work 在失败时仍只回滚自身写入，不会吞掉外层 failure audit。
+            with active.transaction():
+                yield
             return
 
         psycopg = self._load_psycopg()
