@@ -1,5 +1,14 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 LLM 企业级成本治理（进行中）
+
+- [ ] PostgreSQL-only LLM Usage Ledger 与 migration
+- [ ] 额度预占、结算、并发锁与幂等唯一约束
+- [ ] 唯一显式 `POST /api/v1/ai-analysis` 调用边界与 Evidence Gate
+- [ ] 无网络 Stub Provider 及成本快照
+- [ ] RAG 页唯一「AI分析」确认入口
+- [ ] PostgreSQL / InMemory / Frontend 全量回归
+
 最后更新：2026-07-17
 
 ## 2026-07-17 Frontend Enterprise Authentication + RBAC

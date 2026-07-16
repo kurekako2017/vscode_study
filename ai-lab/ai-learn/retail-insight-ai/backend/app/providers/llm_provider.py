@@ -28,6 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
+from app.models.ai_analysis import LLMAnalysisInput, LLMProviderResult
 from app.models.internal_rag import LLMUsageMetrics, RAGPromptContext
 from app.schemas.internal_rag_api import InternalRagCitationResponse
 
@@ -45,7 +46,13 @@ class LLMProviderOutput:
 class LLMProvider(Protocol):
     """定义 future model provider 的最小可替换接口。"""
 
-    name: str
+    provider_name: str
+    model_name: str
+
+    def analyze(self, request: LLMAnalysisInput) -> LLMProviderResult:
+        """只由 AIAnalysisService 在预占成功后显式调用。"""
+
+        ...
 
     def generate(self, context: RAGPromptContext) -> LLMProviderOutput:
         """根据 prompt 上下文生成回答草稿。"""

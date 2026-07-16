@@ -1,0 +1,86 @@
+"""AI Analysis 的领域合同。
+
+文件职责：定义证据引用、Provider 输入输出、Ledger 状态和 API 结果快照。
+调用关系：AIAnalysisService 组装输入，StubLLMProvider 消费，PostgreSQL Repository 持久化。
+设计理由：Provider 不接触 HTTP/JWT/Repository，且只获得截断后的必要证据。
+日本现场面试：可以说成“用稳定 Port 把模型调用与成本治理、数据库事实解耦”。
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+from enum import StrEnum
+
+
+class LLMUsageStatus(StrEnum):
+    RESERVED = "reserved"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    REJECTED = "rejected"
+
+
+@dataclass(frozen=True)
+class AIEvidence:
+    document_id: str
+    chunk_id: str
+    score: Decimal
+    excerpt: str
+
+
+@dataclass(frozen=True)
+class LLMAnalysisInput:
+    question: str
+    evidence: tuple[AIEvidence, ...]
+    max_output_tokens: int
+    request_id: str
+
+
+@dataclass(frozen=True)
+class LLMProviderResult:
+    answer: str
+    input_tokens: int
+    output_tokens: int
+    latency_ms: int
+    provider_request_id: str
+    finish_reason: str
+
+
+@dataclass(frozen=True)
+class AIAnalysisResult:
+    analysis_id: str
+    answer: str
+    citations: tuple[AIEvidence, ...]
+    provider_name: str
+    model_name: str
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    actual_cost: Decimal
+    currency: str
+    status: str
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class ReservationOutcome:
+    kind: str
+    usage_id: str
+    existing_result: AIAnalysisResult | None = None
+    rejection_code: str | None = None
+
+
+class LLMProviderTimeoutError(TimeoutError):
+    """Stub/Real Provider 共用的稳定超时类别。"""
+
+
+class LLMProviderRateLimitError(RuntimeError):
+    """Provider 端限流，与本地 quota rejected 分开。"""
+
+
+__all__ = [
+    "AIEvidence", "AIAnalysisResult", "LLMAnalysisInput", "LLMProviderResult",
+    "LLMProviderRateLimitError", "LLMProviderTimeoutError", "LLMUsageStatus",
+    "ReservationOutcome",
+]

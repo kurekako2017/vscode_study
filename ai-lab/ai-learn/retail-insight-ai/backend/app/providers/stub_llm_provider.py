@@ -26,6 +26,14 @@
 
 from __future__ import annotations
 
+from uuid import uuid5, NAMESPACE_URL
+
+from app.models.ai_analysis import (
+    LLMAnalysisInput,
+    LLMProviderRateLimitError,
+    LLMProviderResult,
+    LLMProviderTimeoutError,
+)
 from app.models.internal_rag import LLMUsageMetrics, RAGPromptContext
 from app.providers.llm_provider import LLMProviderOutput
 
@@ -34,6 +42,35 @@ class StubLLMProvider:
     """本地 stub provider，返回 deterministic 的草稿回答。"""
 
     name = "stub"
+    provider_name = "stub"
+    model_name = "stub-enterprise-v1"
+
+    def __init__(self, behavior: str = "success") -> None:
+        self.behavior = behavior
+        self.call_count = 0
+
+    def analyze(self, request: LLMAnalysisInput) -> LLMProviderResult:
+        """生成确定性分析；故障模式只用于无网络合同测试。"""
+
+        self.call_count += 1
+        if self.behavior == "timeout":
+            raise LLMProviderTimeoutError("stub timeout")
+        if self.behavior == "rate_limit":
+            raise LLMProviderRateLimitError("stub rate limited")
+        if self.behavior == "failure":
+            raise RuntimeError("stub provider failure")
+        excerpts = [f"[{item.document_id}/{item.chunk_id}] {item.excerpt}" for item in request.evidence]
+        answer = "Stub AI analysis:\n" + "\n".join(excerpts)
+        input_tokens = max(1, (len(request.question) + sum(len(item.excerpt) for item in request.evidence) + 3) // 4)
+        output_tokens = min(request.max_output_tokens, max(1, (len(answer) + 3) // 4))
+        return LLMProviderResult(
+            answer=answer,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            latency_ms=max(1, len(answer) // 8),
+            provider_request_id=str(uuid5(NAMESPACE_URL, request.request_id)),
+            finish_reason="stop",
+        )
 
     def generate(self, context: RAGPromptContext) -> LLMProviderOutput:
         """基于 citations 和 answer mode 组装稳定输出，不访问外部服务。"""

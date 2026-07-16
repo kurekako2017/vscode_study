@@ -209,6 +209,68 @@ CREATE TABLE IF NOT EXISTS upload_idempotency_keys (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- LLM 成本事实只在 PostgreSQL 企业模式使用；普通 API 不提供更新或删除入口。
+CREATE TABLE IF NOT EXISTS llm_usage_ledger (
+    usage_id TEXT PRIMARY KEY,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    request_id TEXT NOT NULL,
+    idempotency_key TEXT NOT NULL,
+    actor_user_id TEXT NOT NULL,
+    actor_username TEXT NOT NULL,
+    actor_role TEXT NOT NULL,
+    provider_name TEXT NOT NULL,
+    model_name TEXT NOT NULL,
+    operation TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('reserved','succeeded','failed','rejected')),
+    reserved_input_tokens INTEGER NOT NULL CHECK (reserved_input_tokens >= 0),
+    reserved_output_tokens INTEGER NOT NULL CHECK (reserved_output_tokens >= 0),
+    input_tokens INTEGER NOT NULL DEFAULT 0 CHECK (input_tokens >= 0),
+    output_tokens INTEGER NOT NULL DEFAULT 0 CHECK (output_tokens >= 0),
+    total_tokens INTEGER NOT NULL DEFAULT 0 CHECK (total_tokens >= 0),
+    input_price_per_million NUMERIC(20,8) NOT NULL,
+    output_price_per_million NUMERIC(20,8) NOT NULL,
+    estimated_cost NUMERIC(20,8) NOT NULL CHECK (estimated_cost >= 0),
+    actual_cost NUMERIC(20,8) NOT NULL DEFAULT 0 CHECK (actual_cost >= 0),
+    currency CHAR(3) NOT NULL,
+    latency_ms INTEGER NULL CHECK (latency_ms IS NULL OR latency_ms >= 0),
+    provider_request_id TEXT NULL,
+    finish_reason TEXT NULL,
+    error_code TEXT NULL,
+    task_id TEXT NULL,
+    document_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+    evidence_refs JSONB NOT NULL DEFAULT '[]'::jsonb,
+    analysis_id TEXT NULL,
+    completed_at TIMESTAMPTZ NULL,
+    UNIQUE (actor_user_id, idempotency_key)
+);
+
+CREATE TABLE IF NOT EXISTS llm_quota_buckets (
+    bucket_date DATE NOT NULL,
+    scope_type TEXT NOT NULL CHECK (scope_type IN ('user','global')),
+    scope_id TEXT NOT NULL,
+    request_count BIGINT NOT NULL DEFAULT 0 CHECK (request_count >= 0),
+    token_count BIGINT NOT NULL DEFAULT 0 CHECK (token_count >= 0),
+    cost NUMERIC(20,8) NOT NULL DEFAULT 0 CHECK (cost >= 0),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (bucket_date, scope_type, scope_id)
+);
+
+CREATE TABLE IF NOT EXISTS ai_analysis_results (
+    analysis_id TEXT PRIMARY KEY,
+    usage_id TEXT NOT NULL UNIQUE REFERENCES llm_usage_ledger(usage_id) ON DELETE RESTRICT,
+    answer TEXT NOT NULL,
+    citations JSONB NOT NULL,
+    provider_name TEXT NOT NULL,
+    model_name TEXT NOT NULL,
+    input_tokens INTEGER NOT NULL,
+    output_tokens INTEGER NOT NULL,
+    total_tokens INTEGER NOT NULL,
+    actual_cost NUMERIC(20,8) NOT NULL,
+    currency CHAR(3) NOT NULL,
+    status TEXT NOT NULL CHECK (status = 'succeeded'),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_events_stream_sequence ON events (stream_id, sequence);
 CREATE INDEX IF NOT EXISTS idx_events_type_created ON events (event_type, created_at);
 CREATE INDEX IF NOT EXISTS idx_report_versions_task_version ON report_versions (task_id, version_no DESC);
@@ -232,3 +294,6 @@ CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding_hnsw
 CREATE INDEX IF NOT EXISTS idx_document_imports_status_updated ON document_imports (status, updated_at);
 CREATE INDEX IF NOT EXISTS idx_upload_sessions_document ON upload_sessions (document_id);
 CREATE INDEX IF NOT EXISTS idx_upload_idempotency_upload ON upload_idempotency_keys (upload_id);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_actor_occurred ON llm_usage_ledger (actor_user_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_status_occurred ON llm_usage_ledger (status, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_request_id ON llm_usage_ledger (request_id);

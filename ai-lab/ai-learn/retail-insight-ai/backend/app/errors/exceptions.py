@@ -229,6 +229,13 @@ class InvalidQuestionException(AppException):
         )
 
 
+class AIAnalysisException(AppException):
+    """AI Analysis 成本、证据、幂等与 Provider 统一异常。"""
+
+    def __init__(self, code: ErrorCode, message: str, status_code: int, detail: dict[str, Any] | None = None) -> None:
+        super().__init__(code, message, status_code, detail=detail)
+
+
 class InsufficientContextException(AppException):
     """表示检索返回的证据不足以生成 grounded answer。"""
 

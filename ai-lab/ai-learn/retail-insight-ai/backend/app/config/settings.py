@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import Field, SecretStr, model_validator
@@ -42,7 +43,24 @@ class Settings(BaseSettings):
     research_provider: Literal["static"] = "static"
     data_provider: Literal["static"] = "static"
     llm_provider: Literal["stub"] = "stub"
+    # 保留旧环境变量的解析兼容，但组合根永久禁止普通 RAG 调用 Provider。
     internal_rag_use_llm: bool = False
+    llm_stub_behavior: Literal["success", "timeout", "failure", "rate_limit"] = "success"
+    llm_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
+    llm_max_input_tokens: int = Field(default=2048, ge=128, le=100_000)
+    llm_max_output_tokens: int = Field(default=256, ge=1, le=4096)
+    llm_evidence_max_count: int = Field(default=5, ge=1, le=20)
+    llm_evidence_max_chars: int = Field(default=6000, ge=128, le=100_000)
+    llm_request_max_cost: Decimal = Field(default=Decimal("0.050000"), ge=0)
+    llm_user_daily_request_limit: int = Field(default=20, ge=1)
+    llm_user_daily_token_limit: int = Field(default=50_000, ge=1)
+    llm_user_daily_cost_limit: Decimal = Field(default=Decimal("0.500000"), ge=0)
+    llm_global_daily_request_limit: int = Field(default=200, ge=1)
+    llm_global_daily_token_limit: int = Field(default=500_000, ge=1)
+    llm_global_daily_cost_limit: Decimal = Field(default=Decimal("5.000000"), ge=0)
+    llm_input_price_per_million: Decimal = Field(default=Decimal("0.500000"), ge=0)
+    llm_output_price_per_million: Decimal = Field(default=Decimal("1.500000"), ge=0)
+    llm_currency: str = Field(default="USD", min_length=3, max_length=3)
     # deterministic_test 只服务本地回归；默认 disabled，生产不会把测试向量当成语义向量。
     embedding_provider: Literal[
         "disabled", "deterministic_test", "local", "openai", "openrouter", "nvidia"
