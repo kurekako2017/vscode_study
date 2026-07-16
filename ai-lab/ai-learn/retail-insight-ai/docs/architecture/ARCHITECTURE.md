@@ -1,12 +1,46 @@
 # Enterprise Retail Intelligence Platform (ERIP) Architecture
 
-最后更新：2026-07-16
+最后更新：2026-07-17
 
 本文件记录 `Enterprise Retail Intelligence Platform (ERIP)` 的统一架构口径。当前仓库中的 `Retail Insight AI` 只表示 ERIP 的 Current MVP；未实现的能力必须明确标注，不得把规划写成现状。
 
 Human-readable architecture explanations are trilingual by default.
 本文件中的人类可读架构说明默认采用三语。
 本書の人間向けアーキテクチャ説明は三言語を標準とします。
+
+## Enterprise Approval Workflow / 企业审批工作流 / エンタープライズ承認ワークフロー
+
+- English: Enterprise approval is PostgreSQL-only. InMemory remains the frozen local learning implementation.
+- 中文（简体）：企业审批增强只面向 PostgreSQL；InMemory 保持冻结的本地学习实现。
+- 日本語：エンタープライズ承認の強化は PostgreSQL のみを対象とし、InMemory は凍結されたローカル学習実装として維持します。
+
+```mermaid
+stateDiagram-v2
+    [*] --> generated
+    generated --> pending_approval: submit
+    pending_approval --> approved: approve
+    pending_approval --> rejected: reject
+    rejected --> revised: revise + new ReportVersion
+    revised --> pending_approval: resubmit latest version
+```
+
+```text
+JWT CurrentUser
+├── Permission Registry: approval.submit / approval.admin
+├── Ownership: original submitter or approval.admin
+└── PostgreSQL Transaction
+    ├── Report / Approval row lock
+    ├── ApprovalRequest current decision
+    ├── immutable ReportVersion
+    ├── append-only Approval History
+    └── Persistent Audit security fact
+```
+
+- `ApprovalRequest` stores the current request and decision facts; `ReportVersion` is the immutable content boundary.
+- `ApprovalEvent` is task-level business history with from/to status, verified actor, reason/comment, version link, and stable chronological ordering.
+- `AuditLog` remains the separate security/compliance record. A report body is never copied into either approval audit metadata or permission-denied detail.
+- PostgreSQL uses report/approval row locks plus a partial unique index allowing at most one `pending_approval` request per task.
+- Initial submission claims the workflow for the verified submitter; later revise/resubmit requires that owner or the frozen `approval.admin` permission.
 
 ## PostgreSQL Persistent Audit / PostgreSQL 持久化审计 / PostgreSQL 永続監査
 

@@ -720,6 +720,34 @@
 - `audit_logs` 保留旧物理列兼容已有数据，只增 nullable 字段和必要索引；普通 API 继续只读，不提供 update/delete。
 - 角色权限矩阵、JWT payload、默认 `REPOSITORY_BACKEND=inmemory` 与 InMemory Repository 实现保持不变。
 
+## ADR-034
+
+日期：2026-07-17
+
+决策：Enterprise Approval Workflow 只增强 PostgreSQL 路径；以显式状态机、不可变 ReportVersion、append-only Approval History、行级锁和单 pending 数据库约束建立企业审批链。
+
+原因：
+
+- 审批业务历史必须能回答“谁在何时把哪个报告版本从什么状态变为什么状态”，不能只依赖安全用途的 Persistent Audit。
+- revise 必须产生新的不可变报告版本，而 resubmit 只改变审批状态并复用最新版本，避免重复内容版本。
+- 仅靠应用层检查无法抵御并发提交和并发决策，因此需要 report/approval 行锁与 partial unique index 共同兜底。
+- actor 和 ownership 必须来自已验证的 JWT `CurrentUser` 与冻结 Permission Registry，不能信任客户端字段或散落 role 判断。
+
+备选方案：
+
+- 同步扩展 InMemory Approval；拒绝，因为 InMemory 已进入冻结维护，只保留本地学习与原有回归。
+- 用 Persistent Audit 代替 Approval History；拒绝，因为安全审计事实与业务状态轨迹的用途、查询语义和生命周期不同。
+- revise 后再次 submit 时再创建相同正文的新版本；拒绝，因为会产生无业务内容变化的重复版本。
+- 只做 Service 层幂等检查；拒绝，因为跨进程并发仍可能创建多个 pending request。
+
+影响：
+
+- PostgreSQL 状态机为 `generated -> pending_approval -> approved`，或 `pending_approval -> rejected -> revised -> pending_approval` 循环后再 approved。
+- 初次有效 submitter 成为审批链 owner；后续 revise/resubmit 只允许 owner 或拥有 `approval.admin` 的用户。
+- `approval_events` 保存 from/to status、actor identity、reason/comment 和 report_version_id；普通 API 不提供修改或删除历史。
+- 成功业务、Approval History 与 Persistent Audit 在同一请求事务提交；任一必要写入失败都不会伪装为业务成功。
+- InMemory Repository、默认 backend、Persistent Audit Schema、冻结角色权限矩阵与 JWT Payload 保持不变。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

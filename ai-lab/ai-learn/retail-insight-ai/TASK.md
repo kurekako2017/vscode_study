@@ -1,6 +1,20 @@
 # retail-insight-ai 当前任务
 
-最后更新：2026-07-16
+最后更新：2026-07-17
+
+## 2026-07-17 ERIP Enterprise Approval Workflow
+
+- [x] InMemory Approval 进入冻结维护状态；默认 `REPOSITORY_BACKEND=inmemory` 与原有测试保持可用
+- [x] PostgreSQL Approval 使用 JWT `CurrentUser` 记录 submitter、reviewer 与 revision actor，忽略客户端自报身份
+- [x] 状态机补齐 `rejected -> revised -> resubmitted -> pending_approval`，非法转换统一返回 409
+- [x] `approval_events` 扩展为 append-only Approval History，详情接口按发生时间和主键稳定返回完整任务历史
+- [x] `ReportVersion` 保持不可变；revise 创建新版本，resubmit 复用最新 revised 版本
+- [x] PostgreSQL 使用 report/approval 行锁与单任务单 pending partial unique index 防止并发覆盖和重复待审
+- [x] revision ownership 集中为原 submitter 或拥有 `approval.admin` 的用户，不修改冻结角色权限矩阵
+- [x] 复用既有 Persistent Audit，覆盖 submitted/rejected/revised/resubmitted/approved 的 success/failure/denied
+- [x] 新增 `20260717_04_enterprise_approval` migration，并完成 upgrade/downgrade/re-upgrade
+- [x] 最终验证：InMemory 183（1 expected skip）、PostgreSQL 193（0 skip）、Frontend 47/47、build、compileall、migration、diff-check
+- 完成记录：本轮未扩展 InMemory Repository、Persistent Audit Schema、JWT Payload、角色权限矩阵或 Frontend 登录/RBAC 界面。
 
 ## 2026-07-16 ERIP PostgreSQL Persistent Audit
 

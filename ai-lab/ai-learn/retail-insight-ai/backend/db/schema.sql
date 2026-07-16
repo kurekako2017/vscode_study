@@ -59,8 +59,12 @@ CREATE TABLE IF NOT EXISTS approval_requests (
     report_version_id TEXT NOT NULL REFERENCES report_versions(id) ON DELETE RESTRICT,
     status TEXT NOT NULL,
     requested_by TEXT NULL,
+    requested_by_username TEXT NULL,
+    requested_by_role TEXT NULL,
     requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     approver_id TEXT NULL,
+    approver_username TEXT NULL,
+    approver_role TEXT NULL,
     decision_at TIMESTAMPTZ NULL,
     decision_reason TEXT NULL,
     revision_no INTEGER NOT NULL DEFAULT 1 CHECK (revision_no > 0),
@@ -75,8 +79,25 @@ CREATE TABLE IF NOT EXISTS approval_events (
     event_type TEXT NOT NULL,
     actor_id TEXT NULL,
     reason TEXT NULL,
+    from_status TEXT NULL,
+    to_status TEXT NULL,
+    actor_username TEXT NULL,
+    actor_role TEXT NULL,
+    report_version_id TEXT NULL REFERENCES report_versions(id) ON DELETE RESTRICT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 兼容旧 Approval 表：只增列，不覆盖既有审批、版本和历史事实。
+ALTER TABLE approval_requests ADD COLUMN IF NOT EXISTS requested_by_username TEXT NULL;
+ALTER TABLE approval_requests ADD COLUMN IF NOT EXISTS requested_by_role TEXT NULL;
+ALTER TABLE approval_requests ADD COLUMN IF NOT EXISTS approver_username TEXT NULL;
+ALTER TABLE approval_requests ADD COLUMN IF NOT EXISTS approver_role TEXT NULL;
+ALTER TABLE approval_events ADD COLUMN IF NOT EXISTS from_status TEXT NULL;
+ALTER TABLE approval_events ADD COLUMN IF NOT EXISTS to_status TEXT NULL;
+ALTER TABLE approval_events ADD COLUMN IF NOT EXISTS actor_username TEXT NULL;
+ALTER TABLE approval_events ADD COLUMN IF NOT EXISTS actor_role TEXT NULL;
+ALTER TABLE approval_events ADD COLUMN IF NOT EXISTS report_version_id TEXT NULL
+    REFERENCES report_versions(id) ON DELETE RESTRICT;
 
 CREATE TABLE IF NOT EXISTS audit_logs (
     id TEXT PRIMARY KEY,
@@ -193,6 +214,13 @@ CREATE INDEX IF NOT EXISTS idx_events_type_created ON events (event_type, create
 CREATE INDEX IF NOT EXISTS idx_report_versions_task_version ON report_versions (task_id, version_no DESC);
 CREATE INDEX IF NOT EXISTS idx_approval_requests_task_status ON approval_requests (task_id, status);
 CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created ON approval_events (approval_id, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_requests_one_pending_per_task
+    ON approval_requests (task_id)
+    WHERE status = 'pending_approval';
+CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created_id
+    ON approval_events (approval_id, created_at ASC, id ASC);
+CREATE INDEX IF NOT EXISTS idx_approval_events_task_created_id
+    ON approval_events (task_id, created_at ASC, id ASC);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource_created ON audit_logs (resource_type, resource_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created_id_desc ON audit_logs (created_at DESC, id DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_actor_created ON audit_logs (actor_id, created_at DESC, id DESC);

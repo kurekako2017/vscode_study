@@ -1,6 +1,33 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-16
+最后更新：2026-07-17
+
+## 2026-07-17 ERIP Enterprise Approval Workflow
+
+- [x] 冻结 InMemory Approval，只保持现有回归，不补齐 PostgreSQL 企业审批对等能力
+- [x] 让 PostgreSQL Approval 使用 JWT CurrentUser 作为 submitter、reviewer 和 revision actor
+- [x] 补齐 rejected → revised → resubmitted → pending_approval 主链与非法转换 409
+- [x] 扩展现有 approval_events 为 append-only Approval History，并在详情返回稳定排序历史
+- [x] 使用 PostgreSQL 行锁与 partial unique index 防止重复 pending 和并发决策覆盖
+- [x] 集中实现 submitter ownership / approval.admin 管理策略，不修改冻结权限矩阵
+- [x] 复用既有 Persistent Audit granular actions，不修改 Audit Schema 或基础设施
+- [x] 完成 PostgreSQL、InMemory、Frontend、build、compileall、migration round-trip 与 diff-check
+
+### 审计发现
+
+- 当前 actor 仍硬编码为 `system`，Approval Service 未接收 JWT CurrentUser。
+- 当前 revise 创建新版本，但没有显式 resubmit API；详情也不返回业务审批历史。
+- approve/reject 已有行锁基础，submit 尚缺报告级锁和单一 pending 数据库约束。
+- 现有 `approval_events` 可直接扩展为业务历史，无需用 Persistent Audit 代替。
+
+### 完成记录
+
+- 2026-07-17：PostgreSQL 状态机固定为 `generated -> pending_approval -> approved` 或 `pending_approval -> rejected -> revised -> pending_approval`；重复/越级转换返回 409。
+- 2026-07-17：初次提交者成为该审批链 owner；后续 revise/resubmit 仅 owner 或拥有 `approval.admin` 的用户可执行，未知角色继续 fail-closed。
+- 2026-07-17：revise 生成新 `ReportVersion`，resubmit 复用最新版本；Approval History 与 Persistent Audit 分别保存业务轨迹和安全审计事实。
+- 2026-07-17：report/approval 行锁、单任务单 pending partial unique index、同事务 history/audit 写入共同保证并发、幂等和失败回滚。
+- 2026-07-17：migration 往返通过；InMemory 183（1 skip）、PostgreSQL 193（0 skip）、Frontend 47/47、build、compileall、diff-check 全绿。
+- 2026-07-17：PostgreSQL 首轮全量观察到一次未涉及改动的既有 Internal RAG 用例瞬时 401；定向复跑及最终全量均通过，未修改 RAG 模块。
 
 ## 2026-07-16 ERIP PostgreSQL Persistent Audit
 

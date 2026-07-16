@@ -259,6 +259,13 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         approval_repository=approval_repository,
         event_publisher=event_publisher,
         unit_of_work=repositories.unit_of_work,
+        # 企业审批并发/历史能力只在 PostgreSQL 开启，InMemory Repository 保持冻结。
+        enterprise_repository=(
+            approval_repository
+            if settings.repository_backend == "postgres"
+            else None
+        ),
+        authorization_service=authorization_service,
     )
     document_read_service = DocumentReadService(document_repository)
     document_archive_service = DocumentArchiveService(document_repository, event_publisher)

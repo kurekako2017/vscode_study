@@ -214,11 +214,32 @@ export interface ApprovalResponse {
   status: ApprovalStatus;
   requested_at: string;
   requested_by: string | null;
+  requested_by_username?: string | null;
+  requested_by_role?: string | null;
   decided_at: string | null;
   decided_by: string | null;
+  decided_by_username?: string | null;
+  decided_by_role?: string | null;
   decision_reason: string | null;
   revision_no: number;
   revised_from_version_id: string | null;
+  history?: ApprovalHistoryResponse[];
+}
+
+/** Approval History 是业务状态历史，不等同于安全 Audit Log。 */
+export interface ApprovalHistoryResponse {
+  history_id: string;
+  approval_id: string;
+  action: string;
+  from_status: ApprovalStatus | null;
+  to_status: ApprovalStatus | null;
+  actor_user_id: string | null;
+  actor_username: string | null;
+  actor_role: string | null;
+  comment: string | null;
+  reason: string | null;
+  report_version_id: string | null;
+  occurred_at: string;
 }
 
 /** Approval 列表接口当前返回 items + next_cursor。 */

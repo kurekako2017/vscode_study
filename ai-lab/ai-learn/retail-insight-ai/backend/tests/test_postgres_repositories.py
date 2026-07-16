@@ -5,7 +5,9 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import threading
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -16,8 +18,13 @@ from app.config.settings import Settings
 from app.db.unit_of_work import PostgresUnitOfWork
 from app.embeddings.provider import DeterministicTestEmbeddingProvider
 from app.embeddings.service import EmbeddingService
+from app.events.publisher import EventPublisher
 from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
-from app.errors.exceptions import AuditLogAppendException
+from app.errors.exceptions import (
+    ApprovalAlreadyDecidedException,
+    ApprovalAlreadySubmittedException,
+    AuditLogAppendException,
+)
 from app.main import create_app
 from app.models.audit import AuditLog, AuditLogFilter, AuditLogResult
 from app.models.document import Document, DocumentChunk, DocumentMetadata
@@ -36,6 +43,7 @@ from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
 from app.security.contracts import CurrentUser
 from app.services.audit_service import AuditService
+from app.services.approval_service import ApprovalService
 from app.services.persistent_audit_service import (
     PersistentAuditContext,
     PersistentAuditService,
@@ -43,6 +51,15 @@ from app.services.persistent_audit_service import (
 )
 from tests.auth_test_utils import ADMIN_PASSWORD
 from tests.postgres_test_utils import reset_postgres_state_if_needed
+
+
+def _capture(operation):
+    """并发测试把成功值或业务异常都作为可断言结果返回。"""
+
+    try:
+        return operation()
+    except Exception as exc:  # noqa: BLE001 - 测试需要比较竞争失败类型
+        return exc
 
 
 class PostgresRepositoryIntegrationTest(unittest.TestCase):
@@ -197,6 +214,544 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
         self.assertEqual(self.approval.get_approval_request(request.id).requested_by, "reviewer-a")
         self.assertEqual(self.approval.list_approval_events(request.id)[0].id, event.id)
         self.assertEqual(self.audit.list_all()[0].metadata, {"comment": "review"})
+
+    def test_enterprise_approval_schema_concurrency_and_rollback(self) -> None:
+        """验证新列、单一 pending、并发决定和事务失败回滚。"""
+
+        with self.connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_name IN ('approval_requests', 'approval_events')
+                      AND column_name IN (
+                          'requested_by_username','requested_by_role',
+                          'approver_username','approver_role',
+                          'from_status','to_status','actor_username','actor_role',
+                          'report_version_id'
+                      )
+                    """
+                )
+                # report_version_id 同时存在于 approval_requests 与 approval_events。
+                self.assertEqual(len(cursor.fetchall()), 10)
+                cursor.execute(
+                    """
+                    SELECT indexname
+                    FROM pg_indexes
+                    WHERE tablename IN ('approval_requests', 'approval_events')
+                      AND indexname IN (
+                          'ux_approval_requests_one_pending_per_task',
+                          'idx_approval_events_approval_created_id',
+                          'idx_approval_events_task_created_id'
+                      )
+                    """
+                )
+                self.assertEqual(len(cursor.fetchall()), 3)
+
+        app = create_app(Settings(log_level="CRITICAL"))
+        service = app.state.container.approval_service
+        employee = CurrentUser(
+            user_id="user-employee",
+            username="employee",
+            role="employee",
+        )
+        manager_a = CurrentUser(
+            user_id="user-manager-a",
+            username="manager-a",
+            role="manager",
+        )
+        manager_b = CurrentUser(
+            user_id="user-manager-b",
+            username="manager-b",
+            role="manager",
+        )
+
+        submit_task = self._task()
+        self.task.create(submit_task)
+        self.report.save(Report(submit_task.task_id, "# concurrent submit", "static"))
+        submit_barrier = threading.Barrier(2)
+
+        def submit_once():
+            submit_barrier.wait(timeout=5)
+            return service.submit_approval(
+                submit_task.task_id,
+                "parallel",
+                current_user=employee,
+            )
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            submit_results = list(executor.map(lambda _: _capture(submit_once), range(2)))
+        self.assertEqual(
+            sum(isinstance(item, ApprovalRequest) for item in submit_results),
+            1,
+        )
+        self.assertEqual(
+            sum(isinstance(item, ApprovalAlreadySubmittedException) for item in submit_results),
+            1,
+        )
+        pending = self.approval.list_approval_requests(task_id=submit_task.task_id)
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(len(self.approval.list_report_versions(submit_task.task_id)), 1)
+
+        decision_task = self._task()
+        self.task.create(decision_task)
+        self.report.save(Report(decision_task.task_id, "# concurrent decision", "static"))
+        approval = service.submit_approval(
+            decision_task.task_id,
+            "review",
+            current_user=employee,
+        )
+        decision_barrier = threading.Barrier(2)
+
+        def decide(user: CurrentUser):
+            decision_barrier.wait(timeout=5)
+            return service.approve(
+                approval.id,
+                "parallel approval",
+                current_user=user,
+            )
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            decision_results = list(
+                executor.map(
+                    lambda user: _capture(lambda: decide(user)),
+                    (manager_a, manager_b),
+                )
+            )
+        self.assertEqual(
+            sum(isinstance(item, ApprovalRequest) for item in decision_results),
+            1,
+        )
+        self.assertEqual(
+            sum(isinstance(item, ApprovalAlreadyDecidedException) for item in decision_results),
+            1,
+        )
+        stored = self.approval.get_approval_request(approval.id)
+        self.assertIsNotNone(stored)
+        self.assertEqual(stored.status, ReportStatus.APPROVED)
+        approved_history = [
+            event
+            for event in self.approval.list_task_approval_events(decision_task.task_id)
+            if event.event_type == "approval.approved"
+        ]
+        self.assertEqual(len(approved_history), 1)
+
+        rollback_task = self._task()
+        self.task.create(rollback_task)
+        self.report.save(Report(rollback_task.task_id, "# rollback approval", "static"))
+        repository = app.state.container.approval_repository
+        original_save_event = repository.save_approval_event
+
+        def fail_history(_: ApprovalEvent) -> None:
+            raise RuntimeError("approval history unavailable")
+
+        repository.save_approval_event = fail_history  # type: ignore[method-assign]
+        try:
+            with self.assertRaisesRegex(RuntimeError, "history unavailable"):
+                service.submit_approval(
+                    rollback_task.task_id,
+                    "must rollback",
+                    current_user=employee,
+                )
+        finally:
+            repository.save_approval_event = original_save_event  # type: ignore[method-assign]
+
+        self.assertEqual(
+            self.report.get(rollback_task.task_id).status,
+            ReportStatus.GENERATED,
+        )
+        self.assertEqual(
+            self.approval.list_approval_requests(task_id=rollback_task.task_id),
+            [],
+        )
+        self.assertEqual(
+            self.approval.list_report_versions(rollback_task.task_id),
+            [],
+        )
+
+        class FailingAuditRepository:
+            def append(self, log: AuditLog) -> AuditLog:
+                raise RuntimeError("audit unavailable")
+
+            def list_all(self) -> list[AuditLog]:
+                return []
+
+        audit_rollback_task = self._task()
+        self.task.create(audit_rollback_task)
+        self.report.save(
+            Report(audit_rollback_task.task_id, "# audit rollback", "static")
+        )
+        transactional_service = ApprovalService(
+            report_repository=self.report,
+            approval_repository=self.approval,
+            event_publisher=EventPublisher(self.event),
+            unit_of_work=self.uow,
+            enterprise_repository=self.approval,
+            authorization_service=app.state.container.authorization_service,
+        )
+        persistent = PersistentAuditService(
+            AuditService(FailingAuditRepository()),
+            self.uow,
+            enabled=True,
+        )
+
+        async def submit_with_failing_audit() -> None:
+            async with persistent.operation(
+                PersistentAuditSpec(
+                    action="approval.submitted",
+                    resource_type="report",
+                    resource_id=audit_rollback_task.task_id,
+                    success_status_code=201,
+                    permission="approval.submit",
+                ),
+                lambda: PersistentAuditContext(
+                    request_id="approval-audit-rollback",
+                    http_method="POST",
+                    api_path="/api/v1/reports/task/submit-approval",
+                    resource_id=audit_rollback_task.task_id,
+                    current_user=employee,
+                ),
+            ):
+                transactional_service.submit_approval(
+                    audit_rollback_task.task_id,
+                    "audit must commit",
+                    current_user=employee,
+                )
+
+        with self.assertRaises(AuditLogAppendException):
+            asyncio.run(submit_with_failing_audit())
+        self.assertEqual(
+            self.report.get(audit_rollback_task.task_id).status,
+            ReportStatus.GENERATED,
+        )
+        self.assertEqual(
+            self.approval.list_approval_requests(
+                task_id=audit_rollback_task.task_id
+            ),
+            [],
+        )
+
+    def test_enterprise_approval_http_workflow_history_and_audit(self) -> None:
+        """验证 JWT actor、ownership、版本、历史、状态机和 Persistent Audit。"""
+
+        asyncio.run(self._assert_enterprise_approval_http_workflow())
+
+    async def _assert_enterprise_approval_http_workflow(self) -> None:
+        app = create_app(Settings(log_level="CRITICAL"))
+        client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        )
+        employee = CurrentUser(
+            user_id="user-employee",
+            username="employee",
+            role="employee",
+        )
+        other_employee = CurrentUser(
+            user_id="user-employee-other",
+            username="employee-other",
+            role="employee",
+        )
+        manager = CurrentUser(
+            user_id="user-manager",
+            username="manager",
+            role="manager",
+        )
+        admin = CurrentUser(
+            user_id="user-admin",
+            username="admin",
+            role="admin",
+        )
+
+        def headers(user: CurrentUser, request_id: str) -> dict[str, str]:
+            token = app.state.container.jwt_service.create_access_token(user)
+            return {
+                "Authorization": f"Bearer {token.access_token}",
+                "X-Request-ID": request_id,
+                "X-Actor-User-ID": "client-spoofed-user",
+                "X-Actor-Role": "client-spoofed-role",
+            }
+
+        task = self._task()
+        self.task.create(task)
+        self.report.save(Report(task.task_id, "# original report", "static"))
+        secret_revision = "# revised report\nSECRET-REPORT-BODY"
+
+        try:
+            submitted = await client.post(
+                f"/api/v1/reports/{task.task_id}/submit-approval",
+                headers=headers(employee, "enterprise-approval-submit"),
+                json={"comment": "employee submit"},
+            )
+            self.assertEqual(submitted.status_code, 201)
+            first_approval = submitted.json()["data"]
+            self.assertEqual(first_approval["requested_by"], employee.user_id)
+            self.assertEqual(
+                first_approval["requested_by_username"],
+                employee.username,
+            )
+
+            employee_denied = await client.post(
+                f"/api/v1/approvals/{first_approval['approval_id']}/approve",
+                headers=headers(employee, "enterprise-approval-employee-denied"),
+                json={"comment": "must be denied"},
+            )
+            self.assertEqual(employee_denied.status_code, 403)
+
+            employee_reject_denied = await client.post(
+                f"/api/v1/approvals/{first_approval['approval_id']}/reject",
+                headers=headers(employee, "enterprise-approval-employee-reject-denied"),
+                json={"reason": "must be denied"},
+            )
+            self.assertEqual(employee_reject_denied.status_code, 403)
+
+            rejected = await client.post(
+                f"/api/v1/approvals/{first_approval['approval_id']}/reject",
+                headers=headers(manager, "enterprise-approval-reject"),
+                json={"reason": "source trace is incomplete"},
+            )
+            self.assertEqual(rejected.status_code, 200)
+            self.assertEqual(rejected.json()["data"]["decided_by"], manager.user_id)
+            self.assertEqual(
+                rejected.json()["data"]["decided_by_username"],
+                manager.username,
+            )
+
+            approve_rejected = await client.post(
+                f"/api/v1/approvals/{first_approval['approval_id']}/approve",
+                headers=headers(manager, "enterprise-approval-approve-rejected"),
+                json={"comment": "invalid direct approve"},
+            )
+            self.assertEqual(approve_rejected.status_code, 409)
+
+            ownership_denied = await client.post(
+                f"/api/v1/reports/{task.task_id}/revise",
+                headers=headers(other_employee, "enterprise-approval-owner-denied"),
+                json={
+                    "revision_reason": "not my report",
+                    "markdown": "# unauthorized revision",
+                },
+            )
+            self.assertEqual(ownership_denied.status_code, 403)
+
+            revised = await client.post(
+                f"/api/v1/reports/{task.task_id}/revise",
+                headers=headers(employee, "enterprise-approval-revise"),
+                json={
+                    "revision_reason": "add source trace",
+                    "markdown": secret_revision,
+                },
+            )
+            self.assertEqual(revised.status_code, 201)
+            self.assertEqual(revised.json()["data"]["revision_no"], 2)
+
+            versions_before_resubmit = self.approval.list_report_versions(task.task_id)
+            self.assertEqual(len(versions_before_resubmit), 2)
+            self.assertEqual(versions_before_resubmit[-1].markdown, secret_revision)
+
+            resubmitted = await client.post(
+                f"/api/v1/reports/{task.task_id}/resubmit-approval",
+                headers=headers(employee, "enterprise-approval-resubmit"),
+                json={"comment": "revision ready"},
+            )
+            self.assertEqual(resubmitted.status_code, 201)
+            second_approval = resubmitted.json()["data"]
+            self.assertEqual(second_approval["status"], "pending_approval")
+            self.assertEqual(
+                second_approval["report_version_id"],
+                revised.json()["data"]["report_version_id"],
+            )
+            self.assertEqual(
+                len(self.approval.list_report_versions(task.task_id)),
+                2,
+            )
+
+            approved = await client.post(
+                f"/api/v1/approvals/{second_approval['approval_id']}/approve",
+                headers=headers(manager, "enterprise-approval-approve"),
+                json={"comment": "approved after revision"},
+            )
+            self.assertEqual(approved.status_code, 200)
+
+            duplicate_approve = await client.post(
+                f"/api/v1/approvals/{second_approval['approval_id']}/approve",
+                headers=headers(manager, "enterprise-approval-duplicate-approve"),
+                json={"comment": "duplicate"},
+            )
+            self.assertEqual(duplicate_approve.status_code, 409)
+
+            direct_reject = await client.post(
+                f"/api/v1/approvals/{second_approval['approval_id']}/reject",
+                headers=headers(manager, "enterprise-approval-reject-approved"),
+                json={"reason": "too late"},
+            )
+            self.assertEqual(direct_reject.status_code, 409)
+
+            revise_approved = await client.post(
+                f"/api/v1/reports/{task.task_id}/revise",
+                headers=headers(employee, "enterprise-approval-revise-approved"),
+                json={"revision_reason": "too late"},
+            )
+            self.assertEqual(revise_approved.status_code, 409)
+
+            resubmit_approved = await client.post(
+                f"/api/v1/reports/{task.task_id}/resubmit-approval",
+                headers=headers(employee, "enterprise-approval-resubmit-approved"),
+                json={"comment": "too late"},
+            )
+            self.assertEqual(resubmit_approved.status_code, 409)
+
+            detail = await client.get(
+                f"/api/v1/approvals/{second_approval['approval_id']}",
+                headers=headers(manager, "enterprise-approval-detail"),
+            )
+            self.assertEqual(detail.status_code, 200)
+            history = detail.json()["data"]["history"]
+            self.assertEqual(
+                [item["action"] for item in history],
+                [
+                    "approval.submitted",
+                    "approval.rejected",
+                    "approval.revised",
+                    "approval.resubmitted",
+                    "approval.approved",
+                ],
+            )
+            self.assertEqual(history[0]["actor_user_id"], employee.user_id)
+            self.assertEqual(history[0]["actor_username"], employee.username)
+            self.assertEqual(history[1]["actor_user_id"], manager.user_id)
+            self.assertEqual(history[1]["reason"], "source trace is incomplete")
+            self.assertEqual(history[2]["from_status"], "rejected")
+            self.assertEqual(history[2]["to_status"], "revised")
+            self.assertEqual(
+                history[2]["report_version_id"],
+                revised.json()["data"]["report_version_id"],
+            )
+
+            admin_task = self._task()
+            self.task.create(admin_task)
+            self.report.save(Report(admin_task.task_id, "# admin review", "static"))
+            admin_submit = await client.post(
+                f"/api/v1/reports/{admin_task.task_id}/submit-approval",
+                headers=headers(employee, "enterprise-approval-admin-submit"),
+                json={},
+            )
+            admin_approved = await client.post(
+                f"/api/v1/approvals/{admin_submit.json()['data']['approval_id']}/approve",
+                headers=headers(admin, "enterprise-approval-admin-approve"),
+                json={"comment": "admin approval"},
+            )
+            self.assertEqual(admin_approved.status_code, 200)
+
+            invalid_markdown = await client.post(
+                f"/api/v1/reports/{task.task_id}/revise",
+                headers=headers(employee, "enterprise-approval-invalid-markdown"),
+                json={"revision_reason": "invalid", "markdown": "   "},
+            )
+            self.assertEqual(invalid_markdown.status_code, 422)
+        finally:
+            await client.aclose()
+
+        stored_first = self.approval.get_approval_request(
+            first_approval["approval_id"]
+        )
+        stored_second = self.approval.get_approval_request(
+            second_approval["approval_id"]
+        )
+        self.assertEqual(stored_first.requested_by, employee.user_id)
+        self.assertEqual(stored_first.requested_by_username, employee.username)
+        self.assertEqual(stored_first.approver_id, manager.user_id)
+        self.assertEqual(stored_first.approver_role, manager.role)
+        self.assertEqual(stored_second.approver_id, manager.user_id)
+
+        restarted = PostgresApprovalRepository(self.connection_factory)
+        restarted_history = restarted.list_task_approval_events(task.task_id)
+        self.assertEqual(len(restarted_history), 5)
+        self.assertEqual(restarted_history[-1].event_type, "approval.approved")
+
+        audit_logs = PostgresAuditRepository(self.connection_factory).query(
+            AuditLogFilter(limit=200)
+        ).items
+        by_request = {log.request_id: log for log in audit_logs}
+        expected = {
+            "enterprise-approval-submit": (
+                "approval.submitted",
+                AuditLogResult.SUCCESS,
+            ),
+            "enterprise-approval-employee-denied": (
+                "authorization.denied",
+                AuditLogResult.DENIED,
+            ),
+            "enterprise-approval-employee-reject-denied": (
+                "authorization.denied",
+                AuditLogResult.DENIED,
+            ),
+            "enterprise-approval-reject": (
+                "approval.rejected",
+                AuditLogResult.SUCCESS,
+            ),
+            "enterprise-approval-approve-rejected": (
+                "approval.approved",
+                AuditLogResult.FAILURE,
+            ),
+            "enterprise-approval-owner-denied": (
+                "authorization.denied",
+                AuditLogResult.DENIED,
+            ),
+            "enterprise-approval-revise": (
+                "approval.revised",
+                AuditLogResult.SUCCESS,
+            ),
+            "enterprise-approval-resubmit": (
+                "approval.resubmitted",
+                AuditLogResult.SUCCESS,
+            ),
+            "enterprise-approval-approve": (
+                "approval.approved",
+                AuditLogResult.SUCCESS,
+            ),
+            "enterprise-approval-duplicate-approve": (
+                "approval.approved",
+                AuditLogResult.FAILURE,
+            ),
+        }
+        for request_id, (action, result) in expected.items():
+            self.assertIn(request_id, by_request)
+            self.assertEqual(by_request[request_id].operation_type, action)
+            self.assertEqual(by_request[request_id].result, result)
+            self.assertEqual(
+                len([log for log in audit_logs if log.request_id == request_id]),
+                1,
+            )
+        self.assertEqual(
+            by_request["enterprise-approval-submit"].actor_id,
+            employee.user_id,
+        )
+        self.assertNotEqual(
+            by_request["enterprise-approval-submit"].actor_id,
+            "client-spoofed-user",
+        )
+        self.assertNotIn(
+            "SECRET-REPORT-BODY",
+            json.dumps(
+                [log.metadata for log in audit_logs],
+                ensure_ascii=False,
+            ),
+        )
+
+        approval_paths = {
+            path: methods
+            for path, methods in app.openapi()["paths"].items()
+            if "approval" in path
+        }
+        self.assertFalse(
+            any(
+                method in methods
+                for methods in approval_paths.values()
+                for method in ("put", "patch", "delete")
+            )
+        )
 
     def test_persistent_audit_schema_query_and_restart_contract(self) -> None:
         """验证新增列、索引、过滤、分页、稳定排序与 Repository 重建读取。"""

@@ -62,9 +62,13 @@ class ApprovalRequest:
     report_version_id: str
     status: ReportStatus
     requested_by: str | None = None
+    requested_by_username: str | None = None
+    requested_by_role: str | None = None
     id: str = field(default_factory=_uuid)
     requested_at: datetime = field(default_factory=utc_now)
     approver_id: str | None = None
+    approver_username: str | None = None
+    approver_role: str | None = None
     decision_at: datetime | None = None
     decision_reason: str | None = None
     revision_no: int = 1
@@ -73,13 +77,18 @@ class ApprovalRequest:
 
 @dataclass(frozen=True)
 class ApprovalEvent:
-    """保存审批审计事件。"""
+    """保存只追加的业务审批历史，不能用安全 Audit Log 替代。"""
 
     approval_id: str
     task_id: str
     event_type: str
     actor_id: str | None = None
     reason: str | None = None
+    from_status: ReportStatus | None = None
+    to_status: ReportStatus | None = None
+    actor_username: str | None = None
+    actor_role: str | None = None
+    report_version_id: str | None = None
     id: str = field(default_factory=_uuid)
     created_at: datetime = field(default_factory=utc_now)
 

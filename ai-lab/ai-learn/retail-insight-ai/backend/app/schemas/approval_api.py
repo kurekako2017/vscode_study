@@ -29,7 +29,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.models.approval import ApprovalRequest, ReportVersion
+from app.models.approval import ApprovalEvent, ApprovalRequest, ReportVersion
 from app.models.report import ReportStatus
 
 
@@ -69,6 +69,7 @@ class ApprovalReviseRequest(BaseModel):
     """冻结 revise 的请求结构。"""
 
     revision_reason: str | None = None
+    markdown: str | None = None
 
     @field_validator("revision_reason")
     @classmethod
@@ -80,6 +81,55 @@ class ApprovalReviseRequest(BaseModel):
         value = value.strip()
         return value or None
 
+    @field_validator("markdown")
+    @classmethod
+    def _normalize_markdown(cls, value: str | None) -> str | None:
+        """允许兼容旧请求；一旦提交新正文，就禁止空白版本进入历史。"""
+
+        if value is None:
+            return None
+        value = value.strip()
+        if not value:
+            raise ValueError("markdown must not be blank")
+        return value
+
+
+class ApprovalHistoryResponse(BaseModel):
+    """对外返回业务审批历史；安全审计仍由 Audit API 单独读取。"""
+
+    history_id: str
+    approval_id: str
+    action: str
+    from_status: ReportStatus | None = None
+    to_status: ReportStatus | None = None
+    actor_user_id: str | None = None
+    actor_username: str | None = None
+    actor_role: str | None = None
+    comment: str | None = None
+    reason: str | None = None
+    report_version_id: str | None = None
+    occurred_at: datetime
+
+    @classmethod
+    def from_domain(cls, event: "ApprovalEvent") -> "ApprovalHistoryResponse":
+        """把 approval_events 行转换为稳定、可读的业务历史合同。"""
+
+        is_rejection = event.event_type == "approval.rejected"
+        return cls(
+            history_id=event.id,
+            approval_id=event.approval_id,
+            action=event.event_type,
+            from_status=event.from_status,
+            to_status=event.to_status,
+            actor_user_id=event.actor_id,
+            actor_username=event.actor_username,
+            actor_role=event.actor_role,
+            comment=None if is_rejection else event.reason,
+            reason=event.reason if is_rejection else None,
+            report_version_id=event.report_version_id,
+            occurred_at=event.created_at,
+        )
+
 
 class ApprovalResponse(BaseModel):
     """冻结审批记录的对外响应。"""
@@ -90,14 +140,23 @@ class ApprovalResponse(BaseModel):
     status: ReportStatus
     requested_at: datetime
     requested_by: str | None = None
+    requested_by_username: str | None = None
+    requested_by_role: str | None = None
     decided_at: datetime | None = None
     decided_by: str | None = None
+    decided_by_username: str | None = None
+    decided_by_role: str | None = None
     decision_reason: str | None = None
     revision_no: int
     revised_from_version_id: str | None = None
+    history: list[ApprovalHistoryResponse] = Field(default_factory=list)
 
     @classmethod
-    def from_domain(cls, approval: ApprovalRequest) -> "ApprovalResponse":
+    def from_domain(
+        cls,
+        approval: ApprovalRequest,
+        history: list["ApprovalEvent"] | None = None,
+    ) -> "ApprovalResponse":
         """把领域审批记录转成对外响应。"""
 
         return cls(
@@ -107,11 +166,19 @@ class ApprovalResponse(BaseModel):
             status=approval.status,
             requested_at=approval.requested_at,
             requested_by=approval.requested_by,
+            requested_by_username=approval.requested_by_username,
+            requested_by_role=approval.requested_by_role,
             decided_at=approval.decision_at,
             decided_by=approval.approver_id,
+            decided_by_username=approval.approver_username,
+            decided_by_role=approval.approver_role,
             decision_reason=approval.decision_reason,
             revision_no=approval.revision_no,
             revised_from_version_id=approval.revised_from_version_id,
+            history=[
+                ApprovalHistoryResponse.from_domain(event)
+                for event in (history or [])
+            ],
         )
 
 
@@ -152,6 +219,7 @@ class ApprovalRevisionResponse(BaseModel):
 
 __all__ = [
     "ApprovalListResponse",
+    "ApprovalHistoryResponse",
     "ApprovalRejectRequest",
     "ApprovalResponse",
     "ApprovalRevisionResponse",

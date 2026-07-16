@@ -86,4 +86,26 @@ class ApprovalRepository(Protocol):
         ...
 
 
-__all__ = ["ApprovalRepository"]
+@runtime_checkable
+class EnterpriseApprovalRepository(Protocol):
+    """PostgreSQL-only 并发与历史能力；InMemory 不需要实现。"""
+
+    def lock_report(self, task_id: str) -> bool:
+        """锁定报告审批作用域；资源不存在时返回 False。"""
+
+        ...
+
+    def get_approval_request_for_update(
+        self, approval_id: str
+    ) -> ApprovalRequest | None:
+        """在当前事务内锁定审批请求，防止并发决定覆盖。"""
+
+        ...
+
+    def list_task_approval_events(self, task_id: str) -> list[ApprovalEvent]:
+        """按任务读取跨多次提交的完整业务历史。"""
+
+        ...
+
+
+__all__ = ["ApprovalRepository", "EnterpriseApprovalRepository"]

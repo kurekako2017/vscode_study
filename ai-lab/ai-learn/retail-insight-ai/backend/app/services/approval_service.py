@@ -18,10 +18,15 @@ from app.models.report import Report, ReportStatus
 from app.models.task import utc_now
 from app.observability.logging import get_logger, log_event
 from app.repositories.interfaces.approval_repository import ApprovalRepository
+from app.repositories.interfaces.approval_repository import EnterpriseApprovalRepository
 from app.repositories.interfaces.report_repository import ReportRepository
 from app.repositories.interfaces.unit_of_work import UnitOfWork
 from app.db.unit_of_work import InMemoryUnitOfWork
 from app.schemas.approval_api import ApprovalRevisionResponse
+from app.security.authorization_service import AuthorizationService
+from app.security.contracts import CurrentUser
+from app.security.errors import ForbiddenError
+from app.security.rbac_contracts import Permission
 
 logger = get_logger(__name__)
 
@@ -29,8 +34,9 @@ logger = get_logger(__name__)
 class ApprovalService:
     """审批工作流的应用层编排。
 
-    这个 service 只做状态机、版本快照和审计事件，不碰 RBAC、通知或外部工作流引擎。
-    这样后续无论换成 PostgreSQL 还是接入权限系统，都能保持同一套 API contract。
+    这个 service 负责状态机、版本快照、业务历史和 ownership policy。
+    API permission 仍由统一 Dependency 执行；Service 只做 PostgreSQL 企业路径的
+    防御式权限校验，不解析 JWT，也不判断具体 role 字符串。
     """
 
     def __init__(
@@ -39,6 +45,9 @@ class ApprovalService:
         approval_repository: ApprovalRepository,
         event_publisher: EventPublisher,
         unit_of_work: UnitOfWork | None = None,
+        *,
+        enterprise_repository: EnterpriseApprovalRepository | None = None,
+        authorization_service: AuthorizationService | None = None,
     ) -> None:
         """注入报告仓库、审批仓库和事件发布器。"""
 
@@ -46,19 +55,36 @@ class ApprovalService:
         self._approval_repository = approval_repository
         self._event_publisher = event_publisher
         self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
+        # PostgreSQL-only 能力显式注入；InMemory 不需要扩展 Repository。
+        self._enterprise_repository = enterprise_repository
+        self._authorization_service = authorization_service
 
-    def submit_approval(self, task_id: str, comment: str | None = None) -> ApprovalRequest:
+    def submit_approval(
+        self,
+        task_id: str,
+        comment: str | None = None,
+        *,
+        current_user: CurrentUser | None = None,
+    ) -> ApprovalRequest:
         """以单一事务提交版本、审批请求、报告状态和事件。"""
 
+        self._require_permission(current_user, Permission.APPROVAL_SUBMIT)
         with self._unit_of_work.transaction():
-            return self._submit_approval(task_id, comment)
+            self._lock_report(task_id)
+            return self._submit_approval(task_id, comment, current_user)
 
-    def _submit_approval(self, task_id: str, comment: str | None = None) -> ApprovalRequest:
+    def _submit_approval(
+        self,
+        task_id: str,
+        comment: str | None,
+        current_user: CurrentUser | None,
+    ) -> ApprovalRequest:
         """把当前 report 快照冻结成待审版本。"""
 
         try:
             report = self._get_report(task_id)
             self._ensure_submit_allowed(report)
+            actor_id, actor_username, actor_role = self._actor_identity(current_user)
             latest_version = self._approval_repository.get_latest_report_version(task_id)
             version = self._create_version_snapshot(
                 task_id=task_id,
@@ -66,12 +92,15 @@ class ApprovalService:
                 status=ReportStatus.PENDING_APPROVAL,
                 revision_reason=comment,
                 previous_version=latest_version,
+                created_by=actor_id,
             )
             approval = ApprovalRequest(
                 task_id=task_id,
                 report_version_id=version.id,
                 status=ReportStatus.PENDING_APPROVAL,
-                requested_by="system",
+                requested_by=actor_id,
+                requested_by_username=actor_username,
+                requested_by_role=actor_role,
                 revision_no=version.version_no,
                 revised_from_version_id=version.revised_from_version_id,
             )
@@ -83,8 +112,11 @@ class ApprovalService:
                 approval_id=approval.id,
                 event_type="approval.submitted",
                 message="Approval submitted",
-                actor_id="system",
+                current_user=current_user,
                 reason=comment,
+                from_status=report.status,
+                to_status=ReportStatus.PENDING_APPROVAL,
+                report_version_id=version.id,
                 extra={
                     "approval_id": approval.id,
                     "report_version_id": version.id,
@@ -94,7 +126,12 @@ class ApprovalService:
             )
             return approval
         except AppException as exc:
-            self._record_failed_event(task_id=task_id, approval_id=task_id, exc=exc)
+            self._record_failed_event(
+                task_id=task_id,
+                approval_id=task_id,
+                exc=exc,
+                current_user=current_user,
+            )
             raise
 
     def list_approvals(
@@ -122,23 +159,72 @@ class ApprovalService:
             raise ApprovalNotFoundException(approval_id)
         return approval
 
-    def approve(self, approval_id: str, comment: str | None = None) -> ApprovalRequest:
+    def get_approval_history(self, task_id: str) -> list[ApprovalEvent]:
+        """PostgreSQL 返回跨轮次业务历史；InMemory 冻结路径保持空扩展。"""
+
+        if self._enterprise_repository is None:
+            return []
+        return self._enterprise_repository.list_task_approval_events(task_id)
+
+    def require_revision_access(
+        self,
+        task_id: str,
+        current_user: CurrentUser,
+    ) -> None:
+        """集中执行 submitter ownership；approval.admin 可处理例外情况。"""
+
+        if self._enterprise_repository is None:
+            return
+        self._require_permission(current_user, Permission.APPROVAL_SUBMIT)
+        latest = self._get_latest_approval(task_id)
+        if latest is None:
+            return
+        if latest.requested_by == current_user.user_id:
+            return
+        if self._authorization_service is not None:
+            admin_result = self._authorization_service.check_permission(
+                current_user,
+                Permission.APPROVAL_ADMIN,
+            )
+            if admin_result.allowed:
+                return
+        raise ForbiddenError(
+            permission=Permission.APPROVAL_SUBMIT.value,
+            role=current_user.role,
+        )
+
+    def approve(
+        self,
+        approval_id: str,
+        comment: str | None = None,
+        *,
+        current_user: CurrentUser | None = None,
+    ) -> ApprovalRequest:
         """以单一事务提交审批决定、报告状态和事件。"""
 
+        self._require_permission(current_user, Permission.APPROVAL_ADMIN)
         with self._unit_of_work.transaction():
-            return self._approve(approval_id, comment)
+            return self._approve(approval_id, comment, current_user)
 
-    def _approve(self, approval_id: str, comment: str | None = None) -> ApprovalRequest:
+    def _approve(
+        self,
+        approval_id: str,
+        comment: str | None,
+        current_user: CurrentUser | None,
+    ) -> ApprovalRequest:
         """批准待审版本，并把当前 report 推进到 approved。"""
 
         try:
-            approval = self.get_approval(approval_id)
+            approval = self._get_approval_for_decision(approval_id)
             report = self._get_report(approval.task_id)
             self._ensure_decision_allowed(approval, report, ReportStatus.APPROVED)
+            actor_id, actor_username, actor_role = self._actor_identity(current_user)
             decided = replace(
                 approval,
                 status=ReportStatus.APPROVED,
-                approver_id="system",
+                approver_id=actor_id,
+                approver_username=actor_username,
+                approver_role=actor_role,
                 decision_at=utc_now(),
                 decision_reason=comment,
             )
@@ -149,8 +235,11 @@ class ApprovalService:
                 approval_id=approval.id,
                 event_type="approval.approved",
                 message="Approval approved",
-                actor_id="system",
+                current_user=current_user,
                 reason=comment,
+                from_status=ReportStatus.PENDING_APPROVAL,
+                to_status=ReportStatus.APPROVED,
+                report_version_id=approval.report_version_id,
                 extra={
                     "approval_id": approval.id,
                     "report_version_id": approval.report_version_id,
@@ -159,29 +248,49 @@ class ApprovalService:
             )
             return decided
         except AppException as exc:
-            self._record_failed_event(self._approval_task_id(approval_id), approval_id, exc)
+            self._record_failed_event(
+                self._approval_task_id(approval_id),
+                approval_id,
+                exc,
+                current_user=current_user,
+            )
             raise
 
-    def reject(self, approval_id: str, reason: str | None = None) -> ApprovalRequest:
+    def reject(
+        self,
+        approval_id: str,
+        reason: str | None = None,
+        *,
+        current_user: CurrentUser | None = None,
+    ) -> ApprovalRequest:
         """以单一事务提交拒绝决定、原因、报告状态和事件。"""
 
+        self._require_permission(current_user, Permission.APPROVAL_ADMIN)
         with self._unit_of_work.transaction():
-            return self._reject(approval_id, reason)
+            return self._reject(approval_id, reason, current_user)
 
-    def _reject(self, approval_id: str, reason: str | None = None) -> ApprovalRequest:
+    def _reject(
+        self,
+        approval_id: str,
+        reason: str | None,
+        current_user: CurrentUser | None,
+    ) -> ApprovalRequest:
         """拒绝待审版本，并保留拒绝原因。"""
 
         try:
             if reason is None or not reason.strip():
                 raise MissingRejectionReasonException(approval_id)
 
-            approval = self.get_approval(approval_id)
+            approval = self._get_approval_for_decision(approval_id)
             report = self._get_report(approval.task_id)
             self._ensure_decision_allowed(approval, report, ReportStatus.REJECTED)
+            actor_id, actor_username, actor_role = self._actor_identity(current_user)
             decided = replace(
                 approval,
                 status=ReportStatus.REJECTED,
-                approver_id="system",
+                approver_id=actor_id,
+                approver_username=actor_username,
+                approver_role=actor_role,
                 decision_at=utc_now(),
                 decision_reason=reason.strip(),
             )
@@ -192,8 +301,11 @@ class ApprovalService:
                 approval_id=approval.id,
                 event_type="approval.rejected",
                 message="Approval rejected",
-                actor_id="system",
+                current_user=current_user,
                 reason=reason.strip(),
+                from_status=ReportStatus.PENDING_APPROVAL,
+                to_status=ReportStatus.REJECTED,
+                report_version_id=approval.report_version_id,
                 extra={
                     "approval_id": approval.id,
                     "report_version_id": approval.report_version_id,
@@ -202,16 +314,36 @@ class ApprovalService:
             )
             return decided
         except AppException as exc:
-            self._record_failed_event(self._approval_task_id(approval_id), approval_id, exc)
+            self._record_failed_event(
+                self._approval_task_id(approval_id),
+                approval_id,
+                exc,
+                current_user=current_user,
+            )
             raise
 
-    def revise(self, task_id: str, revision_reason: str | None = None) -> ApprovalRevisionResponse:
+    def revise(
+        self,
+        task_id: str,
+        revision_reason: str | None = None,
+        *,
+        markdown: str | None = None,
+        current_user: CurrentUser | None = None,
+    ) -> ApprovalRevisionResponse:
         """以单一事务提交修订版本、报告状态和事件。"""
 
+        self._require_permission(current_user, Permission.APPROVAL_SUBMIT)
         with self._unit_of_work.transaction():
-            return self._revise(task_id, revision_reason)
+            self._lock_report(task_id)
+            return self._revise(task_id, revision_reason, markdown, current_user)
 
-    def _revise(self, task_id: str, revision_reason: str | None = None) -> ApprovalRevisionResponse:
+    def _revise(
+        self,
+        task_id: str,
+        revision_reason: str | None,
+        markdown: str | None,
+        current_user: CurrentUser | None,
+    ) -> ApprovalRevisionResponse:
         """基于 rejected report 创建新的不可变修订版本。"""
 
         try:
@@ -222,24 +354,38 @@ class ApprovalService:
             latest_approval = self._get_latest_approval(task_id)
             if latest_approval is None or latest_approval.status != ReportStatus.REJECTED:
                 raise ReportRevisionConflictException(task_id, report.status.value)
+            if current_user is not None:
+                self.require_revision_access(task_id, current_user)
 
             latest_version = self._approval_repository.get_latest_report_version(task_id)
+            revised_markdown = markdown if markdown is not None else report.markdown
+            actor_id, _, _ = self._actor_identity(current_user)
             version = self._create_version_snapshot(
                 task_id=task_id,
-                markdown=report.markdown,
+                markdown=revised_markdown,
                 status=ReportStatus.REVISED,
                 revision_reason=revision_reason,
                 previous_version=latest_version,
+                created_by=actor_id,
             )
             self._approval_repository.save_report_version(version)
-            self._report_repository.save(replace(report, status=ReportStatus.REVISED))
+            self._report_repository.save(
+                replace(
+                    report,
+                    markdown=revised_markdown,
+                    status=ReportStatus.REVISED,
+                )
+            )
             self._record_event(
                 task_id=task_id,
                 approval_id=latest_approval.id,
                 event_type="approval.revised",
                 message="Approval revised",
-                actor_id="system",
+                current_user=current_user,
                 reason=revision_reason,
+                from_status=ReportStatus.REJECTED,
+                to_status=ReportStatus.REVISED,
+                report_version_id=version.id,
                 extra={
                     "approval_id": latest_approval.id,
                     "report_version_id": version.id,
@@ -250,7 +396,95 @@ class ApprovalService:
             )
             return ApprovalRevisionResponse.from_domain(version)
         except AppException as exc:
-            self._record_failed_event(task_id=task_id, approval_id=self._approval_task_id(task_id), exc=exc)
+            self._record_failed_event(
+                task_id=task_id,
+                approval_id=self._approval_task_id(task_id),
+                exc=exc,
+                current_user=current_user,
+            )
+            raise
+
+    def resubmit(
+        self,
+        task_id: str,
+        comment: str | None = None,
+        *,
+        current_user: CurrentUser | None = None,
+    ) -> ApprovalRequest:
+        """把已修订版本重新送审；不再复制一份相同 ReportVersion。"""
+
+        if self._enterprise_repository is None:
+            raise InvalidApprovalStateException(
+                task_id,
+                ReportStatus.REVISED.value,
+                ReportStatus.PENDING_APPROVAL.value,
+            )
+        self._require_permission(current_user, Permission.APPROVAL_SUBMIT)
+        with self._unit_of_work.transaction():
+            self._lock_report(task_id)
+            return self._resubmit(task_id, comment, current_user)
+
+    def _resubmit(
+        self,
+        task_id: str,
+        comment: str | None,
+        current_user: CurrentUser | None,
+    ) -> ApprovalRequest:
+        """重新使用 latest revised version 创建新的 pending ApprovalRequest。"""
+
+        try:
+            report = self._get_report(task_id)
+            if report.status != ReportStatus.REVISED:
+                raise InvalidApprovalStateException(
+                    task_id,
+                    report.status.value,
+                    ReportStatus.PENDING_APPROVAL.value,
+                )
+            if current_user is not None:
+                self.require_revision_access(task_id, current_user)
+            latest_version = self._approval_repository.get_latest_report_version(task_id)
+            if latest_version is None or latest_version.status != ReportStatus.REVISED:
+                raise ReportRevisionConflictException(task_id, report.status.value)
+            actor_id, actor_username, actor_role = self._actor_identity(current_user)
+            approval = ApprovalRequest(
+                task_id=task_id,
+                report_version_id=latest_version.id,
+                status=ReportStatus.PENDING_APPROVAL,
+                requested_by=actor_id,
+                requested_by_username=actor_username,
+                requested_by_role=actor_role,
+                revision_no=latest_version.version_no,
+                revised_from_version_id=latest_version.revised_from_version_id,
+            )
+            self._approval_repository.save_approval_request(approval)
+            self._report_repository.save(
+                replace(report, status=ReportStatus.PENDING_APPROVAL)
+            )
+            self._record_event(
+                task_id=task_id,
+                approval_id=approval.id,
+                event_type="approval.resubmitted",
+                message="Approval resubmitted",
+                current_user=current_user,
+                reason=comment,
+                from_status=ReportStatus.REVISED,
+                to_status=ReportStatus.PENDING_APPROVAL,
+                report_version_id=latest_version.id,
+                extra={
+                    "approval_id": approval.id,
+                    "report_version_id": latest_version.id,
+                    "revision_no": latest_version.version_no,
+                    "status": approval.status.value,
+                },
+            )
+            return approval
+        except AppException as exc:
+            self._record_failed_event(
+                task_id=task_id,
+                approval_id=self._approval_task_id(task_id),
+                exc=exc,
+                current_user=current_user,
+            )
             raise
 
     def _get_report(self, task_id: str) -> Report:
@@ -272,6 +506,15 @@ class ApprovalService:
 
         if report.status == ReportStatus.PENDING_APPROVAL:
             raise ApprovalAlreadySubmittedException(report.task_id)
+        if (
+            self._enterprise_repository is not None
+            and report.status == ReportStatus.REVISED
+        ):
+            raise InvalidApprovalStateException(
+                report.task_id,
+                report.status.value,
+                ReportStatus.PENDING_APPROVAL.value,
+            )
         if report.status in {ReportStatus.APPROVED, ReportStatus.REJECTED, ReportStatus.PUBLISHED, ReportStatus.ARCHIVED}:
             raise InvalidApprovalStateException(report.task_id, report.status.value, ReportStatus.PENDING_APPROVAL.value)
 
@@ -296,6 +539,7 @@ class ApprovalService:
         status: ReportStatus,
         revision_reason: str | None,
         previous_version: ReportVersion | None,
+        created_by: str,
     ) -> ReportVersion:
         """创建新的不可变报告版本快照。"""
 
@@ -307,7 +551,7 @@ class ApprovalService:
             status=status,
             revision_reason=revision_reason,
             revised_from_version_id=previous_version.id if previous_version is not None else None,
-            created_by="system",
+            created_by=created_by,
         )
 
     def _record_event(
@@ -317,18 +561,27 @@ class ApprovalService:
         approval_id: str,
         event_type: str,
         message: str,
-        actor_id: str | None,
+        current_user: CurrentUser | None,
         reason: str | None = None,
+        from_status: ReportStatus | None = None,
+        to_status: ReportStatus | None = None,
+        report_version_id: str | None = None,
         extra: dict[str, object] | None = None,
     ) -> ApprovalEvent:
         """把 approval 事件同时写入审计仓库和任务事件流。"""
 
+        actor_id, actor_username, actor_role = self._actor_identity(current_user)
         event = ApprovalEvent(
             approval_id=approval_id,
             task_id=task_id,
             event_type=event_type,
             actor_id=actor_id,
             reason=reason,
+            from_status=from_status,
+            to_status=to_status,
+            actor_username=actor_username,
+            actor_role=actor_role,
+            report_version_id=report_version_id,
         )
         self._approval_repository.save_approval_event(event)
         log_event(
@@ -349,14 +602,25 @@ class ApprovalService:
                 "task_id": task_id,
                 "actor_id": actor_id,
                 "reason": reason,
+                "from_status": from_status.value if from_status is not None else None,
+                "to_status": to_status.value if to_status is not None else None,
+                "report_version_id": report_version_id,
                 **(extra or {}),
             },
         )
         return event
 
-    def _record_failed_event(self, task_id: str, approval_id: str, exc: AppException) -> None:
+    def _record_failed_event(
+        self,
+        task_id: str,
+        approval_id: str,
+        exc: AppException,
+        *,
+        current_user: CurrentUser | None,
+    ) -> None:
         """把失败也记录成 approval.failed，便于审计和回放。"""
 
+        actor_id, _, _ = self._actor_identity(current_user)
         # 申请尚未创建时不能写带外键的 ApprovalEvent，但通用事件流仍可记录失败。
         if self._approval_repository.get_approval_request(approval_id) is None:
             self._event_publisher.publish(
@@ -366,7 +630,7 @@ class ApprovalService:
                 {
                     "approval_id": approval_id,
                     "task_id": task_id,
-                    "actor_id": "system",
+                    "actor_id": actor_id,
                     "reason": exc.error_code.value,
                     "error_code": exc.error_code.value,
                     "message": exc.message,
@@ -378,7 +642,7 @@ class ApprovalService:
             approval_id=approval_id,
             event_type="approval.failed",
             message="Approval failed",
-            actor_id="system",
+            current_user=current_user,
             reason=exc.error_code.value,
             extra={
                 "error_code": exc.error_code.value,
@@ -393,6 +657,50 @@ class ApprovalService:
         if approval is None:
             return approval_id
         return approval.task_id
+
+    def _lock_report(self, task_id: str) -> None:
+        """PostgreSQL 用报告行锁串行化同一 task 的审批写操作。"""
+
+        if self._enterprise_repository is not None:
+            self._enterprise_repository.lock_report(task_id)
+
+    def _get_approval_for_decision(self, approval_id: str) -> ApprovalRequest:
+        """PostgreSQL 决策读取使用行锁；InMemory 保持原有读取。"""
+
+        if self._enterprise_repository is None:
+            return self.get_approval(approval_id)
+        approval = self._enterprise_repository.get_approval_request_for_update(
+            approval_id
+        )
+        if approval is None:
+            raise ApprovalNotFoundException(approval_id)
+        return approval
+
+    def _actor_identity(
+        self,
+        current_user: CurrentUser | None,
+    ) -> tuple[str, str | None, str | None]:
+        """企业路径使用 JWT actor；InMemory 冻结路径继续使用 system。"""
+
+        if self._enterprise_repository is not None and current_user is not None:
+            return current_user.user_id, current_user.username, current_user.role
+        return "system", None, None
+
+    def _require_permission(
+        self,
+        current_user: CurrentUser | None,
+        permission: Permission,
+    ) -> None:
+        """Service 侧防御式校验，未知角色继续 fail-closed。"""
+
+        if self._enterprise_repository is None:
+            return
+        if current_user is None or self._authorization_service is None:
+            raise ForbiddenError(
+                permission=permission.value,
+                role=current_user.role if current_user is not None else "unknown",
+            )
+        self._authorization_service.require_permission(current_user, permission)
 
 
 __all__ = ["ApprovalService"]

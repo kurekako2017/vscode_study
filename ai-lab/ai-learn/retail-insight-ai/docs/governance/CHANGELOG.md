@@ -2,6 +2,17 @@
 
 # CHANGELOG
 
+## 2026-07-17 ERIP Enterprise Approval Workflow
+
+- PostgreSQL Approval 现在使用 JWT `CurrentUser` 保存 requester/reviewer/revision actor；客户端自报身份不参与审批事实。
+- 状态机补齐显式 resubmit：`generated -> pending_approval -> rejected -> revised -> pending_approval -> approved`，重复或非法转换统一返回 409。
+- revise 创建不可变 `ReportVersion`，resubmit 复用最新 revised version；详情返回 append-only、稳定排序的任务级 Approval History。
+- 使用 report/approval `FOR UPDATE`、单任务单 pending partial unique index 和数据库事务处理并发提交、并发决策、history/audit 失败回滚。
+- ownership 固定为初次 submitter 或拥有 `approval.admin` 的用户；冻结角色权限矩阵、JWT Payload 与未知角色 fail-closed 行为保持不变。
+- 新增 `20260717_04_enterprise_approval` migration，旧数据通过 nullable actor/history 字段兼容，不删除已有审批记录。
+- Persistent Audit 复用现有基础设施，覆盖 submitted/rejected/revised/resubmitted/approved 的 success/failure/denied，不保存报告正文。
+- 最终验证：InMemory 183（1 expected skip）、PostgreSQL 193（0 skip）、Frontend 47/47、production build、compileall、migration round-trip、diff-check 全绿。
+
 ## 2026-07-16 ERIP PostgreSQL Persistent Audit
 
 - 新增 PostgreSQL-only `PersistentAuditService` 与 FastAPI yield Dependency；InMemory Audit 保持冻结且默认 backend 不变。

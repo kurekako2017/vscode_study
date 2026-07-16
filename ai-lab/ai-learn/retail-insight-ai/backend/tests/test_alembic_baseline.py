@@ -22,6 +22,7 @@ class AlembicBaselineTest(unittest.TestCase):
         self.assertEqual(
             [revision.revision for revision in script.walk_revisions()],
             [
+                "20260717_04_enterprise_approval",
                 "20260716_03_persistent_audit",
                 "20260714_02_chunk_embeddings",
                 "20260714_01_initial_schema",
