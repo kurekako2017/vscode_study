@@ -8,6 +8,7 @@ import os
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -42,6 +43,8 @@ from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.repositories.postgres.upload_session_repository import PostgresUploadSessionRepository
 from app.security.contracts import CurrentUser
+from app.security.errors import ForbiddenError
+from app.security.rbac_contracts import Permission
 from app.services.audit_service import AuditService
 from app.services.approval_service import ApprovalService
 from app.services.persistent_audit_service import (
@@ -435,6 +438,278 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
         """验证 JWT actor、ownership、版本、历史、状态机和 Persistent Audit。"""
 
         asyncio.run(self._assert_enterprise_approval_http_workflow())
+
+    def test_enterprise_approval_rbac_boundary(self) -> None:
+        """验证正常 review、owner detail、未知角色和 denied audit 边界。"""
+
+        asyncio.run(self._assert_enterprise_approval_rbac_boundary())
+
+    async def _assert_enterprise_approval_rbac_boundary(self) -> None:
+        """用 review-only manager 策略证明 approve/reject 不再依赖 admin。"""
+
+        app = create_app(Settings(log_level="CRITICAL"))
+        client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        )
+        employee = CurrentUser(
+            user_id="rbac-owner",
+            username="employee",
+            role="employee",
+        )
+        other_employee = CurrentUser(
+            user_id="rbac-other",
+            username="employee-other",
+            role="employee",
+        )
+        manager = CurrentUser(
+            user_id="rbac-manager",
+            username="manager",
+            role="manager",
+        )
+        admin = CurrentUser(
+            user_id="rbac-admin",
+            username="admin",
+            role="admin",
+        )
+        unknown = CurrentUser(
+            user_id="rbac-unknown",
+            username="unknown",
+            role="unknown-role",
+        )
+
+        def headers(user: CurrentUser, request_id: str) -> dict[str, str]:
+            token = app.state.container.jwt_service.create_access_token(user)
+            return {
+                "Authorization": f"Bearer {token.access_token}",
+                "X-Request-ID": request_id,
+                # 客户端自报 reviewer 必须被忽略，最终 actor 只能来自 JWT。
+                "X-Actor-User-ID": "spoofed-reviewer",
+                "X-Actor-Role": "spoofed-role",
+            }
+
+        async def create_pending(
+            *,
+            suffix: str,
+        ) -> tuple[Task, dict[str, object]]:
+            task = self._task()
+            self.task.create(task)
+            self.report.save(
+                Report(task.task_id, f"# RBAC boundary {suffix}", "static")
+            )
+            response = await client.post(
+                f"/api/v1/reports/{task.task_id}/submit-approval",
+                headers=headers(employee, f"rbac-submit-{suffix}"),
+                json={"comment": suffix},
+            )
+            self.assertEqual(response.status_code, 201)
+            return task, response.json()["data"]
+
+        original_container = app.state.container
+        approval_service = original_container.approval_service
+        original_authorization = original_container.authorization_service
+
+        class DenyApprovalAdminAuthorization:
+            """测试策略：保留 Registry 判定，但显式拒绝 approval.admin。"""
+
+            @property
+            def registry(self):
+                return original_authorization.registry
+
+            def check_permission(
+                self,
+                current_user: CurrentUser,
+                permission: Permission,
+            ):
+                result = original_authorization.check_permission(
+                    current_user,
+                    permission,
+                )
+                if permission == Permission.APPROVAL_ADMIN:
+                    return replace(result, allowed=False)
+                return result
+
+            def require_permission(
+                self,
+                current_user: CurrentUser,
+                permission: Permission,
+            ):
+                result = self.check_permission(current_user, permission)
+                if not result.allowed:
+                    raise ForbiddenError(
+                        permission=permission.value,
+                        role=current_user.role,
+                    )
+                return result
+
+        review_only_authorization = DenyApprovalAdminAuthorization()
+
+        try:
+            approve_task, approve_pending = await create_pending(suffix="approve")
+            approve_id = str(approve_pending["approval_id"])
+
+            owner_detail = await client.get(
+                f"/api/v1/approvals/{approve_id}",
+                headers=headers(employee, "rbac-owner-detail"),
+            )
+            self.assertEqual(owner_detail.status_code, 200)
+            self.assertEqual(
+                owner_detail.json()["data"]["requested_by"],
+                employee.user_id,
+            )
+            self.assertEqual(
+                [item["action"] for item in owner_detail.json()["data"]["history"]],
+                ["approval.submitted"],
+            )
+
+            other_detail = await client.get(
+                f"/api/v1/approvals/{approve_id}",
+                headers=headers(other_employee, "rbac-other-detail-denied"),
+            )
+            self.assertEqual(other_detail.status_code, 403)
+
+            employee_list = await client.get(
+                "/api/v1/approvals",
+                headers=headers(employee, "rbac-employee-list-denied"),
+            )
+            self.assertEqual(employee_list.status_code, 403)
+
+            employee_approve = await client.post(
+                f"/api/v1/approvals/{approve_id}/approve",
+                headers=headers(employee, "rbac-employee-approve-denied"),
+                json={"comment": "must be denied"},
+            )
+            self.assertEqual(employee_approve.status_code, 403)
+
+            employee_reject = await client.post(
+                f"/api/v1/approvals/{approve_id}/reject",
+                headers=headers(employee, "rbac-employee-reject-denied"),
+                json={"reason": "must be denied"},
+            )
+            self.assertEqual(employee_reject.status_code, 403)
+
+            manager_list = await client.get(
+                "/api/v1/approvals",
+                headers=headers(manager, "rbac-manager-list"),
+            )
+            self.assertEqual(manager_list.status_code, 200)
+
+            manager_detail = await client.get(
+                f"/api/v1/approvals/{approve_id}",
+                headers=headers(manager, "rbac-manager-detail"),
+            )
+            self.assertEqual(manager_detail.status_code, 200)
+
+            # 临时拒绝 approval.admin；若 Router 或 Service 仍绑定 admin，
+            # 以下 manager approve/reject 会立即返回 403。
+            approval_service._authorization_service = review_only_authorization
+            app.state.container = replace(
+                original_container,
+                authorization_service=review_only_authorization,
+            )
+
+            manager_approved = await client.post(
+                f"/api/v1/approvals/{approve_id}/approve",
+                headers=headers(manager, "rbac-manager-approve-review-only"),
+                json={"comment": "review permission approves"},
+            )
+            self.assertEqual(manager_approved.status_code, 200)
+            self.assertEqual(
+                manager_approved.json()["data"]["decided_by"],
+                manager.user_id,
+            )
+
+            reject_task, reject_pending = await create_pending(suffix="reject")
+            reject_id = str(reject_pending["approval_id"])
+            manager_rejected = await client.post(
+                f"/api/v1/approvals/{reject_id}/reject",
+                headers=headers(manager, "rbac-manager-reject-review-only"),
+                json={"reason": "review permission rejects"},
+            )
+            self.assertEqual(manager_rejected.status_code, 200)
+            self.assertEqual(
+                manager_rejected.json()["data"]["decided_by"],
+                manager.user_id,
+            )
+
+            approval_service._authorization_service = original_authorization
+            app.state.container = original_container
+
+            unknown_task, unknown_pending = await create_pending(suffix="unknown")
+            unknown_approve = await client.post(
+                f"/api/v1/approvals/{unknown_pending['approval_id']}/approve",
+                headers=headers(unknown, "rbac-unknown-denied"),
+                json={"comment": "unknown must fail closed"},
+            )
+            self.assertEqual(unknown_approve.status_code, 403)
+
+            admin_approved = await client.post(
+                f"/api/v1/approvals/{unknown_pending['approval_id']}/approve",
+                headers=headers(admin, "rbac-admin-approve"),
+                json={"comment": "admin has frozen review permission"},
+            )
+            self.assertEqual(admin_approved.status_code, 200)
+            self.assertEqual(
+                admin_approved.json()["data"]["decided_by"],
+                admin.user_id,
+            )
+        finally:
+            approval_service._authorization_service = original_authorization
+            app.state.container = original_container
+            await client.aclose()
+
+        stored_approve = self.approval.get_approval_request(approve_id)
+        stored_reject = self.approval.get_approval_request(reject_id)
+        self.assertEqual(stored_approve.approver_id, manager.user_id)
+        self.assertEqual(stored_reject.approver_id, manager.user_id)
+        self.assertNotEqual(stored_approve.approver_id, "spoofed-reviewer")
+
+        audit_logs = PostgresAuditRepository(self.connection_factory).query(
+            AuditLogFilter(limit=200)
+        ).items
+        by_request = {log.request_id: log for log in audit_logs}
+
+        for request_id in (
+            "rbac-other-detail-denied",
+            "rbac-employee-list-denied",
+            "rbac-employee-approve-denied",
+            "rbac-employee-reject-denied",
+            "rbac-unknown-denied",
+        ):
+            self.assertEqual(
+                by_request[request_id].operation_type,
+                "authorization.denied",
+            )
+            self.assertEqual(
+                by_request[request_id].result,
+                AuditLogResult.DENIED,
+            )
+            self.assertEqual(
+                len([log for log in audit_logs if log.request_id == request_id]),
+                1,
+            )
+
+        self.assertEqual(
+            by_request["rbac-owner-detail"].metadata["access_permission"],
+            Permission.APPROVAL_SUBMIT.value,
+        )
+        self.assertEqual(
+            by_request["rbac-manager-detail"].metadata["access_permission"],
+            Permission.APPROVAL_REVIEW.value,
+        )
+        for request_id in (
+            "rbac-manager-approve-review-only",
+            "rbac-manager-reject-review-only",
+            "rbac-admin-approve",
+        ):
+            self.assertEqual(
+                by_request[request_id].permission,
+                Permission.APPROVAL_REVIEW.value,
+            )
+            self.assertEqual(
+                len([log for log in audit_logs if log.request_id == request_id]),
+                1,
+            )
 
     async def _assert_enterprise_approval_http_workflow(self) -> None:
         app = create_app(Settings(log_level="CRITICAL"))

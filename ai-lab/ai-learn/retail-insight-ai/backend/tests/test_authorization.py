@@ -143,7 +143,7 @@ class AuthorizationAPITest(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    async def test_approval_permissions_separate_submit_review_and_admin(self) -> None:
+    async def test_approval_submit_and_normal_decision_use_frozen_permissions(self) -> None:
         headers = self._headers("employee")
         submit = await self.client.post(
             "/api/v1/reports/missing-task/submit-approval",
@@ -158,7 +158,7 @@ class AuthorizationAPITest(unittest.IsolatedAsyncioTestCase):
         )
         self.assertNotEqual(submit.status_code, 403)
         self._assert_forbidden(review, Permission.APPROVAL_REVIEW, "employee")
-        self._assert_forbidden(admin, Permission.APPROVAL_ADMIN, "employee")
+        self._assert_forbidden(admin, Permission.APPROVAL_REVIEW, "employee")
 
     async def test_audit_and_security_permissions_are_distinct(self) -> None:
         manager_headers = self._headers("manager")

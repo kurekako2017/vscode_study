@@ -193,6 +193,45 @@ class ApprovalService:
             role=current_user.role,
         )
 
+    def require_approval_read_access(
+        self,
+        approval_id: str,
+        current_user: CurrentUser,
+    ) -> str:
+        """集中执行 reviewer-or-owner 的单资源读取策略。
+
+        reviewer 直接通过 ``approval.review``；只有 PostgreSQL 企业路径允许
+        拥有 ``approval.submit`` 的原 submitter 读取自己的 Approval/History。
+        InMemory 不启用 owner 例外，从而保持冻结行为不扩展。
+        """
+
+        if self._authorization_service is None:
+            raise ForbiddenError(
+                permission=Permission.APPROVAL_REVIEW.value,
+                role=current_user.role,
+            )
+
+        review_result = self._authorization_service.check_permission(
+            current_user,
+            Permission.APPROVAL_REVIEW,
+        )
+        if review_result.allowed:
+            return Permission.APPROVAL_REVIEW.value
+
+        submit_result = self._authorization_service.check_permission(
+            current_user,
+            Permission.APPROVAL_SUBMIT,
+        )
+        if submit_result.allowed and self._enterprise_repository is not None:
+            approval = self._approval_repository.get_approval_request(approval_id)
+            if approval is not None and approval.requested_by == current_user.user_id:
+                return Permission.APPROVAL_SUBMIT.value
+
+        raise ForbiddenError(
+            permission=Permission.APPROVAL_REVIEW.value,
+            role=current_user.role,
+        )
+
     def approve(
         self,
         approval_id: str,
@@ -202,7 +241,7 @@ class ApprovalService:
     ) -> ApprovalRequest:
         """以单一事务提交审批决定、报告状态和事件。"""
 
-        self._require_permission(current_user, Permission.APPROVAL_ADMIN)
+        self._require_permission(current_user, Permission.APPROVAL_REVIEW)
         with self._unit_of_work.transaction():
             return self._approve(approval_id, comment, current_user)
 
@@ -265,7 +304,7 @@ class ApprovalService:
     ) -> ApprovalRequest:
         """以单一事务提交拒绝决定、原因、报告状态和事件。"""
 
-        self._require_permission(current_user, Permission.APPROVAL_ADMIN)
+        self._require_permission(current_user, Permission.APPROVAL_REVIEW)
         with self._unit_of_work.transaction():
             return self._reject(approval_id, reason, current_user)
 

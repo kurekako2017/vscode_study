@@ -2,6 +2,21 @@
 
 最后更新：2026-07-17
 
+## 2026-07-17 Enterprise Approval RBAC Boundary Correction
+
+- [ ] 将正常 approve/reject 从 `approval.admin` 修正为 `approval.review`
+- [ ] 保持 Approval list 为 `approval.review`，detail 改为 reviewer 或 submitter owner
+- [ ] 保持 `approval.admin` 只承担跨所有者管理能力，不修改冻结角色映射
+- [ ] 验证 manager/admin、employee owner、非 owner、未知角色与 403 Persistent Audit
+- [ ] 完成 PostgreSQL、InMemory、Frontend、build、compileall、diff-check 全量验证
+
+### 审计发现
+
+- 新 Enterprise Approval Router 与 Service 把正常 approve/reject 绑定到了 `approval.admin`，权限层级过高。
+- detail 仅绑定 `approval.review`，导致只有 `approval.submit` 的 employee owner 无法读取自己的当前状态与 History。
+- 冻结注册表中 manager 同时拥有 `approval.review` 与 `approval.admin`，因此旧测试只验证“manager 能执行”，没有验证 endpoint 实际依赖的是哪项权限。
+- 注册表描述仍把批准/拒绝写在 `approval.admin` 下；本轮按要求只报告，不修改冻结 Registry 或角色映射。
+
 ## 2026-07-17 ERIP Enterprise Approval Workflow
 
 - [x] 冻结 InMemory Approval，只保持现有回归，不补齐 PostgreSQL 企业审批对等能力

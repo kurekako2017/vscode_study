@@ -73,6 +73,55 @@ async def require_revision_owner_or_admin(
     return current_user
 
 
+async def require_approval_reviewer_or_owner(
+    approval_id: str,
+    request: Request,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: ApprovalService = Depends(get_approval_service),
+) -> CurrentUser:
+    """允许 reviewer 或 submitter owner 查看单条 Approval 与 History。
+
+    文件职责：
+    - Router 只负责把 HTTP/JWT 上下文交给 Service 的资源级策略。
+    - Service 决定是通过 ``approval.review``，还是通过
+      ``approval.submit + ownership`` 放行。
+
+    为什么这样设计：
+    - list 仍是审批队列能力，只允许 reviewer。
+    - detail 是单资源读取，employee owner 可以读取自己的审批事实。
+    - 拒绝发生在 Persistent Audit operation 之前，因此这里只写一条
+      ``authorization.denied``，不会再追加 approval.read failure。
+
+    日本现场面试怎么讲：
+    - Permission 是能力边界，ownership 是资源边界；两者组合但不写 role if。
+    """
+
+    try:
+        access_permission = service.require_approval_read_access(
+            approval_id,
+            current_user,
+        )
+    except ForbiddenError:
+        request.app.state.container.persistent_audit_service.record_authorization_denied(
+            context=PersistentAuditContext(
+                request_id=get_request_id(),
+                http_method=request.method,
+                api_path=request.url.path,
+                resource_id=approval_id,
+                current_user=current_user,
+            ),
+            permission=Permission.APPROVAL_REVIEW.value,
+        )
+        raise
+
+    existing_metadata = getattr(request.state, "audit_metadata", {})
+    request.state.audit_metadata = {
+        **(existing_metadata if isinstance(existing_metadata, dict) else {}),
+        "access_permission": access_permission,
+    }
+    return current_user
+
+
 async def _run_audited_operation(
     *,
     audit_middleware: AuditMiddleware,
@@ -204,7 +253,7 @@ async def list_approvals(
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
     dependencies=[
-        Depends(require_permission(Permission.APPROVAL_REVIEW)),
+        Depends(require_approval_reviewer_or_owner),
         Depends(
             persistent_audit_dependency(
                 PersistentAuditSpec(
@@ -246,7 +295,7 @@ async def get_approval(
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
     dependencies=[
-        Depends(require_permission(Permission.APPROVAL_ADMIN)),
+        Depends(require_permission(Permission.APPROVAL_REVIEW)),
         Depends(
             persistent_audit_dependency(
                 PersistentAuditSpec(
@@ -254,7 +303,7 @@ async def get_approval(
                     resource_type="approval",
                     resource_id_param="approval_id",
                     success_status_code=status.HTTP_200_OK,
-                    permission=Permission.APPROVAL_ADMIN.value,
+                    permission=Permission.APPROVAL_REVIEW.value,
                 )
             )
         ),
@@ -294,7 +343,7 @@ async def approve(
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
     dependencies=[
-        Depends(require_permission(Permission.APPROVAL_ADMIN)),
+        Depends(require_permission(Permission.APPROVAL_REVIEW)),
         Depends(
             persistent_audit_dependency(
                 PersistentAuditSpec(
@@ -302,7 +351,7 @@ async def approve(
                     resource_type="approval",
                     resource_id_param="approval_id",
                     success_status_code=status.HTTP_200_OK,
-                    permission=Permission.APPROVAL_ADMIN.value,
+                    permission=Permission.APPROVAL_REVIEW.value,
                 )
             )
         ),
