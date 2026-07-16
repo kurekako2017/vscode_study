@@ -63,11 +63,14 @@ class AuditMiddleware:
         security_service: SecurityService,
         rbac_guard: RBACGuard,
         unit_of_work: UnitOfWork | None = None,
+        audit_enabled: bool = True,
     ) -> None:
         self._audit_service = audit_service
         self._security_service = security_service
         self._rbac_guard = rbac_guard
         self._unit_of_work = unit_of_work or InMemoryUnitOfWork()
+        # PostgreSQL 改由 PersistentAuditService 统一记录，避免同一 approval 重复写入。
+        self._audit_enabled = audit_enabled
 
     async def run(
         self,
@@ -88,6 +91,12 @@ class AuditMiddleware:
             require_all_permissions=action.require_all_permissions,
             require_all_roles=action.require_all_roles,
         )
+
+        if not self._audit_enabled:
+            result = operation()
+            if isawaitable(result):
+                result = await result
+            return result
 
         request_id = get_request_id()
         user = self._security_service.get_current_user()

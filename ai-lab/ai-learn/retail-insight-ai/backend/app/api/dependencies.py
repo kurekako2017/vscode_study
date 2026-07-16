@@ -114,6 +114,7 @@ async def get_audit_middleware(
         security_service=security_service,
         rbac_guard=RBACGuard(security_service, audit_service),
         unit_of_work=container.unit_of_work,
+        audit_enabled=container.repository_backend != "postgres",
     )
 
 

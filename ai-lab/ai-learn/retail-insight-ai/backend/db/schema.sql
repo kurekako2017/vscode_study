@@ -82,17 +82,47 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     id TEXT PRIMARY KEY,
     operation_type TEXT NOT NULL,
     actor_id TEXT NULL,
+    actor_username TEXT NULL,
+    actor_role TEXT NULL,
     organization_id TEXT NULL,
     department_id TEXT NULL,
     resource_type TEXT NOT NULL,
     resource_id TEXT NOT NULL,
-    result TEXT NOT NULL,
+    result TEXT NOT NULL CONSTRAINT audit_logs_result_check
+        CHECK (result IN ('success', 'failure', 'denied')),
+    permission TEXT NULL,
+    http_method TEXT NULL,
+    api_path TEXT NULL,
+    status_code INTEGER NULL,
     request_id TEXT NOT NULL,
     trace_id TEXT NOT NULL,
     metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
     error_code TEXT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 兼容已经由旧 schema 创建的 audit_logs：只增列、回填结果，不删除历史数据。
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS actor_username TEXT NULL;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS actor_role TEXT NULL;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS permission TEXT NULL;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS http_method TEXT NULL;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS api_path TEXT NULL;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS status_code INTEGER NULL;
+UPDATE audit_logs SET result = 'failure' WHERE result = 'failed';
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'audit_logs_result_check'
+          AND conrelid = 'audit_logs'::regclass
+    ) THEN
+        ALTER TABLE audit_logs
+        ADD CONSTRAINT audit_logs_result_check
+        CHECK (result IN ('success', 'failure', 'denied'));
+    END IF;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS documents (
     document_id TEXT PRIMARY KEY,
@@ -164,6 +194,10 @@ CREATE INDEX IF NOT EXISTS idx_report_versions_task_version ON report_versions (
 CREATE INDEX IF NOT EXISTS idx_approval_requests_task_status ON approval_requests (task_id, status);
 CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created ON approval_events (approval_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource_created ON audit_logs (resource_type, resource_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_id_desc ON audit_logs (created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_actor_created ON audit_logs (actor_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action_created ON audit_logs (operation_type, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_request_id ON audit_logs (request_id);
 CREATE INDEX IF NOT EXISTS idx_documents_status_updated ON documents (status, updated_at);
 CREATE INDEX IF NOT EXISTS idx_document_chunks_document_version ON document_chunks (document_id, version, chunk_index);
 CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding_hnsw

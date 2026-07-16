@@ -1,6 +1,17 @@
 # retail-insight-ai Project Backlog
 
-最后更新：2026-07-15
+最后更新：2026-07-16
+
+## 2026-07-16 ERIP PostgreSQL Persistent Audit
+
+- [ ] 审计现有 Audit domain、Repository、Service、Router、PostgreSQL schema、写入路径和测试缺口
+- [ ] 冻结 InMemory Audit，只保持既有回归，不补齐 PostgreSQL 企业审计对等能力
+- [ ] 扩展 PostgreSQL append-only Audit schema、兼容旧记录并增加必要索引
+- [ ] 覆盖 login、authorization、document、retrieval、analysis、approval、audit、security 关键事件
+- [ ] 保证 actor 身份来自 JWT CurrentUser，敏感凭证和文档/RAG 正文不进入 Audit Log
+- [ ] 补齐 PostgreSQL 过滤、时间范围、分页和稳定倒序查询
+- [ ] 验证持久化、连接/应用重建、success/failure/denied、403、去重与只读 API
+- [ ] 完成 PostgreSQL、InMemory、Frontend、build、compileall、diff-check 全量验证
 
 ## 2026-07-15 ERIP Enterprise RBAC Authorization
 

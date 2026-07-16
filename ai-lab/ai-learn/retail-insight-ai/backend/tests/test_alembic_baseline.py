@@ -21,7 +21,11 @@ class AlembicBaselineTest(unittest.TestCase):
         self.assertEqual(Path(script.dir).resolve(), (backend_dir / "alembic").resolve())
         self.assertEqual(
             [revision.revision for revision in script.walk_revisions()],
-            ["20260714_02_chunk_embeddings", "20260714_01_initial_schema"],
+            [
+                "20260716_03_persistent_audit",
+                "20260714_02_chunk_embeddings",
+                "20260714_01_initial_schema",
+            ],
         )
         self.assertTrue((backend_dir / "alembic" / "env.py").is_file())
         self.assertTrue((backend_dir / "db" / "schema.sql").is_file())
@@ -61,6 +65,23 @@ class AlembicBaselineTest(unittest.TestCase):
         self.assertNotIn("create extension", frozen_schema)
         self.assertNotIn("embedding vector", frozen_schema)
         self.assertNotIn("using hnsw", frozen_schema)
+
+    def test_persistent_audit_revision_is_backward_compatible(self) -> None:
+        """审计 migration 必须增量升级旧表，并保留 append-only 历史。"""
+
+        migration_path = (
+            Path(__file__).resolve().parents[1]
+            / "alembic"
+            / "versions"
+            / "20260716_03_persistent_audit.py"
+        )
+        source = migration_path.read_text(encoding="utf-8").lower()
+
+        self.assertIn("add column if not exists actor_username", source)
+        self.assertIn("update audit_logs set result = 'failure'", source)
+        self.assertIn("created_at desc, id desc", source)
+        self.assertNotIn("delete from audit_logs", source)
+        self.assertNotIn("drop table audit_logs", source)
 
     def test_database_url_is_not_persisted_in_alembic_ini(self) -> None:
         backend_dir = Path(__file__).resolve().parents[1]

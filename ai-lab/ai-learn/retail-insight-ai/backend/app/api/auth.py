@@ -17,6 +17,8 @@ from app.observability.logging import get_logger, get_request_id, log_event
 from app.schemas.auth import AccessTokenResponse, LoginRequest
 from app.schemas.common import ApiResponse, success_response
 from app.security.authentication import AuthenticationService
+from app.security.errors import AuthenticationError
+from app.services.persistent_audit_service import PersistentAuditContext
 
 router = APIRouter(prefix="/api/v1/auth", tags=["authentication"])
 logger = get_logger(__name__)
@@ -31,11 +33,34 @@ async def get_authentication_service(request: Request) -> AuthenticationService:
 @router.post("/login", response_model=ApiResponse[AccessTokenResponse])
 async def login(
     payload: LoginRequest,
+    request: Request,
     service: AuthenticationService = Depends(get_authentication_service),
 ) -> ApiResponse[AccessTokenResponse]:
     """验证用户名密码并签发 Bearer Access Token。"""
 
-    token = service.login(payload.username, payload.password.get_secret_value())
+    persistent_audit = request.app.state.container.persistent_audit_service
+    audit_context = PersistentAuditContext(
+        request_id=get_request_id(),
+        http_method=request.method,
+        api_path=request.url.path,
+        resource_id="login",
+        actor_username=payload.username.strip().lower(),
+    )
+    try:
+        token = service.login(payload.username, payload.password.get_secret_value())
+    except AuthenticationError as exc:
+        persistent_audit.record_login_failure(
+            context=audit_context,
+            error_code=exc.error_code,
+        )
+        raise
+    current_user = request.app.state.container.jwt_service.get_current_user(
+        token.access_token
+    )
+    persistent_audit.record_login_success(
+        context=audit_context,
+        current_user=current_user,
+    )
     log_event(
         logger,
         "info",

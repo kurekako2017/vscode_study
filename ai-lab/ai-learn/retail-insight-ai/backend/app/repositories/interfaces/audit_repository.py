@@ -27,7 +27,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from app.models.audit import AuditLog
+from app.models.audit import AuditLog, AuditLogFilter, AuditLogPage
 
 
 @runtime_checkable
@@ -45,4 +45,14 @@ class AuditRepository(Protocol):
         ...
 
 
-__all__ = ["AuditRepository"]
+@runtime_checkable
+class PersistentAuditRepository(AuditRepository, Protocol):
+    """仅 PostgreSQL 实现的企业审计查询合同。"""
+
+    def query(self, filters: AuditLogFilter) -> AuditLogPage:
+        """按过滤条件、分页和稳定倒序返回审计事实。"""
+
+        ...
+
+
+__all__ = ["AuditRepository", "PersistentAuditRepository"]

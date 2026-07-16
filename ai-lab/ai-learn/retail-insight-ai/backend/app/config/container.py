@@ -73,6 +73,7 @@ from app.reports.generator import ReportGenerator
 from app.services.document_import_service import DocumentImportService
 from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
+from app.services.persistent_audit_service import PersistentAuditService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.reranker_provider import DeterministicRerankerProvider, RerankerProvider
 from app.services.reranker_service import RerankerService
@@ -121,6 +122,7 @@ class AppContainer:
     document_upload_service: DocumentUploadService
     audit_repository: AuditRepository
     audit_service: AuditService
+    persistent_audit_service: PersistentAuditService
     security_service: SecurityService
     event_repository: EventRepository
     document_import_repository: DocumentImportRepository
@@ -181,6 +183,12 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     audit_repository = repositories.audit
     # 创建服务，注入仓库和事件发布器
     audit_service = AuditService(audit_repository)
+    # Persistent Audit 只在 PostgreSQL enterprise mode 启用；InMemory 保持冻结。
+    persistent_audit_service = PersistentAuditService(
+        audit_service,
+        repositories.unit_of_work,
+        enabled=settings.repository_backend == "postgres",
+    )
     #  创建服务，注入仓库和事件发布器
     security_service = SecurityService()
     #  创建服务，注入仓库和事件发布器
@@ -309,6 +317,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         document_upload_service=document_upload_service,
         audit_repository=audit_repository,
         audit_service=audit_service,
+        persistent_audit_service=persistent_audit_service,
         security_service=security_service,
         event_repository=event_repository,
         document_import_repository=repositories.document_import,

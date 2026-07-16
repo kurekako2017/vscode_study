@@ -28,9 +28,12 @@ from __future__ import annotations
 from typing import Any
 
 from app.errors.exceptions import AuditLogAppendException
-from app.models.audit import AuditLog, AuditLogResult
+from app.models.audit import AuditLog, AuditLogFilter, AuditLogPage, AuditLogResult
 from app.observability.logging import get_logger, get_request_id, log_event
-from app.repositories.interfaces.audit_repository import AuditRepository
+from app.repositories.interfaces.audit_repository import (
+    AuditRepository,
+    PersistentAuditRepository,
+)
 
 logger = get_logger(__name__)
 
@@ -57,6 +60,12 @@ class AuditService:
         trace_id: str,
         metadata: dict[str, Any] | None = None,
         error_code: str | None = None,
+        actor_username: str | None = None,
+        actor_role: str | None = None,
+        permission: str | None = None,
+        http_method: str | None = None,
+        api_path: str | None = None,
+        status_code: int | None = None,
     ) -> AuditLog:
         """创建一条审计事实，并在失败时保留安全日志。"""
 
@@ -72,6 +81,12 @@ class AuditService:
             trace_id=trace_id,
             metadata=dict(metadata or {}),
             error_code=error_code,
+            actor_username=actor_username,
+            actor_role=actor_role,
+            permission=permission,
+            http_method=http_method,
+            api_path=api_path,
+            status_code=status_code,
         )
         try:
             stored = self._repository.append(log)
@@ -110,3 +125,10 @@ class AuditService:
         """按追加顺序读取审计事实。"""
 
         return self._repository.list_all()
+
+    def query_audit_logs(self, filters: AuditLogFilter) -> AuditLogPage:
+        """PostgreSQL 使用企业查询；InMemory 冻结为既有全量读取行为。"""
+
+        if isinstance(self._repository, PersistentAuditRepository):
+            return self._repository.query(filters)
+        return AuditLogPage(items=self._repository.list_all(), next_offset=None)

@@ -39,7 +39,17 @@ class AuditLogResult(StrEnum):
 
     SUCCESS = "success"
     DENIED = "denied"
-    FAILED = "failed"
+    FAILURE = "failure"
+    # 兼容既有调用方名称；持久化值统一升级为企业合同要求的 failure。
+    FAILED = "failure"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "AuditLogResult | None":
+        """兼容 migration 前已经写入 PostgreSQL 的 ``failed`` 旧值。"""
+
+        if value == "failed":
+            return cls.FAILURE
+        return None
 
 
 @dataclass(frozen=True)
@@ -59,4 +69,35 @@ class AuditLog:
     error_code: str | None = None
     audit_log_id: str = field(default_factory=lambda: str(uuid4()))
     timestamp: datetime = field(default_factory=utc_now)
+    actor_username: str | None = None
+    actor_role: str | None = None
+    permission: str | None = None
+    http_method: str | None = None
+    api_path: str | None = None
+    status_code: int | None = None
 
+
+@dataclass(frozen=True)
+class AuditLogFilter:
+    """PostgreSQL Persistent Audit 的查询条件。"""
+
+    actor_user_id: str | None = None
+    actor_username: str | None = None
+    actor_role: str | None = None
+    action: str | None = None
+    resource_type: str | None = None
+    resource_id: str | None = None
+    result: AuditLogResult | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    request_id: str | None = None
+    limit: int = 50
+    offset: int = 0
+
+
+@dataclass(frozen=True)
+class AuditLogPage:
+    """保存稳定倒序查询的一页审计事实。"""
+
+    items: list[AuditLog]
+    next_offset: int | None

@@ -10,6 +10,8 @@ from app.schemas.document_import_api import DocumentImportResponse
 from app.services.document_import_service import DocumentImportService
 from app.security.dependencies import require_permission
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 # 文档导入路由只承载 Import Pipeline 的 HTTP 入口，不负责解析或持久化细节。
 router = APIRouter(tags=["document-imports"])
@@ -19,7 +21,20 @@ router = APIRouter(tags=["document-imports"])
     path="/api/v1/documents/{document_id}/import",
     response_model=ApiResponse[DocumentImportResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission(Permission.DOCUMENTS_WRITE))],
+    dependencies=[
+        Depends(require_permission(Permission.DOCUMENTS_WRITE)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="document.import",
+                    resource_type="document",
+                    resource_id_param="document_id",
+                    success_status_code=status.HTTP_201_CREATED,
+                    permission=Permission.DOCUMENTS_WRITE.value,
+                )
+            )
+        ),
+    ],
 )
 async def import_document(
     document_id: str,

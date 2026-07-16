@@ -34,6 +34,8 @@ from app.schemas.internal_rag_api import InternalRagAnswerRequest, InternalRagAn
 from app.services.internal_rag_service import InternalRagService
 from app.security.dependencies import require_permission
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 # internal RAG 路由只承载 answer 的 HTTP 入口，不负责检索排名或引用组装细节。
 router = APIRouter(
@@ -47,6 +49,19 @@ router = APIRouter(
     path="/answer",
     response_model=ApiResponse[InternalRagAnswerResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="analysis.execute",
+                    resource_type="internal_rag",
+                    resource_id="internal-rag",
+                    success_status_code=status.HTTP_200_OK,
+                    permission=Permission.ANALYSIS_EXECUTE.value,
+                )
+            )
+        )
+    ],
 )
 async def answer_internal_rag(
     request: InternalRagAnswerRequest,

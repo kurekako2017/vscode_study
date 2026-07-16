@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, File, Form, Header, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Header, Query, Request, UploadFile, status
 
 from app.api.dependencies import (
     get_document_archive_service,
@@ -22,6 +22,8 @@ from app.services.document_read_service import DocumentReadService
 from app.services.document_upload_service import DocumentUploadService
 from app.security.dependencies import require_permission
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 # 文档路由。
 router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
@@ -31,10 +33,24 @@ router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
     path="",
     response_model=ApiResponse[DocumentUploadSessionResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission(Permission.DOCUMENTS_WRITE))],
+    dependencies=[
+        Depends(require_permission(Permission.DOCUMENTS_WRITE)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="document.upload",
+                    resource_type="document",
+                    resource_id="uploaded-document",
+                    success_status_code=status.HTTP_201_CREATED,
+                    permission=Permission.DOCUMENTS_WRITE.value,
+                )
+            )
+        ),
+    ],
 )
 
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     metadata: str = Form(...),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
@@ -61,6 +77,8 @@ async def upload_document(
         metadata_json=metadata,
         idempotency_key=idempotency_key,
     )
+    # Dependency 在 endpoint 完成后读取服务端生成的 document_id，客户端不能伪造。
+    request.state.audit_resource_id = data.document_id
     return success_response(data, get_request_id())
 
 
@@ -140,7 +158,20 @@ async def get_document(
     path="/{document_id}",
     response_model=ApiResponse[DocumentArchiveResponse],
     status_code=status.HTTP_202_ACCEPTED,
-    dependencies=[Depends(require_permission(Permission.DOCUMENTS_ARCHIVE))],
+    dependencies=[
+        Depends(require_permission(Permission.DOCUMENTS_ARCHIVE)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="document.archive",
+                    resource_type="document",
+                    resource_id_param="document_id",
+                    success_status_code=status.HTTP_202_ACCEPTED,
+                    permission=Permission.DOCUMENTS_ARCHIVE.value,
+                )
+            )
+        ),
+    ],
 )
 async def archive_document(
     document_id: str,

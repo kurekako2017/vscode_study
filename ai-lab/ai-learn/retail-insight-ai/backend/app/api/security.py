@@ -24,6 +24,8 @@ from app.security.dependencies import (
     require_permission,
 )
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 # security 路由。
 router = APIRouter(prefix="/api/v1", tags=["security"])
@@ -52,7 +54,20 @@ async def read_current_user(
 @router.get(
     "/security/roles",
     response_model=ApiResponse[RoleListResponse],
-    dependencies=[Depends(require_permission(Permission.SECURITY_MANAGE))],
+    dependencies=[
+        Depends(require_permission(Permission.SECURITY_MANAGE)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="security.manage",
+                    resource_type="security_catalog",
+                    resource_id="roles",
+                    success_status_code=200,
+                    permission=Permission.SECURITY_MANAGE.value,
+                )
+            )
+        ),
+    ],
 )
 async def get_roles(
     service: AuthorizationService = Depends(get_authorization_service),
@@ -73,7 +88,20 @@ async def get_roles(
 @router.get(
     "/security/permissions",
     response_model=ApiResponse[PermissionListResponse],
-    dependencies=[Depends(require_permission(Permission.SECURITY_MANAGE))],
+    dependencies=[
+        Depends(require_permission(Permission.SECURITY_MANAGE)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="security.manage",
+                    resource_type="security_catalog",
+                    resource_id="permissions",
+                    success_status_code=200,
+                    permission=Permission.SECURITY_MANAGE.value,
+                )
+            )
+        ),
+    ],
 )
 async def get_permissions(
     service: AuthorizationService = Depends(get_authorization_service),

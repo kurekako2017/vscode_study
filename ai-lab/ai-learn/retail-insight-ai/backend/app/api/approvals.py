@@ -21,6 +21,8 @@ from app.services.approval_service import ApprovalService
 from app.services.audit_middleware import AuditAction, AuditMiddleware
 from app.security.dependencies import require_permission
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 router = APIRouter(prefix="/api/v1", tags=["approvals"])
 T = TypeVar("T")
@@ -56,7 +58,20 @@ async def _run_audited_operation(
     "/reports/{task_id}/submit-approval",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_SUBMIT))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_SUBMIT)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.submitted",
+                    resource_type="report",
+                    resource_id_param="task_id",
+                    success_status_code=status.HTTP_201_CREATED,
+                    permission=Permission.APPROVAL_SUBMIT.value,
+                )
+            )
+        ),
+    ],
 )
 async def submit_approval(
     task_id: str,
@@ -85,7 +100,20 @@ async def submit_approval(
     "/approvals",
     response_model=ApiResponse[ApprovalListResponse],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_REVIEW))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_REVIEW)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.listed",
+                    resource_type="approval_collection",
+                    resource_id="all",
+                    success_status_code=status.HTTP_200_OK,
+                    permission=Permission.APPROVAL_REVIEW.value,
+                )
+            )
+        ),
+    ],
 )
 async def list_approvals(
     task_id: str | None = Query(default=None),
@@ -124,7 +152,20 @@ async def list_approvals(
     "/approvals/{approval_id}",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_REVIEW))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_REVIEW)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.read",
+                    resource_type="approval",
+                    resource_id_param="approval_id",
+                    success_status_code=status.HTTP_200_OK,
+                    permission=Permission.APPROVAL_REVIEW.value,
+                )
+            )
+        ),
+    ],
 )
 async def get_approval(
     approval_id: str,
@@ -152,7 +193,20 @@ async def get_approval(
     "/approvals/{approval_id}/approve",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_ADMIN)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.approved",
+                    resource_type="approval",
+                    resource_id_param="approval_id",
+                    success_status_code=status.HTTP_200_OK,
+                    permission=Permission.APPROVAL_ADMIN.value,
+                )
+            )
+        ),
+    ],
 )
 async def approve(
     approval_id: str,
@@ -181,7 +235,20 @@ async def approve(
     "/approvals/{approval_id}/reject",
     response_model=ApiResponse[ApprovalResponse],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_ADMIN)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.rejected",
+                    resource_type="approval",
+                    resource_id_param="approval_id",
+                    success_status_code=status.HTTP_200_OK,
+                    permission=Permission.APPROVAL_ADMIN.value,
+                )
+            )
+        ),
+    ],
 )
 async def reject(
     approval_id: str,
@@ -210,7 +277,20 @@ async def reject(
     "/reports/{task_id}/revise",
     response_model=ApiResponse[ApprovalRevisionResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission(Permission.APPROVAL_ADMIN))],
+    dependencies=[
+        Depends(require_permission(Permission.APPROVAL_ADMIN)),
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="approval.revised",
+                    resource_type="report",
+                    resource_id_param="task_id",
+                    success_status_code=status.HTTP_201_CREATED,
+                    permission=Permission.APPROVAL_ADMIN.value,
+                )
+            )
+        ),
+    ],
 )
 async def revise(
     task_id: str,

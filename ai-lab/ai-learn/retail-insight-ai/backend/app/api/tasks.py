@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, status
 from fastapi.responses import StreamingResponse
 
 from app.api.dependencies import get_event_repository, get_task_service
@@ -14,6 +14,8 @@ from app.schemas.task_api import TaskCreateRequest, TaskCreateResponse, TaskResp
 from app.services.task_service import TaskService
 from app.security.dependencies import require_permission
 from app.security.rbac_contracts import Permission
+from app.api.persistent_audit import persistent_audit_dependency
+from app.services.persistent_audit_service import PersistentAuditSpec
 
 # 定义 tasks 路由器。
 router = APIRouter(
@@ -28,9 +30,23 @@ logger = get_logger(__name__)
     path="",
     response_model=ApiResponse[TaskCreateResponse],
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[
+        Depends(
+            persistent_audit_dependency(
+                PersistentAuditSpec(
+                    action="analysis.execute",
+                    resource_type="task",
+                    resource_id="analysis-task",
+                    success_status_code=status.HTTP_202_ACCEPTED,
+                    permission=Permission.ANALYSIS_EXECUTE.value,
+                )
+            )
+        )
+    ],
 )
 # 创建任务并返回一个响应。
 async def create_task(
+    request: Request,
     payload: TaskCreateRequest,                                 # 请求体中的任务创建请求。
     background_tasks: BackgroundTasks,                          # FastAPI 提供的 BackgroundTasks，用于安排后台任务。
     service: TaskService = Depends(dependency=get_task_service),    # 依赖注入获取任务服务。
@@ -48,6 +64,7 @@ async def create_task(
     )
     # 创建任务并安排后台执行。  
     task = service.create_task(payload.question, payload.mode)
+    request.state.audit_resource_id = task.task_id
     # 安排后台任务执行，避免阻塞响应。
     background_tasks.add_task(service.run_task, task.task_id)
     trace_step(
