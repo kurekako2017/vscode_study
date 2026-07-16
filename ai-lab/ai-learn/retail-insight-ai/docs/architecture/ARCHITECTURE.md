@@ -26,7 +26,9 @@ stateDiagram-v2
 
 ```text
 JWT CurrentUser
-├── Permission Registry: approval.submit / approval.admin
+├── Normal decision: approval.review
+├── Owner actions: approval.submit + requested_by
+├── Cross-owner management: approval.admin
 ├── Ownership: original submitter or approval.admin
 └── PostgreSQL Transaction
     ├── Report / Approval row lock

@@ -2,6 +2,15 @@
 
 最后更新：2026-07-17
 
+## 2026-07-17 Enterprise Approval RBAC Boundary Correction
+
+- [x] 正常 approve/reject 在 Router、Persistent Audit 和 Service 防御校验中统一改用 `approval.review`
+- [x] Approval list 保持 `approval.review`；detail 支持 reviewer 或 `approval.submit` submitter owner
+- [x] employee 非 owner、employee approve/reject、未知角色继续返回 403 并写单条 `authorization.denied`
+- [x] admin 继续按冻结 Registry 同时拥有 `approval.review` 与 `approval.admin`，未修改角色权限矩阵
+- [x] InMemory、状态机、Schema、Migration、Persistent Audit 基础设施和 Frontend 保持不变
+- [x] 最终验证：InMemory 183（1 expected skip）、PostgreSQL 194（0 skip）、Frontend 47/47、build、compileall、diff-check
+
 ## 2026-07-17 ERIP Enterprise Approval Workflow
 
 - [x] InMemory Approval 进入冻结维护状态；默认 `REPOSITORY_BACKEND=inmemory` 与原有测试保持可用

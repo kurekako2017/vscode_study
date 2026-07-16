@@ -2,6 +2,14 @@
 
 # CHANGELOG
 
+## 2026-07-17 Enterprise Approval RBAC Boundary Correction
+
+- 正常 approve/reject 从 `approval.admin` 修正为 `approval.review`，Router、Persistent Audit 与 ApprovalService 防御校验保持一致。
+- Approval list 继续要求 `approval.review`；detail 允许 reviewer，或拥有 `approval.submit` 且 requested_by 匹配 JWT CurrentUser 的 owner。
+- employee 非 owner、employee approve/reject 与未知角色继续返回 403，并且每个 denied 请求只写一条 `authorization.denied`。
+- 冻结 Permission Registry、角色映射、状态机、Schema、Migration、InMemory 和 Frontend 均未修改。
+- 最终验证：InMemory 183（1 expected skip）、PostgreSQL 194（0 skip）、Frontend 47/47、production build、compileall、diff-check 全绿。
+
 ## 2026-07-17 ERIP Enterprise Approval Workflow
 
 - PostgreSQL Approval 现在使用 JWT `CurrentUser` 保存 requester/reviewer/revision actor；客户端自报身份不参与审批事实。

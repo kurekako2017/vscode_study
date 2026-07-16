@@ -4,11 +4,11 @@
 
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 
-- [ ] 将正常 approve/reject 从 `approval.admin` 修正为 `approval.review`
-- [ ] 保持 Approval list 为 `approval.review`，detail 改为 reviewer 或 submitter owner
-- [ ] 保持 `approval.admin` 只承担跨所有者管理能力，不修改冻结角色映射
-- [ ] 验证 manager/admin、employee owner、非 owner、未知角色与 403 Persistent Audit
-- [ ] 完成 PostgreSQL、InMemory、Frontend、build、compileall、diff-check 全量验证
+- [x] 将正常 approve/reject 从 `approval.admin` 修正为 `approval.review`
+- [x] 保持 Approval list 为 `approval.review`，detail 改为 reviewer 或 submitter owner
+- [x] 保持 `approval.admin` 只承担跨所有者管理能力，不修改冻结角色映射
+- [x] 验证 manager/admin、employee owner、非 owner、未知角色与 403 Persistent Audit
+- [x] 完成 PostgreSQL、InMemory、Frontend、build、compileall、diff-check 全量验证
 
 ### 审计发现
 
@@ -16,6 +16,14 @@
 - detail 仅绑定 `approval.review`，导致只有 `approval.submit` 的 employee owner 无法读取自己的当前状态与 History。
 - 冻结注册表中 manager 同时拥有 `approval.review` 与 `approval.admin`，因此旧测试只验证“manager 能执行”，没有验证 endpoint 实际依赖的是哪项权限。
 - 注册表描述仍把批准/拒绝写在 `approval.admin` 下；本轮按要求只报告，不修改冻结 Registry 或角色映射。
+
+### 完成记录
+
+- 2026-07-17：正常 approve/reject 的 API Dependency、Persistent Audit permission 与 Service 防御校验统一为 `approval.review`。
+- 2026-07-17：detail 使用 reviewer-or-owner 策略；owner 通过 `approval.submit + requested_by` 读取自己的当前状态与 History，list 仍只允许 reviewer。
+- 2026-07-17：新增 review-only manager PostgreSQL 测试，显式拒绝 `approval.admin` 后 approve/reject 仍成功。
+- 2026-07-17：403 继续只写一条 `authorization.denied`，正常 approval Audit 每个 request_id 只写一条。
+- 2026-07-17：InMemory 183（1 skip）、PostgreSQL 194（0 skip）、Frontend 47/47、build、compileall、diff-check 全绿。
 
 ## 2026-07-17 ERIP Enterprise Approval Workflow
 
