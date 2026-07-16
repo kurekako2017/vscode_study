@@ -224,6 +224,45 @@ describe("RagPage", () => {
     const second = (fetchMock.mock.calls[2][1].headers as Record<string, string>)["Idempotency-Key"];
     expect(second).toBe(first);
   });
+
+  it("renders provider timeout without hiding the evidence", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(jsonResponse({ success: false, request_id: "t", data: null, error: { code: "provider_timeout", message: "Provider timed out", detail: {} } }, 504));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[provider_timeout] Provider timed out");
+    expect(screen.getByText("Controlled AI evidence.")).toBeInTheDocument();
+  });
+
+  it("renders provider rate limiting separately from local quota", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(jsonResponse({ success: false, request_id: "r", data: null, error: { code: "provider_rate_limited", message: "Provider rate limited", detail: {} } }, 429));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[provider_rate_limited] Provider rate limited");
+  });
+
+  it("renders an AI network failure through the shared API error path", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockRejectedValueOnce(new Error("offline"));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[NETWORK_ERROR] offline");
+  });
+
+  it("disables the AI button while one request is in flight", async () => {
+    let resolveAI: ((value: Response) => void) | undefined;
+    const pending = new Promise<Response>((resolve) => { resolveAI = resolve; });
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockReturnValueOnce(pending);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    const button = screen.getByRole("button", { name: "AI分析" });
+    fireEvent.click(button);
+    expect(screen.getByRole("button", { name: "AI分析中…" })).toBeDisabled();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    resolveAI?.(aiSuccessResponse());
+    expect(await screen.findByText(/Usage: 12 \+ 8 = 20/)).toBeInTheDocument();
+  });
 });
 
 function aiSuccessResponse() {
