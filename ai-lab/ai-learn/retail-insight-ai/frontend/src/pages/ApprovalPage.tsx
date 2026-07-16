@@ -42,9 +42,17 @@ const approvalStatuses: ApprovalStatus[] = [
  */
 interface ApprovalPageProps {
   onLearningEvent?: RecordLearningEvent;
+  canSubmit?: boolean;
+  canReview?: boolean;
+  currentUserLabel?: string;
 }
 
-export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
+export function ApprovalPage({
+  onLearningEvent,
+  canSubmit = true,
+  canReview = true,
+  currentUserLabel = "システム既定ユーザー",
+}: ApprovalPageProps = {}) {
   const [filterTaskId, setFilterTaskId] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [approvals, setApprovals] = useState<ApprovalListResponse["items"]>([]);
@@ -66,12 +74,11 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
   const [rejectReason, setRejectReason] = useState("");
   const [revisionReason, setRevisionReason] = useState("");
   const [decisionLoading, setDecisionLoading] = useState<DecisionAction>(null);
-
-  const currentIdentity = "システム既定ユーザー";
+  const [directApprovalId, setDirectApprovalId] = useState("");
 
   useEffect(() => {
-    void loadApprovals(true);
-  }, []);
+    if (canReview) void loadApprovals(true);
+  }, [canReview]);
 
   useEffect(() => {
     if (selectedApprovalId === null) {
@@ -82,8 +89,8 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
     void loadApprovalDetail(selectedApprovalId);
   }, [selectedApprovalId]);
 
-  const canApproveOrReject = selectedApproval?.status === "pending_approval";
-  const canRevise = selectedApproval?.status === "rejected";
+  const canApproveOrReject = canReview && selectedApproval?.status === "pending_approval";
+  const canRevise = canSubmit && selectedApproval?.status === "rejected";
 
   const selectedStatusLabel = useMemo(
     () => (selectedApproval ? selectedApproval.status.replaceAll("_", " ") : "未選択"),
@@ -140,9 +147,9 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
   }
 
   async function refreshAfterChange(nextSelectedApprovalId: string | null) {
-    await loadApprovals(false);
+    if (canReview) await loadApprovals(false);
     if (nextSelectedApprovalId !== null) {
-      if (nextSelectedApprovalId === selectedApprovalId) {
+      if (!canReview || nextSelectedApprovalId === selectedApprovalId) {
         await loadApprovalDetail(nextSelectedApprovalId);
       } else {
         setSelectedApprovalId(nextSelectedApprovalId);
@@ -157,6 +164,7 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
 
   async function handleSubmitApproval(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canSubmit) return;
     setSubmitLoading(true);
     setSubmitError(null);
     setBannerMessage(null);
@@ -174,6 +182,13 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
     } finally {
       setSubmitLoading(false);
     }
+  }
+
+  async function handleDirectDetail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const approvalId = directApprovalId.trim();
+    if (approvalId.length === 0) return;
+    setSelectedApprovalId(approvalId);
   }
 
   async function handleApprove() {
@@ -255,7 +270,8 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
           <span>01</span>
           <h2>承認待ち一覧</h2>
         </div>
-        <p className="boundary">現在のユーザー: {currentIdentity}</p>
+        <p className="boundary">現在のユーザー: {currentUserLabel}</p>
+        {canReview ? <>
         <form className="stack-form" onSubmit={handleFilterSubmit}>
           <label htmlFor="approval-filter-task-id">Task ID 絞り込み</label>
           <input
@@ -313,10 +329,25 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
             ))}
           </div>
         )}
+        </> : (
+          <form className="stack-form" onSubmit={handleDirectDetail}>
+            <p className="boundary">自分が提出した Approval ID のみ、Backend の owner 判定を通して確認できます。</p>
+            <label htmlFor="approval-direct-id">Approval ID</label>
+            <input
+              id="approval-direct-id"
+              value={directApprovalId}
+              onChange={(event) => setDirectApprovalId(event.target.value)}
+              disabled={detailLoading}
+            />
+            <button type="submit" disabled={detailLoading || directApprovalId.trim().length === 0}>
+              {detailLoading ? "読み込み中…" : "自分の承認詳細を表示"}
+            </button>
+          </form>
+        )}
         </aside>
 
         <section className="approval-main">
-        <section className="panel approval-submit-panel">
+        {canSubmit && <section className="panel approval-submit-panel">
           <div className="panel-heading">
             <span>02</span>
             <h2>承認依頼を送信</h2>
@@ -342,7 +373,7 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
             </button>
             {submitError && <StatusBanner tone="error">[{submitError.code}] {submitError.message}</StatusBanner>}
           </form>
-        </section>
+        </section>}
 
         <section className="panel detail-panel approval-detail-panel" aria-live="polite">
           <div className="panel-heading">
@@ -376,7 +407,7 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
               </dl>
 
               <div className="approval-actions">
-                <section className="result-card">
+                {canReview && <section className="result-card">
                   <div className="subheading">
                     <strong>承認</strong>
                     <small>pending_approval の場合のみ実行できます</small>
@@ -392,9 +423,9 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
                   <button type="button" disabled={!canApproveOrReject || decisionLoading !== null} onClick={() => void handleApprove()}>
                     {decisionLoading === "approve" ? "承認中…" : "承認"}
                   </button>
-                </section>
+                </section>}
 
-                <section className="result-card">
+                {canReview && <section className="result-card">
                   <div className="subheading">
                     <strong>却下</strong>
                     <small>pending_approval の場合のみ実行できます</small>
@@ -410,9 +441,9 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
                   <button type="button" disabled={!canApproveOrReject || decisionLoading !== null} onClick={() => void handleReject()}>
                     {decisionLoading === "reject" ? "却下中…" : "却下"}
                   </button>
-                </section>
+                </section>}
 
-                <section className="result-card">
+                {canSubmit && <section className="result-card">
                   <div className="subheading">
                     <strong>修正依頼</strong>
                     <small>rejected の場合のみ実行できます</small>
@@ -428,7 +459,7 @@ export function ApprovalPage({ onLearningEvent }: ApprovalPageProps = {}) {
                   <button type="button" disabled={!canRevise || decisionLoading !== null} onClick={() => void handleRevise()}>
                     {decisionLoading === "revise" ? "修正依頼中…" : "修正依頼"}
                   </button>
-                </section>
+                </section>}
               </div>
             </>
           )}

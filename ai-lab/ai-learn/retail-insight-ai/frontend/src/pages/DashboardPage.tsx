@@ -7,18 +7,13 @@ type DashboardTarget = "analysis" | "documents" | "rag" | "approval";
 interface DashboardPageProps {
   onNavigate: (target: DashboardTarget) => void;
   onLearningEvent?: RecordLearningEvent;
+  canNavigate?: (target: DashboardTarget) => boolean;
+  currentUser?: {
+    username: string;
+    role: string;
+    permissionCount: number;
+  };
 }
-
-const runtimeFacts = [
-  ["数据存储", "InMemory"],
-  ["调研数据源", "静态数据"],
-  ["检索方式", "关键词检索"],
-  ["RAG 回答方式", "固定逻辑生成"],
-  ["当前用户", "系统默认用户"],
-  ["真实 LLM", "未启用"],
-  ["PostgreSQL", "当前运行环境尚未验证"],
-  ["pgvector", "尚未实现"],
-];
 
 const boundaryFacts = [
   ["任务工作流", "可用"],
@@ -80,7 +75,25 @@ const businessFlow: Array<{
  * - 进入系统的第一屏先给全局地图，比直接落到某个业务页更适合演示和学习。
  * - 这里的内容全部基于当前真实实现事实，不依赖新增后端统计接口。
  */
-export function DashboardPage({ onNavigate, onLearningEvent }: DashboardPageProps) {
+export function DashboardPage({
+  onNavigate,
+  onLearningEvent,
+  canNavigate = () => true,
+  currentUser,
+}: DashboardPageProps) {
+  const runtimeFacts = [
+    ["数据存储", "InMemory"],
+    ["调研数据源", "静态数据"],
+    ["检索方式", "关键词检索"],
+    ["RAG 回答方式", "固定逻辑生成"],
+    ["当前用户", currentUser?.username ?? "系统默认用户"],
+    ["当前角色", currentUser?.role ?? "未认证"],
+    ["权限来源", currentUser ? `前端冻结 Registry（${currentUser.permissionCount} 项）` : "未加载"],
+    ["真实 LLM", "未启用"],
+    ["PostgreSQL", "当前运行环境尚未验证"],
+    ["pgvector", "尚未实现"],
+  ];
+
   function openBusinessStep(target: DashboardTarget, actionLabel: string) {
     onLearningEvent?.({
       eventName: `openBusinessStep(${target})`,
@@ -112,7 +125,7 @@ export function DashboardPage({ onNavigate, onLearningEvent }: DashboardPageProp
                 <strong>{step.title}</strong>
                 <p className="page-description card-description">{step.purpose}</p>
                 <p className="boundary">{step.connection}</p>
-                {step.target !== null && step.actionLabel && (
+                {step.target !== null && step.actionLabel && canNavigate(step.target) && (
                   <button type="button" onClick={() => step.target !== null && openBusinessStep(step.target, step.actionLabel!)}>{step.actionLabel}</button>
                 )}
               </article>

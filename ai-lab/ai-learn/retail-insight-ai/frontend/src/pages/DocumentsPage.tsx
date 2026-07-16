@@ -28,9 +28,15 @@ type DocumentAction = "archive" | "import" | "chunk" | null;
  */
 interface DocumentsPageProps {
   onLearningEvent?: RecordLearningEvent;
+  canWrite?: boolean;
+  canArchive?: boolean;
 }
 
-export function DocumentsPage({ onLearningEvent }: DocumentsPageProps = {}) {
+export function DocumentsPage({
+  onLearningEvent,
+  canWrite = true,
+  canArchive = true,
+}: DocumentsPageProps = {}) {
   const [documents, setDocuments] = useState<DocumentListResponse["items"]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsRefreshing, setDocumentsRefreshing] = useState(false);
@@ -222,7 +228,7 @@ export function DocumentsPage({ onLearningEvent }: DocumentsPageProps = {}) {
       />
 
       <section className="documents-shell" aria-label="文档管理页面">
-        <aside className="panel upload-panel">
+        {canWrite && <aside className="panel upload-panel">
         <div className="panel-heading">
           <span>01</span>
           <h2>文書アップロード</h2>
@@ -283,7 +289,7 @@ export function DocumentsPage({ onLearningEvent }: DocumentsPageProps = {}) {
           </button>
           {uploadError && <StatusBanner tone="error">[{uploadError.code}] {uploadError.message}</StatusBanner>}
         </form>
-        </aside>
+        </aside>}
 
         <section className="documents-main">
         <section className="panel list-panel" aria-live="polite">
@@ -381,15 +387,15 @@ export function DocumentsPage({ onLearningEvent }: DocumentsPageProps = {}) {
               )}
 
               <div className="action-grid">
-                <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("archive")}>
+                {canArchive && <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("archive")}>
                   {activeDocumentAction === "archive" ? "アーカイブ中…" : "アーカイブ"}
-                </button>
-                <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("import")}>
+                </button>}
+                {canWrite && <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("import")}>
                   {activeDocumentAction === "import" ? "Import 中…" : "Import"}
-                </button>
-                <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("chunk")}>
+                </button>}
+                {canWrite && <button type="button" disabled={selectedDocumentBusy} onClick={() => void runDocumentAction("chunk")}>
                   {activeDocumentAction === "chunk" ? "Chunk 処理中…" : "Chunk 実行"}
-                </button>
+                </button>}
                 <button
                   type="button"
                   className="secondary-button"

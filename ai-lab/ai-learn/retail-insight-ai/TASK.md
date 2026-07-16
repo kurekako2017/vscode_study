@@ -2,6 +2,16 @@
 
 最后更新：2026-07-17
 
+## 2026-07-17 Frontend Enterprise Authentication + RBAC
+
+- [ ] Access Token 只保存于 sessionStorage，刷新时经 JWT 基础校验与 `/api/v1/users/me` 恢复身份
+- [ ] AuthContext 集中提供当前用户、认证状态、登录、登出与 permission helper
+- [ ] fetch API Client 自动注入 Bearer；Login/Health 保持匿名；401 清会话，403 保持会话
+- [ ] Login、ProtectedRoute、原目标回跳和未知角色 fail-closed 落地
+- [ ] 导航、Documents、RAG、Analysis、Approval 按冻结权限控制可见性与操作
+- [ ] 不修改后端 Registry、JWT Payload、Approval 状态机、Schema、Migration 或 InMemory
+- [ ] 完成 Frontend、双 Backend、build、compileall 与 diff-check 验证
+
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 
 - [x] 正常 approve/reject 在 Router、Persistent Audit 和 Service 防御校验中统一改用 `approval.review`

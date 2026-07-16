@@ -2,6 +2,23 @@
 
 最后更新：2026-07-17
 
+## 2026-07-17 Frontend Enterprise Authentication + RBAC
+
+- [ ] 建立 sessionStorage Access Token、JWT 身份校验、`/users/me` 恢复与集中 AuthContext
+- [ ] 让统一 fetch API Client 自动注入 Bearer，并集中处理 401、403 与并发失效
+- [ ] 建立 Login、URL 路由、ProtectedRoute、原目标回跳与登出链
+- [ ] 按冻结 Permission Registry 控制导航、页面入口与业务按钮，未知角色 fail-closed
+- [ ] 保持 Approval 状态机、后端 RBAC、JWT Payload、Schema、Migration 与 InMemory 不变
+- [ ] 补齐 Frontend 认证、请求链、路由和权限测试并完成全量回归
+
+### 实施前审计
+
+- 当前 Frontend 没有 Login、AuthContext、URL Router 或 ProtectedRoute，页面只由 `App` 内部 tab state 切换。
+- 当前统一使用 `fetch`，但没有 Bearer 注入与 401/403 会话处理；页面无需引入第二套 HTTP Client。
+- 当前导航和 Approval/Document/RAG 操作按页面状态静态展示，没有复用后端冻结 Permission Registry。
+- 原生 `EventSource` 不能携带 Authorization Header，生产 SSE 请求链需要改为带 Bearer 的 fetch stream。
+- 后端现有 Login、CurrentUser 与冻结 RBAC 合同足够，本轮不需要修改后端。
+
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 
 - [x] 将正常 approve/reject 从 `approval.admin` 修正为 `approval.review`

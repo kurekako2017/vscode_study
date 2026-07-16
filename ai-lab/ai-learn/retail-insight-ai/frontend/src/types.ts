@@ -18,6 +18,26 @@ export interface ApiResponse<T> {
   error: ApiError | null;
 }
 
+/** Login 只返回 Access Token，不把权限列表写入 JWT 或响应。 */
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+/** CurrentUser 身份来自 Backend 验证后的 JWT，不接受页面或表单自报。 */
+export interface CurrentUserResponse {
+  user_id: string;
+  username: string;
+  role: string;
+}
+
+/** Health 保持匿名；前端 API Client 不为它附加 Bearer。 */
+export interface HealthResponse {
+  status: string;
+  service: string;
+}
+
 /** POST /api/tasks 的最小响应。 */
 export interface TaskCreateResponse {
   task_id: string;

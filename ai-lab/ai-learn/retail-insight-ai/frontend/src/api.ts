@@ -17,10 +17,46 @@ import type {
   DocumentUploadSessionResponse,
   InternalRagAnswerRequest,
   InternalRagAnswerResponse,
+  CurrentUserResponse,
+  HealthResponse,
+  LoginResponse,
   ReportResponse,
   TaskCreateResponse,
   TaskEvent,
 } from "./types";
+
+interface ApiAuthHandlers {
+  onUnauthorized?: () => void | Promise<void>;
+  onForbidden?: () => void;
+}
+
+interface RequestOptions {
+  anonymous?: boolean;
+}
+
+let apiAccessToken: string | null = null;
+let apiAuthHandlers: ApiAuthHandlers = {};
+let unauthorizedHandling: Promise<void> | null = null;
+
+/**
+ * AuthContext 是浏览器内唯一 Token owner；页面不直接读取 Token，也不手写 Authorization。
+ * 测试可以传 null 恢复匿名状态，生产登出也走同一入口。
+ */
+export function setApiAccessToken(accessToken: string | null) {
+  apiAccessToken = accessToken;
+}
+
+/** 注册全局 401/403 行为，避免每个页面各自实现会话失效逻辑。 */
+export function setApiAuthHandlers(handlers: ApiAuthHandlers) {
+  apiAuthHandlers = handlers;
+}
+
+/** 仅供测试隔离使用，不会接触 localStorage。 */
+export function resetApiAuthForTests() {
+  apiAccessToken = null;
+  apiAuthHandlers = {};
+  unauthorizedHandling = null;
+}
 
 /** 保留 Backend error code，使 UI 不需要从 message 中猜错误类型。 */
 export class ApiClientError extends Error {
@@ -66,15 +102,65 @@ interface ApprovalListParams {
 }
 
 /** 统一处理 fetch 的网络层失败，避免组件中散落 try/catch 文案。 */
-async function request(path: string, init?: RequestInit): Promise<Response> {
+async function handleUnauthorizedOnce() {
+  if (!apiAuthHandlers.onUnauthorized) return;
+  if (unauthorizedHandling === null) {
+    unauthorizedHandling = Promise.resolve(apiAuthHandlers.onUnauthorized())
+      .finally(() => {
+        unauthorizedHandling = null;
+      });
+  }
+  await unauthorizedHandling;
+}
+
+async function request(
+  path: string,
+  init?: RequestInit,
+  options: RequestOptions = {},
+): Promise<Response> {
   try {
-    return await fetch(path, init);
+    let requestInit = init;
+    if (!options.anonymous && apiAccessToken !== null) {
+      const headers = new Headers(init?.headers);
+      headers.set("Authorization", `Bearer ${apiAccessToken}`);
+      requestInit = { ...init, headers };
+    }
+    const response = await fetch(path, requestInit);
+    if (response.status === 401 && !options.anonymous) {
+      await handleUnauthorizedOnce();
+    } else if (response.status === 403 && !options.anonymous) {
+      apiAuthHandlers.onForbidden?.();
+    }
+    return response;
   } catch (reason) {
     throw new ApiClientError(
       "NETWORK_ERROR",
       reason instanceof Error ? reason.message : "Network request failed",
     );
   }
+}
+
+/** Login 与 Health 是冻结匿名入口，不能误带旧会话的 Authorization Header。 */
+export async function login(username: string, password: string): Promise<LoginResponse> {
+  const response = await request("/api/v1/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  }, { anonymous: true });
+  return unwrapResponse<LoginResponse>(response);
+}
+
+export async function getCurrentUser(): Promise<CurrentUserResponse> {
+  const response = await request("/api/v1/users/me");
+  return unwrapResponse<CurrentUserResponse>(response);
+}
+
+export async function getHealth(): Promise<HealthResponse> {
+  const response = await request("/health", undefined, { anonymous: true });
+  if (!response.ok) {
+    throw new ApiClientError("HTTP_ERROR", `HTTP ${response.status}`);
+  }
+  return response.json() as Promise<HealthResponse>;
 }
 
 /** 解析统一 envelope，并保证调用方只会收到成功 data 或结构化异常。 */
@@ -287,6 +373,13 @@ export function subscribeToTask(
     onTransportError: () => void;
   },
 ): () => void {
+  if (apiAccessToken !== null) {
+    const controller = new AbortController();
+    void subscribeToAuthenticatedTaskStream(taskId, controller, handlers);
+    return () => controller.abort();
+  }
+
+  // 匿名 fallback 只保留给既有本地组件测试；真实受保护页面始终使用上面的 Bearer fetch stream。
   const source = new EventSource(`/api/tasks/${taskId}/events`);
 
   /** 所有业务事件共享同一个 JSON Schema，因此可以复用解析函数。 */
@@ -307,4 +400,56 @@ export function subscribeToTask(
 
   // API Client 不猜测组件生命周期，而是把资源清理权交还调用方。
   return () => source.close();
+}
+
+/**
+ * 原生 EventSource 不能设置 Authorization Header，因此认证后的 SSE 使用 fetch stream。
+ * Parser 只保存当前事件块，不记录完整流或报告正文。
+ */
+async function subscribeToAuthenticatedTaskStream(
+  taskId: string,
+  controller: AbortController,
+  handlers: {
+    onEvent: (event: TaskEvent) => void;
+    onTransportError: () => void;
+  },
+) {
+  try {
+    const response = await request(`/api/tasks/${taskId}/events`, {
+      headers: { Accept: "text/event-stream" },
+      signal: controller.signal,
+    });
+    if (!response.ok || response.body === null) {
+      handlers.onTransportError();
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (!controller.signal.aborted) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done }).replaceAll("\r\n", "\n");
+      let boundary = buffer.indexOf("\n\n");
+      while (boundary >= 0) {
+        const block = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        const data = block
+          .split("\n")
+          .filter((line) => line.startsWith("data:"))
+          .map((line) => line.slice(5).trimStart())
+          .join("\n");
+        if (data.length > 0) {
+          handlers.onEvent(JSON.parse(data) as TaskEvent);
+        }
+        boundary = buffer.indexOf("\n\n");
+      }
+      if (done) break;
+    }
+  } catch (reason) {
+    if (!controller.signal.aborted && (!(reason instanceof DOMException) || reason.name !== "AbortError")) {
+      handlers.onTransportError();
+    }
+  }
 }

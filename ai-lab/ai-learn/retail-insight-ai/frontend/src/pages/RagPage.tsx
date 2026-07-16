@@ -22,9 +22,15 @@ import type { RecordLearningEvent } from "../learning/learningTypes";
  */
 interface RagPageProps {
   onLearningEvent?: RecordLearningEvent;
+  canRetrieve?: boolean;
+  canAnalyze?: boolean;
 }
 
-export function RagPage({ onLearningEvent }: RagPageProps = {}) {
+export function RagPage({
+  onLearningEvent,
+  canRetrieve = true,
+  canAnalyze = true,
+}: RagPageProps = {}) {
   const [retrievalQuery, setRetrievalQuery] = useState("");
   const [retrievalLimit, setRetrievalLimit] = useState("10");
   const [retrievalDocumentType, setRetrievalDocumentType] = useState("");
@@ -148,7 +154,7 @@ export function RagPage({ onLearningEvent }: RagPageProps = {}) {
       />
 
       <section className="rag-shell" aria-label="RAG 検索ワークスペース">
-        <section className="panel rag-panel">
+        {canRetrieve && <section className="panel rag-panel">
         <div className="panel-heading">
           <span>01</span>
           <h2>文書検索</h2>
@@ -251,9 +257,9 @@ export function RagPage({ onLearningEvent }: RagPageProps = {}) {
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
-      <section className="panel rag-panel">
+      {canAnalyze && <section className="panel rag-panel">
         <div className="panel-heading">
           <span>02</span>
           <h2>Internal RAG 回答</h2>
@@ -371,7 +377,7 @@ export function RagPage({ onLearningEvent }: RagPageProps = {}) {
             </div>
           </div>
         )}
-      </section>
+      </section>}
       </section>
 
       <BusinessLearningPanel
