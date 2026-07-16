@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     llm_provider: Literal["stub"] = "stub"
     # 保留旧环境变量的解析兼容，但组合根永久禁止普通 RAG 调用 Provider。
     internal_rag_use_llm: bool = False
-    llm_stub_behavior: Literal["success", "timeout", "failure", "rate_limit"] = "success"
+    llm_stub_behavior: Literal["success", "timeout", "failure", "rate_limit", "partial_failure"] = "success"
     llm_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
     llm_max_input_tokens: int = Field(default=2048, ge=128, le=100_000)
     llm_max_output_tokens: int = Field(default=256, ge=1, le=4096)

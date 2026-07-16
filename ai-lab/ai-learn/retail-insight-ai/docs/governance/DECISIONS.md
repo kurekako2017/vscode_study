@@ -1,5 +1,13 @@
 # retail-insight-ai Architecture Decisions
 
+## ADR-20260717-LLM-COST: 贵的 Provider side effect 必须经过 PostgreSQL 成本边界
+
+- 状态：Accepted。
+- 决策：只有 `POST /api/v1/ai-analysis` 可调用 `LLMProvider.analyze()`；普通 RAG/Task/KPI/Approval 不得隐式调用。
+- 事务：预占先提交，Provider 在事务外运行，结算与最终 Audit 同事务。
+- 并发：`(actor_user_id,idempotency_key)` 唯一约束与 quota bucket `FOR UPDATE` 是最终保障。
+- 费用：使用 `Decimal/NUMERIC` 及调用时价格快照，Stub 无网络、无真实费用。
+
 本文件保存 Architecture Decision Record（ADR）。不得删除已生效或已废弃的历史决策。
 
 ## ADR-001

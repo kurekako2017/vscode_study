@@ -35,6 +35,7 @@ class LLMAnalysisInput:
     evidence: tuple[AIEvidence, ...]
     max_output_tokens: int
     request_id: str
+    timeout_seconds: float
 
 
 @dataclass(frozen=True)
@@ -79,8 +80,18 @@ class LLMProviderRateLimitError(RuntimeError):
     """Provider 端限流，与本地 quota rejected 分开。"""
 
 
+class LLMProviderPartialFailureError(RuntimeError):
+    """Provider 已消耗部分 token 后失败，Ledger 仍必须结算该成本。"""
+
+    def __init__(self, *, input_tokens: int, output_tokens: int, latency_ms: int) -> None:
+        super().__init__("provider partial failure")
+        self.input_tokens = input_tokens
+        self.output_tokens = output_tokens
+        self.latency_ms = latency_ms
+
+
 __all__ = [
     "AIEvidence", "AIAnalysisResult", "LLMAnalysisInput", "LLMProviderResult",
-    "LLMProviderRateLimitError", "LLMProviderTimeoutError", "LLMUsageStatus",
+    "LLMProviderPartialFailureError", "LLMProviderRateLimitError", "LLMProviderTimeoutError", "LLMUsageStatus",
     "ReservationOutcome",
 ]

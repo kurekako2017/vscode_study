@@ -1,5 +1,11 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 LLM Cost Governance
+
+- 新增 PostgreSQL-only `llm_usage_ledger` / `llm_quota_buckets` / `ai_analysis_results` 与 revision `20260717_05_llm_cost_governance`。
+- 新增唯一显式 `POST /api/v1/ai-analysis`，包含 Evidence Gate、Decimal 成本、预占/结算、幂等和 Stub 故障模式。
+- 普通 Internal RAG 固定为 deterministic 路径；RAG 页只在真实检索证据后显示二次确认的「AI分析」按钮。
+
 # CHANGELOG
 
 ## 2026-07-17 Frontend Enterprise Authentication + RBAC

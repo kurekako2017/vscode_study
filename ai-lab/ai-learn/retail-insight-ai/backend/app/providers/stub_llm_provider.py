@@ -30,6 +30,7 @@ from uuid import uuid5, NAMESPACE_URL
 
 from app.models.ai_analysis import (
     LLMAnalysisInput,
+    LLMProviderPartialFailureError,
     LLMProviderRateLimitError,
     LLMProviderResult,
     LLMProviderTimeoutError,
@@ -59,6 +60,8 @@ class StubLLMProvider:
             raise LLMProviderRateLimitError("stub rate limited")
         if self.behavior == "failure":
             raise RuntimeError("stub provider failure")
+        if self.behavior == "partial_failure":
+            raise LLMProviderPartialFailureError(input_tokens=7, output_tokens=3, latency_ms=4)
         excerpts = [f"[{item.document_id}/{item.chunk_id}] {item.excerpt}" for item in request.evidence]
         answer = "Stub AI analysis:\n" + "\n".join(excerpts)
         input_tokens = max(1, (len(request.question) + sum(len(item.excerpt) for item in request.evidence) + 3) // 4)

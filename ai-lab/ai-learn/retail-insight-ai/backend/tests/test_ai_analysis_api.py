@@ -135,7 +135,7 @@ class AIAnalysisPostgresAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sum(log.operation_type == "analysis.execute.quota_rejected" for log in logs), 1)
 
     async def test_provider_timeout_failure_and_rate_limit_are_settled(self) -> None:
-        for index, (behavior, status, code) in enumerate((("timeout", 504, "provider_timeout"), ("failure", 502, "provider_failed"), ("rate_limit", 429, "provider_rate_limited"))):
+        for index, (behavior, status, code) in enumerate((("timeout", 504, "provider_timeout"), ("failure", 502, "provider_failed"), ("rate_limit", 429, "provider_rate_limited"), ("partial_failure", 502, "provider_failed"))):
             self.app.state.container.llm_provider.behavior = behavior
             response = await self._post(f"ai-provider-{index:04d}")
             self.assertEqual(response.status_code, status)
@@ -143,9 +143,13 @@ class AIAnalysisPostgresAPITest(unittest.IsolatedAsyncioTestCase):
         factory = self.app.state.container.audit_repository._connection_factory
         with factory.connection() as connection, connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM llm_usage_ledger WHERE status='failed'")
-            self.assertEqual(cursor.fetchone()[0], 3)
+            self.assertEqual(cursor.fetchone()[0], 4)
             cursor.execute("SELECT COUNT(*) FROM audit_logs WHERE operation_type='analysis.execute.failed'")
-            self.assertEqual(cursor.fetchone()[0], 3)
+            self.assertEqual(cursor.fetchone()[0], 4)
+            cursor.execute("SELECT input_tokens,output_tokens,actual_cost FROM llm_usage_ledger WHERE error_code='provider_partial_failure'")
+            partial = cursor.fetchone()
+            self.assertEqual(partial[0:2], (7, 3))
+            self.assertGreater(Decimal(partial[2]), 0)
 
     async def test_per_request_cap_rejects_before_reservation(self) -> None:
         service = self.app.state.container.ai_analysis_service
@@ -220,6 +224,126 @@ class AIAnalysisPostgresAPITest(unittest.IsolatedAsyncioTestCase):
             results = list(pool.map(execute, (1, 2)))
         self.assertEqual(self.app.state.container.llm_provider.call_count, 1)
         self.assertGreaterEqual(sum(hasattr(item, "analysis_id") for item in results), 1)
+
+    async def test_missing_bearer_is_401_and_zero_call(self) -> None:
+        response = await self.client.post("/api/v1/ai-analysis", json=self._payload(),
+                                          headers={"Authorization": "", "Idempotency-Key": "ai-no-bearer-0001"})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_missing_idempotency_header_is_422_and_zero_call(self) -> None:
+        response = await self.client.post("/api/v1/ai-analysis", json=self._payload())
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_blank_question_is_422_and_zero_call(self) -> None:
+        response = await self._post("ai-blank-question-01", question="   ")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_question_length_limit_is_422_and_zero_call(self) -> None:
+        response = await self._post("ai-long-question-001", question="x" * 2001)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_evidence_count_limit_is_422_and_zero_call(self) -> None:
+        evidence = [{"document_id": self.document_id, "chunk_id": self.chunk_id, "score": 1}] * 21
+        response = await self._post("ai-too-many-evidence", evidence=evidence)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_negative_score_is_422_and_zero_call(self) -> None:
+        response = await self._post("ai-negative-score-01", evidence=[{"document_id": self.document_id, "chunk_id": self.chunk_id, "score": -1}])
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_blank_document_id_is_422_and_zero_call(self) -> None:
+        response = await self._post("ai-blank-document-01", evidence=[{"document_id": "", "chunk_id": self.chunk_id, "score": 1}])
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_blank_chunk_id_is_422_and_zero_call(self) -> None:
+        response = await self._post("ai-blank-chunk-0001", evidence=[{"document_id": self.document_id, "chunk_id": "", "score": 1}])
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_missing_confirmation_field_is_422_and_zero_call(self) -> None:
+        payload = self._payload()
+        payload.pop("confirmed")
+        response = await self.client.post("/api/v1/ai-analysis", json=payload, headers={"Idempotency-Key": "ai-no-confirm-0001"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_extra_provider_field_is_rejected_and_zero_call(self) -> None:
+        response = await self._post("ai-forged-provider-1", provider="paid-provider")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_malformed_json_is_422_and_zero_call(self) -> None:
+        response = await self.client.post("/api/v1/ai-analysis", content="{", headers={
+            "Content-Type": "application/json", "Idempotency-Key": "ai-malformed-json-1",
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.app.state.container.llm_provider.call_count, 0)
+
+    async def test_duplicate_evidence_is_deduplicated(self) -> None:
+        ref = {"document_id": self.document_id, "chunk_id": self.chunk_id, "score": "0.9"}
+        response = await self._post("ai-deduplicate-0001", evidence=[ref, ref])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()["data"]["citations"]), 1)
+
+    async def test_evidence_is_score_sorted_with_stable_tie_break(self) -> None:
+        doc_b, chunk_b = self._seed_evidence("second evidence")
+        response = await self._post("ai-stable-order-0001", evidence=[
+            {"document_id": doc_b, "chunk_id": chunk_b, "score": "0.4"},
+            {"document_id": self.document_id, "chunk_id": self.chunk_id, "score": "0.9"},
+        ])
+        citations = response.json()["data"]["citations"]
+        self.assertEqual(citations[0]["document_id"], self.document_id)
+
+    async def test_evidence_is_capped_to_configured_count(self) -> None:
+        evidence = [{"document_id": self.document_id, "chunk_id": self.chunk_id, "score": "1"}]
+        for index in range(5):
+            document_id, chunk_id = self._seed_evidence(f"evidence {index}")
+            evidence.append({"document_id": document_id, "chunk_id": chunk_id, "score": str(index / 10)})
+        response = await self._post("ai-evidence-cap-0001", evidence=evidence)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()["data"]["citations"]), self.settings.llm_evidence_max_count)
+
+    async def test_price_and_currency_snapshot_are_persisted(self) -> None:
+        self.assertEqual((await self._post("ai-price-snapshot-1")).status_code, 200)
+        factory = self.app.state.container.audit_repository._connection_factory
+        with factory.connection() as connection, connection.cursor() as cursor:
+            cursor.execute("SELECT input_price_per_million,output_price_per_million,currency FROM llm_usage_ledger")
+            row = cursor.fetchone()
+        self.assertEqual(Decimal(row[0]), self.settings.llm_input_price_per_million)
+        self.assertEqual(Decimal(row[1]), self.settings.llm_output_price_per_million)
+        self.assertEqual(row[2].strip(), self.settings.llm_currency)
+
+    async def test_success_reserves_both_user_and_global_buckets(self) -> None:
+        self.assertEqual((await self._post("ai-two-buckets-0001")).status_code, 200)
+        factory = self.app.state.container.audit_repository._connection_factory
+        with factory.connection() as connection, connection.cursor() as cursor:
+            cursor.execute("SELECT scope_type,request_count FROM llm_quota_buckets ORDER BY scope_type")
+            rows = cursor.fetchall()
+        self.assertEqual(rows, [("global", 1), ("user", 1)])
+
+    async def test_provider_failure_releases_reserved_tokens_and_cost(self) -> None:
+        self.app.state.container.llm_provider.behavior = "failure"
+        self.assertEqual((await self._post("ai-release-failure-1")).status_code, 502)
+        factory = self.app.state.container.audit_repository._connection_factory
+        with factory.connection() as connection, connection.cursor() as cursor:
+            cursor.execute("SELECT token_count,cost,request_count FROM llm_quota_buckets")
+            rows = cursor.fetchall()
+        self.assertTrue(all(row[0] == 0 and Decimal(row[1]) == 0 and row[2] == 1 for row in rows))
+
+    async def test_request_id_and_identity_come_from_server_context(self) -> None:
+        self.assertEqual((await self._post("ai-server-context-1")).status_code, 200)
+        factory = self.app.state.container.audit_repository._connection_factory
+        with factory.connection() as connection, connection.cursor() as cursor:
+            cursor.execute("SELECT request_id,actor_user_id,actor_username,actor_role FROM llm_usage_ledger")
+            row = cursor.fetchone()
+        self.assertEqual(row, ("req-ai-server-context-1", "user-employee", "employee", "employee"))
 
 
 if __name__ == "__main__":

@@ -115,17 +115,21 @@ class PostgresLLMUsageRepository:
                 created_at = cursor.fetchone()[0]
         return AIAnalysisResult(analysis_id, answer, evidence, provider, model, input_tokens, output_tokens, total, actual_cost, currency, "succeeded", created_at)
 
-    def settle_failure(self, *, usage_id: str, error_code: str, latency_ms: int | None = None) -> None:
+    def settle_failure(self, *, usage_id: str, error_code: str, latency_ms: int | None = None,
+                       input_tokens: int = 0, output_tokens: int = 0,
+                       actual_cost: Decimal = Decimal("0")) -> None:
         """失败不伪装成功；释放 token/cost 预占，保留 request attempt。"""
 
         with self._factory.connection() as connection:
             with connection.cursor() as cursor:
                 reserved_tokens, estimated_cost, actor_user_id, *_ = self._lock_usage(cursor, usage_id)
-                self._adjust_buckets(cursor, actor_user_id, -reserved_tokens, -Decimal(estimated_cost))
+                total = input_tokens + output_tokens
+                self._adjust_buckets(cursor, actor_user_id, total - reserved_tokens, actual_cost - Decimal(estimated_cost))
                 cursor.execute(
                     """UPDATE llm_usage_ledger SET status='failed',error_code=%s,latency_ms=%s,
+                    input_tokens=%s,output_tokens=%s,total_tokens=%s,actual_cost=%s,
                     completed_at=CURRENT_TIMESTAMP WHERE usage_id=%s AND status='reserved'""",
-                    (error_code, latency_ms, usage_id),
+                    (error_code, latency_ms, input_tokens, output_tokens, total, actual_cost, usage_id),
                 )
 
     def _existing(self, cursor, actor_user_id: str, idempotency_key: str) -> ReservationOutcome:
@@ -140,6 +144,8 @@ class PostgresLLMUsageRepository:
             evidence = tuple(AIEvidence(item["document_id"], item["chunk_id"], Decimal(item["score"]), item["excerpt"]) for item in row[5])
             result = AIAnalysisResult(row[3], row[4], evidence, row[6], row[7], row[8], row[9], row[10], Decimal(row[11]), row[12].strip(), row[13], row[14])
             return ReservationOutcome("succeeded", row[0], existing_result=result)
+        if row[1] == "reserved":
+            return ReservationOutcome("in_progress", row[0])
         return ReservationOutcome(row[1], row[0], rejection_code=row[2])
 
     def _lock_usage(self, cursor, usage_id: str):

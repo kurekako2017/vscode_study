@@ -17,7 +17,7 @@ from app.config.settings import Settings
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import AIAnalysisException
 from app.models.ai_analysis import (
-    AIEvidence, AIAnalysisResult, LLMAnalysisInput, LLMProviderRateLimitError,
+    AIEvidence, AIAnalysisResult, LLMAnalysisInput, LLMProviderPartialFailureError, LLMProviderRateLimitError,
     LLMProviderTimeoutError,
 )
 from app.models.document import DocumentStatus
@@ -102,7 +102,13 @@ class AIAnalysisService:
                 question=request.question, evidence=evidence,
                 max_output_tokens=self._settings.llm_max_output_tokens,
                 request_id=context.request_id,
+                timeout_seconds=self._settings.llm_timeout_seconds,
             ))
+        except LLMProviderPartialFailureError as exc:
+            return self._fail(usage_id, actor, context, "provider_partial_failure", 502,
+                              ErrorCode.PROVIDER_FAILED, started,
+                              input_tokens=exc.input_tokens, output_tokens=exc.output_tokens,
+                              latency_ms=exc.latency_ms)
         except LLMProviderTimeoutError:
             return self._fail(usage_id, actor, context, "provider_timeout", 504, ErrorCode.PROVIDER_TIMEOUT, started)
         except LLMProviderRateLimitError:
@@ -127,11 +133,15 @@ class AIAnalysisService:
         return result
 
     def _fail(self, usage_id: str, actor: CurrentUser, context: PersistentAuditContext,
-              error_code: str, status_code: int, public_code: ErrorCode, started: float):
+              error_code: str, status_code: int, public_code: ErrorCode, started: float,
+              input_tokens: int = 0, output_tokens: int = 0, latency_ms: int | None = None):
         assert self._usage is not None
-        latency = max(0, int((monotonic() - started) * 1000))
+        latency = latency_ms if latency_ms is not None else max(0, int((monotonic() - started) * 1000))
+        actual_cost = self._cost(input_tokens, output_tokens) if input_tokens or output_tokens else Decimal("0")
         with self._uow.transaction():
-            self._usage.settle_failure(usage_id=usage_id, error_code=error_code, latency_ms=latency)
+            self._usage.settle_failure(usage_id=usage_id, error_code=error_code, latency_ms=latency,
+                                       input_tokens=input_tokens, output_tokens=output_tokens,
+                                       actual_cost=actual_cost)
             self._audit.record_ai_analysis_event(context=context, actor=actor, action="analysis.execute.failed",
                                                  result="failure", status_code=status_code, error_code=error_code,
                                                  usage_id=usage_id)

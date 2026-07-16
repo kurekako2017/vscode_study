@@ -1,13 +1,15 @@
 # retail-insight-ai Project Backlog
 
-## 2026-07-17 Active: LLM 企业级成本可控边界
+## 2026-07-17 Completed: LLM 企业级成本可控边界
 
-- [ ] 封死普通 Internal RAG 的隐式 Provider 调用
-- [ ] 完成 PostgreSQL Ledger / Quota / Idempotency / Result 事实
-- [ ] 完成显式 AI Analysis API、Evidence Gate、Stub 与 Persistent Audit
-- [ ] 完成 RAG 页唯一显式入口与回归验证
+- [x] 封死普通 Internal RAG 的隐式 Provider 调用
+- [x] 完成 PostgreSQL Ledger / Quota / Idempotency / Result 事实
+- [x] 完成显式 AI Analysis API、Evidence Gate、Stub 与 Persistent Audit
+- [x] 完成 RAG 页唯一显式入口与回归验证
 
 已发现问题：`INTERNAL_RAG_USE_LLM=true` 可让普通 RAG 路由调用 Provider；现有 Provider Usage 使用 float，且没有额度、幂等与持久 Ledger。
+
+完成记录：已以 Decimal 价格快照、PostgreSQL 唯一约束/行锁、短事务预占/结算、安全 Evidence ref 和唯一显式前端按钮关闭上述问题。
 
 最后更新：2026-07-17
 

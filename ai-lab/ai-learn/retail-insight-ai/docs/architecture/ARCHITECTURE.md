@@ -1,5 +1,19 @@
 # Enterprise Retail Intelligence Platform (ERIP) Architecture
 
+## 2026-07-17 显式 AI Analysis 成本边界
+
+```mermaid
+flowchart LR
+  UI[AI分析按钮 + 二次确认] --> API[POST /api/v1/ai-analysis]
+  API --> G[JWT + analysis.execute + Evidence Gate]
+  G --> R[幂等占位 + user/global quota 行锁]
+  R -->|reserved commit| P[Stub LLMProvider\n事务外]
+  P --> S[结算 Ledger + Result + Audit\n同事务]
+  R -->|rejected| Q[429 + Ledger + Audit]
+```
+
+State owner：PostgreSQL 持有 usage/quota/result/audit 事实；React 只持有当前用户操作的临时幂等键和展示状态。InMemory 不实现 Ledger。
+
 最后更新：2026-07-17
 
 本文件记录 `Enterprise Retail Intelligence Platform (ERIP)` 的统一架构口径。当前仓库中的 `Retail Insight AI` 只表示 ERIP 的 Current MVP；未实现的能力必须明确标注，不得把规划写成现状。
