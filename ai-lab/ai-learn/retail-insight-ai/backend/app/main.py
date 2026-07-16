@@ -28,6 +28,7 @@ from app.api.documents import router as documents_router
 from app.api.approvals import router as approvals_router
 from app.api.internal_rag import router as internal_rag_router
 from app.api.ai_analysis import router as ai_analysis_router
+from app.api.executive_reports import router as executive_reports_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
@@ -167,6 +168,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     application.include_router(
         ai_analysis_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        executive_reports_router, dependencies=authentication_dependencies
     )
     application.include_router(
         approvals_router, dependencies=authentication_dependencies

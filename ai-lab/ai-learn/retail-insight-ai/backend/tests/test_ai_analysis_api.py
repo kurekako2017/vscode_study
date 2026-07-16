@@ -69,8 +69,9 @@ class AIAnalysisPostgresAPITest(unittest.IsolatedAsyncioTestCase):
         response = await self._post()
         self.assertEqual(response.status_code, 200, response.text)
         data = response.json()["data"]
-        self.assertEqual(data["provider"], "stub")
-        self.assertEqual(data["model"], "stub-enterprise-v1")
+        self.assertEqual(data["provider"], "stub-low-cost")
+        self.assertEqual(data["model"], "stub-low-cost-v1")
+        self.assertEqual(data["route_tier"], "low_cost")
         self.assertEqual(data["status"], "succeeded")
         self.assertGreater(data["usage"]["total_tokens"], 0)
         self.assertEqual(data["currency"], "USD")
@@ -152,8 +153,15 @@ class AIAnalysisPostgresAPITest(unittest.IsolatedAsyncioTestCase):
             self.assertGreater(Decimal(partial[2]), 0)
 
     async def test_per_request_cap_rejects_before_reservation(self) -> None:
-        service = self.app.state.container.ai_analysis_service
-        service._settings = self.settings.model_copy(update={"llm_request_max_cost": Decimal("0")})
+        limited = self.settings.model_copy(update={"llm_request_max_cost": Decimal("0")})
+        reset_postgres_state_if_needed(limited)
+        await self.client.aclose()
+        self.app = create_app(limited)
+        self.client = httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=self.app), base_url="http://test",
+            headers=authorization_headers(self.app, username=EMPLOYEE_USERNAME, password=EMPLOYEE_PASSWORD),
+        )
+        self.document_id, self.chunk_id = self._seed_evidence("cost cap evidence")
         response = await self._post("ai-cost-cap-0001")
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["error"]["code"], "llm_request_cost_exceeded")

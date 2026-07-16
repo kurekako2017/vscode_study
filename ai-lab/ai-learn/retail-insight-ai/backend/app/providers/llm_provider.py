@@ -1,26 +1,14 @@
 """LLMProvider 的稳定接口与输出模型。
 
 文件职责：
-- 冻结未来模型 provider 的接口形状。
-- 让 RAGAnswerGenerator 可以对接 stub provider 或 future provider。
+- 冻结 Provider 接口形状，供 Gateway 与 Stub 使用。
+- analyze / generate_report 只允许经 LLMGatewayService 调用。
 
 谁会调用它：
-- `backend/app/services/rag_answer_generator.py`
+- LLMGatewayService（唯一生产调用方）
 
-它调用谁：
-- 不直接调用其他模块，只定义类型和协议。
-
-输入是什么：
-- `RAGPromptContext`
-
-输出是什么：
-- `LLMProviderOutput`
-
-为什么需要这一层：
-- 先固定 provider seam，再让 answer generator 只依赖一个可替换接口。
-
-日本现场面试怎么讲：
-- 这是未来 LLM provider 的契约层，当前只接 stub，不接真实外部模型。
+设计理由：
+- 先固定 provider seam，再让业务服务只依赖 Gateway。
 """
 
 from __future__ import annotations
@@ -28,7 +16,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
-from app.models.ai_analysis import LLMAnalysisInput, LLMProviderResult
+from app.models.ai_analysis import (
+    LLMAnalysisInput,
+    LLMProviderResult,
+    LLMReportInput,
+    LLMReportResult,
+)
 from app.models.internal_rag import LLMUsageMetrics, RAGPromptContext
 from app.schemas.internal_rag_api import InternalRagCitationResponse
 
@@ -44,18 +37,23 @@ class LLMProviderOutput:
 
 @runtime_checkable
 class LLMProvider(Protocol):
-    """定义 future model provider 的最小可替换接口。"""
+    """定义 model provider 的最小可替换接口。"""
 
     provider_name: str
     model_name: str
 
     def analyze(self, request: LLMAnalysisInput) -> LLMProviderResult:
-        """只由 AIAnalysisService 在预占成功后显式调用。"""
+        """只由 LLMGatewayService 在预占成功后显式调用。"""
+
+        ...
+
+    def generate_report(self, request: LLMReportInput) -> LLMReportResult:
+        """只由 LLMGatewayService 在 high_quality 路由上调用。"""
 
         ...
 
     def generate(self, context: RAGPromptContext) -> LLMProviderOutput:
-        """根据 prompt 上下文生成回答草稿。"""
+        """旧 RAG seam；普通 Internal RAG 不得进入此路径。"""
 
         ...
 

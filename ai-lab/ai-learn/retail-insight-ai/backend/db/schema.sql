@@ -220,7 +220,13 @@ CREATE TABLE IF NOT EXISTS llm_usage_ledger (
     actor_role TEXT NOT NULL,
     provider_name TEXT NOT NULL,
     model_name TEXT NOT NULL,
-    operation TEXT NOT NULL,
+    operation TEXT NOT NULL CHECK (operation IN ('ai_analysis', 'executive_report')),
+    route_tier TEXT NOT NULL DEFAULT 'low_cost' CHECK (route_tier IN ('low_cost', 'high_quality')),
+    selected_provider TEXT NULL,
+    selected_model TEXT NULL,
+    policy_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+    token_limit_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+    price_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
     status TEXT NOT NULL CHECK (status IN ('reserved','succeeded','failed','rejected')),
     reserved_input_tokens INTEGER NOT NULL CHECK (reserved_input_tokens >= 0),
     reserved_output_tokens INTEGER NOT NULL CHECK (reserved_output_tokens >= 0),
@@ -240,6 +246,9 @@ CREATE TABLE IF NOT EXISTS llm_usage_ledger (
     document_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
     evidence_refs JSONB NOT NULL DEFAULT '[]'::jsonb,
     analysis_id TEXT NULL,
+    ai_analysis_id TEXT NULL,
+    report_id TEXT NULL,
+    report_version_id TEXT NULL,
     completed_at TIMESTAMPTZ NULL,
     UNIQUE (actor_user_id, idempotency_key)
 );
@@ -248,11 +257,12 @@ CREATE TABLE IF NOT EXISTS llm_quota_buckets (
     bucket_date DATE NOT NULL,
     scope_type TEXT NOT NULL CHECK (scope_type IN ('user','global')),
     scope_id TEXT NOT NULL,
+    route_tier TEXT NOT NULL DEFAULT 'low_cost' CHECK (route_tier IN ('low_cost', 'high_quality')),
     request_count BIGINT NOT NULL DEFAULT 0 CHECK (request_count >= 0),
     token_count BIGINT NOT NULL DEFAULT 0 CHECK (token_count >= 0),
     cost NUMERIC(20,8) NOT NULL DEFAULT 0 CHECK (cost >= 0),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (bucket_date, scope_type, scope_id)
+    PRIMARY KEY (bucket_date, scope_type, scope_id, route_tier)
 );
 
 CREATE TABLE IF NOT EXISTS ai_analysis_results (
@@ -297,3 +307,7 @@ CREATE INDEX IF NOT EXISTS idx_upload_idempotency_upload ON upload_idempotency_k
 CREATE INDEX IF NOT EXISTS idx_llm_usage_actor_occurred ON llm_usage_ledger (actor_user_id, occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_llm_usage_status_occurred ON llm_usage_ledger (status, occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_llm_usage_request_id ON llm_usage_ledger (request_id);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_route_tier_occurred ON llm_usage_ledger (route_tier, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_operation_occurred ON llm_usage_ledger (operation, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_analysis_id ON llm_usage_ledger (ai_analysis_id);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_report_id ON llm_usage_ledger (report_id);

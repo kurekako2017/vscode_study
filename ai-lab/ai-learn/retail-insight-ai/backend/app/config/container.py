@@ -28,6 +28,9 @@ from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.db.unit_of_work import InMemoryUnitOfWork, PostgresUnitOfWork
 from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
+from app.llm.gateway import LLMGatewayService
+from app.llm.model_router import ModelRouter
+from app.llm.operation_policy import OperationPolicyRegistry
 from app.providers.llm_provider import LLMProvider
 from app.providers.stub_llm_provider import StubLLMProvider
 from app.repositories.implementations.in_memory.audit_repository import InMemoryAuditRepository
@@ -75,6 +78,7 @@ from app.services.document_import_service import DocumentImportService
 from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
 from app.services.ai_analysis_service import AIAnalysisService
+from app.services.executive_report_service import ExecutiveReportService
 from app.services.persistent_audit_service import PersistentAuditService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.reranker_provider import DeterministicRerankerProvider, RerankerProvider
@@ -112,12 +116,15 @@ class AppContainer:
     embedding_provider: EmbeddingProvider
     embedding_service: EmbeddingService
     llm_provider: LLMProvider
+    llm_provider_high_quality: LLMProvider
+    llm_gateway: LLMGatewayService
     rag_answer_generator: RAGAnswerGenerator
     reranker_provider: RerankerProvider
     reranker_service: RerankerService
     document_retrieval_service: DocumentRetrievalService
     internal_rag_service: InternalRagService
     ai_analysis_service: AIAnalysisService
+    executive_report_service: ExecutiveReportService
     document_import_service: DocumentImportService
     document_chunk_service: DocumentChunkService
     document_read_service: DocumentReadService
@@ -220,8 +227,28 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         ),
     )
     #  创建服务，注入仓库和事件发布器
-    llm_provider = StubLLMProvider(settings.llm_stub_behavior)
-    #  创建服务，注入仓库和事件发布器
+    # 双 Stub：low_cost 与 high_quality 物理隔离，call_count 可分别统计。
+    llm_provider = StubLLMProvider(
+        provider_name=settings.llm_low_cost_provider_alias,
+        model_name=settings.llm_low_cost_model_name,
+        behavior=settings.llm_stub_behavior,
+        mode="analysis",
+    )
+    llm_provider_high_quality = StubLLMProvider(
+        provider_name=settings.llm_high_quality_provider_alias,
+        model_name=settings.llm_high_quality_model_name,
+        behavior=settings.llm_stub_behavior,
+        mode="report",
+    )
+    policy_registry = OperationPolicyRegistry(settings)
+    model_router = ModelRouter(
+        policy_registry=policy_registry,
+        providers_by_alias={
+            settings.llm_low_cost_provider_alias: llm_provider,
+            settings.llm_high_quality_provider_alias: llm_provider_high_quality,
+        },
+    )
+    llm_gateway = LLMGatewayService(policy_registry=policy_registry, model_router=model_router)
     # 普通 Internal RAG 永久使用 deterministic path，环境变量不能绕过成本治理。
     rag_answer_generator = RAGAnswerGenerator(provider=None, use_llm=False)
     # Reranker 是 retrieval 之后的独立二阶段排序，不进入 Repository 或 Retrieval Service。
@@ -260,11 +287,21 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         reranker_service=reranker_service,
     )
     ai_analysis_service = AIAnalysisService(
-        settings=settings,
-        provider=llm_provider,
+        gateway=llm_gateway,
         usage_repository=repositories.llm_usage,
         document_repository=document_repository,
         chunk_repository=document_chunk_repository,
+        persistent_audit_service=persistent_audit_service,
+        unit_of_work=repositories.unit_of_work,
+    )
+    executive_report_service = ExecutiveReportService(
+        gateway=llm_gateway,
+        usage_repository=repositories.llm_usage,
+        document_repository=document_repository,
+        chunk_repository=document_chunk_repository,
+        task_repository=task_repository,
+        report_repository=report_repository,
+        approval_repository=approval_repository,
         persistent_audit_service=persistent_audit_service,
         unit_of_work=repositories.unit_of_work,
     )
@@ -326,12 +363,15 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         embedding_provider=embedding_provider,
         embedding_service=embedding_service,
         llm_provider=llm_provider,
+        llm_provider_high_quality=llm_provider_high_quality,
+        llm_gateway=llm_gateway,
         rag_answer_generator=rag_answer_generator,
         reranker_provider=reranker_provider,
         reranker_service=reranker_service,
         document_retrieval_service=document_retrieval_service,
         internal_rag_service=internal_rag_service,
         ai_analysis_service=ai_analysis_service,
+        executive_report_service=executive_report_service,
         document_import_service=document_import_service,
         document_chunk_service=document_chunk_service,
         document_read_service=document_read_service,

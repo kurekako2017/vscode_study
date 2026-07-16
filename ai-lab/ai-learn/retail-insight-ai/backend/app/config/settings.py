@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     internal_rag_use_llm: bool = False
     llm_stub_behavior: Literal["success", "timeout", "failure", "rate_limit", "partial_failure"] = "success"
     llm_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
+    # low_cost / ai_analysis 政策
+    llm_low_cost_provider_alias: str = "stub-low-cost"
+    llm_low_cost_model_name: str = "stub-low-cost-v1"
     llm_max_input_tokens: int = Field(default=2048, ge=128, le=100_000)
     llm_max_output_tokens: int = Field(default=256, ge=1, le=4096)
     llm_evidence_max_count: int = Field(default=5, ge=1, le=20)
@@ -60,6 +63,21 @@ class Settings(BaseSettings):
     llm_global_daily_cost_limit: Decimal = Field(default=Decimal("5.000000"), ge=0)
     llm_input_price_per_million: Decimal = Field(default=Decimal("0.500000"), ge=0)
     llm_output_price_per_million: Decimal = Field(default=Decimal("1.500000"), ge=0)
+    # high_quality / executive_report 独立政策
+    llm_high_quality_provider_alias: str = "stub-high-quality"
+    llm_high_quality_model_name: str = "stub-high-quality-v1"
+    llm_hq_max_input_tokens: int = Field(default=4096, ge=128, le=100_000)
+    llm_hq_max_output_tokens: int = Field(default=1024, ge=1, le=8192)
+    llm_hq_evidence_max_chars: int = Field(default=12000, ge=128, le=200_000)
+    llm_hq_request_max_cost: Decimal = Field(default=Decimal("0.250000"), ge=0)
+    llm_hq_user_daily_request_limit: int = Field(default=5, ge=1)
+    llm_hq_user_daily_token_limit: int = Field(default=40_000, ge=1)
+    llm_hq_user_daily_cost_limit: Decimal = Field(default=Decimal("1.000000"), ge=0)
+    llm_hq_global_daily_request_limit: int = Field(default=50, ge=1)
+    llm_hq_global_daily_token_limit: int = Field(default=200_000, ge=1)
+    llm_hq_global_daily_cost_limit: Decimal = Field(default=Decimal("10.000000"), ge=0)
+    llm_hq_input_price_per_million: Decimal = Field(default=Decimal("3.000000"), ge=0)
+    llm_hq_output_price_per_million: Decimal = Field(default=Decimal("9.000000"), ge=0)
     llm_currency: str = Field(default="USD", min_length=3, max_length=3)
     # deterministic_test 只服务本地回归；默认 disabled，生产不会把测试向量当成语义向量。
     embedding_provider: Literal[

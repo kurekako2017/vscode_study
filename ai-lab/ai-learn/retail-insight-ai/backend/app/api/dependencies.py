@@ -14,6 +14,7 @@ from app.services.document_retrieval_service import DocumentRetrievalService
 from app.services.document_upload_service import DocumentUploadService
 from app.services.internal_rag_service import InternalRagService
 from app.services.ai_analysis_service import AIAnalysisService
+from app.services.executive_report_service import ExecutiveReportService
 from app.services.rbac_guard import RBACGuard
 from app.services.security_service import SecurityService
 from app.services.task_service import TaskService
@@ -89,6 +90,12 @@ async def get_ai_analysis_service(request: Request) -> AIAnalysisService:
     """取得 PostgreSQL-only AI Analysis 编排服务。"""
 
     return request.app.state.container.ai_analysis_service
+
+
+async def get_executive_report_service(request: Request) -> ExecutiveReportService:
+    """取得 PostgreSQL-only Executive Report 编排服务。"""
+
+    return request.app.state.container.executive_report_service
 
 
 async def get_approval_service(request: Request) -> ApprovalService:

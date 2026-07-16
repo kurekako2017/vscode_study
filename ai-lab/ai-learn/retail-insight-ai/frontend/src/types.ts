@@ -194,10 +194,42 @@ export interface AIAnalysisResponse {
   citations: Array<{ document_id: string; chunk_id: string; score: string; excerpt: string }>;
   provider: string;
   model: string;
+  route_tier?: string;
   usage: { input_tokens: number; output_tokens: number; total_tokens: number };
   cost: string;
   currency: string;
   status: string;
+  created_at: string;
+}
+
+/** 高质量董事会报告：仅在 succeeded AI Analysis 之后由用户显式触发。 */
+export interface ExecutiveReportRequest {
+  ai_analysis_id: string;
+  title: string;
+  confirmed: true;
+  task_id?: string;
+}
+
+export interface ExecutiveReportResponse {
+  report_id: string;
+  report_version_id: string;
+  task_id: string;
+  title: string;
+  executive_summary: string;
+  kpi_findings: string[];
+  risks: string[];
+  recommendations: string[];
+  citations: Array<{ document_id: string; chunk_id: string; score: string; excerpt: string }>;
+  provider: string;
+  model: string;
+  route_tier: string;
+  usage: { input_tokens: number; output_tokens: number; total_tokens: number };
+  estimated_cost: string;
+  actual_cost: string;
+  currency: string;
+  status: string;
+  analysis_id: string;
+  usage_id: string;
   created_at: string;
 }
 

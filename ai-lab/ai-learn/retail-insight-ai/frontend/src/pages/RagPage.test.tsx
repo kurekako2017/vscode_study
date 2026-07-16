@@ -183,7 +183,65 @@ describe("RagPage", () => {
     await showEvidence(fetchMock);
     fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
     expect(await screen.findByText("Cost: 0.00001800 USD")).toBeInTheDocument();
-    expect(screen.getByText(/stub \/ stub-enterprise-v1 \/ succeeded/)).toBeInTheDocument();
+    expect(screen.getByText(/stub-low-cost \/ stub-low-cost-v1 \/ low_cost \/ succeeded/)).toBeInTheDocument();
+  });
+
+  it("does not show executive report button before successful AI analysis", async () => {
+    await showEvidence(vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])));
+    expect(screen.queryByRole("button", { name: "生成取締役会報告" })).not.toBeInTheDocument();
+  });
+
+  it("shows high-quality report button after successful analysis and requires confirmation", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(aiSuccessResponse());
+    const confirm = vi.fn().mockReturnValueOnce(true).mockReturnValueOnce(false);
+    vi.stubGlobal("confirm", confirm);
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("button", { name: "生成取締役会報告" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
+    expect(confirm.mock.calls[1][0]).toMatch(/high_quality/);
+    expect(confirm.mock.calls[1][0]).toMatch(/1024 tokens/);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("generates executive report with idempotency key and never auto-submits approval", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(aiSuccessResponse())
+      .mockResolvedValueOnce(executiveReportSuccessResponse());
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    await screen.findByRole("button", { name: "生成取締役会報告" });
+    fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
+    expect(await screen.findByText(/Report: task-er-1 \/ Version: rv-1/)).toBeInTheDocument();
+    expect(screen.getByText(/stub-high-quality \/ stub-high-quality-v1 \/ high_quality/)).toBeInTheDocument();
+    expect(screen.getByText(/Approval 入口/)).toBeInTheDocument();
+    const reportCall = fetchMock.mock.calls[2] as [string, RequestInit];
+    expect(reportCall[0]).toContain("/api/v1/executive-reports");
+    expect((reportCall[1].headers as Record<string, string>)["Idempotency-Key"]).toMatch(/^er-/);
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain("submit-approval");
+  });
+
+  it("reuses executive report idempotency key after provider failure", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(aiSuccessResponse())
+      .mockResolvedValueOnce(jsonResponse({ success: false, request_id: "p", data: null, error: { code: "provider_failed", message: "Provider failed", detail: {} } }, 502))
+      .mockResolvedValueOnce(executiveReportSuccessResponse());
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    await screen.findByRole("button", { name: "生成取締役会報告" });
+    fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
+    await screen.findByText(/provider_failed/);
+    fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
+    await screen.findByText(/Report: task-er-1/);
+    const first = (fetchMock.mock.calls[2][1].headers as Record<string, string>)["Idempotency-Key"];
+    const second = (fetchMock.mock.calls[3][1].headers as Record<string, string>)["Idempotency-Key"];
+    expect(second).toBe(first);
   });
 
   it("renders quota 429 as a structured error", async () => {
@@ -267,8 +325,23 @@ describe("RagPage", () => {
 
 function aiSuccessResponse() {
   return jsonResponse({ success: true, request_id: "ai", error: null, data: {
-    analysis_id: "ana-1", answer: "Stub AI analysis", citations: [], provider: "stub",
-    model: "stub-enterprise-v1", usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
+    analysis_id: "ana-1", answer: "Stub AI analysis",
+    citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+    provider: "stub-low-cost", model: "stub-low-cost-v1", route_tier: "low_cost",
+    usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
     cost: "0.00001800", currency: "USD", status: "succeeded", created_at: "2026-07-17T00:00:00Z",
+  } }, 200);
+}
+
+function executiveReportSuccessResponse() {
+  return jsonResponse({ success: true, request_id: "er", error: null, data: {
+    report_id: "task-er-1", report_version_id: "rv-1", task_id: "task-er-1",
+    title: "Board Report", executive_summary: "Board summary",
+    kpi_findings: ["KPI ok"], risks: ["Risk A"], recommendations: ["Act now"],
+    citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+    provider: "stub-high-quality", model: "stub-high-quality-v1", route_tier: "high_quality",
+    usage: { input_tokens: 40, output_tokens: 80, total_tokens: 120 },
+    estimated_cost: "0.00100000", actual_cost: "0.00090000", currency: "USD",
+    status: "succeeded", analysis_id: "ana-1", usage_id: "llm-1", created_at: "2026-07-17T00:00:00Z",
   } }, 200);
 }

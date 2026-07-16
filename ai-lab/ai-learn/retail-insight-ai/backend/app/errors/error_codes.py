@@ -53,6 +53,7 @@ class ErrorCode(StrEnum):
     AI_ANALYSIS_IN_PROGRESS = "ai_analysis_in_progress"
     AI_ANALYSIS_REQUIRES_POSTGRES = "ai_analysis_requires_postgres"
     AI_ANALYSIS_CONFIRMATION_REQUIRED = "ai_analysis_confirmation_required"
+    EXECUTIVE_REPORT_ANALYSIS_REQUIRED = "executive_report_analysis_required"
     EVIDENCE_INVALID = "evidence_invalid"
     EVENT_PUBLISH_FAILED = "event_publish_failed"
     UNAUTHORIZED = "unauthorized"

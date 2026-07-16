@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 
-import { ApiClientError, answerInternalRag, executeAIAnalysis, searchDocumentRetrieval } from "../api";
+import { ApiClientError, answerInternalRag, executeAIAnalysis, generateExecutiveReport, searchDocumentRetrieval } from "../api";
 import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
@@ -8,6 +8,7 @@ import { StatusBanner } from "../components/StatusBanner";
 import type {
   DisplayError,
   AIAnalysisResponse,
+  ExecutiveReportResponse,
   DocumentRetrievalSearchResponse,
   InternalRagAnswerMode,
   InternalRagAnswerResponse,
@@ -45,6 +46,10 @@ export function RagPage({
   const [aiError, setAiError] = useState<DisplayError | null>(null);
   const [aiResult, setAiResult] = useState<AIAnalysisResponse | null>(null);
   const [aiIdempotencyKey, setAiIdempotencyKey] = useState<string | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<DisplayError | null>(null);
+  const [reportResult, setReportResult] = useState<ExecutiveReportResponse | null>(null);
+  const [reportIdempotencyKey, setReportIdempotencyKey] = useState<string | null>(null);
 
   const [ragQuestion, setRagQuestion] = useState("");
   const [ragLimit, setRagLimit] = useState("5");
@@ -141,18 +146,20 @@ export function RagPage({
   }
 
   async function runExplicitAIAnalysis() {
-    if (!retrievalResult || retrievalResult.results.length === 0 || aiLoading) return;
+    if (!retrievalResult || retrievalResult.results.length === 0 || aiLoading || reportLoading) return;
     const evidenceChars = retrievalResult.results.reduce((total, item) => total + item.content_excerpt.length, 0);
     const estimatedInputTokens = Math.max(1, Math.ceil((retrievalQuery.length + evidenceChars) / 4));
     // 确认对话在发送请求之前展示，取消时 fetch 次数保持为 0。
     const confirmed = window.confirm(
-      `AI分析を実行しますか？\n推定入力: ${estimatedInputTokens} tokens\n出力上限: 256 tokens\nProvider: 開発用 Stub（外部通信・実費 0）`,
+      `AI分析を実行しますか？\nroute_tier: low_cost\n推定入力: ${estimatedInputTokens} tokens\n出力上限: 256 tokens\nProvider: 開発用 Stub-low-cost（外部通信・実費 0）`,
     );
     if (!confirmed) return;
     const key = aiIdempotencyKey ?? createAIIdempotencyKey();
     setAiIdempotencyKey(key);
     setAiLoading(true);
     setAiError(null);
+    setReportResult(null);
+    setReportError(null);
     try {
       const response = await executeAIAnalysis({
         question: retrievalQuery.trim(),
@@ -169,6 +176,42 @@ export function RagPage({
       setAiError(toDisplayError(reason, "AI_ANALYSIS_ERROR", "AI分析に失敗しました"));
     } finally {
       setAiLoading(false);
+    }
+  }
+
+  async function runExecutiveReport() {
+    if (!aiResult || aiResult.status !== "succeeded" || !aiResult.citations?.length || reportLoading || aiLoading) {
+      return;
+    }
+    const evidenceChars = aiResult.citations.reduce((total, item) => total + (item.excerpt?.length ?? 0), 0);
+    const estimatedInputTokens = Math.max(1, Math.ceil((aiResult.answer.length + evidenceChars) / 4));
+    const confirmed = window.confirm(
+      [
+        "取締役会報告を生成しますか？",
+        "route_tier: high_quality（AI分析より高コスト）",
+        `推定入力: ${estimatedInputTokens} tokens`,
+        "出力上限: 1024 tokens",
+        "Provider: 開発用 Stub-high-quality（外部通信・実費 0）",
+        "成功後も Approval は自動提出しません。",
+      ].join("\n"),
+    );
+    if (!confirmed) return;
+    const key = reportIdempotencyKey ?? createReportIdempotencyKey();
+    setReportIdempotencyKey(key);
+    setReportLoading(true);
+    setReportError(null);
+    try {
+      const response = await generateExecutiveReport({
+        ai_analysis_id: aiResult.analysis_id,
+        title: `Board Report: ${retrievalQuery.trim() || "RAG Evidence"}`,
+        confirmed: true,
+      }, key);
+      setReportResult(response);
+      setReportIdempotencyKey(null);
+    } catch (reason) {
+      setReportError(toDisplayError(reason, "EXECUTIVE_REPORT_ERROR", "取締役会報告の生成に失敗しました"));
+    } finally {
+      setReportLoading(false);
     }
   }
 
@@ -302,10 +345,44 @@ export function RagPage({
                 {aiError && <StatusBanner tone="error">[{aiError.code}] {aiError.message}</StatusBanner>}
                 {aiResult && (
                   <div className="result-stack">
-                    <StatusBanner tone="success">{aiResult.provider} / {aiResult.model} / {aiResult.status}</StatusBanner>
+                    <StatusBanner tone="success">{aiResult.provider} / {aiResult.model} / {aiResult.route_tier ?? "low_cost"} / {aiResult.status}</StatusBanner>
                     <pre className="answer-block">{aiResult.answer}</pre>
                     <p>Usage: {aiResult.usage.input_tokens} + {aiResult.usage.output_tokens} = {aiResult.usage.total_tokens} tokens</p>
                     <p>Cost: {aiResult.cost} {aiResult.currency}</p>
+                    {canAnalyze && aiResult.status === "succeeded" && aiResult.citations.length > 0 && (
+                      <div className="result-card" aria-label="高品質取締役会報告">
+                        <div className="subheading">
+                          <strong>生成取締役会報告（high_quality）</strong>
+                          <small>高コスト / Stub-high-quality</small>
+                        </div>
+                        <p>AI分析より高い LLM 用量が発生します。ページ読み込みでは自動実行されず、Approval も自動提出しません。</p>
+                        <button
+                          type="button"
+                          onClick={runExecutiveReport}
+                          disabled={reportLoading || aiLoading}
+                        >
+                          {reportLoading ? "取締役会報告生成中…" : "生成取締役会報告"}
+                        </button>
+                        {reportError && (
+                          <StatusBanner tone="error">[{reportError.code}] {reportError.message}</StatusBanner>
+                        )}
+                        {reportResult && (
+                          <div className="result-stack">
+                            <StatusBanner tone="success">
+                              {reportResult.provider} / {reportResult.model} / {reportResult.route_tier} / {reportResult.status}
+                            </StatusBanner>
+                            <p>Report: {reportResult.report_id} / Version: {reportResult.report_version_id}</p>
+                            <pre className="answer-block">{reportResult.executive_summary}</pre>
+                            <p>Usage: {reportResult.usage.input_tokens} + {reportResult.usage.output_tokens} = {reportResult.usage.total_tokens} tokens</p>
+                            <p>Cost: {reportResult.actual_cost} {reportResult.currency} (est. {reportResult.estimated_cost})</p>
+                            <p>Citations: {reportResult.citations.length}</p>
+                            <p>
+                              Approval 入口: Tasks / Approval 画面で task_id <code>{reportResult.task_id}</code> を開き、手動で submit-approval を実行してください。自動提出は行いません。
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -477,6 +554,13 @@ export function RagPage({
       />
     </>
   );
+}
+
+function createReportIdempotencyKey(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `er-${crypto.randomUUID()}`;
+  }
+  return `er-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function createAIIdempotencyKey(): string {

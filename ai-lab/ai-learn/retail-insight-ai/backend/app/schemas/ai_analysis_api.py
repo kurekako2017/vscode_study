@@ -49,6 +49,7 @@ class AIAnalysisResponse(BaseModel):
     citations: list[AIAnalysisCitationResponse]
     provider: str
     model: str
+    route_tier: str = "low_cost"
     usage: AIAnalysisUsageResponse
     cost: Decimal
     currency: str

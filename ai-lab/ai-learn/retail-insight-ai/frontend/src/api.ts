@@ -2,6 +2,8 @@ import type {
   AnalysisMode,
   AIAnalysisRequest,
   AIAnalysisResponse,
+  ExecutiveReportRequest,
+  ExecutiveReportResponse,
   ApiResponse,
   ApprovalListResponse,
   ApprovalRejectRequest,
@@ -293,7 +295,7 @@ export async function answerInternalRag(
   return unwrapResponse<InternalRagAnswerResponse>(response);
 }
 
-/** 唯一可触发 Provider 的前端 API；幂等键必须在同一次重试中复用。 */
+/** low_cost AI 分析；幂等键必须在同一次重试中复用。 */
 export async function executeAIAnalysis(
   payload: AIAnalysisRequest,
   idempotencyKey: string,
@@ -304,6 +306,19 @@ export async function executeAIAnalysis(
     body: JSON.stringify(payload),
   });
   return unwrapResponse<AIAnalysisResponse>(response);
+}
+
+/** high_quality 董事会报告；仅在 succeeded AI Analysis 后由用户显式确认触发。 */
+export async function generateExecutiveReport(
+  payload: ExecutiveReportRequest,
+  idempotencyKey: string,
+): Promise<ExecutiveReportResponse> {
+  const response = await request("/api/v1/executive-reports", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<ExecutiveReportResponse>(response);
 }
 
 /** Approval 列表查询参数统一在 API Client 里拼接，页面只管理筛选表单。 */

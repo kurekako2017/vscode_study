@@ -90,7 +90,10 @@ class RAGAnswerGeneratorTest(unittest.TestCase):
         self.assertEqual(result.usage.latency_ms, 0)
 
     def test_stub_provider_path(self) -> None:
-        generator = RAGAnswerGenerator(provider=StubLLMProvider(), use_llm=True)
+        generator = RAGAnswerGenerator(
+            provider=StubLLMProvider(provider_name="stub-low-cost", model_name="stub-low-cost-v1"),
+            use_llm=True,
+        )
         result = generator.generate(
             request=self._request(),
             question="What is the monthly sales policy?",
@@ -99,7 +102,7 @@ class RAGAnswerGeneratorTest(unittest.TestCase):
         )
 
         self.assertTrue(result.used_llm_provider)
-        self.assertEqual(result.provider_name, "stub")
+        self.assertEqual(result.provider_name, "stub-low-cost")
         self.assertEqual(result.fallback_reason, RAGFallbackReason.NONE)
         self.assertTrue(result.answer.startswith("Stub extractive answer:"))
         self.assertEqual(result.usage.provider_name, "stub")
