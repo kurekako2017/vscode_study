@@ -92,4 +92,3 @@ class PermissionRegistry:
         """读取一个已验证角色的不可变映射。"""
 
         return self._ROLE_MAPPINGS[role]
-

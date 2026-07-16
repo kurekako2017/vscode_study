@@ -76,4 +76,3 @@ class PermissionChecker(Protocol):
         self, current_user: CurrentUser, permission: Permission
     ) -> AuthorizationResult:
         """检查当前用户是否拥有指定权限，不修改任何状态。"""
-

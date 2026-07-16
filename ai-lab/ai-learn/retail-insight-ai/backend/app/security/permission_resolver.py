@@ -29,4 +29,3 @@ class PermissionResolver:
         except (AttributeError, ValueError):
             return frozenset()
         return self._registry.get_role_mapping(role).permissions
-
