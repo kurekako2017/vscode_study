@@ -60,12 +60,8 @@ def upgrade() -> None:
         WHERE status = 'pending_approval'
         """
     )
-    op.execute(
-        """
-        CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created_id
-        ON approval_events (approval_id, created_at ASC, id ASC)
-        """
-    )
+    # 清理开发期曾创建的重复索引；既有 approval_id 查询继续复用旧索引。
+    op.execute("DROP INDEX IF EXISTS idx_approval_events_approval_created_id")
     op.execute(
         """
         CREATE INDEX IF NOT EXISTS idx_approval_events_task_created_id
@@ -78,7 +74,6 @@ def downgrade() -> None:
     """删除本轮兼容列和索引，不删除 Approval、History 或 ReportVersion 行。"""
 
     op.execute("DROP INDEX IF EXISTS idx_approval_events_task_created_id")
-    op.execute("DROP INDEX IF EXISTS idx_approval_events_approval_created_id")
     op.execute("DROP INDEX IF EXISTS ux_approval_requests_one_pending_per_task")
     op.execute(
         "ALTER TABLE approval_events DROP COLUMN IF EXISTS report_version_id"

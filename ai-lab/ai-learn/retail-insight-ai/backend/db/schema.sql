@@ -217,8 +217,6 @@ CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created ON approval_even
 CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_requests_one_pending_per_task
     ON approval_requests (task_id)
     WHERE status = 'pending_approval';
-CREATE INDEX IF NOT EXISTS idx_approval_events_approval_created_id
-    ON approval_events (approval_id, created_at ASC, id ASC);
 CREATE INDEX IF NOT EXISTS idx_approval_events_task_created_id
     ON approval_events (task_id, created_at ASC, id ASC);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource_created ON audit_logs (resource_type, resource_id, created_at);

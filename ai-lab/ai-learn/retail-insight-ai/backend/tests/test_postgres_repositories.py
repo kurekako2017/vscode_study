@@ -242,12 +242,11 @@ class PostgresRepositoryIntegrationTest(unittest.TestCase):
                     WHERE tablename IN ('approval_requests', 'approval_events')
                       AND indexname IN (
                           'ux_approval_requests_one_pending_per_task',
-                          'idx_approval_events_approval_created_id',
                           'idx_approval_events_task_created_id'
                       )
                     """
                 )
-                self.assertEqual(len(cursor.fetchall()), 3)
+                self.assertEqual(len(cursor.fetchall()), 2)
 
         app = create_app(Settings(log_level="CRITICAL"))
         service = app.state.container.approval_service
