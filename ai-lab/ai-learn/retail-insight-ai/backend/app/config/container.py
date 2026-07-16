@@ -64,6 +64,7 @@ from app.repositories.postgres.upload_session_repository import PostgresUploadSe
 from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
+from app.repositories.postgres.llm_usage_repository import PostgresLLMUsageRepository
 from app.services.document_archive_service import DocumentArchiveService
 from app.services.audit_service import AuditService
 from app.services.approval_service import ApprovalService
@@ -73,6 +74,7 @@ from app.reports.generator import ReportGenerator
 from app.services.document_import_service import DocumentImportService
 from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
+from app.services.ai_analysis_service import AIAnalysisService
 from app.services.persistent_audit_service import PersistentAuditService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.reranker_provider import DeterministicRerankerProvider, RerankerProvider
@@ -115,6 +117,7 @@ class AppContainer:
     reranker_service: RerankerService
     document_retrieval_service: DocumentRetrievalService
     internal_rag_service: InternalRagService
+    ai_analysis_service: AIAnalysisService
     document_import_service: DocumentImportService
     document_chunk_service: DocumentChunkService
     document_read_service: DocumentReadService
@@ -147,6 +150,7 @@ class RepositoryBundle:
     upload_session: UploadSessionRepository
     unit_of_work: UnitOfWork
     health_check: Callable[[], None]
+    llm_usage: PostgresLLMUsageRepository | None
 
 #   读取配置，创建Repository，创建Service，创建所有依赖，以后所有Router都会从这里拿Service
 def build_container(settings: Settings | None = None) -> AppContainer:
@@ -216,9 +220,10 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         ),
     )
     #  创建服务，注入仓库和事件发布器
-    llm_provider = StubLLMProvider()
+    llm_provider = StubLLMProvider(settings.llm_stub_behavior)
     #  创建服务，注入仓库和事件发布器
-    rag_answer_generator = RAGAnswerGenerator(provider=llm_provider, use_llm=settings.internal_rag_use_llm)
+    # 普通 Internal RAG 永久使用 deterministic path，环境变量不能绕过成本治理。
+    rag_answer_generator = RAGAnswerGenerator(provider=None, use_llm=False)
     # Reranker 是 retrieval 之后的独立二阶段排序，不进入 Repository 或 Retrieval Service。
     reranker_provider = DeterministicRerankerProvider()
     reranker_service = RerankerService(
@@ -253,6 +258,15 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         event_publisher=event_publisher,
         answer_generator=rag_answer_generator,
         reranker_service=reranker_service,
+    )
+    ai_analysis_service = AIAnalysisService(
+        settings=settings,
+        provider=llm_provider,
+        usage_repository=repositories.llm_usage,
+        document_repository=document_repository,
+        chunk_repository=document_chunk_repository,
+        persistent_audit_service=persistent_audit_service,
+        unit_of_work=repositories.unit_of_work,
     )
     approval_service = ApprovalService(
         report_repository=report_repository,
@@ -317,6 +331,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         reranker_service=reranker_service,
         document_retrieval_service=document_retrieval_service,
         internal_rag_service=internal_rag_service,
+        ai_analysis_service=ai_analysis_service,
         document_import_service=document_import_service,
         document_chunk_service=document_chunk_service,
         document_read_service=document_read_service,
@@ -353,6 +368,7 @@ def _build_repositories(
             upload_session=InMemoryUploadSessionRepository(),
             unit_of_work=InMemoryUnitOfWork(),
             health_check=lambda: None,
+            llm_usage=None,
         )
 
     connection_factory = PostgresConnectionFactory(
@@ -380,4 +396,5 @@ def _build_repositories(
         upload_session=PostgresUploadSessionRepository(connection_factory),
         unit_of_work=PostgresUnitOfWork(connection_factory),
         health_check=connection_factory.health_check,
+        llm_usage=PostgresLLMUsageRepository(connection_factory),
     )

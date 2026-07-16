@@ -115,4 +115,121 @@ describe("RagPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[insufficient_context] No usable evidence");
   });
+
+  const evidenceItem = {
+    document_id: "doc-ai", chunk_id: "chunk-ai", chunk_index: 0,
+    content_excerpt: "Controlled AI evidence.", score: 0.95,
+    source: { source_type: "upload", uri: "upload://ai", label: null, external_id: null },
+    metadata: { document_id: "doc-ai", title: "AI Evidence", description: null, owner: "team",
+      created_at: "2026-07-17T00:00:00Z", updated_at: "2026-07-17T00:00:00Z", version: 1,
+      language: "en", document_type: "text", status: "uploaded", tags: [], source: null, checksum: "sha256:ai" },
+  };
+
+  async function showEvidence(fetchMock: ReturnType<typeof vi.fn>, canAnalyze = true) {
+    vi.stubGlobal("fetch", fetchMock);
+    render(<RagPage canAnalyze={canAnalyze} />);
+    fireEvent.change(screen.getByLabelText("検索語"), { target: { value: "controlled evidence" } });
+    fireEvent.click(screen.getByRole("button", { name: "検索する" }));
+    await screen.findByText("Controlled AI evidence.");
+  }
+
+  it("does not expose the explicit AI button before retrieval evidence exists", () => {
+    render(<RagPage />);
+    expect(screen.queryByRole("button", { name: "AI分析" })).not.toBeInTheDocument();
+  });
+
+  it("does not expose AI analysis without analysis.execute", async () => {
+    await showEvidence(vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])), false);
+    expect(screen.queryByRole("button", { name: "AI分析" })).not.toBeInTheDocument();
+  });
+
+  it("cancels confirmation without sending an AI request", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem]));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows Stub, estimated input and output cap in confirmation", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem]));
+    const confirm = vi.fn().mockReturnValue(false);
+    vi.stubGlobal("confirm", confirm);
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(confirm.mock.calls[0][0]).toMatch(/Stub/);
+    expect(confirm.mock.calls[0][0]).toMatch(/推定入力/);
+    expect(confirm.mock.calls[0][0]).toMatch(/256 tokens/);
+  });
+
+  it("sends only stable evidence refs, confirmation and an idempotency header", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(aiSuccessResponse());
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    await screen.findByText(/Usage: 12 \+ 8 = 20/);
+    const [, init] = fetchMock.mock.calls[1] as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body).toEqual({ question: "controlled evidence", evidence: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: 0.95 }], confirmed: true });
+    expect(JSON.stringify(body)).not.toContain("Controlled AI evidence");
+    expect((init.headers as Record<string, string>)["Idempotency-Key"]).toMatch(/^ai-/);
+  });
+
+  it("renders trusted usage, synthetic cost and model after success", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(aiSuccessResponse());
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByText("Cost: 0.00001800 USD")).toBeInTheDocument();
+    expect(screen.getByText(/stub \/ stub-enterprise-v1 \/ succeeded/)).toBeInTheDocument();
+  });
+
+  it("renders quota 429 as a structured error", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(jsonResponse({ success: false, request_id: "q", data: null, error: { code: "llm_quota_exceeded", message: "Daily quota exceeded", detail: {} } }, 429));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[llm_quota_exceeded] Daily quota exceeded");
+  });
+
+  it("renders permission 403 as a structured error", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(jsonResponse({ success: false, request_id: "f", data: null, error: { code: "forbidden", message: "Forbidden", detail: {} } }, 403));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[forbidden] Forbidden");
+  });
+
+  it("renders evidence 422 as a structured error", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(jsonResponse({ success: false, request_id: "e", data: null, error: { code: "evidence_invalid", message: "Evidence unavailable", detail: {} } }, 422));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[evidence_invalid] Evidence unavailable");
+  });
+
+  it("reuses the same idempotency key after a provider failure", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(jsonResponse({ success: false, request_id: "p", data: null, error: { code: "provider_failed", message: "Provider failed", detail: {} } }, 502))
+      .mockResolvedValueOnce(aiSuccessResponse());
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    await screen.findByText(/provider_failed/);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    await screen.findByText(/Usage: 12 \+ 8 = 20/);
+    const first = (fetchMock.mock.calls[1][1].headers as Record<string, string>)["Idempotency-Key"];
+    const second = (fetchMock.mock.calls[2][1].headers as Record<string, string>)["Idempotency-Key"];
+    expect(second).toBe(first);
+  });
 });
+
+function aiSuccessResponse() {
+  return jsonResponse({ success: true, request_id: "ai", error: null, data: {
+    analysis_id: "ana-1", answer: "Stub AI analysis", citations: [], provider: "stub",
+    model: "stub-enterprise-v1", usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
+    cost: "0.00001800", currency: "USD", status: "succeeded", created_at: "2026-07-17T00:00:00Z",
+  } }, 200);
+}

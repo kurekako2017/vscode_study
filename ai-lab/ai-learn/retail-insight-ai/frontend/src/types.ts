@@ -181,6 +181,26 @@ export interface DocumentRetrievalSearchResponse {
   retrieval_mode: string;
 }
 
+/** 显式 AI Analysis 只接收稳定证据 ID，不上传 Chunk 正文或 actor。 */
+export interface AIAnalysisRequest {
+  question: string;
+  evidence: Array<{ document_id: string; chunk_id: string; score: number }>;
+  confirmed: true;
+}
+
+export interface AIAnalysisResponse {
+  analysis_id: string;
+  answer: string;
+  citations: Array<{ document_id: string; chunk_id: string; score: string; excerpt: string }>;
+  provider: string;
+  model: string;
+  usage: { input_tokens: number; output_tokens: number; total_tokens: number };
+  cost: string;
+  currency: string;
+  status: string;
+  created_at: string;
+}
+
 /** Internal RAG 当前只有两种冻结回答模式。 */
 export type InternalRagAnswerMode = "extractive" | "summary";
 

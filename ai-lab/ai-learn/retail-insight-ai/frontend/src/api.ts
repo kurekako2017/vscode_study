@@ -1,5 +1,7 @@
 import type {
   AnalysisMode,
+  AIAnalysisRequest,
+  AIAnalysisResponse,
   ApiResponse,
   ApprovalListResponse,
   ApprovalRejectRequest,
@@ -289,6 +291,19 @@ export async function answerInternalRag(
     body: JSON.stringify(payload),
   });
   return unwrapResponse<InternalRagAnswerResponse>(response);
+}
+
+/** 唯一可触发 Provider 的前端 API；幂等键必须在同一次重试中复用。 */
+export async function executeAIAnalysis(
+  payload: AIAnalysisRequest,
+  idempotencyKey: string,
+): Promise<AIAnalysisResponse> {
+  const response = await request("/api/v1/ai-analysis", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+    body: JSON.stringify(payload),
+  });
+  return unwrapResponse<AIAnalysisResponse>(response);
 }
 
 /** Approval 列表查询参数统一在 API Client 里拼接，页面只管理筛选表单。 */

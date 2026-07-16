@@ -27,7 +27,8 @@ def reset_postgres_state_if_needed(settings: Settings) -> None:
                     "This guard prevents accidental cleanup of a non-test database."
                 )
             cursor.execute(
-                """TRUNCATE upload_idempotency_keys,upload_sessions,document_imports,
+                """TRUNCATE ai_analysis_results,llm_usage_ledger,llm_quota_buckets,
+                upload_idempotency_keys,upload_sessions,document_imports,
                 document_chunks,documents,audit_logs,approval_events,approval_requests,
                 report_versions,reports,events,tasks RESTART IDENTITY CASCADE"""
             )

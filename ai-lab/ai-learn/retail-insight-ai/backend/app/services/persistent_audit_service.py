@@ -257,6 +257,38 @@ class PersistentAuditService:
                 extra_metadata={"attempted_permission": permission},
             )
 
+    def record_ai_analysis_event(
+        self, *, context: PersistentAuditContext, actor: CurrentUser, action: str,
+        result: str, status_code: int, usage_id: str,
+        error_code: str | None = None, **safe_metadata: Any,
+    ) -> AuditLog | None:
+        """AI Analysis 只写最终事实；reserved/requested 由 Ledger 表达。"""
+
+        if not self._enabled:
+            return None
+        audit_result = AuditLogResult.SUCCESS if result == "success" else AuditLogResult.FAILURE
+        with self._unit_of_work.transaction():
+            return self._record(
+                spec=PersistentAuditSpec(
+                    action=action,
+                    resource_type="ai_analysis",
+                    resource_id=usage_id,
+                    success_status_code=status_code,
+                    permission="analysis.execute",
+                ),
+                context=PersistentAuditContext(
+                    request_id=context.request_id,
+                    http_method=context.http_method,
+                    api_path=context.api_path,
+                    resource_id=usage_id,
+                    current_user=actor,
+                    metadata={"usage_id": usage_id, **safe_metadata},
+                ),
+                result=audit_result,
+                status_code=status_code,
+                error_code=error_code,
+            )
+
     def _record(
         self,
         *,

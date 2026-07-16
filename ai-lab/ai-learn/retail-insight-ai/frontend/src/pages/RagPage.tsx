@@ -1,12 +1,13 @@
 import { FormEvent, useState } from "react";
 
-import { ApiClientError, answerInternalRag, searchDocumentRetrieval } from "../api";
+import { ApiClientError, answerInternalRag, executeAIAnalysis, searchDocumentRetrieval } from "../api";
 import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
 import type {
   DisplayError,
+  AIAnalysisResponse,
   DocumentRetrievalSearchResponse,
   InternalRagAnswerMode,
   InternalRagAnswerResponse,
@@ -40,6 +41,10 @@ export function RagPage({
   const [retrievalLoading, setRetrievalLoading] = useState(false);
   const [retrievalError, setRetrievalError] = useState<DisplayError | null>(null);
   const [retrievalResult, setRetrievalResult] = useState<DocumentRetrievalSearchResponse | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<DisplayError | null>(null);
+  const [aiResult, setAiResult] = useState<AIAnalysisResponse | null>(null);
+  const [aiIdempotencyKey, setAiIdempotencyKey] = useState<string | null>(null);
 
   const [ragQuestion, setRagQuestion] = useState("");
   const [ragLimit, setRagLimit] = useState("5");
@@ -132,6 +137,38 @@ export function RagPage({
       });
     } finally {
       setRagLoading(false);
+    }
+  }
+
+  async function runExplicitAIAnalysis() {
+    if (!retrievalResult || retrievalResult.results.length === 0 || aiLoading) return;
+    const evidenceChars = retrievalResult.results.reduce((total, item) => total + item.content_excerpt.length, 0);
+    const estimatedInputTokens = Math.max(1, Math.ceil((retrievalQuery.length + evidenceChars) / 4));
+    // 确认对话在发送请求之前展示，取消时 fetch 次数保持为 0。
+    const confirmed = window.confirm(
+      `AI分析を実行しますか？\n推定入力: ${estimatedInputTokens} tokens\n出力上限: 256 tokens\nProvider: 開発用 Stub（外部通信・実費 0）`,
+    );
+    if (!confirmed) return;
+    const key = aiIdempotencyKey ?? createAIIdempotencyKey();
+    setAiIdempotencyKey(key);
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const response = await executeAIAnalysis({
+        question: retrievalQuery.trim(),
+        evidence: retrievalResult.results.map((item) => ({
+          document_id: item.document_id,
+          chunk_id: item.chunk_id,
+          score: item.score,
+        })),
+        confirmed: true,
+      }, key);
+      setAiResult(response);
+      setAiIdempotencyKey(null);
+    } catch (reason) {
+      setAiError(toDisplayError(reason, "AI_ANALYSIS_ERROR", "AI分析に失敗しました"));
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -255,6 +292,24 @@ export function RagPage({
                 </dl>
               </article>
             ))}
+            {canAnalyze && (
+              <div className="result-card" aria-label="明示的 AI 分析">
+                <div className="subheading"><strong>AI分析（明示的呼び出し）</strong><small>Stub / コスト管理対象</small></div>
+                <p>上記の検索証拠だけを使用します。ページ表示や検索では自動実行されません。</p>
+                <button type="button" onClick={runExplicitAIAnalysis} disabled={aiLoading || retrievalResult.results.length === 0}>
+                  {aiLoading ? "AI分析中…" : "AI分析"}
+                </button>
+                {aiError && <StatusBanner tone="error">[{aiError.code}] {aiError.message}</StatusBanner>}
+                {aiResult && (
+                  <div className="result-stack">
+                    <StatusBanner tone="success">{aiResult.provider} / {aiResult.model} / {aiResult.status}</StatusBanner>
+                    <pre className="answer-block">{aiResult.answer}</pre>
+                    <p>Usage: {aiResult.usage.input_tokens} + {aiResult.usage.output_tokens} = {aiResult.usage.total_tokens} tokens</p>
+                    <p>Cost: {aiResult.cost} {aiResult.currency}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </section>}
@@ -422,6 +477,11 @@ export function RagPage({
       />
     </>
   );
+}
+
+function createAIIdempotencyKey(): string {
+  const randomUUID = globalThis.crypto?.randomUUID?.bind(globalThis.crypto);
+  return `ai-${randomUUID ? randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
 }
 
 function parseTags(raw: string): string[] | undefined {

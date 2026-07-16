@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import uuid4
 
@@ -51,7 +51,7 @@ class PostgresLLMUsageRepository:
                 if cursor.fetchone() is None:
                     return self._existing(cursor, actor.user_id, idempotency_key)
 
-                today = date.today()
+                today = datetime.now(timezone.utc).date()
                 scopes = (("global", "global", global_limits), ("user", actor.user_id, user_limits))
                 for scope_type, scope_id, _ in scopes:
                     cursor.execute(
@@ -153,7 +153,7 @@ class PostgresLLMUsageRepository:
         return row
 
     def _adjust_buckets(self, cursor, actor_user_id: str, token_delta: int, cost_delta: Decimal) -> None:
-        today = date.today()
+        today = datetime.now(timezone.utc).date()
         for scope_type, scope_id in (("global", "global"), ("user", actor_user_id)):
             cursor.execute(
                 """UPDATE llm_quota_buckets SET token_count=GREATEST(0,token_count+%s),
