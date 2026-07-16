@@ -19,13 +19,13 @@ const modeLabels: Record<AnalysisMode, string> = {
  * TasksPage 负责现有 Task → SSE → Report 主链路。
  *
  * 谁调用它：
- * - `App.tsx` 在 Analysis / Tasks tab 下渲染它。
+ * - `App.tsx` 在 `/analysis` ProtectedRoute 下渲染它。
  *
  * 它调用谁：
  * - `api.ts` 中的 task 创建、SSE 订阅和 report 读取函数。
  *
  * 日本现场面试可以这样讲：
- * - 这是前端最小 workflow 页面，展示了 request、progress stream 和 final report 三段式数据流。
+ * - 这是前端最小 workflow 页面，展示了带 JWT 的 request、SSE fetch stream 和 final report 三段式数据流。
  */
 interface TasksPageProps {
   onLearningEvent?: RecordLearningEvent;

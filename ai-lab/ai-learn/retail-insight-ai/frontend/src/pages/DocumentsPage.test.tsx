@@ -227,4 +227,33 @@ describe("DocumentsPage", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("アーカイブを受け付けました: doc-1 (archived)");
   });
+
+  it("keeps read-only document users away from write and archive controls", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(documentList([{
+        document_id: "doc-read",
+        title: "Read Only",
+        description: null,
+        owner: "analysis-team",
+        created_at: "2026-07-17T00:00:00Z",
+        updated_at: "2026-07-17T00:00:00Z",
+        version: 1,
+        language: "ja",
+        document_type: "markdown",
+        status: "uploaded",
+        tags: [],
+        source: null,
+        checksum: "sha256:read",
+      }]))
+      .mockResolvedValueOnce(documentDetail({ document_id: "doc-read", title: "Read Only" }))
+      .mockResolvedValueOnce(chunkList()));
+
+    render(<DocumentsPage canWrite={false} canArchive={false} />);
+
+    expect(await screen.findByText("Read Only")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "文書をアップロード" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Import" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Chunk 実行" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "アーカイブ" })).not.toBeInTheDocument();
+  });
 });

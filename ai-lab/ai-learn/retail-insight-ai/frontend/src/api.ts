@@ -51,7 +51,7 @@ export function setApiAuthHandlers(handlers: ApiAuthHandlers) {
   apiAuthHandlers = handlers;
 }
 
-/** 仅供测试隔离使用，不会接触 localStorage。 */
+/** 仅供测试隔离使用，不接触任何浏览器持久存储。 */
 export function resetApiAuthForTests() {
   apiAccessToken = null;
   apiAuthHandlers = {};

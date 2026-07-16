@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { jsonResponse, ragAnswerResponse, retrievalResponse } from "../test/page-test-helpers";
@@ -9,6 +9,18 @@ describe("RagPage", () => {
     cleanup();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+  });
+
+  it("renders only the RAG capability allowed by permission-derived props", () => {
+    const { rerender } = render(<RagPage canRetrieve canAnalyze={false} />);
+    let workspace = within(screen.getByLabelText("RAG 検索ワークスペース"));
+    expect(workspace.getByRole("heading", { name: "文書検索" })).toBeInTheDocument();
+    expect(workspace.queryByRole("heading", { name: "Internal RAG 回答" })).not.toBeInTheDocument();
+
+    rerender(<RagPage canRetrieve={false} canAnalyze />);
+    workspace = within(screen.getByLabelText("RAG 検索ワークスペース"));
+    expect(workspace.queryByRole("heading", { name: "文書検索" })).not.toBeInTheDocument();
+    expect(workspace.getByRole("heading", { name: "Internal RAG 回答" })).toBeInTheDocument();
   });
 
   it("shows retrieval results", async () => {

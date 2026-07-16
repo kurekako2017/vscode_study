@@ -4,12 +4,12 @@
 
 ## 2026-07-17 Frontend Enterprise Authentication + RBAC
 
-- [ ] 建立 sessionStorage Access Token、JWT 身份校验、`/users/me` 恢复与集中 AuthContext
-- [ ] 让统一 fetch API Client 自动注入 Bearer，并集中处理 401、403 与并发失效
-- [ ] 建立 Login、URL 路由、ProtectedRoute、原目标回跳与登出链
-- [ ] 按冻结 Permission Registry 控制导航、页面入口与业务按钮，未知角色 fail-closed
-- [ ] 保持 Approval 状态机、后端 RBAC、JWT Payload、Schema、Migration 与 InMemory 不变
-- [ ] 补齐 Frontend 认证、请求链、路由和权限测试并完成全量回归
+- [x] 建立 sessionStorage Access Token、JWT 身份校验、`/users/me` 恢复与集中 AuthContext
+- [x] 让统一 fetch API Client 自动注入 Bearer，并集中处理 401、403 与并发失效
+- [x] 建立 Login、URL 路由、ProtectedRoute、原目标回跳与登出链
+- [x] 按冻结 Permission Registry 控制导航、页面入口与业务按钮，未知角色 fail-closed
+- [x] 保持 Approval 状态机、后端 RBAC、JWT Payload、Schema、Migration 与 InMemory 不变
+- [x] 补齐 Frontend 认证、请求链、路由和权限测试并完成全量回归
 
 ### 实施前审计
 
@@ -18,6 +18,15 @@
 - 当前导航和 Approval/Document/RAG 操作按页面状态静态展示，没有复用后端冻结 Permission Registry。
 - 原生 `EventSource` 不能携带 Authorization Header，生产 SSE 请求链需要改为带 Bearer 的 fetch stream。
 - 后端现有 Login、CurrentUser 与冻结 RBAC 合同足够，本轮不需要修改后端。
+
+### 完成记录
+
+- 2026-07-17：Login → JWT → `/users/me` → AuthContext → ProtectedRoute 已接通；Access Token 只保存于 sessionStorage。
+- 2026-07-17：统一 fetch Client 为受保护 JSON API 和 SSE fetch stream 注入 Bearer；Login/Health 保持匿名。
+- 2026-07-17：并发 401 只触发一次清会话/跳转；403 保持当前用户和页面状态并显示无权提示。
+- 2026-07-17：admin / manager / employee 前端权限镜像与冻结 Backend Registry 一致，未知角色为空权限集。
+- 2026-07-17：Approval 正常 approve/reject 只由 `approval.review` 控制；submit-only owner 通过 Approval ID 请求自己的详情。
+- 2026-07-17：Frontend 77/77（原 47 + 新增 30）、InMemory 183（1 skip）、PostgreSQL 194、build、compileall、diff-check 全绿。
 
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 

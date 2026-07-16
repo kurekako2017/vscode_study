@@ -38,7 +38,7 @@ const approvalStatuses: ApprovalStatus[] = [
  *
  * 为什么单独成页：
  * - Approval 有自己独立的状态机和错误分支，和 Documents / RAG 放在一起会让学习路径变乱。
- * - 当前仍然保持最小前端结构，不引入 Router 和全局状态框架。
+ * - URL Router 与权限判断由 App/AuthContext 负责，本页只接收 permission-derived boolean。
  */
 interface ApprovalPageProps {
   onLearningEvent?: RecordLearningEvent;
@@ -471,7 +471,7 @@ export function ApprovalPage({
         pageName="承認管理"
         purpose="将已完成的经营分析报告提交给负责人审批，并保留 approval_id、报告版本和审批审计事实。"
         scenario="关东饮料销售下降分析完成后，负责人手动输入 task_id 提交承认依赖，再根据审核结果执行承認、却下或修正依頼。"
-        prerequisites="分析依頼已经完成并生成 report。当前用户是系统既定用户；Approval API 的 RBAC 已生效，权限不足会返回 403。"
+        prerequisites="分析依頼已经完成并生成 report。当前用户来自 JWT CurrentUser；Approval API 的 RBAC 已生效，权限不足会返回 403。"
         relationship="本页使用分析依頼产生的 task_id，创建 approval_id 和 report_version_id。task_id 当前不从 TasksPage 自动传入，必须手动复制；批准结果不自动回写到 Documents 或 RAG 页面。"
         journey={{ previous: "分析依頼", current: "4 / 4 承認管理", completion: "执行承認、却下或修正依頼，并记录审批结果。", next: "最终可审计报告", recommendedCase: "APR-BIZ-001", transferredObjects: "approval_id、report_version_id、approval event", connection: "当前没有独立的最终汇总页面。" }}
         cases={[

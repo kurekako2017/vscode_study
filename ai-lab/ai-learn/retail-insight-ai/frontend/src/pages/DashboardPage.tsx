@@ -97,9 +97,9 @@ export function DashboardPage({
   function openBusinessStep(target: DashboardTarget, actionLabel: string) {
     onLearningEvent?.({
       eventName: `openBusinessStep(${target})`,
-      stateChanges: ["activeView: dashboard → target", `入口：${actionLabel}`],
-      backendFlow: ["无 Backend 调用", "App.tsx changeView()", "React 重新渲染目标页面"],
-      note: "导航只修改 React 本地状态，不发送 API 请求。",
+      stateChanges: ["URL path: /dashboard → target", `入口：${actionLabel}`],
+      backendFlow: ["无 Backend 调用", "App.tsx changeView()", "History API 更新并重新渲染目标页面"],
+      note: "导航只修改浏览器 URL 与 React 页面状态，不发送 API 请求。",
     });
     onNavigate(target);
   }

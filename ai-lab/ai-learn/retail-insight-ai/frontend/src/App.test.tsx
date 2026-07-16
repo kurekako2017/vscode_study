@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
 import { LearningSidebar } from "./components/LearningSidebar";
+import { ADMIN_SESSION } from "./test/auth-test-helpers";
 import { FakeEventSource, jsonResponse } from "./test/page-test-helpers";
 
 describe("App navigation", () => {
@@ -13,7 +14,7 @@ describe("App navigation", () => {
   });
 
   it("shows dashboard by default with current runtime facts", async () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Enterprise Retail Intelligence Platform" })).toBeInTheDocument();
     expect(screen.getByText("数据存储")).toBeInTheDocument();
@@ -26,7 +27,7 @@ describe("App navigation", () => {
   });
 
   it("highlights the current page in top navigation", async () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
 
     expect(screen.getByRole("button", { name: "学习总览" })).toHaveAttribute("aria-current", "page");
     fireEvent.click(screen.getByRole("button", { name: "文書管理" }));
@@ -34,7 +35,7 @@ describe("App navigation", () => {
   });
 
   it("uses the document-first enterprise navigation order", () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
 
     expect(within(screen.getByRole("navigation", { name: "主要ページ" })).getAllByRole("button").map((button) => button.textContent)).toEqual([
       "学习总览",
@@ -111,7 +112,7 @@ describe("App navigation", () => {
         error: null,
       }, 200)));
 
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
     fireEvent.click(screen.getByRole("button", { name: "分析依頼" }));
     fireEvent.change(screen.getByLabelText("確認したい経営課題"), { target: { value: "関東飲料の売上を確認" } });
     fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
@@ -132,7 +133,7 @@ describe("App navigation", () => {
   });
 
   it("navigates to tasks from dashboard shortcut", async () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
 
     fireEvent.click(screen.getByRole("button", { name: "分析依頼を開く" }));
 
@@ -148,14 +149,14 @@ describe("App navigation", () => {
       error: null,
     }), { status: 200 })));
 
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
     fireEvent.click(screen.getByRole("button", { name: "文書管理を開く" }));
 
     expect(await screen.findByRole("heading", { name: "文書管理" })).toBeInTheDocument();
   });
 
   it("navigates to rag from dashboard shortcut", async () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
     fireEvent.click(screen.getByRole("button", { name: "RAG検索を開く" }));
 
     expect(screen.getByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
@@ -164,7 +165,7 @@ describe("App navigation", () => {
   });
 
   it("records a local-only clear action in the learning sidebar", () => {
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
 
     fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
     fireEvent.click(screen.getByRole("button", { name: "結果をクリア" }));
@@ -181,7 +182,7 @@ describe("App navigation", () => {
       error: { code: "insufficient_context", message: "No usable evidence", detail: {} },
     }), { status: 422 })));
 
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
     fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
     fireEvent.change(screen.getByLabelText("質問"), { target: { value: "関東飲料の未登録要因" } });
     fireEvent.click(screen.getByRole("button", { name: "回答を生成" }));
@@ -199,7 +200,7 @@ describe("App navigation", () => {
       error: null,
     }), { status: 200 })));
 
-    render(<App />);
+    render(<App initialSession={ADMIN_SESSION} />);
     fireEvent.click(screen.getByRole("button", { name: "承認管理を開く" }));
 
     expect(await screen.findByRole("heading", { name: "承認管理" })).toBeInTheDocument();

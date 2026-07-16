@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -22,7 +23,7 @@ import {
   hasPermission as checkPermission,
   type Permission,
 } from "./permissions";
-import { parseJwtIdentity } from "./token";
+import { parseJwtIdentity } from "./jwtIdentity";
 import { navigateTo } from "../routing/navigation";
 
 export const ACCESS_TOKEN_SESSION_KEY = "erip.access_token";
@@ -82,6 +83,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(initialSession?.currentUser ?? null);
   const [isInitializing, setIsInitializing] = useState(initialSession === undefined);
   const [authorizationNotice, setAuthorizationNotice] = useState<string | null>(null);
+  const restoreStarted = useRef(false);
 
   const clearSession = useCallback(() => {
     sessionStorage.removeItem(ACCESS_TOKEN_SESSION_KEY);
@@ -101,13 +103,15 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       return;
     }
 
-    let active = true;
+    if (restoreStarted.current) return;
+    restoreStarted.current = true;
+
     async function restoreSession() {
       const storedToken = sessionStorage.getItem(ACCESS_TOKEN_SESSION_KEY);
       const claims = storedToken ? parseJwtIdentity(storedToken) : null;
       if (storedToken === null || claims === null) {
         clearSession();
-        if (active) setIsInitializing(false);
+        setIsInitializing(false);
         return;
       }
 
@@ -122,20 +126,15 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         ) {
           throw new Error("JWT identity does not match CurrentUser");
         }
-        if (active) {
-          setAccessToken(storedToken);
-          setCurrentUser(buildCurrentUser(identity));
-        }
+        setAccessToken(storedToken);
+        setCurrentUser(buildCurrentUser(identity));
       } catch {
         clearSession();
       } finally {
-        if (active) setIsInitializing(false);
+        setIsInitializing(false);
       }
     }
     void restoreSession();
-    return () => {
-      active = false;
-    };
   }, [clearSession, initialSession]);
 
   useEffect(() => {

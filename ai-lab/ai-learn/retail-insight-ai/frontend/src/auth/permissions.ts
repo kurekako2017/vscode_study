@@ -24,7 +24,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 export type Role = "admin" | "manager" | "employee";
 
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = Object.freeze({
-  admin: Object.freeze([...PERMISSIONS]),
+  admin: Object.freeze([...PERMISSIONS]) as readonly Permission[],
   manager: Object.freeze([
     "documents.read",
     "documents.write",
@@ -35,14 +35,14 @@ export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = O
     "approval.review",
     "approval.admin",
     "audit.read",
-  ]),
+  ]) as readonly Permission[],
   employee: Object.freeze([
     "documents.read",
     "documents.write",
     "retrieval.query",
     "analysis.execute",
     "approval.submit",
-  ]),
+  ]) as readonly Permission[],
 });
 
 /** 未知角色返回空集合，不能因为前端字符串异常而获得默认权限。 */

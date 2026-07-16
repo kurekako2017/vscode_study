@@ -4,13 +4,14 @@
 
 ## 2026-07-17 Frontend Enterprise Authentication + RBAC
 
-- [ ] Access Token 只保存于 sessionStorage，刷新时经 JWT 基础校验与 `/api/v1/users/me` 恢复身份
-- [ ] AuthContext 集中提供当前用户、认证状态、登录、登出与 permission helper
-- [ ] fetch API Client 自动注入 Bearer；Login/Health 保持匿名；401 清会话，403 保持会话
-- [ ] Login、ProtectedRoute、原目标回跳和未知角色 fail-closed 落地
-- [ ] 导航、Documents、RAG、Analysis、Approval 按冻结权限控制可见性与操作
-- [ ] 不修改后端 Registry、JWT Payload、Approval 状态机、Schema、Migration 或 InMemory
-- [ ] 完成 Frontend、双 Backend、build、compileall 与 diff-check 验证
+- [x] Access Token 只保存于 sessionStorage，刷新时经 JWT 基础校验与 `/api/v1/users/me` 恢复身份
+- [x] AuthContext 集中提供当前用户、认证状态、登录、登出与 permission helper
+- [x] fetch API Client 自动注入 Bearer；Login/Health 保持匿名；401 清会话，403 保持会话
+- [x] Login、ProtectedRoute、原目标回跳和未知角色 fail-closed 落地
+- [x] 导航、Documents、RAG、Analysis、Approval 按冻结权限控制可见性与操作
+- [x] 不修改后端 Registry、JWT Payload、Approval 状态机、Schema、Migration 或 InMemory
+- [x] 完成 Frontend 77/77、PostgreSQL 194、InMemory 183、build、compileall 与 diff-check 验证
+- 完成记录：原 Frontend 47 项保持通过，新增 30 项认证、请求链、路由与权限测试；未新增 Audit/Security 页面。
 
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 

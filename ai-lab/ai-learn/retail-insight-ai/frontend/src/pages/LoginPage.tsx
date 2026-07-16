@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 
 import { ApiClientError } from "../api";
 import { useAuth } from "../auth/AuthContext";
@@ -27,17 +27,13 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const loginInFlight = useRef(false);
   const expired = (window.history.state as { reason?: unknown } | null)?.reason === "expired";
-
-  useEffect(() => {
-    if (!auth.isInitializing && auth.isAuthenticated) {
-      navigateTo("/dashboard", { replace: true });
-    }
-  }, [auth.isAuthenticated, auth.isInitializing]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isSubmitting || username.trim().length === 0 || password.length === 0) return;
+    if (loginInFlight.current || username.trim().length === 0 || password.length === 0) return;
+    loginInFlight.current = true;
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
@@ -52,6 +48,7 @@ export function LoginPage() {
           : "ユーザー名またはパスワードを確認してください。",
       );
     } finally {
+      loginInFlight.current = false;
       setIsSubmitting(false);
     }
   }

@@ -9,12 +9,17 @@ import {
   getApproval,
   getDocument,
   getDocumentChunks,
+  getHealth,
   importDocument,
+  login,
   listApprovals,
   rejectApproval,
   requestApprovalRevision,
   listDocuments,
   searchDocumentRetrieval,
+  setApiAccessToken,
+  setApiAuthHandlers,
+  subscribeToTask,
   submitApproval,
   uploadDocument,
 } from "./api";
@@ -364,5 +369,126 @@ describe("API Client", () => {
     expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/approvals/approval-1/approve");
     expect(fetchMock.mock.calls[2][0]).toBe("/api/v1/approvals/approval-2/reject");
     expect(fetchMock.mock.calls[3][0]).toBe("/api/v1/reports/task-2/revise");
+  });
+
+  it("adds one centralized Bearer header to protected JSON requests", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({
+      success: true,
+      request_id: "request-authenticated",
+      data: { task_id: "task-authenticated", status: "queued" },
+      error: null,
+    }, 202));
+    vi.stubGlobal("fetch", fetchMock);
+    setApiAccessToken("access-token");
+
+    await createTask("在庫を確認", "kpi");
+
+    const headers = new Headers((fetchMock.mock.calls[0][1] as RequestInit).headers);
+    expect(headers.get("Authorization")).toBe("Bearer access-token");
+  });
+
+  it("keeps login and health anonymous even when an old token exists", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({
+        success: true,
+        request_id: "request-login",
+        data: { access_token: "new-token", token_type: "bearer", expires_in: 1800 },
+        error: null,
+      }, 200))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        status: "ok",
+        service: "retail-insight-ai",
+      }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    setApiAccessToken("old-token");
+
+    await login("manager", "password");
+    await getHealth();
+
+    expect(new Headers((fetchMock.mock.calls[0][1] as RequestInit).headers).has("Authorization")).toBe(false);
+    expect(fetchMock.mock.calls[1][1]).toBeUndefined();
+  });
+
+  it("runs one unauthorized handler for concurrent 401 responses", async () => {
+    let releaseUnauthorized: (() => void) | undefined;
+    const onUnauthorized = vi.fn(() => new Promise<void>((resolve) => {
+      releaseUnauthorized = resolve;
+    }));
+    setApiAccessToken("expired-token");
+    setApiAuthHandlers({ onUnauthorized });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({
+      success: false,
+      request_id: "request-unauthorized",
+      data: null,
+      error: { code: "unauthorized", message: "Unauthorized", detail: {} },
+    }, 401)));
+
+    const requests = [
+      createTask("one", "kpi").catch(() => null),
+      createTask("two", "kpi").catch(() => null),
+    ];
+    await vi.waitFor(() => expect(onUnauthorized).toHaveBeenCalledTimes(1));
+    releaseUnauthorized?.();
+    await Promise.all(requests);
+    expect(onUnauthorized).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves the token and reports 403 through the global forbidden handler", async () => {
+    const onForbidden = vi.fn();
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({
+      success: false,
+      request_id: "request-forbidden",
+      data: null,
+      error: { code: "forbidden", message: "Forbidden", detail: {} },
+    }, 403));
+    setApiAccessToken("still-valid");
+    setApiAuthHandlers({ onForbidden });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await createTask("forbidden", "kpi").catch(() => null);
+    await createTask("still-authenticated", "kpi").catch(() => null);
+
+    expect(onForbidden).toHaveBeenCalledTimes(2);
+    expect(new Headers((fetchMock.mock.calls[1][1] as RequestInit).headers).get("Authorization")).toBe("Bearer still-valid");
+  });
+
+  it("uses authenticated fetch streaming without putting the token in the SSE URL", async () => {
+    const event = {
+      task_id: "task-stream",
+      sequence: 1,
+      event: "done",
+      status: "completed",
+      message: "done",
+      request_id: "request-stream",
+      error_code: null,
+      node: null,
+      report_path: null,
+      created_at: "2026-07-17T00:00:00Z",
+    };
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(`event: done\ndata: ${JSON.stringify(event)}\n\n`));
+        controller.close();
+      },
+    });
+    const fetchMock = vi.fn().mockResolvedValue(new Response(stream, {
+      status: 200,
+      headers: { "Content-Type": "text/event-stream" },
+    }));
+    const onEvent = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    setApiAccessToken("stream-token");
+
+    const unsubscribe = subscribeToTask("task-stream", {
+      onEvent,
+      onTransportError: vi.fn(),
+    });
+    await vi.waitFor(() => expect(onEvent).toHaveBeenCalledWith(event));
+    unsubscribe();
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/tasks/task-stream/events");
+    const headers = new Headers((fetchMock.mock.calls[0][1] as RequestInit).headers);
+    expect(headers.get("Authorization")).toBe("Bearer stream-token");
+    expect(String(fetchMock.mock.calls[0][0])).not.toContain("stream-token");
   });
 });

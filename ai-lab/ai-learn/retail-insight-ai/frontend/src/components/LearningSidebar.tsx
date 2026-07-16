@@ -37,12 +37,12 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     whyNeeded: "业务人员先确认当前 MVP 的可用能力和边界，再按正确顺序进入页面，避免把本地固定数据误当作生产结论。",
     initialState: "渲染当前能力边界与业务流程卡片；不读取 Backend。",
     lifecycle: [
-      { name: "Render", detail: "App 根据 activeView 渲染 DashboardPage。", technologies: ["React Component", "React Render"] },
-      { name: "Choose", detail: "openBusinessStep() 记录学习操作，并请求 App 切换目标 tab。", technologies: ["Event Handler", "React useState"] },
-      { name: "Switch", detail: "App.changeView() 更新 activeView，React 卸载总览并渲染目标页面。", technologies: ["React useState", "React Re-render"] },
+      { name: "Render", detail: "App 根据当前 URL path 渲染 DashboardPage。", technologies: ["React Component", "History API"] },
+      { name: "Choose", detail: "openBusinessStep() 记录学习操作，并请求 App 切换目标 URL。", technologies: ["Event Handler", "History API"] },
+      { name: "Switch", detail: "App.changeView() 更新 URL，React 卸载总览并渲染目标页面。", technologies: ["History API", "React Re-render"] },
     ],
     sources: [
-      { label: "页面入口", path: "frontend/src/App.tsx", reason: "持有 activeView，并渲染当前业务页与 LearningSidebar。" },
+      { label: "页面入口", path: "frontend/src/App.tsx", reason: "读取 URL path，并渲染 ProtectedRoute、当前业务页与 LearningSidebar。" },
       { label: "业务总览", path: "frontend/src/pages/DashboardPage.tsx", reason: "定义 Scenario01 的页面顺序、能力边界和入口事件。" },
     ],
   },
@@ -95,13 +95,13 @@ const pageInfo: Record<LearningPage, PageLearningInfo> = {
     initialState: "初始为 idle；没有 task_id、SSE 事件或 report。",
     lifecycle: [
       { name: "Submit", detail: "submit() 清空旧状态，POST /api/tasks 后保存 task_id 与 queued 状态。", technologies: ["Event Handler", "React useState", "Fetch API", "REST API", "FastAPI Router", "BackgroundTasks", "LangGraph"] },
-      { name: "Stream", detail: "subscribeToTask() 用 EventSource 接收 queued / running / done 等 SSE 事件。", technologies: ["SSE / EventSource", "React useState"] },
+      { name: "Stream", detail: "subscribeToTask() 用带 Bearer Header 的 fetch stream 接收 queued / running / done 等 SSE 事件。", technologies: ["SSE / EventSource", "Fetch Stream"] },
       { name: "Complete", detail: "收到 done 后取消订阅，并调用 loadReport() 读取最终 report。", technologies: ["Fetch API", "REST API", "React useState", "React Re-render"] },
       { name: "Unmount", detail: "useEffect cleanup 调用取消订阅，防止旧 SSE 继续写入已离开的页面。", technologies: ["React useEffect", "SSE / EventSource"] },
     ],
     sources: [
       { label: "页面状态", path: "frontend/src/pages/TasksPage.tsx", reason: "管理 taskId、status、events、report 和 SSE cleanup。" },
-      { label: "API / SSE", path: "frontend/src/api.ts", reason: "创建任务、读取报告并建立 EventSource 订阅。" },
+      { label: "API / SSE", path: "frontend/src/api.ts", reason: "创建任务、读取报告并建立可携带 Authorization Header 的 SSE fetch stream。" },
       { label: "Task Router", path: "backend/app/api/tasks.py", reason: "接受任务、注册后台执行并提供 SSE 与 report。" },
       { label: "Workflow", path: "backend/app/workflow/graph.py", reason: "执行 route → kpi → research → report 工作流。" },
     ],
@@ -143,7 +143,7 @@ function eventSummary(event: LearningEvent | null) {
  * LearningSidebar V2 只负责当前 React 页面和最近一次操作的即时学习信息。
  *
  * 谁调用它：
- * - App.tsx 将 activeView 对应的 page 与页面 handler 上报的 LearningEvent 传入。
+ * - App.tsx 将 URL path 对应的 page 与页面 handler 上报的 LearningEvent 传入。
  *
  * 它不做什么：
  * - 不发送请求、不保存业务数据、不复制 Scenario01 原文，也不展示业务测试 Case。

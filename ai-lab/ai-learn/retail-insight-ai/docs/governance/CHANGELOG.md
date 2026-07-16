@@ -2,6 +2,16 @@
 
 # CHANGELOG
 
+## 2026-07-17 Frontend Enterprise Authentication + RBAC
+
+- 新增 Login、sessionStorage Access Token、JWT 身份结构校验、`/users/me` 会话恢复和集中 AuthContext。
+- 统一 fetch API Client 自动注入 Bearer；Login/Health 匿名；SSE 使用可携带 Authorization Header 的 fetch stream。
+- 新增 History API URL 导航与 ProtectedRoute，支持直达保护、原目标回跳、401 单次登出、403 保持会话和未知角色 fail-closed。
+- 前端集中镜像冻结的 10 项 Permission 与三角色映射；导航、Documents、RAG、Analysis、Approval 按权限显示。
+- Approval approve/reject 由 `approval.review` 控制；submit-only employee 只提供 owner detail 入口，不显示 review 按钮。
+- 后端、JWT Payload、Registry、状态机、Schema、Migration 与 InMemory 未修改。
+- 最终验证：Frontend 77/77（原 47 + 新增 30）、InMemory 183（1 expected skip）、PostgreSQL 194、production build、compileall、diff-check 全绿。
+
 ## 2026-07-17 Enterprise Approval RBAC Boundary Correction
 
 - 正常 approve/reject 从 `approval.admin` 修正为 `approval.review`，Router、Persistent Audit 与 ApprovalService 防御校验保持一致。

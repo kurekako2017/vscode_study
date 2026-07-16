@@ -748,6 +748,31 @@
 - 成功业务、Approval History 与 Persistent Audit 在同一请求事务提交；任一必要写入失败都不会伪装为业务成功。
 - InMemory Repository、默认 backend、Persistent Audit Schema、冻结角色权限矩阵与 JWT Payload 保持不变。
 
+## ADR-035
+
+日期：2026-07-17
+
+决策：Frontend 使用 sessionStorage Access Token、集中 AuthContext、统一 fetch Client、History API ProtectedRoute 与后端 Registry 的只读权限镜像建立 JWT/RBAC 请求链。
+
+原因：
+
+- 页面不能各自保存 Token、手写 Authorization 或用 role 字符串控制按钮。
+- JWT 按冻结合同只承载身份，权限必须由集中 role mapping 推导，并由 Backend 最终授权。
+- 原生 EventSource 无法设置 Authorization Header，认证 SSE 必须使用 fetch stream。
+
+备选方案：
+
+- 使用 localStorage；拒绝，因为会扩大 Token 的浏览器持久化范围。
+- 引入 Axios 与 React Router；拒绝，因为当前 fetch 与小型页面集合可复用，新增第二套 Client/Router 会扩大本轮范围。
+- 把 permissions 写入 JWT；拒绝，因为会复制并固化易漂移的授权策略。
+
+影响：
+
+- 刷新恢复必须先校验 JWT 基本结构，再调用 `/api/v1/users/me` 确认身份。
+- 401 并发失效只清理一次会话；403 不登出；未知角色为空权限集。
+- Frontend permission guard 只改善 UX，不替代 FastAPI `require_permission()`。
+- 后端 Registry、JWT Payload、Approval 状态机、Schema、Migration 与 InMemory 保持不变。
+
 <!-- DOC-SYNC:START group=architecture -->
 ## 文档同步块
 

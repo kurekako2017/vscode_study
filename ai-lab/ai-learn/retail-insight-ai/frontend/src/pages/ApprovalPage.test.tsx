@@ -398,4 +398,84 @@ describe("ApprovalPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[permission_denied] Reject denied");
   });
+
+  it("lets approval.review users see normal approve and reject controls", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(approvalList([
+        {
+          approval_id: "approval-review",
+          task_id: "task-review",
+          report_version_id: "version-review",
+          status: "pending_approval",
+          requested_at: "2026-07-17T00:00:00Z",
+          requested_by: "user-employee",
+          decided_at: null,
+          decided_by: null,
+          decision_reason: null,
+          revision_no: 1,
+          revised_from_version_id: null,
+        },
+      ]))
+      .mockResolvedValueOnce(approvalDetail({ approval_id: "approval-review" })));
+
+    render(<ApprovalPage canReview canSubmit={false} currentUserLabel="manager (manager)" />);
+
+    expect(await screen.findByRole("button", { name: "承認" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "却下" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "承認依頼を送信" })).not.toBeInTheDocument();
+  });
+
+  it("lets approval.submit owners load their own detail without review controls or list API", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(approvalDetail({
+      approval_id: "approval-owner",
+      requested_by: "user-employee",
+      history: [
+        {
+          history_id: "history-1",
+          approval_id: "approval-owner",
+          action: "submitted",
+          from_status: "generated",
+          to_status: "pending_approval",
+          actor_user_id: "user-employee",
+          actor_username: "employee",
+          actor_role: "employee",
+          comment: null,
+          reason: null,
+          report_version_id: "report-version-1",
+          occurred_at: "2026-07-17T00:00:00Z",
+        },
+      ],
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<ApprovalPage canReview={false} canSubmit currentUserLabel="employee (employee)" />);
+
+    fireEvent.change(screen.getByLabelText("Approval ID"), { target: { value: "approval-owner" } });
+    fireEvent.click(screen.getByRole("button", { name: "自分の承認詳細を表示" }));
+
+    expect(await screen.findByText("approval-owner")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "承認" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "却下" })).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/approvals/approval-owner");
+  });
+
+  it("shows backend 403 when a submit-only employee requests another owner's approval", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({
+      success: false,
+      request_id: "request-other-owner",
+      data: null,
+      error: {
+        code: "forbidden",
+        message: "Approval detail access denied",
+        detail: {},
+      },
+    }, 403)));
+    render(<ApprovalPage canReview={false} canSubmit currentUserLabel="employee (employee)" />);
+
+    fireEvent.change(screen.getByLabelText("Approval ID"), { target: { value: "approval-other-owner" } });
+    fireEvent.click(screen.getByRole("button", { name: "自分の承認詳細を表示" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("[forbidden] Approval detail access denied");
+    expect(screen.queryByRole("button", { name: "承認" })).not.toBeInTheDocument();
+  });
 });

@@ -1588,6 +1588,25 @@ Frontend
 
 ## Architecture Freeze
 
+### Frontend Authentication and Authorization Flow
+
+Current State
+
+```mermaid
+flowchart LR
+    Login[Login Page] --> AuthAPI[POST /api/v1/auth/login]
+    AuthAPI --> Session[sessionStorage Access Token]
+    Session --> Me[GET /api/v1/users/me]
+    Me --> Context[AuthContext + Frontend Permission Registry]
+    Context --> Route[ProtectedRoute]
+    Context --> Client[Central fetch API Client]
+    Client --> API[FastAPI require_permission]
+```
+
+- JWT 只承载身份，Frontend 权限由冻结 role mapping 推导，Backend 仍是最终授权边界。
+- 受保护 JSON API 与 SSE fetch stream 统一使用 Bearer Header；Login / Health 保持匿名。
+- 401 清理会话并跳转 Login；403 保持会话和页面状态；未知角色为空权限集。
+
 ### Current Architecture
 
 Current State
