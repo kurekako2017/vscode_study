@@ -28,12 +28,19 @@ from app.db.connection import PostgresConfig, PostgresConnectionFactory
 from app.db.unit_of_work import InMemoryUnitOfWork, PostgresUnitOfWork
 from app.events.publisher import EventPublisher
 from app.kpi.workflow import FixedKPIWorkflow
+from app.llm.circuit_breaker import CircuitBreaker, CircuitBreakerConfig, InMemoryCircuitBreakerStore
 from app.llm.gateway import LLMGatewayService
 from app.llm.model_router import ModelRouter
 from app.llm.operation_policy import OperationPolicyRegistry
+from app.llm.provider_chain import BoundProvider, ProviderChain
+from app.llm.provider_registry import enabled_chain_endpoints
+from app.providers.gemini_llm_provider import GeminiLLMProvider
 from app.providers.llm_provider import LLMProvider
+from app.providers.local_qwen_llm_provider import LocalQwenLLMProvider
+from app.providers.nvidia_llm_provider import NVIDIALLMProvider
 from app.providers.openrouter_llm_provider import OpenRouterLLMProvider
 from app.providers.stub_llm_provider import StubLLMProvider
+from app.repositories.postgres.llm_circuit_repository import PostgresCircuitBreakerStore
 from app.repositories.implementations.in_memory.audit_repository import InMemoryAuditRepository
 from app.repositories.implementations.in_memory.approval_repository import InMemoryApprovalRepository
 from app.repositories.implementations.in_memory.document_chunk_repository import InMemoryDocumentChunkRepository
@@ -227,9 +234,10 @@ def build_container(settings: Settings | None = None) -> AppContainer:
             vector_weight=settings.hybrid_vector_weight,
         ),
     )
-    #  创建服务，注入仓库和事件发布器
-    # Provider 模式由 Settings 决定：默认 stub；openrouter 使用两个独立模型别名。
-    llm_provider, llm_provider_high_quality = _build_llm_providers(settings)
+    # Provider 模式：stub / openrouter（单 Provider 兼容）/ fallback_chain（严格串行）。
+    llm_provider, llm_provider_high_quality, analysis_chain, report_chain = _build_llm_stack(
+        settings, repositories.llm_usage, repositories
+    )
     policy_registry = OperationPolicyRegistry(settings)
     model_router = ModelRouter(
         policy_registry=policy_registry,
@@ -238,7 +246,16 @@ def build_container(settings: Settings | None = None) -> AppContainer:
             settings.llm_high_quality_provider_alias: llm_provider_high_quality,
         },
     )
-    llm_gateway = LLMGatewayService(policy_registry=policy_registry, model_router=model_router)
+    llm_gateway = LLMGatewayService(
+        policy_registry=policy_registry,
+        model_router=model_router if settings.llm_provider_mode != "fallback_chain" else None,
+        analysis_chain=analysis_chain,
+        report_chain=report_chain,
+        mode=settings.llm_provider_mode,
+        total_timeout_seconds=settings.llm_total_timeout_seconds,
+        max_provider_attempts=settings.llm_max_provider_attempts,
+        currency=settings.llm_currency,
+    )
     # 普通 Internal RAG 永久使用 deterministic path，环境变量不能绕过成本治理。
     rag_answer_generator = RAGAnswerGenerator(provider=None, use_llm=False)
     # Reranker 是 retrieval 之后的独立二阶段排序，不进入 Repository 或 Retrieval Service。
@@ -380,48 +397,154 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     )
 
 
-def _build_llm_providers(settings: Settings) -> tuple[LLMProvider, LLMProvider]:
-    """按 LLM_PROVIDER_MODE 构建 low_cost / high_quality Provider；客户端不可切换。"""
+def _build_llm_stack(
+    settings: Settings,
+    llm_usage: PostgresLLMUsageRepository | None,
+    repositories: "RepositoryBundle",
+) -> tuple[LLMProvider, LLMProvider, ProviderChain | None, ProviderChain | None]:
+    """按 LLM_PROVIDER_MODE 构建 Provider 与可选 Fallback Chain。"""
 
     if settings.llm_provider_mode == "stub":
-        return (
-            StubLLMProvider(
-                provider_name=settings.llm_low_cost_provider_alias,
-                model_name=settings.llm_low_cost_model_name,
-                behavior=settings.llm_stub_behavior,
-                mode="analysis",
-            ),
-            StubLLMProvider(
-                provider_name=settings.llm_high_quality_provider_alias,
-                model_name=settings.llm_high_quality_model_name,
-                behavior=settings.llm_stub_behavior,
-                mode="report",
-            ),
+        low = StubLLMProvider(
+            provider_name=settings.llm_low_cost_provider_alias,
+            model_name=settings.llm_low_cost_model_name,
+            behavior=settings.llm_stub_behavior,
+            mode="analysis",
         )
+        high = StubLLMProvider(
+            provider_name=settings.llm_high_quality_provider_alias,
+            model_name=settings.llm_high_quality_model_name,
+            behavior=settings.llm_stub_behavior,
+            mode="report",
+        )
+        return low, high, None, None
 
-    if settings.llm_provider_mode != "openrouter":
-        raise ValueError("unsupported LLM_PROVIDER_MODE")
-    assert settings.openrouter_api_key is not None
-    shared_kwargs = {
-        "api_key": settings.openrouter_api_key,
-        "base_url": settings.openrouter_base_url,
-        "timeout_seconds": settings.real_llm_timeout_seconds,
-        "max_retries": settings.real_llm_max_retries,
-        "http_referer": settings.openrouter_http_referer,
-        "app_title": settings.openrouter_app_title,
-    }
-    return (
-        OpenRouterLLMProvider(
+    if settings.llm_provider_mode == "openrouter":
+        assert settings.openrouter_api_key is not None
+        shared_kwargs = {
+            "api_key": settings.openrouter_api_key,
+            "base_url": settings.openrouter_base_url,
+            "timeout_seconds": settings.real_llm_timeout_seconds,
+            "max_retries": settings.real_llm_max_retries,
+            "http_referer": settings.openrouter_http_referer,
+            "app_title": settings.openrouter_app_title,
+        }
+        low = OpenRouterLLMProvider(
             provider_name=settings.llm_low_cost_provider_alias,
             model_name=settings.llm_low_cost_model_name,
             **shared_kwargs,
-        ),
-        OpenRouterLLMProvider(
+        )
+        high = OpenRouterLLMProvider(
             provider_name=settings.llm_high_quality_provider_alias,
             model_name=settings.llm_high_quality_model_name,
             **shared_kwargs,
+        )
+        return low, high, None, None
+
+    if settings.llm_provider_mode != "fallback_chain":
+        raise ValueError("unsupported LLM_PROVIDER_MODE")
+
+    endpoints = enabled_chain_endpoints(settings)
+    if not endpoints:
+        raise ValueError("fallback_chain requires at least one enabled provider")
+
+    analysis_bound: list[BoundProvider] = []
+    report_bound: list[BoundProvider] = []
+    for endpoint in endpoints:
+        low_model = endpoint.model_for("low_cost")
+        high_model = endpoint.model_for("high_quality")
+        low_provider = _instantiate_provider(endpoint, model_name=low_model, route_tier="low_cost")
+        high_provider = _instantiate_provider(endpoint, model_name=high_model, route_tier="high_quality")
+        analysis_bound.append(
+            BoundProvider(endpoint=endpoint, provider=low_provider, configured_model=low_model, route_tier="low_cost")
+        )
+        report_bound.append(
+            BoundProvider(endpoint=endpoint, provider=high_provider, configured_model=high_model, route_tier="high_quality")
+        )
+
+    # 多进程共享优先 PostgreSQL；InMemory backend 使用内存 store。
+    if settings.repository_backend == "postgres" and llm_usage is not None:
+        # connection factory 从 usage repository 复用
+        store = PostgresCircuitBreakerStore(llm_usage._factory)
+        attempt_writer = _PostgresAttemptWriter(llm_usage)
+    else:
+        store = InMemoryCircuitBreakerStore()
+        attempt_writer = None
+
+    circuit = CircuitBreaker(
+        store=store,
+        config=CircuitBreakerConfig(
+            failure_threshold=settings.llm_circuit_failure_threshold,
+            open_duration_seconds=settings.llm_circuit_open_duration_seconds,
+            half_open_probe_limit=settings.llm_circuit_half_open_probe_limit,
         ),
     )
+    analysis_chain = ProviderChain(
+        providers=analysis_bound, circuit_breaker=circuit, attempt_writer=attempt_writer
+    )
+    report_chain = ProviderChain(
+        providers=report_bound, circuit_breaker=circuit, attempt_writer=attempt_writer
+    )
+    # 兼容 container.llm_provider 字段：暴露 Chain 首个 low/high。
+    return analysis_bound[0].provider, report_bound[0].provider, analysis_chain, report_chain
+
+
+def _instantiate_provider(endpoint, *, model_name: str, route_tier: str) -> LLMProvider:
+    """按 Provider 名称实例化；模型名只来自配置。"""
+
+    name = endpoint.name
+    if name == "openrouter":
+        assert endpoint.api_key is not None
+        return OpenRouterLLMProvider(
+            provider_name="openrouter",
+            model_name=model_name,
+            api_key=endpoint.api_key,
+            base_url=endpoint.base_url,
+            timeout_seconds=endpoint.attempt_timeout_seconds,
+            max_retries=endpoint.max_retries,
+        )
+    if name == "nvidia":
+        assert endpoint.api_key is not None
+        return NVIDIALLMProvider(
+            provider_name="nvidia",
+            model_name=model_name,
+            api_key=endpoint.api_key,
+            base_url=endpoint.base_url,
+            timeout_seconds=endpoint.attempt_timeout_seconds,
+            max_retries=0,
+        )
+    if name == "gemini":
+        assert endpoint.api_key is not None
+        return GeminiLLMProvider(
+            provider_name="gemini",
+            model_name=model_name,
+            api_key=endpoint.api_key,
+            base_url=endpoint.base_url,
+            timeout_seconds=endpoint.attempt_timeout_seconds,
+        )
+    if name == "local_qwen":
+        return LocalQwenLLMProvider(
+            provider_name="local_qwen",
+            model_name=model_name,
+            base_url=endpoint.base_url,
+            api_key=endpoint.api_key,
+            timeout_seconds=endpoint.attempt_timeout_seconds,
+            max_retries=0,
+        )
+    raise ValueError(f"unknown provider: {name}")
+
+
+class _PostgresAttemptWriter:
+    """将 Attempt 写入 PostgreSQL append-only 表。"""
+
+    def __init__(self, usage: PostgresLLMUsageRepository) -> None:
+        self._usage = usage
+
+    def append_attempt(self, record) -> None:
+        self._usage.append_provider_attempt(record)
+
+    def complete_attempt(self, record) -> None:
+        self._usage.complete_provider_attempt(record)
 
 
 def _build_repositories(

@@ -15,13 +15,26 @@ from uuid import uuid4
 
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import AIAnalysisException
+from app.llm.attempt_models import (
+    ProviderChainCancelledError,
+    ProviderChainExhaustedError,
+    ProviderChainQuotaStopError,
+    outcome_to_safe_dict,
+)
 from app.llm.gateway import LLMGatewayService
 from app.models.ai_analysis import (
-    AIEvidence, AIAnalysisResult, LLMAnalysisInput,
-    LLMProviderAuthenticationError, LLMProviderCitationInvalidError,
-    LLMProviderModelUnavailableError, LLMProviderPartialFailureError,
-    LLMProviderRateLimitError, LLMProviderResponseInvalidError,
-    LLMProviderTimeoutError, LLMProviderUnavailableError,
+    AIEvidence,
+    AIAnalysisResult,
+    LLMAnalysisInput,
+    LLMProviderAuthenticationError,
+    LLMProviderCitationInvalidError,
+    LLMProviderModelUnavailableError,
+    LLMProviderPartialFailureError,
+    LLMProviderRateLimitError,
+    LLMProviderResponseInvalidError,
+    LLMProviderTimeoutError,
+    LLMProviderUnavailableError,
+    ProviderAttemptPublic,
 )
 from app.models.document import DocumentStatus
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
@@ -98,7 +111,10 @@ class AIAnalysisService:
         if outcome.kind == "succeeded" and isinstance(outcome.existing_result, AIAnalysisResult):
             return outcome.existing_result
         if outcome.kind == "reserved":
-            return self._invoke_and_settle(outcome.usage_id, request, evidence, actor, context, policy)
+            return self._invoke_and_settle(
+                outcome.usage_id, request, evidence, actor, context, policy,
+                idempotency_key, estimated_input, estimated_cost,
+            )
         if outcome.kind == "rejected":
             raise AIAnalysisException(
                 ErrorCode.LLM_QUOTA_EXCEEDED, "Daily LLM quota exceeded", 429,
@@ -113,10 +129,28 @@ class AIAnalysisService:
     def _invoke_and_settle(
         self, usage_id: str, request: AIAnalysisRequest, evidence: tuple[AIEvidence, ...],
         actor: CurrentUser, context: PersistentAuditContext, policy,
+        idempotency_key: str, estimated_input: int, estimated_cost: Decimal,
     ) -> AIAnalysisResult:
         started = monotonic()
+        spent_holder = {"cost": Decimal("0")}
+
+        def can_afford(attempt_cost: Decimal) -> bool:
+            # 进入下一个 Provider 前：累计 attempt 费用 + 本 attempt 预估不得超过 request_max 与剩余预占。
+            projected = spent_holder["cost"] + attempt_cost
+            if projected > policy.request_max_cost:
+                return False
+            if self._usage is None:
+                return True
+            return self._usage.can_afford_additional(
+                actor_user_id=actor.user_id,
+                route_tier=policy.route_tier,
+                additional_cost=attempt_cost,
+                additional_tokens=estimated_input + policy.max_output_tokens,
+                policy=policy,
+            )
+
         try:
-            provider_result = self._gateway.analyze(
+            chain_outcome = self._gateway.analyze(
                 operation=_OPERATION,
                 request=LLMAnalysisInput(
                     question=request.question, evidence=evidence,
@@ -124,6 +158,26 @@ class AIAnalysisService:
                     request_id=context.request_id,
                     timeout_seconds=policy.timeout_seconds,
                 ),
+                usage_id=usage_id,
+                idempotency_key=idempotency_key,
+                estimated_input_tokens=estimated_input,
+                can_afford=can_afford,
+            )
+        except ProviderChainQuotaStopError as exc:
+            return self._fail_chain(
+                usage_id, actor, context, "llm_quota_exceeded", 429,
+                ErrorCode.LLM_QUOTA_EXCEEDED, started, policy, exc.failure,
+            )
+        except ProviderChainCancelledError as exc:
+            return self._fail_chain(
+                usage_id, actor, context, "provider_chain_cancelled", 499,
+                ErrorCode.PROVIDER_FAILED, started, policy, exc.failure,
+            )
+        except ProviderChainExhaustedError as exc:
+            status_code, public = self._map_chain_error(exc.failure.error_category)
+            return self._fail_chain(
+                usage_id, actor, context, exc.failure.error_code, status_code,
+                public, started, policy, exc.failure,
             )
         except LLMProviderPartialFailureError as exc:
             return self._fail(
@@ -161,20 +215,78 @@ class AIAnalysisService:
                 ErrorCode.PROVIDER_CITATION_INVALID, started, policy,
             )
         except Exception:
-            return self._fail(usage_id, actor, context, "provider_failed", 502, ErrorCode.PROVIDER_FAILED, started, policy)
+            return self._fail(
+                usage_id, actor, context, "provider_failed", 502, ErrorCode.PROVIDER_FAILED,
+                started, policy,
+            )
 
-        actual_cost = self._cost(provider_result.input_tokens, provider_result.output_tokens, policy)
+        provider_result = chain_outcome.result
+        # stub/openrouter：按 policy 价格；fallback_chain：使用 chain 汇总的 actual_cost（含失败 attempt）
+        if chain_outcome.attempts:
+            actual_cost = chain_outcome.total_actual_cost
+            input_tokens = chain_outcome.total_input_tokens
+            output_tokens = chain_outcome.total_output_tokens
+        else:
+            input_tokens = provider_result.input_tokens
+            output_tokens = provider_result.output_tokens
+            actual_cost = self._cost(input_tokens, output_tokens, policy)
+
+        public_attempts = tuple(
+            ProviderAttemptPublic(
+                provider_name=item.provider_name,
+                model_name=item.model_name,
+                status=item.status,
+                latency_ms=item.latency_ms,
+            )
+            for item in chain_outcome.attempted_providers
+        )
         analysis_id = f"ana-{uuid4().hex}"
         with self._uow.transaction():
             result = self._usage.settle_analysis_success(
                 usage_id=usage_id, analysis_id=analysis_id, answer=provider_result.answer,
-                evidence=evidence, input_tokens=provider_result.input_tokens,
-                output_tokens=provider_result.output_tokens, actual_cost=actual_cost,
+                evidence=evidence, input_tokens=input_tokens,
+                output_tokens=output_tokens, actual_cost=actual_cost,
                 latency_ms=provider_result.latency_ms, provider_request_id=provider_result.provider_request_id,
                 finish_reason=provider_result.finish_reason,
                 usage_source=provider_result.usage_source,
-                actual_model=provider_result.actual_model,
+                actual_model=chain_outcome.actual_model,
+                selected_provider=chain_outcome.provider_name,
+                fallback_used=chain_outcome.fallback_used,
+                attempt_count=chain_outcome.attempt_count,
+                attempted_providers=[
+                    {
+                        "provider_name": a.provider_name,
+                        "model_name": a.model_name,
+                        "status": a.status,
+                        "latency_ms": a.latency_ms,
+                    }
+                    for a in public_attempts
+                ],
             )
+            # 附加 fallback 元数据到返回对象
+            result = AIAnalysisResult(
+                analysis_id=result.analysis_id,
+                answer=result.answer,
+                citations=result.citations,
+                provider_name=chain_outcome.provider_name,
+                model_name=chain_outcome.actual_model,
+                input_tokens=result.input_tokens,
+                output_tokens=result.output_tokens,
+                total_tokens=result.total_tokens,
+                actual_cost=result.actual_cost,
+                currency=result.currency,
+                status=result.status,
+                created_at=result.created_at,
+                route_tier=result.route_tier,
+                estimated_cost=result.estimated_cost,
+                actor_user_id=result.actor_user_id,
+                task_id=result.task_id,
+                usage_id=usage_id,
+                fallback_used=chain_outcome.fallback_used,
+                attempt_count=chain_outcome.attempt_count,
+                attempted_providers=public_attempts,
+            )
+            audit_meta = outcome_to_safe_dict(chain_outcome)
             self._audit.record_ai_analysis_event(
                 context=context, actor=actor, action="analysis.execute.succeeded",
                 result="success", status_code=200, usage_id=usage_id,
@@ -182,8 +294,42 @@ class AIAnalysisService:
                 cost=str(result.actual_cost), currency=result.currency,
                 operation=_OPERATION, route_tier=policy.route_tier,
                 provider=result.provider_name, model=result.model_name,
+                **audit_meta,
             )
         return result
+
+    def _fail_chain(
+        self, usage_id: str, actor: CurrentUser, context: PersistentAuditContext,
+        error_code: str, status_code: int, public_code: ErrorCode, started: float, policy,
+        failure,
+    ):
+        assert self._usage is not None
+        latency = max(0, int((monotonic() - started) * 1000))
+        with self._uow.transaction():
+            self._usage.settle_failure(
+                usage_id=usage_id, error_code=error_code, latency_ms=latency,
+                input_tokens=failure.total_input_tokens,
+                output_tokens=failure.total_output_tokens,
+                actual_cost=failure.total_actual_cost,
+                fallback_used=failure.attempt_count > 1,
+                attempt_count=failure.attempt_count,
+                attempted_providers=[
+                    {
+                        "provider_name": a.provider_name,
+                        "model_name": a.model_name,
+                        "status": a.status,
+                        "latency_ms": a.latency_ms,
+                    }
+                    for a in failure.attempted_providers
+                ],
+            )
+            self._audit.record_ai_analysis_event(
+                context=context, actor=actor, action="analysis.execute.failed",
+                result="failure", status_code=status_code, error_code=error_code,
+                usage_id=usage_id, operation=_OPERATION, route_tier=policy.route_tier,
+                **outcome_to_safe_dict(failure),
+            )
+        raise AIAnalysisException(public_code, "AI analysis provider failed", status_code)
 
     def _fail(
         self, usage_id: str, actor: CurrentUser, context: PersistentAuditContext,
@@ -204,6 +350,21 @@ class AIAnalysisService:
                 usage_id=usage_id, operation=_OPERATION, route_tier=policy.route_tier,
             )
         raise AIAnalysisException(public_code, "AI analysis provider failed", status_code)
+
+    def _map_chain_error(self, category: str) -> tuple[int, ErrorCode]:
+        mapping = {
+            "timeout": (504, ErrorCode.PROVIDER_TIMEOUT),
+            "rate_limited": (429, ErrorCode.PROVIDER_RATE_LIMITED),
+            "authentication": (502, ErrorCode.PROVIDER_AUTHENTICATION_FAILED),
+            "configuration_error": (502, ErrorCode.PROVIDER_AUTHENTICATION_FAILED),
+            "model_unavailable": (502, ErrorCode.PROVIDER_MODEL_UNAVAILABLE),
+            "unavailable": (502, ErrorCode.PROVIDER_UNAVAILABLE),
+            "connection_failure": (502, ErrorCode.PROVIDER_UNAVAILABLE),
+            "citation_invalid": (502, ErrorCode.PROVIDER_CITATION_INVALID),
+            "response_invalid": (502, ErrorCode.PROVIDER_RESPONSE_INVALID),
+            "partial_failure": (502, ErrorCode.PROVIDER_FAILED),
+        }
+        return mapping.get(category, (502, ErrorCode.PROVIDER_FAILED))
 
     def _load_evidence(
         self, request: AIAnalysisRequest, max_count: int, max_chars: int, max_input_tokens: int,

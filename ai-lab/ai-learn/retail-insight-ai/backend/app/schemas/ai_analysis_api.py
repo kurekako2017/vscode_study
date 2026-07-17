@@ -43,18 +43,37 @@ class AIAnalysisUsageResponse(BaseModel):
     total_tokens: int
 
 
+class AttemptedProviderSummary(BaseModel):
+    """安全摘要：仅 provider/model/status/latency；无 URL/Key/原始错误。"""
+
+    provider_name: str
+    model_name: str
+    status: str
+    latency_ms: int | None = None
+
+
 class AIAnalysisResponse(BaseModel):
     analysis_id: str
     answer: str
     citations: list[AIAnalysisCitationResponse]
     provider: str
     model: str
+    provider_name: str | None = None
+    model_name: str | None = None
     route_tier: str = "low_cost"
     usage: AIAnalysisUsageResponse
     cost: Decimal
     currency: str
     status: str
     created_at: datetime
+    usage_id: str | None = None
+    fallback_used: bool = False
+    attempt_count: int = 1
+    attempted_providers: list[AttemptedProviderSummary] = Field(default_factory=list)
+    total_input_tokens: int | None = None
+    total_output_tokens: int | None = None
+    total_tokens: int | None = None
+    total_actual_cost: Decimal | None = None
 
 
-__all__ = ["AIAnalysisRequest", "AIAnalysisResponse"]
+__all__ = ["AIAnalysisRequest", "AIAnalysisResponse", "AttemptedProviderSummary"]

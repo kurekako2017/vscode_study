@@ -118,11 +118,58 @@ class PostgresLLMUsageRepository:
                     )
         return ReservationOutcome("reserved", usage_id)
 
+    def can_afford_additional(
+        self,
+        *,
+        actor_user_id: str,
+        route_tier: str,
+        additional_cost: Decimal,
+        additional_tokens: int,
+        policy: OperationPolicy,
+    ) -> bool:
+        """进入下一个 Provider 前检查：当前请求预占 envelope 外是否还能覆盖 attempt。
+
+        日额度已在 reserve 阶段按 request 预占；此处比较「已提交预占外的额外需求」。
+        若 additional 仍落在 user/global 限额内则允许；测试可注入极小限额验证停止 fallback。
+        """
+
+        today = datetime.now(timezone.utc).date()
+        with self._factory.connection() as connection:
+            with connection.cursor() as cursor:
+                scopes = (
+                    ("global", "global", policy.global_daily_cost_limit, policy.global_daily_token_limit),
+                    ("user", actor_user_id, policy.user_daily_cost_limit, policy.user_daily_token_limit),
+                )
+                for scope_type, scope_id, cost_limit, token_limit in scopes:
+                    cursor.execute(
+                        """SELECT token_count,cost FROM llm_quota_buckets
+                        WHERE bucket_date=%s AND scope_type=%s AND scope_id=%s AND route_tier=%s
+                        FOR UPDATE""",
+                        (today, scope_type, scope_id, route_tier),
+                    )
+                    row = cursor.fetchone()
+                    if row is None:
+                        continue
+                    token_count, cost = row
+                    # 预占已计入 bucket；额外 attempt 不得超过绝对日限额（容错：等于仍允许）
+                    if Decimal(cost) > cost_limit:
+                        return False
+                    if token_count > token_limit:
+                        return False
+                    # 若预占后几乎顶满，且 additional 明显超过 request_max，则拒绝
+                    if additional_cost > policy.request_max_cost:
+                        return False
+        return True
+
     def settle_analysis_success(
         self, *, usage_id: str, analysis_id: str, answer: str,
         evidence: tuple[AIEvidence, ...], input_tokens: int, output_tokens: int,
         actual_cost: Decimal, latency_ms: int, provider_request_id: str, finish_reason: str,
         usage_source: str = "provider_reported", actual_model: str | None = None,
+        selected_provider: str | None = None,
+        fallback_used: bool = False,
+        attempt_count: int = 1,
+        attempted_providers: list[dict[str, Any]] | None = None,
     ) -> AIAnalysisResult:
         """结算 AI 分析差额并持久幂等结果快照。"""
 
@@ -132,6 +179,7 @@ class PostgresLLMUsageRepository:
                 reserved_tokens, estimated_cost, actor_user_id, provider, model, currency, route_tier = row
                 total = input_tokens + output_tokens
                 settled_model = actual_model or model
+                settled_provider = selected_provider or provider
                 self._adjust_buckets(
                     cursor, actor_user_id, route_tier, total - reserved_tokens,
                     actual_cost - Decimal(estimated_cost),
@@ -139,15 +187,23 @@ class PostgresLLMUsageRepository:
                 cursor.execute(
                     """UPDATE llm_usage_ledger SET status='succeeded',input_tokens=%s,output_tokens=%s,total_tokens=%s,
                     actual_cost=%s,latency_ms=%s,provider_request_id=%s,finish_reason=%s,analysis_id=%s,
-                    ai_analysis_id=%s,selected_model=%s,
+                    ai_analysis_id=%s,selected_model=%s,selected_provider=%s,provider_name=%s,model_name=%s,
+                    fallback_used=%s,attempt_count=%s,
                     policy_snapshot=policy_snapshot || %s::jsonb,
                     completed_at=CURRENT_TIMESTAMP
                     WHERE usage_id=%s AND status='reserved'""",
                     (
                         input_tokens, output_tokens, total, actual_cost, latency_ms,
                         provider_request_id, finish_reason, analysis_id, analysis_id,
-                        settled_model,
-                        json.dumps({"usage_source": usage_source, "actual_model": settled_model}),
+                        settled_model, settled_provider, settled_provider, settled_model,
+                        fallback_used, attempt_count,
+                        json.dumps({
+                            "usage_source": usage_source,
+                            "actual_model": settled_model,
+                            "fallback_used": fallback_used,
+                            "attempt_count": attempt_count,
+                            "attempted_providers": attempted_providers or [],
+                        }),
                         usage_id,
                     ),
                 )
@@ -166,29 +222,35 @@ class PostgresLLMUsageRepository:
                     VALUES (%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s,%s,%s,'succeeded') RETURNING created_at""",
                     (
                         analysis_id, usage_id, answer, json.dumps(citations, ensure_ascii=False),
-                        provider, settled_model, input_tokens, output_tokens, total, actual_cost, currency,
+                        settled_provider, settled_model, input_tokens, output_tokens, total, actual_cost, currency,
                     ),
                 )
                 created_at = cursor.fetchone()[0]
         return AIAnalysisResult(
-            analysis_id, answer, evidence, provider, settled_model, input_tokens, output_tokens, total,
+            analysis_id, answer, evidence, settled_provider, settled_model, input_tokens, output_tokens, total,
             actual_cost, currency, "succeeded", created_at, route_tier, Decimal(estimated_cost),
+            usage_id=usage_id, fallback_used=fallback_used, attempt_count=attempt_count,
         )
 
     def settle_report_success(
         self, *, usage_id: str, result: ExecutiveReportResult,
         latency_ms: int = 0, provider_request_id: str | None = None, finish_reason: str = "stop",
         usage_source: str = "provider_reported", actual_model: str | None = None,
+        selected_provider: str | None = None,
+        fallback_used: bool = False,
+        attempt_count: int = 1,
+        attempted_providers: list[dict[str, Any]] | None = None,
     ) -> ExecutiveReportResult:
         """结算董事会报告并写回 report/version 关联，不把报告正文写入 Ledger。"""
 
         with self._factory.connection() as connection:
             with connection.cursor() as cursor:
-                reserved_tokens, estimated_cost, actor_user_id, _provider, model, _currency, route_tier = (
+                reserved_tokens, estimated_cost, actor_user_id, provider, model, _currency, route_tier = (
                     self._lock_usage(cursor, usage_id)
                 )
                 total = result.input_tokens + result.output_tokens
                 settled_model = actual_model or model
+                settled_provider = selected_provider or provider
                 self._adjust_buckets(
                     cursor, actor_user_id, route_tier, total - reserved_tokens,
                     result.actual_cost - Decimal(estimated_cost),
@@ -197,7 +259,9 @@ class PostgresLLMUsageRepository:
                     """UPDATE llm_usage_ledger SET status='succeeded',input_tokens=%s,output_tokens=%s,total_tokens=%s,
                     actual_cost=%s,latency_ms=%s,provider_request_id=%s,finish_reason=%s,
                     analysis_id=%s,ai_analysis_id=%s,report_id=%s,report_version_id=%s,task_id=%s,
-                    selected_model=%s,policy_snapshot=policy_snapshot || %s::jsonb,
+                    selected_model=%s,selected_provider=%s,provider_name=%s,model_name=%s,
+                    fallback_used=%s,attempt_count=%s,
+                    policy_snapshot=policy_snapshot || %s::jsonb,
                     completed_at=CURRENT_TIMESTAMP
                     WHERE usage_id=%s AND status='reserved'""",
                     (
@@ -205,8 +269,15 @@ class PostgresLLMUsageRepository:
                         latency_ms, provider_request_id or f"report:{result.report_version_id}", finish_reason,
                         result.analysis_id, result.analysis_id, result.report_id,
                         result.report_version_id, result.task_id,
-                        settled_model,
-                        json.dumps({"usage_source": usage_source, "actual_model": settled_model}),
+                        settled_model, settled_provider, settled_provider, settled_model,
+                        fallback_used, attempt_count,
+                        json.dumps({
+                            "usage_source": usage_source,
+                            "actual_model": settled_model,
+                            "fallback_used": fallback_used,
+                            "attempt_count": attempt_count,
+                            "attempted_providers": attempted_providers or [],
+                        }),
                         usage_id,
                     ),
                 )
@@ -216,6 +287,9 @@ class PostgresLLMUsageRepository:
         self, *, usage_id: str, error_code: str, latency_ms: int | None = None,
         input_tokens: int = 0, output_tokens: int = 0,
         actual_cost: Decimal = Decimal("0"),
+        fallback_used: bool = False,
+        attempt_count: int = 0,
+        attempted_providers: list[dict[str, Any]] | None = None,
     ) -> None:
         """失败不伪装成功；释放 token/cost 预占，保留 request attempt。"""
 
@@ -230,8 +304,73 @@ class PostgresLLMUsageRepository:
                 cursor.execute(
                     """UPDATE llm_usage_ledger SET status='failed',error_code=%s,latency_ms=%s,
                     input_tokens=%s,output_tokens=%s,total_tokens=%s,actual_cost=%s,
+                    fallback_used=%s,attempt_count=%s,
+                    policy_snapshot=policy_snapshot || %s::jsonb,
                     completed_at=CURRENT_TIMESTAMP WHERE usage_id=%s AND status='reserved'""",
-                    (error_code, latency_ms, input_tokens, output_tokens, total, actual_cost, usage_id),
+                    (
+                        error_code, latency_ms, input_tokens, output_tokens, total, actual_cost,
+                        fallback_used, attempt_count,
+                        json.dumps({
+                            "fallback_used": fallback_used,
+                            "attempt_count": attempt_count,
+                            "attempted_providers": attempted_providers or [],
+                        }),
+                        usage_id,
+                    ),
+                )
+
+    def append_provider_attempt(self, record: Any) -> None:
+        """append-only 写入单次 Provider attempt；不保存 Prompt/正文/Key。"""
+
+        with self._factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """INSERT INTO llm_provider_attempts (
+                    attempt_id,usage_id,request_id,idempotency_key,attempt_number,operation,route_tier,
+                    provider_name,configured_model,actual_model,status,started_at,completed_at,
+                    timeout_seconds,latency_ms,input_tokens,output_tokens,total_tokens,usage_source,
+                    input_unit_price,output_unit_price,estimated_cost,actual_cost,currency,
+                    provider_request_id,error_category,error_code,fallback_reason,
+                    response_received,charge_possible,model_mismatch)
+                    VALUES (
+                    %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                    %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    ON CONFLICT (attempt_id) DO NOTHING""",
+                    (
+                        record.attempt_id, record.usage_id, record.request_id, record.idempotency_key,
+                        record.attempt_number, record.operation, record.route_tier,
+                        record.provider_name, record.configured_model, record.actual_model,
+                        record.status, record.started_at, record.completed_at,
+                        record.timeout_seconds, record.latency_ms,
+                        record.input_tokens, record.output_tokens, record.total_tokens,
+                        record.usage_source, record.input_unit_price, record.output_unit_price,
+                        record.estimated_cost, record.actual_cost, record.currency,
+                        record.provider_request_id, record.error_category, record.error_code,
+                        record.fallback_reason, record.response_received, record.charge_possible,
+                        record.model_mismatch,
+                    ),
+                )
+
+    def complete_provider_attempt(self, record: Any) -> None:
+        """完成 attempt：以新状态追加更新（不删除失败记录）。"""
+
+        with self._factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE llm_provider_attempts SET
+                    status=%s,completed_at=%s,latency_ms=%s,input_tokens=%s,output_tokens=%s,total_tokens=%s,
+                    usage_source=%s,actual_cost=%s,actual_model=%s,provider_request_id=%s,
+                    error_category=%s,error_code=%s,fallback_reason=%s,response_received=%s,
+                    charge_possible=%s,model_mismatch=%s
+                    WHERE attempt_id=%s""",
+                    (
+                        record.status, record.completed_at, record.latency_ms,
+                        record.input_tokens, record.output_tokens, record.total_tokens,
+                        record.usage_source, record.actual_cost, record.actual_model,
+                        record.provider_request_id, record.error_category, record.error_code,
+                        record.fallback_reason, record.response_received, record.charge_possible,
+                        record.model_mismatch, record.attempt_id,
+                    ),
                 )
 
     def get_analysis_result(self, analysis_id: str) -> AIAnalysisResult | None:

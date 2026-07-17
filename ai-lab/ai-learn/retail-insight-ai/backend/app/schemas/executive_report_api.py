@@ -7,7 +7,11 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.schemas.ai_analysis_api import AIAnalysisCitationResponse, AIAnalysisUsageResponse
+from app.schemas.ai_analysis_api import (
+    AIAnalysisCitationResponse,
+    AIAnalysisUsageResponse,
+    AttemptedProviderSummary,
+)
 
 
 class ExecutiveReportRequest(BaseModel):
@@ -46,6 +50,8 @@ class ExecutiveReportResponse(BaseModel):
     citations: list[AIAnalysisCitationResponse]
     provider: str
     model: str
+    provider_name: str | None = None
+    model_name: str | None = None
     route_tier: str
     usage: AIAnalysisUsageResponse
     estimated_cost: Decimal
@@ -55,6 +61,13 @@ class ExecutiveReportResponse(BaseModel):
     analysis_id: str
     usage_id: str
     created_at: datetime
+    fallback_used: bool = False
+    attempt_count: int = 1
+    attempted_providers: list[AttemptedProviderSummary] = Field(default_factory=list)
+    total_input_tokens: int | None = None
+    total_output_tokens: int | None = None
+    total_tokens: int | None = None
+    total_actual_cost: Decimal | None = None
 
 
 __all__ = ["ExecutiveReportRequest", "ExecutiveReportResponse"]

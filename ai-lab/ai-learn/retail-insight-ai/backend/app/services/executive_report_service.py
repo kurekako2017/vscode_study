@@ -16,6 +16,12 @@ from uuid import uuid4
 
 from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import AIAnalysisException
+from app.llm.attempt_models import (
+    ProviderChainCancelledError,
+    ProviderChainExhaustedError,
+    ProviderChainQuotaStopError,
+    outcome_to_safe_dict,
+)
 from app.llm.gateway import LLMGatewayService
 from app.models.ai_analysis import (
     AIEvidence,
@@ -29,6 +35,7 @@ from app.models.ai_analysis import (
     LLMProviderTimeoutError,
     LLMProviderUnavailableError,
     LLMReportInput,
+    ProviderAttemptPublic,
 )
 from app.models.approval import ReportVersion
 from app.models.document import DocumentStatus
@@ -157,6 +164,7 @@ class ExecutiveReportService:
         if outcome.kind == "reserved":
             return self._invoke_and_settle(
                 outcome.usage_id, request, analysis, evidence, actor, context, policy, estimated_cost, task_id,
+                idempotency_key=idempotency_key, estimated_input=estimated_input,
             )
         if outcome.kind == "rejected":
             raise AIAnalysisException(
@@ -172,11 +180,25 @@ class ExecutiveReportService:
     def _invoke_and_settle(
         self, usage_id: str, request: ExecutiveReportRequest, analysis, evidence,
         actor: CurrentUser, context: PersistentAuditContext, policy, estimated_cost: Decimal,
-        task_id: str | None,
+        task_id: str | None, idempotency_key: str = "", estimated_input: int = 1,
     ) -> ExecutiveReportResult:
         started = monotonic()
+
+        def can_afford(attempt_cost: Decimal) -> bool:
+            if attempt_cost > policy.request_max_cost:
+                return False
+            if self._usage is None:
+                return True
+            return self._usage.can_afford_additional(
+                actor_user_id=actor.user_id,
+                route_tier=policy.route_tier,
+                additional_cost=attempt_cost,
+                additional_tokens=estimated_input + policy.max_output_tokens,
+                policy=policy,
+            )
+
         try:
-            provider_result = self._gateway.generate_report(
+            chain_outcome = self._gateway.generate_report(
                 operation=_OPERATION,
                 request=LLMReportInput(
                     title=request.title,
@@ -186,6 +208,26 @@ class ExecutiveReportService:
                     request_id=context.request_id,
                     timeout_seconds=policy.timeout_seconds,
                 ),
+                usage_id=usage_id,
+                idempotency_key=idempotency_key or context.request_id,
+                estimated_input_tokens=estimated_input,
+                can_afford=can_afford,
+            )
+        except ProviderChainQuotaStopError as exc:
+            return self._fail_chain(
+                usage_id, actor, context, "llm_quota_exceeded", 429,
+                ErrorCode.LLM_QUOTA_EXCEEDED, started, policy, request.ai_analysis_id, exc.failure,
+            )
+        except ProviderChainCancelledError as exc:
+            return self._fail_chain(
+                usage_id, actor, context, "provider_chain_cancelled", 499,
+                ErrorCode.PROVIDER_FAILED, started, policy, request.ai_analysis_id, exc.failure,
+            )
+        except ProviderChainExhaustedError as exc:
+            status_code, public = self._map_chain_error(exc.failure.error_category)
+            return self._fail_chain(
+                usage_id, actor, context, exc.failure.error_code, status_code,
+                public, started, policy, request.ai_analysis_id, exc.failure,
             )
         except LLMProviderPartialFailureError as exc:
             return self._fail(
@@ -234,7 +276,24 @@ class ExecutiveReportService:
                 started, policy, request.ai_analysis_id,
             )
 
-        actual_cost = self._cost(provider_result.input_tokens, provider_result.output_tokens, policy)
+        provider_result = chain_outcome.result
+        if chain_outcome.attempts:
+            actual_cost = chain_outcome.total_actual_cost
+            input_tokens = chain_outcome.total_input_tokens
+            output_tokens = chain_outcome.total_output_tokens
+        else:
+            input_tokens = provider_result.input_tokens
+            output_tokens = provider_result.output_tokens
+            actual_cost = self._cost(input_tokens, output_tokens, policy)
+        public_attempts = tuple(
+            ProviderAttemptPublic(
+                provider_name=item.provider_name,
+                model_name=item.model_name,
+                status=item.status,
+                latency_ms=item.latency_ms,
+            )
+            for item in chain_outcome.attempted_providers
+        )
         latency_ms = max(1, int((monotonic() - started) * 1000))
         resolved_task_id = task_id or f"task-er-{uuid4().hex}"
         report_version_id = f"rv-{uuid4().hex}"
@@ -249,7 +308,7 @@ class ExecutiveReportService:
             report = Report(
                 task_id=resolved_task_id,
                 markdown=provider_result.markdown,
-                provider=policy.provider_alias,
+                provider=chain_outcome.provider_name,
                 status=ReportStatus.GENERATED,
             )
             previous = self._approvals.get_latest_report_version(resolved_task_id)
@@ -275,12 +334,12 @@ class ExecutiveReportService:
                 risks=provider_result.risks,
                 recommendations=provider_result.recommendations,
                 citations=evidence,
-                provider_name=policy.provider_alias,
-                model_name=policy.model_name,
+                provider_name=chain_outcome.provider_name,
+                model_name=chain_outcome.actual_model,
                 route_tier=policy.route_tier,
-                input_tokens=provider_result.input_tokens,
-                output_tokens=provider_result.output_tokens,
-                total_tokens=provider_result.input_tokens + provider_result.output_tokens,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                total_tokens=input_tokens + output_tokens,
                 estimated_cost=estimated_cost,
                 actual_cost=actual_cost,
                 currency=policy.currency,
@@ -289,13 +348,56 @@ class ExecutiveReportService:
                 analysis_id=request.ai_analysis_id,
                 usage_id=usage_id,
                 markdown=provider_result.markdown,
+                fallback_used=chain_outcome.fallback_used,
+                attempt_count=chain_outcome.attempt_count,
+                attempted_providers=public_attempts,
             )
             settled = self._usage.settle_report_success(
                 usage_id=usage_id, result=result, latency_ms=latency_ms,
                 provider_request_id=provider_result.provider_request_id,
                 finish_reason=provider_result.finish_reason,
                 usage_source=provider_result.usage_source,
-                actual_model=provider_result.actual_model,
+                actual_model=chain_outcome.actual_model,
+                selected_provider=chain_outcome.provider_name,
+                fallback_used=chain_outcome.fallback_used,
+                attempt_count=chain_outcome.attempt_count,
+                attempted_providers=[
+                    {
+                        "provider_name": a.provider_name,
+                        "model_name": a.model_name,
+                        "status": a.status,
+                        "latency_ms": a.latency_ms,
+                    }
+                    for a in public_attempts
+                ],
+            )
+            settled = ExecutiveReportResult(
+                report_id=settled.report_id,
+                report_version_id=settled.report_version_id,
+                task_id=settled.task_id,
+                title=settled.title,
+                executive_summary=settled.executive_summary,
+                kpi_findings=settled.kpi_findings,
+                risks=settled.risks,
+                recommendations=settled.recommendations,
+                citations=settled.citations,
+                provider_name=chain_outcome.provider_name,
+                model_name=chain_outcome.actual_model,
+                route_tier=settled.route_tier,
+                input_tokens=settled.input_tokens,
+                output_tokens=settled.output_tokens,
+                total_tokens=settled.total_tokens,
+                estimated_cost=settled.estimated_cost,
+                actual_cost=settled.actual_cost,
+                currency=settled.currency,
+                status=settled.status,
+                created_at=settled.created_at,
+                analysis_id=settled.analysis_id,
+                usage_id=settled.usage_id,
+                markdown=settled.markdown,
+                fallback_used=chain_outcome.fallback_used,
+                attempt_count=chain_outcome.attempt_count,
+                attempted_providers=public_attempts,
             )
             self._audit.record_executive_report_event(
                 context=context, actor=actor, action="executive_report.generated",
@@ -304,9 +406,58 @@ class ExecutiveReportService:
                 report_version_id=version.id, token_count=settled.total_tokens,
                 cost=str(settled.actual_cost), currency=settled.currency,
                 operation=_OPERATION, route_tier=policy.route_tier,
-                provider=policy.provider_alias, model=policy.model_name,
+                provider=chain_outcome.provider_name, model=chain_outcome.actual_model,
+                **outcome_to_safe_dict(chain_outcome),
             )
         return settled
+
+    def _fail_chain(
+        self, usage_id: str, actor: CurrentUser, context: PersistentAuditContext,
+        error_code: str, status_code: int, public_code: ErrorCode, started: float, policy,
+        analysis_id: str, failure,
+    ):
+        assert self._usage is not None
+        latency = max(0, int((monotonic() - started) * 1000))
+        with self._uow.transaction():
+            self._usage.settle_failure(
+                usage_id=usage_id, error_code=error_code, latency_ms=latency,
+                input_tokens=failure.total_input_tokens,
+                output_tokens=failure.total_output_tokens,
+                actual_cost=failure.total_actual_cost,
+                fallback_used=failure.attempt_count > 1,
+                attempt_count=failure.attempt_count,
+                attempted_providers=[
+                    {
+                        "provider_name": a.provider_name,
+                        "model_name": a.model_name,
+                        "status": a.status,
+                        "latency_ms": a.latency_ms,
+                    }
+                    for a in failure.attempted_providers
+                ],
+            )
+            self._audit.record_executive_report_event(
+                context=context, actor=actor, action="executive_report.failed",
+                result="failure", status_code=status_code, error_code=error_code,
+                usage_id=usage_id, operation=_OPERATION, route_tier=policy.route_tier,
+                analysis_id=analysis_id, **outcome_to_safe_dict(failure),
+            )
+        raise AIAnalysisException(public_code, "Executive report provider failed", status_code)
+
+    def _map_chain_error(self, category: str) -> tuple[int, ErrorCode]:
+        mapping = {
+            "timeout": (504, ErrorCode.PROVIDER_TIMEOUT),
+            "rate_limited": (429, ErrorCode.PROVIDER_RATE_LIMITED),
+            "authentication": (502, ErrorCode.PROVIDER_AUTHENTICATION_FAILED),
+            "configuration_error": (502, ErrorCode.PROVIDER_AUTHENTICATION_FAILED),
+            "model_unavailable": (502, ErrorCode.PROVIDER_MODEL_UNAVAILABLE),
+            "unavailable": (502, ErrorCode.PROVIDER_UNAVAILABLE),
+            "connection_failure": (502, ErrorCode.PROVIDER_UNAVAILABLE),
+            "citation_invalid": (502, ErrorCode.PROVIDER_CITATION_INVALID),
+            "response_invalid": (502, ErrorCode.PROVIDER_RESPONSE_INVALID),
+            "partial_failure": (502, ErrorCode.PROVIDER_FAILED),
+        }
+        return mapping.get(category, (502, ErrorCode.PROVIDER_FAILED))
 
     def _fail(
         self, usage_id: str, actor: CurrentUser, context: PersistentAuditContext,

@@ -8,7 +8,11 @@ from fastapi import APIRouter, Depends, Header, Request
 
 from app.api.dependencies import get_executive_report_service
 from app.observability.logging import get_request_id
-from app.schemas.ai_analysis_api import AIAnalysisCitationResponse, AIAnalysisUsageResponse
+from app.schemas.ai_analysis_api import (
+    AIAnalysisCitationResponse,
+    AIAnalysisUsageResponse,
+    AttemptedProviderSummary,
+)
 from app.schemas.common import ApiResponse, success_response
 from app.schemas.executive_report_api import ExecutiveReportRequest, ExecutiveReportResponse
 from app.security.contracts import CurrentUser
@@ -40,6 +44,15 @@ async def generate_executive_report(
             resource_id="executive-report", current_user=current_user,
         ),
     )
+    attempted = [
+        AttemptedProviderSummary(
+            provider_name=item.provider_name,
+            model_name=item.model_name,
+            status=item.status,
+            latency_ms=item.latency_ms,
+        )
+        for item in result.attempted_providers
+    ]
     data = ExecutiveReportResponse(
         report_id=result.report_id,
         report_version_id=result.report_version_id,
@@ -58,6 +71,8 @@ async def generate_executive_report(
         ],
         provider=result.provider_name,
         model=result.model_name,
+        provider_name=result.provider_name,
+        model_name=result.model_name,
         route_tier=result.route_tier,
         usage=AIAnalysisUsageResponse(
             input_tokens=result.input_tokens,
@@ -71,6 +86,13 @@ async def generate_executive_report(
         analysis_id=result.analysis_id,
         usage_id=result.usage_id,
         created_at=result.created_at,
+        fallback_used=result.fallback_used,
+        attempt_count=result.attempt_count,
+        attempted_providers=attempted,
+        total_input_tokens=result.input_tokens,
+        total_output_tokens=result.output_tokens,
+        total_tokens=result.total_tokens,
+        total_actual_cost=result.actual_cost,
     )
     return success_response(data, get_request_id())
 

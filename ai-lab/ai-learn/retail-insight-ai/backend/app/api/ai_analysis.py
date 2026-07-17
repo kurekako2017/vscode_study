@@ -9,7 +9,11 @@ from fastapi import APIRouter, Depends, Header, Request
 from app.api.dependencies import get_ai_analysis_service
 from app.observability.logging import get_request_id
 from app.schemas.ai_analysis_api import (
-    AIAnalysisCitationResponse, AIAnalysisRequest, AIAnalysisResponse, AIAnalysisUsageResponse,
+    AIAnalysisCitationResponse,
+    AIAnalysisRequest,
+    AIAnalysisResponse,
+    AIAnalysisUsageResponse,
+    AttemptedProviderSummary,
 )
 from app.schemas.common import ApiResponse, success_response
 from app.security.contracts import CurrentUser
@@ -38,15 +42,34 @@ async def execute_ai_analysis(
             resource_id="ai-analysis", current_user=current_user,
         ),
     )
+    attempted = [
+        AttemptedProviderSummary(
+            provider_name=item.provider_name,
+            model_name=item.model_name,
+            status=item.status,
+            latency_ms=item.latency_ms,
+        )
+        for item in result.attempted_providers
+    ]
     data = AIAnalysisResponse(
         analysis_id=result.analysis_id, answer=result.answer,
         citations=[AIAnalysisCitationResponse(document_id=item.document_id, chunk_id=item.chunk_id,
                                               score=item.score, excerpt=item.excerpt) for item in result.citations],
-        provider=result.provider_name, model=result.model_name, route_tier=result.route_tier,
+        provider=result.provider_name, model=result.model_name,
+        provider_name=result.provider_name, model_name=result.model_name,
+        route_tier=result.route_tier,
         usage=AIAnalysisUsageResponse(input_tokens=result.input_tokens, output_tokens=result.output_tokens,
                                       total_tokens=result.total_tokens),
         cost=result.actual_cost, currency=result.currency, status=result.status,
         created_at=result.created_at,
+        usage_id=result.usage_id,
+        fallback_used=result.fallback_used,
+        attempt_count=result.attempt_count,
+        attempted_providers=attempted,
+        total_input_tokens=result.input_tokens,
+        total_output_tokens=result.output_tokens,
+        total_tokens=result.total_tokens,
+        total_actual_cost=result.actual_cost,
     )
     return success_response(data, get_request_id())
 

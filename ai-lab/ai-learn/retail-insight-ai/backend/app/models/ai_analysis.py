@@ -85,6 +85,16 @@ class LLMReportResult:
 
 
 @dataclass(frozen=True)
+class ProviderAttemptPublic:
+    """API 安全摘要：仅 provider/model/status/latency。"""
+
+    provider_name: str
+    model_name: str
+    status: str
+    latency_ms: int | None = None
+
+
+@dataclass(frozen=True)
 class AIAnalysisResult:
     analysis_id: str
     answer: str
@@ -102,6 +112,10 @@ class AIAnalysisResult:
     estimated_cost: Decimal | None = None
     actor_user_id: str | None = None
     task_id: str | None = None
+    usage_id: str | None = None
+    fallback_used: bool = False
+    attempt_count: int = 1
+    attempted_providers: tuple[ProviderAttemptPublic, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -129,6 +143,9 @@ class ExecutiveReportResult:
     analysis_id: str
     usage_id: str
     markdown: str
+    fallback_used: bool = False
+    attempt_count: int = 1
+    attempted_providers: tuple[ProviderAttemptPublic, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -184,5 +201,5 @@ __all__ = [
     "LLMProviderAuthenticationError", "LLMProviderModelUnavailableError",
     "LLMProviderUnavailableError", "LLMProviderResponseInvalidError",
     "LLMProviderCitationInvalidError",
-    "LLMUsageStatus", "ReservationOutcome",
+    "LLMUsageStatus", "ProviderAttemptPublic", "ReservationOutcome",
 ]
