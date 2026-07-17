@@ -8,6 +8,7 @@
 
 | 场景 | 权威入口 |
 |---|---|
+| **部署后验收 / 生产差距** | **[`docs/development/DEPLOYMENT_GUIDE.md`](docs/development/DEPLOYMENT_GUIDE.md)**（首次 Compose、Health、Seed、禁止 `down -v`） |
 | ERIP V1.0 正式启动 | Docker Compose + PostgreSQL（RUNBOOK Appendix M） |
 | 本地 PostgreSQL 联调 | `REPOSITORY_BACKEND=postgres` + Backend/Frontend |
 | 快速单元测试 / 教学 | InMemory，**仅辅助**（不作业务验收） |

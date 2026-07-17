@@ -1,5 +1,13 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 部署指南（文档）
+
+- 重写/定稿权威部署文档 `docs/development/DEPLOYMENT_GUIDE.md`（22 节可执行结构）：
+  - 三种模式表；Compose 架构；环境变量/Secret；首次部署命令；Alembic head `20260717_08_ai_runtime`
+  - AI Runtime / Seed / 禁止 `down -v`；Backup/Restore 模板（不实际执行）；Upgrade/Rollback；生产清单与未交付边界
+  - 明确：本地开发不需要 Docker，但业务联调必须 PostgreSQL；Docker Volume 与宿主库分离
+- README / RUNBOOK / VERIFY 最小入口链接（不整体重写）
+
 ## 2026-07-17 AI Runtime 持久化 + 页面衔接
 
 ### Backend

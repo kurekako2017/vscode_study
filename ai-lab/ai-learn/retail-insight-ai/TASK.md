@@ -1,6 +1,15 @@
 # retail-insight-ai 当前任务
 
-## 2026-07-17 AI Runtime 持久化 + 页面衔接（本轮最高优先级 / 六项验收完成）
+## 2026-07-17 部署指南文档（本轮 / 已完成）
+
+- [x] `docs/development/DEPLOYMENT_GUIDE.md` 按 22 节定稿（真实 compose/entrypoint/scripts）
+- [x] 基线数字：PG 297/6、InMemory 286/62、FE 116、head `20260717_08_ai_runtime`
+- [x] README / RUNBOOK / VERIFY 最小入口链接
+- [x] 未改业务代码、未改 .env、未真实 LLM、未 backup/restore、未 down -v、未 git commit
+
+最后更新：2026-07-17
+
+## 2026-07-17 AI Runtime 持久化 + 页面衔接（六项验收完成）
 
 - [x] PostgreSQL `ai_runtime_settings` 单例 + migration `20260717_08_ai_runtime`（upgrade/downgrade/re-upgrade）
 - [x] `GET/PATCH /api/v1/admin/ai-runtime`：mode / kill_switch / expected_version / confirmed / readiness / budget

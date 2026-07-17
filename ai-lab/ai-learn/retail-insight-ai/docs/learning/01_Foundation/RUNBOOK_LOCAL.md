@@ -8,6 +8,7 @@
 
 | 场景 | 权威入口 |
 |---|---|
+| **部署分层（本地 / Compose / 生产差距）** | **[`docs/development/DEPLOYMENT_GUIDE.md`](../../development/DEPLOYMENT_GUIDE.md)**（独立部署权威；本 RUNBOOK 不重复生产清单） |
 | ERIP V1.0 正式启动 | [Appendix M](#appendix-m-docker-compose-启动与本地验收v10)：**Docker Compose + PostgreSQL**（默认且必须） |
 | 本地 PostgreSQL 联调 | PostgreSQL 环境变量 + Backend/Frontend（见下文「本地 PostgreSQL 联调」；脚本步骤可参考 [Appendix L](#appendix-l-frontend-启动验证测试与停止)） |
 | 快速单元测试 / 教学 | **InMemory，仅辅助用途**（unittest 加速 / 故障隔离；**不是**正式业务验收） |

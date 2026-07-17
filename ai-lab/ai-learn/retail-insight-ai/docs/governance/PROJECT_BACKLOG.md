@@ -1,5 +1,15 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: V1.0 部署指南文档
+
+- [x] 新增 `docs/development/DEPLOYMENT_GUIDE.md`
+- [x] 区分：无 Docker 本地开发 / Compose 验收演示 / 生产硬化差距
+- [x] 服务名 `postgres|backend|frontend`、volume `erip_postgres_data`、默认用户 `erip_app`、库 `erip`
+- [x] 脚本：`compose_up/down/verify`、`start_backend/frontend`、`seed_scenario01`、`check_env`、`run_tests`
+- [x] README + CHANGELOG 登记
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: AI Runtime 持久化 + 页面衔接
 
 - [x] Migration `20260717_08_ai_runtime`：`ai_runtime_settings` 单例（mode/kill_switch/version/actor；无 Secret）
