@@ -1,5 +1,19 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 — ERIP V1.0 Volume 真合并 / 归档 / 03 矩阵 / 静态验证
+
+### 变更
+- 合并两份面试 Volume 为唯一活动权威 `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+- 旧 Volume 移动到 `docs/_archive_candidate/handbook-interview/`
+- `03_AI核心知识.md` 定稿技术版本矩阵（B）与技术知识点表（C）
+- 修复 handbook/根 README 等活动文档断链
+- 静态验证：活动 md 断链 0；旧 Volume 不在活动 handbook 根
+
+### 未变更
+- 代码、测试、Docker、Migration、脚本、数据库、`.env`
+- 未 git commit / push
+
+
 ## 2026-07-17 — ERIP V1.0 文档最终更新 / 面试材料合并 / 全库一致性
 
 ### 变更
@@ -281,7 +295,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 ## 2026-07-07 API Walkthrough Repair
 
-- 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 被截断的问题，恢复 `01~23` 全部接口章节和补充接口章节。
+- 修复 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 被截断的问题，恢复 `01~23` 全部接口章节和补充接口章节。
 - 保持原有接口顺序、Swagger 操作、输入输出、后台日志和程序调用流程不变。
 - 将错位的“源码学习说明”按接口归位，避免 Health 混入 Task、Document、Approval、Security、Audit 相关源码。
 - 每个接口只保留一套源码学习说明，并限制为说明当前接口 `对应源码` 中的文件。
@@ -291,7 +305,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 - Learning Trace 升级为源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示。
 - `backend/app/core/learning_trace.py` 按文件切换自动补出 `Controller File`、`Entering File`、`Schema File`、`Schema`，便于直接对照源码阅读。
-- `GET /health` 与 `POST /api/tasks` 的学习顺序同步到 `docs/learning/LEARNING_API_WALKTHROUGH.md`，健康检查 schema 文件名修正为 `backend/app/schemas/health.py`。
+- `GET /health` 与 `POST /api/tasks` 的学习顺序同步到 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`，健康检查 schema 文件名修正为 `backend/app/schemas/health.py`。
 - `LEARNING_TRACE=false` 时仍然不会输出新增学习日志。
 - 本次保持 API 行为、响应 JSON、Swagger/OpenAPI、SSE 和业务逻辑不变。
 
@@ -308,7 +322,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - learning trace 从单行 JSON 改为终端可读 block，便于学习调用链。
 - `POST /api/tasks` 的学习链路会在后台任务完成后统一打印完整 block。
 - `LEARNING_TRACE=false` 时仍然不会输出任何学习 trace。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 补充了可读格式说明和节点含义。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 补充了可读格式说明和节点含义。
 - 本次仅优化学习 trace 的显示格式，不修改 API 行为、返回值、Swagger、OpenAPI、SSE 或业务逻辑。
 
 ## 2026-07-05 Learning Trace Phase 2
@@ -316,7 +330,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - 学习日志升级为 `HTTP Request -> Router -> Service -> Workflow -> Provider -> Repository -> Schema(Response Model) -> HTTP Response`。
 - `GET /health` 与 `POST /api/tasks` 输出更细的学习节点，便于按 `node / class / method / file` 阅读源码调用链。
 - `LEARNING_TRACE=false` 时仍然不产生新增学习日志。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`，说明默认关闭、如何开启和如何关闭。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`，说明默认关闭、如何开启和如何关闭。
 - 本次只增强 Learning Trace，不修改 API 行为、返回值、Swagger、OpenAPI、SSE 或测试逻辑。
 
 ## 2026-07-05 Learning Trace Phase 1
@@ -324,7 +338,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - 新增可关闭的 Learning Trace，用于学习 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events` 的调用链。
 - `LEARNING_TRACE=false` 时完全关闭，不影响 API 行为、返回值、Swagger 或业务逻辑。
 - 新增 `backend/app/core/learning_trace.py`，统一提供 `trace_enter()`、`trace_step()`、`trace_exit()`。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 新增 `Learning Trace（学习调用链日志）` 章节，说明开启时机、存在原因、阅读方式和 Swagger 配合方法。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 新增 `Learning Trace（学习调用链日志）` 章节，说明开启时机、存在原因、阅读方式和 Swagger 配合方法。
 - `.env.example` 增加 `LEARNING_TRACE=false`。
 - 本次只做 Documentation + Learning Trace，不修改测试逻辑，也不扩大到其他 API。
 
@@ -332,28 +346,28 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 - `docs/` 下活动 Markdown 已按职责移动到 `learning/`、`architecture/`、`contracts/`、`development/`、`database/`、`governance/`。
 - `README.md` 已同步新目录结构、学习路线和全量 Markdown 文档导航。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、每个接口详细表和程序调用流程。
-- `docs/learning/TEST_CASES.md` 保留测试总览、每个测试文件详细表和后端程序流程，并新增“保护的 Bug / 风险”列。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、每个接口详细表和程序调用流程。
+- `docs/learning/01_Foundation/TEST_CASES.md` 保留测试总览、每个测试文件详细表和后端程序流程，并新增“保护的 Bug / 风险”列。
 - `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 已中文化，日语为辅，覆盖 Workflow vs Agent、Tool、Repository、Provider、RAGAnswerGenerator、LLMProvider、Retrieval、Approval、RBAC / Audit 和未来模型 Provider 接入方式。
 - `docs/development/MASTER_PROMPT.md` 已补充文档合并、唯一主文档、归档候选区、学习内容保护和语言规则。
 - Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑。
 
 ## 2026-07-05 Documentation Readability Optimization Sprint
 
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 所有主接口统一采用详细表格，保留 Swagger 操作、输入、输出、后台 Log、源码、测试和下一步。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 程序流程统一写文件路径、类名、方法名。
-- `docs/learning/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`。
-- `docs/learning/TEST_CASES.md` 所有测试文件统一采用详细表格，保留测试目的、API、Swagger 操作、命令、输入、输出、后台 Log、源码和为什么设计。
-- `docs/learning/TEST_CASES.md` 后端程序流程统一写文件路径、类名、方法名。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 所有主接口统一采用详细表格，保留 Swagger 操作、输入、输出、后台 Log、源码、测试和下一步。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 程序流程统一写文件路径、类名、方法名。
+- `docs/learning/01_Foundation/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`。
+- `docs/learning/01_Foundation/TEST_CASES.md` 所有测试文件统一采用详细表格，保留测试目的、API、Swagger 操作、命令、输入、输出、后台 Log、源码和为什么设计。
+- `docs/learning/01_Foundation/TEST_CASES.md` 后端程序流程统一写文件路径、类名、方法名。
 - Documentation Only：未修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑。
 
 ## 2026-07-05 Documentation Governance V2
 
 - `README.md` 升级为唯一知识导航中心，补齐全部 59 个 Markdown 文档链接、知识地图、学习路线流程图、当前完成情况矩阵和企业项目验证体系。
 - `README.md` 增加文档责任表，明确唯一职责、是否唯一、是否允许新增同类文档。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，同时保留每个接口的作用、Swagger 操作、输入、输出、后台日志、程序流程、源码、测试和下一步。
-- `docs/learning/TEST_CASES.md` 增加测试总览表，同时保留每个测试文件的测试目的、API、命令、输入、输出、Swagger 操作、后台日志、程序流程、源码和设计理由。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，同时保留每个接口的作用、Swagger 操作、输入、输出、后台日志、程序流程、源码、测试和下一步。
+- `docs/learning/01_Foundation/TEST_CASES.md` 增加测试总览表，同时保留每个测试文件的测试目的、API、命令、输入、输出、Swagger 操作、后台日志、程序流程、源码和设计理由。
 - `RUNBOOK_LOCAL.md` 的启动、Swagger、ReDoc、OpenAPI、验证、测试和排错内容已由 README、LEARNING、TEST、VERIFY 承接，文件移动到 `docs/_archive_candidate/RUNBOOK_LOCAL.md`。
 - `STUDY_PLAN_DAY1_DAY3.md` 已由 README 学习路线、接口学习、测试学习和源码阅读文档承接，移动到 `docs/_archive_candidate/root/STUDY_PLAN_DAY1_DAY3.md`。
 - handbook 侧 `TASK.md`、`ROADMAP.md` 已由根目录同名主文档承接，移动到 `docs/_archive_candidate/handbook-root/`。
@@ -366,8 +380,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 ## 2026-07-05 Documentation Restore + Safe Merge Sprint
 
 - `README.md` 恢复树形目录结构图、文档导航中心和企业项目测试体系说明。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复分接口学习章节，并补回每个接口的完整学习流程。
-- `docs/learning/TEST_CASES.md` 恢复分测试文件学习章节，并补回每个测试文件的程序运行流程。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 恢复分接口学习章节，并补回每个接口的完整学习流程。
+- `docs/learning/01_Foundation/TEST_CASES.md` 恢复分测试文件学习章节，并补回每个测试文件的程序运行流程。
 - `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/development/MASTER_PROMPT.md` 补充文档规则和验证体系说明。
 - `docs/ai-agent-retail-handbook-v3/README.md` 补充根目录与 `docs` 目录职责说明。
 - 本次仅修改文档，不修改 backend、frontend、scripts、业务代码、测试代码。
@@ -375,8 +389,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 ## 2026-07-05 Documentation Recovery + Governance Sprint
 
 - `README.md` 重新恢复为项目总入口，补齐项目一句话介绍、当前已实现能力、部分完成能力、未来规划、项目验证体系、目录树、文档导航中心、学习路线、测试路线、源码阅读路线、面试准备路线和文档治理规则。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为按接口逐节展开的学习文档，覆盖 `GET /health`、tasks、documents、retrieval、internal-rag、approvals、security、audit 等主接口，不再用总表承载主内容。
-- `docs/learning/TEST_CASES.md` 恢复为按测试文件逐节展开的学习文档，覆盖重点测试目的、输入、预想输出、Swagger 对应操作、后端程序流程、源码和设计理由。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 恢复为按接口逐节展开的学习文档，覆盖 `GET /health`、tasks、documents、retrieval、internal-rag、approvals、security、audit 等主接口，不再用总表承载主内容。
+- `docs/learning/01_Foundation/TEST_CASES.md` 恢复为按测试文件逐节展开的学习文档，覆盖重点测试目的、输入、预想输出、Swagger 对应操作、后端程序流程、源码和设计理由。
 - `RUNBOOK_LOCAL.md` 和 `VERIFY_CHECKLIST.md` 补充 Swagger、ReDoc、OpenAPI JSON 的区别，以及 `unittest` 必须在 `backend/` 目录执行的规则。
 - `docs/development/MASTER_PROMPT.md` 补充永久文档保护规则，明确不能把 `TEST_CASES.md` 压缩成命令列表，也不能把 `LEARNING_API_WALKTHROUGH.md` 压缩成接口表格。
 - `docs/ai-agent-retail-handbook-v3/README.md` 明确 handbook 根目录负责学习/面试，handbook/docs 负责技术规范镜像和治理记录。
@@ -388,8 +402,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 - `README.md` 重写为项目门户，补齐项目概览、架构、目录、文档导航和验证系统。
 - `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
-- `docs/learning/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
+- `docs/learning/01_Foundation/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
 - `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`。
 - `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
 - 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现。
@@ -397,8 +411,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 ## 2026-07-05 文档重构 V3
 
 - `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明和文档导航中心。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志。
-- `docs/learning/TEST_CASES.md` 重写为程序运行流程学习文档，补齐程序流转、后台日志观察点和学习日志。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志。
+- `docs/learning/01_Foundation/TEST_CASES.md` 重写为程序运行流程学习文档，补齐程序流转、后台日志观察点和学习日志。
 - `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、命令、成功判断、失败现象和修复方法。
 - `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、命令、预想结果、失败现象和参考文档。
 - `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`。
@@ -410,8 +424,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 - README 增加“文档导航中心”，把项目入口、本地排错、验证清单、源码阅读、接口学习、测试学习、面试讲解、架构、契约、错误码、数据库、AI 执行规则、编码规范、开发流程统一串联。
 - README 增加初学者只读 5 个文档、面试准备 3 个文档、开发维护再看哪些文档、不要一开始看的文档，以及文档数量控制规则。
-- `docs/learning/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
-- `docs/learning/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
+- `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
+- `docs/learning/01_Foundation/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
 - `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
 - `RUNBOOK_LOCAL.md` 明确项目根目录脚本和 backend 目录 uvicorn 的不同执行方式，并补上 Swagger / ReDoc / OpenAPI JSON 的用途。
 - `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档。
@@ -422,8 +436,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 ## 2026-07-05 Sprint R3.1 Documentation Quality Refactor
 
 - 将 `README.md` 重写为中文入口，并新增“第一次启动项目”章节，逐步说明命令、作用、成功标志、失败现象和下一步操作。
-- 将 `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为按接口顺序展开的中文学习走读，每个接口都补齐接口作用、学习原因、Swagger 位置、输入、预期输出、知识点和源码位置。
-- 将 `docs/learning/TEST_CASES.md` 重写为按测试文件逐项说明的中文文档，补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由。
+- 将 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为按接口顺序展开的中文学习走读，每个接口都补齐接口作用、学习原因、Swagger 位置、输入、预期输出、知识点和源码位置。
+- 将 `docs/learning/01_Foundation/TEST_CASES.md` 重写为按测试文件逐项说明的中文文档，补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由。
 - 将 `RUNBOOK_LOCAL.md` 改为“启动与排错指南”，并用“问题 → 原因 → 解决方法”重新组织。
 - 将 `VERIFY_CHECKLIST.md` 改为启动完成检查清单，明确每项如何验证成功。
 - 将 `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和看完应掌握的内容。
@@ -431,8 +445,8 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
-- 统一最短学习路径到 `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
-- 新增 `docs/learning/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 统一最短学习路径到 `README.md`、`docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
+- 新增 `docs/learning/01_Foundation/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
 - 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
 - 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
@@ -441,7 +455,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 
 - 验证 `from app.main import app; print(app.title)` 和 `app.openapi()` 可正常运行。
 - 通过 ASGI 直接确认最小可运行路径：health、task、document、pipeline、approval、security、audit。
-- 新增 `docs/learning/LEARNING_API_WALKTHROUGH.md`，把 runnable learning 路径收敛成最短学习顺序。
+- 新增 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`，把 runnable learning 路径收敛成最短学习顺序。
 - 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 本次不新增功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。
 
@@ -738,7 +752,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
+- `retail-insight-ai/docs/governance/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；历史名称 Retail Insight AI 仅表示早期 MVP；当前正式名称为 ERIP V1.0，包含：
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
 - `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认

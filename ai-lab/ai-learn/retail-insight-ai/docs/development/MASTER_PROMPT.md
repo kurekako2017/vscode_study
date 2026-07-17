@@ -168,7 +168,7 @@ All AI tools working in this repository must follow this document before they wr
   - 禁止删除源码位置。
   - 禁止把树形目录改成普通文本。
   - 禁止把章节压缩成摘要。
-  - 禁止把 `docs/learning/LEARNING_API_WALKTHROUGH.md` 和 `docs/learning/TEST_CASES.md` 压缩成纯摘要。
+  - 禁止把 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 和 `docs/learning/01_Foundation/TEST_CASES.md` 压缩成纯摘要。
   - 中文为主，日语为辅，英文只保留技术名词、代码标识符、API 路径、类名、环境变量、enum、error code 和 event name。
   - 必须先 Merge，再 Move，再 Archive。
   - Delete 只能发生在未来人工确认之后，且必须有 README 替代入口和 changelog / backlog 记录。
@@ -176,9 +176,9 @@ All AI tools working in this repository must follow this document before they wr
 - Prefer adding, organizing, and merging. Do not compress a full explanation into one sentence when the original content is valuable.
 - If a table becomes hard to understand, restore it into section-based explanations.
 - Keep directory structures as tree diagrams with Chinese explanations.
-- Keep `docs/learning/TEST_CASES.md` permanently as a program-flow learning document, not a command list.
-- Keep `docs/learning/LEARNING_API_WALKTHROUGH.md` permanently as an interface-learning document, not a table-only summary.
-- Keep enterprise testing system explanations in `README.md`, `docs/learning/LEARNING_API_WALKTHROUGH.md`, `docs/learning/TEST_CASES.md`, and `VERIFY_CHECKLIST.md`.
+- Keep `docs/learning/01_Foundation/TEST_CASES.md` permanently as a program-flow learning document, not a command list.
+- Keep `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` permanently as an interface-learning document, not a table-only summary.
+- Keep enterprise testing system explanations in `README.md`, `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`, `docs/learning/01_Foundation/TEST_CASES.md`, and `VERIFY_CHECKLIST.md`.
 - `docs/ai-agent-retail-handbook-v3/` is the learning and interview center, and `docs/ai-agent-retail-handbook-v3/docs/` is the technical spec mirror.
 - Before deleting any document, first confirm that README navigation has a replacement entry and that no useful content will be lost.
 - Update `TASK.md`, `docs/governance/PROJECT_BACKLOG.md`, and `docs/governance/CHANGELOG.md` after every completed work session.
@@ -187,8 +187,8 @@ All AI tools working in this repository must follow this document before they wr
 - Update handbook mirror files in `docs/ai-agent-retail-handbook-v3/`.
 - Do not add a new Markdown file when the same kind of content can be merged into an existing document.
 - Keep `README.md` as the navigation center.
-- Keep `docs/learning/LEARNING_API_WALKTHROUGH.md` for runnable learning.
-- Keep `docs/learning/TEST_CASES.md` for test learning.
+- Keep `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` for runnable learning.
+- Keep `docs/learning/01_Foundation/TEST_CASES.md` for test learning.
 - Keep `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
 - Keep startup and troubleshooting as part of `README.md` and `VERIFY_CHECKLIST.md`; archived runbooks must not remain active maintenance entry points.
 - Keep `VERIFY_CHECKLIST.md` for verification.
@@ -198,9 +198,9 @@ All AI tools working in this repository must follow this document before they wr
   2. 优先补充、整理、合并，不允许粗暴压缩。
   3. 如果把表格改得看不懂，必须恢复为分章节说明。
   4. 目录结构必须保留树形图 + 中文说明。
-  5. `docs/learning/TEST_CASES.md` 永久保留，不能变成测试命令列表。
-  6. `docs/learning/LEARNING_API_WALKTHROUGH.md` 永久保留，不能变成接口表格。
-  7. 企业项目测试体系必须长期保留在 `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`docs/learning/TEST_CASES.md`、`VERIFY_CHECKLIST.md` 中。
+  5. `docs/learning/01_Foundation/TEST_CASES.md` 永久保留，不能变成测试命令列表。
+  6. `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 永久保留，不能变成接口表格。
+  7. 企业项目测试体系必须长期保留在 `README.md`、`docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`、`docs/learning/01_Foundation/TEST_CASES.md`、`VERIFY_CHECKLIST.md` 中。
   8. handbook 根目录是学习和面试中心，`handbook/docs` 是技术规范镜像。
   9. 删除任何文档前，必须先确认 README 导航中有替代入口，并且内容没有丢失。
   10. Mini 模型不能用于大规模文档体系重构，只能用于局部润色或翻译。

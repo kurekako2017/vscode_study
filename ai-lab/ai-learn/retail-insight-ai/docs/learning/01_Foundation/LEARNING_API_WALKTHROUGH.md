@@ -472,7 +472,7 @@ Swagger Execute
 | 20   | `GET /api/v1/users/me`                           | 当前用户      | Execute                           | 无                     | `user_id=system`             | `test_security_audit_api.py`     | `SecurityService.get_current_user()`        | `GET /api/v1/security/roles`                     |
 | 21   | `GET /api/v1/security/roles`                     | 角色目录      | Execute                           | 无                     | roles                          | `test_security_audit_api.py`     | `SecurityService.list_roles()`              | `GET /api/v1/security/permissions`               |
 | 22   | `GET /api/v1/security/permissions`               | 权限目录      | Execute                           | 无                     | permissions                    | `test_security_audit_api.py`     | `SecurityService.list_permissions()`        | `GET /api/v1/audit-logs`                         |
-| 23   | `GET /api/v1/audit-logs`                         | 审计日志      | Execute                           | 无                     | audit logs                     | `test_security_audit_api.py`     | `AuditService.list_audit_logs()`            | `docs/learning/TEST_CASES.md`                    |
+| 23   | `GET /api/v1/audit-logs`                         | 审计日志      | Execute                           | 无                     | audit logs                     | `test_security_audit_api.py`     | `AuditService.list_audit_logs()`            | `docs/learning/01_Foundation/TEST_CASES.md`                    |
 
 ## 01. GET /health
 
@@ -1768,7 +1768,7 @@ Response
 | 后台日志观察         | append-only 读取、审计事件名、成功/失败事实                                                                                                              |
 | 对应测试             | `backend/tests/test_security_audit_api.py`、`backend/tests/test_audit_middleware.py`                                                                 |
 | 对应源码             | `backend/app/api/audit_logs.py`、`backend/app/services/audit_service.py`、`backend/app/repositories/implementations/in_memory/audit_repository.py` |
-| 下一步               | `docs/learning/TEST_CASES.md`                                                                                                                          |
+| 下一步               | `docs/learning/01_Foundation/TEST_CASES.md`                                                                                                                          |
 
 ### 程序执行阶段（Execution Flow）
 

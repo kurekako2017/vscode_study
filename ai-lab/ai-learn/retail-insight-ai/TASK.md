@@ -1,5 +1,19 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 ERIP V1.0 Volume 真合并 + 归档 + 03 矩阵 + 全库静态验证（本轮）
+
+- [x] 两份面试 Volume **真合并**进 `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+- [x] 旧 Volume **实际移动**到 `docs/_archive_candidate/handbook-interview/`
+- [x] `03_AI核心知识.md`：技术版本矩阵（第一章 B）+ 技术知识点表（第一章 C）
+- [x] handbook 活动文档链接修复；根 README / CODE_STUDY 路径修复
+- [x] 活动文档静态验证：断链 0；旧 Volume 不在活动目录
+- [x] 未 git commit / push（用户审阅后自行提交）
+- [x] 未改代码/测试/Docker/Migration/脚本/数据库/`.env`
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 ERIP V1.0 文档最终更新 / 面试材料合并 / 全库一致性（本轮）
 
 - [x] 保护工作区：确认无覆盖未提交修改；本轮仅文档
@@ -284,7 +298,7 @@
 
 - [x] 在 `TaskService.create_task()` 追加学习日志，终端可直接看到 `request.question`、`request.mode` 和 `task_id`
 - [x] 保持 API response、Workflow、Repository 和测试逻辑不变
-- [x] 同步更新 `README.md`、`docs/learning/LEARNING_API_WALKTHROUGH.md`、`docs/learning/RUNBOOK_LOCAL.md`、`docs/learning/CODE_STUDY_GUIDE.md` 和 `VERIFY_CHECKLIST.md`
+- [x] 同步更新 `README.md`、`docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`、`docs/learning/RUNBOOK_LOCAL.md`、`docs/learning/CODE_STUDY_GUIDE.md` 和 `VERIFY_CHECKLIST.md`
 - [x] 完成后验证 `POST /api/tasks` 的终端输出能明确看到 `question: 你好`
 
 ## 2026-07-08 ERIP Worldview Alignment
@@ -306,7 +320,7 @@
 
 ## 2026-07-07 API Walkthrough Repair
 
-- [x] 修复 `docs/learning/LEARNING_API_WALKTHROUGH.md` 的接口章节截断与错位问题
+- [x] 修复 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的接口章节截断与错位问题
 - [x] 恢复 `01~23` 接口章节与补充接口章节，保持原学习路线不变
 - [x] 将“源码学习说明”拆回各自接口下，避免跨章节混放源码说明
 - [x] 保持 Swagger 操作、输入输出、后台日志、程序调用流程原结构不变
@@ -333,7 +347,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] 新增可关闭的 Learning Trace，统一输出学习调用链日志
 - [x] 仅覆盖 `GET /health`、`POST /api/tasks`、`GET /api/tasks/{task_id}`、`GET /api/tasks/{task_id}/events`
 - [x] `.env.example` 增加 `LEARNING_TRACE=false`
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace（学习调用链日志）` 章节
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace（学习调用链日志）` 章节
 - [x] 保持 API 行为、返回值、Swagger、业务逻辑、测试逻辑不变
 - [x] 完成记录：`LEARNING_TRACE=false` 时完全无影响，开启后只输出学习调用链日志，不扩展到其他 API。
 
@@ -341,7 +355,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 - [x] 学习日志升级为 `HTTP Request -> Router -> Service -> Workflow -> Provider -> Repository -> Schema(Response Model) -> HTTP Response`
 - [x] `GET /health` 与 `POST /api/tasks` 补齐更细的学习节点
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 增加 `Learning Trace Phase 2`
 - [x] 默认仍然关闭，`LEARNING_TRACE=false` 时不产生新增学习日志
 - [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
 
@@ -349,7 +363,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 - [x] learning trace 由单行 JSON 改为终端可读 block
 - [x] `POST /api/tasks` 学习链路支持后台任务完成后统一打印
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 补充可读格式说明
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 补充可读格式说明
 - [x] `LEARNING_TRACE=false` 时仍然不输出任何学习 trace
 - [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
 
@@ -358,15 +372,15 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] Learning Trace 升级为企业级、源码一眼可读 block，按 `HTTP Request -> Router -> Controller File -> Controller Method -> Return -> Schema File -> Schema -> HTTP Response` 展示
 - [x] `backend/app/core/learning_trace.py` 支持按文件切换自动补出 `Controller File`、`Entering File`、`Schema File`、`Schema`
 - [x] `GET /health` 与 `POST /api/tasks` 的学习顺序和实际 trace 输出保持一致
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 同步更新程序调用流程，并修正健康检查 schema 文件名为真实路径 `backend/app/schemas/health.py`
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 同步更新程序调用流程，并修正健康检查 schema 文件名为真实路径 `backend/app/schemas/health.py`
 - [x] `LEARNING_TRACE=false` 时仍然不输出新增学习 trace
 - [x] 保持 API 行为、返回值、Swagger、OpenAPI、SSE、业务逻辑不变
 
 ### Documentation Organization + AI Agent Guide 中文化 Sprint 结果
 
 - [x] `docs/` 活动 Markdown 已按 `learning`、`architecture`、`contracts`、`development`、`database`、`governance` 分层管理
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、接口详细表和程序调用流程
-- [x] `docs/learning/TEST_CASES.md` 保留测试总览、测试详细表和后端程序流程，并新增“保护的 Bug / 风险”列
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 保留主链路接口总览、接口详细表和程序调用流程
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 保留测试总览、测试详细表和后端程序流程，并新增“保护的 Bug / 风险”列
 - [x] `docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 已调整为中文为主、日语为辅，覆盖 Workflow、Agent、Tool、Repository、Provider、RAG、Approval、RBAC、Audit
 - [x] `README.md` 已同步新目录结构和所有 Markdown 链接
 - [x] `docs/development/MASTER_PROMPT.md` 已补充文档合并、唯一主文档、归档和语言规则
@@ -374,12 +388,12 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 ### Documentation Readability Optimization Sprint 结果
 
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 的所有主接口均采用统一详细表格
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 的程序流程统一补充文件路径、类名、方法名
-- [x] `docs/learning/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`
-- [x] `docs/learning/TEST_CASES.md` 的所有测试文件均采用统一详细表格
-- [x] `docs/learning/TEST_CASES.md` 的后端程序流程统一补充文件路径、类名、方法名
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 调整为 `主链路接口总览 -> 接口详细表 -> 程序调用流程`
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的所有主接口均采用统一详细表格
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 的程序流程统一补充文件路径、类名、方法名
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 调整为 `测试总览 -> 测试详细表 -> 后端程序流程`
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 的所有测试文件均采用统一详细表格
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 的后端程序流程统一补充文件路径、类名、方法名
 - [x] 本次仅修改 Markdown 文档，不修改 backend、frontend、scripts、Python、React、API、测试实现或业务逻辑
 
 ### Documentation Governance V2 结果
@@ -387,8 +401,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] README 升级为唯一知识导航中心，补齐全部 Markdown 文档链接
 - [x] README 增加知识地图、学习路线流程图、当前完成情况矩阵和企业项目验证体系
 - [x] README 增加文档责任表，明确唯一职责和禁止新增同类文档
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，并保留每个接口的完整章节
-- [x] `docs/learning/TEST_CASES.md` 增加测试总览表，并保留每个测试文件的完整章节
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 增加接口学习总表，并保留每个接口的完整章节
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 增加测试总览表，并保留每个测试文件的完整章节
 - [x] `RUNBOOK_LOCAL.md` 内容已由 README、LEARNING、TEST、VERIFY 承接，移动到 `docs/_archive_candidate/RUNBOOK_LOCAL.md`
 - [x] handbook/docs 技术规范镜像已移动到 `docs/_archive_candidate/handbook-docs/`
 - [x] handbook TASK / ROADMAP 镜像已移动到 `docs/_archive_candidate/handbook-root/`
@@ -402,8 +416,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 - [x] 先盘点仓库 Markdown 文档，再开始修改
 - [x] `README.md` 恢复为项目总入口，并补齐目录树、文档导航中心、学习路线、测试路线、源码阅读路线、面试准备路线、文档治理规则
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习文档，23 个主接口分别独立成节
-- [x] `docs/learning/TEST_CASES.md` 恢复为分测试文件学习文档，重点测试文件分别独立成节
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习文档，23 个主接口分别独立成节
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 恢复为分测试文件学习文档，重点测试文件分别独立成节
 - [x] `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md` 补充 Swagger / ReDoc / OpenAPI JSON 与 backend 目录执行 unittest 规则
 - [x] `docs/development/MASTER_PROMPT.md` 补充永久文档保护规则
 - [x] `docs/ai-agent-retail-handbook-v3/README.md` 明确 handbook 根目录与 handbook/docs 的职责边界
@@ -414,8 +428,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 ### Documentation Restore + Safe Merge Sprint 结果
 
 - [x] 恢复 README 的树形目录结构图和文档导航中心，保留原有目录说明与验证系统
-- [x] 将 `docs/learning/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习说明，补回每个接口的完整学习路径
-- [x] 将 `docs/learning/TEST_CASES.md` 恢复为程序运行流程学习文档，补回每个测试文件的完整流程说明
+- [x] 将 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 恢复为分接口学习说明，补回每个接口的完整学习路径
+- [x] 将 `docs/learning/01_Foundation/TEST_CASES.md` 恢复为程序运行流程学习文档，补回每个测试文件的完整流程说明
 - [x] 补充 `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`docs/development/MASTER_PROMPT.md` 的企业项目测试体系和文档规则说明
 - [x] 补充 `docs/ai-agent-retail-handbook-v3/README.md` 的根目录与 `docs` 目录职责说明
 - [x] 同步更新 handbook 镜像侧 `MASTER_PROMPT` 规则说明
@@ -425,8 +439,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 - [x] README 重写为项目门户，并补齐项目概览、架构、目录、文档导航和验证系统
 - [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐每条命令的原因、结果、失败和验证
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
-- [x] `docs/learning/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
 - [x] `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 保持企业 AI 后端项目面试稿定位，继续作为唯一面试文档入口
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
@@ -434,8 +448,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 ### 文档重构 V1 结果
 
 - [x] `README.md` 重写为唯一项目入口，补齐项目介绍、当前实现范围、目录说明、文档导航中心和文档原则
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志
-- [x] `docs/learning/TEST_CASES.md` 重写为程序运行流程学习文档，补齐测试目的、程序流转、后台日志观察点和学习日志
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为中文主导的接口学习走读，补齐 Swagger / ReDoc / OpenAPI JSON、后台日志观察点和学习日志
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 重写为程序运行流程学习文档，补齐测试目的、程序流转、后台日志观察点和学习日志
 - [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、成功判断、失败原因和解决方法
 - [x] `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、执行命令、预想结果、失败现象和对应文档
 - [x] `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`
@@ -446,8 +460,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 ### Documentation Consolidation Sprint 2 Result
 
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
-- [x] `docs/learning/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
 - [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
 - [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
 - [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
@@ -458,8 +472,8 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 ### Sprint R3.1 Result
 
 - [x] `README.md` 改为中文入口，并新增“第一次启动项目”章节
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
-- [x] `docs/learning/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 按接口顺序重写为中文学习走读
+- [x] `docs/learning/01_Foundation/TEST_CASES.md` 按测试文件逐个补齐测试目的、对应 API、源码位置、运行命令、输入、预期输出和设计理由
 - [x] `RUNBOOK_LOCAL.md` 改写为“启动与排错指南”，使用“问题 → 原因 → 解决方法”组织内容
 - [x] `VERIFY_CHECKLIST.md` 改写为启动完成检查清单，并明确每项如何验证成功
 - [x] `CODE_STUDY_GUIDE.md` 为每章补齐学习目标、推荐阅读时间、推荐顺序和掌握目标
@@ -467,11 +481,11 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 ### Sprint R3 Result
 
-- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
-- [x] 新增 `docs/learning/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/learning/01_Foundation/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
 - [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Future Sprint Checklist
@@ -482,11 +496,11 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 
 ### Sprint R3 Result
 
-- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
+- [x] 最短学习路径已收敛到 `README.md` / `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
-- [x] 新增 `docs/learning/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
+- [x] 新增 `docs/learning/01_Foundation/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
 - [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
-- [x] `docs/learning/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
+- [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
 ### Verification Boundary

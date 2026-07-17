@@ -165,7 +165,7 @@ All AI tools working in this repository must follow this document before they wr
 - Keep enterprise testing system explanations in `README.md`, `docs/LEARNING_API_WALKTHROUGH.md`, `docs/TEST_CASES.md`, and `VERIFY_CHECKLIST.md`.
 - `docs/ai-agent-retail-handbook-v3/` is the learning and interview center, and `docs/ai-agent-retail-handbook-v3/docs/` is the technical spec mirror.
 - Before deleting any document, first confirm that README navigation has a replacement entry and that no useful content will be lost.
-- Update `TASK.md`, `docs/PROJECT_BACKLOG.md`, and `docs/CHANGELOG.md` after every completed work session.
+- Update `TASK.md`, `docs/governance/PROJECT_BACKLOG.md`, and `docs/CHANGELOG.md` after every completed work session.
 - Update `docs/ARCHITECTURE.md` for architecture changes.
 - Update `docs/DECISIONS.md` for important decisions.
 - Update handbook mirror files in `docs/ai-agent-retail-handbook-v3/`.
@@ -243,7 +243,7 @@ Current Phase: Phase 2 PostgreSQL Persistence MVP
 Task Scope: <fill here>
 Allowed Changes: <fill here>
 Protected Areas: backend/, frontend/, scripts/ unless explicitly requested
-Required Reads: AGENTS.md, ROADMAP.md, docs/PROJECT_BACKLOG.md, TASK.md
+Required Reads: AGENTS.md, ROADMAP.md, docs/governance/PROJECT_BACKLOG.md, TASK.md
 Required Outputs: TASK, Backlog, Changelog, Architecture/ADR if impacted, handbook mirror if impacted
 Contract Rules: Follow docs/API_CONTRACT.md and docs/EVENT_CONTRACT.md
 Prompt Rules: Follow docs/PROMPT_STANDARD.md

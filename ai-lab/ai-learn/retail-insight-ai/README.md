@@ -188,9 +188,9 @@ Mermaid 版本：
 
 ```mermaid
 flowchart TD
-    A[README] --> B[docs/learning/LEARNING_API_WALKTHROUGH.md]
+    A[README] --> B[docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md]
     B --> C[Swagger /docs]
-    C --> D[docs/learning/TEST_CASES.md]
+    C --> D[docs/learning/01_Foundation/TEST_CASES.md]
     D --> E[CODE_STUDY_GUIDE]
     E --> F[Source Code]
     F --> G[docs/architecture/ARCHITECTURE.md]
@@ -232,10 +232,10 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 ### 学习文档
 
 - [README.md](README.md)
-- [CODE_STUDY_GUIDE.md](CODE_STUDY_GUIDE.md)
-- [docs/learning/LEARNING_API_WALKTHROUGH.md](docs/learning/LEARNING_API_WALKTHROUGH.md)
-- [docs/learning/RUNBOOK_LOCAL.md](docs/learning/RUNBOOK_LOCAL.md)
-- [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md)
+- [docs/learning/01_Foundation/CODE_STUDY_GUIDE.md](docs/learning/01_Foundation/CODE_STUDY_GUIDE.md)
+- [docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md](docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md)
+- [docs/learning/01_Foundation/RUNBOOK_LOCAL.md](docs/learning/01_Foundation/RUNBOOK_LOCAL.md)
+- [docs/learning/01_Foundation/TEST_CASES.md](docs/learning/01_Foundation/TEST_CASES.md)
 - [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md)
 
 ### API 文档
@@ -248,7 +248,7 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 
 ### 测试文档
 
-- [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md)
+- [docs/learning/01_Foundation/TEST_CASES.md](docs/learning/01_Foundation/TEST_CASES.md)
 - [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md)
 
 ### 架构文档
@@ -329,9 +329,9 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 | 文档 | 唯一职责 | 是否唯一 | 是否允许新增同类文档 |
 |---|---|---|---|
 | [README.md](README.md) | 项目唯一入口和知识导航中心 | 是 | 否 |
-| [docs/learning/LEARNING_API_WALKTHROUGH.md](docs/learning/LEARNING_API_WALKTHROUGH.md) | API 学习和 Swagger 操作说明 | 是 | 否 |
-| [docs/learning/TEST_CASES.md](docs/learning/TEST_CASES.md) | 测试学习和测试 Case 导航 | 是 | 否 |
-| [CODE_STUDY_GUIDE.md](CODE_STUDY_GUIDE.md) | 源码阅读路线 | 是 | 否 |
+| [docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md](docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md) | API 学习和 Swagger 操作说明 | 是 | 否 |
+| [docs/learning/01_Foundation/TEST_CASES.md](docs/learning/01_Foundation/TEST_CASES.md) | 测试学习和测试 Case 导航 | 是 | 否 |
+| [docs/learning/01_Foundation/CODE_STUDY_GUIDE.md](docs/learning/01_Foundation/CODE_STUDY_GUIDE.md) | 源码阅读路线 | 是 | 否 |
 | [VERIFY_CHECKLIST.md](VERIFY_CHECKLIST.md) | 本地验证清单 | 是 | 否 |
 | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | 架构设计主文档 | 是 | 否 |
 | [docs/contracts/API_CONTRACT.md](docs/contracts/API_CONTRACT.md) | API 合同主文档 | 是 | 否 |

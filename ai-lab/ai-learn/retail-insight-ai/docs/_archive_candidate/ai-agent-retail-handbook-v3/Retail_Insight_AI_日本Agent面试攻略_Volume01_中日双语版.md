@@ -1,20 +1,12 @@
-# 【历史稿 / 非当前权威】Retail Insight AI 日本 Agent 面试攻略 Volume01
+# 【已归档】Retail Insight AI 日本 Agent 面试攻略 Volume01
 
-> **状态：历史稿（保留不删除）**  
+> **状态：已归档（非活动文档）**  
+> **归档路径：** `docs/_archive_candidate/handbook-interview/`  
 > **当前项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
-> **当前权威面试材料请改用：**
->
-> 1. `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
-> 2. `01_日本AI项目实战.md`
-> 3. `02_日本AI现场面试.md`
-> 4. `03_AI核心知识.md`（含真实技术版本表）
-> 5. `07_面试口头训练.md`
-> 6. `INTERVIEW_GUIDE.md`
->
-> **当前基线（勿用下文旧数字）：**  
-> PostgreSQL **297/6 skip** · InMemory **286/62 skip** · Frontend **116/116** · Alembic **`20260717_08_ai_runtime`** · 默认 LLM **stub** · 正式 Repository **PostgreSQL** · InMemory **仅 unittest** · 本地 **5173** / Compose **8080**  
->
-> 下文正文保留供对照历史演进；**面试背诵以 ERIP 权威五份+INTERVIEW_GUIDE 为准**。
+> **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`  
+> TaskService / LangGraph / LangChain 等有价值问答已合并进权威 Volume01 第 6、7、13 章（并按 V1.0 主链校正）。  
+> **禁止**用本文件作面试背诵源。  
+> 基线（若与正文冲突，以权威 Volume01 / `03_AI核心知识.md` 为准）：PG 297/6 · IM 286/62 · FE 116 · head `20260717_08_ai_runtime` · stub · PostgreSQL 正式。
 
 ---
 

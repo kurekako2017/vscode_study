@@ -27,7 +27,7 @@
 影响：
 
 - 每个 Phase 都必须检查并同步：
-  `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
+  `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/ARCHITECTURE.md`、`docs/CHANGELOG.md`、`docs/DECISIONS.md`。
 - 若变更涉及测试、流程、系统设计、生产路线图，还必须同步检查并更新：
   `08_架构图册.md`、`09_系统设计书.md`、`10_Production_Roadmap.md`。
 - 每个测试用例必须包含：
@@ -154,7 +154,7 @@
 - `backend/app/api/approvals.py` 只在 approval APIs 上调用 RBAC helper。
 - `permission_denied` 通过 append-only audit log 记录 denied facts。
 - `backend/tests/test_approval_api.py` 覆盖 allow / deny 路径和 denied audit logging。
-- `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
+- `docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现。
 决策：Phase 2 采用双后端 Repository 策略，默认仍为 `inmemory`，仅在显式配置时启用 PostgreSQL。
 
 原因：handbook 需要忠实反映主项目“本地可运行优先”的边界，不能把 PostgreSQL 说成默认必选依赖。
@@ -527,7 +527,7 @@
 - `docs/EVENT_CONTRACT.md` 新增 `approval.submitted`、`approval.approved`、`approval.rejected`、`approval.revised`、`approval.published`、`approval.failed`。
 - `docs/ERROR_CATALOG.md` 新增 approval workflow error section。
 - `docs/ARCHITECTURE.md` 与 `docs/DATABASE.md` 记录 report revision relationship、audit relationship 与 future RBAC relationship。
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录。
 
 ## ADR-027
 
@@ -545,7 +545,7 @@
 影响：
 
 - `docs/MASTER_PROMPT.md`、`docs/CODING_STANDARD.md`、`docs/DEVELOPMENT_GUIDE.md` 冻结文档语言政策。
-- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 同步记录该规则。
+- `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 同步记录该规则。
 - English-only 仅允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes、event names。
 - 后续新增文档必须先检查三语一致性，再进入评审。
 
@@ -563,7 +563,7 @@
 
 - `POST /api/v1/reports/{task_id}/submit-approval`、`GET /api/v1/approvals`、`GET /api/v1/approvals/{approval_id}`、`POST /api/v1/approvals/{approval_id}/approve`、`POST /api/v1/approvals/{approval_id}/reject`、`POST /api/v1/reports/{task_id}/revise` 进入 backend MVP。
 - 审批历史与 report version 事实层保持可替换，后续可演进到 PostgreSQL repository。
-- `docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现结果。
+- `docs/ARCHITECTURE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该实现结果。
 - Approval API / Approval Events / Approval Errors / Approval Architecture sections were checked for trilingual coverage and supplemented where English-only prose remained.
 
 ## ADR-029
@@ -582,7 +582,7 @@
 影响：
 
 - `docs/API_CONTRACT.md`、`docs/EVENT_CONTRACT.md`、`docs/ERROR_CATALOG.md`、`docs/ARCHITECTURE.md`、`docs/DATABASE.md` 冻结企业安全基础合同。
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该冻结。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md` 以及 handbook mirror 需要同步记录该冻结。
 - 后续 RBAC 实现必须沿用 frozen role / permission names 和 audit log contract，不能重新命名。
 - English-only 仍只允许用于 code identifiers、API paths、class names、environment variables、enum values、error codes 和 event names。
 
@@ -601,7 +601,7 @@
 
 影响：
 
-- `TASK.md`、`ROADMAP.md`、`docs/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要记录最终收口结果。
+- `TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/CHANGELOG.md`、`docs/ARCHITECTURE.md` 以及 handbook mirror 需要记录最终收口结果。
 - 当前完成能力被固定为：Document Upload / Read / Archive / Import / Chunk / Retrieval、Internal RAG without LLM、LLM Provider Stub Seam、Approval Workflow、RBAC for Approval APIs、Approval Audit Middleware、Security Domain、InMemory Audit Log。
 - 当前未完成能力被固定为：frontend UI、PostgreSQL repository full migration、real authentication、JWT/OAuth、real LLM provider、pgvector、internet search、MCP、production deployment。
 - English / 中文（简体） / 日本語 三语摘要继续作为人类可读文档的默认表达方式。

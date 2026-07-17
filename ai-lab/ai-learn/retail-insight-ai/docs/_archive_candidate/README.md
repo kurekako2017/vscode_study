@@ -15,7 +15,7 @@
 - README 仍然有替代入口。
 - 主文档已经承接所有有价值内容。
 - 人工确认归档文件没有独有内容。
-- 删除动作被单独记录在 `docs/CHANGELOG.md` 和 `docs/PROJECT_BACKLOG.md`。
+- 删除动作被单独记录在 `docs/CHANGELOG.md` 和 `docs/governance/PROJECT_BACKLOG.md`。
 
 ## 归档原则
 
@@ -55,7 +55,7 @@
 | [handbook-docs/ERROR_CATALOG.md](handbook-docs/ERROR_CATALOG.md) | `docs/ai-agent-retail-handbook-v3/docs/ERROR_CATALOG.md` | `docs/ERROR_CATALOG.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
 | [handbook-docs/EVENT_CONTRACT.md](handbook-docs/EVENT_CONTRACT.md) | `docs/ai-agent-retail-handbook-v3/docs/EVENT_CONTRACT.md` | `docs/EVENT_CONTRACT.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
 | [handbook-docs/MASTER_PROMPT.md](handbook-docs/MASTER_PROMPT.md) | `docs/ai-agent-retail-handbook-v3/docs/MASTER_PROMPT.md` | `docs/MASTER_PROMPT.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
-| [handbook-docs/PROJECT_BACKLOG.md](handbook-docs/PROJECT_BACKLOG.md) | `docs/ai-agent-retail-handbook-v3/docs/PROJECT_BACKLOG.md` | `docs/PROJECT_BACKLOG.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
+| [handbook-docs/governance/PROJECT_BACKLOG.md](handbook-docs/governance/PROJECT_BACKLOG.md) | `docs/ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | `docs/governance/PROJECT_BACKLOG.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
 | [handbook-docs/PROMPT_STANDARD.md](handbook-docs/PROMPT_STANDARD.md) | `docs/ai-agent-retail-handbook-v3/docs/PROMPT_STANDARD.md` | `docs/PROMPT_STANDARD.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
 | [handbook-docs/UPLOAD_POLICY.md](handbook-docs/UPLOAD_POLICY.md) | `docs/ai-agent-retail-handbook-v3/docs/UPLOAD_POLICY.md` | `docs/UPLOAD_POLICY.md` | handbook 技术规范镜像，改为引用主 docs | 是 | 是 | 人工确认镜像无独有内容 |
 
@@ -73,3 +73,12 @@
 - 归档文件是否还有主文档未承接的独有内容。
 - handbook 根目录文档是否继续承担长期学习价值。
 - 任何未来删除动作都必须先确认 README 仍有替代入口。
+
+## handbook-interview（2026-07-17 追加）
+
+| 文件 | 说明 |
+|---|---|
+| `handbook-interview/Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | 旧 Volume01；已并入 ERIP 权威 Volume01 后移入此处 |
+
+**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+
