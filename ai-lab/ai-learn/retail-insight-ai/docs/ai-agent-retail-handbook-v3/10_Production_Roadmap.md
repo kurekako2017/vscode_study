@@ -1,4 +1,4 @@
-# 10_Production_Roadmap
+# 10 生产演进路线（Production Roadmap）
 
 > **文档角色：** 活动 handbook 章节。若与文首 ERIP V1.0 摘要冲突，以源码 + `03_AI核心知识.md` 技术表 + 权威 Volume01 为准。历史阶段表述保留时仅作演进记录。
 
@@ -10,7 +10,7 @@
 # 目录
 
 - [1. Roadmap 原则](#1-roadmap-原则)
-- [2. Level 1 Demo](#2-level-1-demo)
+- [2. Level 1 Demo](#2-level-1-演示)
 - [3. Level 2 Internal Tool](#3-level-2-internal-tool)
 - [4. Level 3 Department System](#4-level-3-department-system)
 - [5. Level 4 Enterprise System](#5-level-4-enterprise-system)
@@ -18,11 +18,11 @@
 - [7. 等级对照](#7-等级对照)
 - [8. 未来两年升级路线图](#8-未来两年升级路线图)
 - [9. 投资与决策门禁](#9-投资与决策门禁)
-- [1.9 Phase 3.1 Document Domain Model](#19-phase-31-document-domain-model)
-- [1.10 Sprint 2 Document Upload API Contract Freeze](#110-sprint-2-document-upload-api-contract-freeze)
+- [1.9 Phase 3.1 Document Domain Model](#19-阶段-31-文档领域模型)
+- [1.10 Sprint 2 Document Upload API Contract Freeze](#110-冲刺-2文档上传-api-契约冻结)
 - [1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze](#111-sprint-25-document-upload-workflow--error-catalog--upload-policy-freeze)
-- [1.12 Sprint 3 Document Upload API MVP](#112-sprint-3-document-upload-api-mvp)
-- [1.13 Sprint 4 Document Read API MVP](#113-sprint-4-document-read-api-mvp)
+- [1.12 Sprint 3 Document Upload API MVP](#112-冲刺-3文档上传-api-mvp)
+- [1.13 Sprint 4 Document Read API MVP](#113-冲刺-4文档读取-api-mvp)
 
 ## 1. Roadmap 原则
 
@@ -38,9 +38,9 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 - 每一级必须满足上一等级的质量门禁，不能跨级跳过数据、权限或恢复能力。
 - 成本同时包含基础设施、模型调用、开发、测试、安全、运维和业务确认。
 
-## 1.1 Project Positioning
+## 1.1 项目定位
 
-### Current Platform
+### 当前平台
 
 当前项目名称保持为：
 
@@ -48,17 +48,17 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 
 当前项目已作为大手流通集团的企业经营分析平台正式运行。
 
-### System Architecture
+### 系统架构
 
 平台名称统一为：
 
 `Enterprise Retail Intelligence Platform (ERIP)`
 
-### Enterprise Deployment
+### 企业部署
 
 本路线图中的平台化能力按 ERIP 正式交付版本与企业运行版本说明，不再区分“尚未存在”的平台状态。
 
-## 1.2 Architecture Principles
+## 1.2 架构原则
 
 - Platform First
 - Domain Driven
@@ -70,7 +70,7 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 - Documentation First
 - Backward Compatibility
 
-## 1.3 Definition of Done
+## 1.3 完成定义（Definition of Done）
 
 任何一个 Phase 或 Level 的关闭至少需要满足：
 
@@ -85,7 +85,7 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 - Mermaid Diagram Update
 - Task Update
 
-## 1.4 Epic 0 Deliverables
+## 1.4 Epic 0 交付物
 
 - [ ] Architecture Freeze
 - [ ] Directory Freeze
@@ -96,40 +96,40 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 - [ ] Testing Freeze
 - [ ] Documentation Freeze
 
-## 1.5 Epic 12 Retrieval and RAG Platform
+## 1.5 Epic 12 检索与 RAG 平台
 
-### Runtime Architecture
+### 运行时架构（Epic 12）
 
 当前已形成完整 Retrieval Platform。
 
-### Production Architecture
+### 生产架构（Epic 12）
 
 Epic 12 作为横向平台能力，覆盖结构化业务数据检索、社内文档检索、互联网检索和 `Hybrid Retrieval`。
 
-### Enterprise Deployment
+### 企业部署
 
 Epic 12 已作为横向平台能力投入企业运行。
 
-## 1.6 Phase 1 File Input Foundation
+## 1.6 阶段 1 文件输入基础
 
-### Runtime Architecture
+### 运行时架构（阶段 1）
 
 主项目已完成 CSV / JSON / Markdown 文件输入落地。
 
-### Production Architecture
+### 生产架构（阶段 1）
 
 - 当前为 local file input + InMemory Repository
 - 当前 Report 状态为 `generated`
 - Approval Workflow 已覆盖：
   `draft / pending_approval / approved / rejected / revised`
 
-## 1.7 Phase 1.5 Contract Freeze and Approval Design
+## 1.7 阶段 1.5 契约冻结与审批设计
 
-### Runtime Architecture
+### 运行时架构（阶段 1.5）
 
 主项目已完成 Contract Freeze 与审批状态机设计冻结。
 
-### Production Architecture
+### 生产架构（阶段 1.5）
 
 - PostgreSQL 已投入运行
 - 审批 API 已投入运行
@@ -141,7 +141,7 @@ Epic 12 已作为横向平台能力投入企业运行。
   `approval_requests`
   `approval_events`
 
-## 1.8 Phase 2 PostgreSQL Persistence MVP
+## 1.8 阶段 2 PostgreSQL 持久化 MVP
 
 - Current State:
   主项目已落地 PostgreSQL Repository MVP，但默认运行模式仍为 `inmemory`。
@@ -159,7 +159,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Pending Reason:
   当前环境缺少 Docker CLI；当前环境未安装 `psycopg` 到实际运行 venv；PostgreSQL 集成测试当前被 skip。
 
-## 1.9 Phase 3.1 Document Domain Model
+## 1.9 阶段 3.1 文档领域模型
 
 - Current State:
   主项目已补齐 Document Domain Model 和 InMemory Document Repository，作为后续 Upload、RAG、审批和持久化的共同基础。
@@ -170,7 +170,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   不在本阶段实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
-## 1.10 Sprint 2 Document Upload API Contract Freeze
+## 1.10 冲刺 2：文档上传 API 契约冻结
 
 - Current State:
   当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
@@ -181,7 +181,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
-## 1.11 Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+## 1.11 冲刺 2.5：文档上传工作流与错误目录与上传策略冻结
 
 - Current State:
   当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
@@ -192,7 +192,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
-## 1.12 Sprint 3 Document Upload API MVP
+## 1.12 冲刺 3：文档上传 API MVP
 
 - Current State:
   `POST /api/v1/documents` 已实现同步 MVP。
@@ -203,7 +203,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 冻结但未实现；PostgreSQL Document Repository 仍只设计不实现。
 
-## 1.13 Sprint 4 Document Read API MVP
+## 1.13 冲刺 4：文档读取 API MVP
 
 - Current State:
   `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已实现。
@@ -214,7 +214,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   `DELETE`、`versions`、`chunks` 继续保持冻结未实现；PostgreSQL Document Repository 仍只设计不实现。
 
-## 1.14 Sprint 5 Document Archive API MVP
+## 1.14 冲刺 5：文档归档 API MVP
 
 - Current State:
   `DELETE /api/v1/documents/{document_id}` 仍未实现。
@@ -223,7 +223,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   `versions`、`chunks`、PostgreSQL Document Repository 仍只设计不实现。
 
-## 1.15 Sprint 6 Document Import Pipeline MVP
+## 1.15 冲刺 6：文档导入流水线 MVP
 
 - Current State:
   `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
@@ -234,7 +234,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 - Enterprise Deployment:
   `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
-## 2. Level 1 Demo
+## 2. 级别 1：演示
 
 **目标范围**
 
@@ -260,7 +260,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 
 多用户权限、分布式执行、高可用、正式 SLA、多租户和企业检索。
 
-## 3. Level 2 Internal Tool
+## 3. 级别 2：Internal Tool
 
 **目标范围**
 
@@ -286,7 +286,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 
 内部用户、任务量或部门数量超过单实例安全范围，进入 Level 3。
 
-## 4. Level 3 Department System
+## 4. 级别 3：Department System
 
 **目标范围**
 
@@ -312,7 +312,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 
 根据端到端完成时间、队列等待、数据库延迟、Research 成功率和成本决定扩展，不按 API QPS 单独判断。
 
-## 5. Level 4 Enterprise System
+## 5. 级别 4：Enterprise System
 
 **目标范围**
 
@@ -339,7 +339,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 
 Prompt、KPI、Report Template、模型、数据 Schema、Workflow State 和权限策略全部版本化并受变更流程控制。
 
-## 6. Level 5 SaaS Platform
+## 6. 级别 5：SaaS Platform
 
 **目标范围**
 

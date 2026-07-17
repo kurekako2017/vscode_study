@@ -12,55 +12,55 @@ All AI tools working in this repository must follow this document before they wr
 
 ## Master Prompt Summary / 摘要 / 要約
 
-### Project Position
+### 项目定位
 
 - `Retail Insight AI` is the current project.
 - The current positioning is `Retail Analysis Domain Reference Implementation`.
 - `Enterprise Retail Intelligence Platform (ERIP)` is only `Target State` / `Planned`, not current reality.
 
-### Current State
+### 当前状态
 
 - The repository is a local-first learning and reference implementation.
 - `inmemory` is still the default repository backend.
 - Phase 2 PostgreSQL persistence exists as an optional path and is not fully verified yet.
 - Real LLM, production RAG, production approval API, Redis, and RabbitMQ are not enabled.
 
-### Target State
+### 目标状态
 
 - Freeze stable boundaries for Task, Workflow, Repository, Provider, Retrieval, Approval, Audit, and Documentation.
 - Keep API and event evolution versioned.
 - Preserve replaceable provider and repository implementations behind stable contracts.
 
-### Execution Rules
+### 执行规则
 
 - Read governance docs before editing.
 - Follow frozen contract, prompt, coding, development, and architecture documents under `docs/`.
 - Prefer contract consistency and documented assumptions over ad hoc shortcuts.
 
-### Forbidden Operations
+### 禁止操作
 
 - Do not rewrite target-state planning as current production reality.
 - Do not modify `backend/`, `frontend/`, `scripts/`, or database assets during standards-only document work unless explicitly requested.
 - Do not bypass versioning, delete governance history, or hardcode secrets.
 
-### Definition of Done
+### 完成定义（Definition of Done）
 
 - The work is done only after scope completion, contract review, verification or blocker recording, architecture updates if needed, changelog update, and handbook mirror update.
 
-### Three-language Documentation Rule
+### 三语文档规则
 
 - Freeze-level documents must keep title, key terms, critical flow, and non-negotiable rules aligned across English, 简体中文, and 日本語.
 - Human-readable project documentation is trilingual by default: English, 中文（简体）, 日本語.
 - English-only is allowed only for code identifiers, API paths, class names, environment variables, enum values, error codes, and event names.
 - Future sprint checklists must keep the item `Human-readable documentation is trilingual: English / 中文（简体） / 日本語` present as a permanent review reminder.
 
-### Handbook Sync Rule
+### Handbook 同步规则
 
 - Main project docs remain the source of truth.
 - Handbook mirror docs must be updated in the same work session.
 - Sync metadata blocks do not replace real handbook content updates.
 
-### API / Event / Prompt Contract Rule
+### API / Event / Prompt 契约规则
 
 - API changes must follow `docs/contracts/API_CONTRACT.md`.
 - SSE event changes must follow `docs/contracts/EVENT_CONTRACT.md`.

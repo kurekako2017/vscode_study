@@ -369,7 +369,7 @@ docker compose ps
 curl -fsS http://127.0.0.1:8000/health
 # 成功标准：JSON 中 "repository_backend":"postgres"（顶层字段，与当前 Health 响应一致）
 
-# Frontend
+# 前端（Frontend）
 curl -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080/
 # 成功标准：200
 
@@ -670,13 +670,13 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 ### 20.1 日常启动 / 停止（一条命令）
 
-本地页面库：**WSL 宿主 PostgreSQL** 库 **`erip_local`**（Unix socket 或 **:5432**）。  
-**不依赖 Docker**；与 Compose Volume **`erip_postgres_data`**、测试库 **`erip_integration_test`** 隔离。  
+本地页面库：**WSL 宿主 PostgreSQL** 库 **`erip_local`**（Unix socket 或 **:5432**）。
+**不依赖 Docker**；与 Compose Volume **`erip_postgres_data`**、测试库 **`erip_integration_test`** 隔离。
 **不是** `erip-local-pg` 容器 / `erip_local_pg_data`（误建物可保留，但非权威路径）。
 
 ```bash
 ./scripts/start_local.sh
-# Frontend http://127.0.0.1:5173/login
+# 前端（Frontend） http://127.0.0.1:5173/login
 # Health   http://127.0.0.1:8000/health  → repository_backend=postgres
 # Swagger  http://127.0.0.1:8000/docs
 

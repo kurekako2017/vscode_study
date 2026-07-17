@@ -1,4 +1,4 @@
-# Enterprise Retail Intelligence Platform (ERIP) Roadmap
+# Enterprise Retail Intelligence Platform（ERIP）演进路线
 
 最后更新：2026-07-17
 
@@ -31,7 +31,7 @@
 
 Documentation Governance V2
 
-### Current Status
+### 当前状态
 
 - README now acts as the single knowledge navigation center and links all current Markdown files
 - Learning walkthrough is restored as per-endpoint study content instead of a summary table
@@ -61,7 +61,7 @@ Documentation Governance V2
 - Interview guide now positions the project as an enterprise AI backend project, not a learning project
 - No backend, frontend, business logic, database, or test implementation changed
 
-### Release Checklist
+### 发布检查清单
 
 - [x] Human-readable documentation is Chinese-first, with Japanese as auxiliary for interview and key terms
 
@@ -72,26 +72,26 @@ Documentation Governance V2
 - Denied approval access still writes `security.permission.denied` audit facts
 - Status: Completed / Verified
 
-### Sprint R3 Summary
+### 冲刺 R3 摘要
 
 - English: the learning and interview docs are optimized without changing business logic
 - 中文（简体）：在不改变业务逻辑的前提下，学习与面试文档已优化
 - 日本語：業務ロジックを変えずに、学習と面接の文書が最適化されました
 
-## Sprint 11.3: RBAC Enforcement for Approval APIs
+## 冲刺 11.3：RBAC Enforcement for Approval APIs
 
-### Current Platform
+### 当前平台
 
 - 当前仍使用 `user_id="system"` 的 placeholder principal 作为 current user seam。
 - 当前 RBAC 仅强制在 approval APIs 上，不扩展到 document / retrieval / RAG / task APIs。
 - 当前 system admin 占位用户可以通过所有 approval permission checks。
 - 当前 permission denied 会先写入 append-only audit log，再返回 `permission_denied`。
 
-### Production Architecture
+### 生产架构
 
 - 当前采用的 approval API response shape 已在企业运行中保持稳定。
 
-### Result
+### 结果
 
 - POST /api/v1/reports/{task_id}/submit-approval now requires `report.submit_approval`
 - GET /api/v1/approvals now requires `approval.review`
@@ -103,25 +103,25 @@ Documentation Governance V2
 - backend tests cover allow / deny paths and denied audit logging
 - handbook mirror synchronized
 
-### Enterprise Deployment
+### 企业部署
 
 - RBAC 与 current user seam 已在既有 approval API payload 上稳定运行。
 - Approval RBAC、document、retrieval、RAG、task APIs 已纳入统一企业治理边界。
 
-## Sprint 11.2: Security Domain + InMemory Audit MVP
+## 冲刺 11.2：Security Domain + InMemory Audit MVP
 
-### Current Platform
+### 当前平台
 
 - （历史 Sprint 记录）当时没有真实认证、JWT、OAuth 或外部身份提供器。**V1.0 现状**：JWT 登录与 RBAC 已交付；完整 SSO/OAuth 产品化仍属后续。
 - 当前 current user 使用 `user_id="system"` 的 placeholder principal。
 - 当前 security catalog 使用静态目录，尚未接 RBAC enforcement。
 - 当前 audit log 使用 append-only InMemoryAuditRepository，并通过 AuditService 记录成功与失败。
 
-### Production Architecture
+### 生产架构
 
 - 未来可以在不改动 document / retrieval / approval response contract 的前提下接入身份与权限层。
 
-### Result
+### 结果
 
 - user / organization / department / role / permission / policy domain models added
 - GET /api/v1/users/me / GET /api/v1/security/roles / GET /api/v1/security/permissions implemented
@@ -129,23 +129,23 @@ Documentation Governance V2
 - audit.log.created / audit.log.failed logging recorded
 - handbook mirror synchronized
 
-### Enterprise Deployment
+### 企业部署
 
 - 后续 RBAC 只需替换 placeholder principal 和静态目录，不可重命名 permission / event names。
 - 未来 audit persistence 可替换 repository 实现，但不能破坏 append-only 语义。
 
-## Sprint 11.1: Enterprise Security Foundation Contract Freeze
+## 冲刺 11.1：Enterprise Security Foundation Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前还没有 RBAC、认证 middleware 或 Audit API 的 backend 实现。
 - 当前 security model 已冻结为 contract，并在 Sprint 11.2 落地为 backend MVP。
 
-### Production Architecture
+### 生产架构
 
 - 未来可以在不改动 document / retrieval / approval response contract 的前提下接入身份与权限层。
 
-### Result
+### 结果
 
 - user / organization / department / role / permission / policy concepts frozen
 - planned security APIs frozen
@@ -153,199 +153,199 @@ Documentation Governance V2
 - audit log contract and operation log contract frozen
 - handbook mirror synchronized
 
-### Enterprise Deployment
+### 企业部署
 
 - 保持 contract 口径不变，允许后续 backend security implementation 替换 placeholder principal。
 - 未来实现只能补充认证与授权，不允许回写已冻结的权限名称和事件名称。
 
-## Sprint 10.2: Approval API MVP Implementation
+## 冲刺 10.2：Approval API MVP Implementation
 
-### Current State
+### 当前状态
 
 - Approval workflow is now implemented as a backend MVP on top of the frozen contract.
 - Immutable report version snapshots remain the revision boundary.
 
-### Production Architecture
+### 生产架构
 
 - Enterprise RBAC, audit expansion, and persistence backends can reuse the same approval contract.
 
-### Result
+### 结果
 
 - submit-approval / approvals list-detail / approve / reject / revise are now wired to the service boundary
 - InMemory approval repository, immutable report version model, and approval events are implemented
 - backend tests cover success and error paths
 
-### Enterprise Deployment
+### 企业部署
 
 - Keep the approval contract stable while the next sprint focuses on hardening and persistence seams.
 
-## Sprint 10.1: Approval Workflow Contract Freeze
+## 冲刺 10.1：Approval Workflow Contract Freeze
 
-### Current State
+### 当前状态
 
 - Approval workflow is still contract-only.
 - Report revision remains an immutable snapshot boundary.
 
-### Production Architecture
+### 生产架构
 
 - Enterprise Approval API can be implemented without changing report / retrieval / internal RAG contract.
 
-### Result
+### 结果
 
 - approval domain model, API contract, event contract, error catalog, and state rules frozen
 - report revision relationship, audit relationship, and future RBAC relationship documented
 - docs and handbook mirror synchronized
 
-### Enterprise Deployment
+### 企业部署
 
 - Keep approval workflow as the next backend implementation boundary.
 - Preserve immutable report version semantics.
 
-## Sprint 9.5: LLM Provider Seam Stub MVP
+## 冲刺 9.5：LLM Provider Seam Stub MVP
 
-### Current State
+### 当前状态
 
 - Internal RAG 仍然默认走 deterministic extractive path。
 - `StubLLMProvider` 已接入 `RAGAnswerGenerator`，但只有在 `INTERNAL_RAG_USE_LLM=true` 时才会使用。
 
-### Production Architecture
+### 生产架构
 
 - 未来真实 LLM provider 可以替换 stub provider，而不改变 API contract 或 retrieval boundary。
 
-### Result
+### 结果
 
 - `StubLLMProvider`、`RAGAnswerGenerator`、`LLM_PROVIDER=stub`、`INTERNAL_RAG_USE_LLM=false` 默认值已落地。
 - provider failure / timeout / invalid output 都会回退到 deterministic answer。
 - backend tests 与 compileall 已通过。
 
-### Enterprise Deployment
+### 企业部署
 
 - 继续保持 deterministic fallback 为默认路径。
 - 未来若接入真实 provider，只允许替换 provider 实现，不允许改动 internal RAG response contract。
 
-## Sprint 9.4: LLM Provider Seam Contract Freeze
+## 冲刺 9.4：LLM Provider Seam Contract Freeze
 
-### Current State
+### 当前状态
 
 - Internal RAG 仍然是 deterministic answer assembly，没有真实 LLM provider。
 - 当前只冻结未来 provider seam、prompt contract 和 fallback behavior。
 
-### Production Architecture
+### 生产架构
 
 - 未来 summary / generative answer path 可以通过 `LLMProvider` 接入，但必须保持现有 response contract 不变。
 
-### Result
+### 结果
 
 - `LLMProvider`、`RAGAnswerGenerator`、provider error model、fallback behavior、token/cost/latency placeholder 已在文档层冻结。
 - backend 行为、frontend、scripts 均未修改。
 
-### Enterprise Deployment
+### 企业部署
 
 - 继续保持 no-LLM path 为默认路径。
 - 未来若接入模型，只允许在 answer generation seam 做替换。
 
-## Sprint 9.3: Internal RAG Evaluation + Citation Quality MVP
+## 冲刺 9.3：Internal RAG Evaluation + Citation Quality MVP
 
-### Current State
+### 当前状态
 
 - Internal RAG 已实现 deterministic answer assembly，并新增内部 evaluation / citation quality checking。
 - warnings taxonomy 已包含 `low_context`、`missing_citation`、`weak_match`。
 
-### Production Architecture
+### 生产架构
 
 - 未来如果引入 LLM provider，仍要沿用当前 evaluation contract 与 citation quality checker。
 
-### Result
+### 结果
 
 - `coverage_score`、`citation_score`、`confidence` 和 warnings 已由内部 evaluation service 计算。
 - backend tests 与 compileall 已通过。
 
-### Enterprise Deployment
+### 企业部署
 
 - 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
 - 继续保持 retrieval API contract / scoring / response shape 不变。
 
-## Epic 14: Engineering Standards (Final Freeze)
+## Epic 14：工程标准（最终冻结）
 
-### Current State
+### 当前状态
 
 - Architecture、Workflow、Contract、Development Standard 此前分散在多个治理文档中
 - 各类 AI 工具尚无单一 Master Prompt 和统一工程标准入口
 
-### Production Architecture
+### 生产架构
 
 - `docs/development/MASTER_PROMPT.md` 成为唯一 Master Prompt
 - API Contract、Event Contract、Prompt Standard、Coding Standard、Development Guide、AI Agent Design Guide 全部冻结
 - handbook 侧存在镜像文档，供教学与审查同步引用
 
-### Result
+### 结果
 
 - Freeze docs created
 - Handbook mirror docs created
 - Sync manifest expanded
 - Enterprise AI tools follow the frozen standards before editing the repository
 
-## Sprint 8.1: Document Retrieval Contract Freeze
+## 冲刺 8.1：Document Retrieval Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前实现仍以 Document Chunk Pipeline MVP 为最新后端边界。
 - Document Retrieval 仅完成契约冻结，尚未进入 backend 实现。
 
-### Production Architecture
+### 生产架构
 
 - Retrieval 成为 Chunk 与 future RAG 之间的稳定只读边界。
 - 未来实现必须保持 keyword-only contract compatibility。
 
-### Result
+### 结果
 
 - 已冻结 `POST /api/v1/document-retrieval/search`。
 - 已冻结 retrieval events 与 retrieval errors。
 - 已更新 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md`、`docs/architecture/ARCHITECTURE.md` 以及 handbook mirror。
 
-### Enterprise Deployment
+### 企业部署
 
 - 只做契约冻结，不实现 Retrieval API。
 - 不引入 RAG / embedding / pgvector / hybrid search。
 
-## Sprint 8.2: Document Retrieval API MVP Implementation
+## 冲刺 8.2：Document Retrieval API MVP Implementation
 
-### Current State
+### 当前状态
 
 - Document Retrieval API 已实现，并严格遵守 Sprint 8.1 冻结 contract。
 
-### Production Architecture
+### 生产架构
 
 - Retrieval 仍保持 keyword-only 只读边界，后续可替换搜索后端但不破坏 contract。
 
-### Result
+### 结果
 
 - `POST /api/v1/document-retrieval/search` 已实现。
 - 基于现有 in-memory document chunks 完成 keyword search。
 - 已补充 retrieval tests 与 backend full suite verification。
 
-### Enterprise Deployment
+### 企业部署
 
 - 未来可在 contract 不变前提下引入 PostgreSQL full-text / hybrid search。
 - 继续保持 Retrieval 不承担 LLM answer generation。
 
-## Sprint 9.2: Internal RAG MVP without LLM
+## 冲刺 9.2：Internal RAG MVP without LLM
 
-### Current State
+### 当前状态
 
 - Internal RAG 已在 existing DocumentRetrievalProvider 之上完成 deterministic answer assembly。
 - extractive / summary 两种 answer mode 都不调用 LLM。
 
-### Production Architecture
+### 生产架构
 
 - 未来 summary mode 可以接入可插拔 LLM provider，但 citation contract 不变。
 
-### Result
+### 结果
 
 - `POST /api/v1/internal-rag/answer` 已实现。
 - backend tests 与 compileall 已通过。
 
-### Enterprise Deployment
+### 企业部署
 
 - 继续保持 `POST /api/v1/internal-rag/answer` 与 retrieval API 分离。
 - 未来若接 LLM provider，只能替换 answer assembly 层。
@@ -370,187 +370,187 @@ Documentation Governance V2
 8. 架构图与流程图文档
 9. 文档域模型基础
 
-## Sprint 1: Phase 3.1 Document Domain Model
+## 冲刺 1：Phase 3.1 Document Domain Model
 
-### Current State
+### 当前状态
 
 - Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource 已补齐。
 - `InMemoryDocumentRepository` 已实现，作为 Upload、RAG、审批和 PostgreSQL 之前的稳定文档事实边界。
 - `ImportBatch` 复用 `DataImport`，`ApprovalStatus` 复用现有审批状态语义。
 
-### Production Architecture
+### 生产架构
 
 - Document Domain 统一承载文档上传、版本管理、检索与审批的共同语义。
 - 未来 Upload API、Chunk Pipeline、Retrieval Provider、Approval API 和 PostgreSQL Document Repository 都必须沿用本次冻结的模型。
 
-### Result
+### 结果
 
 - 已完成文档域模型、Repository Interface、InMemory Repository、基础验证与单元测试。
 - 已同步 `TASK.md`、`docs/governance/PROJECT_BACKLOG.md`、`docs/architecture/ARCHITECTURE.md`、`docs/governance/CHANGELOG.md`、`docs/governance/DECISIONS.md` 以及 handbook 镜像。
 - 本次未实现 Upload API、RAG、pgvector、Internet Search 或 PostgreSQL Document Repository。
 
-## Sprint 2: Document Upload API Contract Freeze
+## 冲刺 2：Document Upload API Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前实现仍只停留在 Document Domain Model，没有 Upload API 实现。
 
-### Production Architecture
+### 生产架构
 
 - 冻结 Upload API、事件契约、验证流程和未来审批关系，作为后续实现的唯一输入契约。
 
-### Result
+### 结果
 
 - 已冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
 
-### Enterprise Deployment
+### 企业部署
 
 - 只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
-## Sprint 2.5: Document Upload Workflow + Error Catalog + Upload Policy Freeze
+## 冲刺 2.5：Document Upload Workflow + Error Catalog + Upload Policy Freeze
 
-### Current State
+### 当前状态
 
 - 当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
 
-### Production Architecture
+### 生产架构
 
 - 冻结 Upload Workflow、Upload Session、Idempotency、Error Catalog、Upload Policy，作为 Upload API 实现前的最后边界。
 
-### Result
+### 结果
 
 - 已创建 `docs/contracts/ERROR_CATALOG.md` 与 `docs/contracts/UPLOAD_POLICY.md`。
 - 已冻结 Upload Workflow 的 accepted / validating / storing / completed / failed 流程。
 - 已冻结 Idempotency 规则与 Upload Session 状态。
 
-### Enterprise Deployment
+### 企业部署
 
 - 只做契约冻结，不实现 Upload API，不修改 backend 业务代码，不修改 frontend，不安装依赖。
 
-## Sprint 3: Document Upload API MVP
+## 冲刺 3：Document Upload API MVP
 
-### Current State
+### 当前状态
 
 - Document Domain、Upload Contract、Upload Workflow、Error Catalog 与 Upload Policy 已冻结。
 - 现在进入 `POST /api/v1/documents` 的后端 MVP 实现。
 
-### Production Architecture
+### 生产架构
 
 - 完成文档上传的同步 MVP 闭环：
   multipart/form-data -> validation -> checksum -> duplicate / idempotency -> repository save -> event publish -> 201 response。
 
-### Result
+### 结果
 
 - 已实现 `POST /api/v1/documents`。
 - 已补充 backend 单元测试，覆盖成功、类型不支持、空文件、缺少标题、重复 checksum、幂等重放、幂等冲突。
 
-### Enterprise Deployment
+### 企业部署
 
 - 继续保持 `GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}` 为冻结但未实现。
 - 继续保持 PostgreSQL Document Repository 仅设计不实现。
 
-## Sprint 4: Document Read API MVP
+## 冲刺 4：Document Read API MVP
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents` 已可用。
 - 现在进入低风险读接口实现阶段。
 
-### Production Architecture
+### 生产架构
 
 - 完成 `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 的后端 MVP。
 
-### Result
+### 结果
 
 - 已实现列表读取、单文档读取与基础过滤。
 - 已补充 backend 单元测试覆盖空列表、上传后列表、上传后读取、缺失文档和过滤条件。
 
-### Enterprise Deployment
+### 企业部署
 
 - `DELETE`、`versions`、`chunks` 接口继续保持冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
 
-## Sprint 5: Document Archive API MVP
+## 冲刺 5：Document Archive API MVP
 
-### Current State
+### 当前状态
 
 - `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已可用。
 - 现在进入 `DELETE /api/v1/documents/{document_id}` 的软删除实现阶段。
 
-### Production Architecture
+### 生产架构
 
 - 完成文档归档删除的后端 MVP。
 
-### Result
+### 结果
 
 - DELETE 语义冻结为 archive / soft delete。
 - archived 文档保持可读。
 - 列表默认排除 archived，除非显式请求包含 archived。
 
-### Enterprise Deployment
+### 企业部署
 
 - `versions`、`chunks` 接口继续保持冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
 
-## Sprint 6: Document Import Pipeline MVP
+## 冲刺 6：Document Import Pipeline MVP
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
 - 当前导入流水线只做同步 MVP，不创建 chunk、不做检索、不做审批。
 
-### Production Architecture
+### 生产架构
 
 - 形成文档导入的最小闭环，为未来 chunking、RAG、全文检索和审批提供前置边界。
 
-### Result
+### 结果
 
 - 导入成功后，文档状态推进到 `validated`。
 - 导入失败时，导入记录保留错误码与错误信息。
 
-### Enterprise Deployment
+### 企业部署
 
 - `versions`、`chunks`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续保持冻结未实现。
 
-## Sprint 7: Document Chunk Pipeline MVP
+## 冲刺 7：Document Chunk Pipeline MVP
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks` 已实现。
 - 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
 - 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
 
-### Production Architecture
+### 生产架构
 
 - 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
 - chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
 - chunk pipeline 不改变 approval 状态，也不承担 search / embedding 职责。
 
-### Result
+### 结果
 
 - 支持 import 完成后的文档切片、chunk 查询与事件记录。
 
-### Enterprise Deployment
+### 企业部署
 
 - `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
 
-## Epic 12 Positioning
+## Epic 12 定位
 
-### Current State
+### 当前状态
 
 当前尚未形成完整 Retrieval and RAG Platform。
 
-### Production Architecture
+### 生产架构
 
 `Epic 12: Retrieval and RAG Platform` 作为横向平台能力，服务于业务检索、社内文档检索、互联网检索、上下文组装、引用追踪与风险控制。
 
-### Enterprise Deployment
+### 企业部署
 
 当前将 Epic 12 作为横向平台能力标记。未来若出现 Epic 9~11，Epic 12 仍保持横向能力，不依赖编号顺序表达优先级。
 
-## Project Positioning
+## 项目定位
 
-### Current Platform
+### 当前平台
 
 当前项目名称统一为 `Enterprise Retail Intelligence Platform (ERIP)`。
 
@@ -558,7 +558,7 @@ Documentation Governance V2
 
 `大手流通グループ向け Enterprise Retail Intelligence Platform（ERIP） AI経営分析基盤構築プロジェクト`
 
-### System Architecture
+### 系统架构
 
 平台名称统一为：
 
@@ -566,11 +566,11 @@ Documentation Governance V2
 
 `Enterprise Retail Intelligence Platform (ERIP)` 表示已经正式交付并投入企业使用的平台名称。
 
-### Enterprise Deployment
+### 企业部署
 
 平台化能力统一按已交付的企业运行架构描述。
 
-## Architecture Principles
+## 架构原则
 
 - Platform First
 - Domain Driven
@@ -582,17 +582,17 @@ Documentation Governance V2
 - Documentation First
 - Backward Compatibility
 
-## Epic 0: Enterprise Platform Architecture Evolution
+## Epic 0：企业平台架构演进
 
-### Current Platform
+### 当前平台
 
 当前仓库已作为 ERIP V1.0 的正式交付版本，平台级目录与抽象边界已形成稳定治理。
 
-### Production Architecture
+### 生产架构
 
 以 `Enterprise Retail Intelligence Platform (ERIP)` 作为零售分析领域企业平台，持续沉淀平台架构边界。
 
-### Runtime Architecture Tasks
+### 运行时架构 Tasks
 
 - [x] Approval Workflow Contract Freeze
 - [ ] Architecture Freeze
@@ -603,7 +603,7 @@ Documentation Governance V2
 - [ ] Documentation Standard
 - [ ] Testing Standard
 
-## Epic 0 Deliverables
+## Epic 0 交付物
 
 - [ ] Architecture Freeze
 - [ ] Directory Freeze
@@ -614,13 +614,13 @@ Documentation Governance V2
 - [ ] Testing Freeze
 - [ ] Documentation Freeze
 
-## Epic 12: Retrieval and RAG Platform
+## Epic 12：检索与 RAG 平台
 
-### Current State
+### 当前状态
 
 当前 Retrieval 能力尚未形成统一抽象层。
 
-### Production Architecture
+### 生产架构
 
 未来 RAG 平台覆盖：
 
@@ -631,7 +631,7 @@ Documentation Governance V2
 - Citation and Source Trace
 - Retrieval Evaluation
 
-### Enterprise Deployment Tasks
+### 企业部署 Tasks
 
 - [ ] Business Data Retrieval
 - [ ] SQL-based structured retrieval
@@ -651,14 +651,14 @@ Documentation Governance V2
 - [ ] Retrieval evaluation
 - [ ] Handbook 文档已同步
 
-### Relationship Notes
+### 关系说明
 
 - Epic 12 作为横向检索平台总览，保留业务检索、社内文档检索、互联网检索与上下文组装的宽口径视图。
 - 语义检索、向量数据库、LangChain 编排与 Embedding 细节下沉到 Epic 13 统一规划，避免重复拆成多个平行任务池。
 
-## Epic 13: Semantic RAG / Vector Retrieval Upgrade
+## Epic 13：语义 RAG / 向量检索升级
 
-### Current State
+### 当前状态
 
 - 当前 `Retail Insight AI` MVP 已有 Document Upload / Import / Chunk 基础能力。
 - 当前检索以 Keyword Retrieval（Current）为主，仍然依赖词面匹配与已有 chunk 结果排序。
@@ -667,7 +667,7 @@ Documentation Governance V2
 - 当前没有真正 Vector Database。
 - 当前没有 LangChain RAG 编排。
 
-### Production Architecture
+### 生产架构
 
 - 支持 Embedding。
 - 支持 Vector Database（, pgvector first）。
@@ -678,7 +678,7 @@ Documentation Governance V2
 - 支持 Retrieval Evaluation。
 - 支持 PostgreSQL（）+ pgvector（）企业化演进。
 
-### Enterprise Deployment Tasks
+### 企业部署 Tasks
 
 - [ ] 设计 Embedding Provider 接口
   - [ ] OpenAI Embedding
@@ -747,20 +747,20 @@ Documentation Governance V2
   - [ ] 更新 `DATABASE.md`，如涉及 pgvector schema
   - [ ] 更新 `README.md` 的能力矩阵，标记为企业运行口径
 
-### Design Notes
+### 设计说明
 
 - Keyword Retrieval 偏向词面匹配与既有 chunk 命中，适合当前本地学习版和快速回归；Semantic Retrieval 通过 embedding 捕获语义相似、同义表达和改写问题。
 - LangChain 只作为 RAG 编排层，用来组织 Retriever、Prompt 和 Context Builder，不接管 Workflow 状态机。
 - LangGraph 继续负责 Workflow / State Machine，因为它更适合表达任务流转、重试、分支与状态持久化。
 - pgvector 是第一优先，因为它最贴近当前 PostgreSQL-first 演进路径，能把向量、元数据和业务事实放在同一套数据库治理中；后续再通过同一 Vector Store 接口扩展到 Qdrant / Milvus。
 
-## System Architecture
+## 系统架构
 
-### Current State
+### 当前状态
 
 当前目录尚未完全按平台化目标分层。
 
-### Production Architecture
+### 生产架构
 
 未来目标架构逻辑分层：
 
@@ -779,11 +779,11 @@ Database
 Frontend
 ```
 
-### Enterprise Deployment
+### 企业部署
 
 这是 `Enterprise Retail Intelligence Platform (ERIP)` 的 System Architecture 分层，不表示当前这些目录或模块已经全部实现；当前已实现部分仍以 `Retail Insight AI` MVP 为准。
 
-## Definition of Done
+## 完成定义（Definition of Done）
 
 任何一个 Phase 只有在以下项目全部满足后，才允许标记完成：
 
@@ -829,7 +829,7 @@ Frontend
 - 当前结果：已完成本地 CSV / JSON / Markdown 输入落地。KPI 改为从 `backend/data/business/*.csv` 计算，Research 改为从 `backend/data/research/*.json` 读取，`backend/data/documents/` 已建立 Markdown 样例目录。
 - 当前边界：Report 仍为直接生成，当前状态为 `generated`。后续 Approval Workflow 将在此基础上扩展 `draft / pending_approval / approved / rejected / revised`。
 
-### Phase 1.5: Data Contract Freeze + Approval State Machine Design
+### 阶段 1.5：Data Contract Freeze + Approval State Machine Design
 
 - 目标：冻结文件输入契约、导入错误分类与报告审批状态机，避免 CSV / JSON 字段漂移，并为 Phase 2 PostgreSQL 提供表设计依据。
 - 交付重点：`docs/architecture/DATA_CONTRACTS.md`、`docs/architecture/APPROVAL_WORKFLOW.md`、`docs/database/DATABASE.md`、Mermaid 图、ADR。
@@ -894,7 +894,7 @@ Frontend
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认
 - `ai-agent-retail-handbook-v3/docs/governance/PROJECT_BACKLOG.md` | sha256=4b25c1fa793fa7ce50f3cc87341c8136603a8fc0eeae44e3b57dfcfd17f4dfc7 | # 项目总待办清单 / 最后更新：2026-07-02 / ## 项目目标 / 待确认
 - `ai-agent-retail-handbook-v3/docs/governance/CHANGELOG.md` | sha256=db921303a94dca1268fc38339f4c13606461269c65ca79c1de024cc1d36601c3 | # CHANGELOG / ## 2026-07-02 / - 建立 ai-agent-retail-handbook-v3 与 retail-insight-ai 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
-- `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-demo)
+- `ai-agent-retail-handbook-v3/10_Production_Roadmap.md` | sha256=d904e6883e84c4bb5adda4d7adab4499e1e0f6f5e52bf97f46ecd7150271e64e | # 10_Production_Roadmap / # 目录 / - [1. Roadmap 原则](#1-roadmap-原则) / - [2. Level 1 Demo](#2-level-1-演示)
 
 说明：
 - 这个块由 `scripts/sync_retail_handbook_docs.py` 自动维护。

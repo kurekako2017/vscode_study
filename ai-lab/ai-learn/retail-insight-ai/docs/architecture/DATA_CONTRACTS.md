@@ -1,4 +1,4 @@
-# retail-insight-ai Data Contracts
+# ERIP 数据契约（Data Contracts）
 
 最后更新：2026-07-04
 
@@ -11,26 +11,26 @@
 - 当前不表示导入 API 已实现。
 - 后续 Phase 2 及以后必须兼容本文件，除非通过 ADR 明确变更。
 
-## Current State
+## 当前状态
 
 - KPI 输入来自 `backend/data/business/*.csv`
 - Research 输入来自 `backend/data/research/*.json`
 - Documents 输入边界来自 `backend/data/documents/*.md`
 - 当前由本地文件加载层读取，不经过数据库
 
-## Target State
+## 目标状态
 
 - 文件输入字段冻结
 - 校验规则冻结
 - 导入错误分类冻结
 - 为 Phase 2 PostgreSQL 导入表和 Repository 提供依据
 
-## Planned
+## 计划项
 
 - Phase 2 将把本文件映射到 `data_imports` / `import_errors`
 - Phase 3 将把 documents Markdown 纳入上传与入库规则
 
-## Import Error Model
+## 导入错误模型
 
 导入错误分类冻结如下：
 
@@ -46,12 +46,12 @@
 
 ## sales.csv
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/business/sales.csv`
 - 用途：用于计算 `revenue` 与 `gross_margin_rate`
 
-### Contract
+### 契约
 
 | 字段 | 类型 | 必填 | 示例 | 校验规则 |
 | --- | --- | --- | --- | --- |
@@ -60,13 +60,13 @@
 | `revenue_jpy` | 整数 | 是 | `4200000` | `>= 0` |
 | `gross_profit_jpy` | 整数 | 是 | `1302000` | `>= 0` 且 `<= revenue_jpy` |
 
-### Header Freeze
+### 表头冻结
 
 ```text
 date,store_id,revenue_jpy,gross_profit_jpy
 ```
 
-### Validation Rules
+### 校验规则
 
 - 表头顺序必须固定
 - 至少 1 行数据
@@ -75,12 +75,12 @@ date,store_id,revenue_jpy,gross_profit_jpy
 
 ## inventory.csv
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/business/inventory.csv`
 - 用途：用于计算 `inventory_turnover`
 
-### Contract
+### 契约
 
 | 字段 | 类型 | 必填 | 示例 | 校验规则 |
 | --- | --- | --- | --- | --- |
@@ -89,13 +89,13 @@ date,store_id,revenue_jpy,gross_profit_jpy
 | `average_inventory_jpy` | 整数 | 是 | `1200000` | `> 0` |
 | `cost_of_goods_sold_jpy` | 整数 | 是 | `5100000` | `>= 0` |
 
-### Header Freeze
+### 表头冻结
 
 ```text
 sku_id,category,average_inventory_jpy,cost_of_goods_sold_jpy
 ```
 
-### Validation Rules
+### 校验规则
 
 - 表头顺序必须固定
 - 至少 1 行数据
@@ -103,12 +103,12 @@ sku_id,category,average_inventory_jpy,cost_of_goods_sold_jpy
 
 ## members.csv
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/business/members.csv`
 - 用途：用于计算 `active_members`
 
-### Contract
+### 契约
 
 | 字段 | 类型 | 必填 | 示例 | 校验规则 |
 | --- | --- | --- | --- | --- |
@@ -116,13 +116,13 @@ sku_id,category,average_inventory_jpy,cost_of_goods_sold_jpy
 | `segment` | 字符串 | 是 | `gold` | 非空；建议使用受控枚举 |
 | `is_active` | 布尔字符串 | 是 | `true` | 只允许 `true/false/1/0/yes/no/y/n` |
 
-### Header Freeze
+### 表头冻结
 
 ```text
 member_id,segment,is_active
 ```
 
-### Validation Rules
+### 校验规则
 
 - 表头顺序必须固定
 - 至少 1 行数据
@@ -130,12 +130,12 @@ member_id,segment,is_active
 
 ## promotions.csv
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/business/promotions.csv`
 - 用途：用于计算 `promotion_lift`
 
-### Contract
+### 契约
 
 | 字段 | 类型 | 必填 | 示例 | 校验规则 |
 | --- | --- | --- | --- | --- |
@@ -144,26 +144,26 @@ member_id,segment,is_active
 | `baseline_revenue_jpy` | 整数 | 是 | `1200000` | `> 0` |
 | `promoted_revenue_jpy` | 整数 | 是 | `1380000` | `>= 0` |
 
-### Header Freeze
+### 表头冻结
 
 ```text
 promotion_id,channel,baseline_revenue_jpy,promoted_revenue_jpy
 ```
 
-### Validation Rules
+### 校验规则
 
 - 表头顺序必须固定
 - 至少 1 行数据
 - `baseline_revenue_jpy` 必须大于 0
 
-## Research JSON
+## 调研（Research） JSON
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/research/*.json`
 - 用途：用于 `StaticResearchProvider` 组合 `summary / sources`
 
-### Contract
+### 契约
 
 | 字段 | 类型 | 必填 | 示例 | 校验规则 |
 | --- | --- | --- | --- | --- |
@@ -184,7 +184,7 @@ promotion_id,channel,baseline_revenue_jpy,promoted_revenue_jpy
 }
 ```
 
-### Validation Rules
+### 校验规则
 
 - JSON 根必须是 object
 - `summary` 必须是非空字符串
@@ -196,17 +196,17 @@ promotion_id,channel,baseline_revenue_jpy,promoted_revenue_jpy
 
 ## Documents Markdown
 
-### Current State
+### 当前状态
 
 - 路径：`backend/data/documents/*.md`
 - 当前只作为目录边界样例存在
 - 当前不参与 Workflow、RAG、Approval、Import API
 
-### Target State
+### 目标状态
 
 - 未来作为文档上传、入库、切分、检索的输入源之一
 
-### Planned Rules
+### 计划项 Rules
 
 - 编码默认 `UTF-8`
 - 文件扩展名固定 `.md`
@@ -219,7 +219,7 @@ promotion_id,channel,baseline_revenue_jpy,promoted_revenue_jpy
   - `classification`
   - `approval_scope`
 
-## Data Contract Validation Flow
+## 数据（Data） Contract Validation Flow
 
 ```mermaid
 flowchart TD
@@ -236,7 +236,7 @@ flowchart TD
     D -->|valid| L[Contract Accepted]
 ```
 
-## Data Import Flow
+## 数据（Data） Import Flow
 
 ```mermaid
 flowchart LR

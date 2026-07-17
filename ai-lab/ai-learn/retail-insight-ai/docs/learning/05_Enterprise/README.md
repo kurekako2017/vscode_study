@@ -3,8 +3,8 @@
 
 
 
-> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
-> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。
 > 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
 
 # Volume 05：Enterprise（企业架构）
@@ -113,7 +113,7 @@ Volume 05 不再讲：
 
 # 本册目录（规划）
 
-## Chapter 26：Repository Pattern
+## 第 26 章：仓储模式（Repository Pattern）
 
 学习内容：
 
@@ -130,7 +130,7 @@ backend/app/repositories/
 
 ---
 
-## Chapter 27：Dependency Injection
+## 第 27 章：依赖注入（Dependency Injection）
 
 学习内容：
 
@@ -149,7 +149,7 @@ backend/app/services/
 
 ---
 
-## Chapter 28：Background Task Pattern
+## 第 28 章：后台任务模式（Background Task Pattern）
 
 学习内容：
 
@@ -167,7 +167,7 @@ task_service.py
 
 ---
 
-## Chapter 29：Event Driven Architecture
+## 第 29 章：事件驱动架构（Event Driven Architecture）
 
 学习内容：
 
@@ -184,7 +184,7 @@ publisher.py
 
 ---
 
-## Chapter 30：Workflow Pattern
+## 第 30 章：工作流模式（Workflow Pattern）
 
 学习内容：
 
@@ -202,7 +202,7 @@ graph.py
 
 ---
 
-## Chapter 31：Security Architecture
+## 第 31 章：安全架构（Security Architecture）
 
 学习内容：
 
@@ -213,7 +213,7 @@ graph.py
 
 ---
 
-## Chapter 32：Persistence Architecture
+## 第 32 章：持久化架构（Persistence Architecture）
 
 学习内容：
 
@@ -225,7 +225,7 @@ graph.py
 
 ---
 
-## Chapter 33：Scalability Architecture
+## 第 33 章：可扩展架构（Scalability Architecture）
 
 学习内容：
 
@@ -237,7 +237,7 @@ graph.py
 
 ---
 
-## Chapter 34：Cloud Native Architecture
+## 第 34 章：云原生架构（Cloud Native Architecture）
 
 学习内容：
 
@@ -249,7 +249,7 @@ graph.py
 
 ---
 
-## Chapter 35：Enterprise AI Architecture
+## 第 35 章：企业 AI 架构（Enterprise AI Architecture）
 
 学习内容：
 

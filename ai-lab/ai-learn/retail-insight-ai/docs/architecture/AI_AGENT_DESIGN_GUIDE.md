@@ -39,7 +39,7 @@
 | `Tool` | 外部能力调用、权限敏感操作、副作用操作 | 普通领域状态读写 | 未来 Search Tool、Future MCP Tool |
 | `Provider` | 可替换的数据源、模型源、检索源 | 业务状态持久化 | `StaticResearchProvider`、未来 `LLMProvider` |
 
-## 3. Tool
+## 3. 工具（Tool）
 
 中文说明：
 
@@ -51,7 +51,7 @@
 
 `Tool` は Agent が外部能力を安全に使うための境界です。権限、監査、タイムアウトを必ず設計します。
 
-## 4. Repository
+## 4. 仓储（Repository）
 
 中文说明：
 
@@ -112,7 +112,7 @@
 
 モデルを切り替えても API 契約と Service 境界を変えないことが重要です。
 
-## 8. Retrieval
+## 8. 检索（Retrieval）
 
 中文说明：
 
@@ -130,7 +130,7 @@
 
 `Retrieval` は証拠を探す層です。回答生成とは分離します。
 
-## 9. Approval
+## 9. 审批（Approval）
 
 中文说明：
 
@@ -151,7 +151,7 @@
 
 承認状態とタスク実行状態は別です。承認履歴は監査可能でなければなりません。
 
-## 10. RBAC / Audit
+## 10. RBAC / 审计（Audit）
 
 中文说明：
 

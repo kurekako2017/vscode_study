@@ -1,4 +1,4 @@
-# 11_Project_Structure
+# 11 项目结构（Project Structure）
 
 > **文档角色：** 活动 handbook 章节。若与文首 ERIP V1.0 摘要冲突，以源码 + `03_AI核心知识.md` 技术表 + 权威 Volume01 为准。历史阶段表述保留时仅作演进记录。
 
@@ -32,9 +32,9 @@
 - API、Worker、SSE 可作为独立部署单元扩展，但不为每个类创建服务。
 - 目录结构能够映射基本设计、详细设计、测试和运维责任。
 
-## 1.1 Project Positioning
+## 1.1 项目定位
 
-### Current State
+### 当前状态
 
 当前项目名称保持为：
 
@@ -44,17 +44,17 @@
 
 `Retail Analysis Domain Reference Implementation`
 
-### Target State
+### 目标状态
 
 未来平台目标名称：
 
 `Enterprise Retail Intelligence Platform (ERIP)`
 
-### Planned
+### 计划项
 
 本文件中的平台化目录结构用于描述 ERIP 目标架构，不表示当前仓库已经全部按该结构落地。
 
-## 1.2 Architecture Principles
+## 1.2 架构原则
 
 - Platform First
 - Domain Driven
@@ -66,7 +66,7 @@
 - Documentation First
 - Backward Compatibility
 
-## 1.3 Target Architecture Mapping
+## 1.3 目标架构映射
 
 未来目标逻辑分层：
 
@@ -87,37 +87,37 @@ Frontend
 
 当前尚未全部实现，当前 `backend/`、`frontend/`、`docs/` 仍是现阶段主目录。
 
-## 1.4 Directory Refactor Design
+## 1.4 目录重构设计
 
-### Platform Layer
+### 平台层
 
 - 负责平台通用能力、配置、审批、审计、权限与装配。
 
-### Domain Layer
+### 领域层
 
 - 负责 Task、Analysis、Workflow、Report 等领域模型与用例。
 
-### Infrastructure Layer
+### 基础设施层
 
 - 负责 Repository、Provider、Database、Search、Import 等外部适配。
 
-### Frontend
+### 前端（Frontend）
 
 - 负责页面状态、交互流程、前端契约与展示。
 
-### Documentation
+### 文档
 
 - 负责架构、设计、ADR、测试、运维与培训文档。
 
-### Data
+### 数据（Data）
 
 - 负责 CSV / Excel / JSON / Markdown 输入样例与导入入口。
 
-### Template
+### 模板（Template）
 
 - 负责报告模板、Prompt 模板、导入模板。
 
-### Test
+### 测试（Test）
 
 - 负责 unit / integration / api / workflow / frontend / db / performance / manual 覆盖。
 

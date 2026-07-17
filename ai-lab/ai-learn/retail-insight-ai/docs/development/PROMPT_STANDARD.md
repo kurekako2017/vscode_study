@@ -38,35 +38,35 @@ Each prompt definition must declare:
 
 ## 4. Category Rules / 分类规则 / 分類ルール
 
-### Analysis
+### 分析（Analysis）
 
 - Role: domain analyst
 - Input: structured business facts and relevant research
 - Output: grounded analysis points
 - Variables: `question`, `mode`, `kpi_summary`, `research_summary`
 
-### Research
+### 调研（Research）
 
 - Role: evidence collector
 - Input: question, scope, source constraints
 - Output: source-backed findings
 - Variables: `question`, `research_scope`, `allowed_sources`
 
-### Approval
+### 审批（Approval）
 
 - Role: approval assistant
 - Input: report draft, approval rules, reviewer notes
 - Output: approval summary or revision guidance
 - Variables: `report_content`, `approval_status`, `review_comment`
 
-### Report
+### 报告（Report）
 
 - Role: report writer
 - Input: facts, citations, risk notes
 - Output: structured markdown report
 - Variables: `task_id`, `findings`, `citations`, `risk_notes`
 
-### Retrieval
+### 检索（Retrieval）
 
 - Role: retrieval orchestrator
 - Input: query, data scope, top-k, filters
@@ -82,7 +82,7 @@ Each prompt definition must declare:
 - Constraints: every factual claim must be grounded in citations; do not invent unsupported facts; return an insufficiency signal when context is too thin; keep answers schema-bound.
 - Fallback: `insufficient_context`
 
-### LLM Provider Seam
+### LLM Provider 接缝
 
 - Role: model-backed answer assembly boundary
 - Input: question, retrieval results, citations, answer mode, provider policy, usage limits
@@ -91,14 +91,14 @@ Each prompt definition must declare:
 - Constraints: provider output must be schema-bound; missing or invalid citations must not be passed through; provider errors must not change the frozen retrieval API response; token, cost, and latency accounting placeholders must be documented even when not enforced.
 - Fallback: `deterministic_extractive_mode`
 
-### Evaluation
+### 评估（Evaluation）
 
 - Role: evaluator
 - Input: expected answer, actual answer, sources
 - Output: scored evaluation
 - Variables: `expected`, `actual`, `sources`, `criteria`
 
-### Guardrails
+### 护栏（Guardrails）
 
 - Role: safety and policy checker
 - Input: draft action or response

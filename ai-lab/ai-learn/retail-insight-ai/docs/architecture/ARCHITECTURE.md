@@ -1,4 +1,4 @@
-# Enterprise Retail Intelligence Platform (ERIP) Architecture
+# Enterprise Retail Intelligence Platform（ERIP）架构说明
 
 
 ## ERIP V1.0 交付架构摘要
@@ -21,7 +21,7 @@ React (JWT / ProtectedRoute / RBAC UI / Learning Dashboard / Lifecycle Live Stat
   → AI Runtime：`ai_runtime_settings`（默认 stub）
 ```
 
-### Repository 最终定位（V1.0）
+### 仓储（Repository） 最终定位（V1.0）
 
 - PostgreSQL 是正式运行、企业验收、数据持久化的权威 Repository；Docker Compose **默认且必须** PostgreSQL。
 - 最终业务链、人工验收、Stub E2E、Audit、Approval、Ledger、ReportVersion **均以 PostgreSQL 为准**。
@@ -128,19 +128,19 @@ flowchart LR
 
 ## Current Verified Capability Envelope / 当前已验证能力边界 / 現在の検証済み能力範囲
 
-### Current State
+### 当前状态
 
 - English: the Retail Insight AI MVP backend is verified for document lifecycle, document retrieval, internal RAG without LLM, LLM provider stub seam, approval workflow, approval-scope RBAC, approval-scope audit middleware, security domain, and in-memory audit log
 - 中文（简体）：当前 ERIP V1.0 后端已验证文档生命周期、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批范围内的 RBAC、审批范围内的审计中间件、安全域和 InMemory 审计日志
 - 日本語：現在の ERIP V1.0 バックエンドでは、ドキュメントライフサイクル、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認範囲の RBAC、承認範囲の監査ミドルウェア、セキュリティドメイン、InMemory 監査ログまで検証済みです
 
-### Target State
+### 目标状态
 
 - English: **Historical Target text superseded.** V1.0 already includes React frontend, PostgreSQL/pgvector, JWT/RBAC, Persistent Audit, LLM governance. Remaining enhancements: production-grade hybrid defaults, OTel backend, Redis/RabbitMQ, MCP, K8s/HA — mark as not delivered.
 - 中文（简体）：**以下为历史 Target 文案，已被 V1.0 现实取代。** 前端 UI、PostgreSQL/pgvector、全平台 RBAC、持久化 Audit 等**已交付**。后续增强：Hybrid 默认强化、OpenTelemetry 后端、Redis/RabbitMQ、MCP、K8s/HA 等（未实现）。
 - 日本語：**歴史的 Target 記述。V1.0 では Frontend、PostgreSQL/pgvector、RBAC、永続 Audit 等は交付済み。** 今後は Hybrid 強化、OTel、Redis/RabbitMQ、MCP、K8s/HA 等（未実装）。
 
-### Result
+### 结果
 
 - English: the current Retail Insight AI MVP is runnable, learnable, and interview-ready, but ERIP as the final enterprise platform is still a target state
 - 中文（简体）：当前 ERIP V1.0 可运行、可学习、可面试讲解，但 `ERIP` 作为最终企业平台仍然是 Target State
@@ -148,12 +148,12 @@ flowchart LR
 
 ## Epic 14 Engineering Standards Freeze
 
-### Current State
+### 当前状态
 
 - Architecture、Workflow、Contract、Prompt、Development Standard 的约束分散在 README、AGENTS、Architecture 文档与历史任务记录中。
 - 不同 AI 工具可能对 API version、SSE event、prompt 分类和 workflow 边界产生不一致解释。
 
-### Target State
+### 目标状态
 
 - `docs/development/MASTER_PROMPT.md` 成为唯一总入口。
 - `docs/contracts/API_CONTRACT.md` 冻结 HTTP 边界。
@@ -161,7 +161,7 @@ flowchart LR
 - `docs/development/PROMPT_STANDARD.md` 冻结 Prompt 分类与模板要求。
 - `docs/development/CODING_STANDARD.md`、`docs/development/DEVELOPMENT_GUIDE.md`、`docs/architecture/AI_AGENT_DESIGN_GUIDE.md` 冻结工程实现与设计判断入口。
 
-### Planned
+### 计划项
 
 - 以后新增 API 必须 version。
 - 以后新增 event family 或 breaking event 字段必须 version。
@@ -169,30 +169,30 @@ flowchart LR
 - 以后所有 AI 工具必须先读冻结文档，再执行具体实现。
 - Epic 14 has frozen the master prompt, API contract, event contract, prompt standard, coding standard, development guide, and AI agent design guide as the final planning baseline.
 
-## Phase 1.5 Contract Freeze and Approval Design
+## 阶段 1.5 契约冻结与审批设计
 
-### Current State
+### 当前状态
 
 - 当前文件输入已落地
 - 当前 Report 只实现 `generated`
 - 当前无审批 API、无 PostgreSQL、无导入表
 
-### Target State
+### 目标状态
 
 - 文件输入字段契约冻结
 - 导入错误模型冻结
 - Approval State Machine 冻结
 - Phase 2 数据库准备项冻结
 
-### Planned
+### 计划项
 
 - 由 `docs/architecture/DATA_CONTRACTS.md` 作为文件输入单一来源
 - 由 `docs/architecture/APPROVAL_WORKFLOW.md` 作为审批状态机单一来源
 - 由 `docs/database/DATABASE.md` 作为 Phase 2 表结构准备来源
 
-## Sprint 10.1 Approval Workflow Contract Freeze
+## 冲刺 10.1 Approval Workflow Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前报告仍以 `generated` 作为默认业务状态。
 - Approval API MVP 已实现，但仍必须遵守已冻结的审批 contract、event contract 和 error catalog。
@@ -204,13 +204,13 @@ flowchart LR
 日本語：
 承認ワークフローは backend MVP まで実装済みですが、境界は凍結済み契約のままです。承認記録、監査イベント、report revision snapshot を分離し、可変本文を承認事実として扱わないことが重要です。
 
-### Target State
+### 目标状态
 
 - Approval Workflow 成为 Report Revision、Audit、Future RBAC 之间的稳定承接层。
 - `submit-approval`、`approve`、`reject`、`revise`、`list`、`detail` 六个 API 先冻结契约，再进入实现。
 - `approved` report 只能通过创建新 revision 变更，不得覆盖旧 snapshot。
 
-### Result
+### 结果
 
 - Approval domain model、state machine、API contract、event contract、error catalog 已冻结。
 - report revision relationship、audit relationship、future RBAC relationship 已写入架构边界。
@@ -222,7 +222,7 @@ flowchart LR
 日本語：
 この結果は「契約は凍結済みで、コードも実装済み」という意味です。今後は同じ状態意味を保ったまま拡張し、frontend、RBAC、外部 workflow engine を直接混ぜ込んではいけません。
 
-### Planned
+### 计划项
 
 - 后续 Approval API 只能沿用当前冻结的状态与事件语义。
 - 未来 RBAC 只能控制调用资格，不能改变既有状态机含义。
@@ -230,7 +230,7 @@ flowchart LR
 
 ## Sprint 11.1 Enterprise Security Foundation Contract Freeze / 企业安全基础合同冻结 / エンタープライズセキュリティ基盤契約凍結
 
-### Current State
+### 当前状态
 
 - （历史记录）当时没有真实 RBAC/JWT/OAuth。**V1.0**：JWT + 冻结 RBAC 已交付；完整 SSO/OAuth 产品化仍属后续。
 - 当前 Approval API、Retrieval API 和 Internal RAG 仍只依赖既有 backend service boundary。
@@ -242,7 +242,7 @@ flowchart LR
 日本語：
 この段階では、企業セキュリティ基盤の概念層を先に凍結します。ユーザー、組織、部署、ロール、権限、ポリシー、監査ログ、操作ログの意味だけを固定し、実認証や RBAC サービスはまだ導入しません。
 
-### Target State
+### 目标状态
 
 - `GET /api/v1/users/me` provides the authenticated principal snapshot.
 - `GET /api/v1/security/roles` provides the frozen role catalog.
@@ -250,13 +250,13 @@ flowchart LR
 - `GET /api/v1/audit-logs` provides append-only audit facts and the operation log projection.
 - RBAC approval-action matrix is fixed before backend implementation.
 
-### Result
+### 结果
 
 - User / organization / department / role / permission / policy concepts are frozen as documentation-level domain models.
 - Security API contracts are frozen and now have a backend MVP with a system placeholder principal.
 - Audit log contract and operation log contract are defined as read-only, append-only facts.
 
-### Planned
+### 计划项
 
 - Later backend work may implement authentication middleware, RBAC enforcement, and audit append paths.
 - The current contract only freezes the read surface and the approval-action matrix.
@@ -264,7 +264,7 @@ flowchart LR
 
 ## Sprint 11.2 Security Domain + InMemory Audit MVP / 企业安全域 + InMemory 审计最小可行实现 / 企業セキュリティ領域 + InMemory 監査 MVP
 
-### Current State
+### 当前状态
 
 - 当前 backend 仍不接真实认证、JWT、OAuth 或外部身份提供器。
 - 当前 current user 采用 `user_id="system"` 的 placeholder principal。
@@ -277,13 +277,13 @@ flowchart LR
 日本語：
 この段階では、セキュリティ領域を「契約凍結だけ」から「バックエンドで動く read model + 監査追加 seam」へ進めます。目的は実ログインではなく、current user、role catalog、permission catalog、audit fact を分離して、後続の認証や永続化差し替えを容易にすることです。
 
-### Target State
+### 目标状态
 
 - 未来 RBAC middleware 可以直接消费 current user snapshot，而不破坏 `users/me` contract。
 - 未来 audit persistence 可以替换 repository 实现，而不破坏 `GET /api/v1/audit-logs` contract。
 - 未来真身份接入前，系统占位用户仍然是当前默认行为。
 
-### Result
+### 结果
 
 - `User` / `Organization` / `Department` / `Role` / `Permission` / `Policy` domain models added.
 - `GET /api/v1/users/me` returns the system placeholder principal.
@@ -293,13 +293,13 @@ flowchart LR
 - `audit.log.created` is logged after successful append; `audit.log.failed` is logged only when append fails.
 - Existing approval/document/RAG APIs remain unaffected by RBAC enforcement in this sprint.
 
-### Planned
+### 计划项
 
 - Later backend work may implement authentication middleware, RBAC enforcement, and audit append paths.
 - The current contract only freezes the read surface and the approval-action matrix.
 - Future implementation must preserve the frozen permission names and event names.
 
-### Security Read Flow
+### 安全读取流程（Security Read Flow）
 
 ```mermaid
 flowchart TD
@@ -312,7 +312,7 @@ flowchart TD
     A3 --> D
 ```
 
-### Audit Append Flow
+### 审计追加流程（Audit Append Flow）
 
 ```mermaid
 flowchart TD
@@ -322,9 +322,9 @@ flowchart TD
     B --> E[audit.log.created / audit.log.failed]
 ```
 
-## Sprint 11.3 RBAC Enforcement for Approval APIs
+## 冲刺 11.3 RBAC Enforcement for Approval APIs
 
-### Current State
+### 当前状态
 
 - 当前 current user 仍然使用 `user_id="system"` 的 placeholder principal。
 - 当前 RBAC 只在 approval APIs 上生效，不扩展到 document / retrieval / RAG / task APIs。
@@ -337,11 +337,11 @@ flowchart TD
 日本語：
 この層では approval API の RBAC ガードを backend service / route seam に実装しますが、実認証、JWT、OAuth、外部 IdP はまだ導入しません。current-user seam、permission map、deny 時の audit fact を先に検証し、その後に本物のログイン接続を検討できます。
 
-### Target State
+### 目标状态
 
 - 未来可以在不改变 approval API response shape 的前提下替换 current user 来源。
 
-### Result
+### 结果
 
 - `POST /api/v1/reports/{task_id}/submit-approval` now requires `report.submit_approval`
 - `GET /api/v1/approvals` now requires `approval.review`
@@ -353,7 +353,7 @@ flowchart TD
 - backend tests cover allow / deny paths and audit logging
 - handbook mirror synchronized
 
-### Planned
+### 计划项
 
 - Future RBAC can replace the placeholder current user seam without changing approval payloads.
 - Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
@@ -392,7 +392,7 @@ flowchart TD
 - Operation logs are a projection of the same facts for human review and support workflows.
 - Audit failures must not leak sensitive input, and they must preserve the failure error code.
 
-### Future Authentication Flow
+### Future Authentication流程
 
 ```mermaid
 flowchart LR
@@ -403,7 +403,7 @@ flowchart LR
     E --> F[Audit Log Writer]
 ```
 
-### RBAC Flow
+### RBAC流程
 
 ```mermaid
 flowchart TD
@@ -414,7 +414,7 @@ flowchart TD
     D -->|no| F[permission_denied]
 ```
 
-### Approval Permission Flow
+### 审批（Approval） Permission Flow
 
 ```mermaid
 flowchart TD
@@ -424,7 +424,7 @@ flowchart TD
     C -->|no| E[forbidden / permission_denied]
 ```
 
-### Audit Log Flow
+### Audit Log流程
 
 ```mermaid
 flowchart TD
@@ -440,7 +440,7 @@ flowchart TD
 - RBAC consumes the authenticated principal after the identity provider is introduced.
 - Audit logging must remain available as a read model even before the authentication seam ships.
 
-## Approval Workflow Model
+## 审批（Approval） Workflow Model
 
 ```mermaid
 flowchart TD
@@ -455,7 +455,7 @@ flowchart TD
     G --> H[archived]
 ```
 
-## Report Revision Flow
+## 报告修订流程
 
 ```mermaid
 flowchart TD
@@ -466,7 +466,7 @@ flowchart TD
     E --> F[approved or rejected]
 ```
 
-## Approval Event Flow
+## 审批（Approval） Event Flow
 
 ```mermaid
 flowchart TD
@@ -481,7 +481,7 @@ flowchart TD
     I --> J[approval.published]
 ```
 
-## Approval + Audit Flow
+## 审批（Approval） + Audit Flow
 
 ```mermaid
 flowchart TD
@@ -493,7 +493,7 @@ flowchart TD
     F --> D
 ```
 
-## Future RBAC Integration Flow
+## Future RBAC Integration流程
 
 ```mermaid
 flowchart TD
@@ -503,26 +503,26 @@ flowchart TD
     B -->|deny| E[authorization rejected]
 ```
 
-### Planned Notes
+### 计划项 Notes
 
 - RBAC is a future authorization seam only.
 - Audit facts must remain usable even before RBAC exists.
 - Published output must stay readable after archival.
 
-## Phase 3.1 Document Domain Model
+## 阶段 3.1 文档领域模型
 
-### Current State
+### 当前状态
 
 - 当前已经补齐 Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource。
 - （历史记录）早期仅 InMemory Document。**V1.0**：Upload/Import/Chunk/Retrieval、pgvector Compose、PostgreSQL Repository 已交付；InMemory 测试适配器仍保留。
 - `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有 `ReportStatus`。
 
-### Target State
+### 目标状态
 
 - Document Domain 成为 Upload、Version Management、Internal RAG、Approval Workflow、Retrieval 与 PostgreSQL Persistence 的共同基础。
 - 未来所有文档相关能力都必须沿用本节定义的状态、类型、语言和元数据，不得重新发明另一套文档语义。
 
-### Planned
+### 计划项
 
 - 后续 Upload API、Document Pipeline、Chunk Pipeline、Retrieval Provider、Approval API 和 PostgreSQL Repository 都必须基于本节模型扩展。
 - 当前阶段只允许 `uploaded` 作为新建文档的初始状态，未来状态仅作为生命周期占位与迁移边界。
@@ -593,25 +593,25 @@ flowchart LR
     C[Current: Domain Model + InMemory Repository] --> F[Future: Upload API + Chunk + Retrieval + Approval + PostgreSQL]
 ```
 
-## Sprint 2 Document Upload API Contract Freeze
+## 冲刺 2 Document Upload API Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前实现仍只停留在 Document Domain Model。
 - 当前没有 Upload API，没有 Upload 事件流，没有前端改动。
 
-### Target State
+### 目标状态
 
 - 冻结 `POST /api/v1/documents`、`GET /api/v1/documents`、`GET /api/v1/documents/{document_id}`、`GET /api/v1/documents/{document_id}/versions`、`GET /api/v1/documents/{document_id}/chunks`、`DELETE /api/v1/documents/{document_id}`。
 - 冻结 `document.upload.started`、`document.upload.validated`、`document.upload.completed`、`document.upload.failed`、`document.version.created`、`document.validation.failed`。
 - Upload API 只负责受理、校验、版本边界和事件发布，不直接实现审批。
 
-### Planned
+### 计划项
 
 - 后续实现必须遵守 `docs/contracts/API_CONTRACT.md` 与 `docs/contracts/EVENT_CONTRACT.md`。
 - 当前阶段不实现 Upload API，不修改业务代码，不把审批状态当成 Upload 成功的隐含结果。
 
-## Document Upload API Flow
+## Document Upload API流程
 
 ```mermaid
 flowchart TD
@@ -626,7 +626,7 @@ flowchart TD
     C -->|checksum duplicate| J[document.upload.failed]
 ```
 
-## Document Upload Event Flow
+## Document Upload Event流程
 
 ```mermaid
 flowchart TD
@@ -638,7 +638,7 @@ flowchart TD
     D -->|storage failure| G[document.upload.failed]
 ```
 
-## Document Upload Validation Flow
+## Document Upload Validation流程
 
 ```mermaid
 flowchart TD
@@ -655,7 +655,7 @@ flowchart TD
     F -->|no| G[accept]
 ```
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -668,19 +668,19 @@ flowchart TD
     G --> C
 ```
 
-## Sprint 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
+## 冲刺 2.5 Document Upload Workflow + Error Catalog + Upload Policy Freeze
 
-### Current State
+### 当前状态
 
 - 当前仍只停留在 Document Domain Model 与 Upload API contract freeze。
 - 当前 Upload Workflow 只作为前置契约冻结，不是已实现流程。
 
-### Target State
+### 目标状态
 
 - 冻结 Upload Request Accepted、Upload Session Created、File Validation、Metadata Validation、Checksum Calculation、Duplicate Detection、Version Decision、Repository Save、Event Publishing、Response Returned。
 - 冻结 Error Catalog 与 Upload Policy 作为 Upload API 实现前的最后约束。
 
-### Planned
+### 计划项
 
 - 后续 Upload API 实现必须先遵守 Upload Session、Idempotency、Error Catalog、Upload Policy。
 - 当前阶段不实现 Upload API，不引入文件存储、Chunk、RAG、Approval API、pgvector 或前端上传 UI。
@@ -700,88 +700,88 @@ flowchart TD
     I --> J[Response Returned]
 ```
 
-## Sprint 3 Document Upload API MVP Implementation
+## 冲刺 3 Document Upload API MVP Implementation
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents` 已实现同步 MVP。
 - 当前只实现 backend，不实现 frontend、不实现 RAG、不实现 chunking、不实现 pgvector、不实现 Approval API。
 
-### Target State
+### 目标状态
 
 - 继续保持 `DocumentUploadSession`、checksum duplicate detection、`Idempotency-Key`、event publishing 和 `InMemoryDocumentRepository` 作为当前文档上传闭环。
 
-### Result
+### 结果
 
 - 成功上传返回 `201 Created` 和完成态 `DocumentUploadSession`。
 - 重复 checksum 返回已有结果。
 - `Idempotency-Key` 同 key 不同 checksum 返回 `idempotency_conflict`。
 
-### Planned
+### 计划项
 
 - 后续只读接口、删除接口、版本接口和 chunks 接口仍保持冻结未实现。
 - PostgreSQL Document Repository 仍保持设计不实现。
 
-## Sprint 4 Document Read API MVP
+## 冲刺 4 Document Read API MVP
 
-### Current State
+### 当前状态
 
 - `GET /api/v1/documents` 与 `GET /api/v1/documents/{document_id}` 已实现。
 - 当前只使用现有 `InMemoryDocumentRepository`，不引入新的检索层或 PostgreSQL 读实现。
 
-### Target State
+### 目标状态
 
 - 保持低风险读取能力，支持 status / document_type / language / owner / tag 的基础过滤。
 
-### Result
+### 结果
 
 - 列表接口返回 `items` 与 `next_cursor`。
 - 详情接口在缺失时返回 `document_not_found`。
 
-### Planned
+### 计划项
 
 - `DELETE`、`versions`、`chunks` 继续冻结未实现。
 - PostgreSQL Document Repository 仍只设计不实现。
 
-## Sprint 5 Document Archive API MVP
+## 冲刺 5 Document Archive API MVP
 
-### Current State
+### 当前状态
 
 - `DELETE /api/v1/documents/{document_id}` 仍未实现。
 - 当前列表接口仍以低风险读取为主，需要明确 archived 的默认过滤边界。
 
-### Target State
+### 目标状态
 
 - DELETE 语义冻结为 archive / soft delete，不做物理删除。
 - archived 文档默认不出现在列表中，除非显式请求 `include_archived=true` 或 `status=archived`。
 
-### Result
+### 结果
 
 - 当前阶段只补齐软删除契约，不引入新存储模型。
 
-### Planned
+### 计划项
 
 - 继续保持 `versions`、`chunks`、`PostgreSQL Document Repository` 冻结未实现。
 
-## Sprint 6 Document Import Pipeline MVP
+## 冲刺 6 Document Import Pipeline MVP
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents/{document_id}/import` 与 `GET /api/v1/document-imports/{import_id}` 已实现。
 - 当前导入流水线只做同步 MVP，不创建 chunk、不做检索、不做审批。
 - 当前只复用现有 `InMemoryDocumentRepository`，不引入 PostgreSQL Import Repository。
 
-### Target State
+### 目标状态
 
 - 导入流水线成为 future chunking、internal RAG、full-text search、approval workflow 与 audit 的前置边界。
 - 成功导入后，文档状态推进到 `validated`。
 - 仅允许 `markdown`、`text`、`csv`、`json` 进入当前导入闭环。
 
-### Result
+### 结果
 
 - 导入结果、错误与状态查询已可在后端读取。
 
-### Planned
+### 计划项
 
 - `versions`、`chunks`、RAG、embedding、pgvector、Internet Search、Approval API 与 PostgreSQL Document Repository 继续冻结未实现。
 
@@ -801,7 +801,7 @@ flowchart TD
     G --> H[document.import.completed]
 ```
 
-## Import Status Flow
+## Import Status流程
 
 ```mermaid
 flowchart TD
@@ -810,7 +810,7 @@ flowchart TD
     B --> D[failed]
 ```
 
-## Import Error Flow
+## Import Error流程
 
 ```mermaid
 flowchart TD
@@ -823,7 +823,7 @@ flowchart TD
     D -->|yes| E[Import completed]
 ```
 
-## Future Chunking Integration Flow
+## Future Chunking Integration流程
 
 ```mermaid
 flowchart TD
@@ -832,7 +832,7 @@ flowchart TD
     C --> D[Future Internal RAG]
 ```
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -845,25 +845,25 @@ flowchart TD
     G --> C
 ```
 
-## Sprint 7 Document Chunk Pipeline MVP
+## 冲刺 7 Document Chunk Pipeline MVP
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/documents/{document_id}/chunks` 与 `GET /api/v1/documents/{document_id}/chunks` 已实现。
 - 当前 chunk pipeline 只接受 `validated` 文档，只支持 `markdown` / `text`，并使用独立的 InMemory chunk repository。
 - 当前 chunk 结果采用 deterministic replace 规则，同一文档版本重复 chunk 会覆盖并返回相同结果。
 
-### Target State
+### 目标状态
 
 - 文档切片成为 future RAG、全文检索、上下文组装与引用追踪的前置边界。
 - chunk 结果必须稳定保存 `chunk_index`、`content`、`character_count` 与父文档 metadata snapshot。
 - chunk pipeline 不改变 approval 状态，也不承担 search / embedding 职责。
 
-### Result
+### 结果
 
 - 支持 import 完成后的文档切片、chunk 查询与事件记录。
 
-### Planned
+### 计划项
 
 - `versions`、`RAG`、`embedding`、`pgvector`、`Approval API`、`PostgreSQL Document Repository` 继续冻结未实现。
 
@@ -894,7 +894,7 @@ flowchart TD
     B --> D[failed]
 ```
 
-## Chunk Error Flow
+## Chunk Error流程
 
 ```mermaid
 flowchart TD
@@ -909,7 +909,7 @@ flowchart TD
     E -->|yes| F[chunk_failed only on unexpected failure]
 ```
 
-## Future RAG Integration Flow
+## Future RAG Integration流程
 
 ```mermaid
 flowchart TD
@@ -918,7 +918,7 @@ flowchart TD
     C --> D[Future RAG Answering]
 ```
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -928,7 +928,7 @@ flowchart TD
     C --> E[rejected]
 ```
 
-## Upload Session Flow
+## Upload Session流程
 
 ```mermaid
 flowchart TD
@@ -939,7 +939,7 @@ flowchart TD
     C --> E
 ```
 
-## Validation Flow
+## Validation流程
 
 ```mermaid
 flowchart TD
@@ -954,7 +954,7 @@ flowchart TD
     E -->|pass| F[checksum + idempotency check]
 ```
 
-## Duplicate Detection Flow
+## Duplicate Detection流程
 
 ```mermaid
 flowchart TD
@@ -964,7 +964,7 @@ flowchart TD
     E[Same checksum without key] --> F[duplicate_checksum]
 ```
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -976,123 +976,123 @@ flowchart TD
     F --> B
 ```
 
-## Sprint 8.1 Document Retrieval Contract Freeze
+## 冲刺 8.1 Document Retrieval Contract Freeze
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/document-retrieval/search` 已冻结为内部文档检索 contract。
 - 当前只冻结 keyword retrieval，不实现 RAG、embedding 或真实搜索后端。
 - 当前检索结果以 document/chunk/source/metadata 为核心，不能把答案生成混进该 contract。
 
-### Target State
+### 目标状态
 
 - 文档检索成为 chunk 之后、RAG 之前的稳定只读边界。
 - 检索请求必须支持 query、limit、include_archived、document_type、language、tags。
 - 检索响应必须返回 `results[]`、`total`、`query`、`retrieval_mode=keyword`。
 
-### Result
+### 结果
 
 - 只冻结 API / Event / Error contract，不实现检索后端。
 
-### Planned
+### 计划项
 
 - 未来检索实现可替换为 keyword search、full-text search、hybrid search 或 retrieval provider，但必须保持契约兼容。
 
-## Sprint 8.2 Document Retrieval API MVP Implementation
+## 冲刺 8.2 Document Retrieval API MVP Implementation
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/document-retrieval/search` 已实现为 keyword-only search。
 - 当前检索只读取现有 in-memory document chunks，不调用 LLM、embedding、pgvector 或 PostgreSQL 搜索后端。
 - 当前支持 `query`、`limit`、`include_archived`、`document_type`、`language`、`tags`，并返回 `document_id`、`chunk_id`、`chunk_index`、`content_excerpt`、`score`、`source`、`metadata`。
 - 当前事件已实现 `document.retrieval.started`、`document.retrieval.completed`、`document.retrieval.failed`。
 
-### Target State
+### 目标状态
 
 - 检索继续保持为 chunk 之后、RAG 之前的稳定只读边界。
 - 未来可以替换 keyword scoring 为 full-text search、hybrid search 或 retrieval provider，但 response contract 必须保持兼容。
 
-### Result
+### 结果
 
 - 当前 MVP 已可通过测试验证空查询、无结果、归档过滤、include_archived 与确定性排序。
 
-### Planned
+### 计划项
 
 - 未来检索后端可迁移到 PostgreSQL full-text 或混合检索，但不在当前 sprint 引入。
 - 当前阶段不把答案生成、引用拼装或上下文构建塞进 retrieval API。
 
-## Sprint 8.3 Retrieval Repository Abstraction + Worktree Cleanup
+## 冲刺 8.3 Retrieval Repository Abstraction + Worktree Cleanup
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/document-retrieval/search` 的 HTTP contract 与事件 contract 保持不变。
 - `DocumentRetrievalService` 已改为依赖 `DocumentRetrievalProvider`，不再直接读取 raw chunk storage。
 - 当前唯一实现仍是本地 `InMemoryKeywordRetrieval`，它继续复用现有 `DocumentRepository` 与 `DocumentChunkRepository`。
 
-### Target State
+### 目标状态
 
 - Retrieval service 只负责 API、事件和错误边界，检索后端可替换。
 - 后续引入 PostgreSQL full-text 或其他搜索后端时，只需要替换 provider 实现，不改 route contract。
 
-### Result
+### 结果
 
 - 检索评分、排序、响应结构保持不变。
 - 工作区中未发现额外 untracked chunk 文件，因此没有需要回收的 Sprint 7 重复产物。
 
-### Planned
+### 计划项
 
 - 后续可在 provider 接口后面继续增加 PostgreSQL search backend、hybrid search 或 retrieval evaluation。
 - 当前阶段仍不实现 RAG、embedding、pgvector 或 frontend。
 
-## Sprint 9.1 Internal RAG Contract Freeze
+## 冲刺 9.1 Internal RAG Contract Freeze
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/internal-rag/answer` 仅完成 contract freeze。
 - 当前没有 RAG implementation，没有 LLM provider，没有 embedding，没有 pgvector，没有 frontend。
 - Internal RAG 依赖现有 retrieval provider 边界，但不改变 retrieval API 行为。
 
-### Target State
+### 目标状态
 
 - Internal RAG 作为 retrieval 之后、approval 之前的稳定只读回答边界。
 - `answer_mode=extractive | summary` 与 `require_citations=true` 被冻结为 contract 约束。
 - 未来 summary 生成可以接入可替换 LLM provider，但不能破坏当前 API / Event / Error contract。
 
-### Result
+### 结果
 
 - 当前只冻结 API、Event、Error、Prompt、Architecture 以及任务治理文档。
 - 仍不实现回答生成、上下文合并执行逻辑、向量检索或审批联动。
 
-### Planned
+### 计划项
 
 - 未来 Internal RAG 必须通过 citation-aware contract 连接 retrieval provider。
 - 后续如果要支持其他 retrieval backend 或 LLM provider，必须在不破坏 `/api/v1/internal-rag/answer` 的前提下版本化扩展。
 
-## Sprint 9.2 Internal RAG MVP without LLM
+## 冲刺 9.2 Internal RAG MVP without LLM
 
-### Current State
+### 当前状态
 
 - `POST /api/v1/internal-rag/answer` 已实现 deterministic answer assembly。
 - internal RAG 只依赖现有 `DocumentRetrievalProvider`，不直接碰 raw chunk storage。
 - `answer_mode=extractive | summary` 都保持 no-LLM、no-embedding、no-pgvector。
 
-### Target State
+### 目标状态
 
 - Internal RAG 继续作为 retrieval 之后、approval 之前的稳定 grounded answer boundary。
 - 未来 summary mode 可以替换成可插拔 LLM provider，但必须保持 citation contract 和 retrieval contract 不变。
 
-### Result
+### 结果
 
 - extractive answer 会把 top retrieval excerpts 组装成可追溯 answer，并返回对应 citations。
 - summary answer 采用 deterministic 本地规则，便于测试和面试讲解。
 - `invalid_question`、`insufficient_context`、`citation_required`、archived exclusion 行为已被 backend tests 覆盖。
 
-### Planned
+### 计划项
 
 - 继续保持 `/api/v1/internal-rag/answer` 与 `/api/v1/document-retrieval/search` 分离。
 - 后续若引入真正的 LLM provider，只能替换 answer assembly 层，不得回写 retrieval provider contract。
 
-## Internal RAG Flow
+## Internal RAG流程
 
 ```mermaid
 flowchart TD
@@ -1104,7 +1104,7 @@ flowchart TD
     E --> F[internal_rag.answer_generated]
 ```
 
-## Retrieval to Citation Flow
+## 检索（Retrieval） to Citation Flow
 
 ```mermaid
 flowchart TD
@@ -1122,7 +1122,7 @@ flowchart TD
     G --> H
 ```
 
-## Future LLM Provider Flow
+## Future LLM Provider流程
 
 ```mermaid
 flowchart TD
@@ -1131,7 +1131,7 @@ flowchart TD
     C --> D[Grounded summary / extractive rewrite]
 ```
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -1141,31 +1141,31 @@ flowchart TD
     C --> E[rejected]
 ```
 
-## Sprint 9.5 LLM Provider Seam Stub MVP
+## 冲刺 9.5 LLM Provider Seam Stub MVP
 
-### Current State
+### 当前状态
 
 - Internal RAG 仍然默认走 deterministic extractive path。
 - `StubLLMProvider` 已接入 `RAGAnswerGenerator`，但只有在 `INTERNAL_RAG_USE_LLM=true` 时才会使用。
 - 当前不调用 OpenAI、Azure 或任何外部 API，不引入真实 LLM dependency。
 
-### Target State
+### 目标状态
 
 - 未来真实 LLM provider 可以替换 stub provider，而不改变 retrieval contract、citation contract 或 API contract。
 - usage / cost / latency placeholder 记录只用于内部事件和日志，不暴露为 API response 字段。
 
-### Result
+### 结果
 
 - `StubLLMProvider`、`RAGAnswerGenerator`、`LLM_PROVIDER=stub`、`INTERNAL_RAG_USE_LLM=false` 默认值已落地。
 - provider failure / timeout / invalid output / missing citation 都会回退到 deterministic answer。
 - backend full suite 与 compileall 已通过。
 
-### Planned
+### 计划项
 
 - 继续保持 deterministic fallback 为默认路径。
 - 未来若接入真实 provider，只允许替换 provider 实现，不允许改动 internal RAG response contract。
 
-## Stub LLM Provider Flow
+## Stub LLM Provider流程
 
 ```mermaid
 flowchart TD
@@ -1180,7 +1180,7 @@ flowchart TD
     H --> G
 ```
 
-## Usage Placeholder Flow
+## Usage Placeholder流程
 
 ```mermaid
 flowchart TD
@@ -1194,25 +1194,25 @@ flowchart TD
     E --> F
 ```
 
-## Sprint 9.4 LLM Provider Seam Contract Freeze
+## 冲刺 9.4 LLM Provider Seam Contract Freeze
 
-### Current State
+### 当前状态
 
 - 当前 Internal RAG 仍然是 deterministic answer assembly。
 - 当前没有真实 LLM provider，没有外部调用，没有新增依赖。
 - 当前只冻结未来 model integration seam，不改变 `POST /api/v1/internal-rag/answer` response。
 
-### Target State
+### 目标状态
 
 - 未来 `LLMProvider` 可以接到 `RAGAnswerGenerator` 后面，而不改变 retrieval contract、citation contract 或 API contract。
 - provider error model、fallback behavior、token/cost/latency tracking placeholders 必须先冻结，再考虑任何实现。
 
-### Result
+### 结果
 
 - `LLMProvider`、`RAGAnswerGenerator`、future provider errors、fallback behavior、tracking placeholders 已在文档层冻结。
 - backend、frontend、scripts 维持不变。
 
-### Planned
+### 计划项
 
 - 继续保持 deterministic extractive fallback 为默认路径。
 - 未来若接入模型，只允许替换 answer generation seam，不允许回写 retrieval provider boundary。
@@ -1250,7 +1250,7 @@ flowchart TD
     C --> D[Return frozen API response]
 ```
 
-## Token Cost Tracking Flow
+## Token Cost Tracking流程
 
 ```mermaid
 flowchart TD
@@ -1261,29 +1261,29 @@ flowchart TD
     E --> F[Attach usage placeholders]
 ```
 
-## Sprint 9.3 Internal RAG Evaluation + Citation Quality MVP
+## 冲刺 9.3 Internal RAG Evaluation + Citation Quality MVP
 
-### Current State
+### 当前状态
 
 - Internal RAG 已实现 deterministic answer assembly，并新增内部 evaluation / citation quality checking。
 - warnings taxonomy 已包含 `low_context`、`missing_citation`、`weak_match`。
 
-### Target State
+### 目标状态
 
 - 未来若引入 LLM provider，仍要复用当前 evaluation contract 与 citation quality checker。
 
-### Result
+### 结果
 
 - `coverage_score`、`citation_score`、`confidence` 和 warnings 由内部 evaluation service 计算。
 - citation quality checker 验证 `document_id`、`chunk_id` 与 grounded excerpt 的一致性。
 - backend tests 已覆盖 perfect citation score、missing citation warning、weak match、low context、summary citation 和 archived filtering。
 
-### Planned
+### 计划项
 
 - 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
 - 继续保持 retrieval API contract / scoring / response shape 不变。
 
-## RAG Evaluation Flow
+## RAG Evaluation流程
 
 ```mermaid
 flowchart TD
@@ -1296,7 +1296,7 @@ flowchart TD
     F --> G[warnings]
 ```
 
-## Citation Quality Flow
+## Citation Quality流程
 
 ```mermaid
 flowchart TD
@@ -1307,7 +1307,7 @@ flowchart TD
     C -->|yes| D[valid citation]
 ```
 
-## Future LLM Evaluation Flow
+## Future LLM Evaluation流程
 
 ```mermaid
 flowchart TD
@@ -1320,7 +1320,7 @@ flowchart TD
     E --> F
 ```
 
-## Document Retrieval Flow
+## Document Retrieval流程
 
 ```mermaid
 flowchart TD
@@ -1332,7 +1332,7 @@ flowchart TD
     E --> F[document.retrieval.completed]
 ```
 
-## Source Trace Flow
+## Source Trace流程
 
 ```mermaid
 flowchart TD
@@ -1345,7 +1345,7 @@ flowchart TD
     F --> G
 ```
 
-## Future RAG Integration Flow
+## Future RAG Integration流程
 
 ```mermaid
 flowchart TD
@@ -1353,9 +1353,9 @@ flowchart TD
     B --> C[Future RAG Answering]
 ```
 
-## Phase 2 PostgreSQL Persistence MVP
+## 阶段 2 PostgreSQL 持久化 MVP
 
-### Current State
+### 当前状态
 
 - 当前默认 Repository backend 仍为 `inmemory`
 - 当前已新增可选 `postgres` backend
@@ -1370,13 +1370,13 @@ flowchart TD
   `PostgreSQL real integration test pending`
   `Status: In Progress / Partially Verified`
 
-### Target State
+### 目标状态
 
 - PostgreSQL 成为事务事实的持久化实现
 - InMemory 继续作为本地学习、测试和降级 fallback
 - Approval 与 Import 在后续 Phase 基于现有表结构继续扩展，不破坏当前 API / Workflow / SSE
 
-### Planned
+### 计划项
 
 - Phase 2 完成真实 PostgreSQL 联调后，继续保持 `REPOSITORY_BACKEND=inmemory` 默认值
 - Phase 3 复用 `data_imports` 与 `import_errors`
@@ -1390,7 +1390,7 @@ flowchart TD
   `pip install -r requirements.txt`
   `REPOSITORY_BACKEND=postgres python -m unittest tests.test_postgres_repositories -v`
 
-## Repository Backend Switch
+## 仓储（Repository） Backend Switch
 
 ```mermaid
 flowchart LR
@@ -1425,7 +1425,7 @@ flowchart TD
     L --> N[(approval_events)]
 ```
 
-## Approval and Import Boundary
+## 审批（Approval） and Import Boundary
 
 - Approval Current State:
   当前只在 `reports` 中持久化 `approval_status=generated`，尚未开放审批 API。
@@ -1436,16 +1436,16 @@ flowchart TD
 - Import Planned:
   后续导入流程会把文件元数据、错误明细和 schema version 写入 PostgreSQL。
 
-## Phase 1 File Input Implementation
+## 阶段 1：File Input Implementation
 
-### Current State
+### 当前状态
 
 - 当前 KPI 已不再使用代码写死数值。
 - 当前 Research 已不再使用代码写死 summary / sources。
 - 当前仍使用 InMemory Repository，不接数据库。
 - 当前报告仍直接生成，不经过 Approval Workflow。
 
-### Target State
+### 目标状态
 
 - 文件输入成为本地运行的稳定数据边界。
 - KPI 从 CSV 读取并计算。
@@ -1453,13 +1453,13 @@ flowchart TD
 - 文档目录为后续 RAG / Approval / Upload 提前固定输入边界。
 - 报告状态模型提前预留审批流扩展。
 
-### Planned
+### 计划项
 
 - Phase 2 把 Task / Event / Report 迁移到 PostgreSQL。
 - Phase 3 开始利用 `backend/data/documents/` 向上传与文档入库演进。
 - Phase 5 基于当前 `generated` 状态扩展 `draft / pending_approval / approved / rejected / revised`。
 
-## File Input Flow
+## File Input流程
 
 ```mermaid
 flowchart LR
@@ -1474,13 +1474,13 @@ flowchart LR
     J --> K[Report status=generated]
 ```
 
-## Approval State Machine
+## 审批状态机
 
-### Current State
+### 当前状态
 
 - 当前只实现 `generated`
 
-### Target State
+### 目标状态
 
 - 未来状态机覆盖：
   `generated`
@@ -1492,7 +1492,7 @@ flowchart LR
   `published`
   `archived`
 
-### Planned
+### 计划项
 
 ```mermaid
 flowchart TD
@@ -1508,7 +1508,7 @@ flowchart TD
     F --> H[archived]
 ```
 
-## Approval Workflow Reserve
+## 审批（Approval） Workflow Reserve
 
 - Current State:
   Report 当前仍在 Workflow 完成后直接生成，状态为 `generated`。
@@ -1524,7 +1524,7 @@ flowchart TD
 - Boundary:
   当前文件输入层只负责提供业务事实和 Research 事实，不与审批状态耦合，因此不会阻碍后续审批流接入。
 
-## Report Revision Flow
+## 报告修订流程
 
 ```mermaid
 flowchart LR
@@ -1535,7 +1535,7 @@ flowchart LR
     E --> F[approved or rejected]
 ```
 
-## Phase 1 to Phase 2 Migration Flow
+## 阶段 1：to Phase 2 Migration Flow
 
 ```mermaid
 flowchart LR
@@ -1545,9 +1545,9 @@ flowchart LR
     D --> E[Phase 2 implementation]
 ```
 
-## Project Positioning
+## 项目定位
 
-### Current State
+### 当前状态
 
 项目正式名称为 `Enterprise Retail Intelligence Platform (ERIP)`；`Retail Insight AI` 仅为历史早期名称。
 
@@ -1557,7 +1557,7 @@ flowchart LR
 
 当前重点是把零售分析 Domain 的 `Task API`、`TaskService`、`LangGraph Workflow`、`Research Agent`、`Repository Pattern` 和文档治理边界稳定下来。
 
-### Target State
+### 目标状态
 
 未来目标平台名称：
 
@@ -1565,11 +1565,11 @@ flowchart LR
 
 ERIP 是企业平台化目标架构，不代表当前仓库、当前目录或当前部署已经达到平台形态。
 
-### Planned
+### 计划项
 
 后续平台化演进必须以 Current State / Target State / Planned 的方式描述，不得把目标能力写成现状。
 
-## Architecture Principles
+## 架构原则
 
 - Platform First
 - Domain Driven
@@ -1581,9 +1581,9 @@ ERIP 是企业平台化目标架构，不代表当前仓库、当前目录或当
 - Documentation First
 - Backward Compatibility
 
-## Epic 0: Enterprise Platform Architecture Evolution
+## Epic 0：Enterprise Platform Architecture Evolution
 
-### Planned Tasks
+### 计划项 Tasks
 
 - [ ] Architecture Freeze
 - [ ] Directory Refactor
@@ -1595,11 +1595,11 @@ ERIP 是企业平台化目标架构，不代表当前仓库、当前目录或当
 
 ## Target Architecture
 
-### Current State
+### 当前状态
 
 当前实现仍是单仓库、单项目、教学型结构，尚未完全形成企业平台目录。
 
-### Target State
+### 目标状态
 
 未来 ERIP 目标逻辑分层：
 
@@ -1618,11 +1618,11 @@ Database
 Frontend
 ```
 
-### Planned
+### 计划项
 
 该分层用于指导后续目录重构和抽象边界，不表示当前这些模块都已全部实现。
 
-## Definition of Done
+## 完成定义（Definition of Done）
 
 任何一个 Phase 标记完成前，必须同时完成：
 
@@ -1639,7 +1639,7 @@ Frontend
 
 ## Architecture Freeze
 
-### Frontend Authentication and Authorization Flow
+### 前端（Frontend） Authentication and Authorization Flow
 
 Current State
 
@@ -1694,27 +1694,27 @@ Planned
 4. 再引入 Document Pipeline、Search、Approval、Internet Search。
 5. 最后进入性能、观测、权限和平台化部署。
 
-### Planned State
+### 计划项 State
 
 - 当前实现继续服务本地运行与学习。
 - 新架构先作为设计约束存在，不代表当前已经落地。
 - 后续 Phase 只能在本冻结文档范围内细化，不得绕开主边界新增临时架构。
 
-### Risks
+### 风险
 
 - 过早抽象导致实现复杂度上升。
 - 平台目标与当前代码结构差距较大，迁移周期长。
 - 多数据源与多 Provider 接入会增加测试矩阵和回归成本。
 - 文档若不同步，会导致冻结失效。
 
-## Directory Refactor Design
+## 目录重构设计
 
-### Current State
+### 当前状态
 
 - 当前真实目录仍以 `backend/`、`frontend/`、`docs/`、`scripts/` 为主。
 - 本次不修改任何真实目录。
 
-### Target State
+### 目标状态
 
 未来目录结构只作为设计输出：
 
@@ -1730,7 +1730,7 @@ retail-insight-ai/
 └── tests/                     # Test：unit / integration / api / workflow / frontend / db / performance / manual
 ```
 
-### Planned State
+### 计划项 State
 
 未来逻辑分层映射：
 
@@ -1760,13 +1760,13 @@ Template
 Test
 ```
 
-## Repository Abstraction Design
+## 仓储（Repository） Abstraction Design
 
 ### Goal
 
 用统一 Repository Interface 隔离当前 InMemory、未来 PostgreSQL，以及后续向量检索与搜索存储实现。
 
-### Repository Interface
+### 仓储（Repository） Interface
 
 - 职责：
   定义 Task、Event、Report、Document、Import、Approval、Audit 等聚合的读写合同。
@@ -1830,7 +1830,7 @@ Test
 - 生命周期：
   按请求初始化调用，上层通过接口引用。
 
-### Research Agent
+### 调研（Research） Agent
 
 - 职责：
   统一封装市场、竞品、行业调研结果获取。
@@ -1896,16 +1896,16 @@ Test
 - 生命周期：
   进程级加载，支持运行时读取配置快照。
 
-## Retrieval Layer Architecture
+## 检索（Retrieval） Layer Architecture
 
-### Current State
+### 当前状态
 
 - 当前 Retrieval Layer 已出现稳定的 service/provider 边界，但仍处于本地 InMemory 实现阶段。
 - 当前 Research 与未来 Internal Search / Internet Search / Structured Retrieval 仍然是不同能力域，尚未合并成统一平台层。
 - `DocumentRetrievalService` 现在依赖 `DocumentRetrievalProvider`，而不是直接依赖 raw chunk storage。
 - Internal RAG contract is frozen on top of the same retrieval provider boundary, but answer generation is still only a documented future boundary.
 
-### Target State
+### 目标状态
 
 - 未来 Retrieval Layer 统一承接：
   - Business Data Retrieval
@@ -1916,7 +1916,7 @@ Test
   - Retrieval Evaluation
   - Internal RAG Answering
 
-### Planned
+### 计划项
 
 ```mermaid
 flowchart LR
@@ -1938,7 +1938,7 @@ flowchart LR
 
 RAG 在本项目中不只指社内文档问答，也包括结构化业务数据检索和互联网检索。
 
-## Business Retrieval Flow
+## Business Retrieval流程
 
 ```mermaid
 flowchart TD
@@ -1949,12 +1949,12 @@ flowchart TD
     E --> F[Analysis]
 ```
 
-### Planned
+### 计划项
 
 - 结构化业务数据检索优先使用 SQL-based structured retrieval。
 - 业务事实与文档事实必须分层处理，不能直接混入同一检索实现。
 
-## Internal RAG Flow
+## Internal RAG流程
 
 ```mermaid
 flowchart TD
@@ -1968,12 +1968,12 @@ flowchart TD
     H --> I[Analysis]
 ```
 
-### Planned
+### 计划项
 
 - 当前仅为目标设计，不表示已经实现 Internal RAG MVP。
 - Internal RAG is frozen as contract-only on top of the retrieval provider boundary.
 
-## Retrieval to Citation Flow
+## 检索（Retrieval） to Citation Flow
 
 ```mermaid
 flowchart TD
@@ -1983,12 +1983,12 @@ flowchart TD
     D --> E[Answer Payload]
 ```
 
-### Planned
+### 计划项
 
 - Citations must preserve document_id, chunk_id, chunk_index, excerpt, source, and score.
 - Answer payloads must remain secret-safe and schema-bound.
 
-## Future LLM Provider Flow
+## Future LLM Provider流程
 
 ```mermaid
 flowchart TD
@@ -1998,11 +1998,11 @@ flowchart TD
     D --> E[Final Answer Contract]
 ```
 
-### Planned
+### 计划项
 
 - Future LLM providers must be replaceable and must not change the frozen internal RAG API contract.
 
-## Future Approval Integration Flow
+## Future Approval Integration流程
 
 ```mermaid
 flowchart TD
@@ -2015,12 +2015,12 @@ flowchart TD
     G --> C
 ```
 
-### Planned
+### 计划项
 
 - Internal RAG itself does not create approval state.
 - Approval remains a separate future API and must not be implied by answer success.
 
-## Internet Search Flow
+## Internet Search流程
 
 ```mermaid
 flowchart TD
@@ -2032,12 +2032,12 @@ flowchart TD
     F --> G[Analysis]
 ```
 
-### Planned
+### 计划项
 
 - 互联网检索默认受控、可关闭。
 - 所有外部结果必须带来源与时间边界。
 
-## Context Merge Flow
+## Context Merge流程
 
 ```mermaid
 flowchart TD
@@ -2048,11 +2048,11 @@ flowchart TD
     E --> F[Unified Analysis Context]
 ```
 
-### Planned
+### 计划项
 
 - 未来必须定义合并优先级、冲突策略、缺失值策略和来源保留策略。
 
-## Citation and Source Trace Flow
+## Citation and Source Trace流程
 
 ```mermaid
 flowchart TD
@@ -2062,7 +2062,7 @@ flowchart TD
     D --> E[Audit / Trace]
 ```
 
-### Planned
+### 计划项
 
 - 所有检索结果进入分析前后都必须可追踪来源。
 - 引用模型与审计模型必须保持一致。
@@ -2081,14 +2081,14 @@ flowchart LR
     F --> G[Top-K Context]
 ```
 
-### Planned
+### 计划项
 
 - PostgreSQL keyword search 可作为早期能力。
 - PostgreSQL full-text search、pgvector、Hybrid Search 均为规划项，不表示当前已实现。
 
 ## Workflow Architecture
 
-### Planned Flow
+### 计划项 Flow
 
 ```mermaid
 flowchart TD
@@ -2103,11 +2103,11 @@ flowchart TD
     I --> J[Publish]
 ```
 
-### Current State
+### 当前状态
 
 - 当前只实现了 Task → KPI / Research → Report 的简化链路。
 
-### Planned State
+### 计划项 State
 
 - 后续 Workflow 统一以该主链路为冻结基线。
 
@@ -2124,11 +2124,11 @@ flowchart TD
     G --> H[Workflow]
 ```
 
-### Current State
+### 当前状态
 
 - 当前尚未实现完整 Document Pipeline。
 
-### Planned State
+### 计划项 State
 
 - 文档先进入版本化与分块，再进入检索与 Workflow。
 
@@ -2148,15 +2148,15 @@ flowchart TD
     G --> H[Workflow]
 ```
 
-### Current State
+### 当前状态
 
 - 当前业务数据仍以写死示例和本地静态值为主。
 
-### Planned State
+### 计划项 State
 
 - 所有业务数据通过 Validate → Transform → Import 进入 PostgreSQL，再供 Workflow 使用。
 
-## Approval Workflow
+## 审批（Approval） Workflow
 
 ```mermaid
 flowchart TD
@@ -2170,11 +2170,11 @@ flowchart TD
     H --> C
 ```
 
-### Current State
+### 当前状态
 
 - 当前未实现审批流。
 
-### Planned State
+### 计划项 State
 
 - 后续 Approval 将作为 Workflow 正式节点而非附加人工步骤。
 
@@ -2199,11 +2199,11 @@ erDiagram
     SYSTEM_SETTINGS ||--o{ TASKS : configures
 ```
 
-### Current State
+### 当前状态
 
 - 当前数据库目标尚未实现。
 
-### Planned State
+### 计划项 State
 
 - 上述 ER 图是 PostgreSQL 目标设计基线，不表示当前表已经存在。
 
@@ -2220,7 +2220,7 @@ erDiagram
 | Performance | API、Search、Workflow、Import | 验证容量、延迟、退化行为 |
 | Manual | 端到端业务场景、异常场景、运维场景 | 验证真实业务可接受性 |
 
-### Retrieval Evaluation Scope
+### 检索（Retrieval） Evaluation Scope
 
 - Business Data Retrieval
 - Internal Document Retrieval
@@ -2229,7 +2229,7 @@ erDiagram
 - Citation Completeness
 - Hallucination Risk Control
 
-## Documentation Matrix
+## 文档 Matrix
 
 任何功能完成后必须同步：
 
@@ -2248,7 +2248,7 @@ erDiagram
 
 未同步以上文档，不得标记完成。
 
-## Epic 0 Deliverables
+## Epic 0 交付物
 
 - [ ] Architecture Freeze
 - [ ] Directory Freeze

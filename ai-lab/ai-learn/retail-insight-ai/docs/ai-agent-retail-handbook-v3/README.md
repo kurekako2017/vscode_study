@@ -1,4 +1,4 @@
-# Enterprise Retail Intelligence Platform (ERIP) Handbook V3
+# Enterprise Retail Intelligence Platform（ERIP）手册 V3
 
 本目录是 **Enterprise Retail Intelligence Platform（ERIP）V1.0** 的长期知识库、面试中心与复盘区。
 

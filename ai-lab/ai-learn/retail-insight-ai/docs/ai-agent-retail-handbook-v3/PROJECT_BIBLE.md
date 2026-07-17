@@ -174,7 +174,7 @@ SSE / Report
 9. 部署
 10. 保守
 
-# Production Gap
+# 生产差距与后续增强（Production Gap）
 
 ## 已实现能力
 
@@ -307,7 +307,7 @@ Approval、Persistent Audit、PostgreSQL、Docker Compose、テスト整備を�
 
 所有文档不得重复定义另一套项目背景、自我介绍、项目说明或职责表达。
 
-# Book First Principle
+# 文档优先原则
 
 V3 遵守一本书原则：
 
@@ -328,9 +328,9 @@ V3 遵守一本书原则：
 - 章节标题统一使用中文
 - 技术名保留英文
 
-## Handbook Trilingual Documentation Standard
+## Handbook 三语文档标准
 
-### Handbook Trilingual Documentation Standard
+### Handbook 三语文档标准
 
 为了保证整个 Handbook 长期一致性，所有新增或修改文档必须遵循以下规范：
 
