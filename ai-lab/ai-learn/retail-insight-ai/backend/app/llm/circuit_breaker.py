@@ -9,9 +9,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import uuid4
 
 
@@ -91,7 +92,7 @@ class CircuitBreaker:
         store: CircuitBreakerStore,
         config: CircuitBreakerConfig | None = None,
         clock: Clock | None = None,
-        on_state_change: callable | None = None,
+        on_state_change: Callable[..., Any] | None = None,
     ) -> None:
         self._store = store
         self._config = config or CircuitBreakerConfig()

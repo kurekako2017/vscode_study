@@ -363,3 +363,9 @@ CREATE INDEX IF NOT EXISTS idx_llm_usage_report_id ON llm_usage_ledger (report_i
 CREATE INDEX IF NOT EXISTS idx_llm_provider_attempts_usage ON llm_provider_attempts (usage_id, attempt_number);
 CREATE INDEX IF NOT EXISTS idx_llm_provider_attempts_request ON llm_provider_attempts (request_id);
 CREATE INDEX IF NOT EXISTS idx_llm_provider_attempts_provider ON llm_provider_attempts (provider_name, created_at DESC);
+
+-- 兼容已存在的 llm_usage_ledger：initialize_schema 不会重建旧表，需增量补列。
+ALTER TABLE llm_usage_ledger
+  ADD COLUMN IF NOT EXISTS fallback_used BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE llm_usage_ledger
+  ADD COLUMN IF NOT EXISTS attempt_count INTEGER NOT NULL DEFAULT 0;

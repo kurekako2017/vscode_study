@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 interface StatusBannerProps {
-  tone: "success" | "error" | "info";
+  tone: "success" | "error" | "info" | "warning";
   children: ReactNode;
 }
 
@@ -16,7 +16,9 @@ export function StatusBanner({ tone, children }: StatusBannerProps) {
     ? "error"
     : tone === "success"
       ? "success-banner"
-      : "info-banner";
+      : tone === "warning"
+        ? "info-banner"
+        : "info-banner";
 
   return (
     <div className={className} role={tone === "error" ? "alert" : "status"}>

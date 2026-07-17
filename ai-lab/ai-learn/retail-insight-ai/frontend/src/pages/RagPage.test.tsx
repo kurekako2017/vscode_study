@@ -157,7 +157,7 @@ describe("RagPage", () => {
     vi.stubGlobal("confirm", confirm);
     await showEvidence(fetchMock);
     fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
-    expect(confirm.mock.calls[0][0]).toMatch(/Stub|OpenRouter/);
+    expect(confirm.mock.calls[0][0]).toMatch(/Fallback Chain|サーバー/);
     expect(confirm.mock.calls[0][0]).toMatch(/推定入力/);
     expect(confirm.mock.calls[0][0]).toMatch(/256 tokens/);
     expect(confirm.mock.calls[0][0]).not.toMatch(/api[_-]?key/i);
@@ -362,10 +362,118 @@ describe("RagPage", () => {
     await showEvidence(fetchMock);
     const button = screen.getByRole("button", { name: "AI分析" });
     fireEvent.click(button);
-    expect(screen.getByRole("button", { name: "AI分析中…" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "正在执行企业 AI 路由……" })).toBeDisabled();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     resolveAI?.(aiSuccessResponse());
     expect(await screen.findByText(/Usage: 12 \+ 8 = 20/)).toBeInTheDocument();
+  });
+
+  it("renders fallback provider summary safely without secrets", async () => {
+    const fallbackResponse = jsonResponse({
+      success: true,
+      request_id: "fb-1",
+      error: null,
+      data: {
+        analysis_id: "ana-fb",
+        answer: "Fallback answer",
+        citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+        provider: "nvidia",
+        model: "nvidia-low-test",
+        provider_name: "nvidia",
+        model_name: "nvidia-low-test",
+        route_tier: "low_cost",
+        usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
+        cost: "0.00010000",
+        currency: "USD",
+        status: "succeeded",
+        created_at: "2026-07-17T00:00:00Z",
+        usage_id: "llm-fb",
+        fallback_used: true,
+        attempt_count: 2,
+        attempted_providers: [
+          { provider_name: "openrouter", model_name: "openrouter-low-test", status: "timed_out", latency_ms: 20 },
+          { provider_name: "nvidia", model_name: "nvidia-low-test", status: "succeeded", latency_ms: 15 },
+        ],
+        total_input_tokens: 12,
+        total_output_tokens: 8,
+        total_tokens: 20,
+        total_actual_cost: "0.00010000",
+      },
+    }, 200);
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(fallbackResponse);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByText(/主要 AI 服务暂时不可用，已自动切换至备用服务/)).toBeInTheDocument();
+    expect(screen.getByText(/使用服务/)).toBeInTheDocument();
+    expect(screen.getByText("NVIDIA")).toBeInTheDocument();
+    expect(screen.getByText("nvidia-low-test")).toBeInTheDocument();
+    expect(screen.getByText(/尝试摘要: OpenRouter：timed_out \/ NVIDIA：succeeded/)).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/api[_-]?key/i);
+    expect(document.body.textContent).not.toMatch(/Bearer /);
+    expect(document.body.textContent).not.toMatch(/https:\/\/openrouter/);
+  });
+
+  it("renders gemini provider label from trusted server fields", async () => {
+    const response = jsonResponse({
+      success: true,
+      request_id: "p-gemini",
+      error: null,
+      data: {
+        analysis_id: "ana-gemini",
+        answer: "ok",
+        citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+        provider: "gemini",
+        model: "gemini-low-test",
+        provider_name: "gemini",
+        model_name: "gemini-low-test",
+        route_tier: "low_cost",
+        usage: { input_tokens: 1, output_tokens: 1, total_tokens: 2 },
+        cost: "0.00000100",
+        currency: "USD",
+        status: "succeeded",
+        created_at: "2026-07-17T00:00:00Z",
+        fallback_used: true,
+        attempt_count: 3,
+        attempted_providers: [{ provider_name: "gemini", model_name: "gemini-low-test", status: "succeeded", latency_ms: 1 }],
+      },
+    }, 200);
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(response);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByText(/Gemini \/ gemini \/ gemini-low-test/)).toBeInTheDocument();
+  });
+
+  it("renders local qwen provider label from trusted server fields", async () => {
+    const response = jsonResponse({
+      success: true,
+      request_id: "p-qwen",
+      error: null,
+      data: {
+        analysis_id: "ana-qwen",
+        answer: "ok",
+        citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+        provider: "local_qwen",
+        model: "qwen-low-test",
+        provider_name: "local_qwen",
+        model_name: "qwen-low-test",
+        route_tier: "low_cost",
+        usage: { input_tokens: 1, output_tokens: 1, total_tokens: 2 },
+        cost: "0.00000000",
+        currency: "USD",
+        status: "succeeded",
+        created_at: "2026-07-17T00:00:00Z",
+        fallback_used: true,
+        attempt_count: 4,
+        attempted_providers: [{ provider_name: "local_qwen", model_name: "qwen-low-test", status: "succeeded", latency_ms: 1 }],
+      },
+    }, 200);
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(response);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByText(/Local Qwen \/ local_qwen \/ qwen-low-test/)).toBeInTheDocument();
   });
 });
 
@@ -374,8 +482,12 @@ function aiSuccessResponse() {
     analysis_id: "ana-1", answer: "Stub AI analysis",
     citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
     provider: "stub-low-cost", model: "stub-low-cost-v1", route_tier: "low_cost",
+    provider_name: "stub-low-cost", model_name: "stub-low-cost-v1",
     usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
     cost: "0.00001800", currency: "USD", status: "succeeded", created_at: "2026-07-17T00:00:00Z",
+    usage_id: "llm-ai-1", fallback_used: false, attempt_count: 1,
+    attempted_providers: [{ provider_name: "stub-low-cost", model_name: "stub-low-cost-v1", status: "succeeded", latency_ms: 12 }],
+    total_input_tokens: 12, total_output_tokens: 8, total_tokens: 20, total_actual_cost: "0.00001800",
   } }, 200);
 }
 
@@ -386,8 +498,12 @@ function executiveReportSuccessResponse() {
     kpi_findings: ["KPI ok"], risks: ["Risk A"], recommendations: ["Act now"],
     citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
     provider: "stub-high-quality", model: "stub-high-quality-v1", route_tier: "high_quality",
+    provider_name: "stub-high-quality", model_name: "stub-high-quality-v1",
     usage: { input_tokens: 40, output_tokens: 80, total_tokens: 120 },
     estimated_cost: "0.00100000", actual_cost: "0.00090000", currency: "USD",
     status: "succeeded", analysis_id: "ana-1", usage_id: "llm-1", created_at: "2026-07-17T00:00:00Z",
+    fallback_used: false, attempt_count: 1,
+    attempted_providers: [{ provider_name: "stub-high-quality", model_name: "stub-high-quality-v1", status: "succeeded", latency_ms: 20 }],
+    total_input_tokens: 40, total_output_tokens: 80, total_tokens: 120, total_actual_cost: "0.00090000",
   } }, 200);
 }

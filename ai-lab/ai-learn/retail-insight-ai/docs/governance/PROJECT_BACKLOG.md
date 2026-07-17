@@ -1,5 +1,21 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: Provider Fallback Chain（NVIDIA / Gemini / Local Qwen）
+
+- [x] 固定串行 Chain：OpenRouter → NVIDIA → Gemini → Local Qwen
+- [x] Provider Mode：`stub` / `fallback_chain` / `openrouter`（单 Provider 兼容）
+- [x] 每 Provider low_cost/high_quality 模型、价格、timeout、enabled fail-closed
+- [x] Attempt Ledger（`llm_provider_attempts`）与 Usage 汇总
+- [x] Circuit Breaker closed/open/half_open（PostgreSQL 共享状态表）
+- [x] Backend 响应：provider/model/route_tier/fallback/attempt/token/cost
+- [x] Frontend 显示实际服务/模型/fallback/尝试摘要/Token/Cost
+- [x] Migration `20260717_07_provider_fallback_chain`
+- [x] 默认零外网；真实 smoke 未执行
+
+完成记录：InMemory Backend 266 tests（51 skipped）、Frontend 100/100、production build、compileall、diff-check 通过。PostgreSQL 本环境不可用，未跑全量 PG 与 migration round-trip。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: OpenRouter Real LLM Provider
 
 - [x] 默认 `LLM_PROVIDER_MODE=stub`；`openrouter` 模式 fail-closed 校验 Key/模型

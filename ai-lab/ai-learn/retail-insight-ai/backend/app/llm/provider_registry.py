@@ -16,9 +16,12 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Literal
 
+from typing import TYPE_CHECKING
+
 from pydantic import SecretStr
 
-from app.config.settings import Settings
+if TYPE_CHECKING:
+    from app.config.settings import Settings
 
 ProviderName = Literal["openrouter", "nvidia", "gemini", "local_qwen"]
 RouteTier = Literal["low_cost", "high_quality"]
@@ -84,7 +87,7 @@ def _secret_present(value: SecretStr | None) -> bool:
     return bool(value.get_secret_value().strip())
 
 
-def build_provider_endpoints(settings: Settings) -> list[ProviderEndpointConfig]:
+def build_provider_endpoints(settings: "Settings") -> list[ProviderEndpointConfig]:
     """按固定顺序返回全部端点配置（含 disabled）；Chain 构建时再过滤。"""
 
     return [
@@ -151,7 +154,7 @@ def build_provider_endpoints(settings: Settings) -> list[ProviderEndpointConfig]
     ]
 
 
-def enabled_chain_endpoints(settings: Settings) -> list[ProviderEndpointConfig]:
+def enabled_chain_endpoints(settings: "Settings") -> list[ProviderEndpointConfig]:
     """仅返回 enabled 且配置完整的 Provider；顺序与 FIXED_PROVIDER_ORDER 一致。"""
 
     return [item for item in build_provider_endpoints(settings) if item.enabled]

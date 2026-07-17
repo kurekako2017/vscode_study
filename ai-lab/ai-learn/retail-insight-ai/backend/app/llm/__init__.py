@@ -1,9 +1,9 @@
-"""LLM 成本可控调用层：Policy、Router、Gateway、Prompt。"""
+"""LLM 成本可控调用层：Policy、Router、Gateway、Prompt、Provider Chain。
 
-from app.llm.gateway import LLMGatewayService
-from app.llm.model_router import ModelRouter
-from app.llm.operation_policy import OperationPolicy, OperationPolicyRegistry
-from app.llm.prompt_builder import PROMPT_TEMPLATE_VERSION, PromptBuilder
+注意：本包 __init__ 不做重导入，避免与 app.config.container 形成循环依赖。
+调用方请从具体子模块导入，例如：
+    from app.llm.gateway import LLMGatewayService
+"""
 
 __all__ = [
     "LLMGatewayService",

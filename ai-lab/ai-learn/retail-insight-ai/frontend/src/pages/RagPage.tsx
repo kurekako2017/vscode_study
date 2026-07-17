@@ -28,15 +28,24 @@ interface RagPageProps {
   canAnalyze?: boolean;
 }
 
-/** 成功応答の provider 名から開発 Stub / OpenRouter を表示する（Key や内部設定は出さない）。 */
+/** 成功応答の provider 名から信頼できる表示名を返す（Key / URL / 内部設定は出さない）。 */
 function providerModeLabel(provider: string): string {
-  if (provider.startsWith("stub")) {
-    return "Development Stub";
-  }
-  if (provider.startsWith("openrouter")) {
-    return "OpenRouter";
-  }
+  const name = provider.toLowerCase();
+  if (name.startsWith("stub")) return "Development Stub";
+  if (name.startsWith("openrouter")) return "OpenRouter";
+  if (name.startsWith("nvidia")) return "NVIDIA";
+  if (name.startsWith("gemini")) return "Gemini";
+  if (name.startsWith("local_qwen") || name.startsWith("qwen")) return "Local Qwen";
   return "Server Provider";
+}
+
+function formatAttemptSummary(
+  attempts: Array<{ provider_name: string; model_name: string; status: string; latency_ms?: number | null }> | undefined,
+): string {
+  if (!attempts || attempts.length === 0) return "";
+  return attempts
+    .map((item) => `${providerModeLabel(item.provider_name)}：${item.status}`)
+    .join(" / ");
 }
 
 export function RagPage({
@@ -167,7 +176,7 @@ export function RagPage({
         "route_tier: low_cost",
         `推定入力: ${estimatedInputTokens} tokens`,
         "出力上限: 256 tokens",
-        "Provider: サーバー設定（Development Stub または OpenRouter low_cost）",
+        "Provider: サーバー固定 Fallback Chain（クライアント選択不可）",
         "モデル名はクライアントから指定できません。",
       ].join("\n"),
     );
@@ -209,7 +218,7 @@ export function RagPage({
         "route_tier: high_quality（AI分析より高コスト）",
         `推定入力: ${estimatedInputTokens} tokens`,
         "出力上限: 1024 tokens",
-        "Provider: サーバー設定（Development Stub または OpenRouter high_quality）",
+        "Provider: サーバー固定 Fallback Chain（high_quality）",
         "モデル名はクライアントから指定できません。",
         "成功後も Approval は自動提出しません。",
       ].join("\n"),
@@ -362,14 +371,31 @@ export function RagPage({
                 </div>
                 <p>上記の検索証拠だけを使用します。ページ表示や検索では自動実行されません。Provider はサーバー設定のみです。</p>
                 <button type="button" onClick={runExplicitAIAnalysis} disabled={aiLoading || retrievalResult.results.length === 0}>
-                  {aiLoading ? "AI分析中…" : "AI分析"}
+                  {aiLoading ? "正在执行企业 AI 路由……" : "AI分析"}
                 </button>
                 {aiError && <StatusBanner tone="error">[{aiError.code}] {aiError.message}</StatusBanner>}
                 {aiResult && (
                   <div className="result-stack">
                     <StatusBanner tone="success">
-                      {providerModeLabel(aiResult.provider)} / {aiResult.provider} / {aiResult.model} / {aiResult.route_tier ?? "low_cost"} / {aiResult.status}
+                      {providerModeLabel(aiResult.provider_name ?? aiResult.provider)} / {aiResult.provider_name ?? aiResult.provider} / {aiResult.model_name ?? aiResult.model} / {aiResult.route_tier ?? "low_cost"} / {aiResult.status}
                     </StatusBanner>
+                    {aiResult.fallback_used && (
+                      <StatusBanner tone="warning">
+                        主要 AI 服务暂时不可用，已自动切换至备用服务。
+                      </StatusBanner>
+                    )}
+                    <dl className="detail-grid result-meta-grid" aria-label="AI分析路由摘要">
+                      <div><dt>使用服务</dt><dd>{providerModeLabel(aiResult.provider_name ?? aiResult.provider)}</dd></div>
+                      <div><dt>使用模型</dt><dd>{aiResult.model_name ?? aiResult.model}</dd></div>
+                      <div><dt>路由等级</dt><dd>{aiResult.route_tier ?? "low_cost"}</dd></div>
+                      <div><dt>自动切换</dt><dd>{aiResult.fallback_used ? "是" : "否"}</dd></div>
+                      <div><dt>尝试次数</dt><dd>{aiResult.attempt_count ?? 1}</dd></div>
+                      <div><dt>Token</dt><dd>{aiResult.total_tokens ?? aiResult.usage.total_tokens}</dd></div>
+                      <div><dt>本次总成本</dt><dd>{aiResult.total_actual_cost ?? aiResult.cost} {aiResult.currency}</dd></div>
+                    </dl>
+                    {aiResult.attempted_providers && aiResult.attempted_providers.length > 0 && (
+                      <p>尝试摘要: {formatAttemptSummary(aiResult.attempted_providers)}</p>
+                    )}
                     <pre className="answer-block">{aiResult.answer}</pre>
                     <p>Usage: {aiResult.usage.input_tokens} + {aiResult.usage.output_tokens} = {aiResult.usage.total_tokens} tokens</p>
                     <p>Cost: {aiResult.cost} {aiResult.currency}</p>
@@ -385,7 +411,7 @@ export function RagPage({
                           onClick={runExecutiveReport}
                           disabled={reportLoading || aiLoading}
                         >
-                          {reportLoading ? "取締役会報告生成中…" : "生成取締役会報告"}
+                          {reportLoading ? "正在执行企业 AI 路由……" : "生成取締役会報告"}
                         </button>
                         {reportError && (
                           <StatusBanner tone="error">[{reportError.code}] {reportError.message}</StatusBanner>
@@ -393,8 +419,27 @@ export function RagPage({
                         {reportResult && (
                           <div className="result-stack">
                             <StatusBanner tone="success">
-                              {providerModeLabel(reportResult.provider)} / {reportResult.provider} / {reportResult.model} / {reportResult.route_tier} / {reportResult.status}
+                              {providerModeLabel(reportResult.provider_name ?? reportResult.provider)} / {reportResult.provider_name ?? reportResult.provider} / {reportResult.model_name ?? reportResult.model} / {reportResult.route_tier} / {reportResult.status}
                             </StatusBanner>
+                            {reportResult.fallback_used && (
+                              <StatusBanner tone="warning">
+                                主要 AI 服务暂时不可用，已自动切换至备用服务。
+                              </StatusBanner>
+                            )}
+                            <dl className="detail-grid result-meta-grid" aria-label="取締役会報告路由摘要">
+                              <div><dt>使用服务</dt><dd>{providerModeLabel(reportResult.provider_name ?? reportResult.provider)}</dd></div>
+                              <div><dt>使用模型</dt><dd>{reportResult.model_name ?? reportResult.model}</dd></div>
+                              <div><dt>路由等级</dt><dd>{reportResult.route_tier}</dd></div>
+                              <div><dt>自动切换</dt><dd>{reportResult.fallback_used ? "是" : "否"}</dd></div>
+                              <div><dt>尝试次数</dt><dd>{reportResult.attempt_count ?? 1}</dd></div>
+                              <div><dt>Token</dt><dd>{reportResult.total_tokens ?? reportResult.usage.total_tokens}</dd></div>
+                              <div><dt>总成本</dt><dd>{reportResult.total_actual_cost ?? reportResult.actual_cost} {reportResult.currency}</dd></div>
+                              <div><dt>Report ID</dt><dd>{reportResult.report_id}</dd></div>
+                              <div><dt>ReportVersion ID</dt><dd>{reportResult.report_version_id}</dd></div>
+                            </dl>
+                            {reportResult.attempted_providers && reportResult.attempted_providers.length > 0 && (
+                              <p>尝试摘要: {formatAttemptSummary(reportResult.attempted_providers)}</p>
+                            )}
                             <p>Report: {reportResult.report_id} / Version: {reportResult.report_version_id}</p>
                             <pre className="answer-block">{reportResult.executive_summary}</pre>
                             <p>Usage: {reportResult.usage.input_tokens} + {reportResult.usage.output_tokens} = {reportResult.usage.total_tokens} tokens</p>

@@ -188,18 +188,36 @@ export interface AIAnalysisRequest {
   confirmed: true;
 }
 
+/** 安全尝试摘要：仅 provider/model/status/latency，无 URL/Key/原始错误。 */
+export interface AttemptedProviderSummary {
+  provider_name: string;
+  model_name: string;
+  status: string;
+  latency_ms?: number | null;
+}
+
 export interface AIAnalysisResponse {
   analysis_id: string;
   answer: string;
   citations: Array<{ document_id: string; chunk_id: string; score: string; excerpt: string }>;
   provider: string;
   model: string;
+  provider_name?: string;
+  model_name?: string;
   route_tier?: string;
   usage: { input_tokens: number; output_tokens: number; total_tokens: number };
   cost: string;
   currency: string;
   status: string;
   created_at: string;
+  usage_id?: string | null;
+  fallback_used?: boolean;
+  attempt_count?: number;
+  attempted_providers?: AttemptedProviderSummary[];
+  total_input_tokens?: number;
+  total_output_tokens?: number;
+  total_tokens?: number;
+  total_actual_cost?: string;
 }
 
 /** 高质量董事会报告：仅在 succeeded AI Analysis 之后由用户显式触发。 */
@@ -222,6 +240,8 @@ export interface ExecutiveReportResponse {
   citations: Array<{ document_id: string; chunk_id: string; score: string; excerpt: string }>;
   provider: string;
   model: string;
+  provider_name?: string;
+  model_name?: string;
   route_tier: string;
   usage: { input_tokens: number; output_tokens: number; total_tokens: number };
   estimated_cost: string;
@@ -231,6 +251,13 @@ export interface ExecutiveReportResponse {
   analysis_id: string;
   usage_id: string;
   created_at: string;
+  fallback_used?: boolean;
+  attempt_count?: number;
+  attempted_providers?: AttemptedProviderSummary[];
+  total_input_tokens?: number;
+  total_output_tokens?: number;
+  total_tokens?: number;
+  total_actual_cost?: string;
 }
 
 /** Internal RAG 当前只有两种冻结回答模式。 */

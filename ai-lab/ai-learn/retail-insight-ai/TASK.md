@@ -1,5 +1,18 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 Provider Fallback Chain（已完成）
+
+- [x] 固定顺序 OpenRouter → NVIDIA → Gemini → Local Qwen
+- [x] `LLM_PROVIDER_MODE=stub|openrouter|fallback_chain`
+- [x] 各 Provider low/high 模型、价格、timeout、enabled fail-closed
+- [x] Attempt Ledger + Circuit Breaker（PostgreSQL 共享状态）
+- [x] Backend 返回实际 Provider/Model/fallback/attempt/token/cost
+- [x] Frontend 显示路由摘要与安全 fallback 说明
+- [x] Migration `20260717_07_provider_fallback_chain`
+- [x] 默认零外网 MockTransport；真实 smoke 未执行
+
+最后更新：2026-07-17
+
 ## 2026-07-17 OpenRouter Real LLM Provider（已完成）
 
 - [x] `LLM_PROVIDER_MODE=stub|openrouter` 与 OpenRouter Settings/SecretStr
