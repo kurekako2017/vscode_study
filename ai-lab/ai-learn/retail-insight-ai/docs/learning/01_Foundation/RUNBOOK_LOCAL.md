@@ -112,29 +112,29 @@ curl -fsS http://127.0.0.1:8000/health
 
 来源：`backend/tests/auth_test_utils.py` + `backend/app/security/user_provider.py`（bcrypt，应用不存明文）。
 
-| 角色 | 用户名 | 密码（仅本地测试） | 用途 |
-|---|---|---|---|
-| admin | `admin` | `Admin#2026!` | 全权限；**AI管理**；Audit |
-| manager | `manager` | `Manager#2026!` | 审批 review/approve/reject |
+| 角色     | 用户名       | 密码（仅本地测试） | 用途                                 |
+| -------- | ------------ | ------------------ | ------------------------------------ |
+| admin    | `admin`    | `Admin#2026!`    | 全权限；**AI管理**；Audit      |
+| manager  | `manager`  | `Manager#2026!`  | 审批 review/approve/reject           |
 | employee | `employee` | `Employee#2026!` | 文档/RAG/AI分析/submit；approve→403 |
 
 登录 API：`POST /api/v1/auth/login`。页面：`http://127.0.0.1:8080/login`（Compose 正式）或 `http://127.0.0.1:5173/login`（Vite 开发）。
 
 ### 8080 与 5173
 
-| 端口 | 用途 |
-|---|---|
-| **8080** | **正式 Docker Frontend**（连 Compose Backend + PostgreSQL）— 日常手动使用优先 |
+| 端口           | 用途                                                                                           |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| **8080** | **正式 Docker Frontend**（连 Compose Backend + PostgreSQL）— 日常手动使用优先           |
 | **5173** | **Vite 本地开发** Frontend（需自行 `start_frontend.sh`，并保证 Backend 指向 postgres） |
-| 8000 | Backend API / Swagger `/docs` |
+| 8000           | Backend API / Swagger`/docs`                                                                 |
 
 ### KPI任务分析 vs RAG/AI分析
 
-| 入口 | 路径 | 含义 |
-|---|---|---|
-| KPI任务分析 | `/analysis` | 旧 Task API + SSE（hybrid/kpi/research），**不是** low_cost AI 成本入口 |
-| RAG/AI分析 | `/rag` | 检索 + **显式** AI分析(low_cost) + 董事会报告(high_quality)；展示 Provider/Model/Route/Token/Cost |
-| AI管理 | `/ai-admin` | 仅 `security.manage`：查看/切换 `LLM_PROVIDER_MODE`（stub/openrouter/fallback_chain） |
+| 入口        | 路径          | 含义                                                                                                   |
+| ----------- | ------------- | ------------------------------------------------------------------------------------------------------ |
+| KPI任务分析 | `/analysis` | 旧 Task API + SSE（hybrid/kpi/research），**不是** low_cost AI 成本入口                          |
+| RAG/AI分析  | `/rag`      | 检索 +**显式** AI分析(low_cost) + 董事会报告(high_quality)；展示 Provider/Model/Route/Token/Cost |
+| AI管理      | `/ai-admin` | 仅`security.manage`：查看/切换 `LLM_PROVIDER_MODE`（stub/openrouter/fallback_chain）               |
 
 ### Scenario01 导入 PostgreSQL
 
@@ -178,10 +178,10 @@ curl -fsS http://127.0.0.1:8000/health
 
 **正式页面入口：**
 
-| 环境 | URL |
-|---|---|
+| 环境                          | URL                       |
+| ----------------------------- | ------------------------- |
 | Docker/PostgreSQL（推荐日常） | `http://127.0.0.1:8080` |
-| Vite 本地开发 | `http://127.0.0.1:5173` |
+| Vite 本地开发                 | `http://127.0.0.1:5173` |
 
 说明：下文若仍出现 `Dashboard / Analysis / Tasks` / `RAG検索` / `分析依頼` 等旧标签，视为**历史阶段记录**；当前操作与验收以本节导航与上表端口为准。
 

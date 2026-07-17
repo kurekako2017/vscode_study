@@ -5,29 +5,29 @@
 本文档是 **Enterprise Retail Intelligence Platform (ERIP) V1.0** 的权威、可执行部署入口。
 服务名、端口、数据库用户、环境变量与命令均来自仓库当前配置（`docker-compose.yml`、Dockerfile、entrypoint、`.env.example`、`scripts/*`），禁止用记忆替代事实。
 
-| 文档 | 职责 |
-|---|---|
-| **本文件** | 部署分层、Compose 操作、Secret、Backup/Restore 命令模板、生产差距 |
-| `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` | 学习向启动/排错、业务 Case、Appendix M/N |
-| `VERIFY_CHECKLIST.md` | 启动完成勾选 |
-| `.env.example` | 环境变量模板（无真实密钥） |
+| 文档                                             | 职责                                                              |
+| ------------------------------------------------ | ----------------------------------------------------------------- |
+| **本文件**                                 | 部署分层、Compose 操作、Secret、Backup/Restore 命令模板、生产差距 |
+| `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` | 学习向启动/排错、业务 Case、Appendix M/N                          |
+| `VERIFY_CHECKLIST.md`                          | 启动完成勾选                                                      |
+| `.env.example`                                 | 环境变量模板（无真实密钥）                                        |
 
 **V1.0 验收基线（文档编写时仓库事实）**
 
-| 项 | 值 |
-|---|---|
-| 正式 Repository | **PostgreSQL** |
-| InMemory | 仅辅助 unittest / 教学，不作业务验收 |
-| Alembic head | **`20260717_08_ai_runtime`** |
-| PostgreSQL Backend | **297 tests / 6 skipped** |
-| InMemory Backend | **286 tests / 62 skipped** |
-| Frontend | **116/116**；production build 通过 |
-| Compose | services `postgres` / `backend` / `frontend` healthy |
-| Volume | **`erip_postgres_data`** |
-| 默认 LLM | `LLM_PROVIDER_MODE=stub`，`effective_mode=stub`，`RUN_REAL_LLM_SMOKE=0` |
-| Runtime 持久化 | 表 `ai_runtime_settings` |
-| Seed | `scripts/seed_scenario01.sh`（不自动随 Compose） |
-| 默认验收 | **零真实 LLM 调用** |
+| 项                 | 值                                                                            |
+| ------------------ | ----------------------------------------------------------------------------- |
+| 正式 Repository    | **PostgreSQL**                                                          |
+| InMemory           | 仅辅助 unittest / 教学，不作业务验收                                          |
+| Alembic head       | **`20260717_08_ai_runtime`**                                          |
+| PostgreSQL Backend | **297 tests / 6 skipped**                                               |
+| InMemory Backend   | **286 tests / 62 skipped**                                              |
+| Frontend           | **116/116**；production build 通过                                      |
+| Compose            | services`postgres` / `backend` / `frontend` healthy                     |
+| Volume             | **`erip_postgres_data`**                                              |
+| 默认 LLM           | `LLM_PROVIDER_MODE=stub`，`effective_mode=stub`，`RUN_REAL_LLM_SMOKE=0` |
+| Runtime 持久化     | 表`ai_runtime_settings`                                                     |
+| Seed               | `scripts/seed_scenario01.sh`（不自动随 Compose）                            |
+| 默认验收           | **零真实 LLM 调用**                                                     |
 
 ---
 
@@ -119,16 +119,16 @@ flowchart LR
 
 ### 2.2 组件说明（与代码一致）
 
-| 组件 | 说明 |
-|---|---|
-| Alembic 启动链 | entrypoint：PG ready → `alembic upgrade head` → uvicorn；**migration 失败则不启动应用** |
-| Volume | `erip_postgres_data` → `/var/lib/postgresql/data` |
-| JWT / RBAC | Access Token + 冻结 Permission；401/403 fail-closed |
-| Persistent Audit | PostgreSQL append-only 审计 |
-| LLM Gateway | 唯一 Provider 外呼边界；Evidence Gate / 额度 / Ledger |
-| Usage Ledger | PostgreSQL `llm_usage_ledger` 等 |
-| `ai_runtime_settings` | 运行时 mode / kill_switch / version（**无 Key**） |
-| Provider Secret | **仅 Backend 进程环境变量**读取；Frontend / DB 不保存 Key |
+| 组件                    | 说明                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| Alembic 启动链          | entrypoint：PG ready →`alembic upgrade head` → uvicorn；**migration 失败则不启动应用** |
+| Volume                  | `erip_postgres_data` → `/var/lib/postgresql/data`                                           |
+| JWT / RBAC              | Access Token + 冻结 Permission；401/403 fail-closed                                              |
+| Persistent Audit        | PostgreSQL append-only 审计                                                                      |
+| LLM Gateway             | 唯一 Provider 外呼边界；Evidence Gate / 额度 / Ledger                                            |
+| Usage Ledger            | PostgreSQL`llm_usage_ledger` 等                                                                |
+| `ai_runtime_settings` | 运行时 mode / kill_switch / version（**无 Key**）                                          |
+| Provider Secret         | **仅 Backend 进程环境变量**读取；Frontend / DB 不保存 Key                                  |
 
 Compose project name（`docker-compose.yml`）：**`erip`**
 Services：**`postgres`**、**`backend`**、**`frontend`**
@@ -137,19 +137,19 @@ Services：**`postgres`**、**`backend`**、**`frontend`**
 
 ## 3. 环境要求
 
-| 项 | 要求 | 说明 |
-|---|---|---|
-| Docker Engine / Desktop | Compose 场景必需 | `docker info` 必须成功 |
-| Docker Compose | `docker compose` 插件 | 脚本使用 `docker compose` |
-| WSL Integration | Windows 用户建议 | daemon 需在 WSL 可见 |
-| Git | 克隆仓库 | — |
-| curl | 健康检查 / verify / seed | 脚本依赖 |
-| Node.js + npm | 本地 Frontend | `scripts/check_env.sh` |
-| Python 3 + pip | 本地 Backend | 建议 3.12（镜像为 `python:3.12-slim`） |
-| 端口 | 默认 5432 / 8000 / 8080 / 5173 | 可被占用则改环境变量 |
-| CPU | **建议** ≥ 2 核 | 建议值，非硬门槛 |
-| Memory | **建议** ≥ 4 GB 可用 | 建议值 |
-| Disk | **建议** ≥ 10 GB 空闲 | 镜像 + volume |
+| 项                      | 要求                           | 说明                                    |
+| ----------------------- | ------------------------------ | --------------------------------------- |
+| Docker Engine / Desktop | Compose 场景必需               | `docker info` 必须成功                |
+| Docker Compose          | `docker compose` 插件        | 脚本使用`docker compose`              |
+| WSL Integration         | Windows 用户建议               | daemon 需在 WSL 可见                    |
+| Git                     | 克隆仓库                       | —                                      |
+| curl                    | 健康检查 / verify / seed       | 脚本依赖                                |
+| Node.js + npm           | 本地 Frontend                  | `scripts/check_env.sh`                |
+| Python 3 + pip          | 本地 Backend                   | 建议 3.12（镜像为`python:3.12-slim`） |
+| 端口                    | 默认 5432 / 8000 / 8080 / 5173 | 可被占用则改环境变量                    |
+| CPU                     | **建议** ≥ 2 核         | 建议值，非硬门槛                        |
+| Memory                  | **建议** ≥ 4 GB 可用    | 建议值                                  |
+| Disk                    | **建议** ≥ 10 GB 空闲   | 镜像 + volume                           |
 
 检查工具（本地无 Docker 场景）：
 
@@ -161,24 +161,24 @@ Services：**`postgres`**、**`backend`**、**`frontend`**
 
 ## 4. 部署文件职责
 
-| 文件 / 脚本 | 职责 |
-|---|---|
-| `docker-compose.yml` | 三服务编排、默认 stub、volume、端口、健康检查 |
-| `backend/Dockerfile` | Backend 镜像：依赖、app、alembic、db、data、entrypoint；**不 COPY `.env`** |
-| `frontend/Dockerfile` | multi-stage：`npm ci` + Vite build → nginx:1.29-alpine |
-| `frontend/nginx.conf` | SPA + `/api`、`/health` 反代 `backend:8000` |
-| `backend/scripts/docker-entrypoint.sh` | 等 PG → `alembic upgrade head` → `exec` uvicorn |
-| `.dockerignore` / `backend/.dockerignore` / `frontend/.dockerignore` | 排除 `.env`、venv、tests 等 |
-| `scripts/compose_up.sh` | build + up -d + 健康轮询 |
-| `scripts/compose_verify.sh` | health / SPA 路径 / 镜像无 `.env` |
-| `scripts/compose_down.sh` | `docker compose down`；**拒绝 `-v`** |
-| `scripts/prove_dockerignore.sh` | 证明 dockerignore 排除 `.env`、compose 默认 stub |
-| `scripts/run_api_e2e.sh` | Stub API E2E（`E2E_BASE_URL` 默认 `http://127.0.0.1:8000`） |
-| `scripts/seed_scenario01.sh` | Scenario01 幂等种子（PG-only） |
-| `scripts/start_backend.sh` / `start_frontend.sh` | 本地无 Docker 启动 |
-| `.env.example` | 环境变量模板 |
-| `backend/alembic/` + `alembic.ini` | Migration；URL 仅来自进程 `DATABASE_URL` |
-| Volume `erip_postgres_data` | PostgreSQL 数据持久化 |
+| 文件 / 脚本                                                                | 职责                                                                               |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `docker-compose.yml`                                                     | 三服务编排、默认 stub、volume、端口、健康检查                                      |
+| `backend/Dockerfile`                                                     | Backend 镜像：依赖、app、alembic、db、data、entrypoint；**不 COPY `.env`** |
+| `frontend/Dockerfile`                                                    | multi-stage：`npm ci` + Vite build → nginx:1.29-alpine                          |
+| `frontend/nginx.conf`                                                    | SPA +`/api`、`/health` 反代 `backend:8000`                                   |
+| `backend/scripts/docker-entrypoint.sh`                                   | 等 PG →`alembic upgrade head` → `exec` uvicorn                               |
+| `.dockerignore` / `backend/.dockerignore` / `frontend/.dockerignore` | 排除`.env`、venv、tests 等                                                       |
+| `scripts/compose_up.sh`                                                  | build + up -d + 健康轮询                                                           |
+| `scripts/compose_verify.sh`                                              | health / SPA 路径 / 镜像无`.env`                                                 |
+| `scripts/compose_down.sh`                                                | `docker compose down`；**拒绝 `-v`**                                     |
+| `scripts/prove_dockerignore.sh`                                          | 证明 dockerignore 排除`.env`、compose 默认 stub                                  |
+| `scripts/run_api_e2e.sh`                                                 | Stub API E2E（`E2E_BASE_URL` 默认 `http://127.0.0.1:8000`）                    |
+| `scripts/seed_scenario01.sh`                                             | Scenario01 幂等种子（PG-only）                                                     |
+| `scripts/start_backend.sh` / `start_frontend.sh`                       | 本地无 Docker 启动                                                                 |
+| `.env.example`                                                           | 环境变量模板                                                                       |
+| `backend/alembic/` + `alembic.ini`                                     | Migration；URL 仅来自进程`DATABASE_URL`                                          |
+| Volume`erip_postgres_data`                                               | PostgreSQL 数据持久化                                                              |
 
 ---
 
@@ -189,50 +189,51 @@ Compose：`backend` 的 `environment:` **钉死** `REPOSITORY_BACKEND=postgres`�
 
 ### 5.1 Repository / Database
 
-| 变量 | 用途 | 必填 | 默认（.env.example / compose） | Secret | 安全示例 |
-|---|---|---|---|---|---|
-| `REPOSITORY_BACKEND` | 存储后端 | 业务验收必填 postgres | example: `postgres`；Compose 钉死 `postgres` | 否 | `postgres` |
-| `POSTGRES_HOST` | DB 主机 | PG 时需要 | example `127.0.0.1`；Compose 容器内 `postgres` | 否 | Compose 内用服务名 `postgres` |
-| `POSTGRES_PORT` | 宿主映射 / 连接端口 | 否 | `5432` | 否 | 冲突时 `export POSTGRES_PORT=5433` |
-| `POSTGRES_DB` | 库名 | 是 | `erip` | 否 | `erip` |
-| `POSTGRES_USER` | 用户 | 是 | `erip_app` | 否 | `erip_app` |
-| `POSTGRES_PASSWORD` | 密码 | 是 | `erip_change_me_local_only`（占位） | **是** | 强随机；勿提交 |
-| `DATABASE_URL` | SQLAlchemy/psycopg URL | Compose 由公式生成 | `postgresql+psycopg://erip_app:***@postgres:5432/erip` | **是** | 勿打印完整串 |
+| 变量                   | 用途                   | 必填                  | 默认（.env.example / compose）                           | Secret       | 安全示例                            |
+| ---------------------- | ---------------------- | --------------------- | -------------------------------------------------------- | ------------ | ----------------------------------- |
+| `REPOSITORY_BACKEND` | 存储后端               | 业务验收必填 postgres | example:`postgres`；Compose 钉死 `postgres`          | 否           | `postgres`                        |
+| `POSTGRES_HOST`      | DB 主机                | PG 时需要             | example`127.0.0.1`；Compose 容器内 `postgres`        | 否           | Compose 内用服务名`postgres`      |
+| `POSTGRES_PORT`      | 宿主映射 / 连接端口    | 否                    | `5432`                                                 | 否           | 冲突时`export POSTGRES_PORT=5433` |
+| `POSTGRES_DB`        | 库名                   | 是                    | `erip`                                                 | 否           | `erip`                            |
+| `POSTGRES_USER`      | 用户                   | 是                    | `erip_app`                                             | 否           | `erip_app`                        |
+| `POSTGRES_PASSWORD`  | 密码                   | 是                    | `erip_change_me_local_only`（占位）                    | **是** | 强随机；勿提交                      |
+| `DATABASE_URL`       | SQLAlchemy/psycopg URL | Compose 由公式生成    | `postgresql+psycopg://erip_app:***@postgres:5432/erip` | **是** | 勿打印完整串                        |
 
 ### 5.2 JWT / App
 
-| 变量 | 用途 | 必填 | 默认 | Secret | 安全示例 |
-|---|---|---|---|---|---|
-| `JWT_SECRET_KEY` | 签发 Access Token | 是 | 本地占位长串 | **是** | 生产高熵随机 |
-| `APP_ENV` | 环境名 | 否 | `local` | 否 | 生产用 `production` |
-| `LOG_LEVEL` | 日志级别 | 否 | `INFO` | 否 | `INFO` |
-| `SERVICE_NAME` | 结构化日志 | Compose 钉死 | `retail-insight-ai` | 否 | — |
-| `CORS_ORIGINS` | CORS | 否 | 含 8080/5173 | 否 | 生产收紧为真实域名 |
-| `LEARNING_TRACE` | 学习日志 | 否 | `false` | 否 | 默认关 |
-| `TASK_EXECUTION_MODE` | 任务执行 | Compose `background` | `background` | 否 | — |
+| 变量                    | 用途              | 必填                  | 默认                  | Secret       | 安全示例             |
+| ----------------------- | ----------------- | --------------------- | --------------------- | ------------ | -------------------- |
+| `JWT_SECRET_KEY`      | 签发 Access Token | 是                    | 本地占位长串          | **是** | 生产高熵随机         |
+| `APP_ENV`             | 环境名            | 否                    | `local`             | 否           | 生产用`production` |
+| `LOG_LEVEL`           | 日志级别          | 否                    | `INFO`              | 否           | `INFO`             |
+| `SERVICE_NAME`        | 结构化日志        | Compose 钉死          | `retail-insight-ai` | 否           | —                   |
+| `CORS_ORIGINS`        | CORS              | 否                    | 含 8080/5173          | 否           | 生产收紧为真实域名   |
+| `LEARNING_TRACE`      | 学习日志          | 否                    | `false`             | 否           | 默认关               |
+| `TASK_EXECUTION_MODE` | 任务执行          | Compose`background` | `background`        | 否           | —                   |
 
 ### 5.3 Port
 
-| 变量 | 用途 | 默认 |
-|---|---|---|
-| `BACKEND_PORT` | 宿主映射 Backend | `8000` |
-| `FRONTEND_PORT` | 宿主映射 Frontend | `8080` |
+| 变量              | 用途                | 默认     |
+| ----------------- | ------------------- | -------- |
+| `BACKEND_PORT`  | 宿主映射 Backend    | `8000` |
+| `FRONTEND_PORT` | 宿主映射 Frontend   | `8080` |
 | `POSTGRES_PORT` | 宿主映射 PostgreSQL | `5432` |
 
 ### 5.4 LLM Mode（权威枚举）
 
-| 值 | 含义 |
-|---|---|
-| `stub` | 默认；无网络；stub-low-cost / stub-high-quality |
-| `openrouter` | 单 Provider（仍经 Gateway/Ledger） |
+| 值                 | 含义                                                 |
+| ------------------ | ---------------------------------------------------- |
+| `stub`           | 默认；无网络；stub-low-cost / stub-high-quality      |
+| `openrouter`     | 单 Provider（仍经 Gateway/Ledger）                   |
 | `fallback_chain` | OpenRouter → NVIDIA → Gemini → Local Qwen（串行） |
 
-| 变量 | 用途 | 必填 | 默认 | Secret |
-|---|---|---|---|---|
-| `LLM_PROVIDER_MODE` | **启动默认** mode | 否 | `stub`；Compose **钉死 stub** | 否 |
-| `LLM_PROVIDER` | 兼容旧名 | 否 | `stub` | 否 |
+| 变量                  | 用途                    | 必填 | 默认                                  | Secret |
+| --------------------- | ----------------------- | ---- | ------------------------------------- | ------ |
+| `LLM_PROVIDER_MODE` | **启动默认** mode | 否   | `stub`；Compose **钉死 stub** | 否     |
+| `LLM_PROVIDER`      | 兼容旧名                | 否   | `stub`                              | 否     |
 
 **运行时授权**另存 PostgreSQL `ai_runtime_settings`（见第 12 节）。
+
 - `LLM_PROVIDER_MODE` = 进程启动默认 / 初始化 DB 行的默认值来源之一。
 - `ai_runtime_settings.mode` / `kill_switch` = 多实例共享的运行事实。
 - Key、模型名、价格 **仍只来自环境变量**，不进 `ai_runtime_settings`。
@@ -241,23 +242,23 @@ Compose：`backend` 的 `environment:` **钉死** `REPOSITORY_BACKEND=postgres`�
 
 （字段以 `.env.example` 为准；价格单位 **USD / 百万 tokens**。）
 
-| 类别 | 关键变量 | 必填时机 | Secret |
-|---|---|---|---|
-| OpenRouter | `OPENROUTER_API_KEY`, `OPENROUTER_*_MODEL`, `OPENROUTER_*_PRICE`, `OPENROUTER_BASE_URL`, `OPENROUTER_ENABLED` | mode=openrouter 或 chain 启用该 provider | Key **是** |
-| NVIDIA | `NVIDIA_API_KEY`, `NVIDIA_*_MODEL`, prices, `NVIDIA_BASE_URL` | chain 启用时 | Key **是** |
-| Gemini | `GEMINI_API_KEY`, `GEMINI_*_MODEL`, prices, `GEMINI_BASE_URL` | chain 启用时 | Key **是** |
-| Local Qwen | `LOCAL_QWEN_ENABLED`, `LOCAL_QWEN_BASE_URL`, models, optional `LOCAL_QWEN_API_KEY` | chain 启用本地时 | 视配置 |
+| 类别       | 关键变量                                                                                                                | 必填时机                                 | Secret          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | --------------- |
+| OpenRouter | `OPENROUTER_API_KEY`, `OPENROUTER_*_MODEL`, `OPENROUTER_*_PRICE`, `OPENROUTER_BASE_URL`, `OPENROUTER_ENABLED` | mode=openrouter 或 chain 启用该 provider | Key**是** |
+| NVIDIA     | `NVIDIA_API_KEY`, `NVIDIA_*_MODEL`, prices, `NVIDIA_BASE_URL`                                                     | chain 启用时                             | Key**是** |
+| Gemini     | `GEMINI_API_KEY`, `GEMINI_*_MODEL`, prices, `GEMINI_BASE_URL`                                                     | chain 启用时                             | Key**是** |
+| Local Qwen | `LOCAL_QWEN_ENABLED`, `LOCAL_QWEN_BASE_URL`, models, optional `LOCAL_QWEN_API_KEY`                                | chain 启用本地时                         | 视配置          |
 
 ### 5.6 Timeout / Circuit / Smoke
 
-| 变量 | 默认（.env.example） | Secret |
-|---|---|---|
-| `LLM_TOTAL_TIMEOUT_SECONDS` | `120` | 否 |
-| `LLM_MAX_PROVIDER_ATTEMPTS` | `4` | 否 |
-| `LLM_CIRCUIT_FAILURE_THRESHOLD` | `3` | 否 |
-| `LLM_CIRCUIT_OPEN_DURATION_SECONDS` | `30` | 否 |
-| `RUN_REAL_LLM_SMOKE` | `0` | 否 |
-| `RUN_OPENROUTER_SMOKE` 等 | `0` | 否 |
+| 变量                                  | 默认（.env.example） | Secret |
+| ------------------------------------- | -------------------- | ------ |
+| `LLM_TOTAL_TIMEOUT_SECONDS`         | `120`              | 否     |
+| `LLM_MAX_PROVIDER_ATTEMPTS`         | `4`                | 否     |
+| `LLM_CIRCUIT_FAILURE_THRESHOLD`     | `3`                | 否     |
+| `LLM_CIRCUIT_OPEN_DURATION_SECONDS` | `30`               | 否     |
+| `RUN_REAL_LLM_SMOKE`                | `0`                | 否     |
+| `RUN_OPENROUTER_SMOKE` 等           | `0`                | 否     |
 
 **首次部署不得开启真实调用。** 默认保持 **stub**。
 
@@ -318,13 +319,13 @@ export POSTGRES_PORT=5433
 
 **访问入口**
 
-| 用途 | URL |
-|---|---|
-| Frontend（正式） | http://127.0.0.1:8080 |
-| Login | http://127.0.0.1:8080/login |
-| Backend API | http://127.0.0.1:8000 |
-| Swagger | http://127.0.0.1:8000/docs |
-| Health | http://127.0.0.1:8000/health |
+| 用途             | URL                          |
+| ---------------- | ---------------------------- |
+| Frontend（正式） | http://127.0.0.1:8080        |
+| Login            | http://127.0.0.1:8080/login  |
+| Backend API      | http://127.0.0.1:8000        |
+| Swagger          | http://127.0.0.1:8000/docs   |
+| Health           | http://127.0.0.1:8000/health |
 
 `compose_up.sh` 行为摘要：`docker compose config` → `build` → `up -d` → 轮询至 Backend `/health` 与 Frontend `/` 可用。
 
@@ -405,10 +406,10 @@ docker volume ls | grep erip_postgres_data
 
 **仅本地 Stub / 演示。禁止生产使用。生产必须替换为企业 IdP，禁止复用测试密码。**
 
-| 角色 | 用户名 | 密码 |
-|---|---|---|
-| admin | `admin` | `Admin#2026!` |
-| manager | `manager` | `Manager#2026!` |
+| 角色     | 用户名       | 密码               |
+| -------- | ------------ | ------------------ |
+| admin    | `admin`    | `Admin#2026!`    |
+| manager  | `manager`  | `Manager#2026!`  |
 | employee | `employee` | `Employee#2026!` |
 
 来源：RUNBOOK + deterministic test users（bcrypt，应用不存明文密码文件）。
@@ -426,16 +427,16 @@ docker volume ls | grep erip_postgres_data
 # BASE_URL=http://127.0.0.1:8000 ./scripts/seed_scenario01.sh
 ```
 
-| 规则 | 说明 |
-|---|---|
+| 规则              | 说明                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
 | 只允许 PostgreSQL | `/health` 的 `repository_backend` 必须为 `postgres`，否则 exit |
-| 幂等 | 按 title / Idempotency-Key / checksum 复用；不删除现有数据 |
-| 调用范围 | login → documents upload → import → chunk |
-| 禁止 | Retrieval、AI 分析、报告、审批、真实 LLM |
-| Provider | `provider_calls=0` / `provider_call_target=0` |
-| 输出 | `document_id`、status、chunk_count、recommended_question |
-| 不输出 | Token、密码、文档正文、API Key |
-| 自动启动 | **不**随 Compose 启动 |
+| 幂等              | 按 title / Idempotency-Key / checksum 复用；不删除现有数据           |
+| 调用范围          | login → documents upload → import → chunk                         |
+| 禁止              | Retrieval、AI 分析、报告、审批、真实 LLM                             |
+| Provider          | `provider_calls=0` / `provider_call_target=0`                    |
+| 输出              | `document_id`、status、chunk_count、recommended_question           |
+| 不输出            | Token、密码、文档正文、API Key                                       |
+| 自动启动          | **不**随 Compose 启动                                          |
 
 样例路径：`docs/learning/sample-data/Scenario01_Sales_Decline/`（`01`–`06` 业务 md）。
 
@@ -455,21 +456,21 @@ docker volume ls | grep erip_postgres_data
 
 ## 12. AI Runtime 管理
 
-| 项 | 事实 |
-|---|---|
-| 权限 | JWT + `security.manage`（admin） |
-| API | `GET/PATCH /api/v1/admin/ai-runtime` |
-| 模式 | `stub` / `openrouter` / `fallback_chain` |
-| PATCH 要求 | `confirmed=true`、`expected_version`；Stub→Real 需 `confirmation_text`（`ENABLE_REAL_LLM`） |
-| readiness | 目标 mode 未 ready → 422 |
-| version 冲突 | 409 |
-| Kill Switch | 强制 `effective_mode=stub` |
-| 持久化 | PostgreSQL `ai_runtime_settings`；**Backend 重启后保持** |
-| Key | **不**存 DB、**不**回响应、**不**进 Frontend |
-| 费用 | 开启 Real **可能产生外部 API 费用** |
-| 普通 RAG | 默认可零 Provider；**不**自动调用 LLM |
-| 真实 smoke | 仅 opt-in 环境变量；默认验收关闭 |
-| InMemory | 管理 API **503** fail-closed |
+| 项           | 事实                                                                                                 |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| 权限         | JWT +`security.manage`（admin）                                                                    |
+| API          | `GET/PATCH /api/v1/admin/ai-runtime`                                                               |
+| 模式         | `stub` / `openrouter` / `fallback_chain`                                                       |
+| PATCH 要求   | `confirmed=true`、`expected_version`；Stub→Real 需 `confirmation_text`（`ENABLE_REAL_LLM`） |
+| readiness    | 目标 mode 未 ready → 422                                                                            |
+| version 冲突 | 409                                                                                                  |
+| Kill Switch  | 强制`effective_mode=stub`                                                                          |
+| 持久化       | PostgreSQL`ai_runtime_settings`；**Backend 重启后保持**                                      |
+| Key          | **不**存 DB、**不**回响应、**不**进 Frontend                                       |
+| 费用         | 开启 Real**可能产生外部 API 费用**                                                             |
+| 普通 RAG     | 默认可零 Provider；**不**自动调用 LLM                                                          |
+| 真实 smoke   | 仅 opt-in 环境变量；默认验收关闭                                                                     |
+| InMemory     | 管理 API**503** fail-closed                                                                    |
 
 前端入口：`http://127.0.0.1:8080/ai-admin`（Compose）。
 
@@ -500,11 +501,11 @@ docker volume ls | grep erip_postgres_data
 ╚══════════════════════════════════════════════════════════╝
 ```
 
-| 操作 | 数据 |
-|---|---|
-| `compose_down` / `docker compose down` | 停容器；**Volume 保留** |
-| `docker compose restart backend` | 进程重启；DB 与 Runtime 配置保留 |
-| `docker compose down -v` | **删除 Volume** → 数据丢失 |
+| 操作                                       | 数据                              |
+| ------------------------------------------ | --------------------------------- |
+| `compose_down` / `docker compose down` | 停容器；**Volume 保留**     |
+| `docker compose restart backend`         | 进程重启；DB 与 Runtime 配置保留  |
+| `docker compose down -v`                 | **删除 Volume** → 数据丢失 |
 
 ---
 
@@ -529,24 +530,24 @@ docker compose logs backend 2>&1 | grep -E 'alembic|entrypoint|ERROR' | tail -50
 
 **日志中不得回显** API Key、密码、完整 JWT、完整 Prompt。
 
-| 现象 | 可能原因 | 处理方向 |
-|---|---|---|
-| Docker daemon 不可用 | Desktop/服务未起 | `docker info`；启动 daemon |
-| WSL Integration | Windows 未集成 | Docker Desktop → WSL 集成 |
-| 端口冲突 | 5432/8000/8080 占用 | `export POSTGRES_PORT=5433` 等；`ss -ltn` |
-| Backend unhealthy | Migration 失败 / PG 未 ready | `logs backend`；确认密码与 volume |
-| Migration failure | SQL/权限/扩展 | 修库后重启 backend；勿伪装 healthy |
-| PostgreSQL unavailable | 依赖未 healthy | `docker compose ps postgres` |
-| health 显示 InMemory | 连错实例或本地未设 postgres | 检查 `REPOSITORY_BACKEND`；Compose 应恒为 postgres |
-| Frontend 404 | 旧镜像 / 路径错误 | 重建 frontend；确认 History 路由 |
-| 401 | 未登录 / Token 过期 | 重新 login |
-| 403 | 权限不足 | 换角色；employee 不可 approve / AI管理 |
-| 文档不可检索 | 未 Chunk / archived | Import→Chunk；searchable=yes |
-| AI 按钮禁用 | 无证据 / 无权限 | 先 Retrieval；`analysis.execute` |
-| Provider not ready | 无 Key/模型 | 配环境变量；保持 stub |
-| Runtime 409 | expected_version 过期 | 重新 GET 再 PATCH |
-| Kill Switch ON | 故意阻断真实调用 | Admin 关闭（需确认） |
-| Volume 不可见 | 未 up 过 / 名称不同 | `docker volume ls \| grep erip` |
+| 现象                   | 可能原因                     | 处理方向                                            |
+| ---------------------- | ---------------------------- | --------------------------------------------------- |
+| Docker daemon 不可用   | Desktop/服务未起             | `docker info`；启动 daemon                        |
+| WSL Integration        | Windows 未集成               | Docker Desktop → WSL 集成                          |
+| 端口冲突               | 5432/8000/8080 占用          | `export POSTGRES_PORT=5433` 等；`ss -ltn`       |
+| Backend unhealthy      | Migration 失败 / PG 未 ready | `logs backend`；确认密码与 volume                 |
+| Migration failure      | SQL/权限/扩展                | 修库后重启 backend；勿伪装 healthy                  |
+| PostgreSQL unavailable | 依赖未 healthy               | `docker compose ps postgres`                      |
+| health 显示 InMemory   | 连错实例或本地未设 postgres  | 检查`REPOSITORY_BACKEND`；Compose 应恒为 postgres |
+| Frontend 404           | 旧镜像 / 路径错误            | 重建 frontend；确认 History 路由                    |
+| 401                    | 未登录 / Token 过期          | 重新 login                                          |
+| 403                    | 权限不足                     | 换角色；employee 不可 approve / AI管理              |
+| 文档不可检索           | 未 Chunk / archived          | Import→Chunk；searchable=yes                       |
+| AI 按钮禁用            | 无证据 / 无权限              | 先 Retrieval；`analysis.execute`                  |
+| Provider not ready     | 无 Key/模型                  | 配环境变量；保持 stub                               |
+| Runtime 409            | expected_version 过期        | 重新 GET 再 PATCH                                   |
+| Kill Switch ON         | 故意阻断真实调用             | Admin 关闭（需确认）                                |
+| Volume 不可见          | 未 up 过 / 名称不同          | `docker volume ls \| grep erip`                    |
 
 ---
 
@@ -554,16 +555,16 @@ docker compose logs backend 2>&1 | grep -E 'alembic|entrypoint|ERROR' | tail -50
 
 实际落库（企业路径）包括但不限于：
 
-| 数据 | 说明 |
-|---|---|
+| 数据                                       | 说明                                                    |
+| ------------------------------------------ | ------------------------------------------------------- |
 | `documents`（含 **content 正文**） | 元数据 + 解码后文本；**非**独立 Object Storage 桶 |
-| imports / chunks / sessions | Import/Chunk 流水与切片 |
-| tasks / events | 任务与事件 |
-| reports / report_versions | 报告与不可变版本 |
-| approvals / approval_events | 审批与 History |
-| audit_logs | Persistent Audit |
-| llm_usage_ledger 等 | 成本与额度 |
-| **ai_runtime_settings** | Runtime mode / kill_switch / version |
+| imports / chunks / sessions                | Import/Chunk 流水与切片                                 |
+| tasks / events                             | 任务与事件                                              |
+| reports / report_versions                  | 报告与不可变版本                                        |
+| approvals / approval_events                | 审批与 History                                          |
+| audit_logs                                 | Persistent Audit                                        |
+| llm_usage_ledger 等                        | 成本与额度                                              |
+| **ai_runtime_settings**              | Runtime mode / kill_switch / version                    |
 
 - Volume 名：**`erip_postgres_data`**
 - 容器重启、`compose_down`（无 `-v`）后数据保留
@@ -652,11 +653,11 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 ## 19. Rollback
 
-| 类型 | 做法 | 注意 |
-|---|---|---|
-| 应用镜像回滚 | 部署上一镜像 tag；`up -d` | 先确认与 DB schema 兼容 |
+| 类型                | 做法                                | 注意                                                 |
+| ------------------- | ----------------------------------- | ---------------------------------------------------- |
+| 应用镜像回滚        | 部署上一镜像 tag；`up -d`         | 先确认与 DB schema 兼容                              |
 | Migration downgrade | `alembic downgrade <rev>`（受控） | 可能丢列/表；需 DBA；**不是** `compose_down` |
-| 数据恢复 | 第 17 节 restore | 覆盖风险 |
+| 数据恢复            | 第 17 节 restore                    | 覆盖风险                                             |
 
 **不得**将 `docker compose down` 表述为数据库回滚。
 `compose_down` 只停容器；只有 `-v` 或 restore/downgrade 才改变数据面。
@@ -737,18 +738,18 @@ export LLM_PROVIDER_MODE=stub
 
 ## 22. 当前边界（未交付，禁止写成已完成）
 
-| 项 | 状态 |
-|---|---|
-| 多租户 | 未交付 |
-| Billing UI | 未交付 |
-| SIEM 产品化 | 未交付 |
-| WORM / Tamper Evidence | 未交付 |
-| Streaming 平台化 | 未交付 |
-| Kubernetes / HA 拓扑 | 未交付 |
-| 自动 CI/CD 全流水线 | 未作为本仓库默认可运行完成项 |
-| 完整监控告警台 | 未交付 |
-| 企业 IdP | 未交付 |
-| 真实付费 LLM smoke | 仅 opt-in；**默认验收禁止** |
+| 项                     | 状态                              |
+| ---------------------- | --------------------------------- |
+| 多租户                 | 未交付                            |
+| Billing UI             | 未交付                            |
+| SIEM 产品化            | 未交付                            |
+| WORM / Tamper Evidence | 未交付                            |
+| Streaming 平台化       | 未交付                            |
+| Kubernetes / HA 拓扑   | 未交付                            |
+| 自动 CI/CD 全流水线    | 未作为本仓库默认可运行完成项      |
+| 完整监控告警台         | 未交付                            |
+| 企业 IdP               | 未交付                            |
+| 真实付费 LLM smoke     | 仅 opt-in；**默认验收禁止** |
 
 默认验收：**stub / 零真实 LLM 调用**。
 
@@ -756,9 +757,9 @@ export LLM_PROVIDER_MODE=stub
 
 ## 变更记录
 
-| 日期 | 说明 |
-|---|---|
-| 2026-07-17 | 按 22 节结构重写：对齐 compose/entrypoint/scripts/Alembic head `20260717_08_ai_runtime`；明确本地开发也必须 PostgreSQL |
+| 日期       | 说明                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-17 | 按 22 节结构重写：对齐 compose/entrypoint/scripts/Alembic head`20260717_08_ai_runtime`；明确本地开发也必须 PostgreSQL |
 
 ---
 
