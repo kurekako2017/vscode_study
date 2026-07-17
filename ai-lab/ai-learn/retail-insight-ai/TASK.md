@@ -1,5 +1,17 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 Docker/Compose + Stub E2E（已完成文件与可运行验证）
+
+- [x] 修正 docker-compose / Dockerfiles / dockerignore
+- [x] Backend entrypoint：Postgres healthy → Alembic upgrade → uvicorn
+- [x] 默认 LLM_PROVIDER_MODE=stub
+- [x] API E2E（Stub 业务链）`tests/test_e2e_api_stub_flow.py`
+- [x] Lifecycle 关键补测
+- [x] scripts: compose_up/down/verify、run_api_e2e、prove_dockerignore
+- [ ] Docker daemon 本机未运行：image build / compose up 阻塞
+
+最后更新：2026-07-17
+
 ## 2026-07-17 React Lifecycle Live Status（已完成）
 
 - [x] LearningTraceProvider + ring buffer（不发送 Backend）

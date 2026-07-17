@@ -1,5 +1,18 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: Docker/Compose + Stub E2E 文件与本地验证
+
+- [x] Compose 服务：postgres(pgvector) / backend / frontend
+- [x] Alembic 启动链与 healthcheck
+- [x] dockerignore 证明 `.env` 不进构建上下文
+- [x] Stub API E2E 业务主链
+- [x] Lifecycle 关键补测
+- [ ] Docker Desktop daemon 启动后执行 image build / compose up / 重启持久化
+
+完成记录：PG 278（含 E2E，2 smoke skip）、Frontend 113、build 通过；Compose up 因 daemon 未运行阻塞。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: React Lifecycle Live Status
 
 - [x] 集中式 Learning Trace（ring buffer + sessionStorage 安全摘要）

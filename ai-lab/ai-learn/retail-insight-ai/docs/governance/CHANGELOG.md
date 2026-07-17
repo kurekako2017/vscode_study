@@ -1,5 +1,12 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 Docker/Compose + Stub API E2E
+
+- 修正 `docker-compose.yml`：pgvector/pg16、postgres healthy、backend Alembic 启动链、frontend nginx SPA、默认 stub LLM。
+- 新增 backend entrypoint、dockerignore 三层、compose_up/down/verify、API E2E 与 Lifecycle 关键补测。
+- 默认不执行真实 LLM；`.env` 不进入 image。
+- 本机 Docker daemon 未运行时 compose up/build 阻塞，API E2E 可走本地 PostgreSQL。
+
 ## 2026-07-17 React Lifecycle Live Status
 
 - 新增 `LearningTraceProvider` / `LifecycleProbe` / `pageCatalog` / sanitize。
