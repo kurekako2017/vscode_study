@@ -1,5 +1,17 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 纠正本地开发数据库：WSL 宿主 PostgreSQL
+
+- `scripts/start_local.sh`：**移除全部 Docker 运行时依赖**（不再 `docker start erip-local-pg` / compose）；Docker Desktop 关闭时仍可走宿主路径
+- 本地页面库权威：`erip_local` on **WSL 宿主 PostgreSQL**（Unix socket `/var/run/postgresql` + peer）；拒绝 `erip_integration_test` 与端口 **5433**（误建 `erip-local-pg`）
+- 新增 `scripts/setup_host_postgres_local.sh`：一次性创建 `erip_local` + pgvector + peer 用户（可能需 sudo；不改 `pg_hba.conf`）
+- `scripts/stop_local.sh`：只停本仓库 Backend/Frontend（进程组 + 5173 orphan vite）；**不停**宿主 PG；**不碰** Docker
+- `.env`：`DATABASE_URL` 指向宿主 socket `erip_local`；保持 `REPOSITORY_BACKEND=postgres` / `LLM_PROVIDER_MODE=stub` / `RUN_REAL_LLM_SMOKE=false`
+- 文档增量：`docs/database/DATABASE.md`、`README.md`、`RUNBOOK_LOCAL.md`、`DEPLOYMENT_GUIDE.md`
+- **保留**误建 `erip-local-pg` / `erip_local_pg_data` / `erip_postgres_data`（未删除、未 `down -v`、未清空库）
+- 本轮阻塞（环境）：宿主 cluster `16/main` **down**；**5432 被 Compose `erip-postgres-1` 占用**；`sudo` 需密码 → 无法非交互 `setup_host_postgres_local` / 完整 `start_local` 验收
+- 未改业务代码；未真实 LLM；未 git commit
+
 ## 2026-07-17 部署指南（文档）
 
 - 重写/定稿权威部署文档 `docs/development/DEPLOYMENT_GUIDE.md`（22 节可执行结构）：

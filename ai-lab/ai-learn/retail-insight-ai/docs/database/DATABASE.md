@@ -23,14 +23,26 @@
 
 ## 2. 环境数据库边界
 
+| 环境 | 数据库 |
+|---|---|
+| **本地完整开发** | **WSL 宿主 PostgreSQL** 库 **`erip_local`**（Unix socket `/var/run/postgresql` 或本机 **:5432**；**不依赖 Docker**） |
+| **Docker Compose** | Compose PostgreSQL 库默认 **`erip`** + Volume **`erip_postgres_data`**（宿主端口默认 **:5432**；与宿主冲突时 `POSTGRES_PORT=5433`） |
+| **自动测试** | **`erip_integration_test`**（**严禁**当页面开发库） |
+| **InMemory** | 仅 unittest / 教学；**不是**页面正式运行模式 |
+
 | 数据库 | 用途 | 页面入口 | 是否正式页面数据 |
 |---|---|---|---|
-| 本地 `erip_local`（宿主 **:5433**，独立 volume `erip_local_pg_data`） | 本地 Backend + Vite | **5173** | **是** |
-| Docker Compose `erip`（volume **`erip_postgres_data`**，宿主 :5432） | Compose 验收/演示 | **8080** | **是** |
+| 本地 `erip_local`（**WSL 宿主 PostgreSQL**） | 本地 Backend + Vite（`./scripts/start_local.sh`） | **5173** | **是** |
+| Docker Compose `erip`（volume **`erip_postgres_data`**） | Compose 验收/演示（`./scripts/compose_up.sh`） | **8080** | **是** |
 | `erip_integration_test` | 自动化测试 | 无 | **否** |
 | InMemory | unittest / 教学 | 无正式页面 | **否** |
 
-**本地库与 Docker Volume 默认不是同一数据源。** 5173 与 8080 不要当成同一套页面数据。
+**说明（冻结）：**
+
+- 本地完整开发权威方案是 **WSL 宿主 PostgreSQL `erip_local`**，**不是** `erip-local-pg` 容器，也**不是** volume `erip_local_pg_data`。
+- 历史上误建的 `erip-local-pg` / `erip_local_pg_data` 可保留待人工清理；**不得**再写进日常启动路径。
+- **本地库与 Docker Volume 默认不是同一数据源。** 5173 与 8080 不要当成同一套页面数据。
+- 首次建库（非日常）：`./scripts/setup_host_postgres_local.sh`（可能需要 sudo）。
 
 ---
 
@@ -765,7 +777,7 @@ Task/Report 生成
 
 | 环境 | 持久化边界 |
 |---|---|
-| 本地页面开发 | 独立容器/库 `erip_local`，宿主端口 **5433**，volume **`erip_local_pg_data`** |
+| 本地完整开发 | **WSL 宿主 PostgreSQL** 库 **`erip_local`**（系统 data directory，如 `/var/lib/postgresql/16/main`；**无 Docker Volume**） |
 | Docker Compose | service `postgres`，volume **`erip_postgres_data`**，宿主端口默认 **5432** |
 | 测试 | `erip_integration_test`（禁止当页面库） |
 
@@ -773,7 +785,7 @@ Task/Report 生成
 |---|---|
 | `docker compose restart` / `down`（无 `-v`） | Volume **保留** |
 | `docker compose down -v` | **删除** `erip_postgres_data`（禁止当日常停止） |
-| `stop_local.sh` | 只停本地 Backend/Frontend，**不停**数据库 |
+| `stop_local.sh` | 只停本地 Backend/Frontend，**不停**宿主 PostgreSQL，**不碰** Docker 容器 |
 
 ---
 
@@ -821,3 +833,4 @@ Task/Report 生成
 |---|---|
 | 2026-07-04 | 旧 Phase 2 规划稿（多处“类型建议/未实现表”） |
 | 2026-07-17 | 按 Alembic head `20260717_08_ai_runtime` + 实库 `erip_local` 全量重对齐字段/约束/索引/ER |
+| 2026-07-17 | 本地完整开发改为 **WSL 宿主 PostgreSQL `erip_local`**；废止 `erip-local-pg`/5433 作为权威方案 |

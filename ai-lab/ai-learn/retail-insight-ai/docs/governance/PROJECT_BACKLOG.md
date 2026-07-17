@@ -1,5 +1,18 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 In Progress / Blocked: 本地开发改用 WSL 宿主 PostgreSQL
+
+- [x] 移除 `start_local.sh` 对 `erip-local-pg` / Docker 的运行时依赖
+- [x] `.env` 指向宿主 `erip_local`（socket/peer）；拒绝 integration_test / 5433
+- [x] `setup_host_postgres_local.sh` 首次建库脚本
+- [x] `stop_local.sh` 只停 Backend/Frontend
+- [x] DATABASE.md / README / RUNBOOK / DEPLOYMENT_GUIDE 环境表纠正
+- [ ] **阻塞**：释放宿主 **5432**（当前 Compose `erip-postgres-1` 映射占用）后执行 `./scripts/setup_host_postgres_local.sh`（需 sudo）
+- [ ] **阻塞解除后**：`./scripts/start_local.sh` 验收 health `repository_backend=postgres` + Alembic head `20260717_08_ai_runtime`
+- [ ] 用户明确授权后再清理误建 `erip-local-pg` / `erip_local_pg_data`（本轮禁止删除）
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: V1.0 部署指南文档
 
 - [x] 新增 `docs/development/DEPLOYMENT_GUIDE.md`

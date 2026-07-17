@@ -670,7 +670,9 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 ### 20.1 日常启动 / 停止（一条命令）
 
-本开发机已配置独立库 **`erip_local`**（宿主 **:5433**，volume `erip_local_pg_data`，与 Compose `erip_postgres_data` / `erip_integration_test` 隔离）。
+本地页面库：**WSL 宿主 PostgreSQL** 库 **`erip_local`**（Unix socket 或 **:5432**）。  
+**不依赖 Docker**；与 Compose Volume **`erip_postgres_data`**、测试库 **`erip_integration_test`** 隔离。  
+**不是** `erip-local-pg` 容器 / `erip_local_pg_data`（误建物可保留，但非权威路径）。
 
 ```bash
 ./scripts/start_local.sh
@@ -679,7 +681,7 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 # Swagger  http://127.0.0.1:8000/docs
 
 ./scripts/stop_local.sh
-# 只停 start_local 的 PID；不停数据库；不影响 Compose
+# 只停 start_local 的 Backend/Frontend PID；不停宿主 PostgreSQL；不碰 Docker
 ```
 
 权威 Schema：[`docs/database/DATABASE.md`](../database/DATABASE.md)。
@@ -688,13 +690,17 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 ```bash
 cp .env.example .env
-# 配置独立开发库连接后写入 .env（gitignore）；勿用 integration_test 库
-# 确保 pgvector + alembic upgrade head
+# 推荐 peer/socket（写入 .env，gitignore）：
+# DATABASE_URL=postgresql+psycopg:///erip_local?host=/var/run/postgresql
+# REPOSITORY_BACKEND=postgres
+# LLM_PROVIDER_MODE=stub
+./scripts/setup_host_postgres_local.sh   # 创建 erip_local + pgvector（可能需 sudo）
+./scripts/start_local.sh                 # Alembic upgrade head → Backend → Vite
 ```
 
-`start_local.sh`：加载 `.env` → 强制 postgres+stub → 检查 PG → Alembic → Backend 8000 → health → Vite 5173。
+`start_local.sh`：加载 `.env` → 强制 postgres+stub → 检查**宿主** PG（无 Docker 命令）→ Alembic head `20260717_08_ai_runtime` → Backend 8000 → health → Vite 5173。
 
-**再次强调：** 5173 ≠ 8080；本地库 ≠ Compose Volume。
+**再次强调：** 5173 ≠ 8080；宿主 `erip_local` ≠ Compose Volume。若 Compose 与宿主争用 5432，Compose 侧使用 `export POSTGRES_PORT=5433`。
 
 ---
 

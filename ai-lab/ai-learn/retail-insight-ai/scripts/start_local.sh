@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
-# 本地完整开发一键启动（宿主 PostgreSQL + Backend :8000 + Vite :5173）
+# 本地完整开发一键启动（WSL 宿主 PostgreSQL + Backend :8000 + Vite :5173）
 #
 # 日常只需：
 #   ./scripts/start_local.sh
 #
-# 配置来源：项目根 .env（Git 忽略；Settings 也读 ../.env / .env）
-# 禁止：在日常命令中 export DATABASE_URL；禁止打印密码/Token/Key。
+# 冻结边界：
+#   - 本地完整开发：宿主 PostgreSQL（库 erip_local），不得依赖 Docker
+#   - Docker Compose：才使用 Docker（compose_up.sh）
+#   - 正式生产：独立部署流程
+#
+# 禁止：docker start / docker compose / 静默切 InMemory / 打印密码/Token/Key
+# 禁止：把 erip_integration_test 当页面库
 #
 set -euo pipefail
 
@@ -19,12 +24,13 @@ FRONTEND_PID_FILE="$RUN_DIR/local_frontend.pid"
 BACKEND_LOG="$RUN_DIR/local_backend.log"
 FRONTEND_LOG="$RUN_DIR/local_frontend.log"
 ENV_FILE="$ROOT_DIR/.env"
-ENV_EXAMPLE="$ROOT_DIR/.env.example"
 
 BACKEND_HOST="127.0.0.1"
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_HOST="127.0.0.1"
 FRONTEND_PORT="5173"
+EXPECTED_ALEMBIC_HEAD="20260717_08_ai_runtime"
+FORBIDDEN_PAGE_DB="erip_integration_test"
 
 log() { echo "[start_local] $*"; }
 err() { echo "[start_local] ERROR: $*" >&2; }
@@ -40,7 +46,6 @@ load_env_file() {
     if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
       key="${BASH_REMATCH[1]}"
       val="${BASH_REMATCH[2]}"
-      # 去掉成对引号
       if [[ "$val" =~ ^\"(.*)\"$ ]]; then val="${BASH_REMATCH[1]}"; fi
       if [[ "$val" =~ ^\'(.*)\'$ ]]; then val="${BASH_REMATCH[1]}"; fi
       export "${key}=${val}"
@@ -58,7 +63,6 @@ port_in_use() {
     lsof -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1
     return $?
   fi
-  # 回退：尝试绑定探测
   python3 - "$port" <<'PY'
 import socket, sys
 port = int(sys.argv[1])
@@ -66,7 +70,7 @@ s = socket.socket()
 try:
     s.bind(("127.0.0.1", port))
 except OSError:
-    sys.exit(0)  # in use
+    sys.exit(0)
 finally:
     s.close()
 sys.exit(1)
@@ -75,7 +79,104 @@ PY
 
 pid_alive() {
   local pid="$1"
-  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null
+  [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null
+}
+
+safe_db_summary() {
+  python3 - <<'PY'
+import os
+from urllib.parse import urlparse, parse_qs
+url = os.environ.get("DATABASE_URL", "")
+raw = url.replace("postgresql+psycopg://", "postgresql://", 1)
+u = urlparse(raw)
+qs = parse_qs(u.query)
+host = u.hostname or (qs.get("host") or [""])[0] or "?"
+port = u.port or (qs.get("port") or ["5432"])[0]
+db = (u.path or "/").lstrip("/") or "?"
+user = u.username or "?"
+print(f"host={host} port={port} db={db} user={user}")
+PY
+}
+
+db_name_from_url() {
+  python3 - <<'PY'
+import os
+from urllib.parse import urlparse
+url = os.environ.get("DATABASE_URL", "").replace("postgresql+psycopg://", "postgresql://", 1)
+print((urlparse(url).path or "/").lstrip("/") or "")
+PY
+}
+
+# 尝试在无交互 sudo 密码的前提下启动宿主 PostgreSQL cluster。
+# 需要密码时不绕过；不回退 Docker / InMemory。
+try_start_host_postgres() {
+  if command -v pg_isready >/dev/null 2>&1; then
+    if pg_isready -h /var/run/postgresql -q 2>/dev/null \
+      || pg_isready -h 127.0.0.1 -p 5432 -q 2>/dev/null; then
+      return 0
+    fi
+  fi
+
+  # socket 已存在且可连
+  if [[ -S /var/run/postgresql/.s.PGSQL.5432 ]]; then
+    return 0
+  fi
+
+  log "宿主 PostgreSQL 未就绪，尝试非交互启动（不使用 Docker）…"
+
+  if command -v pg_lsclusters >/dev/null 2>&1; then
+    local status_line
+    status_line="$(pg_lsclusters 2>/dev/null | awk 'NR>1 && $1=="16" && $2=="main" {print $4}' || true)"
+    if [[ "${status_line}" == "online" ]]; then
+      return 0
+    fi
+  fi
+
+  # 端口被占用时，即使 sudo 成功也可能起不来；先报告冲突
+  if port_in_use 5432; then
+    # 若监听者不是本机 postgres socket 路径，多为 Docker 映射
+    err "宿主端口 5432 已被占用，WSL 宿主 PostgreSQL cluster 无法绑定。"
+    err "本地完整开发需要宿主 PG 使用 5432（或 Unix socket）。"
+    err "请停止占用方后重试。常见原因：Docker Compose postgres 映射了宿主 5432。"
+    err "Compose 验收请改用：export POSTGRES_PORT=5433 && ./scripts/compose_up.sh"
+    err "本脚本不会 docker stop / compose down，也不会改用 erip-local-pg。"
+    return 1
+  fi
+
+  local started=0
+  if command -v sudo >/dev/null 2>&1; then
+    if sudo -n true 2>/dev/null; then
+      if sudo -n pg_ctlcluster 16 main start 2>/dev/null \
+        || sudo -n service postgresql start 2>/dev/null \
+        || sudo -n systemctl start postgresql 2>/dev/null; then
+        started=1
+      fi
+    else
+      err "启动宿主 PostgreSQL 需要 sudo 密码；当前会话无法非交互完成。"
+      err "请在本机终端手动执行其一（需输入密码）："
+      err "  sudo pg_ctlcluster 16 main start"
+      err "  或: sudo service postgresql start"
+      err "首次建库（仅一次）：./scripts/setup_host_postgres_local.sh"
+      err "本脚本不会绕过 sudo，也不会静默切换 Docker 或 InMemory。"
+      return 1
+    fi
+  else
+    err "未找到 sudo，无法启动系统 PostgreSQL 服务。"
+    return 1
+  fi
+
+  sleep 1
+  if pg_isready -h /var/run/postgresql -q 2>/dev/null \
+    || pg_isready -h 127.0.0.1 -p 5432 -q 2>/dev/null \
+    || [[ -S /var/run/postgresql/.s.PGSQL.5432 ]]; then
+    log "宿主 PostgreSQL 已启动"
+    return 0
+  fi
+
+  if [[ "$started" -eq 1 ]]; then
+    err "已尝试启动宿主 PostgreSQL，但仍不可连接（检查日志 /var/log/postgresql/）。"
+  fi
+  return 1
 }
 
 # ---------- 0) 前置 ----------
@@ -84,31 +185,27 @@ mkdir -p "$RUN_DIR"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   err "未找到项目根 .env（本地配置只做一次）。"
-  err "请执行："
-  err "  cp .env.example .env"
-  err "然后编辑 .env，设置 DATABASE_URL 或 POSTGRES_HOST/PORT/DB/USER/PASSWORD。"
+  err "请执行：cp .env.example .env"
+  err "然后按 docs/database/DATABASE.md 配置 WSL 宿主库 erip_local。"
   err "该文件已被 .gitignore 忽略，勿提交。"
   exit 2
 fi
 
-# 配置必须来自项目根 .env（首次填写一次），不依赖会话里偶然残留的 export。
 env_file_has_database_url=0
 env_file_has_postgres_parts=0
 if grep -qE '^[[:space:]]*DATABASE_URL=.+' "$ENV_FILE"; then
   env_file_has_database_url=1
 fi
 if grep -qE '^[[:space:]]*POSTGRES_USER=.+' "$ENV_FILE" \
-  && grep -qE '^[[:space:]]*POSTGRES_PASSWORD=.+' "$ENV_FILE" \
   && grep -qE '^[[:space:]]*POSTGRES_DB=.+' "$ENV_FILE"; then
   env_file_has_postgres_parts=1
 fi
 
 if [[ "$env_file_has_database_url" -eq 0 && "$env_file_has_postgres_parts" -eq 0 ]]; then
-  err "项目根 .env 中尚未配置数据库连接（首次只需设置一次）。"
-  err "请编辑 .env，二选一："
-  err "  1) DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:PORT/DB"
-  err "  2) POSTGRES_HOST / POSTGRES_PORT / POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD"
-  err "示例模板：.env.example。日常启动不要再 export。"
+  err "项目根 .env 中尚未配置数据库连接。"
+  err "推荐（Unix socket / peer，无需密码）："
+  err "  DATABASE_URL=postgresql+psycopg:///erip_local?host=/var/run/postgresql"
+  err "勿使用 erip_integration_test 作为页面库；勿依赖 erip-local-pg Docker 容器。"
   exit 2
 fi
 
@@ -118,34 +215,44 @@ unset DATABASE_URL || true
 log "加载配置：.env（不打印内容）"
 load_env_file "$ENV_FILE"
 
-# 强制本地安全默认（覆盖 .env 中的危险组合；用户日常无需 export）
+# 强制本地安全默认（覆盖 .env 中的危险组合）
 export REPOSITORY_BACKEND=postgres
 export LLM_PROVIDER_MODE=stub
 export LLM_PROVIDER=stub
-export RUN_REAL_LLM_SMOKE=0
+export RUN_REAL_LLM_SMOKE=false
 export RUN_OPENROUTER_SMOKE=0
 export RUN_NVIDIA_SMOKE=0
 export RUN_GEMINI_SMOKE=0
 export RUN_LOCAL_QWEN_SMOKE=0
 
-# 组装 DATABASE_URL：优先 .env 中的 DATABASE_URL；否则由 POSTGRES_* 生成
+# 组装 DATABASE_URL：优先 .env；否则由 POSTGRES_* 生成（支持 socket host）
 if [[ -z "${DATABASE_URL:-}" ]]; then
-  if [[ -n "${POSTGRES_USER:-}" && -n "${POSTGRES_PASSWORD:-}" && -n "${POSTGRES_DB:-}" ]]; then
+  if [[ -n "${POSTGRES_USER:-}" && -n "${POSTGRES_DB:-}" ]]; then
     DATABASE_URL="$(
-      POSTGRES_HOST="${POSTGRES_HOST:-127.0.0.1}" \
+      POSTGRES_HOST="${POSTGRES_HOST:-/var/run/postgresql}" \
       POSTGRES_PORT="${POSTGRES_PORT:-5432}" \
       POSTGRES_DB="$POSTGRES_DB" \
       POSTGRES_USER="$POSTGRES_USER" \
-      POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
+      POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}" \
       python3 - <<'PY'
 import os
 from urllib.parse import quote_plus
-host = os.environ.get("POSTGRES_HOST", "127.0.0.1")
+host = os.environ.get("POSTGRES_HOST", "/var/run/postgresql")
 port = os.environ.get("POSTGRES_PORT", "5432")
 db = os.environ["POSTGRES_DB"]
 user = quote_plus(os.environ["POSTGRES_USER"])
-password = quote_plus(os.environ["POSTGRES_PASSWORD"])
-print(f"postgresql+psycopg://{user}:{password}@{host}:{port}/{db}")
+password = os.environ.get("POSTGRES_PASSWORD", "")
+# Unix socket 目录：postgresql+psycopg://user@/db?host=/var/run/postgresql
+if host.startswith("/"):
+    if password:
+        print(f"postgresql+psycopg://{user}:{quote_plus(password)}@/{db}?host={host}")
+    else:
+        print(f"postgresql+psycopg://{user}@/{db}?host={host}")
+else:
+    if password:
+        print(f"postgresql+psycopg://{user}:{quote_plus(password)}@{host}:{port}/{db}")
+    else:
+        print(f"postgresql+psycopg://{user}@{host}:{port}/{db}")
 PY
     )"
     export DATABASE_URL
@@ -159,17 +266,23 @@ else
   log "已使用 .env 中的 DATABASE_URL（不打印）"
 fi
 
-# 安全摘要（不含密码）
-SAFE_DB_SUMMARY="$(
-  python3 - <<'PY'
-import os
-from urllib.parse import urlparse
-url = os.environ.get("DATABASE_URL", "")
-u = urlparse(url.replace("postgresql+psycopg://", "postgresql://", 1))
-print(f"host={u.hostname or '?'} port={u.port or 5432} db={(u.path or '/').lstrip('/') or '?'} user={u.username or '?'}")
-PY
-)"
+SAFE_DB_SUMMARY="$(safe_db_summary)"
+PAGE_DB="$(db_name_from_url)"
 log "数据库目标：${SAFE_DB_SUMMARY} repository_backend=postgres llm=stub"
+
+if [[ "$PAGE_DB" == "$FORBIDDEN_PAGE_DB" ]]; then
+  err "拒绝：.env 指向 ${FORBIDDEN_PAGE_DB}。该库仅用于自动化测试，严禁作为页面开发库。"
+  err "请改为 erip_local（WSL 宿主 PostgreSQL）。"
+  exit 2
+fi
+
+# 拒绝明显指向误建 Docker 本地容器端口的配置（5433 + erip-local-pg 时代）
+if echo "$SAFE_DB_SUMMARY" | grep -q 'port=5433'; then
+  err "拒绝：DATABASE_URL 指向端口 5433（多为误建 erip-local-pg Docker 映射）。"
+  err "本地完整开发应使用 WSL 宿主 PostgreSQL（默认 5432 / Unix socket）上的 erip_local。"
+  err "请修正 .env 后重试。容器 erip-local-pg 保留不删，但不再作为本地权威方案。"
+  exit 2
+fi
 
 # ---------- 1) 工具 ----------
 if [[ ! -x "$VENV_DIR/bin/python" ]]; then
@@ -195,8 +308,8 @@ if pid_alive "$(cat "$FRONTEND_PID_FILE" 2>/dev/null || true)"; then
 fi
 
 if port_in_use "$BACKEND_PORT"; then
-  err "端口 ${BACKEND_PORT} 已被占用（可能是 Docker Backend 或其他进程）。"
-  err "不要同时启动两个 Backend。若要用 Docker 数据，请只使用 Compose :8080，或 stop 占用方后再启动本地。"
+  err "端口 ${BACKEND_PORT} 已被占用（可能是其他 Backend）。"
+  err "不要同时启动两个 Backend。Compose 演示请用 :8080；本地开发用本脚本 :8000。"
   exit 4
 fi
 if port_in_use "$FRONTEND_PORT"; then
@@ -204,18 +317,15 @@ if port_in_use "$FRONTEND_PORT"; then
   exit 4
 fi
 
-# ---------- 3) PostgreSQL 可连接 ----------
-log "检查 PostgreSQL 可连接…"
-# 若本机约定的 erip-local-pg 容器存在但未启动，尝试拉起（不打印 Secret）
-if command -v docker >/dev/null 2>&1; then
-  if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx 'erip-local-pg'; then
-    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -qx 'erip-local-pg'; then
-      log "检测到 erip-local-pg 容器未运行，正在 docker start…"
-      docker start erip-local-pg >/dev/null 2>&1 || true
-      sleep 2
-    fi
-  fi
+# ---------- 3) 宿主 PostgreSQL（无 Docker）----------
+log "检查 WSL 宿主 PostgreSQL…"
+if ! try_start_host_postgres; then
+  err "无法使用 WSL 宿主 PostgreSQL（${SAFE_DB_SUMMARY}）。"
+  err "不会回退 Docker（erip-local-pg / Compose）或 InMemory。"
+  exit 5
 fi
+
+log "验证数据库可连接…"
 if ! "$VENV_DIR/bin/python" - <<'PY'
 import os, sys
 try:
@@ -229,18 +339,29 @@ try:
         with conn.cursor() as cur:
             cur.execute("SELECT 1")
             cur.fetchone()
+            cur.execute("SELECT extname FROM pg_extension WHERE extname = 'vector'")
+            row = cur.fetchone()
+            if not row:
+                print("pgvector_missing", file=sys.stderr)
+                sys.exit(2)
 except Exception as exc:
     print(type(exc).__name__, file=sys.stderr)
     sys.exit(1)
 sys.exit(0)
 PY
 then
-  err "无法连接 PostgreSQL（${SAFE_DB_SUMMARY}）。"
-  err "请确认：1) 本地开发库服务已运行（本机 erip-local-pg 或等价实例） 2) .env 中库名/用户正确 3) 用户有权限。"
-  err "密码错误时只报连接失败，不会打印密码。勿连接 erip_integration_test 当页面库。"
+  rc=$?
+  err "无法连接或使用宿主库（${SAFE_DB_SUMMARY}）。"
+  if [[ "${rc:-1}" -eq 2 ]]; then
+    err "数据库可连但未启用 pgvector。请在该库执行：CREATE EXTENSION IF NOT EXISTS vector;"
+  else
+    err "请确认：1) 宿主 PostgreSQL 已运行 2) 库 erip_local 已创建 3) 当前用户有 peer/权限。"
+    err "首次建库：./scripts/setup_host_postgres_local.sh（可能需要 sudo 密码）"
+  fi
+  err "勿连接 erip_integration_test 当页面库；勿依赖 Docker 容器。"
   exit 5
 fi
-log "PostgreSQL OK"
+log "PostgreSQL OK（宿主 erip_local + pgvector）"
 
 # ---------- 4) Alembic ----------
 log "Alembic upgrade head…"
@@ -249,9 +370,20 @@ log "Alembic upgrade head…"
   export DATABASE_URL
   export REPOSITORY_BACKEND=postgres
   "$VENV_DIR/bin/python" -m alembic upgrade head
-  "$VENV_DIR/bin/python" -m alembic current 2>/dev/null | tail -n 3 || true
 )
-log "Alembic OK"
+current_out="$(
+  cd "$BACKEND_DIR"
+  export DATABASE_URL
+  export REPOSITORY_BACKEND=postgres
+  "$VENV_DIR/bin/python" -m alembic current 2>/dev/null || true
+)"
+if ! echo "$current_out" | grep -q "$EXPECTED_ALEMBIC_HEAD"; then
+  err "Alembic current 未处于期望 head：${EXPECTED_ALEMBIC_HEAD}"
+  err "实际输出："
+  echo "$current_out" >&2
+  exit 6
+fi
+log "Alembic OK head=${EXPECTED_ALEMBIC_HEAD}"
 
 # ---------- 5) 启动 Backend ----------
 log "启动 Backend ${BACKEND_HOST}:${BACKEND_PORT}…"
@@ -261,14 +393,15 @@ log "启动 Backend ${BACKEND_HOST}:${BACKEND_PORT}…"
   export REPOSITORY_BACKEND=postgres
   export LLM_PROVIDER_MODE=stub
   export LLM_PROVIDER=stub
-  export RUN_REAL_LLM_SMOKE=0
+  export RUN_REAL_LLM_SMOKE=false
   export RUN_OPENROUTER_SMOKE=0
   export RUN_NVIDIA_SMOKE=0
   export RUN_GEMINI_SMOKE=0
   export RUN_LOCAL_QWEN_SMOKE=0
-  nohup "$VENV_DIR/bin/python" -m uvicorn app.main:app \
+  # setsid：独立进程组，stop_local 可干净结束子进程
+  setsid nohup "$VENV_DIR/bin/python" -m uvicorn app.main:app \
     --host "$BACKEND_HOST" --port "$BACKEND_PORT" \
-    >"$BACKEND_LOG" 2>&1 &
+    >"$BACKEND_LOG" 2>&1 < /dev/null &
   echo $! >"$BACKEND_PID_FILE"
 )
 BACKEND_PID="$(cat "$BACKEND_PID_FILE")"
@@ -283,9 +416,7 @@ for i in $(seq 1 40); do
       ok=1
       break
     fi
-    err "Health 返回但 repository_backend 不是 postgres：请检查 .env / 启动环境"
-    err "（不打印完整 body 中的敏感字段；仅检查字段名）"
-    # still fail closed
+    err "Health 返回但 repository_backend 不是 postgres"
     break
   fi
   sleep 0.5
@@ -294,7 +425,6 @@ done
 if [[ "$ok" -ne 1 ]]; then
   err "Backend 未在超时内变为 healthy postgres。"
   err "请查看日志：${BACKEND_LOG}"
-  # 失败时尽量停掉刚起的 backend
   if pid_alive "$BACKEND_PID"; then kill "$BACKEND_PID" 2>/dev/null || true; fi
   rm -f "$BACKEND_PID_FILE"
   exit 6
@@ -310,14 +440,13 @@ fi
 log "启动 Frontend ${FRONTEND_HOST}:${FRONTEND_PORT}…"
 (
   cd "$FRONTEND_DIR"
-  nohup npm run dev -- --host "$FRONTEND_HOST" --port "$FRONTEND_PORT" \
-    >"$FRONTEND_LOG" 2>&1 &
+  setsid nohup npm run dev -- --host "$FRONTEND_HOST" --port "$FRONTEND_PORT" \
+    >"$FRONTEND_LOG" 2>&1 < /dev/null &
   echo $! >"$FRONTEND_PID_FILE"
 )
 FRONTEND_PID="$(cat "$FRONTEND_PID_FILE")"
 log "Frontend PID=${FRONTEND_PID} log=${FRONTEND_LOG}"
 
-# 等待 Vite 端口
 fe_ok=0
 for i in $(seq 1 40); do
   if curl -fsS -o /dev/null "http://${FRONTEND_HOST}:${FRONTEND_PORT}/" 2>/dev/null \
@@ -336,7 +465,7 @@ fi
 # ---------- 8) 成功摘要 ----------
 cat <<EOF
 
-[start_local] 本地完整开发已启动（方式一）
+[start_local] 本地完整开发已启动（方式一 · 无 Docker）
 
   Frontend:  http://${FRONTEND_HOST}:${FRONTEND_PORT}
   Login:     http://${FRONTEND_HOST}:${FRONTEND_PORT}/login
@@ -346,8 +475,9 @@ cat <<EOF
 
   repository_backend=postgres  LLM=stub  零真实 smoke
   DB: ${SAFE_DB_SUMMARY}
+  Alembic head: ${EXPECTED_ALEMBIC_HEAD}
 
-  停止：./scripts/stop_local.sh
+  停止：./scripts/stop_local.sh  （只停 Backend/Frontend；不停宿主 PostgreSQL；不碰 Docker）
   日志：${BACKEND_LOG}  ${FRONTEND_LOG}
 
 EOF

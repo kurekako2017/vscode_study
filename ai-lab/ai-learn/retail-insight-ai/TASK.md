@@ -1,5 +1,17 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 纠正 ERIP 本地开发数据库配置（本轮）
+
+- [x] 只读检查 WSL 宿主 PostgreSQL（psql 16.14；cluster 16/main **down**；5432 被 Compose 占用；pgvector 包已装）
+- [x] `.env` → 宿主 `erip_local` socket URL；postgres+stub；无真实 smoke
+- [x] `start_local.sh` 去 Docker；`stop_local.sh` 只停自身进程
+- [x] `setup_host_postgres_local.sh` 首次建库
+- [x] DATABASE.md / README / RUNBOOK / DEPLOYMENT_GUIDE 增量纠正
+- [ ] **待用户操作（阻塞）**：释放 5432 + 带 sudo 运行 `./scripts/setup_host_postgres_local.sh`，再 `./scripts/start_local.sh`
+- [x] 未删除 erip-local-pg / volumes；未 down -v；未业务代码；未真实 LLM；未 git commit
+
+最后更新：2026-07-17
+
 ## 2026-07-17 部署指南文档（本轮 / 已完成）
 
 - [x] `docs/development/DEPLOYMENT_GUIDE.md` 按 22 节定稿（真实 compose/entrypoint/scripts）

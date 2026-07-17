@@ -55,10 +55,11 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 | Compose 验证 | `./scripts/compose_verify.sh` |
 | Compose 停止 | `./scripts/compose_down.sh`（**禁止** `-v`） |
 
-- 本机日常：`./scripts/start_local.sh`（零 export）；停止：`./scripts/stop_local.sh`。
+- 本机日常：`./scripts/start_local.sh`（零 export，**无 Docker**）；停止：`./scripts/stop_local.sh`（只停 Backend/Frontend，不停宿主 PG）。
+- 本地页面库：**WSL 宿主 PostgreSQL `erip_local`**（首次：`./scripts/setup_host_postgres_local.sh`）。
 - 数据库权威说明：[`docs/database/DATABASE.md`](docs/database/DATABASE.md)（Alembic head `20260717_08_ai_runtime`）。
-- Docker Compose = 多容器编排，**不是**“只打包项目”；日常改页面用 `start_local`，不必开 Docker。
-- **5173 与 8080 不是同一套数据**；本地 `erip_local` 与 Compose Volume 是两套库。
+- Docker Compose = 多容器编排，**不是**“只打包项目”；日常改页面用 `start_local`，**不必开 Docker Desktop**。
+- **5173 与 8080 不是同一套数据**；宿主 `erip_local` 与 Compose Volume `erip_postgres_data` 是两套库。
 - Vite 只是 Frontend 开发服务器；只起 Vite 无法完成业务测试。
 
 项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。

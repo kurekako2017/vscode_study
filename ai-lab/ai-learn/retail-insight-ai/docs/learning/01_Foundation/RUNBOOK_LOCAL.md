@@ -37,8 +37,9 @@
 ./scripts/stop_local.sh
 ```
 
-`start_local.sh` 自动：读项目根 `.env`、强制 postgres+stub、检查 PG、Alembic upgrade head、Backend :8000、Vite :5173。
-**不要**再手动 `export DATABASE_URL` / `REPOSITORY_BACKEND` / `LLM_PROVIDER_MODE`。
+`start_local.sh` 自动：读项目根 `.env`、强制 postgres+stub、检查 **WSL 宿主 PostgreSQL**（**不执行任何 Docker 命令**）、Alembic upgrade head（验证 `20260717_08_ai_runtime`）、Backend :8000、Vite :5173。
+**不要**再手动 `export DATABASE_URL` / `REPOSITORY_BACKEND` / `LLM_PROVIDER_MODE`。  
+页面库必须是宿主 **`erip_local`**；**禁止** `erip_integration_test`；**禁止**依赖 `erip-local-pg`。
 
 权威库说明：[`docs/database/DATABASE.md`](../../database/DATABASE.md)。
 
@@ -47,8 +48,10 @@
 
 ```bash
 cp .env.example .env
-# 配置独立开发库连接（勿与 erip_integration_test / Compose Volume 混用）
-# 详见 DEPLOYMENT_GUIDE；密码只写 .env（gitignore）
+# 推荐：DATABASE_URL=postgresql+psycopg:///erip_local?host=/var/run/postgresql
+# 勿与 erip_integration_test / Compose Volume 混用
+./scripts/setup_host_postgres_local.sh   # 宿主建库 + pgvector（可能需 sudo 密码）
+# 详见 DEPLOYMENT_GUIDE；若使用密码认证，密码只写 .env（gitignore）
 ```
 
 </details>
