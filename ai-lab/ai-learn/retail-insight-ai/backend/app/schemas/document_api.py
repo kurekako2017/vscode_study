@@ -98,12 +98,25 @@ class DocumentResponse(BaseModel):
     tags: tuple[str, ...]
     source: DocumentSourceResponse | None
     checksum: str
+    # 列表页可用性字段：chunk 数 / 是否可检索 / 是否归档
+    chunk_count: int = 0
+    searchable: bool = False
+    archived: bool = False
 
     @classmethod
-    def from_domain(cls, document: Document) -> "DocumentResponse":
+    def from_domain(
+        cls,
+        document: Document,
+        *,
+        chunk_count: int | None = None,
+    ) -> "DocumentResponse":
         """显式选择对 API 公开的文档字段。"""
 
         source = document.metadata.source
+        status = document.metadata.status
+        count = 0 if chunk_count is None else max(0, int(chunk_count))
+        archived = status is DocumentStatus.ARCHIVED
+        searchable = (not archived) and count > 0
         return cls(
             document_id=document.document_id,
             title=document.metadata.title,
@@ -114,10 +127,13 @@ class DocumentResponse(BaseModel):
             version=document.version,
             language=document.metadata.language,
             document_type=document.metadata.document_type,
-            status=document.metadata.status,
+            status=status,
             tags=document.metadata.tags,
             source=DocumentSourceResponse.from_domain(source) if source is not None else None,
             checksum=document.metadata.checksum,
+            chunk_count=count,
+            searchable=searchable,
+            archived=archived,
         )
 
 
@@ -141,10 +157,25 @@ class DocumentListResponse(BaseModel):
     next_cursor: str | None = None
 
     @classmethod
-    def from_domain(cls, documents: list[Document]) -> "DocumentListResponse":
+    def from_domain(
+        cls,
+        documents: list[Document],
+        *,
+        chunk_counts: dict[str, int] | None = None,
+    ) -> "DocumentListResponse":
         """把领域文档列表转换为对外响应。"""
 
-        return cls(items=[DocumentResponse.from_domain(document) for document in documents], next_cursor=None)
+        counts = chunk_counts or {}
+        return cls(
+            items=[
+                DocumentResponse.from_domain(
+                    document,
+                    chunk_count=counts.get(document.document_id, 0),
+                )
+                for document in documents
+            ],
+            next_cursor=None,
+        )
 
 
 __all__ = [

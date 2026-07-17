@@ -264,7 +264,9 @@ describe("RagPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
     expect(await screen.findByText(/Report: task-er-1 \/ Version: rv-1/)).toBeInTheDocument();
     expect(screen.getByText(/Development Stub \/ stub-high-quality \/ stub-high-quality-v1 \/ high_quality/)).toBeInTheDocument();
-    expect(screen.getByText(/Approval 入口/)).toBeInTheDocument();
+    // 报告成功后显示「提交审批」按钮；主流程说明文案也含同词，用 role 避免多重匹配。
+    expect(screen.getByRole("button", { name: "提交审批" })).toBeInTheDocument();
+    expect(screen.getByText(/主流程：报告成功后点/)).toBeInTheDocument();
     const reportCall = fetchMock.mock.calls[2] as [string, RequestInit];
     expect(reportCall[0]).toContain("/api/v1/executive-reports");
     expect((reportCall[1].headers as Record<string, string>)["Idempotency-Key"]).toMatch(/^er-/);

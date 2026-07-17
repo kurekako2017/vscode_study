@@ -101,6 +101,7 @@ class InternalRagService:
                     query=question,
                     # Retrieval 取 Top-N 候选，最终 Top-K 仍由既有 request.limit 决定。
                     limit=self._reranker_service.candidate_limit_for(request.limit),
+                    document_id=request.document_id,
                     include_archived=request.include_archived,
                     document_type=self._document_type_filter(request.document_type),
                     language=self._language_filter(request.language),

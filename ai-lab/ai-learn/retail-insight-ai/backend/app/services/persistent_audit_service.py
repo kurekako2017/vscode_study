@@ -321,6 +321,44 @@ class PersistentAuditService:
                 error_code=error_code,
             )
 
+    def record_ai_runtime_event(
+        self,
+        *,
+        context: PersistentAuditContext,
+        actor: CurrentUser,
+        action: str,
+        result: str,
+        status_code: int,
+        error_code: str | None = None,
+        **safe_metadata: Any,
+    ) -> AuditLog | None:
+        """AI Runtime 配置变更审计；禁止写入 Key / Secret / Prompt。"""
+
+        if not self._enabled:
+            return None
+        audit_result = AuditLogResult.SUCCESS if result == "success" else AuditLogResult.FAILURE
+        with self._unit_of_work.transaction():
+            return self._record(
+                spec=PersistentAuditSpec(
+                    action=action,
+                    resource_type="ai_runtime",
+                    resource_id="default",
+                    success_status_code=status_code,
+                    permission="security.manage",
+                ),
+                context=PersistentAuditContext(
+                    request_id=context.request_id,
+                    http_method=context.http_method,
+                    api_path=context.api_path,
+                    resource_id="default",
+                    current_user=actor,
+                    metadata={**safe_metadata},
+                ),
+                result=audit_result,
+                status_code=status_code,
+                error_code=error_code,
+            )
+
     def _record(
         self,
         *,

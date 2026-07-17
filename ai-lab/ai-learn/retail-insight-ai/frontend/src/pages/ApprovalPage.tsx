@@ -14,6 +14,7 @@ import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
+import { useCurrentPath } from "../routing/navigation";
 import type {
   ApprovalListResponse,
   ApprovalResponse,
@@ -80,6 +81,14 @@ export function ApprovalPage({
   const [revisionReason, setRevisionReason] = useState("");
   const [decisionLoading, setDecisionLoading] = useState<DecisionAction>(null);
   const [directApprovalId, setDirectApprovalId] = useState("");
+  const path = useCurrentPath();
+  const queryApprovalId = useMemo(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("approval_id")?.trim() || null;
+    } catch {
+      return null;
+    }
+  }, [path]);
 
   useEffect(() => {
     if (canReview) void loadApprovals(true);
@@ -88,6 +97,14 @@ export function ApprovalPage({
   useEffect(() => {
     if (canSubmit) void loadReportCatalog();
   }, [canSubmit]);
+
+  // 报告页「提交审批」成功后会带 approval_id 跳转；employee 无列表权限时也能看自己的详情。
+  useEffect(() => {
+    if (queryApprovalId) {
+      setSelectedApprovalId(queryApprovalId);
+      setDirectApprovalId(queryApprovalId);
+    }
+  }, [queryApprovalId]);
 
   async function loadReportCatalog() {
     setCatalogLoading(true);

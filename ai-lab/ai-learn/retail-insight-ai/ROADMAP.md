@@ -11,8 +11,9 @@
 - 业务链：`文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Persistent Audit`
 - 技术：FastAPI + React + JWT/RBAC + PostgreSQL/pgvector + Alembic + Docker Compose + Stub E2E
 - LLM 治理：Gateway、Evidence Gate、Idempotency-Key、Decimal 额度、Ledger、Fallback（OpenRouter→NVIDIA→Gemini→Local Qwen）
-- 前端：ProtectedRoute、正式导航、Lifecycle Live Status、Learning Dashboard
-- 自动化：PG **281/2 skip**，InMemory **270/52 skip**，Frontend **113/113**，head **`20260717_07_fallback_chain`**
+- AI Runtime：PostgreSQL 持久化 mode/kill_switch/version；Admin `GET/PATCH /api/v1/admin/ai-runtime`；默认 stub
+- 前端：ProtectedRoute、正式导航（RAG/AI分析 · KPI任务分析 · AI管理）、Document→RAG / Report→Approval 衔接、Lifecycle Live Status
+- 自动化：PG **291/2 skip**，InMemory **280/59 skip**，Frontend **115/115**，head **`20260717_08_ai_runtime`**
 - 默认 stub；真实付费 smoke / Billing UI / 多租户预算 / SIEM·WORM·Streaming / DeepSeek 默认启用 **未**记为完成
 
 权威细节：`docs/architecture/ARCHITECTURE.md`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix N、面试材料（第二批）。

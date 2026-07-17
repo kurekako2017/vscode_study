@@ -1,5 +1,35 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 AI Runtime 持久化 + 页面衔接
+
+### Backend
+- 新增 migration `20260717_08_ai_runtime` 表 `ai_runtime_settings`（mode/kill_switch/version/actor；禁止 Key）
+- 新增 `AiRuntimeService` / `PostgresAiRuntimeSettingsRepository` / `GET|PATCH /api/v1/admin/ai-runtime`
+- 启动从 DB 恢复 effective_mode；Kill Switch 强制 stub；乐观锁 409；readiness 422；InMemory 503
+- Document 列表/详情增加 `chunk_count` / `searchable` / `archived`；默认 limit=50 稳定排序
+- Internal RAG / Retrieval 透传 `document_id` 过滤
+- Persistent Audit：`ai_runtime.mode_changed` / `ai_runtime.kill_switch_changed`
+- 测试：`test_ai_runtime_postgres.py`；Alembic head 列表更新
+
+### Frontend
+- AdminLlmPage 改用 AI Runtime 合同（version、confirmation_text、kill_switch、readiness）
+- DocumentsPage「使用此文档检索」→ `/rag?document_id=`
+- RagPage 读取 document_id；报告后「提交审批」→ `/approval?approval_id=`
+- ApprovalPage 支持 query `approval_id`
+- 新增 DocumentsPage.flow / RagPage.approval-handoff 测试
+
+### Scripts / Docs
+- `scripts/seed_scenario01.sh`：PG-only Scenario01 种子（不自动随 Compose）
+- VERIFY / INTERVIEW_GUIDE / handbook 面试材料 / FRONTEND 学习指南：导航标签对齐 App.tsx
+
+### Ops 修复
+- Backend Dockerfile 增加 `COPY data ./data`：修复 Compose 镜像缺 KPI/Research 样例导致 Task `Local data file is invalid`
+
+### 验证
+- Frontend **115/115**；InMemory Backend **280**（59 skip）；PostgreSQL full suite **291**（2 smoke skip）；`npm run build` / compileall OK
+- Compose rebuild healthy；alembic head `20260717_08_ai_runtime`；live health + AI Runtime stub；documents 仍在（Volume 保留）
+- 未真实 LLM；未 `down -v`；未 git commit
+
 ## 2026-07-17 ERIP V1.0 页面可用性与 AI 管理
 
 ### Backend

@@ -76,6 +76,9 @@ from app.repositories.postgres.event_repository import PostgresEventRepository
 from app.repositories.postgres.report_repository import PostgresReportRepository
 from app.repositories.postgres.task_repository import PostgresTaskRepository
 from app.repositories.postgres.llm_usage_repository import PostgresLLMUsageRepository
+from app.repositories.postgres.ai_runtime_settings_repository import (
+    PostgresAiRuntimeSettingsRepository,
+)
 from app.services.document_archive_service import DocumentArchiveService
 from app.services.audit_service import AuditService
 from app.services.approval_service import ApprovalService
@@ -87,6 +90,7 @@ from app.services.document_read_service import DocumentReadService
 from app.services.internal_rag_service import InternalRagService
 from app.services.ai_analysis_service import AIAnalysisService
 from app.services.executive_report_service import ExecutiveReportService
+from app.services.ai_runtime_service import AiRuntimeService
 from app.services.persistent_audit_service import PersistentAuditService
 from app.services.rag_answer_generator import RAGAnswerGenerator
 from app.services.reranker_provider import DeterministicRerankerProvider, RerankerProvider
@@ -141,6 +145,7 @@ class AppContainer:
     audit_repository: AuditRepository
     audit_service: AuditService
     persistent_audit_service: PersistentAuditService
+    ai_runtime_service: AiRuntimeService
     security_service: SecurityService
     event_repository: EventRepository
     document_import_repository: DocumentImportRepository
@@ -166,6 +171,8 @@ class RepositoryBundle:
     unit_of_work: UnitOfWork
     health_check: Callable[[], None]
     llm_usage: PostgresLLMUsageRepository | None
+    connection_factory: PostgresConnectionFactory | None = None
+
 
 #   读取配置，创建Repository，创建Service，创建所有依赖，以后所有Router都会从这里拿Service
 def build_container(settings: Settings | None = None) -> AppContainer:
@@ -174,6 +181,30 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     settings = settings or Settings()
     # 根据配置选择 InMemory 或 PostgreSQL Repository
     repositories = _build_repositories(settings)
+    # PostgreSQL：恢复 ai_runtime_settings 中的 mode（Kill Switch 强制 stub）。
+    ai_runtime_repository: PostgresAiRuntimeSettingsRepository | None = None
+    if (
+        settings.repository_backend == "postgres"
+        and repositories.connection_factory is not None
+    ):
+        ai_runtime_repository = PostgresAiRuntimeSettingsRepository(
+            repositories.connection_factory
+        )
+        bootstrap_audit = PersistentAuditService(
+            AuditService(repositories.audit),
+            repositories.unit_of_work,
+            enabled=True,
+        )
+        bootstrap_runtime = AiRuntimeService(
+            settings=settings,
+            repository=ai_runtime_repository,
+            persistent_audit_service=bootstrap_audit,
+        )
+        try:
+            settings = bootstrap_runtime.apply_to_settings(settings)
+        except Exception:
+            # 真实模式环境不完整时保持进程可启动；DB 配置仍保留。
+            pass
     # Authentication 只依赖集中配置和 deterministic identity provider，不进入 Repository/RBAC。
     jwt_config = JWTConfig(
         secret_key=settings.jwt_secret_key.get_secret_value(),
@@ -325,8 +356,22 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         ),
         authorization_service=authorization_service,
     )
-    document_read_service = DocumentReadService(document_repository)
+    document_read_service = DocumentReadService(
+        document_repository,
+        chunk_repository=document_chunk_repository,
+    )
     document_archive_service = DocumentArchiveService(document_repository, event_publisher)
+    ai_runtime_service = AiRuntimeService(
+        settings=settings,
+        repository=ai_runtime_repository,
+        persistent_audit_service=persistent_audit_service,
+    )
+    if ai_runtime_service.available:
+        # 预加载单例，保证 GET 与 Gateway 使用同一 version 事实。
+        try:
+            ai_runtime_service.ensure_loaded()
+        except Exception:
+            pass
     document_upload_service = DocumentUploadService(
         repository=document_repository,
         event_publisher=event_publisher,
@@ -387,6 +432,7 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         audit_repository=audit_repository,
         audit_service=audit_service,
         persistent_audit_service=persistent_audit_service,
+        ai_runtime_service=ai_runtime_service,
         security_service=security_service,
         event_repository=event_repository,
         document_import_repository=repositories.document_import,
@@ -566,6 +612,7 @@ def _build_repositories(
             unit_of_work=InMemoryUnitOfWork(),
             health_check=lambda: None,
             llm_usage=None,
+            connection_factory=None,
         )
 
     connection_factory = PostgresConnectionFactory(
@@ -594,4 +641,5 @@ def _build_repositories(
         unit_of_work=PostgresUnitOfWork(connection_factory),
         health_check=connection_factory.health_check,
         llm_usage=PostgresLLMUsageRepository(connection_factory),
+        connection_factory=connection_factory,
     )

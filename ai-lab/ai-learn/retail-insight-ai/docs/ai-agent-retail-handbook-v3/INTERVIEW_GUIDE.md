@@ -58,24 +58,28 @@ Enterprise Retail Intelligence Platform（ERIP）は正式に導入された企�
 
 ### 中文
 
-「我参与的是 ERIP V1.0。业务主链是：登录 → 文書管理 → RAG検索 → 分析依頼 → 承認管理。
+「我参与的是 ERIP V1.0。业务主链是：登录 → 文書管理 → RAG検索/AI分析 → 董事会报告 → 承認管理。
+正式导航标签：学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理（admin 另有 AI管理）。
 技术上 FastAPI 做 HTTP 边界；React 负责 Login、ProtectedRoute、权限按钮与 Learning Dashboard。
 文档链路是 Upload → Import → Chunk → Retrieval；普通 Internal RAG 默认不走真实 Provider。
 真正的 LLM 调用只允许经 LLM Gateway：AI 分析 low_cost，董事会报告 high_quality，带 Evidence Gate、Idempotency-Key、Decimal 额度与 PostgreSQL Ledger。
+AI Runtime（mode/kill_switch）可经 PostgreSQL 持久化并由 admin 二次确认切换；默认 stub 零费用。
 Provider 失败时可走 OpenRouter → NVIDIA → Gemini → Local Qwen 的串行 fallback（熔断与 attempt ledger）。
 审批有 owner、History、ReportVersion 与 403/409 边界；Persistent Audit 记录 request_id 与关键动作。
-验收：InMemory 学习、PostgreSQL 281 测、Frontend 113、Docker Compose + Alembic + Stub E2E。
+验收：InMemory 学习、PostgreSQL suite、Frontend 115、Docker Compose + Alembic + Stub E2E。
 未默认做真实付费 smoke、Billing UI、多租户预算台、SIEM/WORM/Streaming 与 DeepSeek 启用。」
 
 ### 日本語
 
-「担当したのは ERIP V1.0 です。業務主鎖は ログイン → 文書管理 → RAG検索 → 分析依頼 → 承認管理 です。
+「担当したのは ERIP V1.0 です。業務主鎖は ログイン → 文書管理 → RAG検索/AI分析 → 取締役会報告 → 承認管理 です。
+正式ナビ：学習総覧 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理（admin は AI管理）。
 FastAPI が HTTP 境界、React が Login / ProtectedRoute / 権限制御と Learning Dashboard を担います。
 文書は Upload → Import → Chunk → Retrieval。通常の Internal RAG は既定で実 Provider を呼びません。
 LLM は LLM Gateway のみ：AI 分析は low_cost、取締役会報告は high_quality。Evidence Gate、Idempotency-Key、Decimal 枠、PostgreSQL Ledger を伴います。
+AI Runtime（mode/kill_switch）は PostgreSQL に永続化し、admin が二次確認で切替。既定は stub。
 失敗時は OpenRouter → NVIDIA → Gemini → Local Qwen の直列 fallback（遮断と attempt ledger）。
 Approval は owner / History / ReportVersion、403/409。Persistent Audit が request_id と重要操作を残します。
-受入は InMemory、PostgreSQL 281、Frontend 113、Compose + Alembic + Stub E2E。
+受入は InMemory、PostgreSQL suite、Frontend 115、Compose + Alembic + Stub E2E。
 有料 smoke・Billing UI・マルチテナント予算画面・SIEM/WORM/Streaming・DeepSeek 有効化は既定範囲外です。」
 
 ---
@@ -275,7 +279,7 @@ Login (JWT)
 → Audit + Ledger 可核对
 ```
 
-正式导航：`学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理`
+正式导航：`学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理`（admin：`AI管理`）
 
 ## 企业级架构亮点（口述清单）
 

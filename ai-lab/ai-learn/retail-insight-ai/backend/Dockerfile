@@ -21,10 +21,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 应用代码与迁移（不含 .env / tests / venv）
 # db/schema.sql：Postgres 仓库启动时 initialize_schema 需要（Alembic 之后的幂等补齐）
+# data/：KPI / Research 本地静态样例（sales.csv 等）；缺省会导致 Task API 在 Compose 中失败
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./alembic.ini
 COPY db ./db
+COPY data ./data
 COPY scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
 
 RUN chmod +x ./scripts/docker-entrypoint.sh \

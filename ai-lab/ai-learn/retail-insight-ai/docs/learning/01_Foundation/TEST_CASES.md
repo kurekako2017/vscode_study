@@ -39,7 +39,7 @@
 | 历史阶段记录 | 早期曾写「先用 Swagger 验证后端骨架，再用 unittest」——该句保留为学习史，**不是** V1.0 唯一路径 |
 | 执行目录 | 测试命令默认在 `backend/` 目录执行 |
 | 常见错误 | `ModuleNotFoundError: No module named tests` 通常说明执行目录错了 |
-| 正式前端导航 | `学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理`（与 `App.tsx` 一致） |
+| 正式前端导航 | `学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理`（admin：`AI管理`；与 `App.tsx` 一致） |
 
 ## 企业项目验证体系
 

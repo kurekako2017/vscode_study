@@ -1,5 +1,24 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: AI Runtime 持久化 + 页面衔接
+
+- [x] Migration `20260717_08_ai_runtime`：`ai_runtime_settings` 单例（mode/kill_switch/version/actor；无 Secret）
+- [x] `AiRuntimeService` + `GET/PATCH /api/v1/admin/ai-runtime`（乐观锁、二次确认、readiness fail-closed）
+- [x] 启动恢复 effective_mode；Kill Switch 强制 stub；Persistent Audit `ai_runtime.*`
+- [x] Frontend AdminLlmPage 接新合同；InMemory 503 fail-closed
+- [x] Document 列表 `chunk_count/searchable/archived` + 跳转 RAG document_id
+- [x] RAG 自动 document_id 过滤；报告→提交审批 handoff；Approval query `approval_id`
+- [x] `scripts/seed_scenario01.sh`
+- [x] 测试修复：Alembic head 列表；RagPage 多匹配；InMemory fail-closed 独立用例
+- [x] handbook / VERIFY / FRONTEND 学习指南导航标签对齐
+- [x] Compose rebuild healthy；head 08；Volume 保留；live AI Runtime stub
+
+验证：Frontend **115/115**；InMemory Backend **280**（59 skip）；AI Runtime PG **8/8**；production build OK。全量 PG suite 见本轮 CHANGELOG 记录。
+
+未做：真实 LLM、git commit、`docker compose down -v`。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: ERIP V1.0 页面可用性与 AI 管理
 
 - [x] 审计并确认 `LLM_PROVIDER_MODE` 枚举：`stub` | `openrouter` | `fallback_chain`
@@ -17,8 +36,8 @@
 
 已知后续（非阻断）：
 
-- [ ] handbook 面试材料中「RAG検索/分析依頼」旧导航标签可增量对齐
-- [ ] VERIFY_CHECKLIST / README 若仍写旧入口可增量指针
+- [x] handbook 面试材料中「RAG検索/分析依頼」旧导航标签可增量对齐
+- [x] VERIFY_CHECKLIST / README 若仍写旧入口可增量指针
 
 最后更新：2026-07-17
 
@@ -45,9 +64,10 @@
 - [x] dockerignore 证明 `.env` 不进构建上下文
 - [x] Stub API E2E 业务主链
 - [x] Lifecycle 关键补测
-- [ ] Docker Desktop daemon 启动后执行 image build / compose up / 重启持久化
+- [x] Docker Desktop daemon 启动后执行 image build / compose up / 重启持久化
+- [x] Backend 镜像补拷 `data/`（KPI/Research 静态样例），避免 Compose Task 因缺 CSV 失败
 
-完成记录：PG 278（含 E2E，2 smoke skip）、Frontend 113、build 通过；Compose up 因 daemon 未运行阻塞。
+完成记录：PG 278（含 E2E，2 smoke skip）、Frontend 113、build 通过；本轮 Compose 健康验收 + AI Runtime migration + 全量 PG 291/2skip。
 
 最后更新：2026-07-17
 

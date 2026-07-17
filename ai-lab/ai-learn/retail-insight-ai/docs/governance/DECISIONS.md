@@ -1,5 +1,26 @@
 # retail-insight-ai Architecture Decisions
 
+
+## 2026-07-17 ADR: PostgreSQL AI Runtime 配置持久化
+
+### 决策
+AI 运行时 `mode` / `kill_switch` / `version` 以 PostgreSQL 单例表 `ai_runtime_settings` 为唯一事实源；Admin 经 `GET/PATCH /api/v1/admin/ai-runtime` 管理。
+
+### 原因
+- 进程内 `Settings.llm_provider_mode` 切换在 Backend 重启后丢失，多实例无法共享。
+- 真实 Provider 成本开关必须可审计、可 Kill Switch 强制 stub。
+- API Key / Base URL / 价格仍只来自环境变量，禁止写入数据库与 API 响应。
+
+### 备选方案
+1. 仅环境变量（无法运行时切换、无审计）
+2. Redis 缓存（多一层依赖，学习路径更重）
+3. 本 ADR：PostgreSQL 单例 + 乐观锁 version + 二次确认
+
+### 影响
+- Migration head：`20260717_08_ai_runtime`
+- InMemory 对 AI Runtime Admin fail-closed（503）
+- 旧 `GET/PUT /api/v1/admin/llm/runtime` 保留兼容；前端主路径改为 AI Runtime
+
 ## ADR-20260717-DOC-BATCHES: 文档分三批冻结与权威入口
 
 - 状态：Accepted。

@@ -48,6 +48,7 @@ class InternalRagAnswerRequest(BaseModel):
 
     question: str
     limit: int = Field(default=5, ge=1, le=100)
+    document_id: str | None = None
     include_archived: bool = False
     document_type: DocumentType | None = None
     language: Language | None = None

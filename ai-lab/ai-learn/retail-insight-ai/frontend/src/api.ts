@@ -24,8 +24,9 @@ import type {
   CurrentUserResponse,
   HealthResponse,
   LoginResponse,
+  AiRuntimePatchRequest,
+  AiRuntimeResponse,
   LlmProviderMode,
-  LlmRuntimeResponse,
   ReportCatalogResponse,
   ReportResponse,
   TaskCreateResponse,
@@ -330,20 +331,38 @@ export async function listReportCatalog(limit = 30): Promise<ReportCatalogRespon
   return unwrapResponse<ReportCatalogResponse>(response);
 }
 
-/** 管理员查看 LLM 运行时（无 Key）。 */
-export async function getLlmRuntime(): Promise<LlmRuntimeResponse> {
-  const response = await request("/api/v1/admin/llm/runtime");
-  return unwrapResponse<LlmRuntimeResponse>(response);
+/** 管理员查看 AI Runtime（PostgreSQL 持久化；无 Key）。 */
+export async function getAiRuntime(): Promise<AiRuntimeResponse> {
+  const response = await request("/api/v1/admin/ai-runtime");
+  return unwrapResponse<AiRuntimeResponse>(response);
 }
 
-/** 管理员切换 stub/openrouter/fallback_chain；无密钥时后端 fail-closed。 */
-export async function updateLlmRuntime(mode: LlmProviderMode): Promise<LlmRuntimeResponse> {
-  const response = await request("/api/v1/admin/llm/runtime", {
-    method: "PUT",
+/** @deprecated 使用 getAiRuntime */
+export async function getLlmRuntime(): Promise<AiRuntimeResponse> {
+  return getAiRuntime();
+}
+
+/** 管理员 PATCH AI Runtime；必须 confirmed + expected_version。 */
+export async function patchAiRuntime(payload: AiRuntimePatchRequest): Promise<AiRuntimeResponse> {
+  const response = await request("/api/v1/admin/ai-runtime", {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ llm_provider_mode: mode }),
+    body: JSON.stringify(payload),
   });
-  return unwrapResponse<LlmRuntimeResponse>(response);
+  return unwrapResponse<AiRuntimeResponse>(response);
+}
+
+/** @deprecated 使用 patchAiRuntime */
+export async function updateLlmRuntime(
+  mode: LlmProviderMode,
+  options: { expected_version: number; confirmation_text?: string } = { expected_version: 1 },
+): Promise<AiRuntimeResponse> {
+  return patchAiRuntime({
+    mode,
+    expected_version: options.expected_version,
+    confirmed: true,
+    confirmation_text: options.confirmation_text,
+  });
 }
 
 /** Approval 列表查询参数统一在 API Client 里拼接，页面只管理筛选表单。 */
@@ -365,14 +384,21 @@ export async function getApproval(approvalId: string): Promise<ApprovalResponse>
   return unwrapResponse<ApprovalResponse>(response);
 }
 
-/** Submit Approval 会创建新的 pending 记录，因此返回 approval 明细。 */
+/** Submit Approval 会创建新的 pending 记录，因此返回 approval 明细。
+ * 可选 idempotencyKey：同一报告重试时复用，防双重点击；服务端以状态机 409 为最终幂等保障。
+ */
 export async function submitApproval(
   taskId: string,
   payload: ApprovalSubmitRequest,
+  options: { idempotencyKey?: string } = {},
 ): Promise<ApprovalResponse> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (options.idempotencyKey) {
+    headers["Idempotency-Key"] = options.idempotencyKey;
+  }
   const response = await request(`/api/v1/reports/${taskId}/submit-approval`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   return unwrapResponse<ApprovalResponse>(response);

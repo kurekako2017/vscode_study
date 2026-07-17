@@ -220,9 +220,10 @@ button:disabled { opacity: .5; cursor: wait; }
 .document-row {
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   border: 1px solid #24404a;
   padding: 16px;
   color: var(--ink);
@@ -230,6 +231,19 @@ button:disabled { opacity: .5; cursor: wait; }
   text-align: left;
 }
 .document-row.selected { border-color: var(--mint); box-shadow: inset 0 0 0 1px rgba(104, 216, 193, .25); }
+.document-row-main {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
 .document-row strong, .document-row small { display: block; }
 .document-row small { margin-top: 5px; color: var(--muted); font: 11px/1.5 ui-monospace, monospace; }
 .row-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; color: var(--muted); font-size: 12px; }

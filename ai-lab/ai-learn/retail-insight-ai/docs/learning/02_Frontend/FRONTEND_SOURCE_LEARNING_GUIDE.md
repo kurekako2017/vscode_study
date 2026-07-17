@@ -22,48 +22,54 @@
 
 ```text
 文書管理
-  产生：document_id、import_id、Chunk
-  ↓ 手动衔接（输入相同的检索条件）
-RAG検索
+  产生：document_id、import_id、Chunk、searchable
+  ↓ 「使用此文档检索」→ /rag?document_id=…
+RAG/AI分析
   读取：Chunk；返回：document_id、chunk_id、citation
-  ↓ 手动衔接（把结论写入分析问题）
-分析依頼
-  产生：task_id、SSE 进度、report
-  ↓ 手动衔接（复制已完成的 task_id）
+  显式 AI分析(low_cost) → 董事会报告(high_quality)
+  ↓ 「提交审批」自动 submit-approval → /approval?approval_id=…
 承認管理
   产生：approval_id、report_version_id、审批事件
+  （报告目录下拉为辅助入口，无需手抄 task_id）
   ↓
 最终可审计报告
-  当前未连接：没有单独的前端汇总页
+KPI任务分析（/analysis）
+  旧 Task API + SSE 学习链路，与 RAG/AI 成本入口分离
+AI管理（admin）
+  PostgreSQL AI Runtime：mode / kill_switch / version
 ```
 
-这里的“手动衔接”非常重要：当前前端没有自动把 `document_id`、RAG citation 或 `task_id` 带到下一页。不要把四个独立 API 页面误解为已实现的端到端自动编排。
+V1.0 页面衔接（本轮）：
+- 文書 → RAG：`navigateTo(/rag?document_id=…)`，检索与 Internal RAG 自动带 document_id。
+- 报告 → 审批：报告成功后「提交审批」自动携带 task_id，并跳转 `/approval?approval_id=…`。
+- 仍**不是**全自动后台编排：用户仍需逐步确认 Import/Chunk/AI/审批决策。
 
-| 页面     | 主要对象                                    | 当前连接状态                             |
-| -------- | ------------------------------------------- | ---------------------------------------- |
-| 文書管理 | `document_id`、`import_id`、Chunk       | 文档和 Chunk 在 Backend 内已连接         |
-| RAG検索  | `document_id`、`chunk_id`、`citation` | 与文档通过存储数据连接；前端条件手动输入 |
-| 分析依頼 | `task_id`、`report`                     | 当前不读取 RAG 的答案或 citation         |
-| 承認管理 | `approval_id`、`report_version_id`      | 手动输入 TasksPage 产生的`task_id`     |
+| 页面 | 主要对象 | 当前连接状态 |
+| -------- | ---------------------------------------- | ---------------------------------------- |
+| 文書管理 | `document_id`、`import_id`、Chunk、searchable | 列表可跳转 RAG 并带 document_id |
+| RAG/AI分析 | `document_id`、`chunk_id`、citation、analysis/report | 显式 AI；报告可一键提交审批 |
+| KPI任务分析 | `task_id`、SSE、report | 旧 Task 链路；与 low_cost AI 分离 |
+| 承認管理 | `approval_id`、History | 下拉 report catalog 或 query approval_id |
+| AI管理 | effective/configured mode、kill_switch | PostgreSQL 持久化；无 Key |
 
 ## 3. App.tsx 如何决定显示哪个页面
 
 页面入口：`frontend/src/App.tsx`。
 
 页面看到什么
-→ 顶部导航的「学习总览」「文書管理」「RAG検索」「分析依頼」「承認管理」。
+→ 顶部导航的「学习总览」「文書管理」「RAG/AI分析」「KPI任务分析」「承認管理」（admin：「AI管理」）。
 
 点击后发生什么
-→ `setActiveView()` 改变本地 `useState`。
+→ 路由/视图切换（History API + view state）。
 
 调用哪个 API
-→ 不调用 API。导航只是 React 本地状态切换。
+→ 导航本身不调用业务 API；各页挂载后自行请求。
 
 Backend 经过什么
-→ 不经过 Backend。
+→ 不经过 Backend（仅导航时）。
 
 返回后页面怎么变化
-→ `App` 根据 `activeView` 渲染对应 Page Component。各页面自己的 `useEffect` 或提交动作才可能发请求。
+→ `App` 根据路径/view 渲染对应 Page Component。各页面自己的 `useEffect` 或提交动作才可能发请求。
 
 关键代码：
 

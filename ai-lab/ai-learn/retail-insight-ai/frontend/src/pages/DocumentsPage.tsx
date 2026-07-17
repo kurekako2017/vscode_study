@@ -14,8 +14,11 @@ import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
+import { navigateTo } from "../routing/navigation";
 import type { DisplayError, DocumentChunkListResponse, DocumentListResponse, DocumentResponse } from "../types";
 import type { RecordLearningEvent } from "../learning/learningTypes";
+
+const DOCUMENT_LIST_LIMIT = 50;
 
 const defaultOwner = "analysis-team";
 type DocumentAction = "archive" | "import" | "chunk" | null;
@@ -95,7 +98,10 @@ export function DocumentsPage({
     }
     setDocumentsError(null);
     try {
-      const data = await listDocuments({ include_archived: showArchived });
+      const data = await listDocuments({
+        include_archived: showArchived,
+        limit: DOCUMENT_LIST_LIMIT,
+      });
       setDocuments(data.items);
       setSelectedDocumentId((current) => {
         if (current !== null && data.items.some((item) => item.document_id === current)) {
@@ -317,39 +323,64 @@ export function DocumentsPage({
           ) : documents.length === 0 ? (
             <p className="empty">文書はまだありません。ファイルをアップロードして文書ワークフローを開始してください。</p>
           ) : (
-            <div className="document-table" role="list" aria-label="document-list">
-              {documents.map((document) => {
-                const selected = selectedDocumentId === document.document_id;
-                return (
-                  <button
-                    key={document.document_id}
-                    type="button"
-                    role="listitem"
-                    className={selected ? "document-row selected" : "document-row"}
-                    onClick={() => setSelectedDocumentId(document.document_id)}
-                  >
-                    <div>
-                      <strong>{document.title}</strong>
-                      <small>{document.document_id}</small>
+            <>
+              <div className="document-table" role="list" aria-label="document-list">
+                {documents.map((document) => {
+                  const selected = selectedDocumentId === document.document_id;
+                  const chunkCount = document.chunk_count ?? 0;
+                  const searchable = Boolean(document.searchable);
+                  const archived = Boolean(document.archived) || document.status === "archived";
+                  return (
+                    <div
+                      key={document.document_id}
+                      role="listitem"
+                      className={selected ? "document-row selected" : "document-row"}
+                    >
+                      <button
+                        type="button"
+                        className="document-row-main"
+                        onClick={() => setSelectedDocumentId(document.document_id)}
+                      >
+                        <div>
+                          <strong>{document.title}</strong>
+                          <small>{document.document_id}</small>
+                        </div>
+                        <div className="row-meta">
+                          <StatusBadge value={document.status} />
+                          <span>created: {formatDate(document.created_at)}</span>
+                          <span>archived: {archived ? "yes" : "no"}</span>
+                          <span>chunks: {chunkCount}</span>
+                          <span>searchable: {searchable ? "yes" : "no"}</span>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        disabled={!searchable}
+                        title={
+                          searchable
+                            ? "跳转 RAG 并自动携带 document_id"
+                            : "文档未完成 Chunk 或已归档，无法检索"
+                        }
+                        onClick={() => {
+                          navigateTo(`/rag?document_id=${encodeURIComponent(document.document_id)}`);
+                        }}
+                      >
+                        使用此文档检索
+                      </button>
+                      {!searchable && (
+                        <small className="empty">
+                          {archived ? "已归档，按钮禁用" : "未 searchable：请先 Import → Chunk"}
+                        </small>
+                      )}
                     </div>
-                    <div className="row-meta">
-                      <StatusBadge value={document.status} />
-                      <span title="检索就绪提示">
-                        {document.status === "validated" || document.status === "indexed"
-                          ? "已 Import，需确认 Chunk"
-                          : document.status === "uploaded"
-                            ? "需 Import"
-                            : document.status === "archived"
-                              ? "已归档"
-                              : document.status}
-                      </span>
-                      <span>{document.document_type}</span>
-                      <span>{formatDate(document.updated_at)}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+              <p className="empty">
+                列表 limit={DOCUMENT_LIST_LIMIT}; 按 created_at DESC / document_id 稳定排序。
+              </p>
+            </>
           )}
         </section>
 
@@ -472,15 +503,15 @@ export function DocumentsPage({
         purpose="登记关东地区饮料销售资料，并以 document_id、import_id 与 Chunk 为后续检索留下可追踪依据。"
         scenario="经营企划人员上传“関東飲料売上分析.md”，确认文档状态后执行 Import 和 Chunk，为 RAG検索准备内部资料。"
         prerequisites="准备 markdown 或 text 文件、标题、担当者和语言。Chunk 仅支持 validated 的 markdown／text；页面不自动把 document_id 传给 RAG検索。"
-        relationship="本页产生 document_id、import_id 和 Chunk。RAG検索 使用已完成 Chunk 的内部资料，但当前只能由用户手动输入相同检索条件，未传递 document_id。"
+        relationship="本页产生 document_id、import_id 和 Chunk。列表「使用此文档检索」跳转 RAG 并自动携带 document_id。"
         journey={{
           previous: "无，企业内部资料入口。",
           current: "1 / 4 文書管理",
-          completion: "文档完成 Upload、Import、Chunk，且详情中存在可检索 Chunk。",
+          completion: "文档完成 Upload、Import、Chunk，且 searchable=true。",
           next: "RAG検索",
           recommendedCase: "RAG-BIZ-001",
           transferredObjects: "document_id、Chunk",
-          connection: "Backend 数据层自动连接；前端不自动传 document_id。",
+          connection: "前端 navigateTo(/rag?document_id=…) 自动传递。",
         }}
         standardSop={{
           title: "标准操作流程：将企业资料准备为可检索 Chunk",

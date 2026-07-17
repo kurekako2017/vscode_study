@@ -15,15 +15,19 @@
 
 **Repository 定位**：PostgreSQL 为正式运行/业务验收权威；Compose 默认且必须 PostgreSQL。InMemory 仅快速 unittest/教学，代码保留但不补企业能力。
 
-正式前端导航验收标准：
+正式前端导航验收标准（与 `frontend/src/App.tsx` 一致）：
 
 ```text
 学习总览
 → 文書管理
-→ RAG検索
-→ 分析依頼
+→ RAG/AI分析
+→ KPI任务分析
 → 承認管理
+→ AI管理（仅 security.manage / admin）
 ```
+
+业务主链概念仍可口述为：`文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理`。
+页面标签「分析依頼」已拆分为 **RAG/AI分析**（文档检索 + 显式 AI）与 **KPI任务分析**（旧 Task/SSE 链路）。
 
 说明：Frontend 为 V1.0 正式联调步骤。**业务与持久化验收以 PostgreSQL 为准**（Compose 推荐）。InMemory 仅辅助。若 Docker daemon 不可用，应如实记录未执行 Compose，不要假装通过。
 
@@ -182,7 +186,7 @@ python3 -m unittest tests.test_api -v
 1. `./scripts/start_frontend.sh`（Backend 已在 8000）
 2. 浏览器打开 `http://127.0.0.1:5173`
 
-预想结果：登录后能看到正式主导航（**学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理**）；不是空白连接失败页。历史英文标签 `Dashboard/Tasks/...` 不作验收标准。
+预想结果：登录后能看到正式主导航（**学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理**；admin 另有 **AI管理**）；不是空白连接失败页。历史英文标签 `Dashboard/Tasks/...` 与旧标签「分析依頼」不作验收标准。
 
 ## 12. Frontend 自动化测试与 production build
 
@@ -194,9 +198,9 @@ npm test
 npm run build
 ```
 
-预想结果（V1.0 基线）：
+预想结果（本轮基线）：
 
-- 测试 **113 / 113** 通过
+- 测试 **115 / 115** 通过
 - `vite build` 成功
 
 ## 13. Backend 全量 unittest（InMemory，仅辅助）

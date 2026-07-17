@@ -54,21 +54,52 @@ export interface ReportCatalogResponse {
   total: number;
 }
 
-/** GET/PUT /api/v1/admin/llm/runtime */
+/** GET/PATCH /api/v1/admin/ai-runtime（PostgreSQL 持久化） */
 export type LlmProviderMode = "stub" | "openrouter" | "fallback_chain";
 
-export interface LlmRuntimeResponse {
-  llm_provider_mode: LlmProviderMode;
-  repository_backend: string;
-  chain_order: string[];
+export interface ProviderReadinessItem {
+  name: string;
+  ready: boolean;
+  key_configured: boolean;
+  low_cost_model?: string | null;
+  high_quality_model?: string | null;
+  enabled: boolean;
+}
+
+export interface AiRuntimeResponse {
+  effective_mode: LlmProviderMode;
+  configured_mode: LlmProviderMode;
+  real_calls_enabled: boolean;
+  kill_switch: boolean;
+  version: number;
+  updated_at: string;
+  updated_by: { user_id: string | null; username: string | null };
+  provider_readiness: ProviderReadinessItem[];
   openrouter_key_configured: boolean;
   nvidia_key_configured: boolean;
   gemini_key_configured: boolean;
   local_qwen_enabled: boolean;
+  low_cost_model: string;
+  high_quality_model: string;
+  fallback_order: string[];
+  timeout_seconds: number;
+  total_timeout_seconds: number;
+  budget_summary: Record<string, string>;
+  repository_backend: string;
   run_real_llm_smoke: boolean;
-  cost_risk_notes: string[];
-  switchable_modes: LlmProviderMode[];
+  confirmation_text_required_for_real: string;
   note: string;
+}
+
+/** @deprecated 兼容旧类型别名；新代码使用 AiRuntimeResponse */
+export type LlmRuntimeResponse = AiRuntimeResponse;
+
+export interface AiRuntimePatchRequest {
+  expected_version: number;
+  confirmed: true;
+  mode?: LlmProviderMode;
+  kill_switch?: boolean;
+  confirmation_text?: string;
 }
 
 /** POST /api/tasks 的最小响应。 */
@@ -140,6 +171,9 @@ export interface DocumentResponse {
   tags: string[];
   source: DocumentSourceResponse | null;
   checksum: string;
+  chunk_count?: number;
+  searchable?: boolean;
+  archived?: boolean;
 }
 
 /** 文档列表接口当前返回 items + next_cursor。 */
@@ -189,6 +223,7 @@ export interface DocumentChunkListResponse {
 export interface DocumentRetrievalSearchRequest {
   query: string;
   limit?: number;
+  document_id?: string;
   include_archived?: boolean;
   document_type?: string;
   language?: string;
@@ -300,6 +335,7 @@ export type InternalRagAnswerMode = "extractive" | "summary";
 export interface InternalRagAnswerRequest {
   question: string;
   limit?: number;
+  document_id?: string;
   include_archived?: boolean;
   document_type?: string;
   language?: string;

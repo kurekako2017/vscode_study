@@ -1,13 +1,23 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
-import { ApiClientError, answerInternalRag, executeAIAnalysis, generateExecutiveReport, searchDocumentRetrieval } from "../api";
+import {
+  ApiClientError,
+  answerInternalRag,
+  executeAIAnalysis,
+  generateExecutiveReport,
+  getDocument,
+  searchDocumentRetrieval,
+  submitApproval,
+} from "../api";
 import { BusinessLearningPanel } from "../components/BusinessLearningPanel";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
 import { StatusBanner } from "../components/StatusBanner";
+import { navigateTo, useCurrentPath } from "../routing/navigation";
 import type {
   DisplayError,
   AIAnalysisResponse,
+  DocumentResponse,
   ExecutiveReportResponse,
   DocumentRetrievalSearchResponse,
   InternalRagAnswerMode,
@@ -53,6 +63,17 @@ export function RagPage({
   canRetrieve = true,
   canAnalyze = true,
 }: RagPageProps = {}) {
+  const path = useCurrentPath();
+  const selectedDocumentId = useMemo(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("document_id")?.trim() || null;
+    } catch {
+      return null;
+    }
+  }, [path]);
+
+  const [selectedDocument, setSelectedDocument] = useState<DocumentResponse | null>(null);
+  const [selectedDocumentError, setSelectedDocumentError] = useState<DisplayError | null>(null);
   const [retrievalQuery, setRetrievalQuery] = useState("");
   const [retrievalLimit, setRetrievalLimit] = useState("10");
   const [retrievalDocumentType, setRetrievalDocumentType] = useState("");
@@ -70,6 +91,9 @@ export function RagPage({
   const [reportError, setReportError] = useState<DisplayError | null>(null);
   const [reportResult, setReportResult] = useState<ExecutiveReportResponse | null>(null);
   const [reportIdempotencyKey, setReportIdempotencyKey] = useState<string | null>(null);
+  const [approvalSubmitting, setApprovalSubmitting] = useState(false);
+  const [approvalError, setApprovalError] = useState<DisplayError | null>(null);
+  const [approvalIdempotencyKey, setApprovalIdempotencyKey] = useState<string | null>(null);
 
   const [ragQuestion, setRagQuestion] = useState("");
   const [ragLimit, setRagLimit] = useState("5");
@@ -82,6 +106,34 @@ export function RagPage({
   const [ragLoading, setRagLoading] = useState(false);
   const [ragError, setRagError] = useState<DisplayError | null>(null);
   const [ragResult, setRagResult] = useState<InternalRagAnswerResponse | null>(null);
+
+  useEffect(() => {
+    if (!selectedDocumentId) {
+      setSelectedDocument(null);
+      setSelectedDocumentError(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const doc = await getDocument(selectedDocumentId);
+        if (!cancelled) {
+          setSelectedDocument(doc);
+          setSelectedDocumentError(null);
+        }
+      } catch (reason) {
+        if (!cancelled) {
+          setSelectedDocument(null);
+          setSelectedDocumentError(
+            toDisplayError(reason, "DOCUMENT_DETAIL_ERROR", "选择文档读取失败"),
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDocumentId]);
 
   function toDisplayError(reason: unknown, fallbackCode: string, fallbackMessage: string): DisplayError {
     if (reason instanceof ApiClientError) {
@@ -99,6 +151,7 @@ export function RagPage({
       const response = await searchDocumentRetrieval({
         query: retrievalQuery.trim(),
         limit: Number(retrievalLimit),
+        document_id: selectedDocumentId || undefined,
         include_archived: retrievalIncludeArchived,
         document_type: retrievalDocumentType.trim() || undefined,
         language: retrievalLanguage.trim() || undefined,
@@ -131,6 +184,7 @@ export function RagPage({
       const response = await answerInternalRag({
         question: ragQuestion.trim(),
         limit: Number(ragLimit),
+        document_id: selectedDocumentId || undefined,
         include_archived: ragIncludeArchived,
         document_type: ragDocumentType.trim() || undefined,
         language: ragLanguage.trim() || undefined,
@@ -253,6 +307,42 @@ export function RagPage({
     onLearningEvent?.({ eventName: "clearRagResult()", stateChanges: ["ragResult: response → null"], note: "清除仅修改 React state，不发送 API 请求。" });
   }
 
+  async function submitReportForApproval() {
+    if (!reportResult || approvalSubmitting) return;
+    // 同一 task 的提交复用稳定幂等键；防重复点击由 approvalSubmitting 门闩 + 服务端 409 共同保证。
+    const key = approvalIdempotencyKey ?? `approval-submit-${reportResult.task_id}`;
+    setApprovalIdempotencyKey(key);
+    setApprovalSubmitting(true);
+    setApprovalError(null);
+    try {
+      const created = await submitApproval(
+        reportResult.task_id,
+        { comment: "Submitted from RAG report success panel" },
+        { idempotencyKey: key },
+      );
+      setApprovalIdempotencyKey(null);
+      navigateTo(`/approval?approval_id=${encodeURIComponent(created.approval_id)}`);
+    } catch (reason) {
+      const display = toDisplayError(reason, "APPROVAL_SUBMIT_ERROR", "提交审批失败");
+      const alreadyPending =
+        display.code === "approval_already_submitted"
+        || display.code.includes("already")
+        || display.code.includes("pending")
+        || display.message.toLowerCase().includes("pending")
+        || display.message.toLowerCase().includes("already submitted");
+      if (alreadyPending) {
+        setApprovalError({
+          code: display.code || "approval_already_submitted",
+          message: `${display.message}（已有 pending Approval；请到承認管理查看详情）`,
+        });
+      } else {
+        setApprovalError(display);
+      }
+    } finally {
+      setApprovalSubmitting(false);
+    }
+  }
+
   return (
     <>
       <PageHeader
@@ -262,6 +352,42 @@ export function RagPage({
       />
 
       <section className="rag-shell" aria-label="RAG 検索ワークスペース">
+        {(selectedDocumentId || selectedDocumentError) && (
+          <section className="panel" aria-label="当前选择文档">
+            <div className="panel-heading">
+              <span>DOC</span>
+              <h2>当前选择文档</h2>
+            </div>
+            {selectedDocumentError && (
+              <StatusBanner tone="error">
+                [{selectedDocumentError.code}] {selectedDocumentError.message}
+              </StatusBanner>
+            )}
+            {selectedDocumentId && (
+              <dl className="detail-grid result-meta-grid">
+                <div>
+                  <dt>document_id</dt>
+                  <dd>
+                    <code>{selectedDocumentId}</code>
+                  </dd>
+                </div>
+                <div>
+                  <dt>title</dt>
+                  <dd>{selectedDocument?.title ?? "读取中…"}</dd>
+                </div>
+                <div>
+                  <dt>status</dt>
+                  <dd>{selectedDocument?.status ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt>searchable</dt>
+                  <dd>{selectedDocument?.searchable ? "yes" : "no / unknown"}</dd>
+                </div>
+              </dl>
+            )}
+            <p className="empty">Retrieval / Internal RAG 将自动过滤此 document_id，无需手抄。</p>
+          </section>
+        )}
         {canRetrieve && <section className="panel rag-panel">
         <div className="panel-heading">
           <span>01</span>
@@ -441,12 +567,27 @@ export function RagPage({
                               <p>尝试摘要: {formatAttemptSummary(reportResult.attempted_providers)}</p>
                             )}
                             <p>Report: {reportResult.report_id} / Version: {reportResult.report_version_id}</p>
+                            <dl className="detail-grid result-meta-grid" aria-label="报告审批传递">
+                              <div><dt>task_id</dt><dd><code>{reportResult.task_id}</code></dd></div>
+                              <div><dt>report_id</dt><dd><code>{reportResult.report_id}</code></dd></div>
+                              <div><dt>report_version_id</dt><dd><code>{reportResult.report_version_id}</code></dd></div>
+                            </dl>
+                            <button
+                              type="button"
+                              onClick={() => void submitReportForApproval()}
+                              disabled={approvalSubmitting}
+                            >
+                              {approvalSubmitting ? "提交审批中…" : "提交审批"}
+                            </button>
+                            {approvalError && (
+                              <StatusBanner tone="error">[{approvalError.code}] {approvalError.message}</StatusBanner>
+                            )}
                             <pre className="answer-block">{reportResult.executive_summary}</pre>
                             <p>Usage: {reportResult.usage.input_tokens} + {reportResult.usage.output_tokens} = {reportResult.usage.total_tokens} tokens</p>
                             <p>Cost: {reportResult.actual_cost} {reportResult.currency} (est. {reportResult.estimated_cost})</p>
                             <p>Citations: {reportResult.citations.length}</p>
                             <p>
-                              Approval 入口: Tasks / Approval 画面で task_id <code>{reportResult.task_id}</code> を開き、手動で submit-approval を実行してください。自動提出は行いません。
+                              主流程：报告成功后点「提交审批」自动携带 task_id。Approval 下拉为辅助入口。
                             </p>
                           </div>
                         )}

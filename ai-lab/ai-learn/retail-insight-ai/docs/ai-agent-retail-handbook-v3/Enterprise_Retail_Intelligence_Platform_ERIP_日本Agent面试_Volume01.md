@@ -459,7 +459,7 @@ JWT/RBAC，文档与 RAG，LLM 双路由与审批审计，Compose 验收齐备�
 ### 2 分钟 日文
 
 ```text
-業務主鎖は ログイン→文書管理→RAG検索→分析依頼→承認管理 です。
+業務主鎖は ログイン→文書管理→RAG/AI分析→KPI任务分析→承認管理 です。
 通常 RAG は引用可能で既定 LLM 不要。AI 分析は low_cost、取締役会報告は high_quality。
 Evidence Gate、Idempotency-Key、Decimal、Ledger で費用を統治します。
 Fallback は OpenRouter→NVIDIA→Gemini→Local Qwen。Approval は 403/200 と ReportVersion。

@@ -31,6 +31,7 @@ from app.api.ai_analysis import router as ai_analysis_router
 from app.api.executive_reports import router as executive_reports_router
 from app.api.reports_catalog import router as reports_catalog_router
 from app.api.llm_admin import router as llm_admin_router
+from app.api.ai_runtime_admin import router as ai_runtime_admin_router
 from app.api.tasks import router as tasks_router
 from app.config.container import build_container
 from app.config.settings import Settings
@@ -179,6 +180,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     application.include_router(
         llm_admin_router, dependencies=authentication_dependencies
+    )
+    application.include_router(
+        ai_runtime_admin_router, dependencies=authentication_dependencies
     )
     application.include_router(
         approvals_router, dependencies=authentication_dependencies

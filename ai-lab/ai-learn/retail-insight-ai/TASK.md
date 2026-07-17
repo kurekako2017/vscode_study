@@ -1,6 +1,20 @@
 # retail-insight-ai 当前任务
 
-## 2026-07-17 ERIP V1.0 页面可用性与 AI 管理（本轮最高优先级 / 已完成文件与验收）
+## 2026-07-17 AI Runtime 持久化 + 页面衔接（本轮最高优先级 / 六项验收完成）
+
+- [x] PostgreSQL `ai_runtime_settings` 单例 + migration `20260717_08_ai_runtime`（upgrade/downgrade/re-upgrade）
+- [x] `GET/PATCH /api/v1/admin/ai-runtime`：mode / kill_switch / expected_version / confirmed / readiness / budget
+- [x] Backend 重启后 Kill Switch / version 保持；Secret 永不入库/响应；InMemory 503
+- [x] Frontend AI管理页；二次确认 ENABLE_REAL_LLM；Persistent Audit
+- [x] 文書列表：title/id/status/created/archived/chunks/searchable；「使用此文档检索」→ `/rag?document_id=`
+- [x] 报告成功：task_id/report_id/report_version_id +「提交审批」→ `/approval?approval_id=`；409 pending 提示
+- [x] `scripts/seed_scenario01.sh`：PG-only；连续两次 `created=0 reused=6 provider_calls=0`
+- [x] 验证：InMemory **286**/62skip；PG **297**/6skip；Frontend **116/116**；build；compileall；`git diff --check`；Compose healthy
+- [x] 默认 stub；零真实 Provider；未 `down -v`；未 git commit
+
+最后更新：2026-07-17
+
+## 2026-07-17 ERIP V1.0 页面可用性与 AI 管理（已完成文件与验收）
 
 - [x] 正式入口：8080=Compose Frontend；5173=Vite 开发
 - [x] RUNBOOK：本地测试账号、端口、RAG vs KPI、Scenario01 导入、上传存储、LLM 模式与成本风险
@@ -8,9 +22,9 @@
 - [x] AI分析独立入口：`/rag` 显式 AI + Provider/Model/Route/Token/Cost/Status
 - [x] 文档页：PG 列表、Import/Chunk 就绪状态、content 写入 DB 说明
 - [x] 审批：`GET /api/v1/reports` 目录下拉，无需手抄 task_id
-- [x] 管理：`GET/PUT /api/v1/admin/llm/runtime`（stub|openrouter|fallback_chain；无 Key；默认 stub）
-- [x] Frontend 113/113；Backend catalog/llm admin 测试；Compose rebuild healthy；PG 数据与 Volume 保留
-- [ ] 可选：handbook 面试材料中旧导航标签增量校正（非阻断）
+- [x] 管理：`GET/PUT /api/v1/admin/llm/runtime`（兼容保留；主路径改为 AI Runtime 持久化 API）
+- [x] Frontend 113/113（后续 115）；Backend catalog/llm admin 测试；Compose rebuild healthy；PG 数据与 Volume 保留
+- [x] handbook 面试材料中旧导航标签增量校正
 - [ ] 未执行真实 LLM；未 git commit
 
 最后更新：2026-07-17

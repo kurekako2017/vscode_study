@@ -28,17 +28,26 @@ from __future__ import annotations
 from app.core.learning_trace import trace_step
 from app.errors.exceptions import DocumentNotFoundException
 from app.models.document import Document, DocumentStatus, DocumentType, Language
+from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
 from app.repositories.interfaces.document_repository import DocumentRepository
 from app.schemas.document_api import DocumentListResponse, DocumentResponse
+
+# 列表默认上限，保证分页语义明确；客户端可传 1..100。
+_DEFAULT_LIST_LIMIT = 50
 
 
 class DocumentReadService:
     """封装列表过滤与单文档读取逻辑。"""
 
-    def __init__(self, repository: DocumentRepository) -> None:
-        """保存仓储接口引用。"""
+    def __init__(
+        self,
+        repository: DocumentRepository,
+        chunk_repository: DocumentChunkRepository | None = None,
+    ) -> None:
+        """保存仓储接口引用；chunk_repository 用于列表 chunk_count / searchable。"""
 
         self._repository = repository
+        self._chunk_repository = chunk_repository
     # 列表过滤
     def list_documents(
         self,
@@ -52,7 +61,7 @@ class DocumentReadService:
         limit: int | None = None,
         cursor: str | None = None,
     ) -> DocumentListResponse:
-        """返回符合过滤条件的文档列表。"""
+        """返回符合过滤条件的文档列表（稳定排序 + 默认 limit）。"""
 
         # 记录读取 Service，方便初学者看到过滤参数即将交给 Repository 查询。
         trace_step(
@@ -93,9 +102,17 @@ class DocumentReadService:
                 include_archived=include_archived,
             )
         ]
-        if limit is not None:
-            filtered = filtered[:limit]
-        response = DocumentListResponse.from_domain(filtered)
+        # 稳定排序：created_at DESC，同秒按 document_id ASC
+        filtered.sort(
+            key=lambda doc: (
+                -doc.created_at.timestamp(),
+                doc.document_id,
+            )
+        )
+        effective_limit = _DEFAULT_LIST_LIMIT if limit is None else limit
+        filtered = filtered[:effective_limit]
+        chunk_counts = self._chunk_counts_for(filtered)
+        response = DocumentListResponse.from_domain(filtered, chunk_counts=chunk_counts)
 
         # 记录本次真实返回数量，帮助初学者判断过滤和 limit 的最终结果。
         trace_step(
@@ -178,7 +195,27 @@ class DocumentReadService:
             status="200",
             label=f"Document found: {document.metadata.title}",
         )
-        return DocumentResponse.from_domain(document)
+        count = self._chunk_count(document)
+        return DocumentResponse.from_domain(document, chunk_count=count)
+
+    def _chunk_counts_for(self, documents: list[Document]) -> dict[str, int]:
+        """为列表项批量计算 chunk_count（无 chunk 仓储时返回 0）。"""
+
+        result: dict[str, int] = {}
+        for document in documents:
+            result[document.document_id] = self._chunk_count(document)
+        return result
+
+    def _chunk_count(self, document: Document) -> int:
+        if self._chunk_repository is None:
+            return 0
+        try:
+            chunks = self._chunk_repository.list_for_document(
+                document.document_id, document.version
+            )
+            return len(chunks)
+        except Exception:
+            return 0
 
     def _matches(
         self,
