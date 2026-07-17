@@ -33,7 +33,7 @@
 - Swagger 能执行主链路 API。
 - unittest 能在 `backend` 目录执行。
 - 如果启动时报 `Form data requires "python-multipart" to be installed`，先看 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 的 Appendix B。
-- 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
+- 不要在项目根目录直接执行 unittest（错误示范：`python3 -m unittest tests.test_api -v`）；权威命令见第 8 节 `./.venv/bin/python`。
 - 如果报 `ModuleNotFoundError: No module named tests`，说明目录错了。
 - V1.0 默认验收使用 `LLM_PROVIDER_MODE=stub`，不默认产生真实 LLM 费用。
 - 不要用「Frontend Phase 3 / Frontend 可选 / Docker 未验证 / PostgreSQL 未完成 / 未来接入 / 计划中」等历史表述当作当前操作结论。
@@ -75,7 +75,36 @@ curl -sS http://127.0.0.1:8000/openapi.json | head
 1. 打开 `/docs`
 2. 执行 `GET /health`
 
-预想结果：返回 `status=ok`、`service=retail-insight-ai`、`provider=static`、非空 `request_id`。
+预想结果：
+
+- 必有：`status=ok`、`service=retail-insight-ai`、非空 `request_id`
+- **Docker / PostgreSQL 路径**（Compose 或 `REPOSITORY_BACKEND=postgres`）：`repository_backend=postgres`
+- **InMemory 学习路径**（默认本地脚本）：允许 `repository_backend=inmemory`
+- Research / KPI 等业务 provider 字段若存在，以当前配置为准
+- **禁止**再把历史 Health 字段断言（旧文档中的 static provider 字段）当作 V1.0 必过条件
+
+## 4.1 Swagger JWT 认证闭环（login → Authorize → me → 受保护 API）
+
+验证方式：
+
+1. `POST /api/v1/auth/login`（或 UI 登录）：使用测试账号 `admin` / `manager` / `employee` 之一
+2. 从响应复制 `access_token`（**不要**写入文档、截图或 git）
+3. 在 Swagger 点击 **Authorize**，填入 `Bearer <access_token>`（或 UI 等价会话注入）
+4. 执行 `GET /api/v1/users/me`，确认身份与角色
+5. 再执行任一受保护业务 API（例如 `GET /api/v1/documents` 或 `POST /api/v1/ai-analysis`）
+
+预想结果：
+
+- login：`200` + `access_token`
+- users/me：`200` + 与角色一致的权限镜像
+- 受保护 API：已 Authorize 时按权限返回业务结果，而不是匿名失败
+
+### 401 与 403 区别（必会）
+
+| 状态 | 含义 | 会话处理 | 典型场景 |
+|---|---|---|---|
+| **401** | 未认证 / Token 无效或过期 | 应清理会话并回到登录 | 未 Authorize、Token 损坏、过期 JWT |
+| **403** | 已认证但权限不足 | **保持**当前登录会话，仅拒绝该操作 | employee 调用 approve；无 `approval.review` 读他人审批 |
 
 ## 5. Swagger 能执行主链路 API
 
@@ -85,7 +114,7 @@ curl -sS http://127.0.0.1:8000/openapi.json | head
 2. 用返回的 `task_id` 执行 `GET /api/tasks/{task_id}`
 3. 再执行 `GET /api/tasks/{task_id}/report`
 
-预想结果：任务可创建，状态可读取，报告最终可取回；终端还能看到 `question: 你好`、`mode: hybrid` 和 `task_id` 的学习日志。
+预想结果：在 **已 Authorize** 前提下，任务可创建，状态可读取，报告最终可取回；终端还能看到 `question`、`mode` 和 `task_id` 的学习日志（若该链路仍开放）。未带 Token 时优先预期 **401**，而不是把权限错误误判为业务 500。
 
 ## 6. Swagger 能执行文档主链路 API
 
@@ -97,41 +126,43 @@ curl -sS http://127.0.0.1:8000/openapi.json | head
 4. 执行 `POST /api/v1/documents/{document_id}/chunks`
 5. 执行 `POST /api/v1/document-retrieval/search`
 
-预想结果：文档链路可按顺序推进。
+预想结果：在 **Bearer 已 Authorize** 下文档链路可按顺序推进（upload → import → chunk → retrieval）。
 
 ## 7. Swagger 能执行审批 / 安全 / 审计主链路 API
 
-验证方式：
+验证方式（均需有效 JWT；角色按步骤切换 Token）：
 
-1. 执行 `POST /api/v1/reports/{task_id}/submit-approval`
-2. 执行 `GET /api/v1/approvals`
-3. 执行 `GET /api/v1/users/me`
-4. 执行 `GET /api/v1/security/roles`
-5. 执行 `GET /api/v1/security/permissions`
-6. 执行 `GET /api/v1/audit-logs`
+1. `GET /api/v1/users/me`（确认当前主体）
+2. `GET /api/v1/security/roles` 与 `GET /api/v1/security/permissions`
+3. 业务前置完成后 `POST /api/v1/reports/{task_id}/submit-approval`（submitter）
+4. `GET /api/v1/approvals` 与 `GET /api/v1/approvals/{approval_id}`（manager/reviewer）
+5. employee Token 尝试 approve → 期望 **403**（会话保持）
+6. manager Token approve → 期望成功
+7. `GET /api/v1/audit-logs` 核对拒绝与批准事实
 
-预想结果：审批资源可见，安全目录可读，审计日志可取回。
+预想结果：安全目录可读；审批按 RBAC 推进；403/成功路径可区分；审计可取回。
 
-## 8. unittest 能在 backend 目录执行
+## 8. unittest 能在 backend 目录执行（权威命令）
 
 验证方式：
 
 ```bash
 cd backend
-python3 -m unittest tests.test_api -v
+./.venv/bin/python -m unittest tests.test_api -v
 ```
 
-预想结果：测试被正确发现并运行。
+预想结果：测试被正确发现并运行。权威解释器为 `backend/.venv/bin/python`（与 `scripts/start_backend.sh` 一致）。
 
-## 9. 不要在项目根目录直接执行 unittest
+## 9. 不要在项目根目录直接执行 unittest（错误示范）
 
-这条命令不是标准做法：
+以下为 **错误示范，非权威命令**（故意展示裸 `python3 -m`）：
 
 ```bash
+# 错误示范：在项目根目录、且使用系统 python3
 python3 -m unittest tests.test_api -v
 ```
 
-如果这样执行后看到 `ModuleNotFoundError: No module named tests`，说明目录错了。
+如果这样执行后看到 `ModuleNotFoundError: No module named tests`，说明目录或解释器错了。请改回 `cd backend && ./.venv/bin/python -m unittest ...`。
 
 ## 10. 失败时优先看哪里
 
@@ -171,13 +202,14 @@ npm run build
 
 ```bash
 cd backend
-python3 -m unittest discover -s tests -v
+./.venv/bin/python -m unittest discover -s tests -v
 ```
 
 预想结果（V1.0 基线）：
 
 - **270 tests**，**52 skipped**
 - 无 unexpected failure
+- `/health` 路径对应 `repository_backend=inmemory`（若响应暴露该字段）
 
 ## 14. Backend PostgreSQL 全量 unittest（正式验收路径）
 
@@ -188,7 +220,7 @@ cd backend
 export REPOSITORY_BACKEND=postgres
 export DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql"
 export LLM_PROVIDER_MODE=stub
-python3 -m unittest discover -s tests -v
+./.venv/bin/python -m unittest discover -s tests -v
 ```
 
 预想结果（V1.0 基线）：
@@ -196,6 +228,7 @@ python3 -m unittest discover -s tests -v
 - **281 tests**，**2 skipped**（real LLM smoke 默认 skip）
 - 无随机 401（JWT leeway 已覆盖时钟回拨）
 - 专用库名必须是 `erip_integration_test`
+- 服务健康检查：`status=ok` 且 `repository_backend=postgres`
 
 ## 15. Docker Compose 健康验收
 
@@ -219,7 +252,7 @@ docker compose config >/dev/null
 预想结果：
 
 - postgres / backend / frontend healthy
-- `GET http://127.0.0.1:8000/health` → `status=ok`
+- `GET http://127.0.0.1:8000/health` → `status=ok` 且 **`repository_backend=postgres`**
 - `GET http://127.0.0.1:8080/` → 200
 - SPA 路由 `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` → 200（非 404）
 - Alembic current → `20260717_07_fallback_chain (head)`
@@ -254,22 +287,37 @@ export E2E_EXPECT_STUB=1
 
 预想结果：Volume 保留，数据可恢复。
 
-## 18. 人工业务链（样例数据）
+## 18. 人工业务链（Scenario01 勾选，不复制整表）
 
-验证方式：按 `docs/learning/sample-data/Scenario01_Sales_Decline/10_業務テストシナリオ.md`：
+权威详细步骤表（**24 步八列表**）见：
 
-```text
-文書管理 → RAG検索 → 分析依頼 → 承認管理 → 最终审计报告
-```
+`docs/learning/01_Foundation/TEST_CASES.md` → 章节 **「Scenario01 详细验收表」**
 
-预想结果：各页面可推进；默认 stub 下无真实 LLM 费用；权限失败显示 403 Banner 而非静默成功。
+辅助剧本：`docs/learning/sample-data/Scenario01_Sales_Decline/10_業務テストシナリオ.md`
+
+本清单只做勾选，**不复制**整张 Scenario01 表：
+
+- [ ] 登录拿到 `access_token`，Swagger Authorize / UI 会话生效
+- [ ] `users/me` 角色正确
+- [ ] 上传 → Import → Chunk
+- [ ] Retrieval + Citation（普通 RAG）
+- [ ] AI 分析：low_cost Provider/Model/Usage/Cost（stub）
+- [ ] 取締役会报告：high_quality Provider/Model/Usage/Cost（stub）
+- [ ] submit-approval
+- [ ] employee approve → **403**（会话保持）
+- [ ] manager detail/history → manager approve
+- [ ] ReportVersion + Audit + Ledger 可核对
+- [ ] 普通 RAG 路径无真实 Provider 外呼
+- [ ] 最终报告/审计可读；默认 stub 零真实 LLM 费用
+
+预想结果：与 TEST_CASES Scenario01 表一致；403 与 401 区分正确。
 
 ## 19. compileall 与 diff-check
 
 验证方式：
 
 ```bash
-cd backend && python3 -m compileall app
+cd backend && ./.venv/bin/python -m compileall app
 cd .. && git diff --check
 ```
 

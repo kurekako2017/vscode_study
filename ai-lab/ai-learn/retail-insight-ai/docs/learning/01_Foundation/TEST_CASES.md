@@ -936,21 +936,60 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 - 不在日志/截图中暴露 Token、密码、API Key
 - Compose 验收不要 `docker compose down -v`
 
-## 自动化验收命令清单（两列）
+## Scenario01 详细验收表（≥20 步）
 
-| 真实模型 / 真实服务 | 纯本地 / Stub / 本地 Provider |
-|---|---|
-| 不适用（默认验收不调用真实 LLM） | `cd backend && python3 -m unittest discover -s tests -v`（InMemory 默认） |
-| 仅当显式 `RUN_REAL_LLM_SMOKE=1` 且配置真实 Key 时 | `REPOSITORY_BACKEND=postgres DATABASE_URL=... python3 -m unittest discover -s tests -v` |
-| 真实 OpenRouter smoke（默认 skip） | `./scripts/run_tests.sh`（Backend + Frontend + build + compileall） |
-| — | `cd frontend && npm test` 与 `npm run build` |
-| — | `./scripts/compose_up.sh` → `./scripts/compose_verify.sh` → `./scripts/run_api_e2e.sh` → `./scripts/compose_down.sh` |
+前置：Backend/Frontend 已按 RUNBOOK Appendix L（InMemory 学习）或 Appendix M（PostgreSQL/Docker 企业验收）启动；`LLM_PROVIDER_MODE=stub`；样例文件来自 `docs/learning/sample-data/Scenario01_Sales_Decline/`。
+本表供人工 / Swagger / UI 对照；自动化对照列给出仓库内测试入口。**不在文档修改时运行下列测试。**
+
+| Step | Actor/角色 | 页面或 API | 输入/操作 | 预期 HTTP/页面结果 | 数据库/审计验证 | 对应源码 | 对应自动化测试 |
+|---|---|---|---|---|---|---|---|
+| 1 | admin | UI `/login` 或 `POST /api/v1/auth/login` | 账号 `admin` + 测试密码 | `200`，响应含 `access_token`（不落盘明文密码） | 无业务行；登录失败应有安全审计（若实现） | `backend/app/api/` auth、`services` 认证 | `test_authentication.py` / Frontend Login 测试 |
+| 2 | admin | Swagger Authorize 或前端会话 | 粘贴/注入 Bearer `access_token` | 后续受保护 API 不再匿名 401 | Token 仅 sessionStorage（前端）；服务端 JWT 可解析 | `frontend/src` AuthContext；`JWTService` | Frontend Auth / `test_authentication.py` |
+| 3 | admin | `GET /api/v1/users/me` | 已 Authorize | `200`，`role=admin`（或等价权限集） | 身份与冻结 Permission 一致 | `security` API / Service | `test_security_audit_api.py` / Frontend me 恢复 |
+| 4 | admin | 文書管理 `/documents` · `POST /api/v1/documents` | 上传 Scenario01 样例 md + metadata | `201/200`，返回 `document_id` | documents 有新文档，status 待 import | Document Upload API/Service | `test_document_upload_api.py` / E2E |
+| 5 | admin | `POST /api/v1/documents/{id}/import` | 对上一步 `document_id` 执行 import | `200`，文档进入 imported/可 chunk 状态 | 文档状态推进；非法重复 import 被拒 | Document Import Service | `test_document_import_api.py` / E2E |
+| 6 | admin | `POST /api/v1/documents/{id}/chunks` | chunk 已 import 文档 | `200`，chunk 数量 > 0 | chunks 有序落库/内存；重复 chunk 策略稳定 | Document Chunk Service | `test_document_chunk_api.py` / E2E |
+| 7 | admin | RAG検索 `/rag` · `POST /api/v1/document-retrieval/search` | 使用 `07_RAG質問集.md` 中问题 | `200`，hits 非空，可追溯 document/chunk | retrieval 结果含 source 引用字段 | Retrieval Service | `test_document_retrieval_api.py` / E2E |
+| 8 | admin | `POST /api/v1/internal-rag/answer` 或 RAG 页 extractive | 同问题，`require_citations=true` | `200`，答案带 **citations**；证据不足时有 warning | 不强制写入 LLM usage（extractive/stub 路径） | Internal RAG Service / Answer Generator | `test_internal_rag_api.py` / `test_internal_rag_evaluation.py` |
+| 9 | admin | 分析依頼 / RAG「AI分析」· `POST /api/v1/ai-analysis` | `confirmed=true` + Idempotency-Key + 证据 refs | `200`，分析成功；缺确认/缺 key 失败 | 写 AI analysis 结果；Evidence Gate 拒绝无证据调用 | AI Analysis API/Service | `test_ai_analysis_api.py` / E2E |
+| 10 | admin | AI 分析响应字段 | 读取 `route_tier` / `provider` / `model` | `route_tier=low_cost`；provider 以 `stub-low-cost` 为前缀（stub） | policy_snapshot 与 route 一致 | LLM Gateway / Model Router | `test_ai_analysis_api.py` / dual-route 相关 |
+| 11 | admin | AI 分析 Usage/Cost | 读取 token/cost 字段 | 有可解析 usage 与 cost；默认 **零真实费用** | `llm_usage_ledger` 成功行（PG）或等价 stub 记录 | Ledger / Quota 服务 | `test_ai_analysis_api.py` / E2E ledger 断言 |
+| 12 | admin | `POST /api/v1/executive-reports` 或 UI「生成取締役会報告」 | 绑定已成功 `ai_analysis_id`，二次确认 | `200`，报告 GENERATED；**不**自动进入审批 | Report + **ReportVersion** 创建 | Executive Report Service | `test_executive_report_api.py` / E2E |
+| 13 | admin | 取締役会报告响应字段 | 读取 `route_tier` / `provider` / `model` | `route_tier=high_quality`；provider 以 `stub-high-quality` 为前缀 | 与 low_cost 额度桶分离 | Gateway high_quality 路由 | `test_executive_report_api.py` |
+| 14 | admin | 取締役会报告 Usage/Cost | 读取 token/cost | high_quality 独立 usage/cost；默认 stub 零真实费用 | ledger `operation=executive_report`（PG） | Ledger | `test_executive_report_api.py` / E2E |
+| 15 | admin | `POST /api/v1/reports/{task_id}/submit-approval` | 对报告 submit + 可选 comment | `200`，Approval 进入待审 | approvals 记录 pending；audit submit 事实 | Report submit-approval / ApprovalService | `test_approval_api.py` / E2E |
+| 16 | employee | `POST /api/v1/approvals/{id}/approve` | employee Token 尝试 approve | **403** permission_denied；会话保持 | audit 权限拒绝事实；状态仍 pending | RBAC guard / Approval API | `test_rbac_guard.py` / E2E employee 403 |
+| 17 | manager | `GET /api/v1/approvals/{id}` | manager Token 读详情 | `200`，可见当前状态与业务字段 | 详情可读；非 owner employee 受限策略保持 | Approval detail API | `test_approval_api.py` / Frontend Approval |
+| 18 | manager | 审批 History / 列表 | `GET /api/v1/approvals` 或详情 history | `200`，history 含 submit 事件 | history 追加-only，不丢 submit | Approval Service history | approval / E2E |
+| 19 | manager | `POST /api/v1/approvals/{id}/approve` | manager approve + comment（可用 `09_承認コメント例.md`） | `200`，状态 approved | 状态机终态正确；非法重复 approve → 409 | ApprovalService 状态机 | `test_approval_api.py` / E2E manager approve |
+| 20 | manager/admin | ReportVersion 读回 | 报告详情 / versions | `200`，可见与 executive report 对应的 **ReportVersion** | versions 不因 approve 被静默删除 | Report / ReportVersion 仓库 | `test_executive_report_api.py` |
+| 21 | admin/manager | `GET /api/v1/audit-logs` | 过滤近期 request/task | `200`，可见业务与权限拒绝相关审计 | append-only；含 403 拒绝与关键分析/审批动作 | Audit API/Service | `test_security_audit_api.py` / `test_audit_middleware.py` / E2E |
+| 22 | admin | Ledger 核对 | PG：查 `llm_usage_ledger`；或 API 返回 usage | low_cost 与 high_quality 各有成功记账；无 Key/Prompt 泄露 | 幂等 key 不双计费 | Ledger migration / 服务 | AI/Executive/E2E ledger 断言 |
+| 23 | admin | 普通 RAG（非 AI分析按钮） | Internal RAG / retrieval **不**点「AI分析」 | `200` extractive/deterministic 答案 | **不**新增真实 Provider 外呼；默认无额外 ledger 成功计费 | InternalRagService；`INTERNAL_RAG_USE_LLM` 默认关 | `test_internal_rag_api.py` / E2E「普通 retrieval 不强制 Provider」 |
+| 24 | manager/admin | 最终报告闭环 | UI 承認管理 + 报告/审计页 | 页面展示已批准报告与审计可读 | 业务链完成：文書→RAG→分析→承認→最终审计报告 | Frontend pages + 上述 API | Frontend 页测 + `test_e2e_api_stub_flow.py` |
+
+覆盖核对（必须齐全）：登录 → 上传 → Import → Chunk → Retrieval → Citation → AI分析 → low_cost Provider/Model/Usage/Cost → 取締役会报告 → high_quality Provider/Model/Usage/Cost → submit → employee 403 → manager detail/history → manager approve → ReportVersion → Audit → Ledger → 普通 RAG 零 Provider → 最终报告。
+
+## 自动化验收命令清单
+
+权威解释器路径：Backend 使用 `backend/.venv/bin/python`（与 `scripts/start_backend.sh` 一致）。下列命令均不在文档修改时自动执行。
+
+| 验收模式 | 前置条件 | 命令 | 预期结果 | 是否允许真实网络 |
+|---|---|---|---|---|
+| InMemory 全量 unittest | 已创建 `backend/.venv` 并安装 requirements | `cd backend && ./.venv/bin/python -m unittest discover -s tests -v` | **270** tests，**52** skipped；无 unexpected failure | 否（默认 stub） |
+| PostgreSQL 全量 unittest | 专用库 `erip_integration_test`；`REPOSITORY_BACKEND=postgres`；合法 `DATABASE_URL`；`LLM_PROVIDER_MODE=stub` | `cd backend && export REPOSITORY_BACKEND=postgres DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql" LLM_PROVIDER_MODE=stub && ./.venv/bin/python -m unittest discover -s tests -v` | **281** tests，**2** skipped（real smoke 默认 skip） | 否（默认 stub；仅连本地 PG） |
+| 提交前聚合脚本 | 同本地学习环境 | `./scripts/run_tests.sh` | Backend + Frontend + build + compileall 按脚本约定通过 | 否 |
+| Frontend Vitest + build | 已 `npm install` | `cd frontend && npm test && npm run build` | **113 / 113**；production build 成功 | 否 |
+| Compose + Stub E2E | Docker daemon 可用；默认 stub | `./scripts/compose_up.sh` → `./scripts/compose_verify.sh` → `E2E_BASE_URL=http://127.0.0.1:8000 E2E_EXPECT_STUB=1 ./scripts/run_api_e2e.sh` → `./scripts/compose_down.sh` | healthy + E2E `OK`；down **不带** `-v` | 否（容器内 stub） |
+| 真实 OpenRouter smoke（非默认） | 显式 `RUN_REAL_LLM_SMOKE=1` 且已配置 Key | 仅 opt-in 单测入口（见 `test_openrouter_real_smoke.py`）；**默认 suite 不得启用** | 默认 **skip**；启用后才访问外网 | 是（仅该 opt-in） |
+
+说明：若文档其他章节出现 `python3 -m ...` 作为**错误示范**（例如在项目根目录执行导致 `No module named tests`），必须标明「错误示范，非权威命令」。权威执行一律使用 `backend/.venv/bin/python`（在 `backend/` 目录下写作 `./.venv/bin/python`）。
 
 ## 通过标准（V1.0）
 
 Backend：
 
-- PostgreSQL：**281** tests，**2** skipped；建议完整 suite 连续多次无随机失败
+- PostgreSQL：**281** tests，**2** skipped。**发布基线**已在修复 JWT 时钟回拨后对完整 suite **连续三次**验证通过；**日常回归执行一次完整 suite 即可**，不必每次人为连跑三次。
 - InMemory：**270** tests，**52** skipped
 - Alembic head：`20260717_07_fallback_chain`
 - compileall / `git diff --check`：通过
@@ -967,7 +1006,7 @@ Docker（daemon 可用时）：
 
 业务：
 
-- 人工可按 Scenario01 走通「文書→RAG→分析→承認→审计报告」
+- 人工可按上方 **Scenario01 详细验收表** 走通 24 步闭环
 - Stub E2E 覆盖三角色与审批 403/成功路径
 
 ## 与启动手册的交叉引用
