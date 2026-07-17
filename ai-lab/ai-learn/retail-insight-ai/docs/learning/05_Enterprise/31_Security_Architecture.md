@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -251,7 +251,7 @@ Audit Log 不允许随意删除。
 
 ---
 
-# 八、Retail Insight AI 当前实现（Current）
+# 八、ERIP 当前实现（Current）
 
 当前项目已经具备：
 

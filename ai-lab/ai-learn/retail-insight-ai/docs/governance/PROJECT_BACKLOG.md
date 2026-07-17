@@ -1,5 +1,18 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: ERIP V1.0 文档最终更新 / 面试材料合并 / 一致性检查
+
+- [x] handbook 面试权威索引；历史 `Retail_Insight_AI_*Volume01` 标注为非权威
+- [x] INTERVIEW_GUIDE / PROJECT_BIBLE / 04-12 过时口径校正
+- [x] 全库关键入口数字对齐：297/6 · 286/62 · 116 · `20260717_08_ai_runtime`
+- [x] ARCHITECTURE 摘要 + 历史章节阅读规则
+- [x] 学习文档标题 ERIP 化与过时 Alembic head 校正（不删 notebook）
+- [x] TASK / CHANGELOG 登记；**未 commit**（用户自行提交）
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 In Progress / Blocked: 本地开发改用 WSL 宿主 PostgreSQL
 
 - [x] 移除 `start_local.sh` 对 `erip-local-pg` / Docker 的运行时依赖

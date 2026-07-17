@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 04：Execution Flow（源码执行流程）
 
@@ -470,7 +470,7 @@ Workflow：
 
 # 十一、当前源码实现（Current）
 
-Retail Insight AI 当前：
+ERIP 当前：
 
 已经实现：
 

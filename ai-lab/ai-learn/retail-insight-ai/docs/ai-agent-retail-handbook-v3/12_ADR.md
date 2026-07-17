@@ -30,9 +30,9 @@
 ADR 状态说明：Accepted 表示当前架构决策；Planned 表示企业化目标，只有完成对应验收条件后才转为 Accepted。
 
 世界观说明：
-- `Retail Insight AI` = `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP / PoC / Early Prototype
+- 历史名称 `Retail Insight AI` = ERIP 早期 MVP 名称（不作当前项目名）；当前正式名称 = Enterprise Retail Intelligence Platform (ERIP) V1.0
 - `ERIP` = Target 企业平台
-- 本文中的 `Accepted` 默认表示“Current MVP 已接受的架构决策”
+- 本文中的 `Accepted` 默认表示“ERIP V1.0 已接受的架构决策（历史 ADR 保留）”
 - 本文中的 `Planned` 默认表示“ERIP Target 阶段的目标架构决策”
 
 ## ADR-001 使用 Task API
@@ -416,7 +416,7 @@ API、SSE、KPI、Research 和 Report 的扩展特性不同，但过早使用 Ku
 
 **Context**
 
-Retail Insight AI 同时需要结构条件、全文搜索和语义搜索。
+ERIP 同时需要结构条件、全文搜索和语义搜索。
 
 **Decision**
 
@@ -644,7 +644,7 @@ CI/CD 执行测试、架构规则、镜像扫描、Migration 验证、Canary 和
 - peers:
 - `retail-insight-ai/docs/ARCHITECTURE.md` | sha256=99ec6a7ef9caa11ad9233e4d6e8d40c2a55ba621584fde27685bce1a52da50b0 | # retail-insight-ai Architecture / 最后更新：2026-06-29 / 本文件记录项目实际架构。未实现的能力必须明确标注，不得把规划写成现状。 / ## 技术架构图
 - `retail-insight-ai/docs/DECISIONS.md` | sha256=fde8a8d32a6812c38add97db9042a1932dda711f32999bde03e862b86bef35d5 | # retail-insight-ai Architecture Decisions / 本文件保存 Architecture Decision Record（ADR）。不得删除已生效或已废弃的历史决策。 / ## ADR-001 / 日期：2026-06-29
-- `ai-agent-retail-handbook-v3/03_AI核心知识.md` | sha256=b29ec1e0b01d85b5a69735c85dcc9e8cfac763e70e38b844dcca04cce5bb64e5 | # 03_AI核心知识 / ## 第一章 知识服务于项目 / 本书中的知识点只围绕 Retail Insight AI 展开。FastAPI、LangGraph、RAG、Streaming、Docker 都不是孤立知识，而是服务于日本小売業客户的经营分析任务。 / 【TL Review】
+- `ai-agent-retail-handbook-v3/03_AI核心知识.md` | sha256=b29ec1e0b01d85b5a69735c85dcc9e8cfac763e70e38b844dcca04cce5bb64e5 | # 03_AI核心知识 / ## 第一章 知识服务于项目 / 本书中的知识点只围绕 ERIP 展开。FastAPI、LangGraph、RAG、Streaming、Docker 都不是孤立知识，而是服务于日本小売業客户的经营分析任务。 / 【TL Review】
 - `ai-agent-retail-handbook-v3/08_架构图册.md` | sha256=ab27e2cb38443f53f6aff5c2b5d5a495a1774894d29429f463b926c5993d4611 | # 08_架构图册 / # 目录 / - [1. Overall Architecture](#1-overall-architecture) / - [2. User to API Flow](#2-user-to-api-flow)
 - `ai-agent-retail-handbook-v3/09_系统设计书.md` | sha256=506bedbfe7ebcb7f81c127c63a3ace28ee8d3329261015d798bb5b6783032f2e | # 09_系统设计书 / # 目录 / - [1. 项目概要](#1-项目概要) / - [2. 系统目标](#2-系统目标)
 

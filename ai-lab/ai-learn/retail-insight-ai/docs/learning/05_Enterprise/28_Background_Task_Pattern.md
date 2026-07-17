@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -29,7 +29,7 @@
 
 - 为什么需要 Background Task？
 - 为什么 AI Workflow 必须异步执行？
-- Retail Insight AI 如何使用 BackgroundTasks？
+- ERIP 如何使用 BackgroundTasks？
 - BackgroundTasks 与 Thread 有什么区别？
 - Java Spring 如何实现相同功能？
 
@@ -81,7 +81,7 @@ HTTP Response
 
 ---
 
-# 二、Retail Insight AI 当前实现（Current）
+# 二、ERIP 当前实现（Current）
 
 执行流程：
 

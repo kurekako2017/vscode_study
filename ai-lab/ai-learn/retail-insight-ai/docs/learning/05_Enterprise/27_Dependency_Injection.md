@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -189,7 +189,7 @@ TaskService
 
 ---
 
-# 四、Retail Insight AI 当前实现（Current）
+# 四、ERIP 当前实现（Current）
 
 当前项目采用：
 

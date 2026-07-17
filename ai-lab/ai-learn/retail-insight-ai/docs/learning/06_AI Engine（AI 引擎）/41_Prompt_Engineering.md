@@ -52,7 +52,7 @@ AI 是否输出正确结果，
 
 ---
 
-# 二、Retail Insight AI 当前实现（Current）
+# 二、ERIP 当前实现（Current）
 
 当前 AI 调用流程：
 

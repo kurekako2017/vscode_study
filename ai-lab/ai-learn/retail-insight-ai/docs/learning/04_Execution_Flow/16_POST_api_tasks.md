@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 04：Execution Flow（源码执行流程）
 
@@ -195,7 +195,7 @@ backend/app/api/tasks.py
 
 这是：
 
-整个 Retail Insight AI
+整个 ERIP
 
 真正的入口。
 
@@ -848,7 +848,7 @@ EventPublisher
 SSE
 ```
 
-这就是整个 Retail Insight AI 最重要的一条执行链。
+这就是整个 ERIP 最重要的一条执行链。
 
 掌握这一章，
 

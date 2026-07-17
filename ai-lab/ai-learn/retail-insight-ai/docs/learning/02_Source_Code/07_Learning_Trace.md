@@ -1,4 +1,4 @@
-# Retail Insight AI 源码精读系列
+# ERIP 源码精读系列
 
 # 07_Learning_Trace.md
 

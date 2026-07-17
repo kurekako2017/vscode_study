@@ -30,7 +30,7 @@
 
 - 什么是 AI State？
 - Workflow 为什么需要 State？
-- Retail Insight AI 如何管理 Workflow 状态？
+- ERIP 如何管理 Workflow 状态？
 - Context、Memory、Checkpoint 有什么区别？
 - 企业 AI 为什么必须保存状态？
 
@@ -110,7 +110,7 @@ State 的意义。
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 当前：
 

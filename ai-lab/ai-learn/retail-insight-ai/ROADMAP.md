@@ -13,10 +13,11 @@
 - LLM 治理：Gateway、Evidence Gate、Idempotency-Key、Decimal 额度、Ledger、Fallback（OpenRouter→NVIDIA→Gemini→Local Qwen）
 - AI Runtime：PostgreSQL 持久化 mode/kill_switch/version；Admin `GET/PATCH /api/v1/admin/ai-runtime`；默认 stub
 - 前端：ProtectedRoute、正式导航（RAG/AI分析 · KPI任务分析 · AI管理）、Document→RAG / Report→Approval 衔接、Lifecycle Live Status
-- 自动化：PG **291/2 skip**，InMemory **280/59 skip**，Frontend **115/115**，head **`20260717_08_ai_runtime`**
+- 自动化：PG **297/6 skip**，InMemory **286/62 skip**，Frontend **116/116**，head **`20260717_08_ai_runtime`**
 - 默认 stub；真实付费 smoke / Billing UI / 多租户预算 / SIEM·WORM·Streaming / DeepSeek 默认启用 **未**记为完成
+- 面试权威材料：`docs/ai-agent-retail-handbook-v3/` 的 `01`/`02`/`03`/`07`/`ERIP_Volume01` + `INTERVIEW_GUIDE`（`Retail_Insight_AI_*Volume01` 为历史稿）
 
-权威细节：`docs/architecture/ARCHITECTURE.md`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix N、面试材料（第二批）。
+权威细节：`docs/architecture/ARCHITECTURE.md`、`docs/development/DEPLOYMENT_GUIDE.md`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix N、handbook 面试索引。
 
 ### 与下文历史 Sprint 的关系
 

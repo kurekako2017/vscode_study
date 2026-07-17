@@ -20,7 +20,7 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，并投�
 
 Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。
 
-系统重点是经营分析、KPI、LangGraph Workflow、Fixed KPI Workflow、Research Agent、Report Generator、日文报告生成和管理层决策支持。
+系统重点是：JWT/RBAC、文書管理、RAG/Citation、显式 AI 分析、董事会报告、Approval、Persistent Audit、LLM Gateway/Ledger，以及 KPI 任务分析辅线与日文经营报告。
 
 # 项目背景
 
@@ -215,7 +215,7 @@ SSE / Report
 # 统一术语
 
 - Enterprise Retail Intelligence Platform（ERIP）
-- Retail Insight AI（ERIP MVP / Current）
+- Retail Insight AI（**仅历史/早期 MVP 名称**，不作当前项目名）
 - 小売業向け AI 経営分析プラットフォーム
 - Research Agent
 - Task API
@@ -239,20 +239,23 @@ SSE / Report
 - 市场调查
 - 日文报告生成
 - 管理层报告
-- Production Gap
+- 已交付边界与未完成强化点（禁止把 JWT/Approval/PostgreSQL 说成未完成）
 
 # 统一项目介绍
 
 ```text
-Retail Insight AI は、Enterprise Retail Intelligence Platform（ERIP）の Current MVP です。
-ERIP は、日本の小売業向け AI 経営分析プラットフォームであり、POS、在庫、商品、会員、売上、店舗、CSV、Excel、日報、月報を統合し、KPI 分析、LangGraph Workflow、Research Agent、Streaming、Report Generator を通じて、経営判断を支援します。
+Enterprise Retail Intelligence Platform（ERIP）V1.0 は、日本の小売業向け企業 AI 経営分析プラットフォームです。
+文書根拠・RAG・明示 AI 分析・取締役会報告・承認・監査・LLM 台帳を一貫実装し、
+POS/在庫/商品/会員などの経営判断を支援します。正式 Repository は PostgreSQL です。
+（歴史名称：Retail Insight AI = 早期 MVP 名称のみ）
 ```
 
 # 统一自我介绍
 
 ```text
-私は Enterprise Retail Intelligence Platform（ERIP）の Current MVP である Retail Insight AI の開発を担当しました。
-主に Backend、FastAPI、Task API、TaskService、LangGraph Workflow、Research Agent、Report Generator、Streaming、Docker、Architecture Review を担当しました。
+私は Enterprise Retail Intelligence Platform（ERIP）V1.0 の開発を担当しました。
+主に Backend/Frontend 連携、JWT/RBAC、文書パイプライン、RAG、LLM Gateway、
+Approval、Persistent Audit、PostgreSQL、Docker Compose、テスト整備を担当しました。
 ```
 
 # 统一项目说明
@@ -268,7 +271,7 @@ ERIP は、日本の小売業向け AI 経営分析プラットフォームで�
 - Streaming / SSE
 - 日文报告生成
 - 我的职责
-- Production Gap
+- 已交付边界与未完成强化点（禁止把 JWT/Approval/PostgreSQL 说成未完成）
 
 # 统一职责
 

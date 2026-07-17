@@ -17,7 +17,7 @@
 | 项                 | 值                                                                            |
 | ------------------ | ----------------------------------------------------------------------------- |
 | 正式 Repository    | **PostgreSQL**                                                          |
-| InMemory           | 仅辅助 unittest / 教学，不作业务验收                                          |
+| InMemory           | 仅自动化单元测试适配器 / 故障隔离，不作业务验收                                          |
 | Alembic head       | **`20260717_08_ai_runtime`**                                          |
 | PostgreSQL Backend | **297 tests / 6 skipped**                                               |
 | InMemory Backend   | **286 tests / 62 skipped**                                              |

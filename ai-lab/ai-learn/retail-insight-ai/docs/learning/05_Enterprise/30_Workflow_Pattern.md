@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -29,7 +29,7 @@
 
 - 什么是 Workflow？
 - Workflow 与普通 Service 有什么区别？
-- Retail Insight AI 如何实现 Workflow？
+- ERIP 如何实现 Workflow？
 - LangGraph 在项目中的定位是什么？
 - 企业为什么要使用 Workflow Engine？
 
@@ -136,7 +136,7 @@ Edge（边）
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 项目当前：
 
@@ -766,7 +766,7 @@ Workflow Pattern 的核心思想是：
 
 **将复杂业务拆分为多个独立节点，由 Workflow Engine 统一调度。**
 
-Retail Insight AI 当前通过 `AnalysisWorkflow` 实现了这一思想，并为未来接入 LangGraph、Conditional Edge、Multi-Agent 等企业级 AI 能力预留了扩展空间。
+ERIP 当前通过 `AnalysisWorkflow` 实现了这一思想，并为未来接入 LangGraph、Conditional Edge、Multi-Agent 等企业级 AI 能力预留了扩展空间。
 
 ---
 

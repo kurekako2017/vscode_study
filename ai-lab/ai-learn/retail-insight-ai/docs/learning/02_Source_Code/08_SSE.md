@@ -1,4 +1,4 @@
-# Retail Insight AI 源码精读系列
+# ERIP 源码精读系列
 
 # 08_SSE.md
 
@@ -68,7 +68,7 @@ Server
 
 # 二、为什么使用 SSE？
 
-Retail Insight AI 的 AI Workflow 可能持续数秒甚至数十秒。
+ERIP 的 AI Workflow 可能持续数秒甚至数十秒。
 
 如果没有 SSE：
 

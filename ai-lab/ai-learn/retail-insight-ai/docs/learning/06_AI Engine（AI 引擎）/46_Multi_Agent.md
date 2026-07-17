@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
@@ -30,7 +30,7 @@
 - 什么是 Multi-Agent？
 - 为什么企业 AI 不再使用单 Agent？
 - Supervisor Agent 的职责是什么？
-- Retail Insight AI 如何升级为 Multi-Agent？
+- ERIP 如何升级为 Multi-Agent？
 - Agent 之间如何协作？
 
 ---
@@ -133,7 +133,7 @@ Final Report
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 目前：
 

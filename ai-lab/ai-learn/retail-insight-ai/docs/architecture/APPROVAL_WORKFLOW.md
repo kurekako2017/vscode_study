@@ -8,7 +8,7 @@
 
 - 报告默认 `ReportStatus.GENERATED`（JSON `"generated"`）
 - Approval API 已落地：submit / list / detail / approve / reject / revise
-- PostgreSQL Approval Repository + History + ReportVersion；InMemory 学习路径仍可用
+- PostgreSQL Approval Repository + History + ReportVersion；InMemory 测试适配器仍可用
 - 前端「承認管理」页已交付（JWT + RBAC）
 - HTTP 口径（与源码一致）：submit **201** + `pending_approval`；approve **200** + `approved`；employee 无权限 **403**
 - 权威状态机与锁策略见 `ARCHITECTURE.md`「Enterprise Approval Workflow」

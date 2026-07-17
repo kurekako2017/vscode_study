@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
@@ -28,7 +28,7 @@
 阅读本章后，你应该能够回答：
 
 - 企业 AI 平台应该具备哪些能力？
-- Retail Insight AI 如何演进为 Enterprise AI Platform？
+- ERIP 如何演进为 Enterprise AI Platform？
 - 企业 AI 如何保证安全、稳定和可维护？
 - AI Platform 如何持续演进？
 - 企业 AI 架构师需要关注哪些问题？
@@ -65,7 +65,7 @@ LLM：
 
 ---
 
-# 二、Retail Insight AI 当前能力
+# 二、ERIP 当前能力
 
 目前：
 
@@ -674,7 +674,7 @@ Enterprise AI Platform。
 
 企业 AI 平台最重要的是什么？
 
-模型只是 AI 平台的一部分。真正的企业 AI 平台需要 Workflow、知识库、RAG、权限管理、审计、安全、监控、成本控制等完整能力。Retail Insight AI 当前已经具备 Workflow、Repository、SSE 等基础架构，未来可以逐步演进为完整的 Enterprise AI Platform。
+模型只是 AI 平台的一部分。真正的企业 AI 平台需要 Workflow、知识库、RAG、权限管理、审计、安全、监控、成本控制等完整能力。ERIP 当前已经具备 Workflow、Repository、SSE 等基础架构，未来可以逐步演进为完整的 Enterprise AI Platform。
 
 ---
 
@@ -858,7 +858,7 @@ LLM
 
 企业 AI 的核心目标不是构建一个"万能模型"，而是构建一个**可扩展、可治理、可维护、可持续演进的 AI 平台**。
 
-Retail Insight AI 当前已经具备坚实的基础架构，未来可以逐步引入 LangGraph、RAG、MCP、Multi-Agent、pgvector、OpenTelemetry 等能力，演进为真正的 Enterprise AI Platform。
+ERIP 当前已经具备坚实的基础架构，未来可以逐步引入 LangGraph、RAG、MCP、Multi-Agent、pgvector、OpenTelemetry 等能力，演进为真正的 Enterprise AI Platform。
 
 ---
 

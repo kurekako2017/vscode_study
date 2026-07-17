@@ -385,7 +385,7 @@ Business API
 
 # 十一、当前源码实现（Current）
 
-Retail Insight AI 当前已经实现：
+ERIP 当前已经实现：
 
 - Security API
 - 基础认证

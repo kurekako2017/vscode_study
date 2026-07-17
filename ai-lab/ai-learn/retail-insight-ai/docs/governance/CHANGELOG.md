@@ -1,5 +1,27 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 — ERIP V1.0 文档最终更新 / 面试材料合并 / 全库一致性
+
+### 变更
+- 统一面试权威材料索引（handbook README）
+- 校正 INTERVIEW_GUIDE、PROJECT_BIBLE、handbook 04-12、历史 Volume 指引
+- 对齐验收数字与 Alembic head：`297/6`、`286/62`、`116/116`、`20260717_08_ai_runtime`
+- 更新 README / ROADMAP / ARCHITECTURE / DEPLOYMENT_GUIDE / DATABASE / VERIFY / 学习入口
+- 学习系列标题与过时 head 批处理；notebook 增加历史说明（未删除）
+
+### 影响文件（文档）
+- `docs/ai-agent-retail-handbook-v3/*`（面试与 handbook 入口）
+- `README.md`、`ROADMAP.md`、`TASK.md`
+- `docs/architecture/ARCHITECTURE.md`
+- `docs/development/DEPLOYMENT_GUIDE.md`、`docs/database/DATABASE.md`、`VERIFY_CHECKLIST.md`
+- `docs/learning/**`（入口与系列标题/数字）
+- `docs/governance/PROJECT_BACKLOG.md`、`docs/governance/CHANGELOG.md`
+
+### 未变更
+- 业务代码、测试、Docker、Migration、脚本、数据库、`.env`
+- 未 git commit / push
+
+
 ## 2026-07-17 纠正本地开发数据库：WSL 宿主 PostgreSQL
 
 - `scripts/start_local.sh`：**移除全部 Docker 运行时依赖**（不再 `docker start erip-local-pg` / compose）；Docker Desktop 关闭时仍可走宿主路径

@@ -86,7 +86,7 @@ Browser 实时接收
 
 ---
 
-# 二、SSE 在 Retail Insight AI 中的作用
+# 二、SSE 在 ERIP 中的作用
 
 整个 AI Workflow：
 
@@ -500,7 +500,7 @@ publish()
 
 # 十二、当前源码实现（Current）
 
-Retail Insight AI 当前已经实现：
+ERIP 当前已经实现：
 
 ✅ EventPublisher
 
@@ -789,7 +789,7 @@ Browser
 Dashboard
 ```
 
-SSE 是整个 Retail Insight AI 的实时通知机制。
+SSE 是整个 ERIP 的实时通知机制。
 
 Workflow 不直接操作前端，
 

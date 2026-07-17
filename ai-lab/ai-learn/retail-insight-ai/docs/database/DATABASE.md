@@ -28,14 +28,14 @@
 | **本地完整开发** | **WSL 宿主 PostgreSQL** 库 **`erip_local`**（Unix socket `/var/run/postgresql` 或本机 **:5432**；**不依赖 Docker**） |
 | **Docker Compose** | Compose PostgreSQL 库默认 **`erip`** + Volume **`erip_postgres_data`**（宿主端口默认 **:5432**；与宿主冲突时 `POSTGRES_PORT=5433`） |
 | **自动测试** | **`erip_integration_test`**（**严禁**当页面开发库） |
-| **InMemory** | 仅 unittest / 教学；**不是**页面正式运行模式 |
+| **InMemory** | 仅 unittest / 故障隔离；**不是**页面正式运行模式 |
 
 | 数据库 | 用途 | 页面入口 | 是否正式页面数据 |
 |---|---|---|---|
 | 本地 `erip_local`（**WSL 宿主 PostgreSQL**） | 本地 Backend + Vite（`./scripts/start_local.sh`） | **5173** | **是** |
 | Docker Compose `erip`（volume **`erip_postgres_data`**） | Compose 验收/演示（`./scripts/compose_up.sh`） | **8080** | **是** |
 | `erip_integration_test` | 自动化测试 | 无 | **否** |
-| InMemory | unittest / 教学 | 无正式页面 | **否** |
+| InMemory | unittest / 故障隔离 | 无正式页面 | **否** |
 
 **说明（冻结）：**
 
@@ -821,7 +821,7 @@ Task/Report 生成
   → 20260717_04_enterprise_approval
   → 20260717_05_llm_cost_governance
   → 20260717_06_dual_route_llm
-  → 20260717_07_fallback_chain
+  → 20260717_08_ai_runtime
   → 20260717_08_ai_runtime   ← head
 ```
 

@@ -28,7 +28,7 @@
 
 阅读本章后，你应该能够回答：
 
-- Retail Insight AI 的 AI Engine 是什么？
+- ERIP 的 AI Engine 是什么？
 - AI Engine 与 Web API 的关系？
 - AI Engine 包含哪些模块？
 - AI Engine 如何执行一次完整分析？
@@ -58,7 +58,7 @@ AI Engine 是：
 
 ---
 
-# 二、Retail Insight AI 当前 AI Engine
+# 二、ERIP 当前 AI Engine
 
 整个 AI 调用链：
 

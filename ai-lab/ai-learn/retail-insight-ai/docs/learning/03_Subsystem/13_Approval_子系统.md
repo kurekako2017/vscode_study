@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Part 02：子系统架构
 
@@ -379,7 +379,7 @@ Completed
 
 # 十、项目当前实现（Current Implementation）⭐
 
-Retail Insight AI 当前已经实现：
+ERIP 当前已经实现：
 
 - Approval API
 - Approval 管理

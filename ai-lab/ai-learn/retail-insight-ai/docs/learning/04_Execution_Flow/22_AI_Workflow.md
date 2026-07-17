@@ -37,7 +37,7 @@
 
 # 一、AI Workflow 是什么？
 
-AI Workflow 是整个 Retail Insight AI 的核心。
+AI Workflow 是整个 ERIP 的核心。
 
 它负责组织 AI 的完整执行流程。
 
@@ -165,7 +165,7 @@ Next Node
 State Update
 ```
 
-Retail Insight AI 当前采用的执行思想与 LangGraph 一致：
+ERIP 当前采用的执行思想与 LangGraph 一致：
 
 ```text
 Task State
@@ -465,7 +465,7 @@ Report
 
 # 十二、当前源码实现（Current）
 
-Retail Insight AI 当前已经实现：
+ERIP 当前已经实现：
 
 - AnalysisWorkflow
 - stream()
@@ -710,7 +710,7 @@ EventPublisher
 SSE
 ```
 
-AnalysisWorkflow 是整个 Retail Insight AI 的执行引擎。
+AnalysisWorkflow 是整个 ERIP 的执行引擎。
 
 它负责组织 AI Workflow，驱动所有分析节点，并通过 Repository 和 EventPublisher 将结果保存并实时通知前端。
 

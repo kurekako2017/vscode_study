@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
@@ -31,7 +31,7 @@
 - Embedding 是什么？
 - Cosine Similarity 如何工作？
 - 为什么企业 AI 使用 pgvector？
-- Retail Insight AI 如何实现向量检索？
+- ERIP 如何实现向量检索？
 
 ---
 

@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -104,7 +104,7 @@ Docker Container
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 目前项目已经提供：
 

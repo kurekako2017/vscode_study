@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -30,7 +30,7 @@
 - 什么是 Scalability（可扩展性）？
 - 为什么 AI Workflow 不能只依赖一台服务器？
 - Redis、RabbitMQ、Worker 分别负责什么？
-- Retail Insight AI 如何演进为企业 AI 平台？
+- ERIP 如何演进为企业 AI 平台？
 - 什么是 Horizontal Scaling？
 
 ---
@@ -84,7 +84,7 @@ AI Workflow 与普通 CRUD 最大的区别在于：
 
 ---
 
-# 三、Retail Insight AI 当前架构（Current）
+# 三、ERIP 当前架构（Current）
 
 目前：
 

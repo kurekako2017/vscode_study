@@ -1,5 +1,10 @@
 # 代码学习指南
 
+
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
+
 这份指南面向第一次阅读 `React`、`FastAPI` 和 `LangGraph` 项目的学习者。建议先把后端和前端都运行起来，再按本文顺序阅读；每读到一个步骤，就在页面或日志中观察它的实际效果。
 
 > 路径说明：下文路径都相对于 `retail-insight-ai/`。如果你在别处看到类似 `api/routes/tasks.py` 的写法，在本项目中对应的是 `backend/app/api/tasks.py`。
@@ -87,7 +92,7 @@ React
 
 一句话记忆：**HTTP 创建任务，Workflow 做分析，SSE 报进度，HTTP 再取报告。**
 
-当前默认学习路径仍使用进程内 InMemory 与本地样例输入，且默认 `LLM_PROVIDER_MODE=stub`（不产生真实 LLM 费用）。**V1.0** 同时具备 PostgreSQL/pgvector 企业验收路径（Alembic `20260717_07_fallback_chain`）、JWT 登录、`/users/me` 真实身份、冻结 RBAC、Persistent Audit、LLM Gateway 与 Ledger。Redis/RabbitMQ 不是本仓默认可运行依赖。
+当前默认学习路径仍使用进程内 InMemory 与本地样例输入，且默认 `LLM_PROVIDER_MODE=stub`（不产生真实 LLM 费用）。**V1.0** 同时具备 PostgreSQL/pgvector 企业验收路径（Alembic `20260717_08_ai_runtime`）、JWT 登录、`/users/me` 真实身份、冻结 RBAC、Persistent Audit、LLM Gateway 与 Ledger。Redis/RabbitMQ 不是本仓默认可运行依赖。
 
 安全读模型：`users/me` / roles / permissions / audit-logs 已与 JWT 身份和 Persistent Audit 对齐（详见 `ARCHITECTURE.md` 与 `frontend` Auth 链）。
 

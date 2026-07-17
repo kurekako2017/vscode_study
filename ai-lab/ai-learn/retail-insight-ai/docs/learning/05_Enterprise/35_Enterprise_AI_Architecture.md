@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -28,7 +28,7 @@
 阅读本章后，你应该能够回答：
 
 - 什么是 Enterprise AI Platform？
-- Retail Insight AI 如何演进为企业 AI 平台？
+- ERIP 如何演进为企业 AI 平台？
 - LangChain 与 LangGraph 分别负责什么？
 - 为什么需要 RAG？
 - pgvector、MCP、Multi-Agent 在企业中的定位是什么？
@@ -78,7 +78,7 @@ AI 只是其中一个能力。
 
 ---
 
-# 二、Retail Insight AI 当前架构（Current）
+# 二、ERIP 当前架构（Current）
 
 当前项目：
 
@@ -599,7 +599,7 @@ Enterprise AI Platform。
 
 什么是 Enterprise AI Platform？
 
-Enterprise AI Platform 不只是调用大模型，而是围绕 AI 建立完整的平台能力，包括 Workflow、RAG、权限管理、审批、知识库、向量检索、事件驱动和可观测性。Retail Insight AI 当前已经具备 Workflow、Repository、EventPublisher 等基础能力，未来可以逐步引入 LangChain、LangGraph、pgvector、MCP 和 Multi-Agent，演进为完整的企业 AI 平台。
+Enterprise AI Platform 不只是调用大模型，而是围绕 AI 建立完整的平台能力，包括 Workflow、RAG、权限管理、审批、知识库、向量检索、事件驱动和可观测性。ERIP 当前已经具备 Workflow、Repository、EventPublisher 等基础能力，未来可以逐步引入 LangChain、LangGraph、pgvector、MCP 和 Multi-Agent，演进为完整的企业 AI 平台。
 
 ---
 

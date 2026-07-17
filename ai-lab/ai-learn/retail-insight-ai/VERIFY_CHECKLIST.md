@@ -233,7 +233,7 @@ export LLM_PROVIDER_MODE=stub
 
 预想结果（V1.0 基线）：
 
-- **281 tests**，**2 skipped**（real LLM smoke 默认 skip）
+- **297 tests**，**2 skipped**（real LLM smoke 默认 skip）
 - 无随机 401（JWT leeway 已覆盖时钟回拨）
 - 专用库名必须是 `erip_integration_test`
 - 服务健康检查：`status=ok` 且 `repository_backend=postgres`
@@ -263,7 +263,7 @@ docker compose config >/dev/null
 - `GET http://127.0.0.1:8000/health` → `status=ok` 且 **`repository_backend=postgres`**
 - `GET http://127.0.0.1:8080/` → 200
 - SPA 路由 `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` → 200（非 404）
-- Alembic current → `20260717_07_fallback_chain (head)`
+- Alembic current → `20260717_08_ai_runtime (head)`
 - 默认 `LLM_PROVIDER_MODE=stub`
 
 ## 16. Stub API E2E（零真实 LLM）
@@ -335,10 +335,10 @@ cd .. && git diff --check
 
 | 项 | 基线 |
 |---|---|
-| Backend PostgreSQL（正式） | 281 tests / 2 skipped |
+| Backend PostgreSQL（正式） | 297 tests / 6 skipped |
 | Backend InMemory（辅助） | 270 tests / 52 skipped |
 | Frontend | 113 / 113 |
-| Alembic head | `20260717_07_fallback_chain` |
+| Alembic head | `20260717_08_ai_runtime` |
 | 默认 LLM | stub，零真实费用 |
 | Compose | healthy + Stub E2E + volume 保留 |
 

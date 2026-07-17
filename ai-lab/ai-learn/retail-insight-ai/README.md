@@ -35,9 +35,12 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 → Persistent Audit / Usage Ledger
 ```
 
-**Repository 定位**：PostgreSQL 是 V1.0 **正式运行与业务验收**的权威存储；Docker Compose **默认且必须**使用 PostgreSQL。InMemory **仅**快速单元测试/教学/故障隔离，**不是**正式业务验收结果，也**不会**补齐 PostgreSQL 企业能力（代码保留，未删除）。
+**Repository 定位**：PostgreSQL 是 V1.0 **正式运行与业务验收**的权威存储；Docker Compose **默认且必须**使用 PostgreSQL。InMemory **仅**自动化单元测试适配器/故障隔离，**不是**正式页面、企业验收或生产 Repository（代码保留，未删除）。
 
-权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`（顶部入口 + Appendix M/N）；`VERIFY_CHECKLIST.md`。
+**验收基线**：PG **297 tests / 6 skipped** · InMemory **286 / 62 skipped** · Frontend **116/116** · Alembic **`20260717_08_ai_runtime`** · 默认 LLM **stub** · 本地完整开发 **5173** · Compose **8080**。
+
+权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`（顶部入口 + Appendix M/N）；`docs/development/DEPLOYMENT_GUIDE.md`；`VERIFY_CHECKLIST.md`。  
+权威面试材料：`docs/ai-agent-retail-handbook-v3/README.md` 的「面试材料权威合并索引」。
 **部署分层（本地 / Compose / 生产差距）权威入口：** [`docs/development/DEPLOYMENT_GUIDE.md`](docs/development/DEPLOYMENT_GUIDE.md)。
 自动化基线：以 `TASK.md` / `docs/governance/CHANGELOG.md` 最近验收数字为准（Alembic head **`20260717_08_ai_runtime`**）。
 
@@ -74,7 +77,7 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 | Workflow | Runtime Architecture | LangGraph Workflow、Fixed KPI Workflow、Research Agent、Report 主链路可用 |
 | Repository Pattern | Runtime Architecture | **PostgreSQL = 正式权威**；InMemory = 快速测试/教学适配器（不补企业能力、不作业务验收） |
 | LLM | V1.0 成本治理 | 默认 `LLM_PROVIDER_MODE=stub`；LLM Gateway、Evidence Gate、low_cost/high_quality、Fallback Chain、Ledger 已落地；真实付费 smoke 仅 opt-in |
-| PostgreSQL / pgvector | **正式运行与验收** | Compose 默认且必须；持久化 Audit/Approval/Ledger/ReportVersion；Alembic head `20260717_07_fallback_chain` |
+| PostgreSQL / pgvector | **正式运行与验收** | Compose 默认且必须；持久化 Audit/Approval/Ledger/ReportVersion；Alembic head `20260717_08_ai_runtime` |
 | RBAC / JWT | Production Architecture | JWT 登录、`/users/me`、冻结 Permission、401/403 fail-closed |
 | Audit Log | Production Architecture | Persistent Audit（PostgreSQL）+ request_id；禁止落 Token/Key/全文 Prompt |
 | Redis / RabbitMQ / OpenTelemetry / Kubernetes | 规划 / 非 V1.0 默认交付 | **未**作为本仓库默认可运行完成项；勿写成已交付 |
@@ -94,7 +97,7 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 
 - 默认验收使用 stub LLM（零真实费用）；OpenRouter 等真实调用仅 opt-in，**真实付费 smoke 非默认**。
 - **PostgreSQL/pgvector 为正式运行与业务验收权威**；Docker Compose 默认且必须走 PostgreSQL。
-- InMemory 仅快速单元测试/教学；本地脚本若默认 InMemory，只为兼容快速学习——正式请 `REPOSITORY_BACKEND=postgres` 或 Compose。
+- InMemory 仅自动化单元测试适配器；本地脚本若默认 InMemory，只为兼容快速学习——正式请 `REPOSITORY_BACKEND=postgres` 或 Compose。
 - JWT + RBAC + ProtectedRoute + Persistent Audit + LLM Gateway/Ledger/Fallback 已交付。
 - Docker Compose + Alembic + Stub API E2E 已落地；`compose_down` 禁止 `-v` 作为日常验收。
 - **未**把 Redis / RabbitMQ / OpenTelemetry / Kubernetes / MCP / Billing UI / 多租户预算台 / SIEM·WORM·Streaming / DeepSeek 默认启用写成已完成。

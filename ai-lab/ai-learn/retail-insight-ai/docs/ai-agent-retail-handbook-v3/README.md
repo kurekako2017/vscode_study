@@ -1,6 +1,8 @@
-# Retail Insight AI Handbook V3
+# Enterprise Retail Intelligence Platform (ERIP) Handbook V3
 
-本目录是 Retail Insight AI 的长期知识库、长期学习中心、长期面试中心和长期总结区。
+本目录是 **Enterprise Retail Intelligence Platform（ERIP）V1.0** 的长期知识库、面试中心与复盘区。
+
+> 历史名称：Retail Insight AI（仅作早期 MVP 说明，不作当前项目名）。
 
 项目简介、当前完成情况、完整 Markdown 导航和文档治理规则统一维护在主项目 [README.md](../../README.md)。handbook 不重复维护项目介绍，避免主入口和长期知识库出现两套口径。
 
@@ -58,6 +60,36 @@ INTERVIEW_GUIDE.md
 
 面试准备时，先用主项目 README 确认当前实现边界，再用 handbook 训练日语表达和现场讲解。
 
+## 面试材料权威合并索引（V1.0）
+
+以下为**当前权威面试材料**（勿与旧文件混用）：
+
+| 优先级 | 文件 | 用途 |
+|---|---|---|
+| 1 | `01_日本AI项目实战.md` | 业务主链、架构、担当、追问 |
+| 2 | `02_日本AI现场面试.md` | 自介、深掘、压迫面试 |
+| 3 | `03_AI核心知识.md` | 技术知识点表 + **真实版本** |
+| 4 | `07_面试口头训练.md` | 开口训练 |
+| 5 | `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md` | 中日双语 Volume01 |
+| 6 | `INTERVIEW_GUIDE.md` | 讲解稿（口径与上表一致） |
+
+**已并入 / 不再作为当前口径：**
+
+| 文件 | 处理 |
+|---|---|
+| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **历史稿**；文首已指向 ERIP Volume01，不删除 |
+
+**统一业务主链：**
+
+```text
+登录/JWT/RBAC → 文書 Upload/Import/Chunk → RAG/Citation
+→ 显式 AI分析(low_cost) → 取締役会报告(high_quality)
+→ ReportVersion → Approval → Persistent Audit → LLM Usage Ledger
+```
+
+**统一基线：** PG **297/6 skip** · InMemory **286/62 skip** · FE **116/116** · Alembic **`20260717_08_ai_runtime`** · 默认 LLM **stub** · 正式 Repository **PostgreSQL** · 本地 **5173** / Compose **8080**。
+
+
 ## 知识路线
 
 ```text
@@ -94,6 +126,8 @@ PROJECT_BIBLE.md
 - [11_Project_Structure.md](11_Project_Structure.md)
 - [12_ADR.md](12_ADR.md)
 - [INTERVIEW_GUIDE.md](INTERVIEW_GUIDE.md)
+- [Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md](Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md)
+- [Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md](Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md)（历史稿）
 
 ## 技术规范引用
 
@@ -130,7 +164,8 @@ PROJECT_BIBLE.md
 
 ## 更新日志
 
-- V3: 建立 Retail Insight AI 统一世界观和一本书结构。
+- V3: 建立 handbook 统一世界观和一本书结构。
+- V1.0 Final Doc Pass (2026-07-17): 统一 ERIP 名称、面试材料合并索引、版本表与验收数字。
 - Governance V2: handbook README 调整为长期知识库入口，不重复维护主项目介绍。
 - Governance V2 Final: handbook 技术规范镜像改为引用主 `docs/`，旧镜像移动到归档候选区。
 

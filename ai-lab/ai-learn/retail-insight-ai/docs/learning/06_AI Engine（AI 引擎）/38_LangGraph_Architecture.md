@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
@@ -31,7 +31,7 @@
 - 什么是 State Graph？
 - 什么是 Node？
 - 什么是 Edge？
-- Retail Insight AI 的 AnalysisWorkflow 如何对应 LangGraph？
+- ERIP 的 AnalysisWorkflow 如何对应 LangGraph？
 - 为什么企业 AI 都喜欢 Workflow？
 
 ---
@@ -202,7 +202,7 @@ Node。
 
 ---
 
-# 四、Retail Insight AI 当前实现（Current）
+# 四、ERIP 当前实现（Current）
 
 当前：
 
@@ -841,7 +841,7 @@ Node
 完成业务
 ```
 
-LangGraph 的核心价值不是调用 LLM，而是**将复杂 AI Workflow 拆分为多个可维护、可扩展的节点，由 Graph 统一调度执行**。Retail Insight AI 当前的 `AnalysisWorkflow` 已经体现了这种设计思想，为未来接入 LangGraph 的高级能力（Conditional Edge、SubGraph、Multi-Agent）奠定了基础。
+LangGraph 的核心价值不是调用 LLM，而是**将复杂 AI Workflow 拆分为多个可维护、可扩展的节点，由 Graph 统一调度执行**。ERIP 当前的 `AnalysisWorkflow` 已经体现了这种设计思想，为未来接入 LangGraph 的高级能力（Conditional Edge、SubGraph、Multi-Agent）奠定了基础。
 
 ---
 

@@ -1,8 +1,20 @@
-# Retail Insight AI 日本 Agent 面试攻略 V1.0
-## Volume 01 - 项目介绍与系统架构（中日双语版）
+# 【历史稿 / 非当前权威】Retail Insight AI 日本 Agent 面试攻略 Volume01
 
-> 适用对象：日本 AI Agent / Python Backend / LLM Application / RAG 工程师岗位
-> 用法：先读中文理解，再背日文回答。面试时优先使用日文回答，中文只作为自己的理解辅助。
+> **状态：历史稿（保留不删除）**  
+> **当前项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> **当前权威面试材料请改用：**
+>
+> 1. `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+> 2. `01_日本AI项目实战.md`
+> 3. `02_日本AI现场面试.md`
+> 4. `03_AI核心知识.md`（含真实技术版本表）
+> 5. `07_面试口头训练.md`
+> 6. `INTERVIEW_GUIDE.md`
+>
+> **当前基线（勿用下文旧数字）：**  
+> PostgreSQL **297/6 skip** · InMemory **286/62 skip** · Frontend **116/116** · Alembic **`20260717_08_ai_runtime`** · 默认 LLM **stub** · 正式 Repository **PostgreSQL** · InMemory **仅 unittest** · 本地 **5173** / Compose **8080**  
+>
+> 下文正文保留供对照历史演进；**面试背诵以 ERIP 权威五份+INTERVIEW_GUIDE 为准**。
 
 ---
 
@@ -414,7 +426,7 @@ Keyword Retrieval を中心に構成しつつ、LangChain、Embedding、pgvector
 # 14. ERIP V1.0 正式交付増補（增量，不删除前文）
 
 > 前文的 FastAPI / LangGraph / RAG 原问答**全部保留**。本章按当前仓库交付能力校正口径。
-> 数字：PostgreSQL **281 tests / 2 skipped**；InMemory **270 / 52 skipped**；Frontend **113/113**；Alembic **`20260717_07_fallback_chain`**。
+> 数字：PostgreSQL **297 tests / 6 skipped**；InMemory **286 / 62 skipped**；Frontend **116/116**；Alembic **`20260717_08_ai_runtime`**。
 
 ## 14.1 30 秒 / 2 分钟 / 5 分钟（中日）
 
@@ -439,14 +451,14 @@ JWT/RBAC，文档与 RAG，LLM 双路由与审批审计，Compose 验收齐备�
 通常 RAG は引用可能で既定 LLM 不要。AI 分析は low_cost、取締役会報告は high_quality。
 Evidence Gate、Idempotency-Key、Decimal、Ledger で費用を統治します。
 Fallback は OpenRouter→NVIDIA→Gemini→Local Qwen。Approval は 403/200 と ReportVersion。
-Compose+Alembic+Stub E2E。テスト 281/270/113。有料 smoke と Billing UI は既定外です。
+Compose+Alembic+Stub E2E。テスト 297/670/113。有料 smoke と Billing UI は既定外です。
 ```
 
 ### 2 分钟 中文
 
 ```text
 主链到审批。普通 RAG 默认可零 LLM；AI/董事会报告经 Gateway 与 Ledger。
-Fallback 固定串行。Compose 验收。数字 281/270/113。未完成项不夸大。
+Fallback 固定串行。Compose 验收。数字 297/670/113。未完成项不夸大。
 ```
 
 ### 5 分钟架构 日文要点
@@ -490,9 +502,9 @@ Fallback 固定串行。Compose 验收。数字 281/270/113。未完成项不夸
 - Approval 状态机、ReportVersion、History
 - Persistent Audit、Ledger、Gateway、双路由、Fallback
 - 普通 RAG 默认零真实 LLM
-- Docker Compose、Alembic head `20260717_07_fallback_chain`、Stub E2E
+- Docker Compose、Alembic head `20260717_08_ai_runtime`、Stub E2E
 - Lifecycle Live Status、Learning Dashboard
-- 测试：281/2、270/52、113/113
+- 测试：297/6、286/62、116/116
 
 **未完成（必须诚实）**
 
@@ -509,7 +521,7 @@ Fallback 固定串行。Compose 验收。数字 281/270/113。未完成项不夸
 **日文回答**
 
 ```text
-学習は InMemory、企業受入は PostgreSQL で契約一致を証明します。
+正式は PostgreSQL；InMemory はユニットテスト用アダプタ で契約一致を証明します。
 （根拠：repository switch）
 ```
 
@@ -765,7 +777,7 @@ Token、Key、全文 Prompt。
 **日文回答**
 
 ```text
-20260717_07_fallback_chain。
+20260717_08_ai_runtime。
 （根拠：migrations）
 ```
 
@@ -781,7 +793,7 @@ Token、Key、全文 Prompt。
 **日文回答**
 
 ```text
-281/2、270/52、113。
+297/6、286/62、113。
 （根拠：TEST_CASES）
 ```
 

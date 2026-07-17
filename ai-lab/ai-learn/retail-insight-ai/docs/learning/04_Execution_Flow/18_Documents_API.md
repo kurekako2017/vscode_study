@@ -407,7 +407,7 @@ Document。
 
 # 十一、项目当前实现（Current Implementation）
 
-Retail Insight AI 当前：
+ERIP 当前：
 
 已经实现：
 

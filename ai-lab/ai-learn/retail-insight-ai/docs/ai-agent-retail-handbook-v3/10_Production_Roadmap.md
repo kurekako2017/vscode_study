@@ -1,5 +1,10 @@
 # 10_Production_Roadmap
 
+> **说明**：标题保留 “Production Roadmap”，但 **JWT/RBAC、Approval API、PostgreSQL、正式 Frontend、Compose 已是 V1.0 已交付**。  
+> 本节“后续”应理解为 Billing UI / SIEM / 多租户预算 / 真实付费 smoke 默认化等强化，而不是“平台尚未存在”。  
+> 基线：PG **297/6** · IM **286/62** · FE **116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
+
+
 # 目录
 
 - [1. Roadmap 原则](#1-roadmap-原则)
@@ -451,7 +456,7 @@ Roadmap 每季度 Review 一次。任何升级项都必须明确 Owner、业务�
 - peers:
 - `retail-insight-ai/ROADMAP.md` | sha256=5bf39c8dbde1e5279088478951af2f3c02a4506bcbf3682403b3e45a02846cae | # retail-insight-ai Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `retail-insight-ai/TASK.md` | sha256=83a6ef1d9395a1c0026514c5d8fab074fb8428781ab712ad25764c1c82decc05 | # retail-insight-ai 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / Phase 2: Internal Knowledge Approval Agent
-- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `Retail Insight AI` 仅表示该目标平台的 Current MVP，包含：
+- `retail-insight-ai/docs/PROJECT_BACKLOG.md` | sha256=b1dd8a6cee6a7fc07965026b8aefe8c9c8f08669871abd5ce2b8eb3dc1d5d477 | # retail-insight-ai Project Backlog / 最后更新：2026-07-08 / ## 项目目标 / 构建 `Enterprise Retail Intelligence Platform (ERIP)` 的目标平台蓝图；当前仓库中的 `ERIP` 仅表示该目标平台的 Current MVP，包含：
 - `retail-insight-ai/docs/CHANGELOG.md` | sha256=cf9c2939e3369aa13c65a636fb64c44d56b672866b23771cf1dda5f1dbe755b3 | # retail-insight-ai CHANGELOG / ## 2026-07-02 / - 建立 retail-insight-ai 与 ai-agent-retail-handbook-v3 的跨项目文档同步机制。 / - 新增 `../scripts/sync_retail_handbook_docs.py` 与 `../doc-sync.manifest.json`。
 - `ai-agent-retail-handbook-v3/ROADMAP.md` | sha256=8bea54fca33668303cb3ebc6a86e9fb359d814605450746eb7575075bc4600cf | # ai-agent-retail-handbook-v3 Roadmap / 最后更新：2026-06-29 / ## 当前阶段 / 待根据项目现状确认。
 - `ai-agent-retail-handbook-v3/TASK.md` | sha256=8375c8be41775af3f492dbc66e69653096db6bcdc4838d411eacf72cd81d5c82 | # 当前任务 / 最后更新：2026-07-02 / ## 当前阶段 / 待确认

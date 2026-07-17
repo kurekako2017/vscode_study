@@ -1,5 +1,20 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 ERIP V1.0 文档最终更新 / 面试材料合并 / 全库一致性（本轮）
+
+- [x] 保护工作区：确认无覆盖未提交修改；本轮仅文档
+- [x] 面试权威材料索引合并（handbook README）
+- [x] 校正 INTERVIEW_GUIDE / PROJECT_BIBLE / 04-12 / 历史 Volume 指引
+- [x] 补齐/对齐验收数字：PG 297/6、IM 286/62、FE 116、head `20260717_08_ai_runtime`
+- [x] 入口文档 README / ROADMAP / ARCHITECTURE / DEPLOYMENT / DATABASE / VERIFY 一致性
+- [x] 学习文档标题与过时 head 数字批处理；notebook 加历史说明
+- [ ] **用户检查后自行 commit**（本轮禁止 git commit/push）
+- [x] 未改代码/测试/Docker/Migration/脚本/数据库/`.env`；未真实 LLM；未删文件；未 down -v
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 纠正 ERIP 本地开发数据库配置（本轮）
 
 - [x] 只读检查 WSL 宿主 PostgreSQL（psql 16.14；cluster 16/main **down**；5432 被 Compose 占用；pgvector 包已装）

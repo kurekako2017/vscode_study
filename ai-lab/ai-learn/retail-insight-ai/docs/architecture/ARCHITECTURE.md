@@ -5,7 +5,7 @@
 
 > 本节为 **2026-07-17 现状摘要**。下文历史章节保留；冲突时以本节 + 源码为准。
 > 业务链：`文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Persistent Audit`
-> 数字：PG **281/2 skip**，InMemory **270/52 skip**，Frontend **113/113**，Alembic **`20260717_07_fallback_chain`**。
+> 数字：PG **297/6 skip**，InMemory **286/62 skip**，Frontend **116/116**，Alembic **`20260717_08_ai_runtime`**。
 > 详细命令不复制：见 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix L/M/N。
 
 ```text
@@ -17,19 +17,25 @@ React (JWT / ProtectedRoute / RBAC UI / Learning Dashboard / Lifecycle Live Stat
   → Approval state machine (owner / History / 403·409)
   → Persistent Audit + request_id
   → **PostgreSQL/pgvector（正式运行与业务验收权威）**
-  → InMemory（仅快速单元测试/教学适配器，不作业务验收）
+  → InMemory（仅自动化单元测试适配器 / 故障隔离，不作业务验收）
+  → AI Runtime：`ai_runtime_settings`（默认 stub）
 ```
 
 ### Repository 最终定位（V1.0）
 
 - PostgreSQL 是正式运行、企业验收、数据持久化的权威 Repository；Docker Compose **默认且必须** PostgreSQL。
 - 最终业务链、人工验收、Stub E2E、Audit、Approval、Ledger、ReportVersion **均以 PostgreSQL 为准**。
-- InMemory **仅**快速单元测试、教学与故障隔离；**不**作为正式业务验收；**不**继续补齐 PostgreSQL 企业能力；**不**删除 InMemory 代码。
+- InMemory **仅**自动化单元测试适配器与故障隔离；**不**作为正式业务验收；**不**继续补齐 PostgreSQL 企业能力；**不**删除 InMemory 代码。
 - 本地脚本若默认 InMemory，仅为兼容快速学习；正式请 `REPOSITORY_BACKEND=postgres` 或 Compose。
 
 **已交付**：JWT/RBAC、双路由 LLM 治理、Fallback Chain（OpenRouter→NVIDIA→Gemini→Local Qwen）、Compose+Alembic+Stub E2E、普通 RAG 默认可零真实 LLM。
 **未交付（勿夸大）**：真实付费 smoke 默认化、Billing/多租户预算 UI、SIEM/WORM/Streaming、DeepSeek 默认启用、Redis/RabbitMQ/K8s 作为本仓默认可运行栈。
 
+
+## 历史章节阅读规则（V1.0）
+
+下文大量 Sprint / Current State / Target State 记录**保留为演进历史**，不得删除。  
+若出现「没有 JWT」「Approval 无 API」「无 PostgreSQL」「Frontend 未实现」等与 V1.0 摘要冲突的句子，**一律以文首 ERIP V1.0 交付架构摘要 + 源码为准**。
 
 ## 2026-07-17 显式 AI Analysis 成本边界
 
@@ -47,7 +53,7 @@ State owner：PostgreSQL 持有 usage/quota/result/audit 事实；React 只持�
 
 最后更新：2026-07-17
 
-本文件记录 `Enterprise Retail Intelligence Platform (ERIP)` 的统一架构口径。当前仓库中的 `Retail Insight AI` 只表示 ERIP 的 Current MVP；未实现的能力必须明确标注，不得把规划写成现状。
+本文件记录 `Enterprise Retail Intelligence Platform (ERIP)` 的统一架构口径。历史名称 `Retail Insight AI` 仅表示 ERIP 早期 MVP 名称（不作当前项目名）；未实现的能力必须明确标注，不得把规划写成现状。
 
 Human-readable architecture explanations are trilingual by default.
 本文件中的人类可读架构说明默认采用三语。
@@ -125,20 +131,20 @@ flowchart LR
 ### Current State
 
 - English: the Retail Insight AI MVP backend is verified for document lifecycle, document retrieval, internal RAG without LLM, LLM provider stub seam, approval workflow, approval-scope RBAC, approval-scope audit middleware, security domain, and in-memory audit log
-- 中文（简体）：当前 `Retail Insight AI` MVP 后端已验证文档生命周期、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批范围内的 RBAC、审批范围内的审计中间件、安全域和 InMemory 审计日志
-- 日本語：現在の `Retail Insight AI` MVP バックエンドでは、ドキュメントライフサイクル、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認範囲の RBAC、承認範囲の監査ミドルウェア、セキュリティドメイン、InMemory 監査ログまで検証済みです
+- 中文（简体）：当前 ERIP V1.0 后端已验证文档生命周期、文档检索、无 LLM 的内部 RAG、LLM Provider Stub 接缝、审批工作流、审批范围内的 RBAC、审批范围内的审计中间件、安全域和 InMemory 审计日志
+- 日本語：現在の ERIP V1.0 バックエンドでは、ドキュメントライフサイクル、ドキュメント検索、LLM なしの内部 RAG、LLM Provider Stub の接続点、承認ワークフロー、承認範囲の RBAC、承認範囲の監査ミドルウェア、セキュリティドメイン、InMemory 監査ログまで検証済みです
 
 ### Target State
 
 - English: keep the Retail Insight AI MVP stable while future ERIP phases intentionally add frontend UI, PostgreSQL, pgvector, hybrid retrieval, full-platform RBAC, audit persistence, OpenTelemetry, Redis, RabbitMQ, MCP, and production deployment
-- 中文（简体）：在保持 `Retail Insight AI` MVP 稳定的前提下，后续 ERIP 阶段再有计划地加入前端 UI、PostgreSQL、pgvector、Hybrid Retrieval、全平台 RBAC、持久化 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP 和生产部署
-- 日本語：`Retail Insight AI` MVP を安定させたまま、今後の ERIP 段階で frontend UI、PostgreSQL、pgvector、Hybrid Retrieval、全体 RBAC、永続 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP、本番デプロイを計画的に追加します
+- 中文（简体）：在保持 ERIP V1.0 稳定的前提下，后续 ERIP 阶段再有计划地加入前端 UI、PostgreSQL、pgvector、Hybrid Retrieval、全平台 RBAC、持久化 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP 和生产部署
+- 日本語：ERIP V1.0 を安定させたまま、今後の ERIP 段階で frontend UI、PostgreSQL、pgvector、Hybrid Retrieval、全体 RBAC、永続 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP、本番デプロイを計画的に追加します
 
 ### Result
 
 - English: the current Retail Insight AI MVP is runnable, learnable, and interview-ready, but ERIP as the final enterprise platform is still a target state
-- 中文（简体）：当前 `Retail Insight AI` MVP 可运行、可学习、可面试讲解，但 `ERIP` 作为最终企业平台仍然是 Target State
-- 日本語：現在の `Retail Insight AI` MVP は実行可能で、学習しやすく、面接説明にも使えますが、最終的な企業プラットフォームとしての `ERIP` はまだ Target State です
+- 中文（简体）：当前 ERIP V1.0 可运行、可学习、可面试讲解，但 `ERIP` 作为最终企业平台仍然是 Target State
+- 日本語：現在の ERIP V1.0 は実行可能で、学習しやすく、面接説明にも使えますが、最終的な企業プラットフォームとしての `ERIP` はまだ Target State です
 
 ## Epic 14 Engineering Standards Freeze
 
@@ -508,7 +514,7 @@ flowchart TD
 ### Current State
 
 - 当前已经补齐 Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource。
-- （历史记录）早期仅 InMemory Document。**V1.0**：Upload/Import/Chunk/Retrieval、pgvector Compose、PostgreSQL Repository 已交付；InMemory 学习路径仍保留。
+- （历史记录）早期仅 InMemory Document。**V1.0**：Upload/Import/Chunk/Retrieval、pgvector Compose、PostgreSQL Repository 已交付；InMemory 测试适配器仍保留。
 - `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有 `ReportStatus`。
 
 ### Target State
@@ -1543,7 +1549,7 @@ flowchart LR
 
 ### Current State
 
-项目名称保持为 `Retail Insight AI`，它是 `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP。
+项目正式名称为 `Enterprise Retail Intelligence Platform (ERIP)`；`Retail Insight AI` 仅为历史早期名称。
 
 当前项目定位：
 

@@ -1,15 +1,15 @@
 
-# Retail Insight AI 企业源码架构手册
+# Enterprise Retail Intelligence Platform (ERIP) 企业源码架构手册
 
 # 📖 READ FIRST（开始阅读前请先阅读）
 
-> Welcome to the Retail Insight AI Learning Handbook
+> Welcome to the ERIP Learning Handbook（历史名称：Retail Insight AI）
 
 ---
 
 # 为什么会有这套教材？
 
-Retail Insight AI 不只是一个 AI 项目。
+ERIP 不只是一个 AI 项目。
 
 它也是一套专门为了学习企业级 AI 系统开发而整理的源码教材。
 
@@ -17,7 +17,7 @@ Retail Insight AI 不只是一个 AI 项目。
 
 > **从"会运行"到"会理解"，最终达到"会设计"。**
 
-阅读完成后，你不仅能够理解 Retail Insight AI 的源码，还能够掌握现代企业 AI Agent 项目的设计思想。
+阅读完成后，你不仅能够理解 ERIP 的源码，还能够掌握现代企业 AI Agent 项目的设计思想。
 
 ---
 

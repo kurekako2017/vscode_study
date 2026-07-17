@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）
 
@@ -28,7 +28,7 @@
 阅读本章后，你应该能够回答：
 
 - LangChain 在企业 AI 系统中的作用是什么？
-- Retail Insight AI 如何组织 LLM 调用？
+- ERIP 如何组织 LLM 调用？
 - Prompt、LLM、Tool、Retriever 的关系是什么？
 - 为什么企业很少直接调用 OpenAI SDK？
 
@@ -65,7 +65,7 @@ response = client.chat.completions.create(...)
 
 # 二、LangChain 在 AI Engine 中的位置
 
-Retail Insight AI 的 AI Engine 可以抽象为：
+ERIP 的 AI Engine 可以抽象为：
 
 ```text
 Workflow
@@ -92,7 +92,7 @@ LangChain 主要负责：
 
 ---
 
-# 三、Current（Retail Insight AI 当前实现）
+# 三、Current（ERIP 当前实现）
 
 目前项目已经具备：
 

@@ -3,7 +3,7 @@
 这份文档用于日本项目面试场景。Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，面试说明统一基于企业正式上线项目展开，而不是把它描述成单纯的学习项目。
 
 > 更新说明（V1.0 交付口径）：下文在保留原讲解骨架的同时，按当前仓库已交付能力统一数字与边界。
-> 自动化基线：PostgreSQL **281 tests / 2 skipped**；InMemory **270 / 52 skipped**；Frontend **113/113**；Alembic head **`20260717_07_fallback_chain`**。
+> 自动化基线：PostgreSQL **297 tests / 6 skipped**；InMemory **286 / 62 skipped**；Frontend **116/116**；Alembic head **`20260717_08_ai_runtime`**。
 
 ## 项目介绍
 
@@ -46,11 +46,11 @@ Enterprise Retail Intelligence Platform（ERIP）は正式に導入された企�
 
 ### 中文
 
-「ERIP 是零售经营分析用的企业 AI 平台。前端 React，后端 FastAPI，数据可走 InMemory 学习路径或 PostgreSQL/pgvector。文档上传后经检索与引用生成分析；AI 分析必须显式确认，经 LLM Gateway 走 low_cost；董事会报告走 high_quality，再进入审批状态机。权限是 JWT+RBAC+fail-closed，并有持久审计与 Usage Ledger。默认 stub 验收，零真实 LLM 费用。」
+「ERIP 是零售经营分析用的企业 AI 平台。前端 React，后端 FastAPI，正式 Repository 为 PostgreSQL/pgvector；InMemory 仅自动化单元测试适配器。文档上传后经检索与引用生成分析；AI 分析必须显式确认，经 LLM Gateway 走 low_cost；董事会报告走 high_quality，再进入审批状态机。权限是 JWT+RBAC+fail-closed，并有持久审计与 Usage Ledger。默认 stub 验收，零真实 LLM 费用。」
 
 ### 日本語
 
-「ERIP は小売の経営分析向け企業 AI 基盤です。Frontend は React、Backend は FastAPI、データは InMemory 学習経路と PostgreSQL/pgvector を使い分けます。文書アップロード後に検索・引用し、AI 分析は明示確認のうえ LLM Gateway の low_cost、取締役会報告は high_quality、その後 Approval 状態機へ進みます。JWT・RBAC・fail-closed、永続監査と Usage Ledger を持ち、既定は stub で実 LLM 費用ゼロです。」
+「ERIP は小売の経営分析向け企業 AI 基盤です。Frontend は React、Backend は FastAPI、正式 Repository は PostgreSQL/pgvector。InMemory は自動ユニットテスト用アダプタのみ。文書アップロード後に検索・引用し、AI 分析は明示確認のうえ LLM Gateway の low_cost、取締役会報告は high_quality、その後 Approval 状態機へ進みます。JWT・RBAC・fail-closed、永続監査と Usage Ledger を持ち、既定は stub で実 LLM 費用ゼロです。」
 
 ---
 
@@ -66,7 +66,7 @@ Enterprise Retail Intelligence Platform（ERIP）は正式に導入された企�
 AI Runtime（mode/kill_switch）可经 PostgreSQL 持久化并由 admin 二次确认切换；默认 stub 零费用。
 Provider 失败时可走 OpenRouter → NVIDIA → Gemini → Local Qwen 的串行 fallback（熔断与 attempt ledger）。
 审批有 owner、History、ReportVersion 与 403/409 边界；Persistent Audit 记录 request_id 与关键动作。
-验收：InMemory 学习、PostgreSQL suite、Frontend 115、Docker Compose + Alembic + Stub E2E。
+验收：InMemory 测试、PostgreSQL suite、Frontend 116、Docker Compose + Alembic + Stub E2E。
 未默认做真实付费 smoke、Billing UI、多租户预算台、SIEM/WORM/Streaming 与 DeepSeek 启用。」
 
 ### 日本語
@@ -79,7 +79,7 @@ LLM は LLM Gateway のみ：AI 分析は low_cost、取締役会報告は high_
 AI Runtime（mode/kill_switch）は PostgreSQL に永続化し、admin が二次確認で切替。既定は stub。
 失敗時は OpenRouter → NVIDIA → Gemini → Local Qwen の直列 fallback（遮断と attempt ledger）。
 Approval は owner / History / ReportVersion、403/409。Persistent Audit が request_id と重要操作を残します。
-受入は InMemory、PostgreSQL suite、Frontend 115、Compose + Alembic + Stub E2E。
+受入は InMemory、PostgreSQL suite、Frontend 116、Compose + Alembic + Stub E2E。
 有料 smoke・Billing UI・マルチテナント予算画面・SIEM/WORM/Streaming・DeepSeek 有効化は既定範囲外です。」
 
 ---
@@ -92,12 +92,12 @@ Approval は owner / History / ReportVersion、403/409。Persistent Audit が re
 
 FastAPI 分路由：文档、检索、Internal RAG、AI Analysis、Executive Report、Approval、Audit。业务不直接碰 LLM SDK，统一走 LLM Gateway + Operation Policy + Model Router。AI 分析要求 confirmed 与证据；董事会报告必须绑定已成功分析，且不自动 submit approval。
 
-数据：默认 InMemory 方便学习；企业验收 REPOSITORY_BACKEND=postgres，Alembic head 为 20260717_07_fallback_chain，含 usage ledger、attempt、circuit 状态表。Compose 起 postgres(pgvector)/backend/frontend，entrypoint 先迁移再 uvicorn；compose_down 禁止 -v，保证持久化验收。
+数据：正式与页面验收为 PostgreSQL（REPOSITORY_BACKEND=postgres）；Alembic head 为 20260717_08_ai_runtime，含 usage ledger、attempt、circuit 状态表。Compose 起 postgres(pgvector)/backend/frontend，entrypoint 先迁移再 uvicorn；compose_down 禁止 -v，保证持久化验收。
 
 审批：submit 创建 pending_approval；employee approve 403；manager approve 200；状态写 Report 与 ReportVersion，History 追加。审计：Persistent Audit + request_id，不落 Token/Key/完整 Prompt。
 
-前端还有 React Lifecycle Live Status 与固定栏目 Learning Dashboard，只做本地学习 trace，不回传后端。
-自动化：PG 281/2 skip，InMemory 270/52 skip，Frontend 113/113，Stub E2E 覆盖三角色业务链。」
+前端还有 React Lifecycle Live Status 与固定栏目 Learning Dashboard，本地诊断 trace（不回传后端），不回传后端。
+自动化：PG 297/6 skip，InMemory 286/62 skip，Frontend 116/116，Stub E2E 覆盖三角色业务链。」
 
 ### 日本語
 
@@ -105,11 +105,11 @@ FastAPI 分路由：文档、检索、Internal RAG、AI Analysis、Executive Rep
 
 FastAPI は Document / Retrieval / Internal RAG / AI Analysis / Executive Report / Approval / Audit に分割。業務は LLM SDK を直接呼ばず LLM Gateway 経由。AI 分析は confirmed と証拠必須、取締役会報告は成功分析に紐づき自動 submit しない。
 
-データは学習用 InMemory と企業受入 PostgreSQL。Alembic head は 20260717_07_fallback_chain。Compose は pgvector / backend / frontend、起動時 Alembic、down は -v 禁止。
+正式データは PostgreSQL。InMemory はユニットテスト用。Alembic head は 20260717_08_ai_runtime。Compose は pgvector / backend / frontend、起動時 Alembic、down は -v 禁止。
 
 Approval は pending_approval → manager approve、employee は 403。ReportVersion と History を保持。Audit は request_id、Token/Key/全文 Prompt は残さない。
 
-Frontend は Lifecycle Live Status と Learning Dashboard。検証は PG 281、InMemory 270、Frontend 113、Stub E2E。」
+Frontend は Lifecycle Live Status と Learning Dashboard。検証は PG 297、InMemory 286、Frontend 116、Stub E2E。」
 
 ---
 
@@ -127,7 +127,7 @@ Frontend は Lifecycle Live Status と Learning Dashboard。検証は PG 281、I
 - Provider Chain：OpenRouter → NVIDIA → Gemini → Local Qwen（attempt ledger + circuit）
 - PostgreSQL / pgvector、Alembic、Docker Compose、Stub API E2E
 - React Lifecycle Live Status、Frontend Learning Dashboard
-- 自动化：PG **281/2 skip**，InMemory **270/52 skip**，Frontend **113/113**，head **`20260717_07_fallback_chain`**
+- 自动化：PG **297/6 skip**，InMemory **286/62 skip**，Frontend **116/116**，head **`20260717_08_ai_runtime`**
 
 ### 日本語
 
@@ -140,7 +140,7 @@ Frontend は Lifecycle Live Status と Learning Dashboard。検証は PG 281、I
 - LLM Gateway 双路由と Provider Fallback Chain
 - PostgreSQL/pgvector、Alembic、Compose、Stub E2E
 - Lifecycle Live Status、Learning Dashboard
-- 数値：PG 281/2 skip、InMemory 270/52 skip、Frontend 113、Alembic `20260717_07_fallback_chain`
+- 数値：PG 297/6 skip、InMemory 286/62 skip、Frontend 116、Alembic `20260717_08_ai_runtime`
 
 ## 我的职责
 
@@ -322,10 +322,10 @@ Login (JWT)
 | 21 | Fallback 顺序？ | OpenRouter→NVIDIA→Gemini→Local Qwen | 固定直列 | provider chain | DeepSeek 未默认启用 |
 | 22 | 普通 RAG 为何零 LLM？ | 默认可解释、零费用 | 既定ゼロ費用 | Internal RAG | INTERNAL_RAG_USE_LLM 慎开 |
 | 23 | Compose 验收？ | healthy + Alembic + Stub E2E + 无 -v | down -v 禁止 | scripts/compose_* | daemon 依赖环境 |
-| 24 | Lifecycle Live Status？ | 本地 mount/update/unmount 教学 | 学習用 | frontend lifecycle | 不回传后端 |
+| 24 | Lifecycle Live Status？ | 本地 mount/update/unmount 诊断 | 前端诊断 | frontend lifecycle | 不回传后端 |
 | 25 | Learning Dashboard？ | 固定栏目学习路径 | 固定 15 欄 | LearningSidebar | 不替代业务页 |
-| 26 | 测试数字？ | PG 281/2、IM 270/52、FE 113 | 同左 | RUNBOOK N / TEST_CASES | 日常一次 suite |
-| 27 | Alembic head？ | `20260717_07_fallback_chain` | 同左 | migrations | 禁止手改 prod |
+| 26 | 测试数字？ | PG 297/6、IM 286/62、FE 113 | 同左 | RUNBOOK N / TEST_CASES | 日常一次 suite |
+| 27 | Alembic head？ | `20260717_08_ai_runtime` | 同左 | migrations | 禁止手改 prod |
 | 28 | 最弱一环？ | 真实多租户预算与 SIEM 未产品化 | 予算 UI/SIEM 未 | 边界诚实 | 下一阶段 |
 | 29 | 如何防费用失控？ | stub 默认 + 额度 + 幂等 + 显式按钮 | stub 既定 | Gateway/Quota | 真实 smoke opt-in |
 | 30 | 与 Demo 区别？ | 权限/审计/Ledger/E2E/Compose 齐 | 統治境界あり | 全栈交付 | 可持续演进 |

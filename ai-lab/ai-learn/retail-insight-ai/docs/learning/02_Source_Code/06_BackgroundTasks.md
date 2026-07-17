@@ -1,4 +1,4 @@
-# Retail Insight AI 源码精读系列
+# ERIP 源码精读系列
 
 # 06_BackgroundTasks.md
 

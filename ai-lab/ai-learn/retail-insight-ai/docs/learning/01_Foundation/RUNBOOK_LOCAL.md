@@ -1,5 +1,10 @@
 # 启动与排错指南
 
+
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
+
 这份文档用于本地启动 Retail Insight AI，并区分 Swagger、ReDoc、OpenAPI JSON、unittest、前后端联调各自的作用。
 
 ## ERIP 的三种运行与部署方式
@@ -1405,7 +1410,7 @@ PostgreSQL 需要：
 - image build
 - `docker compose config`
 - postgres / backend / frontend healthy
-- Alembic 自动迁移到 `20260717_07_fallback_chain`
+- Alembic 自动迁移到 `20260717_08_ai_runtime`
 - Frontend History API 路由刷新 200
 - Stub E2E
 - `compose_down` **不带 `-v`**，Volume 保留后重启数据仍在
@@ -1491,7 +1496,7 @@ export E2E_EXPECT_STUB=1
 | `curl http://127.0.0.1:8000/health`                          | `status=ok`，`repository_backend=postgres`（Compose 路径）                                                   |
 | `curl -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/` | `200`                                                                                                          |
 | SPA 路由（History API 刷新）                                   | `/` `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` 均为 **200**，不是 404 |
-| Alembic                                                        | `docker compose exec backend alembic current` → `20260717_07_fallback_chain (head)`                         |
+| Alembic                                                        | `docker compose exec backend alembic current` → `20260717_08_ai_runtime (head)`                         |
 | LLM                                                            | 容器内`LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 调用**                                             |
 
 `compose_verify.sh` 已覆盖 Frontend 多路由 200 与 Backend health。
@@ -1575,7 +1580,7 @@ Compose 路径（本附录，权威）
 | PostgreSQL 全量（**正式回归**） | **281 tests**，**2 skipped**（real LLM smoke 默认 skip）        |
 | PostgreSQL 稳定性                     | 完整 suite**连续 3 次** 通过（修复 JWT 时钟回拨后）                   |
 | InMemory 全量（**仅辅助**）     | **270 tests**，**52 skipped**；不作业务验收结论                 |
-| Alembic head                          | `20260717_07_fallback_chain`                                              |
+| Alembic head                          | `20260717_08_ai_runtime`                                              |
 | Repository 权威                       | **PostgreSQL**（Compose 默认且必须）；InMemory 代码保留但不补企业能力 |
 | `python -m compileall app`          | 通过                                                                        |
 | `git diff --check`                  | 通过                                                                        |

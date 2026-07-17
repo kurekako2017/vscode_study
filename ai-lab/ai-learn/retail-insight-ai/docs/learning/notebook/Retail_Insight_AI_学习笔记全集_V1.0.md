@@ -1,5 +1,10 @@
 # Retail Insight AI 学习笔记全集（V1.0）
 
+> **历史学习笔记（保留不删除）**  
+> 当前正式项目名：**Enterprise Retail Intelligence Platform（ERIP）V1.0**。  
+> 面试与现状以 `docs/ai-agent-retail-handbook-v3/` 权威面试材料 + 主 README 为准。  
+> 基线：PG 297/6 · IM 286/62 · FE 116 · head `20260717_08_ai_runtime` · 默认 stub。
+
 本文件为 memo 目录学习资料的**整合入口**，原始文档无需删除，仅保留作为历史版本。
 
 

@@ -31,7 +31,7 @@
 - Browser 如何与 AI Workflow 建立联系？
 - BackgroundTasks 为什么存在？
 - Repository、Workflow、EventPublisher、SSE 如何协作？
-- 如何向别人完整讲解 Retail Insight AI 的执行流程？
+- 如何向别人完整讲解 ERIP 的执行流程？
 
 ---
 
@@ -102,7 +102,7 @@ Browser
 
 这就是：
 
-整个 Retail Insight AI。
+整个 ERIP。
 
 ---
 
@@ -435,7 +435,7 @@ SSE
 
 # 九、项目当前实现（Current）
 
-Retail Insight AI 当前已经实现：
+ERIP 当前已经实现：
 
 ✅ FastAPI
 
@@ -601,7 +601,7 @@ Publisher
 
 面试官：
 
-> 请整体介绍一下 Retail Insight AI 的执行流程。
+> 请整体介绍一下 ERIP 的执行流程。
 
 回答：
 

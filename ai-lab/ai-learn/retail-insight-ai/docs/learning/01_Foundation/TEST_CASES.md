@@ -1,5 +1,10 @@
 # 测试用例学习文档
 
+
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
+
 这份文档用于按 `测试总览表 -> 测试详细表 -> 后端程序流程` 的顺序学习测试。表格负责导航，章节负责学习；所有测试命令、输入、输出、Swagger 操作、后台 Log、源码位置和设计理由都保留。
 
 ## ERIP V1.0 当前权威启动入口
@@ -878,7 +883,7 @@ OK
 | 预想输出（予想結果） | OpenRouter→NVIDIA→Gemini→Local Qwen 顺序；成功即停；open 状态跳过不收费 |
 | Swagger对应操作 | 默认不在 Swagger 演示真实 fallback；学习时看单测更安全 |
 | 后台观察 | attempt ledger / circuit state（PostgreSQL 共享状态场景） |
-| 对应源码 | Provider chain、gateway、migration `20260717_07_fallback_chain` |
+| 对应源码 | Provider chain、gateway、migration `20260717_08_ai_runtime` |
 | 为什么设计 | 韧性链必须可测且默认零费用 |
 
 ### 后端程序流程
@@ -998,7 +1003,7 @@ Backend：
 
 - PostgreSQL（**正式**）：**281** tests，**2** skipped。发布基线曾连续三次；日常一次完整 suite 即可。
 - InMemory（**仅辅助**）：**270** tests，**52** skipped；**不作业务验收结论**
-- Alembic head：`20260717_07_fallback_chain`
+- Alembic head：`20260717_08_ai_runtime`
 - `compileall app` 与 `git diff --check`：各自独立通过（见上方自动化验收表独立行；亦可由 `./scripts/run_tests.sh` 一并覆盖）
 
 Frontend：

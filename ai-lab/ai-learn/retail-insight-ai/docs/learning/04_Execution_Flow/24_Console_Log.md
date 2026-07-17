@@ -200,7 +200,7 @@ CRITICAL
 | ERROR    | 发生错误     |
 | CRITICAL | 严重故障     |
 
-Retail Insight AI 当前主要以 INFO 为主。
+ERIP 当前主要以 INFO 为主。
 
 ---
 
@@ -321,7 +321,7 @@ Learning Trace。
 
 # 九、当前源码实现（Current）
 
-Retail Insight AI 当前已经具备：
+ERIP 当前已经具备：
 
 - Console Log
 - Learning Trace
@@ -621,7 +621,7 @@ Learning Trace 用于理解源码，
 
 Console Log 用于观察程序运行状态。
 
-两者共同构成 Retail Insight AI 的日志体系，也是企业级系统调试和运维的重要基础。
+两者共同构成 ERIP 的日志体系，也是企业级系统调试和运维的重要基础。
 
 ---
 
@@ -642,4 +642,4 @@ Console Log 用于观察程序运行状态。
 - SSE
 - Browser
 
-完整串联整个 Retail Insight AI 的执行流程，为 Volume 04 做最终总结。
+完整串联整个 ERIP 的执行流程，为 Volume 04 做最终总结。

@@ -1,4 +1,9 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
+
+
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
 
 # Volume 05：Enterprise（企业架构）
 
@@ -389,7 +394,7 @@ Console Log
 
 ✅ 理解常见设计模式
 
-✅ 能够解释 Retail Insight AI 的架构
+✅ 能够解释 ERIP 的架构
 
 ✅ 理解 AI Agent 企业系统设计
 

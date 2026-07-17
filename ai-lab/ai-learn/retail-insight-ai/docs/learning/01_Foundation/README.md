@@ -210,7 +210,7 @@ Interview
 
 Foundation 的目标只有一个：
 
-**帮助你建立整个 Retail Insight AI 的整体认识。**
+**帮助你建立整个 ERIP 的整体认识。**
 
 不要急于研究源码。
 

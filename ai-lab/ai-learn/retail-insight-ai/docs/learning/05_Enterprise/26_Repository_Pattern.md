@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Volume 05：Enterprise（企业架构）
 
@@ -14,7 +14,7 @@
 
 - 什么是 Repository Pattern？
 - 为什么企业项目要使用 Repository？
-- Retail Insight AI 如何实现 Repository？
+- ERIP 如何实现 Repository？
 - Repository 与 DAO、ORM 的区别。
 
 ---

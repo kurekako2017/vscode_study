@@ -130,7 +130,7 @@ Publish Event
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 当前项目：
 

@@ -31,7 +31,7 @@
 - 什么是 AI Streaming？
 - 为什么 AI Agent 需要 Streaming？
 - SSE 与 Streaming 有什么关系？
-- Retail Insight AI 如何实现实时输出？
+- ERIP 如何实现实时输出？
 - 企业 AI 为什么几乎都会采用 Streaming？
 
 ---
@@ -132,7 +132,7 @@ Finished
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 当前：
 

@@ -31,7 +31,7 @@
 - 什么是 RAG？
 - 为什么企业 AI 需要 RAG？
 - Retriever、Embedding、Vector Database 分别负责什么？
-- Retail Insight AI 如何接入 RAG？
+- ERIP 如何接入 RAG？
 - 如何设计企业级知识库？
 
 ---
@@ -136,7 +136,7 @@ LLM：
 
 ---
 
-# 三、Retail Insight AI 当前实现（Current）
+# 三、ERIP 当前实现（Current）
 
 当前：
 

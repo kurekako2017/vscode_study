@@ -1,4 +1,4 @@
-# Retail Insight AI 企业源码架构手册
+# ERIP 企业源码架构手册
 
 # Part 02：子系统架构
 
@@ -35,7 +35,7 @@
 
 # 一、子系统定位
 
-AI Workflow 是整个 Retail Insight AI 的核心。
+AI Workflow 是整个 ERIP 的核心。
 
 它负责：
 
@@ -718,7 +718,7 @@ Research
 Report
 ```
 
-AnalysisWorkflow 是整个 Retail Insight AI 的核心调度器，也是学习 LangGraph 最重要的源码入口。
+AnalysisWorkflow 是整个 ERIP 的核心调度器，也是学习 LangGraph 最重要的源码入口。
 
 ---
 

@@ -1,5 +1,10 @@
 # ERIP 前端页面、企业业务测试与源码学习指南
 
+
+> **项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
+> 历史名称：Retail Insight AI（仅早期说明）。正式 Repository：PostgreSQL；InMemory 仅 unittest。  
+> 基线：PG **297/6 skip** · IM **286/62 skip** · FE **116/116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
+
 ## 1. 这份文档解决什么问题
 
 本指南把浏览器中的实际操作，连接到 React、API Client 和 FastAPI 源码。
@@ -657,4 +662,4 @@ RAG 的 `insufficient_context` 在面板中解释为：Backend 未找到足够�
 | Learning Dashboard | 固定栏目教学侧栏，不替代业务页 | LearningSidebar |
 | AI 成本展示 | Provider/Model/route/Token/Cost（无 Key） | RAG/Analysis 页 |
 
-验收：Frontend **113/113**；权威启动见 RUNBOOK Appendix L；企业 Compose 见 Appendix M。
+验收：Frontend **116/116**；权威启动见 RUNBOOK Appendix L；企业 Compose 见 Appendix M。

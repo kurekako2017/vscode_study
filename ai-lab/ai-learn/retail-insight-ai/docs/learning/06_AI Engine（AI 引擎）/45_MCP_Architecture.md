@@ -31,7 +31,7 @@
 - 什么是 MCP（Model Context Protocol）？
 - MCP 与 Function Calling 有什么区别？
 - MCP Server 与 MCP Client 分别负责什么？
-- Retail Insight AI 如何接入 MCP？
+- ERIP 如何接入 MCP？
 - 企业 AI 为什么越来越采用 MCP？
 
 ---
@@ -198,7 +198,7 @@ MCP。
 
 ---
 
-# 四、Retail Insight AI 当前实现（Current）
+# 四、ERIP 当前实现（Current）
 
 当前：
 
