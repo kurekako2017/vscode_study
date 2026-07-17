@@ -1,5 +1,26 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 ERIP V1.0 页面可用性与 AI 管理
+
+### Backend
+- 新增 `backend/app/api/reports_catalog.py`：`GET /api/v1/reports`（approval.submit；task_id 目录）
+- 新增 `backend/app/api/llm_admin.py`：`GET/PUT /api/v1/admin/llm/runtime`（security.manage；模式 stub|openrouter|fallback_chain；无 Key；不启 real smoke）
+- `ReportRepository.list_recent`：interface + InMemory + PostgreSQL
+- `main.py` 挂载上述路由；测试 `tests/test_reports_catalog_and_llm_admin.py`
+
+### Frontend
+- 导航：`RAG/AI分析`、`KPI任务分析`、`AI管理`（`/ai-admin`）
+- 新增 `AdminLlmPage.tsx`；Approval 报告下拉；Documents 就绪/存储说明；Rag 成本元数据；Dashboard 正式入口事实
+- `api.ts` / `types.ts`：listReportCatalog、get/updateLlmRuntime
+
+### Docs
+- `RUNBOOK_LOCAL.md`：本地测试账号、8080/5173、概念区分、Scenario01 导入、上传写 PG、LLM 模式与成本
+
+### 验证
+- Frontend 113/113；Backend catalog/admin 测试 OK；compileall OK
+- Compose rebuild backend+frontend；health postgres；llm_provider_mode=stub；Volume 保留
+- 未真实 LLM；未 git commit；未 `down -v`
+
 ## 2026-07-17 ERIP V1.0 第三批项目文档同步
 
 - 根 `README.md` / `ROADMAP.md` / `TASK.md`：对齐 V1.0 业务主链、完成矩阵、诚实未完成边界与验收数字指针。

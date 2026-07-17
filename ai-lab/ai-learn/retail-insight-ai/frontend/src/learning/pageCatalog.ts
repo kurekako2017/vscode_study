@@ -60,11 +60,11 @@ export const pageCatalog: Record<LearningPage, PageCatalogEntry> = {
   rag: {
     page: "rag",
     route: "/rag",
-    navigation: "RAG検索",
+    navigation: "RAG/AI分析",
     component: "RagPage",
     step: "2 / 4",
-    businessObject: "Scenario01 已完成 Chunk 的内部资料、检索结果和 Citation；当前为 Keyword Retrieval 与固定逻辑回答。",
-    whyNeeded: "业务人员需要先检查结论是否有内部证据支撑，才能把销售下降原因带入分析依頼和审批。",
+    businessObject: "Scenario01 已完成 Chunk 的内部资料、检索结果和 Citation；当前为 Keyword Retrieval 与固定逻辑回答；可显式触发 AI分析。",
+    whyNeeded: "业务人员需要先检查结论是否有内部证据支撑，才能再做显式 AI分析与审批提交。",
     initialState: "页面初始只显示表单；没有自动检索，也不会自动继承文書管理页的条件。",
     hooks: [
       { name: "useState", purpose: "检索/RAG 表单、结果、AI 分析与董事会报告状态。" },
@@ -87,10 +87,10 @@ export const pageCatalog: Record<LearningPage, PageCatalogEntry> = {
   tasks: {
     page: "tasks",
     route: "/analysis",
-    navigation: "分析依頼",
+    navigation: "KPI任务分析",
     component: "TasksPage",
     step: "3 / 4",
-    businessObject: "Scenario01 的关东饮料销售下降经营课题、task_id、SSE 事件和最终 report。",
+    businessObject: "Scenario01 的关东饮料销售下降经营课题、task_id、SSE 事件和最终 report（旧 Task API，非 low_cost AI 成本入口）。",
     whyNeeded: "企业把可确认的问题转成可追踪任务，以异步执行避免 HTTP 请求一直等待，并把执行过程和报告分开读取。",
     initialState: "初始为 idle；没有 task_id、SSE 事件或 report。",
     hooks: [
@@ -120,21 +120,21 @@ export const pageCatalog: Record<LearningPage, PageCatalogEntry> = {
     step: "4 / 4",
     businessObject: "Scenario01 已完成 report 的 task_id、approval_id、report_version_id 与审批审计事件。",
     whyNeeded: "经营结论需要经过责任人审批、拒绝或修正，并保留版本和审计事实，才能成为可追溯的企业决策依据。",
-    initialState: "mount 后读取审批列表；提交审批需要用户手动输入已完成报告的 task_id。",
+    initialState: "mount 后读取审批列表，并 GET /api/v1/reports 加载可提交报告目录；默认选中一条 task_id，无需手抄。",
     hooks: [
-      { name: "useState", purpose: "列表、详情、提交表单与错误。" },
-      { name: "useEffect", purpose: "mount 加载审批列表。" },
+      { name: "useState", purpose: "列表、详情、提交表单、报告目录与错误。" },
+      { name: "useEffect", purpose: "mount 加载审批列表与报告目录。" },
     ],
     sources: [
-      { label: "页面状态", path: "frontend/src/pages/ApprovalPage.tsx", reason: "管理列表、详情、提交和三种审批操作。" },
-      { label: "API 适配", path: "frontend/src/api.ts", reason: "封装 approval HTTP 调用与错误解析。" },
+      { label: "页面状态", path: "frontend/src/pages/ApprovalPage.tsx", reason: "管理列表、详情、报告下拉提交和三种审批操作。" },
+      { label: "API 适配", path: "frontend/src/api.ts", reason: "封装 approval 与 listReportCatalog HTTP 调用。" },
     ],
     tests: [
-      { label: "审批页", path: "frontend/src/pages/ApprovalPage.test.tsx", reason: "提交、批准、拒绝与权限。" },
+      { label: "审批页", path: "frontend/src/pages/ApprovalPage.test.tsx", reason: "目录下拉、提交、批准、拒绝与权限。" },
     ],
     lifecycleTeaching: [
-      { name: "Mount", detail: "useEffect() 读取 approval 列表，并选择当前可见记录。", technologies: ["React useEffect", "Fetch API", "REST API"] },
-      { name: "Submit", detail: "提交 task_id 后由 Backend 创建 report version 与 approval request。", technologies: ["Event Handler", "Fetch API", "REST API", "FastAPI Router", "Service Layer", "Repository Pattern"] },
+      { name: "Mount", detail: "useEffect() 读取 approval 列表与 report catalog，并选择当前可见记录。", technologies: ["React useEffect", "Fetch API", "REST API"] },
+      { name: "Submit", detail: "从报告下拉选择 task_id 后由 Backend 创建 report version 与 approval request。", technologies: ["Event Handler", "Fetch API", "REST API", "FastAPI Router", "Service Layer", "Repository Pattern"] },
       { name: "Decide", detail: "承認、却下或修正依頼触发状态迁移，并刷新列表与详情。", technologies: ["Event Handler", "React useState", "FastAPI Router", "Service Layer", "Repository Pattern"] },
       { name: "Audit", detail: "Approval API 经 AuditMiddleware 与权限边界；403、409 是业务结果而非页面故障。", technologies: ["AuditMiddleware", "FastAPI Router", "Service Layer"] },
     ],

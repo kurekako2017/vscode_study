@@ -24,6 +24,9 @@ import type {
   CurrentUserResponse,
   HealthResponse,
   LoginResponse,
+  LlmProviderMode,
+  LlmRuntimeResponse,
+  ReportCatalogResponse,
   ReportResponse,
   TaskCreateResponse,
   TaskEvent,
@@ -319,6 +322,28 @@ export async function generateExecutiveReport(
     body: JSON.stringify(payload),
   });
   return unwrapResponse<ExecutiveReportResponse>(response);
+}
+
+/** 可供 submit-approval 选择的报告目录（避免手工记忆 task_id）。 */
+export async function listReportCatalog(limit = 30): Promise<ReportCatalogResponse> {
+  const response = await request(`/api/v1/reports?limit=${limit}`);
+  return unwrapResponse<ReportCatalogResponse>(response);
+}
+
+/** 管理员查看 LLM 运行时（无 Key）。 */
+export async function getLlmRuntime(): Promise<LlmRuntimeResponse> {
+  const response = await request("/api/v1/admin/llm/runtime");
+  return unwrapResponse<LlmRuntimeResponse>(response);
+}
+
+/** 管理员切换 stub/openrouter/fallback_chain；无密钥时后端 fail-closed。 */
+export async function updateLlmRuntime(mode: LlmProviderMode): Promise<LlmRuntimeResponse> {
+  const response = await request("/api/v1/admin/llm/runtime", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ llm_provider_mode: mode }),
+  });
+  return unwrapResponse<LlmRuntimeResponse>(response);
 }
 
 /** Approval 列表查询参数统一在 API Client 里拼接，页面只管理筛选表单。 */

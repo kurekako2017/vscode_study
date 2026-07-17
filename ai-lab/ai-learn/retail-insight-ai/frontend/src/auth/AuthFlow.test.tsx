@@ -235,7 +235,7 @@ describe("Frontend authentication and RBAC flow", () => {
     render(<App initialSession={ADMIN_SESSION} />);
 
     expect(screen.getByText("前端冻结 Registry（10 项）")).toBeInTheDocument();
-    expect(within(screen.getByRole("navigation", { name: "主要ページ" })).getAllByRole("button")).toHaveLength(5);
+    expect(within(screen.getByRole("navigation", { name: "主要ページ" })).getAllByRole("button")).toHaveLength(6);
     expect(screen.queryByText("監査ログ")).not.toBeInTheDocument();
     expect(screen.queryByText("セキュリティ管理")).not.toBeInTheDocument();
   });

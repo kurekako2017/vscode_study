@@ -16,13 +16,14 @@ interface DashboardPageProps {
 }
 
 const boundaryFacts = [
-  ["任务工作流", "可用"],
-  ["文书管理", "可用"],
-  ["关键词检索", "可用"],
-  ["固定逻辑 RAG", "可用"],
-  ["审批工作流", "可用"],
-  ["真实 LLM", "未连接"],
-  ["向量检索", "尚未可用"],
+  ["正式入口", "Docker http://127.0.0.1:8080"],
+  ["开发入口", "Vite http://127.0.0.1:5173"],
+  ["Repository", "PostgreSQL 正式 / InMemory 仅测试"],
+  ["文书管理", "列表=DB；Import/Chunk 后可检索"],
+  ["RAG/AI分析", "检索+显式 low_cost AI"],
+  ["KPI任务分析", "/analysis Task+SSE（非 AI 成本页）"],
+  ["LLM 默认", "stub（零费用）；AI管理可看模式"],
+  ["真实付费 LLM", "默认关闭"],
 ];
 
 const businessFlow: Array<{
@@ -35,30 +36,30 @@ const businessFlow: Array<{
   {
     title: "文書管理",
     purpose: "登记关东地区饮料分类销售下降相关的内部资料，并生成 document_id、import_id 与 Chunk。",
-    connection: "已连接：文书与 Chunk 由 Backend 保存；到 RAG検索为手动衔接。",
+    connection: "已连接：文书与 Chunk 由 Backend 保存；到 RAG/AI分析为手动衔接。",
     target: "documents",
     actionLabel: "文書管理を開く",
   },
   {
-    title: "RAG検索",
-    purpose: "以 Keyword Retrieval 验证内部资料可以被检索，并查看 citation。",
-    connection: "手动衔接：用户输入检索条件；结果不会自动带入分析依頼。",
+    title: "RAG/AI分析",
+    purpose: "检索已 Chunk 文档；再显式触发 low_cost AI分析与 high_quality 董事会报告（展示 Provider/Model/Token/Cost）。",
+    connection: "普通 RAG 默认可零 LLM；AI 不会自动跑。生成报告后可在承認管理下拉选择 task_id。",
     target: "rag",
-    actionLabel: "RAG検索を開く",
+    actionLabel: "打开 RAG/AI分析",
   },
   {
-    title: "分析依頼",
-    purpose: "创建关东饮料销售下降分析任务，观察 SSE 并读取 report。",
-    connection: "手动衔接：RAG 结论需手动写入问题；完成后复制 task_id 到承認管理。",
+    title: "KPI任务分析",
+    purpose: "旧 Task API + SSE 路径（hybrid/kpi/research），与成本 AI 分析不同。",
+    connection: "产出 task report；企业审批主路径推荐 executive report 的 task_id。",
     target: "analysis",
-    actionLabel: "分析依頼を開く",
+    actionLabel: "打开 KPI任务分析",
   },
   {
     title: "承認管理",
-    purpose: "基于已完成 report 的 task_id 创建 approval_id，执行承認、却下或修正依頼。",
-    connection: "手动衔接：TasksPage 不会自动传递 task_id；审批审计由 Backend 记录。",
+    purpose: "从报告目录选择 task_id 提交审批，无需手抄。",
+    connection: "API：GET /api/v1/reports → submit-approval；employee 403 / manager 200。",
     target: "approval",
-    actionLabel: "承認管理を開く",
+    actionLabel: "打开承認管理",
   },
   {
     title: "最终可审计报告",
@@ -82,16 +83,17 @@ export function DashboardPage({
   currentUser,
 }: DashboardPageProps) {
   const runtimeFacts = [
-    ["数据存储", "InMemory"],
-    ["调研数据源", "静态数据"],
-    ["检索方式", "关键词检索"],
-    ["RAG 回答方式", "固定逻辑生成"],
+    ["正式数据存储", "PostgreSQL（Compose 权威）"],
+    ["辅助测试存储", "InMemory（仅 unittest，非验收）"],
+    ["调研数据源", "静态 / Stub Provider"],
+    ["检索方式", "关键词检索（已 Chunk 文档）"],
+    ["RAG 回答方式", "固定逻辑 / extractive（默认可零 LLM）"],
     ["当前用户", currentUser?.username ?? "系统默认用户"],
     ["当前角色", currentUser?.role ?? "未认证"],
     ["权限来源", currentUser ? `前端冻结 Registry（${currentUser.permissionCount} 项）` : "未加载"],
-    ["真实 LLM", "未启用"],
-    ["PostgreSQL", "当前运行环境尚未验证"],
-    ["pgvector", "尚未实现"],
+    ["LLM 模式", "默认 stub；admin 可在 AI管理 查看"],
+    ["真实付费 LLM", "默认关闭（禁止验收开启）"],
+    ["pgvector", "教学路线预留，当前非主链"],
   ];
 
   function openBusinessStep(target: DashboardTarget, actionLabel: string) {
@@ -141,8 +143,8 @@ export function DashboardPage({
           </div>
           <ol className="event-list">
             <li><span>01</span><div><strong>文書管理：登记内部资料</strong><small>确认 document_id、import_id 和 Chunk。</small></div></li>
-            <li><span>02</span><div><strong>RAG検索：验证资料是否可检索</strong><small>确认 results、score、citation 与空结果。</small></div></li>
-            <li><span>03</span><div><strong>分析依頼：创建经营分析任务</strong><small>确认 task_id、SSE 和 report。</small></div></li>
+            <li><span>02</span><div><strong>RAG/AI分析：检索 + 显式 AI</strong><small>确认 results、citation；需要时再点 AI分析（看 Provider/Cost）。</small></div></li>
+            <li><span>03</span><div><strong>KPI任务分析（可选）：Task + SSE</strong><small>旧 hybrid 链路；企业审批主路径优先 executive report。</small></div></li>
             <li><span>04</span><div><strong>承認管理：审核结果</strong><small>手动输入 task_id，确认 approval_id 与状态迁移。</small></div></li>
             <li><span>05</span><div><strong>调用流程：确认前后端代码链</strong><small>展开各业务页的「业务测试与源码学习」。</small></div></li>
           </ol>
@@ -156,7 +158,7 @@ export function DashboardPage({
           </div>
           <div className="learning-flow">
             <p><strong>案件背景：</strong>关东地区饮料分类销售额下降，经营企划需要登记内部资料、检索依据、生成经营报告并完成负责人审批。</p>
-            <p><strong>操作顺序：</strong>上传并处理“関東飲料売上分析.md” → 用 RAG検索确认 Chunk 与 citation → 创建 hybrid 分析任务 → 复制已完成 task_id 提交审批。</p>
+            <p><strong>操作顺序：</strong>上传 Scenario01 → Import → Chunk → RAG/AI分析确认 citation → 显式 AI分析/董事会报告 → 承認管理下拉选择 task_id 提交（无需手抄）。</p>
             <p><strong>预期业务结果：</strong>页面分别显示 document_id／import_id／Chunk、检索结果与 citation、task_id／report、approval_id／report_version_id。</p>
             <p><strong>确认点：</strong>这些 ID 当前均需手动衔接；系统没有自动把文书、RAG 结果或 task_id 串成单一请求。</p>
           </div>

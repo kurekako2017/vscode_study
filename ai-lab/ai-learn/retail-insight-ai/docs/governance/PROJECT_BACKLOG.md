@@ -1,5 +1,27 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: ERIP V1.0 页面可用性与 AI 管理
+
+- [x] 审计并确认 `LLM_PROVIDER_MODE` 枚举：`stub` | `openrouter` | `fallback_chain`
+- [x] Backend：`GET /api/v1/reports` 报告目录；`GET/PUT /api/v1/admin/llm/runtime`
+- [x] ReportRepository.list_recent（interface / inmemory / postgres）
+- [x] Frontend：导航 RAG/AI分析、KPI任务分析、AI管理；AdminLlmPage
+- [x] ApprovalPage 报告下拉（无手抄 task_id）
+- [x] DocumentsPage 就绪状态与 PG content 存储说明
+- [x] RagPage Provider/Model/Route/Token/Cost/Status 展示
+- [x] RUNBOOK：账号、8080/5173、Scenario01 导入、存储、LLM 成本风险
+- [x] Frontend 113/113；Backend admin/catalog 测试；Compose rebuild；stub only
+- [x] 禁止：真实 LLM、volume 删除、git commit、旧 Migration 改动
+
+完成记录：PostgreSQL 数据与 `erip_postgres_data` Volume 保留；live health 200、llm_runtime=stub、reports total≥4、documents 仍在。
+
+已知后续（非阻断）：
+
+- [ ] handbook 面试材料中「RAG検索/分析依頼」旧导航标签可增量对齐
+- [ ] VERIFY_CHECKLIST / README 若仍写旧入口可增量指针
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: ERIP V1.0 第三批项目文档同步
 
 - [x] 根入口 README / ROADMAP / TASK 与 V1.0 事实对齐
@@ -8,9 +30,9 @@
 - [x] PROJECT_BIBLE / handbook 01·06·08·09·11·README 增量
 - [x] 冻结第一批启动验收文档与第二批面试材料
 - [x] CHANGELOG 登记
-- [ ] 运行环境检测（下一批）
+- [x] 运行环境检测与页面可用性（见上节）
 
-完成记录：仅文档；未改代码/测试/Docker/Migration/.env；未跑测试。
+完成记录：第三批为文档；页面可用性批为代码+测试+RUNBOOK。
 
 最后更新：2026-07-17
 

@@ -5,6 +5,7 @@ import {
   approveApproval,
   getApproval,
   listApprovals,
+  listReportCatalog,
   rejectApproval,
   requestApprovalRevision,
   submitApproval,
@@ -19,6 +20,7 @@ import type {
   ApprovalRevisionResponse,
   ApprovalStatus,
   DisplayError,
+  ReportCatalogItem,
 } from "../types";
 import type { RecordLearningEvent } from "../learning/learningTypes";
 
@@ -69,6 +71,9 @@ export function ApprovalPage({
   const [submitComment, setSubmitComment] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<DisplayError | null>(null);
+  const [reportCatalog, setReportCatalog] = useState<ReportCatalogItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<DisplayError | null>(null);
 
   const [approveComment, setApproveComment] = useState("");
   const [rejectReason, setRejectReason] = useState("");
@@ -79,6 +84,30 @@ export function ApprovalPage({
   useEffect(() => {
     if (canReview) void loadApprovals(true);
   }, [canReview]);
+
+  useEffect(() => {
+    if (canSubmit) void loadReportCatalog();
+  }, [canSubmit]);
+
+  async function loadReportCatalog() {
+    setCatalogLoading(true);
+    setCatalogError(null);
+    try {
+      const data = await listReportCatalog(30);
+      setReportCatalog(data.items);
+      // 默认选中第一条尚未 pending 的报告，避免手工记忆 task_id
+      if (!submitTaskId && data.items.length > 0) {
+        const preferred =
+          data.items.find((item) => item.approval_status === "generated") ?? data.items[0];
+        setSubmitTaskId(preferred.task_id);
+      }
+    } catch (reason) {
+      setCatalogError(toDisplayError(reason, "REPORT_CATALOG_ERROR", "报告目录读取失败"));
+      setReportCatalog([]);
+    } finally {
+      setCatalogLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (selectedApprovalId === null) {
@@ -353,13 +382,34 @@ export function ApprovalPage({
             <h2>承認依頼を送信</h2>
           </div>
           <form className="stack-form" onSubmit={handleSubmitApproval}>
-            <label htmlFor="approval-submit-task-id">Task ID</label>
-            <input
-              id="approval-submit-task-id"
-              value={submitTaskId}
-              onChange={(event) => setSubmitTaskId(event.target.value)}
-              disabled={submitLoading}
-            />
+            <label htmlFor="approval-submit-task-id">提交用报告（自动列出 task_id，无需手抄）</label>
+            {catalogError && (
+              <StatusBanner tone="error">[{catalogError.code}] {catalogError.message}</StatusBanner>
+            )}
+            {catalogLoading ? (
+              <p className="empty">报告目录读取中…</p>
+            ) : reportCatalog.length === 0 ? (
+              <p className="empty">
+                尚无 executive/task 报告。请先在「RAG/AI分析」生成取締役会报告（会得到 task_id），再回到本页。
+              </p>
+            ) : (
+              <select
+                id="approval-submit-task-id"
+                value={submitTaskId}
+                onChange={(event) => setSubmitTaskId(event.target.value)}
+                disabled={submitLoading}
+              >
+                {reportCatalog.map((item) => (
+                  <option key={item.task_id} value={item.task_id}>
+                    {item.task_id} · {item.approval_status} · {item.provider}
+                  </option>
+                ))}
+              </select>
+            )}
+            <button type="button" className="secondary-button" onClick={() => void loadReportCatalog()} disabled={catalogLoading}>
+              刷新报告目录
+            </button>
+            <small>来源 API：GET /api/v1/reports。仍可从下方详情复制 task_id，但提交优先使用下拉选择。</small>
             <label htmlFor="approval-submit-comment">コメント</label>
             <textarea
               id="approval-submit-comment"
@@ -471,9 +521,9 @@ export function ApprovalPage({
         pageName="承認管理"
         purpose="将已完成的经营分析报告提交给负责人审批，并保留 approval_id、报告版本和审批审计事实。"
         scenario="关东饮料销售下降分析完成后，负责人手动输入 task_id 提交承认依赖，再根据审核结果执行承認、却下或修正依頼。"
-        prerequisites="分析依頼已经完成并生成 report。当前用户来自 JWT CurrentUser；Approval API 的 RBAC 已生效，权限不足会返回 403。"
-        relationship="本页使用分析依頼产生的 task_id，创建 approval_id 和 report_version_id。task_id 当前不从 TasksPage 自动传入，必须手动复制；批准结果不自动回写到 Documents 或 RAG 页面。"
-        journey={{ previous: "分析依頼", current: "4 / 4 承認管理", completion: "执行承認、却下或修正依頼，并记录审批结果。", next: "最终可审计报告", recommendedCase: "APR-BIZ-001", transferredObjects: "approval_id、report_version_id、approval event", connection: "当前没有独立的最终汇总页面。" }}
+        prerequisites="已在「RAG/AI分析」生成取締役会报告（或存在可提交 report）。用户来自 JWT；RBAC 生效，employee 对 approve 为 403。"
+        relationship="本页通过 GET /api/v1/reports 列出可提交的 task_id，下拉选择即可，无需手抄。KPI任务分析(/analysis) 与 RAG/AI分析 是不同链路。"
+        journey={{ previous: "RAG/AI分析", current: "4 / 4 承認管理", completion: "执行承認、却下或修正依頼，并记录审批结果。", next: "最终可审计报告", recommendedCase: "APR-BIZ-001", transferredObjects: "approval_id、report_version_id、approval event", connection: "报告目录下拉提供 task_id。" }}
         cases={[
           { id: "APR-BIZ-001", group: "标准业务 Case", purpose: "正常提交关东饮料报告审批。", input: "输入已完成报告的 Task ID，填写可选コメント，点击「承認依頼を送信」。", expected: "POST 返回 approval_id、report_version_id、pending_approval；列表和详情刷新。" },
           { id: "APR-BIZ-002", group: "异常与维护测试 Case", purpose: "确认提交必填项。", input: "清空 Task ID。", expected: "提交按钮不可点击，不发送请求。" },

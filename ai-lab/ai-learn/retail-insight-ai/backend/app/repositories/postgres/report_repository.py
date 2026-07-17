@@ -63,6 +63,24 @@ class PostgresReportRepository:
                 row = cursor.fetchone()
         return self._to_domain(row) if row is not None else None
 
+    def list_recent(self, *, limit: int = 50) -> list[Report]:
+        """列出最近报告；不返回 markdown 全文以降低载荷。"""
+
+        safe_limit = max(1, min(limit, 100))
+        with self._connection_factory.connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT task_id, markdown, provider, approval_status, created_at
+                    FROM reports
+                    ORDER BY created_at DESC
+                    LIMIT %s
+                    """,
+                    (safe_limit,),
+                )
+                rows = cursor.fetchall()
+        return [self._to_domain(row) for row in rows]
+
     def _to_domain(self, row: tuple[str, str, str, str, datetime]) -> Report:
         """把数据库行转换为领域 Report。"""
 

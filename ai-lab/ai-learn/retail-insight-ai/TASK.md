@@ -1,5 +1,20 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 ERIP V1.0 页面可用性与 AI 管理（本轮最高优先级 / 已完成文件与验收）
+
+- [x] 正式入口：8080=Compose Frontend；5173=Vite 开发
+- [x] RUNBOOK：本地测试账号、端口、RAG vs KPI、Scenario01 导入、上传存储、LLM 模式与成本风险
+- [x] 导航澄清：`RAG/AI分析` / `KPI任务分析` / `AI管理`（security.manage）
+- [x] AI分析独立入口：`/rag` 显式 AI + Provider/Model/Route/Token/Cost/Status
+- [x] 文档页：PG 列表、Import/Chunk 就绪状态、content 写入 DB 说明
+- [x] 审批：`GET /api/v1/reports` 目录下拉，无需手抄 task_id
+- [x] 管理：`GET/PUT /api/v1/admin/llm/runtime`（stub|openrouter|fallback_chain；无 Key；默认 stub）
+- [x] Frontend 113/113；Backend catalog/llm admin 测试；Compose rebuild healthy；PG 数据与 Volume 保留
+- [ ] 可选：handbook 面试材料中旧导航标签增量校正（非阻断）
+- [ ] 未执行真实 LLM；未 git commit
+
+最后更新：2026-07-17
+
 ## 2026-07-17 ERIP V1.0 第三批项目文档（工作区进行中 / 未强制 commit）
 
 - [x] 同步根入口 README / ROADMAP / TASK 与 V1.0 事实
@@ -7,7 +22,7 @@
 - [x] 学习文档与 PROJECT_BIBLE / handbook 总览增量同步
 - [x] 治理 Backlog / CHANGELOG 登记本批文档状态
 - [x] 冻结 RUNBOOK / TEST_CASES / VERIFY / 第二批面试材料不动
-- [ ] 下一轮：运行环境检测（本批不跑测试 / Docker / LLM）
+- [x] 运行环境检测与页面可用性本轮已覆盖（见上节）
 
 最后更新：2026-07-17
 

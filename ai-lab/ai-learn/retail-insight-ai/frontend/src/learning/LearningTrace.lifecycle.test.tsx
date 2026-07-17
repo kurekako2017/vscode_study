@@ -59,8 +59,8 @@ describe("Learning Trace lifecycle critical paths", () => {
     render(<App initialSession={ADMIN_SESSION} strictModeEnabled={false} />);
     expect(await screen.findByLabelText("React Lifecycle Live Status")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
-    expect(await screen.findByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "RAG/AI分析" }));
+    expect(await screen.findByRole("heading", { name: "RAG検索 / AI分析" })).toBeInTheDocument();
 
     const live = screen.getByLabelText("React Lifecycle Live Status");
     expect(live.textContent).toMatch(/RagPage|Mounted|已挂载|Updated|更新/);

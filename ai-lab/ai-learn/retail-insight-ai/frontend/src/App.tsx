@@ -7,6 +7,7 @@ import { LifecycleProbe } from "./learning/LifecycleProbe";
 import { LearningTraceProvider, useLearningTrace } from "./learning/LearningTraceContext";
 import type { LearningEvent, LearningPage } from "./learning/learningTypes";
 import { pageCatalog } from "./learning/pageCatalog";
+import { AdminLlmPage } from "./pages/AdminLlmPage";
 import { ApprovalPage } from "./pages/ApprovalPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DocumentsPage } from "./pages/DocumentsPage";
@@ -16,7 +17,7 @@ import { TasksPage } from "./pages/TasksPage";
 import { ProtectedRoute } from "./routing/ProtectedRoute";
 import { navigateTo, useCurrentPath } from "./routing/navigation";
 
-type ViewTab = "dashboard" | "analysis" | "documents" | "rag" | "approval";
+type ViewTab = "dashboard" | "analysis" | "documents" | "rag" | "approval" | "ai-admin";
 
 interface NavItem {
   value: ViewTab;
@@ -31,16 +32,22 @@ const navItems: readonly NavItem[] = [
   { value: "documents", label: "文書管理", path: "/documents", permission: "documents.read" },
   {
     value: "rag",
-    label: "RAG検索",
+    label: "RAG/AI分析",
     path: "/rag",
     anyPermissions: ["retrieval.query", "analysis.execute"],
   },
-  { value: "analysis", label: "分析依頼", path: "/analysis", permission: "analysis.execute" },
+  { value: "analysis", label: "KPI任务分析", path: "/analysis", permission: "analysis.execute" },
   {
     value: "approval",
     label: "承認管理",
     path: "/approval",
     anyPermissions: ["approval.submit", "approval.review", "approval.admin"],
+  },
+  {
+    value: "ai-admin",
+    label: "AI管理",
+    path: "/ai-admin",
+    permission: "security.manage",
   },
 ];
 
@@ -50,6 +57,7 @@ const viewByPath: Readonly<Record<string, ViewTab>> = {
   "/rag": "rag",
   "/analysis": "analysis",
   "/approval": "approval",
+  "/ai-admin": "ai-admin",
 };
 
 const learningPageByView: Record<ViewTab, LearningPage> = {
@@ -58,6 +66,7 @@ const learningPageByView: Record<ViewTab, LearningPage> = {
   documents: "documents",
   rag: "rag",
   approval: "approval",
+  "ai-admin": "dashboard",
 };
 
 interface AppProps {
@@ -320,6 +329,22 @@ function ApplicationShell({ path }: { path: string }) {
                       canRetrieve={auth.hasPermission("retrieval.query")}
                       canAnalyze={auth.hasPermission("analysis.execute")}
                     />
+                  </ProtectedRoute>
+                </LifecycleProbe>
+              )}
+              {activeView === "ai-admin" && (
+                <LifecycleProbe
+                  componentId="AdminLlmPage"
+                  displayName="AdminLlmPage"
+                  parentId="ApplicationShell"
+                  page="dashboard"
+                  route="/ai-admin"
+                  isPageRoot
+                  revision={pageRevision}
+                  hooks={pageCatalog.dashboard.hooks.map((item) => item.name)}
+                >
+                  <ProtectedRoute permission="security.manage">
+                    <AdminLlmPage />
                   </ProtectedRoute>
                 </LifecycleProbe>
               )}

@@ -16,3 +16,8 @@ class ReportRepository(Protocol):
         """读取报告；尚未生成时返回 None。"""
 
         ...
+
+    def list_recent(self, *, limit: int = 50) -> list[Report]:
+        """按创建时间倒序列出最近报告（供审批提交选择 task_id）。"""
+
+        ...

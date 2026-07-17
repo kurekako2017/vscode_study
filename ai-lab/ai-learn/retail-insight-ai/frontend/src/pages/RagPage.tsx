@@ -256,9 +256,9 @@ export function RagPage({
   return (
     <>
       <PageHeader
-        eyebrow="RAG 検索と回答"
-        title="RAG検索"
-        description="現在はキーワード検索と固定ロジックによる回答を利用できます。ベクトル検索と実際の LLM 生成は未接続です。"
+        eyebrow="检索 + 显式 AI（成本受控）"
+        title="RAG検索 / AI分析"
+        description="上半：Keyword Retrieval 与 extractive RAG（默认可零真实 LLM）。下半/证据后：显式「AI分析」(low_cost) 与「取締役会報告」(high_quality)。与顶部「KPI任务分析」(/analysis Task SSE) 不同。"
       />
 
       <section className="rag-shell" aria-label="RAG 検索ワークスペース">
@@ -582,19 +582,19 @@ export function RagPage({
       </section>
 
       <BusinessLearningPanel
-        pageName="RAG検索"
-        purpose="确认关东地区饮料销售资料已能被关键词检索，并以可引用结果生成固定逻辑的 Internal RAG 回答。"
+        pageName="RAG/AI分析"
+        purpose="确认关东地区饮料销售资料已能被关键词检索，并以可引用结果生成固定逻辑的 Internal RAG 回答；证据足够时可显式触发 AI分析与董事会报告。"
         scenario="资料已在文書管理完成 Chunk 后，分析人员查询“関東地域の飲料カテゴリの売上減少”，再询问主要原因并检查 citation。"
-        prerequisites="存在 validated 的 markdown／text Chunk；查询或问题不能为空。当前只有 Keyword Retrieval 与 deterministic answer，不使用真实 LLM 或 pgvector。"
-        relationship="本页读取文书产生的 Chunk，并返回 document_id、chunk_id、citation。当前检索结果不会自动填入分析依頼；用户需手动把结论或问题带到下一页。"
-        journey={{ previous: "文書管理", current: "2 / 4 RAG検索", completion: "检索到相关 Chunk，或生成带 citation 的 Internal RAG 回答。", next: "分析依頼", recommendedCase: "TASK-BIZ-001", transferredObjects: "检索结论、citation", connection: "当前手动整理分析问题，不自动传递 citation。" }}
+        prerequisites="存在 validated 的 markdown／text Chunk；查询或问题不能为空。普通 RAG 默认可零 LLM；AI分析为显式按钮且走成本路由。"
+        relationship="本页读取已 Chunk 文档。显式 AI分析/董事会报告展示 Provider/Model/Route/Token/Cost/Status。生成的 executive task_id 可在承認管理下拉选择，无需手抄。"
+        journey={{ previous: "文書管理", current: "2 / 4 RAG/AI分析", completion: "检索到相关 Chunk，或完成显式 AI分析/董事会报告。", next: "承認管理", recommendedCase: "RAG-BIZ-001", transferredObjects: "检索结论、citation、executive task_id", connection: "审批用 GET /api/v1/reports 目录，无需手抄 task_id。" }}
         operationGuideTitle="如何选择 RAG 输入"
         operationGuides={[
           { title: "首次测试：先看这里", prerequisite: "实际操作测试优先展开本页底部「业务测试与源码学习」。", input: "当前推荐测试文档：02_関東地域在庫レポート.md。", action: "需要完整规则和六份资料对照时阅读 FRONTEND_SOURCE_LEARNING_GUIDE.md 第 6 章；07_RAG質問集.md 只作为扩展问题库。", expected: "页面提供第一次可直接复制的输入，不需要先阅读全部 Scenario01 文档。" },
           { title: "步骤 1：Document Retrieval", prerequisite: "02_関東地域在庫レポート.md 已完成 Upload → Import → Chunk，且 Chunk Count > 0。", input: "検索語：神奈川 配送遅延 夕方欠品", settings: "取得件数：5；首次测试不填 document_type、language、tags，且不勾选 archived。", action: "先点击「検索する」，不要直接生成 Internal RAG Answer。", expected: "HTTP 200；results > 0。", verification: "确认 document_id 是库存报告、chunk_id 存在、score 有返回、Chunk 摘要包含库存或配送相关内容。", next: "Retrieval 成功后再执行步骤 2。" },
-          { title: "步骤 2：Internal RAG Answer", prerequisite: "步骤 1 已有相关 results。", input: "質問：神奈川で夕方欠品が増加した理由は何ですか。\n可选问题：関東地域の飲料在庫における主な問題を要約してください。\n可选问题：炭酸飲料と無糖飲料の欠品率が高い理由は何ですか。", settings: "limit=5；answer_mode=extractive；require_citations=true；首次测试不填 filters。", action: "点击「回答を生成」。", expected: "当前 Deterministic Internal RAG 从 Backend 返回 answer 与 citations，不由前端生成答案。", verification: "确认 answer、citation、confidence、warnings、retrieval_mode、answer_mode；citation 应关联库存报告 Chunk。", next: "手动整理检索结论后进入分析依頼。" },
+          { title: "步骤 2：Internal RAG Answer", prerequisite: "步骤 1 已有相关 results。", input: "質問：神奈川で夕方欠品が増加した理由は何ですか。\n可选问题：関東地域の飲料在庫における主な問題を要約してください。\n可选问题：炭酸飲料と無糖飲料の欠品率が高い理由は何ですか。", settings: "limit=5；answer_mode=extractive；require_citations=true；首次测试不填 filters。", action: "点击「回答を生成」。", expected: "当前 Deterministic Internal RAG 从 Backend 返回 answer 与 citations，不由前端生成答案。", verification: "确认 answer、citation、confidence、warnings、retrieval_mode、answer_mode；citation 应关联库存报告 Chunk。", next: "需要成本 AI 时再点「AI分析」；审批前先生成董事会报告。" },
           { title: "不推荐问题与 insufficient_context", prerequisite: "当前只准备库存报告时。", input: "不推荐：競合店舗はなぜ値下げしましたか。", action: "不要把竞争店问题当作库存报告的单文档问题。", expected: "该主题属于 05_競合店舗調査；当前 Chunk 没有相应证据时，insufficient_context 是正常业务结果。", troubleshooting: "依次确认 Import 完成、Chunk 完成、Chunk Count > 0、検索語来自正文、Retrieval 已有 results、language/tags/document_type 未过滤过严、require_citations 证据是否不足、文档是否已 archived。" },
-          { title: "综合经营问题的前置资料", prerequisite: "要询问卖上、在库、促销、顾客、竞争、KPI 的综合原因时。", input: "関東地域の飲料カテゴリの売上減少原因を、売上、在庫、販促、顧客、競合、KPIの観点から整理してください。", action: "先将 01 销售、02 库存、03 促销、04 顾客、05 竞争、06 KPI 的相关资料完成 Chunk。", expected: "一份库存报告不能独立证明全部销售下降原因；当前 RAG 只根据已存在证据回答。", next: "Retrieval 成功 → Internal RAG → 分析依頼；citation 不会自动带入 TasksPage。" },
+          { title: "综合经营问题的前置资料", prerequisite: "要询问卖上、在库、促销、顾客、竞争、KPI 的综合原因时。", input: "関東地域の飲料カテゴリの売上減少原因を、売上、在庫、販促、顧客、競合、KPIの観点から整理してください。", action: "先将 01 销售、02 库存、03 促销、04 顾客、05 竞争、06 KPI 的相关资料完成 Chunk。", expected: "一份库存报告不能独立证明全部销售下降原因；当前 RAG 只根据已存在证据回答。", next: "Retrieval → Internal RAG → 显式 AI分析/董事会报告 → 承認管理下拉 task_id。" },
           { title: "清除操作", prerequisite: "已有检索或回答结果。", input: "「結果をクリア」或「回答をクリア」。", action: "点击对应清除按钮。", expected: "只修改 React state，不调用 Backend；可重新执行搜索或回答。" },
         ]}
         cases={[

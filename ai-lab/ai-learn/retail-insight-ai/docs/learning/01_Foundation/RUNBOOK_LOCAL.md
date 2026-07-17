@@ -27,17 +27,81 @@
 正式运行请显式设置 REPOSITORY_BACKEND=postgres，或直接使用 Docker Compose。
 ```
 
+### 本地测试账号（仅限本地 Stub/测试，非生产）
+
+来源：`backend/tests/auth_test_utils.py` + `backend/app/security/user_provider.py`（bcrypt，应用不存明文）。
+
+| 角色 | 用户名 | 密码（仅本地测试） | 用途 |
+|---|---|---|---|
+| admin | `admin` | `Admin#2026!` | 全权限；**AI管理**；Audit |
+| manager | `manager` | `Manager#2026!` | 审批 review/approve/reject |
+| employee | `employee` | `Employee#2026!` | 文档/RAG/AI分析/submit；approve→403 |
+
+登录 API：`POST /api/v1/auth/login`。页面：`http://127.0.0.1:8080/login`（Compose 正式）或 `http://127.0.0.1:5173/login`（Vite 开发）。
+
+### 8080 与 5173
+
+| 端口 | 用途 |
+|---|---|
+| **8080** | **正式 Docker Frontend**（连 Compose Backend + PostgreSQL）— 日常手动使用优先 |
+| **5173** | **Vite 本地开发** Frontend（需自行 `start_frontend.sh`，并保证 Backend 指向 postgres） |
+| 8000 | Backend API / Swagger `/docs` |
+
+### KPI任务分析 vs RAG/AI分析
+
+| 入口 | 路径 | 含义 |
+|---|---|---|
+| KPI任务分析 | `/analysis` | 旧 Task API + SSE（hybrid/kpi/research），**不是** low_cost AI 成本入口 |
+| RAG/AI分析 | `/rag` | 检索 + **显式** AI分析(low_cost) + 董事会报告(high_quality)；展示 Provider/Model/Route/Token/Cost |
+| AI管理 | `/ai-admin` | 仅 `security.manage`：查看/切换 `LLM_PROVIDER_MODE`（stub/openrouter/fallback_chain） |
+
+### Scenario01 导入 PostgreSQL
+
+仓库路径：`docs/learning/sample-data/Scenario01_Sales_Decline/`（磁盘文件 **不会**自动入库）。
+
+页面步骤：
+
+1. 登录 employee/admin → **文書管理**
+2. 上传 `01_…md`～`06_…md`（标题建议前缀 `SCENARIO01_ACCEPTANCE_<date>`）
+3. 对每份文档 **Import** → **Chunk**
+4. 在列表确认状态为 validated 且 Chunk 数 > 0 后再做 RAG
+
+### 上传数据写在哪里
+
+- **PostgreSQL `documents` 表**：元数据 + **正文 `content`**（解码后的文本，非独立对象存储桶）
+- **chunks / imports / sessions** 等表：Import/Chunk 流水与切片
+- 原始 multipart 文件：请求处理时读入内存/字节流并写入 DB 文本字段；**不**默认落到宿主机独立 uploads 目录（以当前 `DocumentUploadService` 为准）
+
+### LLM 模式与成本
+
+枚举（代码权威）：`stub` | `openrouter` | `fallback_chain`。
+
+- **验收/日常：必须 stub**（零外呼费用）
+- `fallback_chain`：OpenRouter→NVIDIA→Gemini→Local Qwen（可能付费；需服务端密钥）
+- `openrouter`：单 Provider 兼容模式（需 Key）
+- 管理页切换：`GET/PUT /api/v1/admin/llm/runtime`（不接收 Key；禁止打开 real smoke）
+- 真实 smoke 仅 opt-in 环境变量，默认测试 suite 永不执行
+
+
 V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可见项受 RBAC 过滤）：
 
 ```text
 学习总览
 → 文書管理
-→ RAG検索
-→ 分析依頼
-→ 承認管理
+→ RAG/AI分析          （/rag：检索 + 显式 AI分析 + 董事会报告）
+→ KPI任务分析         （/analysis：旧 Task API + SSE，不是 AI 成本入口）
+→ 承認管理            （报告下拉选 task_id，无需手抄）
+→ AI管理              （仅 admin / security.manage；LLM 模式开关）
 ```
 
-说明：下文若仍出现 `Dashboard / Analysis / Tasks` 等旧英文标签，视为**历史阶段记录**；当前操作与验收以本节导航为准。
+**正式页面入口：**
+
+| 环境 | URL |
+|---|---|
+| Docker/PostgreSQL（推荐日常） | `http://127.0.0.1:8080` |
+| Vite 本地开发 | `http://127.0.0.1:5173` |
+
+说明：下文若仍出现 `Dashboard / Analysis / Tasks` / `RAG検索` / `分析依頼` 等旧标签，视为**历史阶段记录**；当前操作与验收以本节导航与上表端口为准。
 
 ## 目录
 

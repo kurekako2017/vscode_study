@@ -111,15 +111,15 @@ export function TasksPage({ onLearningEvent }: TasksPageProps = {}) {
     <>
       <PageHeader
         eyebrow="分析ワークフロー"
-        title="分析依頼"
-        description="分析依頼を作成し、SSE の進捗と現在のローカルワークフローが生成したレポートを確認します。"
+        title="KPI任务分析"
+        description="旧 Task API + SSE（hybrid/kpi/research）。与「RAG/AI分析」页的 low_cost AI 成本入口不同。完了后可到承認管理查看报告目录。"
       />
 
       <section className="workspace" aria-label="分析ワークスペース">
         <form className="task-form panel" onSubmit={submit}>
           <div className="panel-heading">
             <span>01</span>
-            <h2>分析依頼</h2>
+            <h2>KPI任务创建</h2>
           </div>
           <label htmlFor="question">確認したい経営課題</label>
           <textarea
@@ -192,12 +192,12 @@ export function TasksPage({ onLearningEvent }: TasksPageProps = {}) {
       </section>
 
       <BusinessLearningPanel
-        pageName="分析依頼"
-        purpose="关东地区饮料分类销售下降时，创建经营分析任务并确认报告生成过程。"
+        pageName="KPI任务分析"
+        purpose="关东地区饮料分类销售下降时，创建经营分析任务并确认报告生成过程（旧 Task API + SSE，不是 low_cost AI 成本入口）。"
         scenario="内部资料已登记后，经营企划人员输入“関東地域の飲料カテゴリの売上減少を分析してください”，以 hybrid 模式取得 KPI 与静态调研结果。"
         prerequisites="Backend 已启动；任务问题不能为空。当前报告使用本地固定数据，不会自动引用 Documents 或 RAG 的结果。"
-        relationship="本页产生 task_id 和 report。任务完成后，需要用户手动复制 task_id 到承認管理提交审批；与 RAG検索 当前未自动连接。"
-        journey={{ previous: "RAG検索", current: "3 / 4 分析依頼", completion: "任务达到 completed 并取得 report。", next: "承認管理", recommendedCase: "APR-BIZ-001", transferredObjects: "task_id、report", connection: "当前手动复制 task_id。" }}
+        relationship="本页产生 task_id 和 KPI report。企业审批主路径推荐「RAG/AI分析」生成的 executive report；承認管理通过 GET /api/v1/reports 下拉选择 task_id，无需手抄。"
+        journey={{ previous: "RAG/AI分析", current: "3 / 4 KPI任务分析", completion: "任务达到 completed 并取得 report。", next: "承認管理", recommendedCase: "APR-BIZ-001", transferredObjects: "task_id、report", connection: "承認管理报告目录下拉（推荐 executive report task_id）。" }}
         cases={[
           { id: "TASK-BIZ-001", group: "标准业务 Case", purpose: "正常创建关东饮料销售下降分析。", input: "输入业务问题，选择 hybrid，点击「分析を開始」。", expected: "收到 queued 状态，SSE 显示 route／kpi／research／report，最终显示 Markdown 报告。" },
           { id: "TASK-BIZ-002", group: "异常与维护测试 Case", purpose: "确认必填校验。", input: "清空问题输入框。", expected: "「分析を開始」不可点击，不发送 POST 请求。" },

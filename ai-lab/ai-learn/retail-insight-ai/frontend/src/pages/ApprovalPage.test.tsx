@@ -1,14 +1,33 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { approvalDetail, approvalList, jsonResponse } from "../test/page-test-helpers";
 import { ApprovalPage } from "./ApprovalPage";
+
+vi.mock("../api", async () => {
+  const actual = await vi.importActual<typeof import("../api")>("../api");
+  return {
+    ...actual,
+    listReportCatalog: vi.fn(async () => ({
+      items: [
+        {
+          task_id: "task-1",
+          provider: "stub-high-quality",
+          approval_status: "generated",
+          created_at: "2026-07-12T00:00:00Z",
+          markdown_preview: "preview",
+        },
+      ],
+      total: 1,
+    })),
+  };
+});
 
 describe("ApprovalPage", () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
-    vi.restoreAllMocks();
+    // 不 restoreAllMocks，避免清掉 listReportCatalog 的 vi.mock 实现
   });
 
   it("shows approval list and detail", async () => {
@@ -39,7 +58,7 @@ describe("ApprovalPage", () => {
     expect(screen.getAllByText("APR-BIZ-001")).toHaveLength(2);
     expect(screen.getByText(/POST \/api\/v1\/reports\/\{task_id\}\/submit-approval/)).toBeInTheDocument();
     expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
-    expect(screen.getByLabelText("承認管理 上一步下一步")).toHaveTextContent("上一步：分析依頼");
+    expect(screen.getByLabelText("承認管理 上一步下一步")).toHaveTextContent("上一步：RAG/AI分析");
   });
 
   it("shows approval empty state and list retry error", async () => {
@@ -104,7 +123,8 @@ describe("ApprovalPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ApprovalPage />);
-    fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-9" } });
+    // catalog mock 默认选中 task-1；直接提交
+    expect(await screen.findByRole("button", { name: "承認依頼を送信" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
     expect(await screen.findByRole("status")).toHaveTextContent("承認依頼を送信しました: approval-9");
@@ -122,7 +142,7 @@ describe("ApprovalPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ApprovalPage />);
-    fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-1" } });
+    expect(await screen.findByRole("button", { name: "承認依頼を送信" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("[approval_already_submitted] Already submitted");
@@ -160,7 +180,7 @@ describe("ApprovalPage", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<ApprovalPage />);
-    fireEvent.change(screen.getByLabelText("Task ID"), { target: { value: "task-10" } });
+    expect(await screen.findByRole("button", { name: "承認依頼を送信" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "承認依頼を送信" }));
 
     expect(screen.getByRole("button", { name: "送信中…" })).toBeDisabled();

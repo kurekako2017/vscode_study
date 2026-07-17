@@ -17,10 +17,11 @@ describe("App navigation", () => {
     render(<App initialSession={ADMIN_SESSION} />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Enterprise Retail Intelligence Platform" })).toBeInTheDocument();
-    expect(screen.getByText("数据存储")).toBeInTheDocument();
-    expect(screen.getByText("InMemory")).toBeInTheDocument();
-    expect(screen.getAllByText("真实 LLM").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("未启用").length).toBeGreaterThan(0);
+    expect(screen.getByText("正式数据存储")).toBeInTheDocument();
+    expect(screen.getAllByText(/PostgreSQL/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/InMemory/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/真实付费 LLM|LLM 模式/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/默认关闭|默认 stub/).length).toBeGreaterThan(0);
     expect(screen.getByLabelText("固定学习面板")).toHaveClass("learning-sidebar");
     expect(screen.getByText("实时学习面板")).toBeInTheDocument();
     expect(screen.getByText("尚未操作")).toBeInTheDocument();
@@ -40,15 +41,16 @@ describe("App navigation", () => {
     expect(within(screen.getByRole("navigation", { name: "主要ページ" })).getAllByRole("button").map((button) => button.textContent)).toEqual([
       "学习总览",
       "文書管理",
-      "RAG検索",
-      "分析依頼",
+      "RAG/AI分析",
+      "KPI任务分析",
       "承認管理",
+      "AI管理",
     ]);
     expect(within(screen.getByLabelText("企业业务流程卡片")).getAllByRole("button").map((button) => button.textContent)).toEqual([
       "文書管理を開く",
-      "RAG検索を開く",
-      "分析依頼を開く",
-      "承認管理を開く",
+      "打开 RAG/AI分析",
+      "打开 KPI任务分析",
+      "打开承認管理",
     ]);
   });
 
@@ -63,11 +65,11 @@ describe("App navigation", () => {
     expect(screen.getByText("frontend/src/pages/DocumentsPage.tsx")).toBeInTheDocument();
 
     rerender(<LearningSidebar page="rag" latestEvent={null} />);
-    expect(screen.getByText(/RAG検索 · RagPage · 2 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText(/RAG\/AI分析 · RagPage · 2 \/ 4/)).toBeInTheDocument();
     expect(screen.getByText(/固定逻辑回答/)).toBeInTheDocument();
 
     rerender(<LearningSidebar page="tasks" latestEvent={null} />);
-    expect(screen.getByText(/分析依頼 · TasksPage · 3 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByText(/KPI任务分析 · TasksPage · 3 \/ 4/)).toBeInTheDocument();
     expect(screen.getAllByText(/初始为 idle；没有 task_id、SSE 事件或 report/).length).toBeGreaterThan(0);
     expect(screen.getByText("Stream")).toBeInTheDocument();
     expect(screen.getByText(/【BackgroundTasks】.*【LangGraph】/)).toBeInTheDocument();
@@ -114,7 +116,7 @@ describe("App navigation", () => {
       }, 200)));
 
     render(<App initialSession={ADMIN_SESSION} />);
-    fireEvent.click(screen.getByRole("button", { name: "分析依頼" }));
+    fireEvent.click(screen.getByRole("button", { name: "KPI任务分析" }));
     fireEvent.change(screen.getByLabelText("確認したい経営課題"), { target: { value: "関東飲料の売上を確認" } });
     fireEvent.click(screen.getByRole("button", { name: "分析を開始" }));
 
@@ -136,10 +138,10 @@ describe("App navigation", () => {
   it("navigates to tasks from dashboard shortcut", async () => {
     render(<App initialSession={ADMIN_SESSION} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "分析依頼を開く" }));
+    fireEvent.click(screen.getByRole("button", { name: "打开 KPI任务分析" }));
 
-    expect(screen.getAllByRole("heading", { name: "分析依頼" }).length).toBeGreaterThan(0);
-    expect(screen.getByText("分析依頼を作成し、SSE の進捗と現在のローカルワークフローが生成したレポートを確認します。")).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "KPI任务分析" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/旧 Task API \+ SSE/).length).toBeGreaterThan(0);
   });
 
   it("navigates to documents from dashboard shortcut", async () => {
@@ -158,17 +160,17 @@ describe("App navigation", () => {
 
   it("navigates to rag from dashboard shortcut", async () => {
     render(<App initialSession={ADMIN_SESSION} />);
-    fireEvent.click(screen.getByRole("button", { name: "RAG検索を開く" }));
+    fireEvent.click(screen.getByRole("button", { name: "打开 RAG/AI分析" }));
 
-    expect(screen.getByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
-    expect(screen.getByText(/RAG検索 · RagPage · 2 \/ 4/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "RAG検索 / AI分析" })).toBeInTheDocument();
+    expect(screen.getByText(/RAG\/AI分析 · RagPage · 2 \/ 4/)).toBeInTheDocument();
     expect(screen.getAllByText("POST /api/v1/internal-rag/answer").length).toBeGreaterThan(0);
   });
 
   it("records a local-only clear action in the learning sidebar", () => {
     render(<App initialSession={ADMIN_SESSION} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
+    fireEvent.click(screen.getByRole("button", { name: "RAG/AI分析" }));
     fireEvent.click(screen.getByRole("button", { name: "結果をクリア" }));
 
     expect(screen.getByText("clearRetrievalResult()")).toBeInTheDocument();
@@ -184,7 +186,7 @@ describe("App navigation", () => {
     }), { status: 422 })));
 
     render(<App initialSession={ADMIN_SESSION} />);
-    fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
+    fireEvent.click(screen.getByRole("button", { name: "RAG/AI分析" }));
     fireEvent.change(screen.getByLabelText("質問"), { target: { value: "関東飲料の未登録要因" } });
     fireEvent.click(screen.getByRole("button", { name: "回答を生成" }));
 
@@ -202,7 +204,7 @@ describe("App navigation", () => {
     }), { status: 200 })));
 
     render(<App initialSession={ADMIN_SESSION} />);
-    fireEvent.click(screen.getByRole("button", { name: "承認管理を開く" }));
+    fireEvent.click(screen.getByRole("button", { name: "打开承認管理" }));
 
     expect(await screen.findByRole("heading", { name: "承認管理" })).toBeInTheDocument();
   });
@@ -218,8 +220,8 @@ describe("App navigation", () => {
     expect(screen.getByText("04 组件树")).toBeInTheDocument();
     expect(screen.getByText("14 StrictMode")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
-    expect(await screen.findByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "RAG/AI分析" }));
+    expect(await screen.findByRole("heading", { name: "RAG検索 / AI分析" })).toBeInTheDocument();
     expect(screen.getByLabelText("React Lifecycle Live Status")).toHaveTextContent(/RagPage|Mounted|已挂载|Updated|更新/);
   });
 

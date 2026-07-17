@@ -29,3 +29,15 @@ class InMemoryReportRepository:
         with self._lock:
             report = self._reports.get(task_id)
             return deepcopy(report) if report is not None else None
+
+    def list_recent(self, *, limit: int = 50) -> list[Report]:
+        """按创建时间倒序列出最近报告。"""
+
+        safe_limit = max(1, min(limit, 100))
+        with self._lock:
+            items = sorted(
+                self._reports.values(),
+                key=lambda item: item.created_at,
+                reverse=True,
+            )
+            return [deepcopy(item) for item in items[:safe_limit]]

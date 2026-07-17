@@ -36,6 +36,39 @@ export interface CurrentUserResponse {
 export interface HealthResponse {
   status: string;
   service: string;
+  repository_backend?: string;
+  provider?: string;
+}
+
+/** GET /api/v1/reports 目录项（无 markdown 全文）。 */
+export interface ReportCatalogItem {
+  task_id: string;
+  provider: string;
+  approval_status: string;
+  created_at: string;
+  markdown_preview: string;
+}
+
+export interface ReportCatalogResponse {
+  items: ReportCatalogItem[];
+  total: number;
+}
+
+/** GET/PUT /api/v1/admin/llm/runtime */
+export type LlmProviderMode = "stub" | "openrouter" | "fallback_chain";
+
+export interface LlmRuntimeResponse {
+  llm_provider_mode: LlmProviderMode;
+  repository_backend: string;
+  chain_order: string[];
+  openrouter_key_configured: boolean;
+  nvidia_key_configured: boolean;
+  gemini_key_configured: boolean;
+  local_qwen_enabled: boolean;
+  run_real_llm_smoke: boolean;
+  cost_risk_notes: string[];
+  switchable_modes: LlmProviderMode[];
+  note: string;
 }
 
 /** POST /api/tasks 的最小响应。 */

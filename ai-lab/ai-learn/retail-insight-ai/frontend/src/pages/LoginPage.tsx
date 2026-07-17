@@ -10,6 +10,7 @@ const protectedPaths = new Set([
   "/rag",
   "/analysis",
   "/approval",
+  "/ai-admin",
 ]);
 
 function getReturnTarget(): string {

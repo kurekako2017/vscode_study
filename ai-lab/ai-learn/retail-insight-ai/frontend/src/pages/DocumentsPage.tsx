@@ -222,9 +222,9 @@ export function DocumentsPage({
   return (
     <>
       <PageHeader
-        eyebrow="文書ワークスペース"
+        eyebrow="文書ワークスペース / PostgreSQL"
         title="文書管理"
-        description="現在の Backend API を使用して、文書のアップロード、詳細確認、アーカイブ、Import、Chunk 操作を行います。"
+        description="列表来自当前 Backend Repository（正式运行为 PostgreSQL）。上传后正文写入数据库 content 字段（非独立对象存储）。状态：uploaded→Import(validated)→Chunk 后才适合检索。"
       />
 
       <section className="documents-shell" aria-label="文档管理页面">
@@ -334,6 +334,15 @@ export function DocumentsPage({
                     </div>
                     <div className="row-meta">
                       <StatusBadge value={document.status} />
+                      <span title="检索就绪提示">
+                        {document.status === "validated" || document.status === "indexed"
+                          ? "已 Import，需确认 Chunk"
+                          : document.status === "uploaded"
+                            ? "需 Import"
+                            : document.status === "archived"
+                              ? "已归档"
+                              : document.status}
+                      </span>
                       <span>{document.document_type}</span>
                       <span>{formatDate(document.updated_at)}</span>
                     </div>
@@ -376,6 +385,22 @@ export function DocumentsPage({
                 <div><dt>作成日時</dt><dd>{formatDate(selectedDocument.created_at)}</dd></div>
                 <div><dt>更新日時</dt><dd>{formatDate(selectedDocument.updated_at)}</dd></div>
                 <div><dt>Chunk 数</dt><dd>{chunkData ? chunkData.items.length : chunkLoading ? "読み込み中…" : "—"}</dd></div>
+                <div>
+                  <dt>检索就绪</dt>
+                  <dd>
+                    {chunkData && chunkData.items.length > 0
+                      ? "已 Chunk，可用于 RAG 检索"
+                      : selectedDocument.status === "validated"
+                        ? "已 Import，请执行 Chunk"
+                        : selectedDocument.status === "uploaded"
+                          ? "仅 uploaded：请 Import → Chunk"
+                          : selectedDocument.status}
+                  </dd>
+                </div>
+                <div>
+                  <dt>存储说明</dt>
+                  <dd>正文保存在 PostgreSQL documents.content（仓库内 Scenario01 文件需上传后才入库）</dd>
+                </div>
                 <div><dt>タグ</dt><dd>{selectedDocument.tags.length > 0 ? selectedDocument.tags.join(", ") : "—"}</dd></div>
               </dl>
 

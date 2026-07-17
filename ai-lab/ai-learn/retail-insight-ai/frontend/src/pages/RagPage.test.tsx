@@ -62,11 +62,11 @@ describe("RagPage", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("検索方式: keyword / 一致件数: 1");
     expect(await screen.findByText("Monthly policy evidence.")).toBeInTheDocument();
-    expect(screen.getByText("RAG-BIZ-001")).toBeInTheDocument();
+    expect(screen.getAllByText("RAG-BIZ-001").length).toBeGreaterThan(0);
     expect(screen.getByText("POST /api/v1/document-retrieval/search")).toBeInTheDocument();
     expect(screen.getByText("业务测试与源码学习")).toBeInTheDocument();
-    expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("上一步：文書管理");
-    expect(screen.getByLabelText("RAG検索 上一步下一步")).toHaveTextContent("下一步：分析依頼");
+    expect(screen.getByLabelText("RAG/AI分析 上一步下一步")).toHaveTextContent("上一步：文書管理");
+    expect(screen.getByLabelText("RAG/AI分析 上一步下一步")).toHaveTextContent("下一步：承認管理");
     expect(screen.getByText("如何选择 RAG 输入")).toBeInTheDocument();
     expect(screen.getAllByText(/02_関東地域在庫レポート\.md/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/検索語：神奈川 配送遅延 夕方欠品/).length).toBeGreaterThan(0);
