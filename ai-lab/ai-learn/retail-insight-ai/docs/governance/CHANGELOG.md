@@ -1,5 +1,17 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 — ERIP V1.0 全量文档收尾
+
+### 变更
+- 权威 Volume01 深合并旧 Volume 独有中日问答与故障/压迫章节（§20）
+- 旧 Volume 归档于 `docs/_archive_candidate/ai-agent-retail-handbook-v3/`
+- `03_AI核心知识.md` 新增强制「ERIP V1.0 技术知识点一览」105 行（版本来自 lock/requirements/Docker）
+- 01/02/07 与 handbook/入口文档口径统一（含 documents.content、S3 未接入）
+
+### 未变更
+- 代码/测试/Docker/Migration/脚本/`.env`；未 commit/push
+
+
 ## 2026-07-17 — ERIP V1.0 Volume 真合并 / 归档 / 03 矩阵 / 静态验证
 
 ### 变更

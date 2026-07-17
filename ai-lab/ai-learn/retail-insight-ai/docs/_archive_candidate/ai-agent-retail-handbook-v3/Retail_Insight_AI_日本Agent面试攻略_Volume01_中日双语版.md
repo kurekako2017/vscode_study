@@ -1,12 +1,10 @@
-# 【已归档】Retail Insight AI 日本 Agent 面试攻略 Volume01
+# 【已归档 / 待删除区】Retail Insight AI 日本 Agent 面试攻略 Volume01
 
-> **状态：已归档（非活动文档）**  
-> **归档路径：** `docs/_archive_candidate/handbook-interview/`  
-> **当前项目正式名称：Enterprise Retail Intelligence Platform（ERIP）V1.0**  
-> **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`  
-> TaskService / LangGraph / LangChain 等有价值问答已合并进权威 Volume01 第 6、7、13 章（并按 V1.0 主链校正）。  
-> **禁止**用本文件作面试背诵源。  
-> 基线（若与正文冲突，以权威 Volume01 / `03_AI核心知识.md` 为准）：PG 297/6 · IM 286/62 · FE 116 · head `20260717_08_ai_runtime` · stub · PostgreSQL 正式。
+> **状态：已合并并移至待删除区（不删除文件本体）**
+> **归档路径：** `docs/_archive_candidate/ai-agent-retail-handbook-v3/`
+> **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+> 独有问答（FastAPI/TaskService/LangGraph/LangChain/RAG/pgvector/Agent/TL）已写入权威 Volume §6–7、§13、**§20** 并按 ERIP V1.0 校正。
+> **禁止**用本文件作面试背诵。
 
 ---
 

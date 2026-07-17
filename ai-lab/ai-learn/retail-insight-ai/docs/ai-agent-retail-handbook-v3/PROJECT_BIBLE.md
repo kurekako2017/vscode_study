@@ -1,5 +1,7 @@
 # PROJECT_BIBLE
 
+> **文档角色：** 活动 handbook 章节。若与文首 ERIP V1.0 摘要冲突，以源码 + `03_AI核心知识.md` 技术表 + 权威 Volume01 为准。历史阶段表述保留时仅作演进记录。
+
 本文件是 `ai-agent-retail-handbook-v3` 的唯一最高规则，也是 `Enterprise Retail Intelligence Platform (ERIP)` 的统一世界观。所有正文文档必须引用并遵守本文件。
 
 # 项目名称

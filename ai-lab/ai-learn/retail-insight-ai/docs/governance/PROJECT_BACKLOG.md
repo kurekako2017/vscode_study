@@ -1,5 +1,16 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: 全量文档收尾（深合并 + 03 一览 + 归档路径）
+
+- [x] Volume 深合并与归档路径 `docs/_archive_candidate/ai-agent-retail-handbook-v3/`
+- [x] 03「ERIP V1.0 技术知识点一览」105 行
+- [x] 核心五材料与 handbook 活动文档一致性
+- [ ] 用户自行 commit
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 Completed: Volume 真合并 / 旧稿归档 / 03 矩阵 / 静态验证
 
 - [x] ERIP Volume01 合并 TaskService/LangGraph/LangChain 有价值问答并校正主链

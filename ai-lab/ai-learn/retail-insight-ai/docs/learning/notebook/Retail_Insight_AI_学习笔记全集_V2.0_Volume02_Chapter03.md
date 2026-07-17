@@ -1,4 +1,6 @@
 # Retail Insight AI 学习笔记全集（正式版 V2.0）
+> **历史学习笔记**：项目现名 ERIP V1.0；本文保留教学叙述。现状数字与架构以 handbook 权威材料与源码为准。
+
 
 # Volume 02：Workflow、Learning Trace 与 LangGraph
 

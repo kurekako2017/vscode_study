@@ -74,7 +74,7 @@ INTERVIEW_GUIDE.md
 
 | 历史文件 | 处理 |
 |---|---|
-| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已移动**至 [`../_archive_candidate/handbook-interview/`](../_archive_candidate/handbook-interview/)；有价值内容已并入 ERIP Volume01 |
+| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已合并并移至待删除区** [`../_archive_candidate/ai-agent-retail-handbook-v3/`](../_archive_candidate/ai-agent-retail-handbook-v3/)；有价值内容已并入 ERIP Volume01 |
 
 **统一业务主链：**
 
@@ -127,7 +127,7 @@ PROJECT_BIBLE.md → 03_AI核心知识.md → 08_架构图册.md → 09_系统�
 ## 归档
 
 - [../_archive_candidate/](../_archive_candidate/)
-- [../_archive_candidate/handbook-interview/](../_archive_candidate/handbook-interview/)（旧 Volume01）
+- [../_archive_candidate/ai-agent-retail-handbook-v3/](../_archive_candidate/ai-agent-retail-handbook-v3/)（旧 Volume01）
 - [../_archive_candidate/handbook-docs/](../_archive_candidate/handbook-docs/)
 - [../_archive_candidate/handbook-root/](../_archive_candidate/handbook-root/)
 
@@ -141,4 +141,4 @@ PROJECT_BIBLE.md → 03_AI核心知识.md → 08_架构图册.md → 09_系统�
 
 - V3: handbook 统一结构。
 - V1.0 Final Doc Pass: ERIP 名称、数字、版本表。
-- **V1.0 Volume 合并 (2026-07-17)**: ERIP Volume01（旧稿已归档） 真合并；旧 Volume 移入 `_archive_candidate/handbook-interview/`；`03` 版本矩阵+知识点表定稿；活动文档链接修复。
+- **V1.0 Volume 合并 (2026-07-17)**: ERIP Volume01（旧稿已归档） 真合并；旧 Volume 移入 `_archive_candidate/ai-agent-retail-handbook-v3/`；`03` 版本矩阵+知识点表定稿；活动文档链接修复。

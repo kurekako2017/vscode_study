@@ -2,11 +2,11 @@
 
 ## Volume 01 - 项目介绍与系统架构（中日双语 · 权威合并版）
 
-> 最后更新：2026-07-17  
-> **权威状态：本文件是 Volume01 唯一活动权威稿**  
-> 项目正式名称：**Enterprise Retail Intelligence Platform（ERIP）**  
-> 早期 MVP 历史名称：Retail Insight AI（全文仅此处出现一次）  
-> 旧稿 `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` 已归档至 `docs/_archive_candidate/handbook-interview/`，不作面试背诵源。  
+> 最后更新：2026-07-17
+> **权威状态：本文件是 Volume01 唯一活动权威稿**
+> 项目正式名称：**Enterprise Retail Intelligence Platform（ERIP）**
+> 早期 MVP 历史名称：Retail Insight AI（全文仅此处出现一次）
+> 旧稿 `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` 已归档至 `docs/_archive_candidate/ai-agent-retail-handbook-v3/`，不作面试背诵源。
 > 口径以当前仓库源码、PostgreSQL、正式页面、Compose/本地部署为准。
 
 **配套权威材料（与本册一起使用）**
@@ -114,9 +114,9 @@
 
 ## 1.3 开场注意
 
-- 先业务，后技术。  
-- 不把 InMemory 说成正式运行。  
-- 未跑真实付费 smoke，不谈“已验证真实模型效果”。  
+- 先业务，后技术。
+- 不把 InMemory 说成正式运行。
+- 未跑真实付费 smoke，不谈“已验证真实模型效果”。
 
 ---
 
@@ -135,12 +135,12 @@ InMemory は自動テスト用アダプタのみで、正式画面や企業受�
 
 ## 2.2 中文理解
 
-ERIP 解决的是“会前如何稳定产出有依据的分析与可审批报告”，不是聊天 Demo。  
+ERIP 解决的是“会前如何稳定产出有依据的分析与可审批报告”，不是聊天 Demo。
 栈已落地：React + FastAPI + PostgreSQL。
 
 ## 2.3 面试官常问
 
-**Q（日）：このプロジェクトの概要を説明してください。**  
+**Q（日）：このプロジェクトの概要を説明してください。**
 按 2.1 回答，再补一句测试数字与默认 stub。
 
 ---
@@ -159,13 +159,13 @@ ERIP 解决的是“会前如何稳定产出有依据的分析与可审批报告
 
 **简历 bullet 示例**
 
-- JWT Access Token + 冻结 RBAC（admin/manager/employee）  
-- 文档 Upload/Import/Chunk + Scenario01 幂等种子  
-- Internal RAG（默认零真实 LLM）+ Citation  
-- LLM Gateway 双路由 + Decimal Ledger + Fallback  
-- Approval 状态机 + ReportVersion + ownership  
-- Persistent Audit；AI Runtime `ai_runtime_settings`  
-- Compose 8080 / 本地 5173  
+- JWT Access Token + 冻结 RBAC（admin/manager/employee）
+- 文档 Upload/Import/Chunk + Scenario01 幂等种子
+- Internal RAG（默认零真实 LLM）+ Citation
+- LLM Gateway 双路由 + Decimal Ledger + Fallback
+- Approval 状态机 + ReportVersion + ownership
+- Persistent Audit；AI Runtime `ai_runtime_settings`
+- Compose 8080 / 本地 5173
 
 ---
 
@@ -188,7 +188,7 @@ Browser
 
 ## 4.2 中文理解
 
-前端持会话与权限 UX；后端持权威授权、状态机、审计与费用台账。  
+前端持会话与权限 UX；后端持权威授权、状态机、审计与费用台账。
 LLM 只经 Gateway。普通 RAG 默认可不调用 Provider。
 
 ## 4.3 纯文本主流程
@@ -286,8 +286,8 @@ error の後に done を送らない、という契約を守ります。
 
 旧 Volume 以 LangGraph 为中心。V1.0 面试仍可能被追问，但必须说明：
 
-- **主链**是 Service 状态机 + Gateway + PostgreSQL  
-- LangGraph（依赖 **1.1.10**）服务于 **KPI/Task 类 workflow 能力**  
+- **主链**是 Service 状态机 + Gateway + PostgreSQL
+- LangGraph（依赖 **1.1.10**）服务于 **KPI/Task 类 workflow 能力**
 - 业务收费 LLM **不**经业务层直连 LangChain SDK，而经 **LLMGatewayService**
 
 ## 7.2 问题
@@ -335,9 +335,9 @@ Token は sessionStorage（erip.access_token）のみ。PyJWT 2.10.1 です。
 
 ## 8.3 源码
 
-- `backend/app/security/*`  
-- `frontend/src/auth/AuthContext.tsx`、`permissions.ts`  
-- `frontend/src/routing/ProtectedRoute.tsx`  
+- `backend/app/security/*`
+- `frontend/src/auth/AuthContext.tsx`、`permissions.ts`
+- `frontend/src/routing/ProtectedRoute.tsx`
 
 ---
 
@@ -510,16 +510,16 @@ React と FastAPI、正式 Repository は PostgreSQL、Alembic head は 08_ai_ru
 
 ## 15.2 5 分钟架构要点
 
-1. 业务课题  
-2. 正式页面与权限  
-3. 文档主链  
-4. 普通 RAG 零真实 LLM  
-5. Gateway 双路由 + Ledger + Fallback  
-6. ReportVersion + Approval  
-7. Persistent Audit  
-8. PostgreSQL 权威 / InMemory 测试  
-9. 5173 / 8080  
-10. 数字与未完成项  
+1. 业务课题
+2. 正式页面与权限
+3. 文档主链
+4. 普通 RAG 零真实 LLM
+5. Gateway 双路由 + Ledger + Fallback
+6. ReportVersion + Approval
+7. Persistent Audit
+8. PostgreSQL 权威 / InMemory 测试
+9. 5173 / 8080
+10. 数字与未完成项
 
 ---
 
@@ -559,44 +559,259 @@ React と FastAPI、正式 Repository は PostgreSQL、Alembic head は 08_ai_ru
 
 ## 已交付（可讲）
 
-- JWT / RBAC / ProtectedRoute / 401·403  
-- 文書 Upload/Import/Chunk + seed_scenario01  
-- RAG/Citation（默认零真实 LLM）  
-- 显式 AI + 董事会报告 + ReportVersion  
-- Approval API 状态机 + History  
-- Persistent Audit  
-- LLM Gateway / Decimal Ledger / Fallback / Circuit  
-- AI Runtime 持久化  
-- 正式 Frontend 导航与 handoff  
-- Docker Compose + Alembic + Stub E2E  
-- 测试：297/6、286/62、116/116  
+- JWT / RBAC / ProtectedRoute / 401·403
+- 文書 Upload/Import/Chunk + seed_scenario01
+- RAG/Citation（默认零真实 LLM）
+- 显式 AI + 董事会报告 + ReportVersion
+- Approval API 状态机 + History
+- Persistent Audit
+- LLM Gateway / Decimal Ledger / Fallback / Circuit
+- AI Runtime 持久化
+- 正式 Frontend 导航与 handoff
+- Docker Compose + Alembic + Stub E2E
+- 测试：297/6、286/62、116/116
 
 ## 未完成（必须诚实）
 
-- 真实付费 smoke 默认化 / 真实模型效果验证  
-- Billing UI / 多租户预算 UI  
-- SIEM / WORM / 全量生产 Streaming  
-- DeepSeek 默认启用  
-- Redis / RabbitMQ / K8s 作为本仓默认可运行栈  
+- 真实付费 smoke 默认化 / 真实模型效果验证
+- Billing UI / 多租户预算 UI
+- SIEM / WORM / 全量生产 Streaming
+- DeepSeek 默认启用
+- Redis / RabbitMQ / K8s 作为本仓默认可运行栈
 
 ---
 
 # 18. 本册训练方法
 
-1. 每天背 60 秒 + 1 分钟 + 主链  
-2. 隔天练 25 问中的 8 题  
-3. 每周一次 5 分钟架构  
-4. 辅线（Task/LangGraph）单独练，避免抢主链  
-5. 版本数字以 `03_AI核心知识.md` 为准  
+1. 每天背 60 秒 + 1 分钟 + 主链
+2. 隔天练 25 问中的 8 题
+3. 每周一次 5 分钟架构
+4. 辅线（Task/LangGraph）单独练，避免抢主链
+5. 版本数字以 `03_AI核心知识.md` 为准
 
 ---
+
+
+
+---
+
+# 20. 从旧 Volume 合并：完整中日双语模块问答（V1.0 校正）
+
+> 以下问答来自历史 `Retail_Insight_AI_日本Agent面试攻略_Volume01` 的独有结构，**内容已全部改写为 ERIP V1.0 事实**。
+> KPI/Task/LangGraph 明确标注为**辅线**；企业主链仍是 登录→文書→RAG→AI→报告→审批→审计→Ledger。
+
+## 20.1 FastAPI 完整问答（旧 §4 合并）
+
+### 面试官（日）
+
+```text
+なぜ FastAPI を使いましたか。
+```
+
+### 回答（日）
+
+```text
+Python ベースの AI / RAG / LLM Gateway と相性がよく、API 層をシンプルに保てるためです。
+Pydantic による入力検証、OpenAPI 自動生成、非同期 I/O、Task 辅線の SSE と相性が良いです。
+バージョンは FastAPI 0.136.3、Uvicorn 0.49.0、Pydantic 2.13.4 です。
+FastAPI は HTTP Boundary に限定し、業務は Service、永続化は Repository、課金 LLM は Gateway に分離しています。
+```
+
+### 中文理解
+
+- 选 FastAPI 是因为 Python AI 栈统一与契约能力，不是“因为简单”
+- 只做 HTTP 边界
+- 业务不写在 Route
+
+### TL 追问（日）
+
+```text
+FastAPI に全部の処理を書けばよいのではないですか。
+```
+
+### 回答（日）
+
+```text
+API 層に Workflow・Ledger・Approval まで書くと責務が肥大し、テストと保守が難しくなります。
+そのため Route は薄く、Service / Repository / Gateway に分けています。
+```
+
+## 20.2 TaskService 完整问答（旧 §5 合并 · 辅线）
+
+### 面试官（日）
+
+```text
+TaskService は何を担当しますか。
+```
+
+### 回答（日）
+
+```text
+KPI任务分析辅線における Application Service です。
+タスク作成、状態更新、Workflow 起動、イベント発行、結果保存、失敗処理を担当します。
+KPI 計算式そのもの、Prompt 本文、RAG 検索本体は持ちません。
+企業主鎖の中心は文書→RAG→AI→取締役会報告→承認であり、TaskService は会議資料の KPI 補完位置付けです。
+```
+
+### 中文理解
+
+TaskService 是用例协调层（辅线），不是大杂烩，也不是整站唯一核心。
+
+## 20.3 LangGraph / LangChain 完整问答（旧 §6–7 合并 · 辅线）
+
+### 面试官（日）
+
+```text
+なぜ LangGraph を使いましたか。LangChain だけではだめですか。
+```
+
+### 回答（日）
+
+```text
+LangGraph（1.1.10）は KPI/Task 辅線で State / Node / Edge を明示し、条件分岐と失敗位置の把握を容易にします。
+LangChain 系依存は RAG 部品概念やライブラリ依存として現れますが、
+課金 side-effect の唯一入口は LLMGatewayService であり、業務から SDK を直接呼びません。
+通常 Internal RAG は既定で実 Provider を呼びません。
+LangGraph と主鎖 Service 状態機は役割分担であり、全部を Agent/Graph にしないのが設計です。
+```
+
+### 中文理解
+
+- LangGraph：辅线流程状态
+- LangChain 依赖：RAG 相关库生态
+- Gateway：收费调用唯一入口
+- 主链：Service + PostgreSQL 状态机
+
+## 20.4 RAG / Vector / pgvector 完整问答（旧 §8–9 合并 · V1.0 校正）
+
+### 面试官（日）
+
+```text
+RAG はどこで使いますか。なぜ全部を Vector DB に入れないのですか。
+```
+
+### 回答（日）
+
+```text
+文書 Upload → Import → Chunk の後、document-retrieval と internal-rag で Citation 付き回答を返します。
+原文は PostgreSQL documents.content に保存します。S3/MinIO は未接入です。
+Keyword retrieval が中心の実運用経路で、通常 RAG は既定で実 LLM Provider を呼びません。
+Embedding / vector 能力は schema と EmbeddingService 境界があり、provider が disabled の場合もあります。
+未実行の有料 Embedding/LLM smoke を「検証済み」とは言いません。
+構造化 KPI は Task/固定計算、非構造文書は RAG、と保存・検索方式を分けます。
+pgvector は PostgreSQL 同一基盤でベクトル列を扱えるため採用（イメージ pgvector/pgvector:pg16）。
+大規模専用 VectorDB（Qdrant/Milvus）は将来拡張候補です。
+```
+
+### 中文理解
+
+- 原文在 PG，不在 S3
+- 普通 RAG 默认可零真实 LLM
+- Embedding 能力存在但可 disabled，禁止夸大
+- 结构化 vs 非结构化分流
+
+## 20.5 Research Agent / Agent 设计（旧 §10 合并 · 辅线）
+
+### 面试官（日）
+
+```text
+Research Agent は何をしますか。なぜ全部 Agent にしないのですか。
+```
+
+### 回答（日）
+
+```text
+Research は不確実な調査・補足情報に限定し、KPI の決定的計算や Approval 状態遷移は固定実装にします。
+Tool allowlist、timeout、出典付与、失敗時 fallback を意識します。
+全部 Agent にすると、Import/Approval/Ledger の検証可能性が下がるためです。
+```
+
+## 20.6 生产故障与调查案例（面试可用 · V1.0）
+
+| 案例 | 现象 | 调查顺序 | 设计对应 |
+|---|---|---|---|
+| A | AI 分析 429 | request_id → Ledger reserved → quota 桶 | 额度预占 |
+| B | employee approve 403 | 权限 registry + Audit denied | RBAC 职责分离 |
+| C | submit 409 | pending partial unique + 行锁 | 并发状态机 |
+| D | Runtime 409 | expected_version | 乐观锁 |
+| E | Runtime 503 | InMemory 调 admin AI Runtime | PG-only 企业能力 |
+| F | RAG 无结果 | 未 Import/Chunk 或 document_id 过滤 | 文档主链 |
+| G | 5173 不能业务测 | 只起了 Vite | 必须完整 start_local |
+| H | 费用异常 | effective_mode 是否离开 stub | Kill Switch / Runtime |
+| I | 报告有了但无审批 | 未 submit（设计如此） | 生成≠批准 |
+| J | Compose unhealthy | PG → alembic → backend → frontend | entrypoint 顺序 |
+
+### 日文口述模板
+
+```text
+障害調査は request_id を起点に、Audit、業務状態、Ledger / provider attempts、
+Backend ログ、PostgreSQL 行、Frontend セッションの順で切り分けます。
+```
+
+## 20.7 压迫面试（日中）
+
+### Q. 実務経験ですか？
+
+```text
+企業要件に基づき ERIP V1.0 を設計・実装・受入可能な状態まで担当しました。
+商用 SaaS 全顧客運用件数は盛りません。実装済みと未完了を分けて説明します。
+```
+
+### Q. 本当に一人で？
+
+```text
+中核の Backend/Frontend 連携、RBAC、文書/RAG、Gateway、Approval、DB/Compose、テストを担当しました。
+本番 SRE チーム規模と同一とは言いません。
+```
+
+### Q. 本番障害件数は？
+
+```text
+件数を作りません。代わりに 403/409/429/Ledger/Compose の調査手順を説明できます。
+```
+
+### Q. 弱点は？
+
+```text
+有料 smoke 既定化、Billing UI、多テナント予算、SIEM/WORM、S3、企業 IdP です。
+JWT/Approval/PostgreSQL を弱点としての「未完成」には挙げません。
+```
+
+## 20.8 TL 连续追问链（旧 §11 扩展）
+
+```text
+Q: なぜ Gateway か → 課金と証跡の唯一入口
+Q: なぜ双ルートか → 分析頻度 vs 取締役会品質
+Q: なぜ ReportVersion か → 承認対象の不変化
+Q: なぜ InMemory を残すか → 高速 unittest / 故障隔離のみ
+Q: なぜ 5173 と 8080 を分けるか → 開発と Compose 受入のデータ境界
+Q: LangGraph は主鎖か → 否、KPI/Task 辅線
+```
+
+## 20.9 合并对照证明（源→目标）
+
+| 旧 Volume 章节 | 已并入本文件位置 | 校正要点 |
+|---|---|---|
+| §1 开场 | §1 | ERIP 主链，非 Task-only |
+| §2 概要 | §2 | PostgreSQL 正式 |
+| §3 架构 | §4 | Gateway/Approval/Audit |
+| §4 FastAPI | §5 + §20.1 | 版本号 + 薄 Route |
+| §5 TaskService | §6 + §20.2 | 标注辅线 |
+| §6–7 LangGraph/LangChain | §7 + §20.3 | 辅线 + Gateway 主入口 |
+| §8–9 RAG/pgvector | §9 + §20.4 | content 在 PG；S3 未接入；Embedding 边界 |
+| §10 Agent | §13 + §20.5 | 不全 Agent 化 |
+| §11 TL 链 | §14 + §20.8 | 增加 V1.0 追问 |
+| §12–13 背诵/训练 | §15 + §18 | 统一数字 |
+| §14 增量 25 问 | §16 | 297/286/116/08 |
+| （新增）故障/压迫 | §20.6–20.7 | V1.0 真实边界 |
+
 
 # 19. 归档说明（合并结果）
 
 | 文件 | 状态 |
 |---|---|
 | **本文件** | Volume01 **唯一活动权威** |
-| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已移动**至 `docs/_archive_candidate/handbook-interview/` |
+| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已移动**至 `docs/_archive_candidate/ai-agent-retail-handbook-v3/` |
 
 旧稿中 Task/LangGraph/LangChain 有价值问答已并入本册第 6、7、13 章，并按 V1.0 主链校正。
 

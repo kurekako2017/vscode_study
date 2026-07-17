@@ -74,11 +74,19 @@
 - handbook 根目录文档是否继续承担长期学习价值。
 - 任何未来删除动作都必须先确认 README 仍有替代入口。
 
-## handbook-interview（2026-07-17 追加）
+## ai-agent-retail-handbook-v3（见下）
 
 | 文件 | 说明 |
 |---|---|
 | `handbook-interview/Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | 旧 Volume01；已并入 ERIP 权威 Volume01 后移入此处 |
+
+**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+
+## ai-agent-retail-handbook-v3（待删除区 · 2026-07-17）
+
+| 文件 | 说明 |
+|---|---|
+| `ai-agent-retail-handbook-v3/Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | 旧 Volume01；已合并入 ERIP 权威 Volume01 后移入本目录 |
 
 **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
 

@@ -1,5 +1,7 @@
 # 10_Production_Roadmap
 
+> **文档角色：** 活动 handbook 章节。若与文首 ERIP V1.0 摘要冲突，以源码 + `03_AI核心知识.md` 技术表 + 权威 Volume01 为准。历史阶段表述保留时仅作演进记录。
+
 > **说明**：标题保留 “Production Roadmap”，但 **JWT/RBAC、Approval API、PostgreSQL、正式 Frontend、Compose 已是 V1.0 已交付**。  
 > 本节“后续”应理解为 Billing UI / SIEM / 多租户预算 / 真实付费 smoke 默认化等强化，而不是“平台尚未存在”。  
 > 基线：PG **297/6** · IM **286/62** · FE **116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。

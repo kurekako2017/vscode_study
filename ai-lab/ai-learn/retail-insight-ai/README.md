@@ -37,6 +37,8 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 
 **Repository 定位**：PostgreSQL 是 V1.0 **正式运行与业务验收**的权威存储；Docker Compose **默认且必须**使用 PostgreSQL。InMemory **仅**自动化单元测试适配器/故障隔离，**不是**正式页面、企业验收或生产 Repository（代码保留，未删除）。
 
+**文档原文：** PostgreSQL `documents.content`（未接入 S3/MinIO）。
+
 **验收基线**：PG **297 tests / 6 skipped** · InMemory **286 / 62 skipped** · Frontend **116/116** · Alembic **`20260717_08_ai_runtime`** · 默认 LLM **stub** · 本地完整开发 **5173** · Compose **8080**。
 
 权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`（顶部入口 + Appendix M/N）；`docs/development/DEPLOYMENT_GUIDE.md`；`VERIFY_CHECKLIST.md`。  

@@ -1,5 +1,18 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 ERIP V1.0 全量文档收尾（Volume 深合并 / 03 一览表 / 归档路径 / 静态门禁）
+
+- [x] 旧 Volume 独有问答并入权威 Volume01 §20（FastAPI/Task/LangGraph/RAG/pgvector/故障/压迫）
+- [x] 旧 Volume 位于 `docs/_archive_candidate/ai-agent-retail-handbook-v3/`（活动目录无旧文件）
+- [x] `03` 强制章节「ERIP V1.0 技术知识点一览」105 行真实版本表
+- [x] 01/02/07/INTERVIEW/ handbook / 入口文档口径统一
+- [x] 静态验证与全库扫描由执行者完成
+- [ ] 用户确认后自行 commit（本轮不 commit/push）
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 ERIP V1.0 Volume 真合并 + 归档 + 03 矩阵 + 全库静态验证（本轮）
 
 - [x] 两份面试 Volume **真合并**进 `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
