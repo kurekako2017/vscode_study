@@ -1,5 +1,17 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: OpenRouter Real LLM Provider
+
+- [x] 默认 `LLM_PROVIDER_MODE=stub`；`openrouter` 模式 fail-closed 校验 Key/模型
+- [x] 单一 `OpenRouterLLMProvider` 经 Gateway + Model Router 双路由
+- [x] Prompt Builder、JSON 校验、usage_source、重试与错误码映射
+- [x] MockTransport 单元/集成测试；真实 smoke 仅 opt-in 且默认 skip
+- [x] 前端最小展示 Provider/Model/Token/Cost；不暴露 Key
+
+完成记录：不绕过 Gateway/Evidence/Quota/Idempotency/Ledger/Audit；无 Migration；OPENROUTER_API_KEY 未设置时真实 smoke 未执行。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: low_cost / high_quality 双路由
 
 - [x] 统一 LLM Gateway，业务服务不再直接调用 Provider

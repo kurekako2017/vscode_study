@@ -74,18 +74,7 @@ export function RagPage({
   const [ragError, setRagError] = useState<DisplayError | null>(null);
   const [ragResult, setRagResult] = useState<InternalRagAnswerResponse | null>(null);
 
-  /** 成功応答の provider 名から開発 Stub / OpenRouter を表示する（Key や内部設定は出さない）。 */
-function providerModeLabel(provider: string): string {
-  if (provider.startsWith("stub")) {
-    return "Development Stub";
-  }
-  if (provider.startsWith("openrouter")) {
-    return "OpenRouter";
-  }
-  return "Server Provider";
-}
-
-function toDisplayError(reason: unknown, fallbackCode: string, fallbackMessage: string): DisplayError {
+  function toDisplayError(reason: unknown, fallbackCode: string, fallbackMessage: string): DisplayError {
     if (reason instanceof ApiClientError) {
       return { code: reason.code, message: reason.message };
     }

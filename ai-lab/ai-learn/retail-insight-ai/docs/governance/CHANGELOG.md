@@ -1,5 +1,13 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 OpenRouter Real LLM Provider
+
+- 新增 `OpenRouterLLMProvider`、`PromptBuilder`、`response_parser`；默认仍 `LLM_PROVIDER_MODE=stub`。
+- openrouter 模式将 low_cost/high_quality 映射到 `OPENROUTER_*_MODEL` 与 Decimal 价格快照。
+- usage_source 写入 `policy_snapshot`；不新增 Migration。
+- 测试：MockTransport 零外网；`test_openrouter_real_smoke` 默认 skip。
+- 前端显示 Development Stub / OpenRouter 与统一 Provider 错误。
+
 ## 2026-07-17 Dual-route LLM Cost Governance
 
 - 新增 `LLMGatewayService` / Operation Policy / Model Router，收敛 Provider 唯一调用入口。

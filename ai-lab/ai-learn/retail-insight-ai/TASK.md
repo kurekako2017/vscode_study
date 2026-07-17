@@ -1,5 +1,17 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 OpenRouter Real LLM Provider（已完成）
+
+- [x] `LLM_PROVIDER_MODE=stub|openrouter` 与 OpenRouter Settings/SecretStr
+- [x] OpenRouterLLMProvider 实现 analyze / generate_report（MockTransport 可注入）
+- [x] Model Router：low_cost / high_quality 映射可配置模型
+- [x] Prompt Builder + 结构化 JSON 校验 + 有限重试 + 错误映射
+- [x] usage_source 写入 policy_snapshot；Ledger 无 Prompt/Key
+- [x] 前端 Stub/OpenRouter 标识与 Provider 错误展示
+- [x] 默认 suite 零外网；opt-in real smoke 默认 skip
+
+最后更新：2026-07-17
+
 ## 2026-07-17 low_cost / high_quality 双路由（已完成）
 
 - [x] 统一 LLMGatewayService + Operation Policy + Model Router

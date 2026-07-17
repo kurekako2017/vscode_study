@@ -205,7 +205,7 @@ describe("RagPage", () => {
         status: "succeeded",
         created_at: "2026-07-17T00:00:00Z",
       },
-    });
+    }, 200);
     const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(openrouterResponse);
     vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
     await showEvidence(fetchMock);
