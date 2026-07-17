@@ -28,6 +28,17 @@ interface RagPageProps {
   canAnalyze?: boolean;
 }
 
+/** 成功応答の provider 名から開発 Stub / OpenRouter を表示する（Key や内部設定は出さない）。 */
+function providerModeLabel(provider: string): string {
+  if (provider.startsWith("stub")) {
+    return "Development Stub";
+  }
+  if (provider.startsWith("openrouter")) {
+    return "OpenRouter";
+  }
+  return "Server Provider";
+}
+
 export function RagPage({
   onLearningEvent,
   canRetrieve = true,
@@ -63,7 +74,18 @@ export function RagPage({
   const [ragError, setRagError] = useState<DisplayError | null>(null);
   const [ragResult, setRagResult] = useState<InternalRagAnswerResponse | null>(null);
 
-  function toDisplayError(reason: unknown, fallbackCode: string, fallbackMessage: string): DisplayError {
+  /** 成功応答の provider 名から開発 Stub / OpenRouter を表示する（Key や内部設定は出さない）。 */
+function providerModeLabel(provider: string): string {
+  if (provider.startsWith("stub")) {
+    return "Development Stub";
+  }
+  if (provider.startsWith("openrouter")) {
+    return "OpenRouter";
+  }
+  return "Server Provider";
+}
+
+function toDisplayError(reason: unknown, fallbackCode: string, fallbackMessage: string): DisplayError {
     if (reason instanceof ApiClientError) {
       return { code: reason.code, message: reason.message };
     }
@@ -151,7 +173,14 @@ export function RagPage({
     const estimatedInputTokens = Math.max(1, Math.ceil((retrievalQuery.length + evidenceChars) / 4));
     // 确认对话在发送请求之前展示，取消时 fetch 次数保持为 0。
     const confirmed = window.confirm(
-      `AI分析を実行しますか？\nroute_tier: low_cost\n推定入力: ${estimatedInputTokens} tokens\n出力上限: 256 tokens\nProvider: 開発用 Stub-low-cost（外部通信・実費 0）`,
+      [
+        "AI分析を実行しますか？",
+        "route_tier: low_cost",
+        `推定入力: ${estimatedInputTokens} tokens`,
+        "出力上限: 256 tokens",
+        "Provider: サーバー設定（Development Stub または OpenRouter low_cost）",
+        "モデル名はクライアントから指定できません。",
+      ].join("\n"),
     );
     if (!confirmed) return;
     const key = aiIdempotencyKey ?? createAIIdempotencyKey();
@@ -191,7 +220,8 @@ export function RagPage({
         "route_tier: high_quality（AI分析より高コスト）",
         `推定入力: ${estimatedInputTokens} tokens`,
         "出力上限: 1024 tokens",
-        "Provider: 開発用 Stub-high-quality（外部通信・実費 0）",
+        "Provider: サーバー設定（Development Stub または OpenRouter high_quality）",
+        "モデル名はクライアントから指定できません。",
         "成功後も Approval は自動提出しません。",
       ].join("\n"),
     );
@@ -337,15 +367,20 @@ export function RagPage({
             ))}
             {canAnalyze && (
               <div className="result-card" aria-label="明示的 AI 分析">
-                <div className="subheading"><strong>AI分析（明示的呼び出し）</strong><small>Stub / コスト管理対象</small></div>
-                <p>上記の検索証拠だけを使用します。ページ表示や検索では自動実行されません。</p>
+                <div className="subheading">
+                  <strong>AI分析（明示的呼び出し）</strong>
+                  <small>low_cost / コスト管理対象</small>
+                </div>
+                <p>上記の検索証拠だけを使用します。ページ表示や検索では自動実行されません。Provider はサーバー設定のみです。</p>
                 <button type="button" onClick={runExplicitAIAnalysis} disabled={aiLoading || retrievalResult.results.length === 0}>
                   {aiLoading ? "AI分析中…" : "AI分析"}
                 </button>
                 {aiError && <StatusBanner tone="error">[{aiError.code}] {aiError.message}</StatusBanner>}
                 {aiResult && (
                   <div className="result-stack">
-                    <StatusBanner tone="success">{aiResult.provider} / {aiResult.model} / {aiResult.route_tier ?? "low_cost"} / {aiResult.status}</StatusBanner>
+                    <StatusBanner tone="success">
+                      {providerModeLabel(aiResult.provider)} / {aiResult.provider} / {aiResult.model} / {aiResult.route_tier ?? "low_cost"} / {aiResult.status}
+                    </StatusBanner>
                     <pre className="answer-block">{aiResult.answer}</pre>
                     <p>Usage: {aiResult.usage.input_tokens} + {aiResult.usage.output_tokens} = {aiResult.usage.total_tokens} tokens</p>
                     <p>Cost: {aiResult.cost} {aiResult.currency}</p>
@@ -353,7 +388,7 @@ export function RagPage({
                       <div className="result-card" aria-label="高品質取締役会報告">
                         <div className="subheading">
                           <strong>生成取締役会報告（high_quality）</strong>
-                          <small>高コスト / Stub-high-quality</small>
+                          <small>高コスト / サーバー選定モデル</small>
                         </div>
                         <p>AI分析より高い LLM 用量が発生します。ページ読み込みでは自動実行されず、Approval も自動提出しません。</p>
                         <button
@@ -369,7 +404,7 @@ export function RagPage({
                         {reportResult && (
                           <div className="result-stack">
                             <StatusBanner tone="success">
-                              {reportResult.provider} / {reportResult.model} / {reportResult.route_tier} / {reportResult.status}
+                              {providerModeLabel(reportResult.provider)} / {reportResult.provider} / {reportResult.model} / {reportResult.route_tier} / {reportResult.status}
                             </StatusBanner>
                             <p>Report: {reportResult.report_id} / Version: {reportResult.report_version_id}</p>
                             <pre className="answer-block">{reportResult.executive_summary}</pre>

@@ -42,12 +42,14 @@ class Settings(BaseSettings):
     task_execution_mode: Literal["background"] = "background"
     research_provider: Literal["static"] = "static"
     data_provider: Literal["static"] = "static"
-    llm_provider: Literal["stub"] = "stub"
+    # 兼容旧变量；权威开关为 llm_provider_mode（LLM_PROVIDER_MODE）。
+    llm_provider: Literal["stub", "openrouter"] = "stub"
+    llm_provider_mode: Literal["stub", "openrouter"] = "stub"
     # 保留旧环境变量的解析兼容，但组合根永久禁止普通 RAG 调用 Provider。
     internal_rag_use_llm: bool = False
     llm_stub_behavior: Literal["success", "timeout", "failure", "rate_limit", "partial_failure"] = "success"
     llm_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
-    # low_cost / ai_analysis 政策
+    # low_cost / ai_analysis 政策（Stub 默认；OpenRouter 模式由 validator 覆盖 alias/model/price）
     llm_low_cost_provider_alias: str = "stub-low-cost"
     llm_low_cost_model_name: str = "stub-low-cost-v1"
     llm_max_input_tokens: int = Field(default=2048, ge=128, le=100_000)
@@ -79,6 +81,21 @@ class Settings(BaseSettings):
     llm_hq_input_price_per_million: Decimal = Field(default=Decimal("3.000000"), ge=0)
     llm_hq_output_price_per_million: Decimal = Field(default=Decimal("9.000000"), ge=0)
     llm_currency: str = Field(default="USD", min_length=3, max_length=3)
+    # OpenRouter：只由后端环境变量配置；Key 使用 SecretStr，绝不写进日志/Frontend/Git。
+    openrouter_api_key: SecretStr | None = None
+    openrouter_base_url: str = Field(default="https://openrouter.ai/api/v1", min_length=8, max_length=256)
+    openrouter_low_cost_model: str | None = Field(default=None, max_length=200)
+    openrouter_high_quality_model: str | None = Field(default=None, max_length=200)
+    openrouter_low_input_price: Decimal = Field(default=Decimal("0.500000"), ge=0)
+    openrouter_low_output_price: Decimal = Field(default=Decimal("1.500000"), ge=0)
+    openrouter_high_input_price: Decimal = Field(default=Decimal("3.000000"), ge=0)
+    openrouter_high_output_price: Decimal = Field(default=Decimal("9.000000"), ge=0)
+    openrouter_http_referer: str | None = Field(default=None, max_length=512)
+    openrouter_app_title: str | None = Field(default=None, max_length=128)
+    real_llm_timeout_seconds: float = Field(default=30.0, gt=0, le=120)
+    real_llm_max_retries: int = Field(default=1, ge=0, le=2)
+    # 仅手动 smoke；默认测试 suite 永远不得打开。
+    run_real_llm_smoke: bool = False
     # deterministic_test 只服务本地回归；默认 disabled，生产不会把测试向量当成语义向量。
     embedding_provider: Literal[
         "disabled", "deterministic_test", "local", "openai", "openrouter", "nvidia"
@@ -113,8 +130,8 @@ class Settings(BaseSettings):
     static_research_fail: bool = False
 
     @model_validator(mode="after")
-    def validate_jwt_deployment_secret(self) -> "Settings":
-        """拒绝短密钥，并禁止 staging/production 沿用公开的本地默认值。"""
+    def validate_jwt_and_llm_provider_mode(self) -> "Settings":
+        """拒绝短密钥，并在 OpenRouter 模式下 fail-closed 校验必要配置。"""
 
         secret = self.jwt_secret_key.get_secret_value()
         if len(secret) < 32:
@@ -123,4 +140,52 @@ class Settings(BaseSettings):
             raise ValueError(
                 "JWT_SECRET_KEY must be overridden outside local/test environments"
             )
+
+        # 兼容 LLM_PROVIDER 与 LLM_PROVIDER_MODE；任一非 stub 时以 mode 为准。
+        mode = self.llm_provider_mode
+        if self.llm_provider == "openrouter" and mode == "stub":
+            mode = "openrouter"
+            object.__setattr__(self, "llm_provider_mode", mode)
+        object.__setattr__(self, "llm_provider", mode)
+
+        if mode == "stub":
+            object.__setattr__(self, "llm_low_cost_provider_alias", "stub-low-cost")
+            object.__setattr__(self, "llm_high_quality_provider_alias", "stub-high-quality")
+            if not self.llm_low_cost_model_name:
+                object.__setattr__(self, "llm_low_cost_model_name", "stub-low-cost-v1")
+            if not self.llm_high_quality_model_name:
+                object.__setattr__(self, "llm_high_quality_model_name", "stub-high-quality-v1")
+            return self
+
+        if mode != "openrouter":
+            raise ValueError("LLM_PROVIDER_MODE must be stub or openrouter")
+
+        api_key = self.openrouter_api_key.get_secret_value().strip() if self.openrouter_api_key else ""
+        if not api_key:
+            raise ValueError("OPENROUTER_API_KEY is required when LLM_PROVIDER_MODE=openrouter")
+        low_model = (self.openrouter_low_cost_model or "").strip()
+        high_model = (self.openrouter_high_quality_model or "").strip()
+        if not low_model:
+            raise ValueError("OPENROUTER_LOW_COST_MODEL is required when LLM_PROVIDER_MODE=openrouter")
+        if not high_model:
+            raise ValueError("OPENROUTER_HIGH_QUALITY_MODEL is required when LLM_PROVIDER_MODE=openrouter")
+        if low_model == high_model:
+            raise ValueError("OPENROUTER low_cost and high_quality models must be distinct")
+
+        object.__setattr__(self, "llm_low_cost_provider_alias", "openrouter-low-cost")
+        object.__setattr__(self, "llm_high_quality_provider_alias", "openrouter-high-quality")
+        object.__setattr__(self, "llm_low_cost_model_name", low_model)
+        object.__setattr__(self, "llm_high_quality_model_name", high_model)
+        object.__setattr__(self, "llm_input_price_per_million", self.openrouter_low_input_price)
+        object.__setattr__(self, "llm_output_price_per_million", self.openrouter_low_output_price)
+        object.__setattr__(self, "llm_hq_input_price_per_million", self.openrouter_high_input_price)
+        object.__setattr__(self, "llm_hq_output_price_per_million", self.openrouter_high_output_price)
+        object.__setattr__(self, "llm_timeout_seconds", self.real_llm_timeout_seconds)
         return self
+
+    def openrouter_api_key_configured(self) -> bool:
+        """只报告是否配置，不暴露值、长度或前后缀。"""
+
+        if self.openrouter_api_key is None:
+            return False
+        return bool(self.openrouter_api_key.get_secret_value().strip())

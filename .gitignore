@@ -51,6 +51,10 @@ softbs/notes/juesuan/company_tax_adjustment_summary.md
 softbs/notes/business/
 softbs/notes/business/**
 
+# softbus directory - never upload
+softbus/
+softbus/**
+
 # Workspace Rules
 不上传GitHub文件清单.md
 

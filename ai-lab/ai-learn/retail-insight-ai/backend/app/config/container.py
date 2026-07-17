@@ -32,6 +32,7 @@ from app.llm.gateway import LLMGatewayService
 from app.llm.model_router import ModelRouter
 from app.llm.operation_policy import OperationPolicyRegistry
 from app.providers.llm_provider import LLMProvider
+from app.providers.openrouter_llm_provider import OpenRouterLLMProvider
 from app.providers.stub_llm_provider import StubLLMProvider
 from app.repositories.implementations.in_memory.audit_repository import InMemoryAuditRepository
 from app.repositories.implementations.in_memory.approval_repository import InMemoryApprovalRepository
@@ -227,19 +228,8 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         ),
     )
     #  创建服务，注入仓库和事件发布器
-    # 双 Stub：low_cost 与 high_quality 物理隔离，call_count 可分别统计。
-    llm_provider = StubLLMProvider(
-        provider_name=settings.llm_low_cost_provider_alias,
-        model_name=settings.llm_low_cost_model_name,
-        behavior=settings.llm_stub_behavior,
-        mode="analysis",
-    )
-    llm_provider_high_quality = StubLLMProvider(
-        provider_name=settings.llm_high_quality_provider_alias,
-        model_name=settings.llm_high_quality_model_name,
-        behavior=settings.llm_stub_behavior,
-        mode="report",
-    )
+    # Provider 模式由 Settings 决定：默认 stub；openrouter 使用两个独立模型别名。
+    llm_provider, llm_provider_high_quality = _build_llm_providers(settings)
     policy_registry = OperationPolicyRegistry(settings)
     model_router = ModelRouter(
         policy_registry=policy_registry,
@@ -387,6 +377,50 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         unit_of_work=repositories.unit_of_work,
         database_health_check=repositories.health_check,
         repository_backend=settings.repository_backend,
+    )
+
+
+def _build_llm_providers(settings: Settings) -> tuple[LLMProvider, LLMProvider]:
+    """按 LLM_PROVIDER_MODE 构建 low_cost / high_quality Provider；客户端不可切换。"""
+
+    if settings.llm_provider_mode == "stub":
+        return (
+            StubLLMProvider(
+                provider_name=settings.llm_low_cost_provider_alias,
+                model_name=settings.llm_low_cost_model_name,
+                behavior=settings.llm_stub_behavior,
+                mode="analysis",
+            ),
+            StubLLMProvider(
+                provider_name=settings.llm_high_quality_provider_alias,
+                model_name=settings.llm_high_quality_model_name,
+                behavior=settings.llm_stub_behavior,
+                mode="report",
+            ),
+        )
+
+    if settings.llm_provider_mode != "openrouter":
+        raise ValueError("unsupported LLM_PROVIDER_MODE")
+    assert settings.openrouter_api_key is not None
+    shared_kwargs = {
+        "api_key": settings.openrouter_api_key,
+        "base_url": settings.openrouter_base_url,
+        "timeout_seconds": settings.real_llm_timeout_seconds,
+        "max_retries": settings.real_llm_max_retries,
+        "http_referer": settings.openrouter_http_referer,
+        "app_title": settings.openrouter_app_title,
+    }
+    return (
+        OpenRouterLLMProvider(
+            provider_name=settings.llm_low_cost_provider_alias,
+            model_name=settings.llm_low_cost_model_name,
+            **shared_kwargs,
+        ),
+        OpenRouterLLMProvider(
+            provider_name=settings.llm_high_quality_provider_alias,
+            model_name=settings.llm_high_quality_model_name,
+            **shared_kwargs,
+        ),
     )
 
 

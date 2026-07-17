@@ -20,9 +20,14 @@ from app.llm.gateway import LLMGatewayService
 from app.models.ai_analysis import (
     AIEvidence,
     ExecutiveReportResult,
+    LLMProviderAuthenticationError,
+    LLMProviderCitationInvalidError,
+    LLMProviderModelUnavailableError,
     LLMProviderPartialFailureError,
     LLMProviderRateLimitError,
+    LLMProviderResponseInvalidError,
     LLMProviderTimeoutError,
+    LLMProviderUnavailableError,
     LLMReportInput,
 )
 from app.models.approval import ReportVersion
@@ -198,6 +203,31 @@ class ExecutiveReportService:
                 usage_id, actor, context, "provider_rate_limited", 429, ErrorCode.PROVIDER_RATE_LIMITED,
                 started, policy, request.ai_analysis_id,
             )
+        except LLMProviderAuthenticationError:
+            return self._fail(
+                usage_id, actor, context, "provider_authentication_failed", 502,
+                ErrorCode.PROVIDER_AUTHENTICATION_FAILED, started, policy, request.ai_analysis_id,
+            )
+        except LLMProviderModelUnavailableError:
+            return self._fail(
+                usage_id, actor, context, "provider_model_unavailable", 502,
+                ErrorCode.PROVIDER_MODEL_UNAVAILABLE, started, policy, request.ai_analysis_id,
+            )
+        except LLMProviderUnavailableError:
+            return self._fail(
+                usage_id, actor, context, "provider_unavailable", 502,
+                ErrorCode.PROVIDER_UNAVAILABLE, started, policy, request.ai_analysis_id,
+            )
+        except LLMProviderResponseInvalidError:
+            return self._fail(
+                usage_id, actor, context, "provider_response_invalid", 502,
+                ErrorCode.PROVIDER_RESPONSE_INVALID, started, policy, request.ai_analysis_id,
+            )
+        except LLMProviderCitationInvalidError:
+            return self._fail(
+                usage_id, actor, context, "provider_citation_invalid", 502,
+                ErrorCode.PROVIDER_CITATION_INVALID, started, policy, request.ai_analysis_id,
+            )
         except Exception:
             return self._fail(
                 usage_id, actor, context, "provider_failed", 502, ErrorCode.PROVIDER_FAILED,
@@ -264,6 +294,8 @@ class ExecutiveReportService:
                 usage_id=usage_id, result=result, latency_ms=latency_ms,
                 provider_request_id=provider_result.provider_request_id,
                 finish_reason=provider_result.finish_reason,
+                usage_source=provider_result.usage_source,
+                actual_model=provider_result.actual_model,
             )
             self._audit.record_executive_report_event(
                 context=context, actor=actor, action="executive_report.generated",

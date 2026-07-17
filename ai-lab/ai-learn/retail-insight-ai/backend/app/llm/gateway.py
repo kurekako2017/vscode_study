@@ -2,7 +2,7 @@
 
 文件职责：根据 operation 解析 policy 与 provider，执行 analyze / generate_report。
 谁调用它：AIAnalysisService、ExecutiveReportService。
-它调用谁：ModelRouter → StubLLMProvider；不接触 HTTP/JWT/Repository。
+它调用谁：ModelRouter → Stub 或 OpenRouter Provider；不接触 HTTP/JWT/Repository。
 输入：operation + 领域请求；输出：Provider 结果。
 设计理由：业务 Router 与普通 RAG 永远不直接依赖 Provider。
 日本现场面试：所有收费 side-effect 都必须经过 Gateway 这一条窄门。
@@ -17,7 +17,7 @@ from app.providers.llm_provider import LLMProvider
 
 
 class LLMGatewayService:
-    """企业级 LLM 调用窄门；本轮只接 Stub，不访问真实网络。"""
+    """企业级 LLM 调用窄门；默认 Stub，可选 OpenRouter，均由 ModelRouter 注入。"""
 
     def __init__(
         self,

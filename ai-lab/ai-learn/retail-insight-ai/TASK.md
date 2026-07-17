@@ -1,5 +1,16 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 low_cost / high_quality 双路由（已完成）
+
+- [x] 统一 LLMGatewayService + Operation Policy + Model Router
+- [x] `ai_analysis` → `low_cost` / `stub-low-cost`
+- [x] `executive_report` → `high_quality` / `stub-high-quality`
+- [x] `POST /api/v1/executive-reports` 门禁、额度分离、幂等、Report/ReportVersion
+- [x] 前端「生成取締役会報告」二次确认入口
+- [x] Migration `20260717_06_dual_route_llm` 与全量回归
+
+最后更新：2026-07-17
+
 ## 2026-07-17 LLM 企业级成本治理（已完成）
 
 - [x] PostgreSQL-only LLM Usage Ledger 与 migration

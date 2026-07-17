@@ -17,8 +17,11 @@ from app.errors.error_codes import ErrorCode
 from app.errors.exceptions import AIAnalysisException
 from app.llm.gateway import LLMGatewayService
 from app.models.ai_analysis import (
-    AIEvidence, AIAnalysisResult, LLMAnalysisInput, LLMProviderPartialFailureError,
-    LLMProviderRateLimitError, LLMProviderTimeoutError,
+    AIEvidence, AIAnalysisResult, LLMAnalysisInput,
+    LLMProviderAuthenticationError, LLMProviderCitationInvalidError,
+    LLMProviderModelUnavailableError, LLMProviderPartialFailureError,
+    LLMProviderRateLimitError, LLMProviderResponseInvalidError,
+    LLMProviderTimeoutError, LLMProviderUnavailableError,
 )
 from app.models.document import DocumentStatus
 from app.repositories.interfaces.document_chunk_repository import DocumentChunkRepository
@@ -132,6 +135,31 @@ class AIAnalysisService:
             return self._fail(usage_id, actor, context, "provider_timeout", 504, ErrorCode.PROVIDER_TIMEOUT, started, policy)
         except LLMProviderRateLimitError:
             return self._fail(usage_id, actor, context, "provider_rate_limited", 429, ErrorCode.PROVIDER_RATE_LIMITED, started, policy)
+        except LLMProviderAuthenticationError:
+            return self._fail(
+                usage_id, actor, context, "provider_authentication_failed", 502,
+                ErrorCode.PROVIDER_AUTHENTICATION_FAILED, started, policy,
+            )
+        except LLMProviderModelUnavailableError:
+            return self._fail(
+                usage_id, actor, context, "provider_model_unavailable", 502,
+                ErrorCode.PROVIDER_MODEL_UNAVAILABLE, started, policy,
+            )
+        except LLMProviderUnavailableError:
+            return self._fail(
+                usage_id, actor, context, "provider_unavailable", 502,
+                ErrorCode.PROVIDER_UNAVAILABLE, started, policy,
+            )
+        except LLMProviderResponseInvalidError:
+            return self._fail(
+                usage_id, actor, context, "provider_response_invalid", 502,
+                ErrorCode.PROVIDER_RESPONSE_INVALID, started, policy,
+            )
+        except LLMProviderCitationInvalidError:
+            return self._fail(
+                usage_id, actor, context, "provider_citation_invalid", 502,
+                ErrorCode.PROVIDER_CITATION_INVALID, started, policy,
+            )
         except Exception:
             return self._fail(usage_id, actor, context, "provider_failed", 502, ErrorCode.PROVIDER_FAILED, started, policy)
 
@@ -144,6 +172,8 @@ class AIAnalysisService:
                 output_tokens=provider_result.output_tokens, actual_cost=actual_cost,
                 latency_ms=provider_result.latency_ms, provider_request_id=provider_result.provider_request_id,
                 finish_reason=provider_result.finish_reason,
+                usage_source=provider_result.usage_source,
+                actual_model=provider_result.actual_model,
             )
             self._audit.record_ai_analysis_event(
                 context=context, actor=actor, action="analysis.execute.succeeded",

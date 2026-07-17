@@ -122,6 +122,7 @@ class PostgresLLMUsageRepository:
         self, *, usage_id: str, analysis_id: str, answer: str,
         evidence: tuple[AIEvidence, ...], input_tokens: int, output_tokens: int,
         actual_cost: Decimal, latency_ms: int, provider_request_id: str, finish_reason: str,
+        usage_source: str = "provider_reported", actual_model: str | None = None,
     ) -> AIAnalysisResult:
         """结算 AI 分析差额并持久幂等结果快照。"""
 
@@ -130,6 +131,7 @@ class PostgresLLMUsageRepository:
                 row = self._lock_usage(cursor, usage_id)
                 reserved_tokens, estimated_cost, actor_user_id, provider, model, currency, route_tier = row
                 total = input_tokens + output_tokens
+                settled_model = actual_model or model
                 self._adjust_buckets(
                     cursor, actor_user_id, route_tier, total - reserved_tokens,
                     actual_cost - Decimal(estimated_cost),
@@ -137,11 +139,16 @@ class PostgresLLMUsageRepository:
                 cursor.execute(
                     """UPDATE llm_usage_ledger SET status='succeeded',input_tokens=%s,output_tokens=%s,total_tokens=%s,
                     actual_cost=%s,latency_ms=%s,provider_request_id=%s,finish_reason=%s,analysis_id=%s,
-                    ai_analysis_id=%s,completed_at=CURRENT_TIMESTAMP
+                    ai_analysis_id=%s,selected_model=%s,
+                    policy_snapshot=policy_snapshot || %s::jsonb,
+                    completed_at=CURRENT_TIMESTAMP
                     WHERE usage_id=%s AND status='reserved'""",
                     (
                         input_tokens, output_tokens, total, actual_cost, latency_ms,
-                        provider_request_id, finish_reason, analysis_id, analysis_id, usage_id,
+                        provider_request_id, finish_reason, analysis_id, analysis_id,
+                        settled_model,
+                        json.dumps({"usage_source": usage_source, "actual_model": settled_model}),
+                        usage_id,
                     ),
                 )
                 citations = [
@@ -159,27 +166,29 @@ class PostgresLLMUsageRepository:
                     VALUES (%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s,%s,%s,'succeeded') RETURNING created_at""",
                     (
                         analysis_id, usage_id, answer, json.dumps(citations, ensure_ascii=False),
-                        provider, model, input_tokens, output_tokens, total, actual_cost, currency,
+                        provider, settled_model, input_tokens, output_tokens, total, actual_cost, currency,
                     ),
                 )
                 created_at = cursor.fetchone()[0]
         return AIAnalysisResult(
-            analysis_id, answer, evidence, provider, model, input_tokens, output_tokens, total,
+            analysis_id, answer, evidence, provider, settled_model, input_tokens, output_tokens, total,
             actual_cost, currency, "succeeded", created_at, route_tier, Decimal(estimated_cost),
         )
 
     def settle_report_success(
         self, *, usage_id: str, result: ExecutiveReportResult,
         latency_ms: int = 0, provider_request_id: str | None = None, finish_reason: str = "stop",
+        usage_source: str = "provider_reported", actual_model: str | None = None,
     ) -> ExecutiveReportResult:
         """结算董事会报告并写回 report/version 关联，不把报告正文写入 Ledger。"""
 
         with self._factory.connection() as connection:
             with connection.cursor() as cursor:
-                reserved_tokens, estimated_cost, actor_user_id, _provider, _model, _currency, route_tier = (
+                reserved_tokens, estimated_cost, actor_user_id, _provider, model, _currency, route_tier = (
                     self._lock_usage(cursor, usage_id)
                 )
                 total = result.input_tokens + result.output_tokens
+                settled_model = actual_model or model
                 self._adjust_buckets(
                     cursor, actor_user_id, route_tier, total - reserved_tokens,
                     result.actual_cost - Decimal(estimated_cost),
@@ -188,13 +197,17 @@ class PostgresLLMUsageRepository:
                     """UPDATE llm_usage_ledger SET status='succeeded',input_tokens=%s,output_tokens=%s,total_tokens=%s,
                     actual_cost=%s,latency_ms=%s,provider_request_id=%s,finish_reason=%s,
                     analysis_id=%s,ai_analysis_id=%s,report_id=%s,report_version_id=%s,task_id=%s,
+                    selected_model=%s,policy_snapshot=policy_snapshot || %s::jsonb,
                     completed_at=CURRENT_TIMESTAMP
                     WHERE usage_id=%s AND status='reserved'""",
                     (
                         result.input_tokens, result.output_tokens, total, result.actual_cost,
                         latency_ms, provider_request_id or f"report:{result.report_version_id}", finish_reason,
                         result.analysis_id, result.analysis_id, result.report_id,
-                        result.report_version_id, result.task_id, usage_id,
+                        result.report_version_id, result.task_id,
+                        settled_model,
+                        json.dumps({"usage_source": usage_source, "actual_model": settled_model}),
+                        usage_id,
                     ),
                 )
         return result

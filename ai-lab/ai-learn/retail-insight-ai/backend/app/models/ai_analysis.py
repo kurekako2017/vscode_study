@@ -47,6 +47,11 @@ class LLMProviderResult:
     latency_ms: int
     provider_request_id: str
     finish_reason: str
+    # provider_reported：信任上游 usage；estimated：本地估算并记账，不伪造精确值。
+    usage_source: str = "provider_reported"
+    actual_model: str | None = None
+    warnings: tuple[str, ...] = ()
+    insufficient_context: bool = False
 
 
 @dataclass(frozen=True)
@@ -75,6 +80,8 @@ class LLMReportResult:
     latency_ms: int
     provider_request_id: str
     finish_reason: str
+    usage_source: str = "provider_reported"
+    actual_model: str | None = None
 
 
 @dataclass(frozen=True)
@@ -150,9 +157,32 @@ class LLMProviderPartialFailureError(RuntimeError):
         self.latency_ms = latency_ms
 
 
+class LLMProviderAuthenticationError(RuntimeError):
+    """Provider 401/403：凭据无效，不得重试。"""
+
+
+class LLMProviderModelUnavailableError(RuntimeError):
+    """模型不存在或不可用：不得重试、不得静默换模型。"""
+
+
+class LLMProviderUnavailableError(RuntimeError):
+    """Provider 5xx / 连接层故障：允许有限重试后仍失败。"""
+
+
+class LLMProviderResponseInvalidError(RuntimeError):
+    """结构化 JSON 无效且本地修复失败：不得发起第二次收费调用。"""
+
+
+class LLMProviderCitationInvalidError(RuntimeError):
+    """模型返回了不在 Evidence 集合内的 Citation。"""
+
+
 __all__ = [
     "AIEvidence", "AIAnalysisResult", "ExecutiveReportResult", "LLMAnalysisInput",
     "LLMProviderResult", "LLMReportInput", "LLMReportResult",
     "LLMProviderPartialFailureError", "LLMProviderRateLimitError", "LLMProviderTimeoutError",
+    "LLMProviderAuthenticationError", "LLMProviderModelUnavailableError",
+    "LLMProviderUnavailableError", "LLMProviderResponseInvalidError",
+    "LLMProviderCitationInvalidError",
     "LLMUsageStatus", "ReservationOutcome",
 ]

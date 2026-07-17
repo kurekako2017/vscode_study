@@ -105,7 +105,7 @@ class RAGAnswerGeneratorTest(unittest.TestCase):
         self.assertEqual(result.provider_name, "stub-low-cost")
         self.assertEqual(result.fallback_reason, RAGFallbackReason.NONE)
         self.assertTrue(result.answer.startswith("Stub extractive answer:"))
-        self.assertEqual(result.usage.provider_name, "stub")
+        self.assertEqual(result.usage.provider_name, "stub-low-cost")
         self.assertGreater(result.usage.prompt_tokens, 0)
         self.assertGreater(result.usage.completion_tokens, 0)
         self.assertGreater(result.usage.estimated_cost, 0.0)

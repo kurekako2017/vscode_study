@@ -60,6 +60,16 @@ class SettingsTest(unittest.TestCase):
         with self.assertRaises(ValidationError):
             Settings(app_env="production", _env_file=None)
 
+    def test_llm_provider_mode_defaults_to_stub(self) -> None:
+        settings = Settings(_env_file=None)
+        self.assertEqual(settings.llm_provider_mode, "stub")
+        self.assertEqual(settings.llm_provider, "stub")
+        self.assertFalse(settings.openrouter_api_key_configured())
+
+    def test_openrouter_mode_requires_models_and_key(self) -> None:
+        with self.assertRaises(ValidationError):
+            Settings(llm_provider_mode="openrouter", _env_file=None)
+
 
 if __name__ == "__main__":
     unittest.main()

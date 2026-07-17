@@ -1,5 +1,13 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 Dual-route LLM Cost Governance
+
+- 新增 `LLMGatewayService` / Operation Policy / Model Router，收敛 Provider 唯一调用入口。
+- `ai_analysis` 固定 `low_cost` + `stub-low-cost`；`executive_report` 固定 `high_quality` + `stub-high-quality`。
+- 新增 `POST /api/v1/executive-reports`，依赖 succeeded AI Analysis，创建 Report/ReportVersion，不自动 Approval。
+- Ledger/Quota 按 `route_tier` 分离；migration `20260717_06_dual_route_llm` 回填历史为 low_cost。
+- 前端在 AI 分析成功后显示「生成取締役会報告」二次确认入口。
+
 ## 2026-07-17 LLM Cost Governance
 
 - 新增 PostgreSQL-only `llm_usage_ledger` / `llm_quota_buckets` / `ai_analysis_results` 与 revision `20260717_05_llm_cost_governance`。

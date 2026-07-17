@@ -1,8 +1,8 @@
-"""服务端 Model Router：operation → route_tier → Stub Provider。
+"""服务端 Model Router：operation → route_tier → Provider 别名。
 
 文件职责：唯一决定 Provider 实例；客户端不能指定 provider/model/route_tier。
 谁调用它：LLMGatewayService。
-它调用谁：已注册的 StubLLMProvider 实例。
+它调用谁：已注册的 Stub 或 OpenRouter Provider 实例。
 输入：operation；输出：匹配的 LLMProvider。
 设计理由：low_cost 与 high_quality 物理隔离，测试可分别统计 call_count。
 日本现场面试：路由是服务端权威，未知 operation/tier 一律 fail-closed。

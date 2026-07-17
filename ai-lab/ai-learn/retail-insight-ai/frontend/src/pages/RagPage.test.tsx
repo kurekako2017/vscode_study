@@ -157,9 +157,10 @@ describe("RagPage", () => {
     vi.stubGlobal("confirm", confirm);
     await showEvidence(fetchMock);
     fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
-    expect(confirm.mock.calls[0][0]).toMatch(/Stub/);
+    expect(confirm.mock.calls[0][0]).toMatch(/Stub|OpenRouter/);
     expect(confirm.mock.calls[0][0]).toMatch(/推定入力/);
     expect(confirm.mock.calls[0][0]).toMatch(/256 tokens/);
+    expect(confirm.mock.calls[0][0]).not.toMatch(/api[_-]?key/i);
   });
 
   it("sends only stable evidence refs, confirmation and an idempotency header", async () => {
@@ -183,7 +184,52 @@ describe("RagPage", () => {
     await showEvidence(fetchMock);
     fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
     expect(await screen.findByText("Cost: 0.00001800 USD")).toBeInTheDocument();
-    expect(screen.getByText(/stub-low-cost \/ stub-low-cost-v1 \/ low_cost \/ succeeded/)).toBeInTheDocument();
+    expect(screen.getByText(/Development Stub \/ stub-low-cost \/ stub-low-cost-v1 \/ low_cost \/ succeeded/)).toBeInTheDocument();
+  });
+
+  it("labels OpenRouter providers from server response without accepting client model fields", async () => {
+    const openrouterResponse = jsonResponse({
+      success: true,
+      request_id: "or-1",
+      error: null,
+      data: {
+        analysis_id: "ana-or",
+        answer: "OpenRouter answer",
+        citations: [{ document_id: "doc-ai", chunk_id: "chunk-ai", score: "0.95", excerpt: "Controlled AI evidence." }],
+        provider: "openrouter-low-cost",
+        model: "vendor/low",
+        route_tier: "low_cost",
+        usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 },
+        cost: "0.00001800",
+        currency: "USD",
+        status: "succeeded",
+        created_at: "2026-07-17T00:00:00Z",
+      },
+    });
+    const fetchMock = vi.fn().mockResolvedValueOnce(retrievalResponse([evidenceItem])).mockResolvedValueOnce(openrouterResponse);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByText(/OpenRouter \/ openrouter-low-cost \/ vendor\/low/)).toBeInTheDocument();
+    const body = JSON.parse(String((fetchMock.mock.calls[1] as [string, RequestInit])[1].body));
+    expect(body).not.toHaveProperty("provider");
+    expect(body).not.toHaveProperty("model");
+    expect(body).not.toHaveProperty("route_tier");
+  });
+
+  it("renders provider unavailable errors through the shared path", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(retrievalResponse([evidenceItem]))
+      .mockResolvedValueOnce(jsonResponse({
+        success: false,
+        request_id: "u",
+        data: null,
+        error: { code: "provider_unavailable", message: "Provider unavailable", detail: {} },
+      }, 502));
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    await showEvidence(fetchMock);
+    fireEvent.click(screen.getByRole("button", { name: "AI分析" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("[provider_unavailable] Provider unavailable");
   });
 
   it("does not show executive report button before successful AI analysis", async () => {
@@ -217,7 +263,7 @@ describe("RagPage", () => {
     await screen.findByRole("button", { name: "生成取締役会報告" });
     fireEvent.click(screen.getByRole("button", { name: "生成取締役会報告" }));
     expect(await screen.findByText(/Report: task-er-1 \/ Version: rv-1/)).toBeInTheDocument();
-    expect(screen.getByText(/stub-high-quality \/ stub-high-quality-v1 \/ high_quality/)).toBeInTheDocument();
+    expect(screen.getByText(/Development Stub \/ stub-high-quality \/ stub-high-quality-v1 \/ high_quality/)).toBeInTheDocument();
     expect(screen.getByText(/Approval 入口/)).toBeInTheDocument();
     const reportCall = fetchMock.mock.calls[2] as [string, RequestInit];
     expect(reportCall[0]).toContain("/api/v1/executive-reports");

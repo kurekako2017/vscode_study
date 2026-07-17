@@ -1,5 +1,18 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: low_cost / high_quality 双路由
+
+- [x] 统一 LLM Gateway，业务服务不再直接调用 Provider
+- [x] Operation Policy + Model Router 集中路由 ai_analysis / executive_report
+- [x] 按 route_tier 分离额度桶与 policy/price snapshot
+- [x] Executive Report API、门禁、Report/ReportVersion、不自动 Approval
+- [x] 前端 AI分析 + 生成取締役会報告 双按钮流程
+- [x] Migration `20260717_06_dual_route_llm` 与全量验证
+
+完成记录：PostgreSQL 239 passed；InMemory 182 + 46 skip（含 PostgreSQL-only）；Frontend 95/95；build/compileall/migration/diff-check 通过。仍只使用 Stub，未接真实模型。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: LLM 企业级成本可控边界
 
 - [x] 封死普通 Internal RAG 的隐式 Provider 调用
