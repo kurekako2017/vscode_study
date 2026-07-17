@@ -82,8 +82,9 @@
 - 管理页切换：`GET/PUT /api/v1/admin/llm/runtime`（不接收 Key；禁止打开 real smoke）
 - 真实 smoke 仅 opt-in 环境变量，默认测试 suite 永不执行
 
+### V1.0 正式前端导航
 
-V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可见项受 RBAC 过滤）：
+（与 `frontend/src/App.tsx` 一致，登录后可见项受 RBAC 过滤）
 
 ```text
 学习总览
@@ -120,7 +121,7 @@ V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可�
 - [Appendix D: Startup Flow](#appendix-d-startup-flow)
 - [Appendix E: Startup Checklist](#appendix-e-startup-checklist)
 - [Appendix F: WSL + VSCode 使用建议](#appendix-f-wsl--vscode-使用建议)
-- [Appendix G: VSCode Debug & Run](#appendix-g-vscode-debug--run)
+- [Appendix G: VSCode Debug &amp; Run](#appendix-g-vscode-debug--run)
 - [Appendix H: Interview Demo Startup](#appendix-h-interview-demo-startup)
 - [Appendix I: Startup Decision Tree](#appendix-i-startup-decision-tree)
 - [Appendix J: FAQ](#appendix-j-faq)
@@ -128,52 +129,6 @@ V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可�
 - [Appendix L: Frontend 启动、验证、测试与停止](#appendix-l-frontend-启动验证测试与停止)
 - [Appendix M: Docker Compose 启动与本地验收（V1.0）](#appendix-m-docker-compose-启动与本地验收v10)
 - [Appendix N: V1.0 启动验收基线（最终状态）](#appendix-n-v10-启动验收基线最终状态)
-
-## 三个文档入口不是同一个用途
-
-- Swagger 是 API 调试与验证工具。
-- ReDoc 是 API 阅读文档。
-- OpenAPI JSON 是机器可读接口定义。
-- 三者不是同一个用途。
-- 正式 UI 已交付后，Swagger 仍然可用于后端验证。
-- Swagger 和 React 调用的是同一套 FastAPI API。
-
-## 企业项目验证体系
-
-Swagger（FastAPI 自动生成的 API 调试与验证工具）
-
-项目验证体系分四层：
-
-| 层级 | 工具 | 目的 |
-|---|---|---|
-| 单元测试（Unit Test） | python -m unittest | 验证单个模块或类的逻辑是否正确 |
-| 接口验证（API Verification） | Swagger UI (/docs) | 手工验证 API 请求、响应和业务流程 |
-| 前后端集成测试（Integration Test） | React + FastAPI | 验证完整用户操作流程 |
-| 端到端测试（E2E Test） | Playwright / Cypress | 模拟真实用户完成整个业务流程 |
-
-补充说明：
-
-- Swagger 不是测试环境。
-- Swagger 不是正式 UI。
-- Swagger 是 API 调试与验证工具。
-
-> **历史阶段记录**（早期骨架期写法，**不是** V1.0 当前操作建议）：
->
-> - 当时主要用 Swagger 验证后端骨架。
-> - UI 完成后再做前后端 Integration Test。
-> - 发布前再考虑 E2E Test。
-
-**V1.0 当前建议**：Swagger 仍用于 API 调试；正式 UI 已交付；**正式联调与业务验收优先 Docker Compose + PostgreSQL**（Appendix M）；Stub API E2E 与 PostgreSQL 全量 unittest 为权威回归；InMemory unittest 仅辅助（见 Appendix N）。
-
-V1.0 最终状态补充（不替换上表，只说明当前仓库已落地能力）：
-
-| 层级 | 当前仓库入口 | 说明 |
-|---|---|---|
-| **正式启动（推荐）** | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | **PostgreSQL + Backend + Frontend**；默认 `LLM_PROVIDER_MODE=stub`（Appendix M） |
-| 本地 PostgreSQL 联调 | 显式 `REPOSITORY_BACKEND=postgres` + `DATABASE_URL` 后 `start_backend.sh` + `start_frontend.sh` | 非 Compose 时的正式数据路径；**不要**用 InMemory 结果当业务验收 |
-| 本地脚本（兼容） | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 脚本可能默认 InMemory，**仅快速学习**；见顶部说明 |
-| Stub API E2E | `./scripts/run_api_e2e.sh`（对 Compose Backend） | **最终业务链** API 验收，以 PostgreSQL 为准 |
-| 全量自动化 | PG / InMemory / Frontend 分项 | PG 为正式基线；InMemory 为辅助数字（Appendix N） |
 
 ## 推荐启动顺序
 
@@ -592,7 +547,7 @@ Docker Compose up（postgres + backend + frontend）
 compose_verify + Stub E2E
 ↓
 浏览器 http://127.0.0.1:8080
-  学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+  学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理 → AI管理
 ↓
 compose_down（禁止 -v）
 ```
@@ -624,7 +579,7 @@ Project Root → .venv → （正式）REPOSITORY_BACKEND=postgres
 - [ ] Backend 已启动；`GET /health` 返回 200 且正式路径为 `repository_backend=postgres`
 - [ ] Swagger / ReDoc / openapi 可打开
 - [ ] Frontend 已启动（Compose `:8080` 或本地 `:5173`）
-- [ ] 正式导航可见：学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+- [ ] 正式导航可见：学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理 → AI管理
 - [ ] **业务验收**：Stub E2E / 人工链以 PostgreSQL 为准（Appendix M/N）
 - [ ] **辅助**：InMemory unittest 可选；不作业务结论
 
@@ -705,7 +660,7 @@ Backend + Frontend
 ↓
 学习总览
 ↓
-文書管理 → RAG検索 → 分析依頼 → 承認管理
+文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理 → AI管理
 ↓
 （需要时）Compose / PostgreSQL 验收见 Appendix M
 ```
@@ -808,9 +763,10 @@ Backend
 → Frontend（登录后）
 → 学习总览
 → 文書管理
-→ RAG検索
-→ 分析依頼
+→ RAG/AI分析
+→ KPI任务分析
 → 承認管理
+→ AI管理
 ```
 
 > **历史阶段记录**：旧文曾写 `Dashboard → Analysis / Tasks → Documents → RAG → Approval` 英文标签。
@@ -835,11 +791,13 @@ Backend 启动
 ↓
 文書管理
 ↓
-RAG検索
+RAG/AI分析
 ↓
-分析依頼
+KPI任务分析
 ↓
 承認管理
+↓
+AI管理
 ```
 
 ## K-2. 学习总览（Dashboard 路由）
@@ -847,7 +805,7 @@ RAG検索
 页面操作：
 
 - 打开首页 / 学习总览
-- 点击快捷入口进入 `文書管理` / `RAG検索` / `分析依頼` / `承認管理`（文案以页面按钮为准）
+- 点击快捷入口进入 `文書管理` / `RAG/AI分析` / `KPI任务分析` / `承認管理` / `AI管理`（文案以页面按钮为准）
 
 对应 API：
 
@@ -863,9 +821,9 @@ RAG検索
 - 顶部导航高亮变化
 - Network 中没有新的 API 请求（仅切换路由时）
 - 页面内容已经切换
-- 导航顺序符合：学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+- 导航顺序符合：学习总览 → 文書管理 → RAG/AI分析 → KPI任务分析 → 承認管理 → AI管理
 
-## K-3. 分析依頼（历史标题曾写作 Analysis / Tasks）
+## K-3. KPI任务分析（历史标题曾写作 Analysis / Tasks）
 
 页面操作：
 
@@ -930,7 +888,7 @@ RAG検索
 - `docs/learning/02_Frontend/FRONTEND_SOURCE_LEARNING_GUIDE.md`
 - `docs/learning/02_Frontend/TEST_LEARNING_DOCUMENTS_PAGE.md`
 
-## K-5. RAG検索
+## K-5. RAG/AI分析
 
 页面操作：
 
@@ -1167,9 +1125,10 @@ npm run dev -- --host 127.0.0.1
 ```text
 学习总览
 → 文書管理
-→ RAG検索
-→ 分析依頼
+→ RAG/AI分析
+→ KPI任务分析
 → 承認管理
+→ AI管理
 ```
 
 - （历史对照）旧文档英文标签 `Dashboard / Analysis / Tasks / Documents / RAG / Approval` 不再作为当前 UI 验收标准
@@ -1356,10 +1315,10 @@ Ctrl+C
 
 当前 Backend 基线（以本机最近稳定验收为准）：
 
-| 模式 | 结果 | 用途 |
-|---|---|---|
-| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；发布基线曾连续 3 次稳定 | **正式回归** |
-| InMemory 全量 suite | **270 tests**，**52 skipped** | **辅助**（加速/隔离；不作业务结论） |
+| 模式                  | 结果                                                                                           | 用途                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；发布基线曾连续 3 次稳定 | **正式回归**                        |
+| InMemory 全量 suite   | **270 tests**，**52 skipped**                                                      | **辅助**（加速/隔离；不作业务结论） |
 
 PostgreSQL 需要：
 
@@ -1396,12 +1355,12 @@ PostgreSQL 需要：
 
 ## M-1. 何时用 Compose
 
-| 场景 | 推荐 |
-|---|---|
-| 正式启动 / 企业业务验收 | **Compose + PostgreSQL**（本附录，权威） |
-| 本地 PostgreSQL 联调 | 显式 `REPOSITORY_BACKEND=postgres` + 本地脚本 |
-| 快速改代码 / 单元测试加速 | 本地脚本可能默认 InMemory（**辅助**；不作业务验收） |
-| 默认费用安全验收 | Compose 默认 `LLM_PROVIDER_MODE=stub`，不要默认开真实 LLM |
+| 场景                      | 推荐                                                       |
+| ------------------------- | ---------------------------------------------------------- |
+| 正式启动 / 企业业务验收   | **Compose + PostgreSQL**（本附录，权威）             |
+| 本地 PostgreSQL 联调      | 显式`REPOSITORY_BACKEND=postgres` + 本地脚本             |
+| 快速改代码 / 单元测试加速 | 本地脚本可能默认 InMemory（**辅助**；不作业务验收）  |
+| 默认费用安全验收          | Compose 默认`LLM_PROVIDER_MODE=stub`，不要默认开真实 LLM |
 
 ## M-2. 前置条件
 
@@ -1457,14 +1416,14 @@ export E2E_EXPECT_STUB=1
 
 ## M-4. 必须看到的健康结果
 
-| 检查项 | 期望 |
-|---|---|
-| `docker compose ps` | postgres / backend / frontend 均为 running 且 healthy（或 frontend healthy） |
-| `curl http://127.0.0.1:8000/health` | `status=ok`，`repository_backend=postgres`（Compose 路径） |
-| `curl -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/` | `200` |
-| SPA 路由（History API 刷新） | `/` `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` 均为 **200**，不是 404 |
-| Alembic | `docker compose exec backend alembic current` → `20260717_07_fallback_chain (head)` |
-| LLM | 容器内 `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 调用** |
+| 检查项                                                         | 期望                                                                                                             |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `docker compose ps`                                          | postgres / backend / frontend 均为 running 且 healthy（或 frontend healthy）                                     |
+| `curl http://127.0.0.1:8000/health`                          | `status=ok`，`repository_backend=postgres`（Compose 路径）                                                   |
+| `curl -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/` | `200`                                                                                                          |
+| SPA 路由（History API 刷新）                                   | `/` `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` 均为 **200**，不是 404 |
+| Alembic                                                        | `docker compose exec backend alembic current` → `20260717_07_fallback_chain (head)`                         |
+| LLM                                                            | 容器内`LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 调用**                                             |
 
 `compose_verify.sh` 已覆盖 Frontend 多路由 200 与 Backend health。
 
@@ -1512,13 +1471,13 @@ docker volume ls | grep erip_postgres_data
 
 ## M-7. Compose 常见错误
 
-| 现象 | 可能原因 | 处理 |
-|---|---|---|
-| `Docker daemon 未运行` | Docker Desktop / WSL Integration 未开 | 先恢复 Desktop，再 `docker info` |
-| backend unhealthy，`No such file: /app/db/schema.sql` | 旧镜像未 COPY `db/` | 确认 `backend/Dockerfile` 含 `COPY db ./db` 后 `docker compose build backend` |
-| 5432 bind 失败 | 宿主 PostgreSQL 占用 | `POSTGRES_PORT=5433` |
-| E2E 401 | 测了错误账号或服务未 ready | 使用 `admin` / `manager` / `employee` 与文档中的测试密码约定；先 `/health` |
-| 想「彻底清空」 | 误用 `docker compose down -v` | **禁止**；验收路径只允许保留 volume 的 down |
+| 现象                                                    | 可能原因                              | 处理                                                                               |
+| ------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
+| `Docker daemon 未运行`                                | Docker Desktop / WSL Integration 未开 | 先恢复 Desktop，再`docker info`                                                  |
+| backend unhealthy，`No such file: /app/db/schema.sql` | 旧镜像未 COPY`db/`                  | 确认`backend/Dockerfile` 含 `COPY db ./db` 后 `docker compose build backend` |
+| 5432 bind 失败                                          | 宿主 PostgreSQL 占用                  | `POSTGRES_PORT=5433`                                                             |
+| E2E 401                                                 | 测了错误账号或服务未 ready            | 使用`admin` / `manager` / `employee` 与文档中的测试密码约定；先 `/health`  |
+| 想「彻底清空」                                          | 误用`docker compose down -v`        | **禁止**；验收路径只允许保留 volume 的 down                                  |
 
 ## M-8. 与本地脚本路径的关系
 
@@ -1542,49 +1501,50 @@ Compose 路径（本附录，权威）
 
 ## N-1. Backend
 
-| 项 | 基线 |
-|---|---|
-| PostgreSQL 全量（**正式回归**） | **281 tests**，**2 skipped**（real LLM smoke 默认 skip） |
-| PostgreSQL 稳定性 | 完整 suite **连续 3 次** 通过（修复 JWT 时钟回拨后） |
-| InMemory 全量（**仅辅助**） | **270 tests**，**52 skipped**；不作业务验收结论 |
-| Alembic head | `20260717_07_fallback_chain` |
-| Repository 权威 | **PostgreSQL**（Compose 默认且必须）；InMemory 代码保留但不补企业能力 |
-| `python -m compileall app` | 通过 |
-| `git diff --check` | 通过 |
-| 默认 LLM | `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 费用** |
+| 项                                    | 基线                                                                        |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| PostgreSQL 全量（**正式回归**） | **281 tests**，**2 skipped**（real LLM smoke 默认 skip）        |
+| PostgreSQL 稳定性                     | 完整 suite**连续 3 次** 通过（修复 JWT 时钟回拨后）                   |
+| InMemory 全量（**仅辅助**）     | **270 tests**，**52 skipped**；不作业务验收结论                 |
+| Alembic head                          | `20260717_07_fallback_chain`                                              |
+| Repository 权威                       | **PostgreSQL**（Compose 默认且必须）；InMemory 代码保留但不补企业能力 |
+| `python -m compileall app`          | 通过                                                                        |
+| `git diff --check`                  | 通过                                                                        |
+| 默认 LLM                              | `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 费用**              |
 
 ## N-2. Frontend
 
-| 项 | 基线 |
-|---|---|
-| 测试 | **113 / 113** |
-| Production build | 通过 |
-| Login / JWT / ProtectedRoute / RBAC Permission UI | 已完成 |
-| React Lifecycle Live Status | 已完成 |
-| Frontend Learning Dashboard | 已完成 |
-| 开发服务器 | `http://127.0.0.1:5173`（`start_frontend.sh`） |
-| Compose 前端 | `http://127.0.0.1:8080`（nginx SPA + `/api` 代理） |
+| 项                                                | 基线                                                   |
+| ------------------------------------------------- | ------------------------------------------------------ |
+| 测试                                              | **113 / 113**                                    |
+| Production build                                  | 通过                                                   |
+| Login / JWT / ProtectedRoute / RBAC Permission UI | 已完成                                                 |
+| React Lifecycle Live Status                       | 已完成                                                 |
+| Frontend Learning Dashboard                       | 已完成                                                 |
+| 开发服务器                                        | `http://127.0.0.1:5173`（`start_frontend.sh`）     |
+| Compose 前端                                      | `http://127.0.0.1:8080`（nginx SPA + `/api` 代理） |
 
 ## N-3. Docker / Compose
 
-| 项 | 基线 |
-|---|---|
-| image build | 通过 |
-| compose config | 通过 |
-| postgres / backend / frontend | healthy |
-| Alembic 自动迁移 | 通过（entrypoint） |
-| History API 路由刷新 | `/login` 等 200 |
-| Stub E2E | 通过 |
-| down 后 volume 保留与数据恢复 | 通过 |
-| 禁止 | `docker compose down -v` 作为日常验收步骤 |
+| 项                            | 基线                                        |
+| ----------------------------- | ------------------------------------------- |
+| image build                   | 通过                                        |
+| compose config                | 通过                                        |
+| postgres / backend / frontend | healthy                                     |
+| Alembic 自动迁移              | 通过（entrypoint）                          |
+| History API 路由刷新          | `/login` 等 200                           |
+| Stub E2E                      | 通过                                        |
+| down 后 volume 保留与数据恢复 | 通过                                        |
+| 禁止                          | `docker compose down -v` 作为日常验收步骤 |
 
 ## N-4. 业务链（人工 + Stub E2E 共同指向）
 
 ```text
 文書管理
-→ RAG検索
-→ 分析依頼
+→ RAG/AI分析
+→ KPI任务分析
 → 承認管理
+→ AI管理
 → 最终审计报告
 ```
 
@@ -1601,11 +1561,11 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 ## N-5. 启动路径对照（保留原路径）
 
-| 路径 | 命令入口 | 典型用途 |
-|---|---|---|
-| A. Compose + PostgreSQL | `compose_up.sh` 等 | **V1.0 正式启动与业务验收（权威）** |
-| B. 本地脚本 + postgres | `REPOSITORY_BACKEND=postgres` + start_* | 本地 PostgreSQL 联调 |
-| C. 本地脚本 / InMemory | start_* 未设 postgres | **仅**快速学习/单元测试辅助 |
-| D. 自动化 | PG suite（正式）/ InMemory（辅助）/ npm test | 业务结论只看 PostgreSQL |
+| 路径                    | 命令入口                                     | 典型用途                                  |
+| ----------------------- | -------------------------------------------- | ----------------------------------------- |
+| A. Compose + PostgreSQL | `compose_up.sh` 等                         | **V1.0 正式启动与业务验收（权威）** |
+| B. 本地脚本 + postgres  | `REPOSITORY_BACKEND=postgres` + start_*    | 本地 PostgreSQL 联调                      |
+| C. 本地脚本 / InMemory  | start_* 未设 postgres                        | **仅**快速学习/单元测试辅助         |
+| D. 自动化               | PG suite（正式）/ InMemory（辅助）/ npm test | 业务结论只看 PostgreSQL                   |
 
 原 Appendix A～L 的命令 **全部仍然有效**；N 固定基线与 Repository 定位，不删除旧步骤。
