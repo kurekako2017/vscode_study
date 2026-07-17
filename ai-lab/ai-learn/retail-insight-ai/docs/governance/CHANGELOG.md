@@ -1,5 +1,17 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 — 架构图 SQLite(Current) 紧急校正
+
+### 变更
+- 重写 `09_系统设计书_7.0_Technical_Architecture_增补_修改版.md` Current 主图：PostgreSQL+pgvector 正式；移除 SQLite(Current)/PostgreSQL(Target) 主图
+- 同步校正 08/09/10/11/12、ARCHITECTURE、PROJECT_BIBLE、学习持久化章节中的旧 Current/Target 标签
+- K8s/OTel/Qdrant/Redis/RabbitMQ/S3 明确为未实现/后续增强
+- Hybrid/Vector/Embedding/LangGraph 按代码标注已实现/部分实现/辅线
+
+### 未变更
+- 代码与配置；未 commit/push
+
+
 ## 2026-07-17 — ERIP V1.0 全量文档收尾
 
 ### 变更

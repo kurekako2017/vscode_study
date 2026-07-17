@@ -2,8 +2,8 @@
 
 > **文档角色：** 活动 handbook 章节。若与文首 ERIP V1.0 摘要冲突，以源码 + `03_AI核心知识.md` 技术表 + 权威 Volume01 为准。历史阶段表述保留时仅作演进记录。
 
-> **说明**：标题保留 “Production Roadmap”，但 **JWT/RBAC、Approval API、PostgreSQL、正式 Frontend、Compose 已是 V1.0 已交付**。  
-> 本节“后续”应理解为 Billing UI / SIEM / 多租户预算 / 真实付费 smoke 默认化等强化，而不是“平台尚未存在”。  
+> **说明**：标题保留 “Production Roadmap”，但 **JWT/RBAC、Approval API、PostgreSQL、正式 Frontend、Compose 已是 V1.0 已交付**。
+> 本节“后续”应理解为 Billing UI / SIEM / 多租户预算 / 真实付费 smoke 默认化等强化，而不是“平台尚未存在”。
 > 基线：PG **297/6** · IM **286/62** · FE **116** · head **`20260717_08_ai_runtime`** · 默认 **stub**。
 
 
@@ -31,7 +31,8 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。它的�
 - 每个 Phase 完成后，必须同步更新 handbook 文档和本路线图中的对应等级说明。
 - 测试方法、流程图和架构图的同步不是附加项，而是阶段关闭条件。
 
-- 当前实现能力：FastAPI、Task API、TaskService、LangGraph Workflow、Fixed KPI Workflow、Research Agent、SSE、Report Generator、SQLite、Docker、PostgreSQL、Redis、RabbitMQ、OpenTelemetry、Kubernetes。
+- 当前实现能力：FastAPI、React、JWT/RBAC、Document/RAG、LLM Gateway、Approval、Audit、Ledger、PostgreSQL+pgvector、Docker Compose（可选）、宿主 PG+Vite；**不含** Redis/RabbitMQ 默认可运行（未实现/后续增强）。历史列表若写 SQLite 视为错误旧口径。
+- （历史列表残留截断修正）OpenTelemetry、Kubernetes。
 - 正式运用优先级：身份与权限、审计、持久化、可观测性、备份恢复先于规模扩展。
 - KPI 始终保持确定性；Agent 只处理调查型任务。
 - 每一级必须满足上一等级的质量门禁，不能跨级跳过数据、权限或恢复能力。
@@ -242,7 +243,7 @@ Epic 12 已作为横向平台能力投入企业运行。
 | 项目 | 内容 |
 | --- | --- |
 | 新增能力 | Task API、TaskService、LangGraph Workflow、Fixed KPI Workflow、Research Agent、SSE、Report Generator |
-| 新增组件 | FastAPI、React、SQLite、Docker、本地文件数据 |
+| 新增组件 | FastAPI、React、PostgreSQL+pgvector、Docker Compose 可选、本地 Vite |
 | 新增成本 | 开发环境、模型调用、基础测试与文档维护 |
 | 新增风险 | 单实例状态、数据结构变化、模型输出不稳定、外部 Tool timeout |
 | 新增开发量 | API、Workflow、KPI、Research、Report、Frontend 的纵向切片 |
@@ -369,7 +370,7 @@ Multi Agent 仅作为租户内部 Research 能力演进，不作为 SaaS 化前�
 | 维度 | Level 1 | Level 2 | Level 3 | Level 4 | Level 5 |
 | --- | --- | --- | --- | --- | --- |
 | 用户范围 | 开发与 Review | 限定内部用户 | 业务部门 | 全企业 | 多客户 |
-| 数据库 | SQLite | PostgreSQL | PostgreSQL + Redis | 高可用数据层 | 租户隔离数据层 |
+| 数据库 | 历史早期曾规划 SQLite→PG | **PostgreSQL+pgvector（V1.0 Current）** | PG+Redis（后续） | 高可用数据层（后续） | 租户隔离（后续） |
 | 执行方式 | 单进程 | 稳定后台任务 | RabbitMQ + Worker Pool | Kubernetes 扩展 | 租户级调度与配额 |
 | 权限 | 边界预留 | 基础角色 | 部门 / 门店 Scope | 企业 SSO + RBAC | Tenant + RBAC + Scope |
 | 审计 | 基础日志 | 基础 Audit Log | 完整业务审计 | 合规治理 | 租户级审计 |
@@ -389,7 +390,7 @@ Multi Agent 仅作为租户内部 Research 能力演进，不作为 SaaS 化前�
 
 ### Year 1 Q2：Internal Tool Foundation
 
-- SQLite 迁移 PostgreSQL。
+- **历史记录：** 曾规划 SQLite→PostgreSQL；**V1.0 已完成 PostgreSQL 正式 Repository，不再使用 SQLite 主路径。**
 - 接入内部身份，落地基础 RBAC 与 Audit Log。
 - 建立 OpenTelemetry 基线和 Backup / Restore。
 - 交付：限定内部用户可用的 Level 2。

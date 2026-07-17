@@ -1,4 +1,6 @@
 # ERIP 企业源码架构手册
+> **V1.0 校正：** 正式 Repository = **PostgreSQL + pgvector**。文中 SQLite 若作为「当前默认库」出现，一律视为**历史教学对比**，不是 V1.0 现状。InMemory = unittest only。
+
 
 # Volume 05：Enterprise（企业架构）
 
@@ -48,7 +50,7 @@ TaskService
     ↓
 TaskRepository
     ↓
-SQLite / InMemory
+PostgreSQL（正式） / InMemory（仅测试）
 ```
 
 源码目录：
@@ -67,7 +69,7 @@ backend/app/repositories/
 
 ## 为什么企业采用 Repository？
 
-- 数据库可替换（SQLite → PostgreSQL）
+- 数据库可替换（历史：SQLite→PostgreSQL；**V1.0 已是 PostgreSQL**，InMemory 仅测试）
 - 易于单元测试（Mock / Fake Repository）
 - 职责分离（Service 负责业务，Repository 负责数据）
 - 提高维护性与扩展性

@@ -458,7 +458,8 @@
 - [x] 统一平台目标命名：`Enterprise Retail Intelligence Platform (ERIP)` 只表示 Target 企业平台
 - [x] 统一 `Current / Target / Planned` 标记，禁止把未来能力写成已实现
 - [x] 统一术语：`Task API`、`TaskService`、`LangGraph Workflow`、`Fixed KPI Workflow`、`Research Agent`、`Report Generator`、`Repository Pattern`
-- [x] 统一平台演进术语：`SQLite(Current)`、`PostgreSQL(Target)`、`pgvector(Target)`、`Hybrid Retrieval(Target)`、`RBAC(Target)`、`Audit Log(Target)`、`OpenTelemetry(Target)`、`Redis(Target)`、`RabbitMQ(Target)`、`Docker(Current)`、`Kubernetes(Target)`
+- [x] 统一平台演进术语：`SQLite(Current)`、`PostgreSQL(Target)`（**历史记录**；V1.0 废止 SQLite(Current) 作为当前架构标签，PostgreSQL+pgvector 为 Current）
+- [x] V1.0 架构口径校正：正式 Repository=PostgreSQL+pgvector；InMemory=unittest only、`pgvector(Target)`、`Hybrid Retrieval(Target)`、`RBAC(Target)`、`Audit Log(Target)`、`OpenTelemetry(Target)`、`Redis(Target)`、`RabbitMQ(Target)`、`Docker(Current)`、`Kubernetes(Target)`
 - [x] 逐份检查 Mermaid、Architecture、目录树、API 示例、ADR、Interview Answer、Roadmap 和 handbook 是否保持同一世界观
 - [x] Documentation Only：只做术语统一、命名统一、Current/Target/Planned 标记统一，不重写、不扩写、不删章节
 - [x] 完成记录：已统一 README、治理文档、架构文档、handbook 总规则、系统设计书、架构图册、生产路线图和面试主文档的 ERIP 世界观

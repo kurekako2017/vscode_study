@@ -125,7 +125,7 @@ SSE / Report
 - RAG
 - Report Generator
 - Docker
-- InMemory / PostgreSQL（V1.0 双轨；历史文档中的 SQLite 表述视为早期阶段）
+- PostgreSQL + pgvector = V1.0 正式 Repository；InMemory = unittest only；历史 SQLite 表述 = 早期阶段，非 Current
 - PostgreSQL
 - Keyword Retrieval
 - Hybrid Retrieval
@@ -185,7 +185,7 @@ SSE / Report
 - Fixed KPI Workflow
 - Streaming / SSE
 - Report Generator
-- InMemory / PostgreSQL（V1.0 双轨；历史文档中的 SQLite 表述视为早期阶段）
+- PostgreSQL + pgvector = V1.0 正式 Repository；InMemory = unittest only；历史 SQLite 表述 = 早期阶段，非 Current
 - Docker
 - 基础 Architecture
 - Review 观点

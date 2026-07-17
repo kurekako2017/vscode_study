@@ -28,7 +28,7 @@
 - TaskService 与 LangGraph Workflow 职责分离。
 - Fixed KPI Workflow 与 Research Agent 保持独立边界。
 - Agent 只能通过受控 Tool / Service 访问外部能力。
-- Repository 隐藏 SQLite、PostgreSQL、Redis、OpenSearch 和 VectorDB 的实现差异。
+- Repository 隐藏 PostgreSQL 正式实现与 InMemory 测试适配器差异；Redis/OpenSearch/Qdrant 为后续增强，非 V1.0 默认栈。
 - API、Worker、SSE 可作为独立部署单元扩展，但不为每个类创建服务。
 - 目录结构能够映射基本设计、详细设计、测试和运维责任。
 
@@ -206,7 +206,8 @@ backend/
 │   │   │   ├── report_repository.py
 │   │   │   └── audit_repository.py
 │   │   └── implementations/
-│   │       ├── sqlite/
+│   │       ├── postgres/   # V1.0 正式
+│   │       ├── (历史) sqlite/  # 已不使用
 │   │       ├── postgres/
 │   │       ├── redis/
 │   │       └── search/
@@ -489,7 +490,7 @@ Research Agent
 | api / services | FastAPI Container | API Pods |
 | streams | FastAPI 内部 Route | SSE Pods |
 | workflow / kpi / agents / reports | Backend Process | KPI / Research / Report Workers |
-| repositories | SQLite / Local | PostgreSQL / Redis / Search Clients |
+| repositories | 历史：SQLite 规划 | **V1.0：PostgreSQL 正式** + InMemory 测试；Redis/Search=后续 |
 | events | In-process | RabbitMQ + Redis Event Store |
 | observability | Structured Logs | OpenTelemetry Collector |
 | frontend | React Container | Static / Frontend Pods |

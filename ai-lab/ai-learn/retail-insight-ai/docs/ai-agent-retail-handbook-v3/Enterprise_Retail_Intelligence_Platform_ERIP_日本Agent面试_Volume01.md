@@ -120,6 +120,31 @@
 
 ---
 
+## 1.4 2 分钟项目介绍（中日）
+
+### 日文
+
+```text
+ERIP V1.0 は小売経営会議向けの企業 AI 基盤です。
+ログイン/JWT/RBAC の後、文書を Upload/Import/Chunk し、RAG で Citation を取り、
+明示 AI 分析（low_cost）と取締役会報告（high_quality）を Gateway 経由で生成します。
+ReportVersion を残し、manager が Approval し、Persistent Audit と LLM Usage Ledger で追跡します。
+正式 Repository は PostgreSQL。InMemory は unittest のみ。既定 LLM は stub。
+ローカル完全起動は 5173、Compose 受入は 8080。テストは 297/6・286/62・116。
+原文は documents.content。S3/MinIO は未接入。有料 smoke 未実施ならモデル効果は語りません。
+```
+
+### 中文
+
+```text
+ERIP V1.0 服务零售经营会议：登录鉴权后完成文档入湖与切片，RAG 给引用，
+显式 AI（low_cost）与董事会报告（high_quality）走 Gateway 与 Ledger。
+报告有 ReportVersion，经理审批，审计可追踪。
+正式库是 PostgreSQL；InMemory 只做测试。默认 stub。5173 完整本地 / 8080 Compose。
+原文在 documents.content，未接 S3。未跑真实付费 smoke 不谈模型效果。
+```
+
+
 # 2. 项目概要 / プロジェクト概要
 
 ## 2.1 日文

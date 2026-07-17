@@ -1,6 +1,6 @@
 # 日本项目面试讲解稿
 
-这份文档用于日本项目面试场景。Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，面试说明统一基于企业正式上线项目展开，而不是把它描述成单纯的学习项目。
+这份文档用于日本项目面试场景。**Enterprise Retail Intelligence Platform（ERIP）V1.0 是真实企业交付项目**，面试说明统一基于企业正式上线能力展开。本 handbook 文档同时承担源码学习与面试准备功能；此处「学习」仅指文档用途，不描述项目性质。
 
 > 更新说明（V1.0 交付口径）：下文在保留原讲解骨架的同时，按当前仓库已交付能力统一数字与边界。
 > 自动化基线：PostgreSQL **297 tests / 6 skipped**；InMemory **286 / 62 skipped**；Frontend **116/116**；Alembic head **`20260717_08_ai_runtime`**。
@@ -70,7 +70,7 @@ Enterprise Retail Intelligence Platform（ERIP）は正式に導入された企�
 AI Runtime（mode/kill_switch）可经 PostgreSQL 持久化并由 admin 二次确认切换；默认 stub 零费用。
 Provider 失败时可走 OpenRouter → NVIDIA → Gemini → Local Qwen 的串行 fallback（熔断与 attempt ledger）。
 审批有 owner、History、ReportVersion 与 403/409 边界；Persistent Audit 记录 request_id 与关键动作。
-验收：InMemory 测试、PostgreSQL suite、Frontend 116、Docker Compose + Alembic + Stub E2E。
+验收：以 PostgreSQL suite 与页面为准；InMemory 仅自动化测试；Frontend 116；Compose + Alembic + Stub E2E。
 未默认做真实付费 smoke、Billing UI、多租户预算台、SIEM/WORM/Streaming 与 DeepSeek 启用。」
 
 ### 日本語
@@ -83,7 +83,7 @@ LLM は LLM Gateway のみ：AI 分析は low_cost、取締役会報告は high_
 AI Runtime（mode/kill_switch）は PostgreSQL に永続化し、admin が二次確認で切替。既定は stub。
 失敗時は OpenRouter → NVIDIA → Gemini → Local Qwen の直列 fallback（遮断と attempt ledger）。
 Approval は owner / History / ReportVersion、403/409。Persistent Audit が request_id と重要操作を残します。
-受入は InMemory、PostgreSQL suite、Frontend 116、Compose + Alembic + Stub E2E。
+受入は PostgreSQL suite と画面が主。InMemory は自動テストのみ。Frontend 116。Compose + Alembic + Stub E2E。
 有料 smoke・Billing UI・マルチテナント予算画面・SIEM/WORM/Streaming・DeepSeek 有効化は既定範囲外です。」
 
 ---
@@ -185,33 +185,33 @@ React (Login/JWT/ProtectedRoute/RBAC UI/Learning Dashboard)
   → Executive Report (high_quality via LLM Gateway)
   → Approval State Machine + ReportVersion
   → Persistent Audit + Usage Ledger
-  → PostgreSQL/pgvector 或 InMemory
+  → **PostgreSQL/pgvector（正式）**；InMemory 仅 unittest 适配器
   → SSE / JSON → React
 ```
 
 ### 中文讲法
 
-- 前端只负责交互、鉴权展示与学习看板。
+- 前端只负责交互、鉴权展示与 Learning Dashboard（文档/诊断用途，不改变 ERIP 企业项目性质）。
 - `FastAPI` 负责 `HTTP` 边界与统一错误。
 - 文档与普通 RAG 保证可引用、默认可零 LLM。
 - 显式 AI 分析与董事会报告必须经 Gateway 与额度。
 - 审批与审计保证权责可追。
-- 存储可在 InMemory 与 PostgreSQL 间切换而不改业务主链。
+- 业务主链不依赖存储细节，但**正式与页面验收只认 PostgreSQL**；InMemory 仅 unittest/故障隔离。
 
 ### 日本語講法
 
-- frontend は操作、権限表示、学習ダッシュボード。
+- frontend は操作、権限表示、Learning Dashboard（文書/診断用途。ERIP は企業交付プロジェクト）。
 - FastAPI は HTTP 境界。
 - 通常 RAG は引用可能で、既定は LLM 不要。
 - 明示 AI / 取締役会報告のみ Gateway と枠を通す。
 - 承認と監査で責任を追える。
-- InMemory と PostgreSQL を切替可能。
+- 正式 Repository は PostgreSQL。InMemory はテストアダプタのみ。
 
 ## 为什么这样设计
 
 ### 中文
 
-- 先 InMemory 是为了学习路径零摩擦；企业验收用 PostgreSQL 证明合同一致。
+- InMemory **仅** unittest / 故障隔离适配器；**正式与页面验收必须 PostgreSQL**，用于证明合同与持久化一致。
 - `Repository` / Provider / Gateway 把可替换点收口，避免业务散落。
 - 双路由隔离成本：分析便宜、报告高质量，额度桶不串。
 - 审批与 AI 成本动作 fail-closed，避免静默越权与静默计费。
@@ -219,7 +219,7 @@ React (Login/JWT/ProtectedRoute/RBAC UI/Learning Dashboard)
 
 ### 日本語
 
-- InMemory で学習摩擦を下げ、PostgreSQL で契約一致を証明。
+- InMemory は unittest / 障害隔離のみ。正式受入と画面は PostgreSQL で契約と永続化を証明。
 - Repository / Provider / Gateway で差し替え点を集約。
 - 双ルートでコスト分離。
 - 承認と課金は fail-closed。
@@ -304,7 +304,7 @@ Login (JWT)
 | # | 问题 | 中文回答要点 | 日本語回答要点 | 源码/设计取舍 | 风险与演进 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | 为什么用 FastAPI？ | 异步 HTTP、OpenAPI、依赖注入清晰 | OpenAPI と DI が明確 | `backend/app/main.py`、`api/` | 演进：网关层限流 |
-| 2 | React 扮演什么？ | 鉴权 UI、业务链、学习看板，不替代后端治理 | 権限 UI と業務導線 | `frontend/src/App.tsx`、Auth | 演进：设计系统 |
+| 2 | React 扮演什么？ | 鉴权 UI、业务链、Learning Dashboard，不替代后端治理 | 権限 UI と業務導線 | `frontend/src/App.tsx`、Auth | 演进：设计系统 |
 | 3 | 为何 PostgreSQL/pgvector？ | 企业验收持久化与向量扩展 | 永続化とベクトル拡張 | postgres repos、Compose | 演进：只读副本 |
 | 4 | JWT 存在哪？ | 仅 sessionStorage，刷新经 `/users/me` | sessionStorage のみ | AuthContext | 风险：XSS，需 CSP |
 | 5 | ProtectedRoute 做什么？ | 未登录跳转登录并保留原目标 | 未ログインを遮断 | ProtectedRoute | 与后端权限双检 |
@@ -327,7 +327,7 @@ Login (JWT)
 | 22 | 普通 RAG 为何零 LLM？ | 默认可解释、零费用 | 既定ゼロ費用 | Internal RAG | INTERNAL_RAG_USE_LLM 慎开 |
 | 23 | Compose 验收？ | healthy + Alembic + Stub E2E + 无 -v | down -v 禁止 | scripts/compose_* | daemon 依赖环境 |
 | 24 | Lifecycle Live Status？ | 本地 mount/update/unmount 诊断 | 前端诊断 | frontend lifecycle | 不回传后端 |
-| 25 | Learning Dashboard？ | 固定栏目学习路径 | 固定 15 欄 | LearningSidebar | 不替代业务页 |
+| 25 | Learning Dashboard？ | 固定栏目文档路径（非项目性质） | 固定 15 欄 | LearningSidebar | 不替代业务页 |
 | 26 | 测试数字？ | PG 297/6、IM 286/62、FE 113 | 同左 | RUNBOOK N / TEST_CASES | 日常一次 suite |
 | 27 | Alembic head？ | `20260717_08_ai_runtime` | 同左 | migrations | 禁止手改 prod |
 | 28 | 最弱一环？ | 真实多租户预算与 SIEM 未产品化 | 予算 UI/SIEM 未 | 边界诚实 | 下一阶段 |

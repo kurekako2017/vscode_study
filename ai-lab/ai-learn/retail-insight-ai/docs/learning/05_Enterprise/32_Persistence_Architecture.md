@@ -1,4 +1,6 @@
 # ERIP 企业源码架构手册
+> **V1.0 校正：** 正式 Repository = **PostgreSQL + pgvector**。文中 SQLite 若作为「当前默认库」出现，一律视为**历史教学对比**，不是 V1.0 现状。InMemory = unittest only。
+
 
 # Volume 05：Enterprise（企业架构）
 

@@ -1,5 +1,16 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 紧急：架构图 SQLite(Current)/PostgreSQL(Target) 校正
+
+- [x] 重写 `09_系统设计书_7.0_Technical_Architecture_增补_修改版.md` V1.0 Current 主图
+- [x] 校正 08/09/10/11/12、ARCHITECTURE、PROJECT_BIBLE、学习持久化相关旧标签
+- [x] 全库搜索 SQLite(Current)/PostgreSQL(Target)/K8s(Target)/OTel(Target) 并分类处理
+- [x] 未 commit/push；未改代码
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 ERIP V1.0 全量文档收尾（Volume 深合并 / 03 一览表 / 归档路径 / 静态门禁）
 
 - [x] 旧 Volume 独有问答并入权威 Volume01 §20（FastAPI/Task/LangGraph/RAG/pgvector/故障/压迫）

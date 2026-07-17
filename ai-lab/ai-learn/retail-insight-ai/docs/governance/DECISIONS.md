@@ -180,9 +180,9 @@ AI 运行时 `mode` / `kill_switch` / `version` 以 PostgreSQL 单例表 `ai_run
   `Report Generator`
   `Repository Pattern`
 - 平台演进术语统一为：
-  `SQLite(Current)`
+  `SQLite(Current)`（**历史术语，V1.0 废止；现为 PostgreSQL+pgvector Current**）
   `Docker(Current)`
-  `PostgreSQL(Target)`
+  `PostgreSQL(Target)`（**历史术语，V1.0 已升为 Current 正式库**）
   `pgvector(Target)`
   `Hybrid Retrieval(Target)`
   `RBAC(Target)`

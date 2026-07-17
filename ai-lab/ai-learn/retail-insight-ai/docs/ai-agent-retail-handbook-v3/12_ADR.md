@@ -193,15 +193,15 @@ SSE 连接中断不能取消任务；done 只表示成功，error 表示失败�
 
 **Context**
 
-SQLite（Current）/ CSV 适合当前数据模型确认，但不满足多用户并发、备份、权限和多实例一致性。
+**历史记录（已过时）：** 早期曾写 PostgreSQL+pgvector（Current/正式）【历史误称已废止】/CSV 适合数据模型确认。**V1.0：正式 Repository 已是 PostgreSQL + pgvector；SQLite 不再作为当前架构。** 早期理由（并发/备份/权限）仍解释「为何选择 PG」。
 
 **Decision**
 
-ERIP 企业运用以 PostgreSQL（Target）保存业务数据、任务、报告和审计事实。
+ERIP 企业运用以 PostgreSQL+pgvector（Current/正式）【历史 Target 标签已废止】保存业务数据、任务、报告和审计事实。
 
 **Alternative**
 
-- 长期使用 SQLite。
+- **历史否决项：** 长期使用 SQLite（V1.0 未采用）。
 - 每个模块自行选择数据库。
 
 **Tradeoff**
@@ -210,7 +210,7 @@ ERIP 企业运用以 PostgreSQL（Target）保存业务数据、任务、报告�
 
 **Impact**
 
-迁移前固定 Repository，执行数据校验、restore test 和 rollback；业务代码不得依赖 SQLite 特性。
+**V1.0：** 业务代码仅依赖 Repository 接口；正式实现为 PostgreSQL。不得依赖已废弃的 SQLite 特性。
 
 ## ADR-008 Redis 只保存热状态
 
@@ -222,7 +222,7 @@ ERIP 企业运用以 PostgreSQL（Target）保存业务数据、任务、报告�
 
 **Decision**
 
-Redis（Target）保存热状态、SSE 事件、短期缓存和必要的分布式协调；PostgreSQL（Target）保存事实。
+Redis（Target）保存热状态、SSE 事件、短期缓存和必要的分布式协调；PostgreSQL+pgvector（Current/正式）【历史 Target 标签已废止】保存事实。
 
 **Alternative**
 
@@ -443,7 +443,7 @@ OpenSearch 承接关键词与条件检索，VectorDB 承接语义检索；两者
 
 **Context**
 
-当前 SQLite 将迁移 PostgreSQL，并增加 Redis 与 Search，业务层不能绑定具体驱动。
+**历史记录：** 曾写「SQLite 将迁移 PostgreSQL」。**V1.0 现状：** PostgreSQL 已是正式库；Redis/Search 等为后续增强；业务层仍不得绑定具体驱动。
 
 **Decision**
 

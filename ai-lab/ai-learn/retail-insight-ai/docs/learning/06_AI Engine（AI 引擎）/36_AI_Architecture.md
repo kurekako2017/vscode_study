@@ -1,4 +1,6 @@
 
+> **V1.0 校正：** 正式 Repository = **PostgreSQL + pgvector**。文中 SQLite 仅作历史/对比教学，不是当前主库。InMemory = unittest only。
+
 # Retail Insight AI 企业源码架构手册
 
 # Volume 06：AI Engine（AI 引擎）

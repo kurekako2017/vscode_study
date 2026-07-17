@@ -34,7 +34,7 @@ React (JWT / ProtectedRoute / RBAC UI / Learning Dashboard / Lifecycle Live Stat
 
 ## 历史章节阅读规则（V1.0）
 
-下文大量 Sprint / Current State / Target State 记录**保留为演进历史**，不得删除。  
+下文大量 Sprint / Current State / Target State 记录**保留为演进历史**，不得删除。
 若出现「没有 JWT」「Approval 无 API」「无 PostgreSQL」「Frontend 未实现」等与 V1.0 摘要冲突的句子，**一律以文首 ERIP V1.0 交付架构摘要 + 源码为准**。
 
 ## 2026-07-17 显式 AI Analysis 成本边界
@@ -136,9 +136,9 @@ flowchart LR
 
 ### Target State
 
-- English: keep the Retail Insight AI MVP stable while future ERIP phases intentionally add frontend UI, PostgreSQL, pgvector, hybrid retrieval, full-platform RBAC, audit persistence, OpenTelemetry, Redis, RabbitMQ, MCP, and production deployment
-- 中文（简体）：在保持 ERIP V1.0 稳定的前提下，后续 ERIP 阶段再有计划地加入前端 UI、PostgreSQL、pgvector、Hybrid Retrieval、全平台 RBAC、持久化 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP 和生产部署
-- 日本語：ERIP V1.0 を安定させたまま、今後の ERIP 段階で frontend UI、PostgreSQL、pgvector、Hybrid Retrieval、全体 RBAC、永続 Audit Log、OpenTelemetry、Redis、RabbitMQ、MCP、本番デプロイを計画的に追加します
+- English: **Historical Target text superseded.** V1.0 already includes React frontend, PostgreSQL/pgvector, JWT/RBAC, Persistent Audit, LLM governance. Remaining enhancements: production-grade hybrid defaults, OTel backend, Redis/RabbitMQ, MCP, K8s/HA — mark as not delivered.
+- 中文（简体）：**以下为历史 Target 文案，已被 V1.0 现实取代。** 前端 UI、PostgreSQL/pgvector、全平台 RBAC、持久化 Audit 等**已交付**。后续增强：Hybrid 默认强化、OpenTelemetry 后端、Redis/RabbitMQ、MCP、K8s/HA 等（未实现）。
+- 日本語：**歴史的 Target 記述。V1.0 では Frontend、PostgreSQL/pgvector、RBAC、永続 Audit 等は交付済み。** 今後は Hybrid 強化、OTel、Redis/RabbitMQ、MCP、K8s/HA 等（未実装）。
 
 ### Result
 
