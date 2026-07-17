@@ -6,11 +6,14 @@
 
 操作与验收前先按场景选择权威章节（正文仍在 `RUNBOOK_LOCAL.md`；本文件负责测试含义与基线对照，**不新增 Appendix**）：
 
-| 场景 | 权威章节 |
+| 场景 | 权威入口 |
 |---|---|
-| 本地 InMemory 学习 | RUNBOOK Appendix L |
-| PostgreSQL/Docker 企业验收 | RUNBOOK Appendix M |
-| 最终测试数字与状态 | RUNBOOK Appendix N |
+| ERIP V1.0 正式启动 | RUNBOOK Appendix M（Docker Compose + PostgreSQL） |
+| 本地 PostgreSQL 联调 | `REPOSITORY_BACKEND=postgres` + Backend/Frontend |
+| 快速单元测试 / 教学 | InMemory，**仅辅助**（不作业务验收） |
+| 最终业务验收 | PostgreSQL + Stub E2E（RUNBOOK M/N） |
+
+**Repository 定位**：PostgreSQL 是正式运行与业务验收权威；Compose 默认且必须 PostgreSQL。InMemory 代码保留供快速 unittest，**不**补齐企业能力、**不**作为正式业务结论。
 
 正式前端导航（与 `frontend/src/App.tsx` 一致）：
 
@@ -60,8 +63,8 @@ V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
 
 | Suite | 基线 |
 |---|---|
-| Backend PostgreSQL | 281 tests，2 skipped（real smoke 默认 skip） |
-| Backend InMemory | 270 tests，52 skipped |
+| Backend PostgreSQL（**正式回归**） | 281 tests，2 skipped（real smoke 默认 skip） |
+| Backend InMemory（**仅辅助**） | 270 tests，52 skipped；不作业务验收结论 |
 | Frontend | 113 / 113 |
 | Production build / compileall / diff-check | 通过 |
 
@@ -87,8 +90,8 @@ V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
 | 16 | `test_document_domain.py` | documents 间接对应 | 领域模型规则 | 防止 Document 状态、metadata、checksum 等领域规则退化 | `python -m unittest tests.test_document_domain -v` | Domain Logic | 领域路径 |
 | 17 | `test_repositories.py` | 无公开 API | Repository 合同 | 防止 Repository interface 与 InMemory 实现不一致 | `python -m unittest tests.test_repositories -v` | 无 | 合同路径 |
 | 18 | `test_settings.py` | 全局间接影响 | 配置解析 | 防止环境变量解析错误、防止默认配置影响本地学习路径 | `python -m unittest tests.test_settings -v` | Settings | 配置路径 |
-| 19 | `test_repository_backend_switch.py` | 全局间接影响 | 仓库后端切换 | 防止切换错误破坏 InMemory 默认学习路径 | `python -m unittest tests.test_repository_backend_switch -v` | Container / Config | 配置路径 |
-| 20 | `test_postgres_repositories.py` | 全局间接影响 | PostgreSQL 合同路径 | 防止 PostgreSQL repository contract 与 InMemory 合同分叉；**V1.0 正式验收含 PG 全量 suite** | `python -m unittest tests.test_postgres_repositories -v` | Repository Layer | 主验收路径（需 DATABASE_URL） |
+| 19 | `test_repository_backend_switch.py` | 全局间接影响 | 仓库后端切换 | 防止切换错误；InMemory 仅辅助，正式以 postgres 为准 | `python -m unittest tests.test_repository_backend_switch -v` | Container / Config | 配置路径 |
+| 20 | `test_postgres_repositories.py` | 全局间接影响 | PostgreSQL 合同路径 | **V1.0 正式 Repository 合同**；不要求 InMemory 对齐全部企业能力 | `python -m unittest tests.test_postgres_repositories -v` | Repository Layer | **主验收路径**（需 DATABASE_URL） |
 | 21 | `test_logging.py` | 全局间接影响 | 结构化日志 | 防止日志缺少 request_id / task_id / error_code、防止敏感信息输出 | `python -m unittest tests.test_logging -v` | logging helpers | 观测路径 |
 | 22 | `test_authentication.py` | login / users/me / JWT | JWT 签发、解析、时钟偏差 leeway | 防止签名错误被放行、防止时钟回拨导致随机 401、防止 jti 合同漂移 | `python -m unittest tests.test_authentication -v` | `JWTService` / `AuthenticationService` | 安全路径 |
 | 23 | `test_authorization.py` | 受保护 API | RBAC Permission | 防止角色越权、防止未知角色 fail-open | `python -m unittest tests.test_authorization -v` | `AuthorizationService` | 权限路径 |
@@ -607,7 +610,7 @@ Assertion
 | Swagger对应操作 | 无直接 Swagger 操作 |
 | 后台观察 | 接口命名、能力边界、实现一致性 |
 | 对应源码 | `backend/app/repositories/interfaces/` |
-| 为什么设计 | Repository 抽象是 InMemory 与 PostgreSQL 双轨切换的前提；V1.0 两条路径均已落地，合同不能分叉 |
+| 为什么设计 | Repository 抽象隔离实现；**V1.0 正式能力在 PostgreSQL**，InMemory 仅保留快速测试面，不补齐企业能力 |
 
 ### 后端程序流程
 
@@ -663,7 +666,7 @@ Assertion
 | Swagger对应操作 | 通常不直接用 Swagger 复现，可结合 `/health` 和主链路理解 |
 | 后台观察 | backend 选择、环境变量、依赖注入 |
 | 对应源码 | `backend/app/config/container.py`、`backend/app/config/settings.py` |
-| 为什么设计 | 防止 PostgreSQL 正式验收路径破坏默认 InMemory 学习路径；双轨并存时切换必须可测 |
+| 为什么设计 | 切换边界可测；**正式业务与企业能力以 PostgreSQL 为准**，InMemory 仅辅助且不补齐企业能力 |
 
 ### 后端程序流程
 
@@ -686,7 +689,7 @@ Assertion
 
 | 项目 | 内容 |
 |---|---|
-| 测试目的 | 验证 PostgreSQL 仓库实现合同（V1.0 正式验收路径之一；InMemory 仍为默认学习路径） |
+| 测试目的 | 验证 PostgreSQL 仓库实现合同（**V1.0 正式/权威 Repository**；InMemory 不作业务验收） |
 | 对应API | documents、tasks、approval 等依赖仓库能力间接受影响 |
 | 测试命令 | `cd backend && python -m unittest tests.test_postgres_repositories -v` |
 | 输入（入力） | PostgreSQL 连接配置、数据库环境、`psycopg` 依赖 |
@@ -694,7 +697,7 @@ Assertion
 | Swagger对应操作 | 不建议直接用 Swagger 验证，先确认底层 roundtrip |
 | 后台观察 | 连接、写入、读取、skip 原因 |
 | 对应源码 | `backend/app/repositories/postgres/` |
-| 为什么设计 | 证明 PostgreSQL 与 InMemory 合同一致；V1.0 交付以 PG 全量 + InMemory 回归双轨验收，默认本地学习仍可不启 PG |
+| 为什么设计 | 证明 PG 合同稳定；**业务验收只认 PostgreSQL**；InMemory 全量仅辅助回归，不要求对齐全部企业能力 |
 
 ### 后端程序流程
 
@@ -940,7 +943,7 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 ## Scenario01 详细验收表（≥20 步）
 
-前置：Backend/Frontend 已按 RUNBOOK Appendix L（InMemory 学习）或 Appendix M（PostgreSQL/Docker 企业验收）启动；`LLM_PROVIDER_MODE=stub`；样例文件来自 `docs/learning/sample-data/Scenario01_Sales_Decline/`。
+前置：**业务验收以 PostgreSQL 为准**（推荐 RUNBOOK Appendix M Compose；或本地 `REPOSITORY_BACKEND=postgres`）。`LLM_PROVIDER_MODE=stub`；样例见 `docs/learning/sample-data/Scenario01_Sales_Decline/`。InMemory 启动仅教学，**不作 Scenario01 业务结论**。
 本表供人工 / Swagger / UI 对照；自动化对照列给出仓库内测试入口。**不在文档修改时运行下列测试。**
 
 | Step | Actor/角色 | 页面或 API | 输入/操作 | 预期 HTTP/页面结果 | 数据库/审计验证 | 对应源码 | 对应自动化测试 |
@@ -978,8 +981,8 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 | 验收模式 | 前置条件 | 命令 | 预期结果 | 是否允许真实网络 |
 |---|---|---|---|---|
-| InMemory 全量 unittest | 已创建 `backend/.venv` 并安装 requirements | `cd backend && ./.venv/bin/python -m unittest discover -s tests -v` | **270** tests，**52** skipped；无 unexpected failure | 否（默认 stub） |
-| PostgreSQL 全量 unittest | 专用库 `erip_integration_test`；`REPOSITORY_BACKEND=postgres`；合法 `DATABASE_URL`；`LLM_PROVIDER_MODE=stub` | `cd backend && export REPOSITORY_BACKEND=postgres DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql" LLM_PROVIDER_MODE=stub && ./.venv/bin/python -m unittest discover -s tests -v` | **281** tests，**2** skipped（real smoke 默认 skip） | 否（默认 stub；仅连本地 PG） |
+| InMemory 全量 unittest（**仅辅助**） | 已创建 `backend/.venv` | `cd backend && ./.venv/bin/python -m unittest discover -s tests -v` | **270** / **52 skipped**；**不作业务验收结论** | 否（默认 stub） |
+| PostgreSQL 全量 unittest（**正式回归**） | 专用库 `erip_integration_test`；`REPOSITORY_BACKEND=postgres`；`LLM_PROVIDER_MODE=stub` | `cd backend && export REPOSITORY_BACKEND=postgres DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql" LLM_PROVIDER_MODE=stub && ./.venv/bin/python -m unittest discover -s tests -v` | **281** / **2 skipped**；**业务与企业能力以本 suite 为准** | 否（默认 stub；仅连本地 PG） |
 | 提交前聚合脚本 | 同本地学习环境 | `./scripts/run_tests.sh` | Backend + Frontend + build + compileall 按脚本约定通过 | 否 |
 | Frontend Vitest + build | 已 `npm install` | `cd frontend && npm test && npm run build` | **113 / 113**；production build 成功 | 否 |
 | Compose + Stub E2E | Docker daemon 可用；默认 stub | `./scripts/compose_up.sh` → `./scripts/compose_verify.sh` → `E2E_BASE_URL=http://127.0.0.1:8000 E2E_EXPECT_STUB=1 ./scripts/run_api_e2e.sh` → `./scripts/compose_down.sh` | healthy + E2E `OK`；down **不带** `-v` | 否（容器内 stub） |
@@ -993,8 +996,8 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 Backend：
 
-- PostgreSQL：**281** tests，**2** skipped。**发布基线**已在修复 JWT 时钟回拨后对完整 suite **连续三次**验证通过；**日常回归执行一次完整 suite 即可**，不必每次人为连跑三次。
-- InMemory：**270** tests，**52** skipped
+- PostgreSQL（**正式**）：**281** tests，**2** skipped。发布基线曾连续三次；日常一次完整 suite 即可。
+- InMemory（**仅辅助**）：**270** tests，**52** skipped；**不作业务验收结论**
 - Alembic head：`20260717_07_fallback_chain`
 - `compileall app` 与 `git diff --check`：各自独立通过（见上方自动化验收表独立行；亦可由 `./scripts/run_tests.sh` 一并覆盖）
 

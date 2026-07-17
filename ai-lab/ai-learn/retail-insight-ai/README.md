@@ -35,8 +35,10 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 → Persistent Audit / Usage Ledger
 ```
 
-权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix L/M/N；`VERIFY_CHECKLIST.md`。
-自动化基线：PostgreSQL **281 tests / 2 skipped**；InMemory **270 / 52 skipped**；Frontend **113/113**；Alembic **`20260717_07_fallback_chain`**。
+**Repository 定位**：PostgreSQL 是 V1.0 **正式运行与业务验收**的权威存储；Docker Compose **默认且必须**使用 PostgreSQL。InMemory **仅**快速单元测试/教学/故障隔离，**不是**正式业务验收结果，也**不会**补齐 PostgreSQL 企业能力（代码保留，未删除）。
+
+权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`（顶部入口 + Appendix M/N）；`VERIFY_CHECKLIST.md`。
+自动化基线：PostgreSQL **281 tests / 2 skipped**（正式回归）；InMemory **270 / 52 skipped**（辅助）；Frontend **113/113**；Alembic **`20260717_07_fallback_chain`**。
 
 项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。
 
@@ -48,9 +50,9 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 | Frontend | V1.0 已交付 | Login/JWT、ProtectedRoute、RBAC UI、正式导航、Lifecycle Live Status、Learning Dashboard；见 `docs/learning/02_Frontend/` |
 | Swagger | Runtime Architecture | `/docs` 仍是 API 调试入口，与 React 共用同一套 FastAPI API |
 | Workflow | Runtime Architecture | LangGraph Workflow、Fixed KPI Workflow、Research Agent、Report 主链路可用 |
-| Repository Pattern | Runtime Architecture | InMemory 学习路径 + PostgreSQL 企业验收双轨；Repository 合同统一 |
+| Repository Pattern | Runtime Architecture | **PostgreSQL = 正式权威**；InMemory = 快速测试/教学适配器（不补企业能力、不作业务验收） |
 | LLM | V1.0 成本治理 | 默认 `LLM_PROVIDER_MODE=stub`；LLM Gateway、Evidence Gate、low_cost/high_quality、Fallback Chain、Ledger 已落地；真实付费 smoke 仅 opt-in |
-| PostgreSQL / pgvector | Production 验收路径 | 企业持久化与 pgvector Compose 路径；Alembic head `20260717_07_fallback_chain` |
+| PostgreSQL / pgvector | **正式运行与验收** | Compose 默认且必须；持久化 Audit/Approval/Ledger/ReportVersion；Alembic head `20260717_07_fallback_chain` |
 | RBAC / JWT | Production Architecture | JWT 登录、`/users/me`、冻结 Permission、401/403 fail-closed |
 | Audit Log | Production Architecture | Persistent Audit（PostgreSQL）+ request_id；禁止落 Token/Key/全文 Prompt |
 | Redis / RabbitMQ / OpenTelemetry / Kubernetes | 规划 / 非 V1.0 默认交付 | **未**作为本仓库默认可运行完成项；勿写成已交付 |
@@ -69,11 +71,12 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 企业交付说明（V1.0 诚实口径）：
 
 - 默认验收使用 stub LLM（零真实费用）；OpenRouter 等真实调用仅 opt-in，**真实付费 smoke 非默认**。
-- PostgreSQL/pgvector 为企业验收路径；InMemory 仍为本地学习默认。
+- **PostgreSQL/pgvector 为正式运行与业务验收权威**；Docker Compose 默认且必须走 PostgreSQL。
+- InMemory 仅快速单元测试/教学；本地脚本若默认 InMemory，只为兼容快速学习——正式请 `REPOSITORY_BACKEND=postgres` 或 Compose。
 - JWT + RBAC + ProtectedRoute + Persistent Audit + LLM Gateway/Ledger/Fallback 已交付。
 - Docker Compose + Alembic + Stub API E2E 已落地；`compose_down` 禁止 `-v` 作为日常验收。
 - **未**把 Redis / RabbitMQ / OpenTelemetry / Kubernetes / MCP / Billing UI / 多租户预算台 / SIEM·WORM·Streaming / DeepSeek 默认启用写成已完成。
-- 详细验收步骤见 `VERIFY_CHECKLIST.md` 与 RUNBOOK Appendix L/M/N（本 README 不重复命令大段）。
+- 详细验收步骤见 `VERIFY_CHECKLIST.md` 与 RUNBOOK Appendix M/N（本 README 不重复命令大段）。
 
 ## 三、项目目录
 
@@ -143,7 +146,7 @@ README
 ↓
 docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md
 ↓
-Swagger + 正式 UI（RUNBOOK Appendix L）
+Swagger + 正式 UI（优先 Compose Appendix M；本地脚本见 L）
 ↓
 docs/learning/01_Foundation/TEST_CASES.md
 ↓

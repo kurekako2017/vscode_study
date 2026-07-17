@@ -6,11 +6,26 @@
 
 操作前先按场景选择章节，避免把历史阶段说明当成当前建议：
 
-| 场景 | 权威章节 |
+| 场景 | 权威入口 |
 |---|---|
-| 本地 InMemory 学习 | [Appendix L](#appendix-l-frontend-启动验证测试与停止) |
-| PostgreSQL/Docker 企业验收 | [Appendix M](#appendix-m-docker-compose-启动与本地验收v10) |
-| 最终测试数字与状态 | [Appendix N](#appendix-n-v10-启动验收基线最终状态) |
+| ERIP V1.0 正式启动 | [Appendix M](#appendix-m-docker-compose-启动与本地验收v10)：**Docker Compose + PostgreSQL**（默认且必须） |
+| 本地 PostgreSQL 联调 | PostgreSQL 环境变量 + Backend/Frontend（见下文「本地 PostgreSQL 联调」；脚本步骤可参考 [Appendix L](#appendix-l-frontend-启动验证测试与停止)） |
+| 快速单元测试 / 教学 | **InMemory，仅辅助用途**（unittest 加速 / 故障隔离；**不是**正式业务验收） |
+| 最终业务验收 | **PostgreSQL + Stub E2E**（Appendix M + [Appendix N](#appendix-n-v10-启动验收基线最终状态)） |
+
+### Repository 最终定位（V1.0）
+
+- **PostgreSQL** 是 ERIP V1.0 **正式运行、企业验收与数据持久化**的权威 Repository。
+- **Docker Compose 默认并必须使用 PostgreSQL**（`REPOSITORY_BACKEND=postgres`）。
+- 最终业务链、人工验收、Stub E2E、Audit、Approval、Ledger、ReportVersion **均以 PostgreSQL 为准**。
+- **InMemory 仅保留**为快速单元测试、教学适配器和故障隔离工具；**不作为正式业务验收结果**。
+- **不**继续补齐 InMemory 的 PostgreSQL 企业能力；**不**删除 InMemory 代码（避免破坏快速测试）；**不**把 InMemory 写成推荐生产配置。
+- 不得把「InMemory 已从代码删除」写成现状（代码仍存在）。
+
+```text
+本地脚本的 InMemory 默认值只为兼容快速学习；
+正式运行请显式设置 REPOSITORY_BACKEND=postgres，或直接使用 Docker Compose。
+```
 
 V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可见项受 RBAC 过滤）：
 
@@ -84,24 +99,30 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 > - UI 完成后再做前后端 Integration Test。
 > - 发布前再考虑 E2E Test。
 
-**V1.0 当前建议**：Swagger 仍用于 API 调试；正式 UI 已交付；Integration 用本地/Compose 联调；Stub API E2E 与 unittest/vitest 已是默认验收手段（见 Appendix L / M / N）。
+**V1.0 当前建议**：Swagger 仍用于 API 调试；正式 UI 已交付；**正式联调与业务验收优先 Docker Compose + PostgreSQL**（Appendix M）；Stub API E2E 与 PostgreSQL 全量 unittest 为权威回归；InMemory unittest 仅辅助（见 Appendix N）。
 
 V1.0 最终状态补充（不替换上表，只说明当前仓库已落地能力）：
 
 | 层级 | 当前仓库入口 | 说明 |
 |---|---|---|
-| 本地脚本启动 | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 日常学习主路径（默认 InMemory；见 Appendix L） |
-| Docker Compose | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | PostgreSQL + Backend + Frontend 三容器，默认 `LLM_PROVIDER_MODE=stub`（见 Appendix M） |
-| Stub API E2E | `./scripts/run_api_e2e.sh` | 企业业务链 API 级验收，零真实 LLM 费用 |
-| 全量自动化 | `./scripts/run_tests.sh` 与 Backend/Frontend 分项命令 | 见 Appendix N 基线数字 |
+| **正式启动（推荐）** | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | **PostgreSQL + Backend + Frontend**；默认 `LLM_PROVIDER_MODE=stub`（Appendix M） |
+| 本地 PostgreSQL 联调 | 显式 `REPOSITORY_BACKEND=postgres` + `DATABASE_URL` 后 `start_backend.sh` + `start_frontend.sh` | 非 Compose 时的正式数据路径；**不要**用 InMemory 结果当业务验收 |
+| 本地脚本（兼容） | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 脚本可能默认 InMemory，**仅快速学习**；见顶部说明 |
+| Stub API E2E | `./scripts/run_api_e2e.sh`（对 Compose Backend） | **最终业务链** API 验收，以 PostgreSQL 为准 |
+| 全量自动化 | PG / InMemory / Frontend 分项 | PG 为正式基线；InMemory 为辅助数字（Appendix N） |
 
 ## 推荐启动顺序
 
+**正式推荐（PostgreSQL / Compose）：** 直接按 [Appendix M](#appendix-m-docker-compose-启动与本地验收v10) 执行 `compose_up` → `compose_verify` → Stub E2E → `compose_down`（禁止 `-v`）。
+
+**本地脚本联调（若不用 Compose）：**
+
 1. Terminal 1 在 `<project_root>` 执行 `./scripts/check_env.sh`。
-2. Terminal 1 在 `<project_root>` 执行 `./scripts/start_backend.sh`。
+2. **正式数据路径**：先 `export REPOSITORY_BACKEND=postgres` 与合法 `DATABASE_URL`，再 `./scripts/start_backend.sh`。
+   （若省略，脚本可能落在 InMemory——**仅兼容快速学习，不作业务验收**。）
 3. 保持 Terminal 1 中的 Backend 持续运行，不关闭，不按 `Ctrl+C`。
 4. 验证：
-   - `http://127.0.0.1:8000/health`
+   - `http://127.0.0.1:8000/health`（正式路径期望 `repository_backend=postgres`）
    - `http://127.0.0.1:8000/docs`
    - `http://127.0.0.1:8000/redoc`
    - `http://127.0.0.1:8000/openapi.json`
@@ -249,7 +270,7 @@ cp <project_root>/.env.example <project_root>/.env
 为什么这样做：
 
 - 后端启动时会读取环境配置。
-- 即使本地学习常用 InMemory / Stub，保留 `.env` 习惯也能避免后续切 PostgreSQL 或 Provider 时踩坑。
+- 正式运行使用 PostgreSQL + stub/LLM 配置；保留 `.env` 习惯避免切换 Repository / Provider 时踩坑。
 
 ## 8. 启动 Backend
 
@@ -497,37 +518,33 @@ http://127.0.0.1:8000/docs
 
 # Appendix D: Startup Flow
 
-V1.0 本地学习主路径（InMemory；权威步骤见 Appendix L）：
+V1.0 **正式启动主路径**（PostgreSQL；权威步骤见 Appendix M）：
 
 ```text
 Project Root
 ↓
-Create .venv
+Docker Compose up（postgres + backend + frontend）
 ↓
-Activate .venv
+compose_verify + Stub E2E
 ↓
-Install Requirements
-↓
-Check .env
-↓
-Start Backend（./scripts/start_backend.sh）
-↓
-GET /health
-↓
-Swagger /docs
-↓
-Start Frontend（./scripts/start_frontend.sh）
-↓
-浏览器 http://127.0.0.1:5173
+浏览器 http://127.0.0.1:8080
   学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
 ↓
-Run Tests（./scripts/run_tests.sh；基线见 Appendix N）
+compose_down（禁止 -v）
 ```
 
-> **历史阶段记录**：旧流程图末尾曾写 `Frontend (Optional)`。
-> **V1.0 当前**：Frontend 是正式联调步骤，不是可选项；仅 Backend API 调试时可暂时只跑到 Swagger。
+V1.0 **本地脚本路径**（兼容；见 Appendix L）：
 
-企业容器验收另走 Appendix M（PostgreSQL + Docker Compose），最终数字见 Appendix N。
+```text
+Project Root → .venv → （正式）REPOSITORY_BACKEND=postgres
+  或（仅快速教学）省略后可能 InMemory（不作业务验收）
+→ start_backend + start_frontend → http://127.0.0.1:5173
+```
+
+> **历史阶段记录**：旧流程图曾以 InMemory 为主、Frontend Optional。
+> **V1.0 当前**：Frontend 正式；**Repository 权威为 PostgreSQL**；InMemory 仅辅助。
+
+最终数字见 Appendix N。
 
 # Appendix E: Startup Checklist
 
@@ -539,15 +556,13 @@ Run Tests（./scripts/run_tests.sh；基线见 Appendix N）
 - [ ] `.venv` 已激活
 - [ ] `requirements.txt` 已安装
 - [ ] `.env` 已存在
-- [ ] Backend 已启动（`./scripts/start_backend.sh` 或 Appendix C）
-- [ ] `GET /health` 返回 200
-- [ ] Swagger 可打开
-- [ ] ReDoc 可打开
-- [ ] `openapi.json` 可打开
-- [ ] Frontend 已启动（`./scripts/start_frontend.sh`，`http://127.0.0.1:5173`）
+- [ ] **正式路径**：Compose 已 up（Appendix M）或已 `REPOSITORY_BACKEND=postgres`
+- [ ] Backend 已启动；`GET /health` 返回 200 且正式路径为 `repository_backend=postgres`
+- [ ] Swagger / ReDoc / openapi 可打开
+- [ ] Frontend 已启动（Compose `:8080` 或本地 `:5173`）
 - [ ] 正式导航可见：学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
-- [ ] 在 `<project_root>/backend` 执行 `python -m unittest discover -s tests -v` 通过（或 `./scripts/run_tests.sh`）
-- [ ] （企业验收）需要时走 Appendix M Compose；基线数字对照 Appendix N
+- [ ] **业务验收**：Stub E2E / 人工链以 PostgreSQL 为准（Appendix M/N）
+- [ ] **辅助**：InMemory unittest 可选；不作业务结论
 
 # Appendix F: WSL + VSCode 使用建议
 
@@ -951,7 +966,7 @@ RAG検索
 > **历史阶段记录**：旧文曾写「Frontend Phase 3 权威入口」。Phase 3 是开发过程标签；**交付状态以本文顶部「ERIP V1.0 当前权威启动入口」与 Appendix N 为准**。
 
 前面 Appendix A ~ J 保留的是原有学习路径和手动命令说明。
-这一章补的是当前双终端联调最直接的权威入口（与顶部权威入口表中的 Appendix L 一致）。
+这一章是 **本地脚本双终端联调**入口：正式数据请 `REPOSITORY_BACKEND=postgres`；**业务验收权威路径仍是 Appendix M（Compose + PostgreSQL）**。InMemory 仅辅助，不作业务结论。
 
 ## L-1. 环境准备
 
@@ -1270,17 +1285,17 @@ Ctrl+C
 - 当前审批状态冲突
 - 比如重复提交、重复决策或状态不允许
 
-### PostgreSQL 验收说明（V1.0 已落地）
+### PostgreSQL 验收说明（V1.0 权威 Repository）
 
 历史笔记中曾出现「PostgreSQL 仅 skipped / 未完成」的表述。
-**V1.0 最终状态**：PostgreSQL 已作为正式验收路径之一，默认 InMemory 学习路径仍然保留。
+**V1.0 最终定位**：**PostgreSQL 是正式运行与业务验收的权威 Repository**；InMemory **仅**保留为快速单元测试/教学适配器，**不是**正式业务验收结果，也**不会**继续补齐 PostgreSQL 企业能力。
 
 当前 Backend 基线（以本机最近稳定验收为准）：
 
-| 模式 | 结果 |
-|---|---|
-| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；完整 suite 曾连续 3 次稳定通过 |
-| InMemory 全量 suite | **270 tests**，**52 skipped** |
+| 模式 | 结果 | 用途 |
+|---|---|---|
+| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；发布基线曾连续 3 次稳定 | **正式回归** |
+| InMemory 全量 suite | **270 tests**，**52 skipped** | **辅助**（加速/隔离；不作业务结论） |
 
 PostgreSQL 需要：
 
@@ -1312,18 +1327,16 @@ PostgreSQL 需要：
 
 # Appendix M: Docker Compose 启动与本地验收（V1.0）
 
-本附录是 **在原有本地脚本启动路径之外** 的补充路径，不删除、不替代：
-
-- `./scripts/start_backend.sh`
-- `./scripts/start_frontend.sh`
-- Appendix A / C / L 中的启动步骤
+本附录是 **ERIP V1.0 正式启动与业务验收的权威路径**（Docker Compose + PostgreSQL）。
+本地脚本（Appendix A / C / L）仍保留作兼容与快速教学，**不替代**本附录的正式地位。
 
 ## M-1. 何时用 Compose
 
 | 场景 | 推荐 |
 |---|---|
-| 日常读代码、改小功能 | 本地脚本 + InMemory（原路径） |
-| 验收 PostgreSQL + 容器 + 迁移 + 前端 nginx SPA | Compose（本附录） |
+| 正式启动 / 企业业务验收 | **Compose + PostgreSQL**（本附录，权威） |
+| 本地 PostgreSQL 联调 | 显式 `REPOSITORY_BACKEND=postgres` + 本地脚本 |
+| 快速改代码 / 单元测试加速 | 本地脚本可能默认 InMemory（**辅助**；不作业务验收） |
 | 默认费用安全验收 | Compose 默认 `LLM_PROVIDER_MODE=stub`，不要默认开真实 LLM |
 
 ## M-2. 前置条件
@@ -1446,16 +1459,17 @@ docker volume ls | grep erip_postgres_data
 ## M-8. 与本地脚本路径的关系
 
 ```text
-本地脚本路径（原文档主路径）
-  start_backend.sh + start_frontend.sh
-  → 适合改代码、看学习日志、InMemory 默认
-
-Compose 路径（本附录）
+Compose 路径（本附录，权威）
   compose_up / verify / e2e / down
-  → 适合 V1.0 交付验收、PostgreSQL + 迁移 + SPA 代理
+  → V1.0 正式运行与业务验收；PostgreSQL + 迁移 + SPA
+
+本地脚本路径（兼容）
+  start_backend.sh + start_frontend.sh
+  → 正式联调须 REPOSITORY_BACKEND=postgres
+  → 省略时可能 InMemory，仅快速学习/单元测试，不作业务验收
 ```
 
-两条路径都要会；**不要**因为学会 Compose 就删除本地脚本启动章节。
+两条路径都要会；**不要**删除本地脚本章节，也**不要**把 InMemory 默认当成正式运行。
 
 # Appendix N: V1.0 启动验收基线（最终状态）
 
@@ -1466,10 +1480,11 @@ Compose 路径（本附录）
 
 | 项 | 基线 |
 |---|---|
-| PostgreSQL 全量 | **281 tests**，**2 skipped**（real LLM smoke 默认 skip） |
+| PostgreSQL 全量（**正式回归**） | **281 tests**，**2 skipped**（real LLM smoke 默认 skip） |
 | PostgreSQL 稳定性 | 完整 suite **连续 3 次** 通过（修复 JWT 时钟回拨后） |
-| InMemory 全量 | **270 tests**，**52 skipped** |
+| InMemory 全量（**仅辅助**） | **270 tests**，**52 skipped**；不作业务验收结论 |
 | Alembic head | `20260717_07_fallback_chain` |
+| Repository 权威 | **PostgreSQL**（Compose 默认且必须）；InMemory 代码保留但不补企业能力 |
 | `python -m compileall app` | 通过 |
 | `git diff --check` | 通过 |
 | 默认 LLM | `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 费用** |
@@ -1524,8 +1539,9 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 | 路径 | 命令入口 | 典型用途 |
 |---|---|---|
-| A. 本地双终端 | `start_backend.sh` + `start_frontend.sh` | 日常开发与学习 |
-| B. Compose | `compose_up.sh` 等 | V1.0 容器 + PostgreSQL 验收 |
-| C. 自动化 | `run_tests.sh` / unittest / npm test | 提交前回归 |
+| A. Compose + PostgreSQL | `compose_up.sh` 等 | **V1.0 正式启动与业务验收（权威）** |
+| B. 本地脚本 + postgres | `REPOSITORY_BACKEND=postgres` + start_* | 本地 PostgreSQL 联调 |
+| C. 本地脚本 / InMemory | start_* 未设 postgres | **仅**快速学习/单元测试辅助 |
+| D. 自动化 | PG suite（正式）/ InMemory（辅助）/ npm test | 业务结论只看 PostgreSQL |
 
-原 Appendix A～L 的命令 **全部仍然有效**；N 只固定基线，不删除旧步骤。
+原 Appendix A～L 的命令 **全部仍然有效**；N 固定基线与 Repository 定位，不删除旧步骤。

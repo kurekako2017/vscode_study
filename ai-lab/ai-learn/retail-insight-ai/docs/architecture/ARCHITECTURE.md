@@ -16,8 +16,16 @@ React (JWT / ProtectedRoute / RBAC UI / Learning Dashboard / Lifecycle Live Stat
   → Executive Report (high_quality + ReportVersion，不自动审批)
   → Approval state machine (owner / History / 403·409)
   → Persistent Audit + request_id
-  → InMemory（学习）或 PostgreSQL/pgvector（企业验收）
+  → **PostgreSQL/pgvector（正式运行与业务验收权威）**
+  → InMemory（仅快速单元测试/教学适配器，不作业务验收）
 ```
+
+### Repository 最终定位（V1.0）
+
+- PostgreSQL 是正式运行、企业验收、数据持久化的权威 Repository；Docker Compose **默认且必须** PostgreSQL。
+- 最终业务链、人工验收、Stub E2E、Audit、Approval、Ledger、ReportVersion **均以 PostgreSQL 为准**。
+- InMemory **仅**快速单元测试、教学与故障隔离；**不**作为正式业务验收；**不**继续补齐 PostgreSQL 企业能力；**不**删除 InMemory 代码。
+- 本地脚本若默认 InMemory，仅为兼容快速学习；正式请 `REPOSITORY_BACKEND=postgres` 或 Compose。
 
 **已交付**：JWT/RBAC、双路由 LLM 治理、Fallback Chain（OpenRouter→NVIDIA→Gemini→Local Qwen）、Compose+Alembic+Stub E2E、普通 RAG 默认可零真实 LLM。
 **未交付（勿夸大）**：真实付费 smoke 默认化、Billing/多租户预算 UI、SIEM/WORM/Streaming、DeepSeek 默认启用、Redis/RabbitMQ/K8s 作为本仓默认可运行栈。

@@ -6,11 +6,14 @@
 
 与 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 一致（本清单不新增 Appendix，只做验收勾选入口）：
 
-| 场景 | 权威章节 |
+| 场景 | 权威入口 |
 |---|---|
-| 本地 InMemory 学习 | RUNBOOK Appendix L |
-| PostgreSQL/Docker 企业验收 | RUNBOOK Appendix M |
-| 最终测试数字与状态 | RUNBOOK Appendix N |
+| ERIP V1.0 正式启动 | Docker Compose + PostgreSQL（RUNBOOK Appendix M） |
+| 本地 PostgreSQL 联调 | `REPOSITORY_BACKEND=postgres` + Backend/Frontend |
+| 快速单元测试 / 教学 | InMemory，**仅辅助**（不作业务验收） |
+| 最终业务验收 | PostgreSQL + Stub E2E（RUNBOOK M/N） |
+
+**Repository 定位**：PostgreSQL 为正式运行/业务验收权威；Compose 默认且必须 PostgreSQL。InMemory 仅快速 unittest/教学，代码保留但不补企业能力。
 
 正式前端导航验收标准：
 
@@ -22,7 +25,7 @@
 → 承認管理
 ```
 
-说明：Frontend 为 V1.0 正式联调步骤（不是可选项）；Docker/PostgreSQL 为企业验收正式路径（不是「未验证 / 未完成」）。若本机 Docker daemon 不可用，应如实记录未执行 Compose，不要假装通过。
+说明：Frontend 为 V1.0 正式联调步骤。**业务与持久化验收以 PostgreSQL 为准**（Compose 推荐）。InMemory 仅辅助。若 Docker daemon 不可用，应如实记录未执行 Compose，不要假装通过。
 
 ## 必查规则
 
@@ -78,8 +81,8 @@ curl -sS http://127.0.0.1:8000/openapi.json | head
 预想结果：
 
 - 必有：`status=ok`、`service=retail-insight-ai`、非空 `request_id`
-- **Docker / PostgreSQL 路径**（Compose 或 `REPOSITORY_BACKEND=postgres`）：`repository_backend=postgres`
-- **InMemory 学习路径**（默认本地脚本）：允许 `repository_backend=inmemory`
+- **正式路径**（Compose 或 `REPOSITORY_BACKEND=postgres`）：必须 `repository_backend=postgres`
+- **InMemory 辅助路径**（本地脚本未设 postgres）：允许 `repository_backend=inmemory`，**不作业务验收**
 - Research / KPI 等业务 provider 字段若存在，以当前配置为准
 - **禁止**再把历史 Health 字段断言（旧文档中的 static provider 字段）当作 V1.0 必过条件
 
@@ -172,7 +175,7 @@ python3 -m unittest tests.test_api -v
 - 启动与排错细节先看 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md`
 - 目录和整体入口先看 `README.md`
 
-## 11. Frontend 开发服务可打开（原本地路径）
+## 11. Frontend 开发服务可打开（本地脚本；正式优先 Compose :8080）
 
 验证方式：
 
@@ -196,7 +199,7 @@ npm run build
 - 测试 **113 / 113** 通过
 - `vite build` 成功
 
-## 13. Backend 全量 unittest（InMemory 默认）
+## 13. Backend 全量 unittest（InMemory，仅辅助）
 
 验证方式：
 
@@ -205,13 +208,13 @@ cd backend
 ./.venv/bin/python -m unittest discover -s tests -v
 ```
 
-预想结果（V1.0 基线）：
+预想结果（V1.0 基线，**辅助**）：
 
 - **270 tests**，**52 skipped**
 - 无 unexpected failure
-- `/health` 路径对应 `repository_backend=inmemory`（若响应暴露该字段）
+- 本结果 **不作** 业务/企业能力验收结论
 
-## 14. Backend PostgreSQL 全量 unittest（正式验收路径）
+## 14. Backend PostgreSQL 全量 unittest（正式验收路径 / 权威）
 
 验证方式：
 
@@ -327,8 +330,8 @@ cd .. && git diff --check
 
 | 项 | 基线 |
 |---|---|
-| Backend PostgreSQL | 281 tests / 2 skipped |
-| Backend InMemory | 270 tests / 52 skipped |
+| Backend PostgreSQL（正式） | 281 tests / 2 skipped |
+| Backend InMemory（辅助） | 270 tests / 52 skipped |
 | Frontend | 113 / 113 |
 | Alembic head | `20260717_07_fallback_chain` |
 | 默认 LLM | stub，零真实费用 |
