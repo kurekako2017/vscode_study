@@ -21,6 +21,24 @@
 | 前后端集成测试（Integration Test） | React + FastAPI | 验证完整用户操作流程 |
 | 端到端测试（E2E Test） | Playwright / Cypress | 模拟真实用户完成整个业务流程 |
 
+V1.0 补充（不删除上表）：
+
+| 层级 | 当前仓库入口 | 目的 |
+|---|---|---|
+| Stub API E2E | `./scripts/run_api_e2e.sh` / `tests.test_e2e_api_stub_flow` | 企业业务链 HTTP 验收，默认零真实 LLM |
+| Compose 验收 | `compose_up` + `compose_verify` | 容器健康、迁移、SPA 路由 |
+| Frontend Vitest | `cd frontend && npm test` | UI / Auth / RBAC / Lifecycle / Learning Dashboard |
+| 业务样例数据 | `docs/learning/sample-data/Scenario01_Sales_Decline/` | 人工业务数据验证 |
+
+V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
+
+| Suite | 基线 |
+|---|---|
+| Backend PostgreSQL | 281 tests，2 skipped（real smoke 默认 skip） |
+| Backend InMemory | 270 tests，52 skipped |
+| Frontend | 113 / 113 |
+| Production build / compileall / diff-check | 通过 |
+
 # 测试总览
 
 | 序号 | 测试文件 | 对应API | 保护能力 | 保护的 Bug / 风险 | 命令 | 对应Service | 状态 |
@@ -46,6 +64,15 @@
 | 19 | `test_repository_backend_switch.py` | 全局间接影响 | 仓库后端切换 | 防止 PostgreSQL 可选路径破坏 InMemory 默认路径 | `python -m unittest tests.test_repository_backend_switch -v` | Container / Config | 配置路径 |
 | 20 | `test_postgres_repositories.py` | 全局间接影响 | PostgreSQL 可选路径 | 防止 PostgreSQL repository contract 与默认 repository contract 分叉 | `python -m unittest tests.test_postgres_repositories -v` | Repository Layer | 可选路径 |
 | 21 | `test_logging.py` | 全局间接影响 | 结构化日志 | 防止日志缺少 request_id / task_id / error_code、防止敏感信息输出 | `python -m unittest tests.test_logging -v` | logging helpers | 观测路径 |
+| 22 | `test_authentication.py` | login / users/me / JWT | JWT 签发、解析、时钟偏差 leeway | 防止签名错误被放行、防止时钟回拨导致随机 401、防止 jti 合同漂移 | `python -m unittest tests.test_authentication -v` | `JWTService` / `AuthenticationService` | 安全路径 |
+| 23 | `test_authorization.py` | 受保护 API | RBAC Permission | 防止角色越权、防止未知角色 fail-open | `python -m unittest tests.test_authorization -v` | `AuthorizationService` | 权限路径 |
+| 24 | `test_ai_analysis_api.py` | `POST /api/v1/ai-analysis` | low_cost 分析、幂等、额度、Evidence Gate | 防止无确认调用、防止幂等双计费、防止证据门禁失效 | `python -m unittest tests.test_ai_analysis_api -v` | `AIAnalysisService` / LLM Gateway | 主路径 |
+| 25 | `test_executive_report_api.py` | `POST /api/v1/executive-reports` | high_quality 报告、审批入口 | 防止报告路由进 low_cost、防止自动 submit approval、防止额度串台 | `python -m unittest tests.test_executive_report_api -v` | `ExecutiveReportService` | 主路径 |
+| 26 | `test_provider_fallback_chain.py` | LLM Gateway 间接 | Fallback Chain 顺序与熔断 | 防止顺序乱序、防止熔断后仍计费、防止跨 tier 串模型 | `python -m unittest tests.test_provider_fallback_chain -v` | ProviderChain | 韧性路径 |
+| 27 | `test_e2e_api_stub_flow.py` | 企业业务链多 API | Stub 端到端 | 防止 Compose/API 链路上权限与文档流断裂 | `python -m unittest tests.test_e2e_api_stub_flow -v` 或 `./scripts/run_api_e2e.sh` | 多 Service | E2E 路径 |
+| 28 | `test_openrouter_real_smoke.py` | 真实 OpenRouter（opt-in） | 真网 smoke | 防止默认 suite 产生费用；仅 `RUN_REAL_LLM_SMOKE=1` 时执行 | 默认 **skip** | OpenRouter Provider | 可选路径 |
+
+说明：序号 01～21 为历史学习总览，**全部保留**。22～28 为 V1.0 增量登记；仓库中还有 `test_vector_retrieval.py`、`test_embedding_factory.py` 等文件，可按同样表格模板继续追加，不在此删除旧章。
 
 ## backend/tests/test_api.py
 
@@ -682,3 +709,246 @@ structured log output
 ↓
 Assertion
 ```
+
+## backend/tests/test_authentication.py（V1.0 增量）
+
+| 项目 | 内容 |
+|---|---|
+| 测试目的 | 验证 JWT 生成/解析、唯一 jti、过期与伪造失败、以及 **时钟回拨 leeway** |
+| 对应API | `POST /api/v1/auth/login`、`GET /api/v1/users/me`、受保护 API 的 Bearer 依赖 |
+| 测试命令 | `cd backend && python -m unittest tests.test_authentication -v` |
+| 输入（入力） | 合法用户密码、伪造签名 Token、过期 Token、iat 略超前的 Token |
+| 预想输出（予想結果） | 合法 Token 通过；伪造/过期 401；iat 超前 2s 在默认 leeway 内可通过；leeway=0 时 immature 仍 401 |
+| Swagger对应操作 | Authorize → login → 带 Bearer 调 `/api/v1/users/me` |
+| 后台观察 | 不打印完整 Token；错误 reason 可为 `invalid_token` / `token_expired` |
+| 对应源码 | `backend/app/security/jwt_service.py`、`jwt_provider.py`、`config.py`、`dependencies.py` |
+| 为什么设计 | V1.0 曾出现 PG 全量 suite 随机 401：主机时钟回拨使 iat 落在未来；必须用回归锁住 leeway 行为且不放宽签名校验 |
+| 保护的 Bug / 风险 | 随机 401、jti 重复假设、过期被误判为成功、伪造签名被接受 |
+
+### 后端程序流程
+
+```text
+unittest / HTTPBearer
+↓
+backend/app/security/dependencies.py
+get_current_user()
+↓
+backend/app/security/jwt_service.py
+JWTService.parse_token() / get_current_user()
+↓
+backend/app/security/jwt_provider.py
+PyJWTProvider.decode(leeway=JWTConfig.leeway_seconds)
+↓
+TokenPayload / CurrentUser
+↓
+Assertion
+```
+
+## backend/tests/test_ai_analysis_api.py（V1.0 增量）
+
+| 项目 | 内容 |
+|---|---|
+| 测试目的 | 验证显式 AI 分析入口、low_cost 路由、幂等、Evidence Gate、缺 Bearer/缺幂等键 |
+| 对应API | `POST /api/v1/ai-analysis` |
+| 测试命令 | `cd backend && REPOSITORY_BACKEND=postgres DATABASE_URL=... python -m unittest tests.test_ai_analysis_api -v`（PostgreSQL-only 集成） |
+| 输入（入力） | 已 chunk 证据、`confirmed=true`、Idempotency-Key |
+| 预想输出（予想結果） | `provider` 以 stub-low-cost 开头；`route_tier=low_cost`；usage/cost 可解析；重复 key 不双计费 |
+| Swagger对应操作 | 先完成文档 Upload→Import→Chunk→Retrieval，再调 ai-analysis（需 Bearer） |
+| 后台观察 | `llm_usage_ledger` 成功行、audit `analysis.execute.*` |
+| 对应源码 | `backend/app/api/` AI 分析路由、`services` 中分析服务、LLM Gateway |
+| 为什么设计 | 成本治理要求「唯一显式入口 + 证据门禁 + 幂等」 |
+
+### 后端程序流程
+
+```text
+TestClient + Bearer
+↓
+POST /api/v1/ai-analysis
+↓
+Evidence Gate + Idempotency
+↓
+LLMGatewayService（low_cost / stub）
+↓
+llm_usage_ledger 结算 + audit
+↓
+Assertion
+```
+
+## backend/tests/test_executive_report_api.py（V1.0 增量）
+
+| 项目 | 内容 |
+|---|---|
+| 测试目的 | 验证 high_quality 董事会报告、与 low_cost 额度分离、不自动 submit approval |
+| 对应API | `POST /api/v1/executive-reports`、`POST /api/v1/reports/{task_id}/submit-approval` |
+| 测试命令 | `cd backend && REPOSITORY_BACKEND=postgres ... python -m unittest tests.test_executive_report_api -v` |
+| 输入（入力） | 已成功的 `ai_analysis_id`、`confirmed=true`、Idempotency-Key |
+| 预想输出（予想結果） | `route_tier=high_quality`；`provider` 以 stub-high-quality 开头；报告 GENERATED；需显式 submit 才进审批 |
+| Swagger对应操作 | ai-analysis 成功 → executive-reports → submit-approval → manager approve |
+| 后台观察 | ledger 中 `operation=executive_report`、report_version_id |
+| 对应源码 | Executive report API/Service、Approval 入口 |
+| 为什么设计 | 高成本路由与审批门禁必须可测、可回归 |
+
+### 后端程序流程
+
+```text
+已成功 analysis_id
+↓
+POST /api/v1/executive-reports
+↓
+LLMGatewayService（high_quality / stub）
+↓
+Report + ReportVersion
+↓
+（可选）submit-approval → Approval 状态机
+↓
+Assertion
+```
+
+## backend/tests/test_e2e_api_stub_flow.py（V1.0 增量）
+
+| 项目 | 内容 |
+|---|---|
+| 测试目的 | 一条 Stub 企业链：登录 → 文档 → 检索 → 分析 → 报告 → 审批 → 审计 |
+| 对应API | auth / documents / retrieval / ai-analysis / executive-reports / approvals / audit-logs |
+| 测试命令 | 进程内：`REPOSITORY_BACKEND=postgres` 下 `python -m unittest tests.test_e2e_api_stub_flow -v`；对 Compose：`./scripts/run_api_e2e.sh`（`E2E_BASE_URL=http://127.0.0.1:8000`） |
+| 输入（入力） | 测试用户 admin/manager/employee；受控销售证据 Markdown |
+| 预想输出（予想結果） | employee 不可 approve（403）；manager 可 approve；ledger 仅 stub；普通 retrieval 不强制真实 Provider |
+| Swagger对应操作 | 可按同一顺序手工点一遍，但自动化以脚本为准 |
+| 后台观察 | 禁止打印 Token/Key；health 响应无 secret 字段 |
+| 对应源码 | 多 API + 多 Service；脚本 `scripts/run_api_e2e.sh` |
+| 为什么设计 | Compose 交付必须有一条「零费用」业务验收链 |
+
+### 后端程序流程
+
+```text
+（可选）Compose Backend :8000
+↓
+HTTP 登录三角色
+↓
+Upload → Import → Chunk → Retrieval
+↓
+AI Analysis（stub-low-cost）
+↓
+Executive Report（stub-high-quality）
+↓
+submit-approval → employee 403 → manager 200
+↓
+audit-logs / usage ledger 断言
+↓
+OK
+```
+
+## backend/tests/test_provider_fallback_chain.py（V1.0 增量）
+
+| 项目 | 内容 |
+|---|---|
+| 测试目的 | 固定 Provider 顺序、失败切换、熔断、配额停止、low/high 模型不交叉 |
+| 对应API | 间接触发（Gateway）；默认 suite 用 MockTransport，不访问公网 |
+| 测试命令 | `cd backend && python -m unittest tests.test_provider_fallback_chain -v` |
+| 输入（入力） | 可控 Mock 失败/429/超时、电路状态 |
+| 预想输出（予想結果） | OpenRouter→NVIDIA→Gemini→Local Qwen 顺序；成功即停；open 状态跳过不收费 |
+| Swagger对应操作 | 默认不在 Swagger 演示真实 fallback；学习时看单测更安全 |
+| 后台观察 | attempt ledger / circuit state（PostgreSQL 共享状态场景） |
+| 对应源码 | Provider chain、gateway、migration `20260717_07_fallback_chain` |
+| 为什么设计 | 韧性链必须可测且默认零费用 |
+
+### 后端程序流程
+
+```text
+unittest MockTransport
+↓
+ProviderChain.execute()
+↓
+attempt 记录 / circuit
+↓
+选中 provider+model 回填
+↓
+Assertion（无真实外呼）
+```
+
+# V1.0 业务数据验证与验收
+
+本章是 **业务数据 / 人工验收** 补充，不删除上文任何测试文件章节。
+
+## 业务主链（最终交付口径）
+
+```text
+文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+→ 最终审计报告
+```
+
+对应前端页面（登录后）：
+
+| 步骤 | 页面 | 自动化对照 |
+|---|---|---|
+| 文書管理 | `/documents` | document upload/import/chunk 测试 + E2E |
+| RAG検索 | `/rag` | retrieval / internal-rag / frontend RagPage 测试 |
+| 分析依頼 | `/analysis` 或 RAG 内 AI 分析入口 | `test_ai_analysis_api` + Tasks 主链路 |
+| 承認管理 | `/approval` | approval / rbac / E2E manager approve |
+| 审计报告 | Approval 详情 + Audit / 报告版本 | audit 测试 + executive report |
+
+## 推荐样例数据
+
+目录：
+
+```text
+docs/learning/sample-data/Scenario01_Sales_Decline/
+```
+
+| 文件 | 用途 |
+|---|---|
+| `01_関東地域飲料売上分析.md` ～ `06_KPI月次報告.md` | 上传/Import/Chunk 用业务正文 |
+| `07_RAG質問集.md` | RAG 查询输入 |
+| `08_分析依頼入力例.md` | Analysis / AI 分析问题示例 |
+| `09_承認コメント例.md` | 审批意见示例 |
+| `10_業務テストシナリオ.md` | 逐步人工验收剧本 |
+
+人工验收时请同时遵守：
+
+- 默认 `LLM_PROVIDER_MODE=stub`（零真实费用）
+- 不在日志/截图中暴露 Token、密码、API Key
+- Compose 验收不要 `docker compose down -v`
+
+## 自动化验收命令清单（两列）
+
+| 真实模型 / 真实服务 | 纯本地 / Stub / 本地 Provider |
+|---|---|
+| 不适用（默认验收不调用真实 LLM） | `cd backend && python3 -m unittest discover -s tests -v`（InMemory 默认） |
+| 仅当显式 `RUN_REAL_LLM_SMOKE=1` 且配置真实 Key 时 | `REPOSITORY_BACKEND=postgres DATABASE_URL=... python3 -m unittest discover -s tests -v` |
+| 真实 OpenRouter smoke（默认 skip） | `./scripts/run_tests.sh`（Backend + Frontend + build + compileall） |
+| — | `cd frontend && npm test` 与 `npm run build` |
+| — | `./scripts/compose_up.sh` → `./scripts/compose_verify.sh` → `./scripts/run_api_e2e.sh` → `./scripts/compose_down.sh` |
+
+## 通过标准（V1.0）
+
+Backend：
+
+- PostgreSQL：**281** tests，**2** skipped；建议完整 suite 连续多次无随机失败
+- InMemory：**270** tests，**52** skipped
+- Alembic head：`20260717_07_fallback_chain`
+- compileall / `git diff --check`：通过
+
+Frontend：
+
+- **113 / 113** tests
+- production build 通过
+
+Docker（daemon 可用时）：
+
+- compose build/up/health/verify/e2e/down（无 `-v`）通过
+- 默认 stub，零真实 LLM 费用
+
+业务：
+
+- 人工可按 Scenario01 走通「文書→RAG→分析→承認→审计报告」
+- Stub E2E 覆盖三角色与审批 403/成功路径
+
+## 与启动手册的交叉引用
+
+- 启动与排错：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md`
+- 启动完成检查清单：项目根目录 `VERIFY_CHECKLIST.md`
+- Compose 步骤：RUNBOOK Appendix M
+- 数字基线：RUNBOOK Appendix N

@@ -43,13 +43,18 @@ class PyJWTProvider:
         )
 
     def decode(self, token: str) -> dict[str, Any]:
-        """验证签名、exp、iat 和必需 claims，并映射为稳定认证错误。"""
+        """验证签名、exp、iat 和必需 claims，并映射为稳定认证错误。
+
+        leeway 仅吸收主机时钟回拨/前跳导致的 iat/exp 边界误判；
+        签名错误、伪造 Token、真正过期仍 fail-closed 返回 401。
+        """
 
         try:
             return jwt.decode(
                 token,
                 self._config.secret_key,
                 algorithms=[self._config.algorithm],
+                leeway=self._config.leeway_seconds,
                 options={
                     "require": ["sub", "user_id", "username", "role", "iat", "exp", "jti"],
                     "verify_exp": True,
@@ -58,5 +63,8 @@ class PyJWTProvider:
             )
         except jwt.ExpiredSignatureError as exception:
             raise TokenExpiredError(reason="token_expired") from exception
+        except jwt.ImmatureSignatureError as exception:
+            # 时钟回拨超过 leeway 时仍拒绝；不单独暴露新 error_code，保持合同。
+            raise UnauthorizedError(reason="invalid_token") from exception
         except jwt.InvalidTokenError as exception:
             raise UnauthorizedError(reason="invalid_token") from exception

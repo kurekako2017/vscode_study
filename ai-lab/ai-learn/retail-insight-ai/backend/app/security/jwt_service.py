@@ -66,14 +66,20 @@ class JWTService:
         )
 
     def parse_token(self, token: str) -> TokenPayload:
-        """解析并二次校验载荷；非法 payload 稳定返回 401。"""
+        """解析并二次校验载荷；非法 payload 稳定返回 401。
+
+        Provider 层已按 leeway 校验 exp/iat。这里的 exp 二次校验同步应用
+        同一 leeway，避免 Provider 接受后 Service 因时钟抖动再次误杀。
+        """
 
         try:
             payload = TokenPayload.model_validate(self._provider.decode(token))
         except (ValidationError, ValueError, TypeError) as exception:
             raise UnauthorizedError(reason="invalid_token_payload") from exception
 
-        if payload.exp <= self._clock().astimezone(timezone.utc):
+        now = self._clock().astimezone(timezone.utc)
+        leeway = timedelta(seconds=max(0, self._config.leeway_seconds))
+        if payload.exp + leeway <= now:
             raise TokenExpiredError(reason="token_expired")
         return payload
 

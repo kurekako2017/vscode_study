@@ -95,6 +95,70 @@ class AuthenticationUnitTest(unittest.TestCase):
         with self.assertRaises(UnauthorizedError):
             self.service.parse_token(token.access_token)
 
+    def test_clock_backward_skew_within_leeway_accepts_valid_token(self) -> None:
+        """根因回归：主机/WSL 时钟回拨使 iat 短暂落在未来时，不得随机 401。
+
+        复现方式：签发时 iat 比当前 wall-clock 超前 2 秒（等价于 decode 时时钟回拨 2s）。
+        leeway=30 应接受；签名/claims 合同不变。
+        """
+
+        now = datetime.now(timezone.utc)
+        skewed = TokenPayload(
+            sub="user-admin",
+            user_id="user-admin",
+            username="admin",
+            role="admin",
+            iat=now + timedelta(seconds=2),
+            exp=now + timedelta(minutes=30),
+            jti="skew-leeway-token-id",
+        )
+        token = self.provider.encode(skewed.model_dump(mode="python"))
+        payload = self.service.parse_token(token)
+        self.assertEqual(payload.user_id, "user-admin")
+        self.assertEqual(payload.jti, "skew-leeway-token-id")
+
+    def test_clock_backward_skew_beyond_leeway_still_rejects(self) -> None:
+        """超过 leeway 的 iat 未来值仍 fail-closed（不无限放宽）。"""
+
+        zero_leeway = JWTConfig(
+            secret_key=self.config.secret_key,
+            algorithm=self.config.algorithm,
+            access_token_expire_minutes=30,
+            leeway_seconds=0,
+        )
+        provider = PyJWTProvider(zero_leeway)
+        service = JWTService(provider, zero_leeway)
+        now = datetime.now(timezone.utc)
+        skewed = TokenPayload(
+            sub="user-admin",
+            user_id="user-admin",
+            username="admin",
+            role="admin",
+            iat=now + timedelta(seconds=2),
+            exp=now + timedelta(minutes=30),
+            jti="skew-beyond-leeway-id",
+        )
+        token = provider.encode(skewed.model_dump(mode="python"))
+        with self.assertRaises(UnauthorizedError) as ctx:
+            service.parse_token(token)
+        self.assertEqual(ctx.exception.reason, "invalid_token")
+
+    def test_two_logins_produce_distinct_jti_and_independent_validity(self) -> None:
+        """两次登录 jti 不同；Token A 失效路径不影响 Token B。"""
+
+        first = self.service.create_access_token(self.user)
+        second = self.service.create_access_token(self.user)
+        first_payload = self.service.parse_token(first.access_token)
+        second_payload = self.service.parse_token(second.access_token)
+        self.assertNotEqual(first_payload.jti, second_payload.jti)
+        # 伪造签名的 A 不影响 B
+        with self.assertRaises(UnauthorizedError):
+            self.service.parse_token(first.access_token[:-4] + "dead")
+        self.assertEqual(
+            self.service.get_current_user(second.access_token).user_id,
+            "user-admin",
+        )
+
 
 class AuthenticationAPITest(unittest.IsolatedAsyncioTestCase):
     """验证 Login、Current User、Protected API、Bearer 与 Swagger。"""

@@ -24,6 +24,8 @@
 - [Appendix J: FAQ](#appendix-j-faq)
 - [Appendix K: Frontend 页面学习路线](#appendix-k-frontend-页面学习路线)
 - [Appendix L: Frontend 启动、验证、测试与停止](#appendix-l-frontend-启动验证测试与停止)
+- [Appendix M: Docker Compose 启动与本地验收（V1.0）](#appendix-m-docker-compose-启动与本地验收v10)
+- [Appendix N: V1.0 启动验收基线（最终状态）](#appendix-n-v10-启动验收基线最终状态)
 
 ## 三个文档入口不是同一个用途
 
@@ -55,6 +57,15 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 - 当前阶段主要用 Swagger 验证后端骨架。
 - UI 完成后再做前后端 Integration Test。
 - 发布前再考虑 E2E Test。
+
+V1.0 最终状态补充（不替换上表，只说明当前仓库已落地能力）：
+
+| 层级 | 当前仓库入口 | 说明 |
+|---|---|---|
+| 本地脚本启动 | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 开发联调主路径（InMemory 默认可选） |
+| Docker Compose | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | PostgreSQL + Backend + Frontend 三容器，默认 `LLM_PROVIDER_MODE=stub` |
+| Stub API E2E | `./scripts/run_api_e2e.sh` | 企业业务链 API 级验收，零真实 LLM 费用 |
+| 全量自动化 | `./scripts/run_tests.sh` 与 Backend/Frontend 分项命令 | 见 Appendix N 基线数字 |
 
 ## 推荐启动顺序
 
@@ -1071,6 +1082,29 @@ cd frontend
 npm test -- --run src/api.test.ts
 ```
 
+V1.0 补充：PostgreSQL 全量 Backend suite（需要本机或专用测试库 `erip_integration_test`）：
+
+```bash
+cd backend
+export REPOSITORY_BACKEND=postgres
+export DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql"
+export LLM_PROVIDER_MODE=stub
+# 可选：固定哈希种子，便于对比偶发问题
+export PYTHONHASHSEED=0
+python3 -m unittest discover -s tests -v
+```
+
+V1.0 补充：Compose Stub API E2E（先 `compose_up` 且 Backend 在 8000）：
+
+```bash
+# 在项目根目录
+export E2E_BASE_URL=http://127.0.0.1:8000
+export E2E_EXPECT_STUB=1
+./scripts/run_api_e2e.sh
+```
+
+当前 V1.0 自动化基线数字见 [Appendix N](#appendix-n-v10-启动验收基线最终状态)。
+
 ## L-11. 停止项目
 
 如果你是直接运行：
@@ -1154,18 +1188,262 @@ Ctrl+C
 - 当前审批状态冲突
 - 比如重复提交、重复决策或状态不允许
 
-### PostgreSQL skipped
+### PostgreSQL 验收说明（V1.0 已落地）
 
-当前自动化测试基线里存在：
+历史笔记中曾出现「PostgreSQL 仅 skipped / 未完成」的表述。  
+**V1.0 最终状态**：PostgreSQL 已作为正式验收路径之一，默认 InMemory 学习路径仍然保留。
 
-- Backend `115 passed, 1 skipped`
+当前 Backend 基线（以本机最近稳定验收为准）：
 
-这一轮学习文档不把 PostgreSQL 写成已完成能力。
+| 模式 | 结果 |
+|---|---|
+| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；完整 suite 曾连续 3 次稳定通过 |
+| InMemory 全量 suite | **270 tests**，**52 skipped** |
 
-### Docker 未验证
+PostgreSQL 需要：
 
-如果本地没有 Docker CLI，就不要假装 Docker 验证通过。
+- 专用测试库名必须是 `erip_integration_test`（防止误清业务库）
+- 环境变量 `REPOSITORY_BACKEND=postgres` 与合法 `DATABASE_URL`
+- 默认 `LLM_PROVIDER_MODE=stub`（验收零真实 LLM 费用）
+
+命令与注意点见 L-10 补充段与 Appendix N。
+
+### Docker / Compose 验收说明（V1.0 已落地）
+
+历史笔记中曾写「Docker 未验证」。  
+**V1.0 最终状态**：在 Docker Desktop Engine 与 WSL Integration 可用时，下列项已通过：
+
+- image build
+- `docker compose config`
+- postgres / backend / frontend healthy
+- Alembic 自动迁移到 `20260717_07_fallback_chain`
+- Frontend History API 路由刷新 200
+- Stub E2E
+- `compose_down` **不带 `-v`**，Volume 保留后重启数据仍在
+
+如果本地 **没有** Docker CLI 或 daemon 未启动，仍然不要假装通过；应明确记录「本机 Docker 不可用，未执行 Compose 验收」。  
+完整步骤见 [Appendix M](#appendix-m-docker-compose-启动与本地验收v10)。
 
 ### WSL 关闭导致服务退出
 
 如果你关闭了 WSL 终端或 VSCode 远程会话，正在运行的本地开发服务通常也会结束。
+
+# Appendix M: Docker Compose 启动与本地验收（V1.0）
+
+本附录是 **在原有本地脚本启动路径之外** 的补充路径，不删除、不替代：
+
+- `./scripts/start_backend.sh`
+- `./scripts/start_frontend.sh`
+- Appendix A / C / L 中的启动步骤
+
+## M-1. 何时用 Compose
+
+| 场景 | 推荐 |
+|---|---|
+| 日常读代码、改小功能 | 本地脚本 + InMemory（原路径） |
+| 验收 PostgreSQL + 容器 + 迁移 + 前端 nginx SPA | Compose（本附录） |
+| 默认费用安全验收 | Compose 默认 `LLM_PROVIDER_MODE=stub`，不要默认开真实 LLM |
+
+## M-2. 前置条件
+
+1. Docker CLI 可用：`docker version` 能看到 Client **与** Server。
+2. Compose v2 可用：`docker compose version`（示例：`v2.40.3-desktop.1`）。
+3. 不在启动前 `kill` 用户进程。
+4. 检查端口占用（只观察，不杀进程）：
+
+```bash
+ss -ltn | grep -E ':8000|:8080|:5432|:5433' || true
+```
+
+若宿主 **5432 已被本机 PostgreSQL 占用**，Compose 发布 Postgres 时改用：
+
+```bash
+export POSTGRES_PORT=5433
+```
+
+Backend / Frontend 默认：
+
+```bash
+export BACKEND_PORT=8000
+export FRONTEND_PORT=8080
+```
+
+## M-3. 推荐命令顺序（项目根目录）
+
+```bash
+cd ~/workspace/vscode_study/ai-lab/ai-learn/retail-insight-ai
+
+# 可选：端口映射（宿主 5432 被占用时）
+export POSTGRES_PORT=5433
+export BACKEND_PORT=8000
+export FRONTEND_PORT=8080
+
+# 1) 证明 .env 不会进镜像；Compose 默认 stub
+./scripts/prove_dockerignore.sh
+
+# 2) 渲染后的配置（可人工确认 LLM_PROVIDER_MODE: stub 与 published 端口）
+docker compose config
+
+# 3) 构建并启动（Postgres healthy → Alembic upgrade → uvicorn → frontend）
+./scripts/compose_up.sh
+
+# 4) 健康、SPA 路由、镜像无 .env
+./scripts/compose_verify.sh
+
+# 5) Stub 企业业务链 API E2E（零真实 LLM）
+export E2E_BASE_URL=http://127.0.0.1:8000
+export E2E_EXPECT_STUB=1
+./scripts/run_api_e2e.sh
+```
+
+## M-4. 必须看到的健康结果
+
+| 检查项 | 期望 |
+|---|---|
+| `docker compose ps` | postgres / backend / frontend 均为 running 且 healthy（或 frontend healthy） |
+| `curl http://127.0.0.1:8000/health` | `status=ok`，`repository_backend=postgres`（Compose 路径） |
+| `curl -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/` | `200` |
+| SPA 路由（History API 刷新） | `/` `/login` `/dashboard` `/documents` `/rag` `/analysis` `/approval` 均为 **200**，不是 404 |
+| Alembic | `docker compose exec backend alembic current` → `20260717_07_fallback_chain (head)` |
+| LLM | 容器内 `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 调用** |
+
+`compose_verify.sh` 已覆盖 Frontend 多路由 200 与 Backend health。
+
+## M-5. Stub E2E 覆盖什么
+
+`./scripts/run_api_e2e.sh` → `backend/tests/test_e2e_api_stub_flow.py`（对 `E2E_BASE_URL` 发 HTTP）：
+
+```text
+三角色登录（admin / manager / employee）
+→ 文档 Upload / Import / Chunk
+→ Retrieval
+→ AI 分析（stub-low-cost）
+→ 董事会报告（stub-high-quality）
+→ submit Approval
+→ employee approve → 403
+→ manager approve → 成功
+→ Audit 可读
+→ Usage Ledger 有 stub 成功记录
+→ 普通 Retrieval / extractive RAG 不强制真实 Provider 外呼
+```
+
+成功标志：终端出现 `OK`，且过程中 **不要** 打印 Token / API Key。
+
+## M-6. 数据持久化验收（禁止 `down -v`）
+
+```bash
+# 1) 在运行中的系统创建一条可识别的专用数据（例如带 PERSIST_PROBE_ 前缀的文档标题）
+# 2) 记录安全 ID（document_id），不要记录密码/Token
+# 3) 停止容器（脚本拒绝 -v）
+./scripts/compose_down.sh
+
+# 4) 确认 volume 仍在
+docker volume ls | grep erip_postgres_data
+
+# 5) 再启动并 verify
+./scripts/compose_up.sh
+./scripts/compose_verify.sh
+
+# 6) 用同一 document_id / 标题确认数据仍在
+# 7) 再 down，仍然不要 -v
+./scripts/compose_down.sh
+```
+
+`scripts/compose_down.sh` 会拒绝 `-v` / `--volumes`，避免误删学习数据。
+
+## M-7. Compose 常见错误
+
+| 现象 | 可能原因 | 处理 |
+|---|---|---|
+| `Docker daemon 未运行` | Docker Desktop / WSL Integration 未开 | 先恢复 Desktop，再 `docker info` |
+| backend unhealthy，`No such file: /app/db/schema.sql` | 旧镜像未 COPY `db/` | 确认 `backend/Dockerfile` 含 `COPY db ./db` 后 `docker compose build backend` |
+| 5432 bind 失败 | 宿主 PostgreSQL 占用 | `POSTGRES_PORT=5433` |
+| E2E 401 | 测了错误账号或服务未 ready | 使用 `admin` / `manager` / `employee` 与文档中的测试密码约定；先 `/health` |
+| 想「彻底清空」 | 误用 `docker compose down -v` | **禁止**；验收路径只允许保留 volume 的 down |
+
+## M-8. 与本地脚本路径的关系
+
+```text
+本地脚本路径（原文档主路径）
+  start_backend.sh + start_frontend.sh
+  → 适合改代码、看学习日志、InMemory 默认
+
+Compose 路径（本附录）
+  compose_up / verify / e2e / down
+  → 适合 V1.0 交付验收、PostgreSQL + 迁移 + SPA 代理
+```
+
+两条路径都要会；**不要**因为学会 Compose 就删除本地脚本启动章节。
+
+# Appendix N: V1.0 启动验收基线（最终状态）
+
+本附录固定 **文档编写时点** 的最终验收数字与禁止项，供启动手册与测试手册共用。  
+数字以本仓库已完成回归为准；若你本机结果不同，先查环境，再改文档。
+
+## N-1. Backend
+
+| 项 | 基线 |
+|---|---|
+| PostgreSQL 全量 | **281 tests**，**2 skipped**（real LLM smoke 默认 skip） |
+| PostgreSQL 稳定性 | 完整 suite **连续 3 次** 通过（修复 JWT 时钟回拨后） |
+| InMemory 全量 | **270 tests**，**52 skipped** |
+| Alembic head | `20260717_07_fallback_chain` |
+| `python -m compileall app` | 通过 |
+| `git diff --check` | 通过 |
+| 默认 LLM | `LLM_PROVIDER_MODE=stub`；默认验收 **零真实 LLM 费用** |
+
+## N-2. Frontend
+
+| 项 | 基线 |
+|---|---|
+| 测试 | **113 / 113** |
+| Production build | 通过 |
+| Login / JWT / ProtectedRoute / RBAC Permission UI | 已完成 |
+| React Lifecycle Live Status | 已完成 |
+| Frontend Learning Dashboard | 已完成 |
+| 开发服务器 | `http://127.0.0.1:5173`（`start_frontend.sh`） |
+| Compose 前端 | `http://127.0.0.1:8080`（nginx SPA + `/api` 代理） |
+
+## N-3. Docker / Compose
+
+| 项 | 基线 |
+|---|---|
+| image build | 通过 |
+| compose config | 通过 |
+| postgres / backend / frontend | healthy |
+| Alembic 自动迁移 | 通过（entrypoint） |
+| History API 路由刷新 | `/login` 等 200 |
+| Stub E2E | 通过 |
+| down 后 volume 保留与数据恢复 | 通过 |
+| 禁止 | `docker compose down -v` 作为日常验收步骤 |
+
+## N-4. 业务链（人工 + Stub E2E 共同指向）
+
+```text
+文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+→ 最终审计报告
+```
+
+样例业务数据目录（人工走 UI 时使用，不替代自动化）：
+
+```text
+docs/learning/sample-data/Scenario01_Sales_Decline/
+```
+
+详细业务步骤与检查表见：
+
+- `docs/learning/sample-data/Scenario01_Sales_Decline/10_業務テストシナリオ.md`
+- `docs/learning/01_Foundation/TEST_CASES.md` 文末「V1.0 业务数据验证与验收」
+
+## N-5. 启动路径对照（保留原路径）
+
+| 路径 | 命令入口 | 典型用途 |
+|---|---|---|
+| A. 本地双终端 | `start_backend.sh` + `start_frontend.sh` | 日常开发与学习 |
+| B. Compose | `compose_up.sh` 等 | V1.0 容器 + PostgreSQL 验收 |
+| C. 自动化 | `run_tests.sh` / unittest / npm test | 提交前回归 |
+
+原 Appendix A～L 的命令 **全部仍然有效**；N 只固定基线，不删除旧步骤。
