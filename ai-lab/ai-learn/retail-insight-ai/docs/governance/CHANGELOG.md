@@ -6,7 +6,7 @@
 - `LLM_PROVIDER_MODE` 支持 `stub` / `fallback_chain` / `openrouter`（单 Provider 兼容）。
 - 新增 NVIDIA / Gemini / Local Qwen Provider；价格单位为 USD/百万 tokens，Decimal 快照入账。
 - 新增 `llm_provider_attempts` Attempt Ledger、`llm_provider_circuit_state` 共享熔断状态。
-- Migration：`20260717_07_provider_fallback_chain`。
+- Migration：`20260717_07_fallback_chain`（version_num ≤32）。
 - AI Analysis / Executive Report 响应增加 fallback_used、attempt_count、attempted_providers、total cost/token。
 - 前端显示实际服务/模型/路由等级/自动切换/尝试次数/Token/成本与安全 fallback 说明。
 - 默认自动测试零外网；真实 smoke 未执行。

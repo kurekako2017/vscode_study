@@ -1,13 +1,16 @@
 """Add provider attempt ledger, circuit state, and fallback summary columns.
 
-Revision ID: 20260717_07_provider_fallback_chain
+Revision ID: 20260717_07_fallback_chain
 Revises: 20260717_06_dual_route_llm
 Create Date: 2026-07-17
+
+注意：alembic_version.version_num 为 VARCHAR(32)，revision id 必须 ≤32。
+原候选名 provider_fallback_chain 超长，已缩短为 fallback_chain。
 """
 
 from alembic import op
 
-revision = "20260717_07_provider_fallback_chain"
+revision = "20260717_07_fallback_chain"
 down_revision = "20260717_06_dual_route_llm"
 branch_labels = None
 depends_on = None

@@ -8,7 +8,7 @@
 - [x] Attempt Ledger + Circuit Breaker（PostgreSQL 共享状态）
 - [x] Backend 返回实际 Provider/Model/fallback/attempt/token/cost
 - [x] Frontend 显示路由摘要与安全 fallback 说明
-- [x] Migration `20260717_07_provider_fallback_chain`
+- [x] Migration `20260717_07_fallback_chain`
 - [x] 默认零外网 MockTransport；真实 smoke 未执行
 
 最后更新：2026-07-17

@@ -9,7 +9,7 @@
 - [x] Circuit Breaker closed/open/half_open（PostgreSQL 共享状态表）
 - [x] Backend 响应：provider/model/route_tier/fallback/attempt/token/cost
 - [x] Frontend 显示实际服务/模型/fallback/尝试摘要/Token/Cost
-- [x] Migration `20260717_07_provider_fallback_chain`
+- [x] Migration `20260717_07_fallback_chain`
 - [x] 默认零外网；真实 smoke 未执行
 
 完成记录：InMemory Backend 266 tests（51 skipped）、Frontend 100/100、production build、compileall、diff-check 通过。PostgreSQL 本环境不可用，未跑全量 PG 与 migration round-trip。
