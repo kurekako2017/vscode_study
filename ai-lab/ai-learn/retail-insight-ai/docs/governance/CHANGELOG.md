@@ -1,5 +1,14 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 ERIP V1.0 第三批项目文档同步
+
+- 根 `README.md` / `ROADMAP.md` / `TASK.md`：对齐 V1.0 业务主链、完成矩阵、诚实未完成边界与验收数字指针。
+- `docs/architecture/*`：补充 V1.0 架构摘要；校正 Approval Current State 等过期句。
+- `docs/learning/**`（不含已冻结 RUNBOOK/TEST_CASES）：增量入口与 Frontend Lifecycle/Dashboard。
+- handbook：`PROJECT_BIBLE`、`01`、`06`、`08`、`09`、`11`、handbook README 增量索引。
+- 治理：Backlog / CHANGELOG 登记；未改代码与第一/二批冻结文档。
+
+
 ## 2026-07-17 Docker/Compose + Stub API E2E
 
 - 修正 `docker-compose.yml`：pgvector/pg16、postgres healthy、backend Alembic 启动链、frontend nginx SPA、默认 stub LLM。

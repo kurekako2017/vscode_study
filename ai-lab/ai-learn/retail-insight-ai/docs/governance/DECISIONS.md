@@ -1,5 +1,13 @@
 # retail-insight-ai Architecture Decisions
 
+## ADR-20260717-DOC-BATCHES: 文档分三批冻结与权威入口
+
+- 状态：Accepted。
+- 决策：启动验收文档（RUNBOOK/TEST_CASES/VERIFY）为第一批权威；面试材料为第二批；入口/架构/学习/治理为第三批同步，且不整体重写、不新建 V2 重复文档。
+- 原因：避免多入口冲突；同一事实只在权威处展开，其他处链接。
+- 影响：后续改口径先改权威文件，再短同步矩阵/摘要。
+
+
 ## ADR-20260717-LLM-COST: 贵的 Provider side effect 必须经过 PostgreSQL 成本边界
 
 - 状态：Accepted。

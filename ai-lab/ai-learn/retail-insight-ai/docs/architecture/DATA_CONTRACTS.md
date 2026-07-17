@@ -7,7 +7,7 @@
 要求：
 
 - 当前只描述本地文件输入。
-- 当前不表示 PostgreSQL 已实现。
+- （历史句）曾表示 PostgreSQL 未实现。**V1.0**：PostgreSQL/pgvector 为企业验收路径；本文件仍以领域合同为主，实现细节见 ARCHITECTURE 与 migrations。
 - 当前不表示导入 API 已实现。
 - 后续 Phase 2 及以后必须兼容本文件，除非通过 ADR 明确变更。
 

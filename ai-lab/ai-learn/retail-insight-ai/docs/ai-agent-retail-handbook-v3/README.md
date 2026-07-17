@@ -152,3 +152,13 @@ PROJECT_BIBLE.md
 - 只同步这个块，不覆盖各自正文。
 - 任一组内文档正文变化时，整组文档的同步块都会一起刷新。
 <!-- DOC-SYNC:END group=overview -->
+
+## V1.0 文档批次（增量索引）
+
+| 批次 | 内容 | 位置 |
+|---|---|---|
+| 第一批 | 启动/测试/验收 | `docs/learning/01_Foundation/RUNBOOK_LOCAL.md`、`TEST_CASES.md`、根 `VERIFY_CHECKLIST.md`（冻结） |
+| 第二批 | 面试材料 | `INTERVIEW_GUIDE.md`、`02`、`07`、两份 Volume（冻结） |
+| 第三批 | 入口/架构/学习/治理同步 | 根 README、ROADMAP、ARCHITECTURE、学习指南、本 handbook 索引、governance |
+
+业务链：`文書管理→RAG検索→AI分析(low_cost)→董事会报告(high_quality)→承認管理→Persistent Audit`。

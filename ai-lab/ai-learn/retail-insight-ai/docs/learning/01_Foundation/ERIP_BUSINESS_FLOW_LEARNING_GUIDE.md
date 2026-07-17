@@ -655,3 +655,19 @@ Approval
 再理解代码。
 
 这是学习 ERIP 最有效的方法。
+
+## V1.0 正式业务链（增量）
+
+```text
+文書管理
+→ RAG検索
+→ AI分析（low_cost）
+→ 董事会报告（high_quality）
+→ 承認管理
+→ Persistent Audit
+```
+
+- 普通 RAG / Retrieval：默认可不调用真实 Provider。
+- AI 分析与董事会报告：必须经 LLM Gateway；默认 stub；Evidence Gate + Idempotency-Key。
+- 审批：submit **201** `pending_approval`；employee approve **403**；manager approve **200**。
+- 步骤级验收表：`TEST_CASES.md` Scenario01（24 步）；本文件不复制整表。

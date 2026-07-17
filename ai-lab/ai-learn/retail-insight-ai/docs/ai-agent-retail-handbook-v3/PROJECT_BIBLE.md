@@ -61,7 +61,21 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付。
 
 Enterprise Retail Intelligence Platform（ERIP）由前端、后端、LangGraph Workflow、Research Agent、数据层、Report Generator 和运用扩展组成。
 
-核心链路：
+## V1.0 企业业务主链
+
+```text
+文書管理
+→ RAG検索
+→ AI分析（low_cost）
+→ 董事会报告（high_quality）
+→ 承認管理
+→ Persistent Audit
+```
+
+配套能力：JWT/RBAC、LLM Gateway/Ledger/Fallback、PostgreSQL/pgvector、Compose/Stub E2E、Lifecycle Live Status、Learning Dashboard。
+默认 stub；真实付费 smoke / Billing UI / SIEM 等未完成项见面试材料与 ARCHITECTURE 摘要。
+
+## 任务分析核心链路（保留）
 
 ```text
 React
@@ -76,7 +90,7 @@ LangGraph Workflow
 ↓
 Fixed KPI Workflow / Research Agent
 ↓
-Streaming
+SSE / Report
 ↓
 日文经营分析报告
 ```
@@ -109,7 +123,7 @@ Streaming
 - RAG
 - Report Generator
 - Docker
-- SQLite
+- InMemory / PostgreSQL（V1.0 双轨；历史文档中的 SQLite 表述视为早期阶段）
 - PostgreSQL
 - Keyword Retrieval
 - Hybrid Retrieval
@@ -169,7 +183,7 @@ Streaming
 - Fixed KPI Workflow
 - Streaming / SSE
 - Report Generator
-- SQLite
+- InMemory / PostgreSQL（V1.0 双轨；历史文档中的 SQLite 表述视为早期阶段）
 - Docker
 - 基础 Architecture
 - Review 观点

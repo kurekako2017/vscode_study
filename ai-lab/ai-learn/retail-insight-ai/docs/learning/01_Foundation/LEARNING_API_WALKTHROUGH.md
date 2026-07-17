@@ -44,7 +44,7 @@ Last Updated：2026-07-09
 | 前后端集成测试（Integration Test） | React + FastAPI        | 验证完整用户操作流程              |
 | 端到端测试（E2E Test）             | Playwright / Cypress   | 模拟真实用户完成整个业务流程      |
 
-补充说明：Swagger 不是测试环境，Swagger 不是正式 UI，Swagger 是 API 调试与验证工具。UI 完成以后 Swagger 通常仍然保留，因为 React 和 Swagger 调用的是同一套 FastAPI API。当前阶段主要用 Swagger 验证后端骨架；UI 完成后再做前后端 Integration Test；发布前再考虑 E2E Test。
+补充说明：Swagger 不是测试环境，Swagger 不是正式 UI，Swagger 是 API 调试与验证工具。UI 完成以后 Swagger 通常仍然保留，因为 React 和 Swagger 调用的是同一套 FastAPI API。历史阶段曾主要用 Swagger 验证后端骨架。**V1.0**：正式 UI 已交付；Swagger 仍用于 API 调试；Integration / Stub E2E / unittest 已是默认验收（见 RUNBOOK L/M/N）。
 
 ## 后台日志怎么观察
 
@@ -1849,3 +1849,12 @@ Response
 
 - `revise()`：创建新的报告版本快照并返回修订结果。
 - `_create_version_snapshot()`：保存修订前后的版本快照。
+
+## V1.0 业务链与认证（增量入口）
+
+```text
+Login/JWT → 文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Audit/Ledger
+```
+
+- 受保护 API 需 Bearer；401 与 403 语义见 `VERIFY_CHECKLIST.md` §4.1。
+- 端点细节仍按本文各节 Swagger 学习；状态码与 Scenario01 以 `TEST_CASES.md` 与源码为准。

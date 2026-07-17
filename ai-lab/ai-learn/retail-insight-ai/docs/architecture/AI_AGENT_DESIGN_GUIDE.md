@@ -6,6 +6,8 @@
 
 中文说明：
 
+**V1.0 说明**：仓库已交付 LLM Gateway、Stub/Fallback Provider、普通 RAG 默认可零 LLM、JWT/审批治理。下文「当前阶段不接真实 LLM」指 *默认学习路径与 Agent 编码约束*，不是否定 Gateway 已落地。
+
 本项目不是先做一个全自动 Agent，再回头补规则。当前阶段优先把业务流程拆成可解释、可测试、可审计的 `Workflow`，再在明确边界内引入 `Agent`、`Tool`、`Provider` 和未来 LLM 能力。
 
 这份文档用于回答三个问题：
@@ -43,7 +45,7 @@
 
 `Tool` 是 Agent 可以调用的能力边界。只要一个能力有外部依赖、副作用、权限风险、成本风险或超时风险，就不应该让 Agent 随意调用内部函数，而应该包装成有 schema、timeout、error mapping、audit 的 `Tool`。
 
-在本项目当前阶段，Tool 不是主实现重点。原因是当前不接真实外部系统、不接真实 LLM、不接 MCP。未来引入 MCP 或搜索能力时，Tool 才会成为 Agent 与外部能力之间的标准边界。
+在本项目默认学习阶段，Tool 不是主实现重点。原因是默认不接真实外部业务系统、不默认产生真实 LLM 费用、不接 MCP。未来引入 MCP 或搜索能力时，Tool 才会成为 Agent 与外部能力之间的标准边界。
 
 日本語補足：
 

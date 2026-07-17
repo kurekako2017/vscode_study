@@ -9,7 +9,7 @@ Enterprise Retail Intelligence Platform（ERIP）V1.0 已正式交付，并投�
 
 Enterprise Retail Intelligence Platform（ERIP）是面向日本大手流通集团的 AI 经营分析基盘构築项目，已经正式交付，并用于企业运行、学习讲解和面试说明。
 
-当前基线：
+当前基线（任务分析主链，仍有效）：
 
 ```text
 React
@@ -24,6 +24,20 @@ React
 → React
 ```
 
+V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
+
+```text
+文書管理
+→ RAG検索
+→ AI分析（low_cost / LLM Gateway）
+→ 董事会报告（high_quality / LLM Gateway）
+→ 承認管理
+→ Persistent Audit / Usage Ledger
+```
+
+权威启动与数字：`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix L/M/N；`VERIFY_CHECKLIST.md`。
+自动化基线：PostgreSQL **281 tests / 2 skipped**；InMemory **270 / 52 skipped**；Frontend **113/113**；Alembic **`20260717_07_fallback_chain`**。
+
 项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。
 
 ## 二、当前完成情况矩阵
@@ -31,16 +45,16 @@ React
 | 模块 | 当前状态 | 完成度说明 |
 |---|---|---|
 | Backend | Production Architecture | FastAPI、Task API、TaskService、LangGraph Workflow、SSE、Report Generator、Document、RAG、Approval、Security、Audit 已正式投入使用 |
-| Frontend | 部分完成 | React 可用于联调和展示，但当前不是主学习入口 |
-| Swagger | Runtime Architecture | `/docs` 可作为 API Verification 入口，长期保留 |
-| Workflow | Runtime Architecture | LangGraph Workflow、Fixed KPI Workflow、Research Agent 已作为正式运行流程投入使用 |
-| Repository Pattern | Runtime Architecture | Repository Pattern、SQLite、本地文件路径与企业持久化链路已纳入统一运行架构 |
-| LLM | Runtime Architecture | LLM 编排与 RAG 组件已纳入企业运行架构 |
-| PostgreSQL | Production Architecture | PostgreSQL 已作为企业持久化基础运行 |
-| RBAC | Production Architecture | RBAC 已纳入企业权限治理 |
-| Audit Log | Production Architecture | Audit Log 已纳入企业审计治理 |
-| Redis / RabbitMQ / OpenTelemetry / Kubernetes | Enterprise Deployment | Redis、RabbitMQ、OpenTelemetry、Kubernetes 已用于企业运行与治理 |
-| MCP | Runtime Architecture | MCP 与外部工具系统已纳入平台运行边界 |
+| Frontend | V1.0 已交付 | Login/JWT、ProtectedRoute、RBAC UI、正式导航、Lifecycle Live Status、Learning Dashboard；见 `docs/learning/02_Frontend/` |
+| Swagger | Runtime Architecture | `/docs` 仍是 API 调试入口，与 React 共用同一套 FastAPI API |
+| Workflow | Runtime Architecture | LangGraph Workflow、Fixed KPI Workflow、Research Agent、Report 主链路可用 |
+| Repository Pattern | Runtime Architecture | InMemory 学习路径 + PostgreSQL 企业验收双轨；Repository 合同统一 |
+| LLM | V1.0 成本治理 | 默认 `LLM_PROVIDER_MODE=stub`；LLM Gateway、Evidence Gate、low_cost/high_quality、Fallback Chain、Ledger 已落地；真实付费 smoke 仅 opt-in |
+| PostgreSQL / pgvector | Production 验收路径 | 企业持久化与 pgvector Compose 路径；Alembic head `20260717_07_fallback_chain` |
+| RBAC / JWT | Production Architecture | JWT 登录、`/users/me`、冻结 Permission、401/403 fail-closed |
+| Audit Log | Production Architecture | Persistent Audit（PostgreSQL）+ request_id；禁止落 Token/Key/全文 Prompt |
+| Redis / RabbitMQ / OpenTelemetry / Kubernetes | 规划 / 非 V1.0 默认交付 | **未**作为本仓库默认可运行完成项；勿写成已交付 |
+| MCP | 规划 / 非 V1.0 默认交付 | **未**作为当前完成项 |
 
 当前已经能跑的能力：
 
@@ -52,16 +66,14 @@ React
 - 审批提交、审批列表/详情、批准、拒绝、修订。
 - `GET /api/v1/users/me`、`roles`、`permissions`、`audit-logs` 的安全读模型。
 
-企业交付说明：
+企业交付说明（V1.0 诚实口径）：
 
-- 真实 LLM 接入已纳入企业运行架构。
-- PostgreSQL 已作为企业持久化基础运行。
-- pgvector 与 Hybrid Retrieval 已投入企业检索链路。
-- Redis 与 RabbitMQ 已用于缓存与异步任务处理。
-- OpenTelemetry 与 Kubernetes 已用于监控与运行治理。
-- 企业级认证与权限治理已投入运行。
-- 企业前端联动能力已正式交付。
-- E2E 验证流程已纳入交付体系。
+- 默认验收使用 stub LLM（零真实费用）；OpenRouter 等真实调用仅 opt-in，**真实付费 smoke 非默认**。
+- PostgreSQL/pgvector 为企业验收路径；InMemory 仍为本地学习默认。
+- JWT + RBAC + ProtectedRoute + Persistent Audit + LLM Gateway/Ledger/Fallback 已交付。
+- Docker Compose + Alembic + Stub API E2E 已落地；`compose_down` 禁止 `-v` 作为日常验收。
+- **未**把 Redis / RabbitMQ / OpenTelemetry / Kubernetes / MCP / Billing UI / 多租户预算台 / SIEM·WORM·Streaming / DeepSeek 默认启用写成已完成。
+- 详细验收步骤见 `VERIFY_CHECKLIST.md` 与 RUNBOOK Appendix L/M/N（本 README 不重复命令大段）。
 
 ## 三、项目目录
 
@@ -71,7 +83,7 @@ retail-insight-ai/
 │   ├── app/              # 后端应用源码
 │   ├── tests/            # 后端自动化测试
 │   └── data/             # 本地学习样例数据
-├── frontend/             # React 前端，目前用于联调和展示，不是主学习入口
+├── frontend/             # React 前端：Login/JWT/RBAC、正式导航、Lifecycle Live Status、Learning Dashboard
 ├── docs/                 # 技术文档、学习文档、测试文档、handbook 和归档候选区
 │   ├── learning/                    # API 学习与测试学习文档
 │   ├── architecture/                # 架构设计、AI Agent 设计和数据契约
@@ -129,11 +141,11 @@ README
 ```text
 README
 ↓
-docs/learning/LEARNING_API_WALKTHROUGH.md
+docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md
 ↓
-Swagger
+Swagger + 正式 UI（RUNBOOK Appendix L）
 ↓
-docs/learning/TEST_CASES.md
+docs/learning/01_Foundation/TEST_CASES.md
 ↓
 CODE_STUDY_GUIDE
 ↓
@@ -184,9 +196,8 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 - Swagger 是 API 调试与验证工具。
 - Swagger 长期保留，即使 React UI 完成以后仍用于后端验证。
 - React 以后也调用同一套 FastAPI API。
-- 当前阶段主要用 Swagger 验证后端骨架。
-- UI 完成后再做前后端 Integration Test。
-- 发布前再考虑 E2E Test。
+- V1.0：Swagger 仍用于 API 调试；正式 UI 已交付；Integration / Stub E2E / unittest / vitest 已是默认验收手段。
+- 历史写法「只验后端骨架」不再作为当前操作结论。
 
 ## 七、所有 Markdown 文档导航
 

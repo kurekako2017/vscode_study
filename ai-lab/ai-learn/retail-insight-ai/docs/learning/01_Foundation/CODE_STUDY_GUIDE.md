@@ -87,9 +87,9 @@ React
 
 一句话记忆：**HTTP 创建任务，Workflow 做分析，SSE 报进度，HTTP 再取报告。**
 
-当前实现默认使用进程内存储和本地文件输入：不调用真实 LLM，不需要 PostgreSQL、Redis 或 RabbitMQ。Phase 2 已新增可选 PostgreSQL Repository，但默认后端仍是 `inmemory`；只有显式切换后，任务、事件和报告才会跨进程保留。
+当前默认学习路径仍使用进程内 InMemory 与本地样例输入，且默认 `LLM_PROVIDER_MODE=stub`（不产生真实 LLM 费用）。**V1.0** 同时具备 PostgreSQL/pgvector 企业验收路径（Alembic `20260717_07_fallback_chain`）、JWT 登录、`/users/me` 真实身份、冻结 RBAC、Persistent Audit、LLM Gateway 与 Ledger。Redis/RabbitMQ 不是本仓默认可运行依赖。
 
-当前 backend 还提供企业安全基础读模型：`users/me` 返回 `system` 占位主体，`security/roles` 和 `security/permissions` 返回冻结目录，`audit-logs` 读取 append-only 审计事实。
+安全读模型：`users/me` / roles / permissions / audit-logs 已与 JWT 身份和 Persistent Audit 对齐（详见 `ARCHITECTURE.md` 与 `frontend` Auth 链）。
 
 ## 2. 后端阅读顺序
 
@@ -319,3 +319,21 @@ log_event(logger, "info", "study_checkpoint", "Reached study checkpoint",
 5. 两个 `catch` 和 `onTransportError`：学习业务错误与网络错误的区别。
 
 同时打开 DevTools Network：`Fetch/XHR` 中看 POST 和 report 请求，`EventStream` 中看 SSE。这样可以把源码断点和网络时序对上。
+
+## V1.0 前端与治理阅读入口
+
+> 增量入口，不替代上文后端主阅读顺序。
+
+| 顺序 | 看什么 | 解决什么 |
+|---|---|---|
+| A | `frontend/src` Login / AuthContext / ProtectedRoute | JWT、401/403、fail-closed |
+| B | 正式导航与业务页 | 文書→RAG→分析→承認 |
+| C | Lifecycle Live Status / Learning Dashboard | 本地学习 trace，不回传后端 |
+| D | `backend/app` LLM Gateway / ai_analysis / executive_reports / approvals | 成本边界与审批状态机 |
+| E | RUNBOOK Appendix L/M/N、VERIFY_CHECKLIST | 启动与验收数字 |
+
+业务链记忆：
+
+```text
+文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Persistent Audit
+```

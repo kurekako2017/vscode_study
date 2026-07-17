@@ -4,30 +4,30 @@
 
 本文件冻结 Report / Approval 状态机设计。
 
-## Current State
+## Current State（V1.0 已交付，2026-07-17 校正）
 
-- Phase 1 已落地的唯一报告状态是 `generated`
-- 当前没有 Approval API
-- 当前没有 Approval Repository
-- 当前没有人工审批页面
+- 报告默认 `ReportStatus.GENERATED`（JSON `"generated"`）
+- Approval API 已落地：submit / list / detail / approve / reject / revise
+- PostgreSQL Approval Repository + History + ReportVersion；InMemory 学习路径仍可用
+- 前端「承認管理」页已交付（JWT + RBAC）
+- HTTP 口径（与源码一致）：submit **201** + `pending_approval`；approve **200** + `approved`；employee 无权限 **403**
+- 权威状态机与锁策略见 `ARCHITECTURE.md`「Enterprise Approval Workflow」
 
-## Target State
+## Target State（枚举全集，含已实现）
 
-后续承認ワークフロー以稳定状态机驱动：
+承認ワークフロー状态机：
 
-- `generated`
-- `draft`
-- `pending_approval`
-- `approved`
-- `rejected`
-- `revised`
-- `published`
-- `archived`
+- `generated`（已实现）
+- `draft`（预留）
+- `pending_approval`（已实现）
+- `approved` / `rejected` / `revised`（已实现）
+- `published` / `archived`（预留/边界）
 
-## Planned
+## Planned（历史规划记录，部分已完成）
 
-- Phase 2 先为状态字段和审批表结构做 PostgreSQL 准备
-- Phase 5 再落地审批 API、审批事件、前端审批流程
+- ~~Phase 2 PostgreSQL 审批表~~ → **V1.0 已完成**
+- ~~Phase 5 审批 API / 前端~~ → **V1.0 已完成**
+- 仍属后续：跨系统工作流引擎产品化、SIEM 消费 Approval/Audit 事件
 
 ## State Definitions
 

@@ -1,5 +1,18 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 ERIP V1.0 第三批项目文档（工作区进行中 / 未强制 commit）
+
+- [x] 同步根入口 README / ROADMAP / TASK 与 V1.0 事实
+- [x] 架构与审批设计文档增量校正过期 Current State
+- [x] 学习文档与 PROJECT_BIBLE / handbook 总览增量同步
+- [x] 治理 Backlog / CHANGELOG 登记本批文档状态
+- [x] 冻结 RUNBOOK / TEST_CASES / VERIFY / 第二批面试材料不动
+- [ ] 下一轮：运行环境检测（本批不跑测试 / Docker / LLM）
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 Docker/Compose + Stub E2E（已完成文件与可运行验证）
 
 - [x] 修正 docker-compose / Dockerfiles / dockerignore

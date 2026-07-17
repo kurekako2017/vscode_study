@@ -1,5 +1,28 @@
 # Enterprise Retail Intelligence Platform (ERIP) Architecture
 
+
+## ERIP V1.0 交付架构摘要
+
+> 本节为 **2026-07-17 现状摘要**。下文历史章节保留；冲突时以本节 + 源码为准。
+> 业务链：`文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Persistent Audit`
+> 数字：PG **281/2 skip**，InMemory **270/52 skip**，Frontend **113/113**，Alembic **`20260717_07_fallback_chain`**。
+> 详细命令不复制：见 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix L/M/N。
+
+```text
+React (JWT / ProtectedRoute / RBAC UI / Learning Dashboard / Lifecycle Live Status)
+  → FastAPI routes
+  → Auth · Documents · Retrieval · Internal RAG
+  → AI Analysis (LLM Gateway low_cost + Evidence Gate + Idempotency + Ledger)
+  → Executive Report (high_quality + ReportVersion，不自动审批)
+  → Approval state machine (owner / History / 403·409)
+  → Persistent Audit + request_id
+  → InMemory（学习）或 PostgreSQL/pgvector（企业验收）
+```
+
+**已交付**：JWT/RBAC、双路由 LLM 治理、Fallback Chain（OpenRouter→NVIDIA→Gemini→Local Qwen）、Compose+Alembic+Stub E2E、普通 RAG 默认可零真实 LLM。
+**未交付（勿夸大）**：真实付费 smoke 默认化、Billing/多租户预算 UI、SIEM/WORM/Streaming、DeepSeek 默认启用、Redis/RabbitMQ/K8s 作为本仓默认可运行栈。
+
+
 ## 2026-07-17 显式 AI Analysis 成本边界
 
 ```mermaid
@@ -195,7 +218,7 @@ flowchart LR
 
 ### Current State
 
-- 当前没有真实 RBAC、认证服务、JWT、OAuth 或外部身份提供器。
+- （历史记录）当时没有真实 RBAC/JWT/OAuth。**V1.0**：JWT + 冻结 RBAC 已交付；完整 SSO/OAuth 产品化仍属后续。
 - 当前 Approval API、Retrieval API 和 Internal RAG 仍只依赖既有 backend service boundary。
 - 当前 security model 已在 Sprint 11.2 落地为 placeholder principal + static catalog + append-only audit seam，但仍不能被解释为已上线的身份系统。
 
@@ -477,7 +500,7 @@ flowchart TD
 ### Current State
 
 - 当前已经补齐 Document / DocumentVersion / DocumentChunk placeholder / DocumentMetadata / DocumentSource。
-- 当前只实现 `InMemoryDocumentRepository`，还没有 Upload API、RAG、Chunk、pgvector 或 PostgreSQL Document Repository。
+- （历史记录）早期仅 InMemory Document。**V1.0**：Upload/Import/Chunk/Retrieval、pgvector Compose、PostgreSQL Repository 已交付；InMemory 学习路径仍保留。
 - `ImportBatch` 复用现有 `DataImport`，`ApprovalStatus` 复用现有 `ReportStatus`。
 
 ### Target State

@@ -1,6 +1,29 @@
 # Enterprise Retail Intelligence Platform (ERIP) Roadmap
 
-最后更新：2026-07-08
+最后更新：2026-07-17
+
+## 当前阶段：ERIP V1.0 正式交付
+
+最后同步：2026-07-17
+
+### V1.0 已交付能力（摘要）
+
+- 业务链：`文書管理 → RAG検索 → AI分析(low_cost) → 董事会报告(high_quality) → 承認管理 → Persistent Audit`
+- 技术：FastAPI + React + JWT/RBAC + PostgreSQL/pgvector + Alembic + Docker Compose + Stub E2E
+- LLM 治理：Gateway、Evidence Gate、Idempotency-Key、Decimal 额度、Ledger、Fallback（OpenRouter→NVIDIA→Gemini→Local Qwen）
+- 前端：ProtectedRoute、正式导航、Lifecycle Live Status、Learning Dashboard
+- 自动化：PG **281/2 skip**，InMemory **270/52 skip**，Frontend **113/113**，head **`20260717_07_fallback_chain`**
+- 默认 stub；真实付费 smoke / Billing UI / 多租户预算 / SIEM·WORM·Streaming / DeepSeek 默认启用 **未**记为完成
+
+权威细节：`docs/architecture/ARCHITECTURE.md`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix N、面试材料（第二批）。
+
+### 与下文历史 Sprint 的关系
+
+以下各 Sprint / Documentation Governance 章节**保留为历史记录**，不删除。
+若与 V1.0 摘要冲突（例如旧文写「没有 JWT」），以本节与源码为准。
+
+---
+
 
 ## 当前阶段
 
@@ -87,7 +110,7 @@ Documentation Governance V2
 
 ### Current Platform
 
-- 当前没有真实认证、JWT、OAuth 或外部身份提供器。
+- （历史 Sprint 记录）当时没有真实认证、JWT、OAuth 或外部身份提供器。**V1.0 现状**：JWT 登录与 RBAC 已交付；完整 SSO/OAuth 产品化仍属后续。
 - 当前 current user 使用 `user_id="system"` 的 placeholder principal。
 - 当前 security catalog 使用静态目录，尚未接 RBAC enforcement。
 - 当前 audit log 使用 append-only InMemoryAuditRepository，并通过 AuditService 记录成功与失败。

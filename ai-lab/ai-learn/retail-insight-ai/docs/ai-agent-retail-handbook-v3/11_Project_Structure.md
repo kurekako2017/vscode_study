@@ -532,3 +532,16 @@ Research Agent
 - 只同步这个块，不覆盖各自正文。
 - 任一组内文档正文变化时，整组文档的同步块都会一起刷新。
 <!-- DOC-SYNC:END group=study-and-runbook -->
+
+## V1.0 结构要点（增量）
+
+| 区域 | V1.0 要点 |
+|---|---|
+| `backend/app/api` | auth / documents / retrieval / ai-analysis / executive-reports / approvals / audit |
+| `backend/app` LLM | Gateway、Provider chain、Ledger |
+| `frontend/src` | Auth、ProtectedRoute、业务页、Lifecycle、Learning Dashboard |
+| `docker-compose.yml` + `scripts/` | postgres(pgvector)/backend/frontend；compose_up/verify/e2e/down |
+| `docs/learning/01_Foundation` | RUNBOOK / TEST_CASES / walkthrough（第一批冻结） |
+| `docs/ai-agent-retail-handbook-v3` | 面试第二批已交付；本文件只作结构索引 |
+
+Alembic head：`20260717_07_fallback_chain`。

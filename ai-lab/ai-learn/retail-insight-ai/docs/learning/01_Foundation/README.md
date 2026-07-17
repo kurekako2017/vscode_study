@@ -221,3 +221,14 @@ Foundation 的目标只有一个：
 下一册：
 
 **Volume 02：Source Code（源码精读）**
+
+## V1.0 阅读顺序（增量）
+
+1. `RUNBOOK_LOCAL.md` 顶部权威入口（L/M/N）
+2. `LEARNING_API_WALKTHROUGH.md` 接口学习
+3. `TEST_CASES.md` 测试含义 + Scenario01
+4. `CODE_STUDY_GUIDE.md` 源码顺序
+5. `ERIP_BUSINESS_FLOW_LEARNING_GUIDE.md` 业务链
+6. `../02_Frontend/FRONTEND_SOURCE_LEARNING_GUIDE.md` 前端与 Lifecycle/Dashboard
+
+数字与启动命令以 RUNBOOK / VERIFY 为准，本 README 不重复大段命令。

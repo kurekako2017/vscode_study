@@ -1,5 +1,21 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: ERIP V1.0 第三批项目文档同步
+
+- [x] 根入口 README / ROADMAP / TASK 与 V1.0 事实对齐
+- [x] ARCHITECTURE / APPROVAL_WORKFLOW / DATA_CONTRACTS / AI_AGENT_DESIGN_GUIDE 增量校正
+- [x] 学习文档 Foundation + Frontend 入口增量
+- [x] PROJECT_BIBLE / handbook 01·06·08·09·11·README 增量
+- [x] 冻结第一批启动验收文档与第二批面试材料
+- [x] CHANGELOG 登记
+- [ ] 运行环境检测（下一批）
+
+完成记录：仅文档；未改代码/测试/Docker/Migration/.env；未跑测试。
+
+最后更新：2026-07-17
+
+
+
 ## 2026-07-17 Completed: Docker/Compose + Stub E2E 文件与本地验证
 
 - [x] Compose 服务：postgres(pgvector) / backend / frontend

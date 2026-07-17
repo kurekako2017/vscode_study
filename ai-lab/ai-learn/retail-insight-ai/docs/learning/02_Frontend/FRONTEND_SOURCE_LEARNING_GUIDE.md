@@ -632,3 +632,23 @@ RAG 的 `insufficient_context` 在面板中解释为：Backend 未找到足够�
 | 审批 409     | `ApprovalService`                          | 已提交、已决策或状态机不允许当前动作           |
 
 当前学习边界：不接真实 LLM、Embedding、PostgreSQL、pgvector 或自动跨页面编排。页面展示的链路以现有源码为准，不代表未来目标架构已经实现。
+
+## V1.0 前端交付要点（增量）
+
+正式导航（与 `App.tsx` 一致）：
+
+```text
+学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+```
+
+| 主题 | 现状 | 源码方向 |
+|---|---|---|
+| JWT | Access Token 仅 sessionStorage；恢复经 `/users/me` | AuthContext / API Client |
+| ProtectedRoute | 未登录跳转登录并保留目标 | routes / ProtectedRoute |
+| RBAC UI | 冻结权限镜像；未知角色 fail-closed | permission helpers |
+| 401 / 403 | 401 清会话；403 保持会话显示无权 | fetch client |
+| Lifecycle Live Status | mount/update/unmount 本地 ring buffer | LifecycleProbe / LearningTrace |
+| Learning Dashboard | 固定栏目教学侧栏，不替代业务页 | LearningSidebar |
+| AI 成本展示 | Provider/Model/route/Token/Cost（无 Key） | RAG/Analysis 页 |
+
+验收：Frontend **113/113**；权威启动见 RUNBOOK Appendix L；企业 Compose 见 Appendix M。

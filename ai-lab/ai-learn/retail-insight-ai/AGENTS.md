@@ -41,6 +41,8 @@ React
 
 ## 2. 当前阶段
 
+> **V1.0 仓库事实（只读说明，不改变下方 Agent 编码禁止项）**：仓库已交付 JWT/RBAC、PostgreSQL 验收路径、LLM Gateway/Ledger/Fallback、Compose/Stub E2E、正式 Frontend。下文「默认阶段 / 当前禁止」仍约束 *Agent 生成代码时* 不得擅自接入真实 OpenAI/生产云服务；学习默认路径继续以 Local Static / InMemory / stub 为主。权威运行与验收见 RUNBOOK Appendix L/M/N。
+
 当前默认阶段：
 
 ```text
