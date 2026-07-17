@@ -1,5 +1,17 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: React Lifecycle Live Status
+
+- [x] 集中式 Learning Trace（ring buffer + sessionStorage 安全摘要）
+- [x] LifecycleProbe 显式 mount/update/unmount（不解析 Fiber）
+- [x] 刷新识别 page_reload；路由 leave/enter
+- [x] Learning Dashboard 固定栏目：路由/页面/Live Status/组件树/Hook/Props/事件/State/流程/监视器/源码/测试/调用/StrictMode/教学
+- [x] 脱敏与 Frontend 回归
+
+完成记录：Frontend 105/105（原 100 + 新增 lifecycle/sanitize）；production build 通过；未改 Backend。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: Provider Fallback Chain（NVIDIA / Gemini / Local Qwen）
 
 - [x] 固定串行 Chain：OpenRouter → NVIDIA → Gemini → Local Qwen

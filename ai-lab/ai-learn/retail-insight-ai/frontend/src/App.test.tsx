@@ -55,10 +55,11 @@ describe("App navigation", () => {
   it("shows each page's business object, lifecycle, and source locations", () => {
     const { rerender } = render(<LearningSidebar page="documents" latestEvent={null} />);
     expect(screen.getByText(/文書管理 · DocumentsPage · 1 \/ 4/)).toBeInTheDocument();
-    expect(screen.getByText("02 当前业务对象")).toBeInTheDocument();
+    expect(screen.getByText("02 当前页面")).toBeInTheDocument();
     expect(screen.getByText(/Scenario01 的销售、库存、促销、顾客和竞品内部资料/)).toBeInTheDocument();
-    expect(screen.getByText("04 页面生命周期")).toBeInTheDocument();
-    expect(screen.getByText("05 源码定位")).toBeInTheDocument();
+    expect(screen.getByText("03 React Lifecycle Live Status")).toBeInTheDocument();
+    expect(screen.getByText("15 React Lifecycle 教学说明")).toBeInTheDocument();
+    expect(screen.getByText("11 对应源码文件")).toBeInTheDocument();
     expect(screen.getByText("frontend/src/pages/DocumentsPage.tsx")).toBeInTheDocument();
 
     rerender(<LearningSidebar page="rag" latestEvent={null} />);
@@ -67,7 +68,7 @@ describe("App navigation", () => {
 
     rerender(<LearningSidebar page="tasks" latestEvent={null} />);
     expect(screen.getByText(/分析依頼 · TasksPage · 3 \/ 4/)).toBeInTheDocument();
-    expect(screen.getByText(/初始为 idle；没有 task_id、SSE 事件或 report/)).toBeInTheDocument();
+    expect(screen.getAllByText(/初始为 idle；没有 task_id、SSE 事件或 report/).length).toBeGreaterThan(0);
     expect(screen.getByText("Stream")).toBeInTheDocument();
     expect(screen.getByText(/【BackgroundTasks】.*【LangGraph】/)).toBeInTheDocument();
     expect(screen.getAllByText(/【SSE \/ EventSource】/)).toHaveLength(2);
@@ -129,7 +130,7 @@ describe("App navigation", () => {
 
     expect(await screen.findByText("# 学习报告")).toBeInTheDocument();
     expect(screen.getByText("loadReport()")).toBeInTheDocument();
-    expect(screen.getByText(/GET \/api\/tasks\/task-learning-1\/report/)).toBeInTheDocument();
+    expect(screen.getAllByText(/GET \/api\/tasks\/task-learning-1\/report/).length).toBeGreaterThan(0);
   });
 
   it("navigates to tasks from dashboard shortcut", async () => {
@@ -189,7 +190,7 @@ describe("App navigation", () => {
 
     expect(await screen.findByText(/Backend 未找到足够的相关 Chunk/)).toBeInTheDocument();
     expect(screen.getAllByText("POST /api/v1/internal-rag/answer").length).toBeGreaterThan(0);
-    expect(screen.getByText(/422 Unprocessable Entity/)).toBeInTheDocument();
+    expect(screen.getAllByText(/422 Unprocessable Entity/).length).toBeGreaterThan(0);
   });
 
   it("navigates to approval from dashboard shortcut", async () => {
@@ -204,5 +205,28 @@ describe("App navigation", () => {
     fireEvent.click(screen.getByRole("button", { name: "承認管理を開く" }));
 
     expect(await screen.findByRole("heading", { name: "承認管理" })).toBeInTheDocument();
+  });
+
+  it("shows React Lifecycle Live Status after mount and route switch", async () => {
+    render(<App initialSession={ADMIN_SESSION} strictModeEnabled />);
+
+    const live = screen.getByLabelText("React Lifecycle Live Status");
+    expect(live).toBeInTheDocument();
+    expect(within(live).getAllByText(/Mounted|已挂载|Mounting|挂载/).length).toBeGreaterThan(0);
+    expect(within(live).getByText("Render 次数")).toBeInTheDocument();
+    expect(screen.getByText("01 当前路由")).toBeInTheDocument();
+    expect(screen.getByText("04 组件树")).toBeInTheDocument();
+    expect(screen.getByText("14 StrictMode")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "RAG検索" }));
+    expect(await screen.findByRole("heading", { name: "RAG検索" })).toBeInTheDocument();
+    expect(screen.getByLabelText("React Lifecycle Live Status")).toHaveTextContent(/RagPage|Mounted|已挂载|Updated|更新/);
+  });
+
+  it("keeps teaching lifecycle section after live status", () => {
+    render(<App initialSession={ADMIN_SESSION} />);
+    expect(screen.getByText("03 React Lifecycle Live Status")).toBeInTheDocument();
+    expect(screen.getByText("15 React Lifecycle 教学说明")).toBeInTheDocument();
+    expect(screen.getByText("Choose")).toBeInTheDocument();
   });
 });

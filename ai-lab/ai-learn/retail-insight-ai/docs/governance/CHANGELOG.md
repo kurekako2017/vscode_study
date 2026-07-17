@@ -1,5 +1,12 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-17 React Lifecycle Live Status
+
+- 新增 `LearningTraceProvider` / `LifecycleProbe` / `pageCatalog` / sanitize。
+- LearningSidebar 固定 15 栏目，含 React Lifecycle Live Status（Mount/Update/Unmount、render 计数、刷新与路由）。
+- 学习 Trace 仅本地 ring buffer + sessionStorage；不发送 Backend；Token/Password 脱敏。
+- Frontend 105/105；production build 通过；Backend 未修改。
+
 ## 2026-07-17 Provider Fallback Chain
 
 - 新增固定串行 Provider Chain：OpenRouter → NVIDIA → Gemini → Local Qwen。

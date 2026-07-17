@@ -405,8 +405,9 @@ class ExecutiveReportService:
                 analysis_id=request.ai_analysis_id, report_id=resolved_task_id,
                 report_version_id=version.id, token_count=settled.total_tokens,
                 cost=str(settled.actual_cost), currency=settled.currency,
-                operation=_OPERATION, route_tier=policy.route_tier,
+                operation=_OPERATION,
                 provider=chain_outcome.provider_name, model=chain_outcome.actual_model,
+                # outcome_to_safe_dict 已含 route_tier，禁止与显式 kwargs 重复。
                 **outcome_to_safe_dict(chain_outcome),
             )
         return settled
@@ -440,7 +441,12 @@ class ExecutiveReportService:
                 context=context, actor=actor, action="executive_report.failed",
                 result="failure", status_code=status_code, error_code=error_code,
                 usage_id=usage_id, operation=_OPERATION, route_tier=policy.route_tier,
-                analysis_id=analysis_id, **outcome_to_safe_dict(failure),
+                analysis_id=analysis_id,
+                **{
+                    key: value
+                    for key, value in outcome_to_safe_dict(failure).items()
+                    if key not in {"route_tier", "operation"}
+                },
             )
         raise AIAnalysisException(public_code, "Executive report provider failed", status_code)
 

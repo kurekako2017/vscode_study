@@ -287,12 +287,13 @@ class AIAnalysisService:
                 attempted_providers=public_attempts,
             )
             audit_meta = outcome_to_safe_dict(chain_outcome)
+            # audit_meta 已含 route_tier/selected_*，避免与显式 kwargs 重复传参。
             self._audit.record_ai_analysis_event(
                 context=context, actor=actor, action="analysis.execute.succeeded",
                 result="success", status_code=200, usage_id=usage_id,
                 analysis_id=analysis_id, token_count=result.total_tokens,
                 cost=str(result.actual_cost), currency=result.currency,
-                operation=_OPERATION, route_tier=policy.route_tier,
+                operation=_OPERATION,
                 provider=result.provider_name, model=result.model_name,
                 **audit_meta,
             )
@@ -327,7 +328,11 @@ class AIAnalysisService:
                 context=context, actor=actor, action="analysis.execute.failed",
                 result="failure", status_code=status_code, error_code=error_code,
                 usage_id=usage_id, operation=_OPERATION, route_tier=policy.route_tier,
-                **outcome_to_safe_dict(failure),
+                **{
+                    key: value
+                    for key, value in outcome_to_safe_dict(failure).items()
+                    if key not in {"route_tier", "operation"}
+                },
             )
         raise AIAnalysisException(public_code, "AI analysis provider failed", status_code)
 

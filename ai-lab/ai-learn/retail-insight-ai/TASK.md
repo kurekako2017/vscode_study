@@ -1,5 +1,17 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 React Lifecycle Live Status（已完成）
+
+- [x] LearningTraceProvider + ring buffer（不发送 Backend）
+- [x] LifecycleProbe：mount / update / unmount
+- [x] page_reload / route_enter / route_leave
+- [x] LearningSidebar 固定 15 栏目顺序
+- [x] 脱敏：Token / password / Authorization
+- [x] Frontend 105/105；production build 通过
+- [x] 未修改 Backend / DB / LLM / 权限
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Provider Fallback Chain（已完成）
 
 - [x] 固定顺序 OpenRouter → NVIDIA → Gemini → Local Qwen

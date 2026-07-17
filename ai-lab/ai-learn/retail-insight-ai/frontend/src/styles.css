@@ -72,6 +72,22 @@ h1 { margin: 12px 0; color: #f4f8f6; font-size: clamp(44px, 7vw, 82px); line-hei
 .sidebar-flow li.active { border-color: var(--accent); color: var(--ink); }
 .sidebar-flow small, .learning-sidebar section > small { color: var(--muted); font-size: 11px; }
 .learning-note { border-left: 2px solid var(--mint); padding-left: 8px; color: #d7fff6; }
+.lifecycle-live { display: grid; gap: 10px; }
+.lifecycle-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+}
+.lifecycle-status-grid > div { display: grid; gap: 2px; }
+.lifecycle-status-grid dt { color: var(--muted); font-size: 10px; }
+.lifecycle-status-grid dd { margin: 0; color: #e7f6f2; font-size: 12px; }
+.lifecycle-recent { display: grid; gap: 6px; }
+.lifecycle-clear { margin-top: 4px; width: fit-content; }
+.component-tree li[data-active="true"] {
+  border-left: 2px solid var(--mint);
+  padding-left: 8px;
+}
+.component-tree li[data-active="false"] strong { color: #8fa3a2; }
 .nav-chip {
   width: auto;
   border: 1px solid #294048;
