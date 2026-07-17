@@ -1,12 +1,5 @@
 # retail-insight-ai CHANGELOG
 
-## 2026-07-17 RUNBOOK_LOCAL 权威入口与过期状态修正
-
-- `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 顶部增加「ERIP V1.0 当前权威启动入口」：InMemory → Appendix L；PostgreSQL/Docker → Appendix M；最终测试数字 → Appendix N。
-- 将 Frontend Phase 3 / Frontend 可选 / Docker 未验证 / PostgreSQL 未完成 / 骨架期「未来 UI」等过期表述改为历史记录，并写明 V1.0 当前结论。
-- 修正 Appendix D Startup Flow、Appendix E Checklist、Appendix H 面试演示，与正式导航一致。
-- 未新增 Appendix；未改 Backend/Frontend 代码。
-
 ## 2026-07-17 Docker/Compose + Stub API E2E
 
 - 修正 `docker-compose.yml`：pgvector/pg16、postgres healthy、backend Alembic 启动链、frontend nginx SPA、默认 stub LLM。

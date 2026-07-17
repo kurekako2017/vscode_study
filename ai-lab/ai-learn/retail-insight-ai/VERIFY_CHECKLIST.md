@@ -2,12 +2,14 @@
 
 本清单用于确认文档、接口和测试入口是否按 **ERIP V1.0 当前交付状态** 正常工作。
 
-权威启动入口（与 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 一致）：
+## ERIP V1.0 当前权威启动入口
+
+与 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 一致（本清单不新增 Appendix，只做验收勾选入口）：
 
 | 场景 | 权威章节 |
 |---|---|
 | 本地 InMemory 学习 | RUNBOOK Appendix L |
-| PostgreSQL / Docker 企业验收 | RUNBOOK Appendix M |
+| PostgreSQL/Docker 企业验收 | RUNBOOK Appendix M |
 | 最终测试数字与状态 | RUNBOOK Appendix N |
 
 正式前端导航验收标准：
@@ -19,6 +21,8 @@
 → 分析依頼
 → 承認管理
 ```
+
+说明：Frontend 为 V1.0 正式联调步骤（不是可选项）；Docker/PostgreSQL 为企业验收正式路径（不是「未验证 / 未完成」）。若本机 Docker daemon 不可用，应如实记录未执行 Compose，不要假装通过。
 
 ## 必查规则
 
@@ -32,7 +36,7 @@
 - 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
 - 如果报 `ModuleNotFoundError: No module named tests`，说明目录错了。
 - V1.0 默认验收使用 `LLM_PROVIDER_MODE=stub`，不默认产生真实 LLM 费用。
-- 不要用「Frontend 可选 / Docker 未验证 / PostgreSQL 未完成」等历史表述当作当前操作结论。
+- 不要用「Frontend Phase 3 / Frontend 可选 / Docker 未验证 / PostgreSQL 未完成 / 未来接入 / 计划中」等历史表述当作当前操作结论。
 
 ## 1. Swagger 可打开
 

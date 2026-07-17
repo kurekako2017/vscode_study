@@ -2,6 +2,28 @@
 
 这份文档用于按 `测试总览表 -> 测试详细表 -> 后端程序流程` 的顺序学习测试。表格负责导航，章节负责学习；所有测试命令、输入、输出、Swagger 操作、后台 Log、源码位置和设计理由都保留。
 
+## ERIP V1.0 当前权威启动入口
+
+操作与验收前先按场景选择权威章节（正文仍在 `RUNBOOK_LOCAL.md`；本文件负责测试含义与基线对照，**不新增 Appendix**）：
+
+| 场景 | 权威章节 |
+|---|---|
+| 本地 InMemory 学习 | RUNBOOK Appendix L |
+| PostgreSQL/Docker 企业验收 | RUNBOOK Appendix M |
+| 最终测试数字与状态 | RUNBOOK Appendix N |
+
+正式前端导航（与 `frontend/src/App.tsx` 一致）：
+
+```text
+学习总览
+→ 文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+```
+
+不要把下列历史表述当作 V1.0 当前操作结论：`Frontend Phase 3`、`Frontend 可选`、`Docker 未验证`、`PostgreSQL 未完成`、`未来接入`、`计划中`。
+
 ## 先理解 Swagger 和 unittest
 
 | 项目 | 内容 |
@@ -373,7 +395,7 @@ Response
 | Swagger对应操作 | 通常以测试为主；启用相关配置后可通过 Internal RAG 观察 fallback |
 | 后台观察 | provider 名称、fallback 分支、内部日志 |
 | 对应源码 | `backend/app/services/rag_answer_generator.py`、`backend/app/services/internal_rag_service.py` |
-| 为什么设计 | 未来接真实模型时，当前本地路径仍要稳定 |
+| 为什么设计 | 默认 stub / deterministic fallback 必须稳定；真实模型仅 opt-in smoke，不能破坏本地零费用路径 |
 
 ### 后端程序流程
 
@@ -494,7 +516,7 @@ Response
 | Swagger对应操作 | 依次执行四个 GET 接口 |
 | 后台观察 | `user_id`、role catalog、permission catalog、audit list |
 | 对应源码 | `backend/app/api/security.py`、`backend/app/api/audit_logs.py`、`backend/app/services/security_service.py`、`backend/app/services/audit_service.py` |
-| 为什么设计 | 安全读模型是未来真实认证和完整审计接入的最小基线 |
+| 为什么设计 | 安全读模型是 V1.0 JWT/RBAC/审计读路径的合同基线；认证与审批权限已落地，本测试锁定读模型字段不漂移 |
 
 ### 后端程序流程
 
@@ -528,7 +550,7 @@ Response
 | Swagger对应操作 | 无直接 Swagger 操作，可通过文档上传和任务链路间接理解 |
 | 后台观察 | 文件路径、解析结果、异常输入处理 |
 | 对应源码 | 本地数据加载相关模块和 `backend/data/` 样本文件 |
-| 为什么设计 | 当前阶段很多能力依赖本地静态数据，底层输入不稳会影响学习路径 |
+| 为什么设计 | 默认学习路径仍依赖本地静态样例输入；底层读取不稳会直接影响文档/任务链路学习 |
 
 ### 后端程序流程
 
@@ -583,7 +605,7 @@ Assertion
 | Swagger对应操作 | 无直接 Swagger 操作 |
 | 后台观察 | 接口命名、能力边界、实现一致性 |
 | 对应源码 | `backend/app/repositories/interfaces/` |
-| 为什么设计 | Repository 抽象是未来切换 PostgreSQL 的前提 |
+| 为什么设计 | Repository 抽象是 InMemory 与 PostgreSQL 双轨切换的前提；V1.0 两条路径均已落地，合同不能分叉 |
 
 ### 后端程序流程
 
@@ -639,7 +661,7 @@ Assertion
 | Swagger对应操作 | 通常不直接用 Swagger 复现，可结合 `/health` 和主链路理解 |
 | 后台观察 | backend 选择、环境变量、依赖注入 |
 | 对应源码 | `backend/app/config/container.py`、`backend/app/config/settings.py` |
-| 为什么设计 | 防止未来引入 PostgreSQL 后破坏默认学习路径 |
+| 为什么设计 | 防止 PostgreSQL 正式验收路径破坏默认 InMemory 学习路径；双轨并存时切换必须可测 |
 
 ### 后端程序流程
 
