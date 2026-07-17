@@ -2,6 +2,86 @@
 
 这份文档用于本地启动 Retail Insight AI，并区分 Swagger、ReDoc、OpenAPI JSON、unittest、前后端联调各自的作用。
 
+## ERIP 的三种运行与部署方式
+
+| 方式 | 启动内容 | 页面 | 数据库 | 是否需要 Docker | 用途 |
+|---|---|---|---|---|---|
+| **方式一：本地完整开发** | 宿主 PostgreSQL + 本地 Backend + Vite | **5173** | 宿主 PostgreSQL | **否** | 日常页面开发、调试 |
+| **方式二：Docker Compose** | PostgreSQL + Backend + Nginx Frontend 三容器 | **8080** | Docker Volume PostgreSQL | **是** | 单机部署、企业验收、演示 |
+| **方式三：正式生产部署** | HTTPS/Reverse Proxy + Backend + 独立 PostgreSQL + 企业安全设施 | 正式域名 | 独立或托管 PostgreSQL | 视平台而定 | 正式企业运行 |
+
+**读表前先理解 Docker Compose（不要误解成“只是打包”）：**
+
+- **Docker**：镜像与容器的运行技术（把应用装进可重复启动的隔离环境）。
+- **Docker Compose**：对**多个容器**做编排与统一启动/停止的方式（本仓库文件 `docker-compose.yml`）。
+- **ERIP Compose 同时管理**（服务名以 compose 为准）：
+  - `postgres`：PostgreSQL + pgvector
+  - `backend`：FastAPI
+  - `frontend`：Nginx SPA
+  - 容器网络、端口映射、Health Check
+  - PostgreSQL Volume：`erip_postgres_data`
+  - Backend 启动顺序：PostgreSQL ready → `alembic upgrade head` → uvicorn
+- Docker **不只是**“把项目打个包”；Compose 启动的是一整套可运行系统。
+- Windows/WSL 下通常经 **Docker Desktop**，会有额外 CPU/内存开销。
+- **镜像主要占磁盘**；**运行中的容器占 CPU/Memory**。
+- **日常开发不必启动 Docker**（用方式一即可）。
+
+**必须记住：**
+
+1. **方式一、方式二**是当前仓库**可直接执行**的启动方式。
+2. **方式三**是生产部署架构说明，**不是**“一条命令即可生产上线”。
+3. 当前 Compose 可用于**单机部署与演示**，但**不能直接等同**完整生产环境（TLS、IdP、密钥轮换等见 `DEPLOYMENT_GUIDE`）。
+4. **不要**把 **5173** 与 **8080** 当成同一套页面数据源。
+5. **本地宿主 PostgreSQL** 与 **Docker Volume 库** 是**两套数据库**。
+
+详细命令与生产差距：[`docs/development/DEPLOYMENT_GUIDE.md`](../../development/DEPLOYMENT_GUIDE.md)。
+
+### 方式一：本地完整开发（启动顺序）
+
+**Vite 不能单独完成业务运行。** 必须先有 **宿主 PostgreSQL + Backend**，再开 Frontend。
+
+```text
+Terminal 0（事先）: 宿主 PostgreSQL 已运行，库已 alembic upgrade head
+Terminal 1: start_backend.sh  →  http://127.0.0.1:8000
+Terminal 2: start_frontend.sh →  http://127.0.0.1:5173
+```
+
+**Terminal 1（Backend，必须先起）：**
+
+```bash
+# 先确认宿主 PostgreSQL 已运行
+export REPOSITORY_BACKEND=postgres
+export DATABASE_URL='<本地 PostgreSQL连接>'
+export LLM_PROVIDER_MODE=stub
+./scripts/start_backend.sh
+```
+
+**Terminal 2（Frontend）：**
+
+```bash
+./scripts/start_frontend.sh
+```
+
+验证：
+
+```bash
+curl -fsS http://127.0.0.1:8000/health
+# 成功：JSON 含 "repository_backend":"postgres"
+# 浏览器：http://127.0.0.1:5173/login
+```
+
+### 方式二：Docker Compose（一行入口）
+
+```bash
+./scripts/compose_up.sh
+./scripts/compose_verify.sh
+# 浏览器：http://127.0.0.1:8080/login
+```
+
+停止（**禁止** `down -v`）：`./scripts/compose_down.sh`
+
+---
+
 ## ERIP V1.0 当前权威启动入口
 
 操作前先按场景选择章节，避免把历史阶段说明当成当前建议：

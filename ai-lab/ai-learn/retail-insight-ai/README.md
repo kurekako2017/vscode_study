@@ -41,6 +41,18 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 **部署分层（本地 / Compose / 生产差距）权威入口：** [`docs/development/DEPLOYMENT_GUIDE.md`](docs/development/DEPLOYMENT_GUIDE.md)。
 自动化基线：以 `TASK.md` / `docs/governance/CHANGELOG.md` 最近验收数字为准（Alembic head **`20260717_08_ai_runtime`**）。
 
+### 运行与部署方式入口（三种）
+
+| 方式 | 需要 Docker？ | 页面 | 数据库 | 入口文档 |
+|---|---|---|---|---|
+| **方式一：本地完整开发** | **否** | **5173**（Vite） | 宿主 PostgreSQL | RUNBOOK「三种方式」+ `start_backend` / `start_frontend` |
+| **方式二：Docker Compose** | **是** | **8080**（Nginx） | Volume `erip_postgres_data` | `./scripts/compose_up.sh`；DEPLOYMENT_GUIDE |
+| **方式三：正式生产** | 视平台 | 正式域名 HTTPS | 独立/托管 PostgreSQL | DEPLOYMENT_GUIDE 生产清单（**非**一条命令上线） |
+
+- Docker Compose = 多容器编排（`postgres` + `backend` + `frontend` + 网络/端口/健康检查/Volume/Alembic 顺序），**不是**“只打包项目”。
+- **5173 与 8080 不是同一套数据源**；本地库与 Docker Volume 是两套库。
+- 日常开发用方式一即可，**不必**为改页面启动 Docker。
+
 项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。
 
 ## 二、当前完成情况矩阵

@@ -2,7 +2,7 @@
 
 最后更新：2026-07-17
 
-本文档是 **Enterprise Retail Intelligence Platform (ERIP) V1.0** 的权威、可执行部署入口。  
+本文档是 **Enterprise Retail Intelligence Platform (ERIP) V1.0** 的权威、可执行部署入口。
 服务名、端口、数据库用户、环境变量与命令均来自仓库当前配置（`docker-compose.yml`、Dockerfile、entrypoint、`.env.example`、`scripts/*`），禁止用记忆替代事实。
 
 | 文档 | 职责 |
@@ -33,20 +33,55 @@
 
 ## 1. 三种运行模式
 
-| 模式 | Frontend | Backend | Database | 用途 |
-|---|---|---|---|---|
-| 本地开发 | `http://127.0.0.1:5173`（Vite） | `http://127.0.0.1:8000` | **宿主 PostgreSQL**（必须） | 页面开发 / API 调试 |
-| Docker Compose | `http://127.0.0.1:8080`（nginx） | 宿主 `8000` 或经 8080 同源 `/api` | Compose PostgreSQL（volume） | 单机部署 / 企业验收 / 演示 |
-| 正式生产 | HTTPS 域名 | 内网 Backend | 独立/托管 PostgreSQL | 企业运行（需额外硬化） |
+### 1.0 Docker 与 Docker Compose 是什么（必读）
+
+| 概念 | 含义 |
+|---|---|
+| **Docker** | 镜像与容器运行技术：把应用放进可重复启动的隔离环境。 |
+| **Docker Compose** | **多个容器**的编排与统一启动/停止（本仓库：`docker-compose.yml`，project name `erip`）。 |
+
+**ERIP Compose 同时管理的内容（不是“只打包项目”）：**
+
+| 管理对象 | 对应事实 |
+|---|---|
+| PostgreSQL / pgvector | service **`postgres`**，镜像 `pgvector/pgvector:pg16` |
+| FastAPI Backend | service **`backend`** |
+| Nginx Frontend | service **`frontend`** |
+| Network | Compose 默认网络（容器间用服务名通信，如 `backend:8000`） |
+| Port | 默认宿主 `5432` / `8000` / `8080`（可用环境变量覆盖） |
+| Health Check | 各 service 的 `healthcheck` |
+| PostgreSQL Volume | **`erip_postgres_data`** |
+| Alembic 启动顺序 | entrypoint：PG ready → `alembic upgrade head` → uvicorn |
+
+**资源与日常习惯：**
+
+- Windows/WSL 下常用 **Docker Desktop**，有**额外 CPU/内存开销**。
+- **镜像主要占磁盘**；**运行中的容器占 CPU/Memory**。
+- **日常开发不必启动 Docker**（用方式一：宿主 PG + 本地 Backend + Vite）。
+
+### 1.1 三种方式总表
+
+| 方式 | 启动内容 | 页面 | 数据库 | 是否需要 Docker | 用途 |
+|---|---|---|---|---|---|
+| 方式一：本地完整开发 | 宿主 PostgreSQL + 本地 Backend + Vite | **5173** | 宿主 PostgreSQL | **否** | 日常页面开发、调试 |
+| 方式二：Docker Compose | PostgreSQL + Backend + Nginx Frontend 三容器 | **8080** | Docker Volume PostgreSQL | **是** | 单机部署、企业验收、演示 |
+| 方式三：正式生产部署 | HTTPS/Reverse Proxy + Backend + 独立 PostgreSQL + 企业安全设施 | 正式域名 | 独立或托管 PostgreSQL | 视平台而定 | 正式企业运行 |
+
+| 对照（端口） | Frontend | Backend | Database |
+|---|---|---|---|
+| 方式一 | `http://127.0.0.1:5173` | `http://127.0.0.1:8000` | 宿主 PostgreSQL |
+| 方式二 | `http://127.0.0.1:8080` | 宿主 `8000` 或经 8080 `/api` | Compose Volume 内 PG |
+| 方式三 | HTTPS 域名 | 内网 Backend | 独立/托管 PG |
 
 **必须明确：**
 
-1. **普通页面测试不需要 Docker**（本地 Backend + Vite 即可）。  
-2. **本地开发仍必须使用 PostgreSQL** 做业务联调：`REPOSITORY_BACKEND=postgres`，且 `GET /health` 必须显示 `repository_backend=postgres`。  
-3. **InMemory 仅**快速 unittest / 教学；**不是**正式业务验收。  
-4. **本地宿主 PostgreSQL 与 Docker Volume `erip_postgres_data` 是不同数据源**。  
-5. 要查看 **Docker 内已有业务数据**，请使用 **Frontend 8080**（Compose），不要假设 5173 连到同一库。  
-6. Compose 下 Backend 环境写死 `REPOSITORY_BACKEND: postgres`。
+1. **方式一、方式二**可直接按仓库脚本执行；**方式三**是生产架构，**不是**一条命令即可生产上线。
+2. 当前 Compose 可用于**单机部署与演示**，**不能直接等同**完整生产环境。
+3. **不要**把 **5173** 与 **8080** 当成同一套页面数据源。
+4. **本地宿主 PostgreSQL** 与 **Docker Volume `erip_postgres_data`** 是**两套数据库**。
+5. 普通页面开发**不需要 Docker**；业务联调必须 PostgreSQL，且 `GET /health` 须为 `repository_backend=postgres`。
+6. **InMemory** 仅 unittest/教学，**不是**业务验收。
+7. Compose 下 Backend 写死 `REPOSITORY_BACKEND: postgres`。
 
 ---
 
@@ -95,7 +130,7 @@ flowchart LR
 | `ai_runtime_settings` | 运行时 mode / kill_switch / version（**无 Key**） |
 | Provider Secret | **仅 Backend 进程环境变量**读取；Frontend / DB 不保存 Key |
 
-Compose project name（`docker-compose.yml`）：**`erip`**  
+Compose project name（`docker-compose.yml`）：**`erip`**
 Services：**`postgres`**、**`backend`**、**`frontend`**
 
 ---
@@ -149,7 +184,7 @@ Services：**`postgres`**、**`backend`**、**`frontend`**
 
 ## 5. 环境变量与 Secret
 
-模板：项目根 `.env.example` → 复制为 `.env`（见第 6 节）。  
+模板：项目根 `.env.example` → 复制为 `.env`（见第 6 节）。
 Compose：`backend` 的 `environment:` **钉死** `REPOSITORY_BACKEND=postgres`、`LLM_PROVIDER_MODE=stub` 及全部 `RUN_*_SMOKE=0`（见 `docker-compose.yml`）。
 
 ### 5.1 Repository / Database
@@ -197,9 +232,9 @@ Compose：`backend` 的 `environment:` **钉死** `REPOSITORY_BACKEND=postgres`�
 | `LLM_PROVIDER_MODE` | **启动默认** mode | 否 | `stub`；Compose **钉死 stub** | 否 |
 | `LLM_PROVIDER` | 兼容旧名 | 否 | `stub` | 否 |
 
-**运行时授权**另存 PostgreSQL `ai_runtime_settings`（见第 12 节）。  
-- `LLM_PROVIDER_MODE` = 进程启动默认 / 初始化 DB 行的默认值来源之一。  
-- `ai_runtime_settings.mode` / `kill_switch` = 多实例共享的运行事实。  
+**运行时授权**另存 PostgreSQL `ai_runtime_settings`（见第 12 节）。
+- `LLM_PROVIDER_MODE` = 进程启动默认 / 初始化 DB 行的默认值来源之一。
+- `ai_runtime_settings.mode` / `kill_switch` = 多实例共享的运行事实。
 - Key、模型名、价格 **仍只来自环境变量**，不进 `ai_runtime_settings`。
 
 ### 5.5 OpenRouter / NVIDIA / Gemini / Local Qwen
@@ -238,13 +273,13 @@ cp .env.example .env
 
 **必须遵守：**
 
-- `.env` **不**提交 Git  
-- **不**把 Key 写进 `docker-compose.yml` 明文生产值、Frontend 源码、文档正文、Audit  
-- 根/backend/frontend **`.dockerignore` 均排除 `.env`**；`prove_dockerignore.sh` 可验证  
-- Dockerfile **不** `COPY .env`  
-- 生产使用 Secret Manager / 编排 secrets  
-- 更换 JWT Secret 与数据库密码  
-- **AI管理** 页仅展示 configured / readiness **布尔值**与模型名等非 Secret 字段  
+- `.env` **不**提交 Git
+- **不**把 Key 写进 `docker-compose.yml` 明文生产值、Frontend 源码、文档正文、Audit
+- 根/backend/frontend **`.dockerignore` 均排除 `.env`**；`prove_dockerignore.sh` 可验证
+- Dockerfile **不** `COPY .env`
+- 生产使用 Secret Manager / 编排 secrets
+- 更换 JWT Secret 与数据库密码
+- **AI管理** 页仅展示 configured / readiness **布尔值**与模型名等非 Secret 字段
 
 ---
 
@@ -309,8 +344,8 @@ alembic current（日志）
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers
 ```
 
-- **Migration 失败时不会启动 uvicorn**，Backend **不应**伪装 healthy。  
-- 当前 head：**`20260717_08_ai_runtime`**  
+- **Migration 失败时不会启动 uvicorn**，Backend **不应**伪装 healthy。
+- 当前 head：**`20260717_08_ai_runtime`**
   （文件：`backend/alembic/versions/20260717_08_ai_runtime_settings.py`，含表 `ai_runtime_settings`）
 
 ### 8.2 查看当前 revision
@@ -378,8 +413,8 @@ docker volume ls | grep erip_postgres_data
 
 来源：RUNBOOK + deterministic test users（bcrypt，应用不存明文密码文件）。
 
-- admin：含 **AI管理**（`security.manage`）、Audit 等  
-- manager：审批 review / approve / reject  
+- admin：含 **AI管理**（`security.manage`）、Audit 等
+- manager：审批 review / approve / reject
 - employee：文档 / RAG / 提交审批；**approve → 403**
 
 ---
@@ -530,8 +565,8 @@ docker compose logs backend 2>&1 | grep -E 'alembic|entrypoint|ERROR' | tail -50
 | llm_usage_ledger 等 | 成本与额度 |
 | **ai_runtime_settings** | Runtime mode / kill_switch / version |
 
-- Volume 名：**`erip_postgres_data`**  
-- 容器重启、`compose_down`（无 `-v`）后数据保留  
+- Volume 名：**`erip_postgres_data`**
+- 容器重启、`compose_down`（无 `-v`）后数据保留
 - **`down -v` 删除 Volume = 数据丢失风险**
 
 ---
@@ -608,9 +643,9 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
   → 页面验证（登录 / 文档 / RAG / 审批）
 ```
 
-- **保留旧镜像 tag** 便于回滚  
-- **不修改** 已发布旧 Migration 文件  
-- 升级窗口保持 **`LLM_PROVIDER_MODE=stub`** / Runtime stub  
+- **保留旧镜像 tag** 便于回滚
+- **不修改** 已发布旧 Migration 文件
+- 升级窗口保持 **`LLM_PROVIDER_MODE=stub`** / Runtime stub
 - **Seed 不随升级自动执行**
 
 ---
@@ -623,68 +658,80 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 | Migration downgrade | `alembic downgrade <rev>`（受控） | 可能丢列/表；需 DBA；**不是** `compose_down` |
 | 数据恢复 | 第 17 节 restore | 覆盖风险 |
 
-**不得**将 `docker compose down` 表述为数据库回滚。  
+**不得**将 `docker compose down` 表述为数据库回滚。
 `compose_down` 只停容器；只有 `-v` 或 restore/downgrade 才改变数据面。
 
 ---
 
-## 20. 本地开发（无需 Docker）
+## 20. 本地开发（无需 Docker）——方式一完整顺序
 
-**仍必须连接宿主 PostgreSQL**（业务联调），不要用 InMemory 充当验收。
+**Vite 不能单独完成业务运行。** 必须：宿主 PostgreSQL + Backend + Frontend。
+**不要**用 InMemory 充当业务验收。
+
+```text
+Terminal 0: 宿主 PostgreSQL 已运行；目标库已 alembic upgrade head
+Terminal 1: Backend  → :8000
+Terminal 2: Frontend → :5173
+```
+
+**Terminal 1（先启动 Backend）：**
 
 ```bash
-# 项目根
-cp -n .env.example .env   # 若尚无 .env
-
+# 先确认宿主 PostgreSQL 已运行
 export REPOSITORY_BACKEND=postgres
-export DATABASE_URL='postgresql+psycopg://<user>:<password>@127.0.0.1:5432/<db>'
+export DATABASE_URL='<本地 PostgreSQL连接>'
+# 示例（勿把真实密码写进文档仓库）：
+# export DATABASE_URL='postgresql+psycopg://erip_app:***@127.0.0.1:5432/erip'
 export LLM_PROVIDER_MODE=stub
-# 首次需对目标库执行：cd backend && alembic upgrade head
+# 首次对该库：cd backend && DATABASE_URL=... alembic upgrade head
 
 ./scripts/start_backend.sh
-# → http://127.0.0.1:8000  （uvicorn --reload）
+# → http://127.0.0.1:8000
+```
 
-# 另开终端
+**Terminal 2（再启动 Frontend）：**
+
+```bash
 ./scripts/start_frontend.sh
-# → http://127.0.0.1:5173  （Vite；代理 /api 与 /health → 8000）
+# → http://127.0.0.1:5173  （Vite 代理 /api、/health → 127.0.0.1:8000）
 ```
 
 | 地址 | 说明 |
 |---|---|
-| http://127.0.0.1:8000/health | 必须 `repository_backend=postgres` |
+| http://127.0.0.1:8000/health | 必须含 `"repository_backend":"postgres"` |
 | http://127.0.0.1:8000/docs | Swagger |
 | http://127.0.0.1:5173/login | Vite 开发登录页 |
 
 **再次强调：**
 
-- **5173** = Vite 开发；**8000** = Backend；**8080** = Compose 正式 Frontend  
-- 本地 DB ≠ Docker Volume  
-- 要看 Compose 里已有数据 → 使用 **8080**
+- **5173** = 方式一 Vite；**8080** = 方式二 Compose Frontend；**不是同一套数据**
+- 本地宿主 DB ≠ Docker Volume
+- 要看 Compose 已有数据 → 只开 **8080** 那套（方式二）
 
 ---
 
 ## 21. Production 安全清单
 
-- [ ] 移除 / 禁用 deterministic 测试账号  
-- [ ] 企业 IdP / SSO（本仓库未交付完整产品化 IdP）  
-- [ ] 强 `JWT_SECRET_KEY`  
-- [ ] 强数据库密码；定期轮换  
-- [ ] TLS / HTTPS 边缘终止  
-- [ ] 正式域名 + Reverse Proxy  
-- [ ] **不**对公网暴露 PostgreSQL 端口  
-- [ ] 收紧 `CORS_ORIGINS`  
-- [ ] Secret Manager 注入 Key  
-- [ ] 日志脱敏（无 Token/Key/全文 Prompt）  
-- [ ] Audit 保留策略  
-- [ ] Backup + Restore 演练  
-- [ ] Monitoring / Alert  
-- [ ] 容器 Resource Limit  
-- [ ] API Rate Limit  
-- [ ] LLM Budget + Kill Switch 流程  
-- [ ] 最小权限 RBAC  
-- [ ] Volume 权限与备份加密  
-- [ ] 非 root 运行（Backend 镜像已 `USER appuser`）  
-- [ ] 镜像漏洞扫描  
+- [ ] 移除 / 禁用 deterministic 测试账号
+- [ ] 企业 IdP / SSO（本仓库未交付完整产品化 IdP）
+- [ ] 强 `JWT_SECRET_KEY`
+- [ ] 强数据库密码；定期轮换
+- [ ] TLS / HTTPS 边缘终止
+- [ ] 正式域名 + Reverse Proxy
+- [ ] **不**对公网暴露 PostgreSQL 端口
+- [ ] 收紧 `CORS_ORIGINS`
+- [ ] Secret Manager 注入 Key
+- [ ] 日志脱敏（无 Token/Key/全文 Prompt）
+- [ ] Audit 保留策略
+- [ ] Backup + Restore 演练
+- [ ] Monitoring / Alert
+- [ ] 容器 Resource Limit
+- [ ] API Rate Limit
+- [ ] LLM Budget + Kill Switch 流程
+- [ ] 最小权限 RBAC
+- [ ] Volume 权限与备份加密
+- [ ] 非 root 运行（Backend 镜像已 `USER appuser`）
+- [ ] 镜像漏洞扫描
 
 ---
 
@@ -717,9 +764,9 @@ export LLM_PROVIDER_MODE=stub
 
 **原则**
 
-1. 普通页面开发不需要 Docker。  
-2. 业务联调与验收必须 PostgreSQL。  
-3. Compose 默认 stub + `erip_postgres_data` 持久化。  
-4. 禁止日常 `down -v`。  
-5. Key 永不进库、不进镜像、不进前端。  
+1. 普通页面开发不需要 Docker。
+2. 业务联调与验收必须 PostgreSQL。
+3. Compose 默认 stub + `erip_postgres_data` 持久化。
+4. 禁止日常 `down -v`。
+5. Key 永不进库、不进镜像、不进前端。
 6. 生产 = Compose 基线 + 第 21 节硬化，不是默认 `.env` 原样上线。

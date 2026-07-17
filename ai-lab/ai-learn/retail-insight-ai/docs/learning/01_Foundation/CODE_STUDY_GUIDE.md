@@ -6,11 +6,11 @@
 
 ## 最短学习路径
 
-| 顺序 | 先看什么 | 先解决什么问题 | 不建议一开始看什么 |
-| --- | --- | --- | --- |
-| 1 | [README.md](./README.md) | 先知道项目是什么、当前边界是什么 | backlog 历史和完整 ADR 细节 |
-| 2 | [docs/learning/LEARNING_API_WALKTHROUGH.md](./docs/learning/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划 |
-| 3 | 本文 | 先知道代码应该按什么顺序读 | 先看前端实现和测试细枝末节 |
+| 顺序 | 先看什么                                                                                | 先解决什么问题                       | 不建议一开始看什么          |
+| ---- | --------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------- |
+| 1    | [README.md](./README.md)                                                                 | 先知道项目是什么、当前边界是什么     | backlog 历史和完整 ADR 细节 |
+| 2    | [docs/learning/LEARNING_API_WALKTHROUGH.md](./docs/learning/LEARNING_API_WALKTHROUGH.md) | 先知道怎么启动、怎么验证最小可运行版 | 过深实现和未来平台化规划    |
+| 3    | 本文                                                                                    | 先知道代码应该按什么顺序读           | 先看前端实现和测试细枝末节  |
 
 ## 主阅读顺序
 
@@ -194,38 +194,38 @@ unsubscribeRef 负责关闭旧 EventSource
 - 看完应该掌握什么：知道每个核心文件为什么存在，以及面试时怎么解释。
 - 下一步看哪里：`backend/app/api/tasks.py`
 
-| 文件路径 | 负责什么 | 为什么需要 | 运行时什么时候被调用 | 初学者重点看哪里 |
-| --- | --- | --- | --- | --- |
-| `backend/app/main.py` | 创建 FastAPI、构造容器、注册 CORS/路由/异常处理和请求日志中间件 | 提供唯一的应用入口和 HTTP 外壳 | Uvicorn 导入 `app.main:app` 时；每个请求还会经过 middleware | `create_app()`、`request_context()`、`include_router()` |
-| `backend/app/api/tasks.py` | 创建任务、查状态、订阅事件、取报告 | 把 HTTP 协议转换成 Service 调用 | 请求 `/api/tasks...` 时 | `create_task()` 中的 `BackgroundTasks`，以及 `StreamingResponse` |
-| `backend/app/services/task_service.py` | 创建任务、推进状态、执行 Workflow、保存报告、发布事件、收敛异常 | 把一次完整用例放在一处，避免路由和节点各自管理生命周期 | 路由创建/查询任务时；后台任务运行时 | `create_task()` 与 `run_task()` 的成功/失败两条路径 |
-| `backend/app/workflow/state.py` | 定义节点共享的 `AnalysisState` | 让每个节点的输入输出字段清晰且可检查 | Workflow 创建和每个节点运行时 | 必填字段与可选结果字段 |
-| `backend/app/workflow/graph.py` | 声明 route/kpi/research/report 节点和条件边 | 把执行顺序显式化，并支持三种 mode | `TaskService.run_task()` 调用 `stream()` 时 | `_build_graph()`、`_after_route()`、`_after_kpi()`、增量 state 合并 |
-| `backend/app/kpi/workflow.py` | 根据固定规则产生 `KPIResult` | KPI 公式必须可重复，不交给模型猜测 | kpi 节点运行时 | `question_factor` 和每个 KPI 字段 |
-| `backend/app/agents/research_agent.py` | 通过 Provider 执行调查并校验结果 | 隔离“如何调查”与 Workflow 编排 | research 节点运行时 | `ResearchAgent.run()` 如何只依赖 Provider 接口 |
-| `backend/app/agents/providers/static_research.py` | 返回固定 Research 结果，可注入失败 | 本地学习时不依赖网络或真实 LLM | `ResearchAgent.run()` 调用 provider 时 | 正常返回和 `fail` 分支 |
-| `backend/app/reports/generator.py` | 把问题、KPI 和 Research 组合成 Markdown | 三种 mode 需要同一种报告输出 | report 节点运行时 | 两个可选结果的 `if` 和 `lines` 列表 |
-| `backend/app/events/publisher.py` | 创建业务事件并写入 EventRepository | Workflow/Service 不需要知道事件存储细节 | queued、running、节点完成、done/error 时 | 自动补入 `request_id` |
-| `backend/app/events/sse.py` | 轮询事件、转换为 SSE 文本、在终态结束连接 | 浏览器需要实时看到进度 | 浏览器连接 `/events` 后 | `id/event/data` 三行格式、cursor、终态 return |
-| `backend/app/api/security.py` | 暴露 current user、roles、permissions 的安全读接口 | 先把未来 RBAC 的读模型固定下来 | 浏览器或 curl 请求 `/api/v1/users/me`、`/api/v1/security/roles`、`/api/v1/security/permissions` 时 | placeholder principal、冻结目录和 response model |
-| `backend/app/api/audit_logs.py` | 暴露 append-only audit read 接口 | 给未来审计查看和支持流程预留读模型 | 请求 `/api/v1/audit-logs` 时 | 只读、append-only、`next_cursor` 占位 |
-| `backend/app/services/security_service.py` | 维护 current user 和静态角色/权限目录 | 避免把目录散落在路由里 | 安全读接口调用时 | `system` placeholder principal 与 frozen catalog |
-| `backend/app/services/audit_service.py` | 追加和读取审计事实，并记录成功/失败日志 | 把 audit append-only seam 固定在 service 层 | 未来写审计事实或测试 seed 时 | `audit.log.created` / `audit.log.failed` |
-| `backend/app/models/security.py` | 定义 user、org、department、role、permission、policy | 先固定安全域概念层 | service / schema / repository 读取时 | 当前用户快照和 static catalog 的字段 |
-| `backend/app/models/audit.py` | 定义 append-only `AuditLog` 领域对象 | 审计事实必须 write-once | audit service / repository 读写时 | `result`、`metadata` 和 `timestamp` |
-| `backend/app/repositories/interfaces/audit_repository.py` | 定义审计追加与读取合同 | 后续换 PostgreSQL 时不改 service | 容器组装和测试时 | 只有 append 与 list_all |
-| `backend/app/repositories/implementations/in_memory/audit_repository.py` | 用列表和锁保存审计事实 | 本地学习时不依赖数据库 | audit append / read 时 | 不能 update/delete，只能 append |
-| `backend/app/repositories/interfaces/` | 定义 Task/Event/Report 存储合同 | Service 依赖抽象，存储实现可替换 | 容器构造和类型检查时 | `Protocol` 中最小方法集合 |
-| `backend/app/repositories/implementations/in_memory/` | 用字典、锁和深拷贝保存运行数据 | 提供无需外部数据库的本地实现 | 任务和事件每次读写时 | 为什么返回 `deepcopy`，为什么使用 `RLock` |
-| `backend/app/config/container.py` | 创建并连接 Repository、Agent、Workflow、Service | 具体实现只在组合根出现 | FastAPI 应用创建时一次 | `build_container()` 的依赖连接顺序 |
-| `backend/app/schemas/task_api.py` | 定义任务请求和响应的 Pydantic Schema | 在 HTTP 边界校验输入并固定合同 | FastAPI 解析请求/序列化响应时 | `question` 长度、`mode` 限制和 `from_domain()` |
-| `backend/app/schemas/security_api.py` | 定义 current user、role、permission 的 HTTP Schema | 固定 security read model 的公开字段 | FastAPI 解析/序列化时 | `from_domain()` 如何扁平化主体快照 |
-| `backend/app/schemas/audit_api.py` | 定义 audit log 的 HTTP Schema | 固定 append-only 审计读模型 | FastAPI 解析/序列化时 | `timestamp`、`metadata`、`next_cursor` |
-| `backend/app/observability/logging.py` | JSON 日志、request_id 上下文和安全字段 | 将同一请求/任务的日志关联起来 | 应用启动、每个请求和业务关键步骤 | `bind_request_id()`、`log_event()` 允许的字段 |
-| `frontend/src/App.tsx` | 页面状态、提交、SSE 回调、报告加载和渲染 | 把完整用户流程集中展示 | React 首次渲染和每次用户/网络事件发生时 | `submit()`、`loadReport()`、函数式 `setEvents()`、清理 EventSource |
-| `frontend/src/api.ts` | 封装 fetch、响应解包和 EventSource | UI 不直接处理 HTTP/SSE 细节 | `App.tsx` 创建任务、订阅或取报告时 | `unwrapResponse()`、`subscribeToTask()`、业务 error 与 transport error 的区别 |
-| `frontend/src/types.ts` | 定义 API 和 SSE 的 TypeScript 类型 | 编译期发现前后端合同不一致 | TypeScript 编译和开发时 | `TaskEvent` 与 Backend `TaskEventResponse` 的字段对应 |
-| `frontend/src/App.test.tsx` | 模拟 fetch/EventSource 验证完整 UI 流程 | 不启动浏览器也能稳定验证成功和错误显示 | 执行 Frontend tests 时 | `FakeEventSource.emit()` 如何驱动真实 React 回调 |
+| 文件路径                                                                   | 负责什么                                                        | 为什么需要                                             | 运行时什么时候被调用                                                                                    | 初学者重点看哪里                                                                  |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `backend/app/main.py`                                                    | 创建 FastAPI、构造容器、注册 CORS/路由/异常处理和请求日志中间件 | 提供唯一的应用入口和 HTTP 外壳                         | Uvicorn 导入`app.main:app` 时；每个请求还会经过 middleware                                            | `create_app()`、`request_context()`、`include_router()`                     |
+| `backend/app/api/tasks.py`                                               | 创建任务、查状态、订阅事件、取报告                              | 把 HTTP 协议转换成 Service 调用                        | 请求`/api/tasks...` 时                                                                                | `create_task()` 中的 `BackgroundTasks`，以及 `StreamingResponse`            |
+| `backend/app/services/task_service.py`                                   | 创建任务、推进状态、执行 Workflow、保存报告、发布事件、收敛异常 | 把一次完整用例放在一处，避免路由和节点各自管理生命周期 | 路由创建/查询任务时；后台任务运行时                                                                     | `create_task()` 与 `run_task()` 的成功/失败两条路径                           |
+| `backend/app/workflow/state.py`                                          | 定义节点共享的`AnalysisState`                                 | 让每个节点的输入输出字段清晰且可检查                   | Workflow 创建和每个节点运行时                                                                           | 必填字段与可选结果字段                                                            |
+| `backend/app/workflow/graph.py`                                          | 声明 route/kpi/research/report 节点和条件边                     | 把执行顺序显式化，并支持三种 mode                      | `TaskService.run_task()` 调用 `stream()` 时                                                         | `_build_graph()`、`_after_route()`、`_after_kpi()`、增量 state 合并         |
+| `backend/app/kpi/workflow.py`                                            | 根据固定规则产生`KPIResult`                                   | KPI 公式必须可重复，不交给模型猜测                     | kpi 节点运行时                                                                                          | `question_factor` 和每个 KPI 字段                                               |
+| `backend/app/agents/research_agent.py`                                   | 通过 Provider 执行调查并校验结果                                | 隔离“如何调查”与 Workflow 编排                       | research 节点运行时                                                                                     | `ResearchAgent.run()` 如何只依赖 Provider 接口                                  |
+| `backend/app/agents/providers/static_research.py`                        | 返回固定 Research 结果，可注入失败                              | 本地学习时不依赖网络或真实 LLM                         | `ResearchAgent.run()` 调用 provider 时                                                                | 正常返回和`fail` 分支                                                           |
+| `backend/app/reports/generator.py`                                       | 把问题、KPI 和 Research 组合成 Markdown                         | 三种 mode 需要同一种报告输出                           | report 节点运行时                                                                                       | 两个可选结果的`if` 和 `lines` 列表                                            |
+| `backend/app/events/publisher.py`                                        | 创建业务事件并写入 EventRepository                              | Workflow/Service 不需要知道事件存储细节                | queued、running、节点完成、done/error 时                                                                | 自动补入`request_id`                                                            |
+| `backend/app/events/sse.py`                                              | 轮询事件、转换为 SSE 文本、在终态结束连接                       | 浏览器需要实时看到进度                                 | 浏览器连接`/events` 后                                                                                | `id/event/data` 三行格式、cursor、终态 return                                   |
+| `backend/app/api/security.py`                                            | 暴露 current user、roles、permissions 的安全读接口              | 先把未来 RBAC 的读模型固定下来                         | 浏览器或 curl 请求`/api/v1/users/me`、`/api/v1/security/roles`、`/api/v1/security/permissions` 时 | placeholder principal、冻结目录和 response model                                  |
+| `backend/app/api/audit_logs.py`                                          | 暴露 append-only audit read 接口                                | 给未来审计查看和支持流程预留读模型                     | 请求`/api/v1/audit-logs` 时                                                                           | 只读、append-only、`next_cursor` 占位                                           |
+| `backend/app/services/security_service.py`                               | 维护 current user 和静态角色/权限目录                           | 避免把目录散落在路由里                                 | 安全读接口调用时                                                                                        | `system` placeholder principal 与 frozen catalog                                |
+| `backend/app/services/audit_service.py`                                  | 追加和读取审计事实，并记录成功/失败日志                         | 把 audit append-only seam 固定在 service 层            | 未来写审计事实或测试 seed 时                                                                            | `audit.log.created` / `audit.log.failed`                                      |
+| `backend/app/models/security.py`                                         | 定义 user、org、department、role、permission、policy            | 先固定安全域概念层                                     | service / schema / repository 读取时                                                                    | 当前用户快照和 static catalog 的字段                                              |
+| `backend/app/models/audit.py`                                            | 定义 append-only`AuditLog` 领域对象                           | 审计事实必须 write-once                                | audit service / repository 读写时                                                                       | `result`、`metadata` 和 `timestamp`                                         |
+| `backend/app/repositories/interfaces/audit_repository.py`                | 定义审计追加与读取合同                                          | 后续换 PostgreSQL 时不改 service                       | 容器组装和测试时                                                                                        | 只有 append 与 list_all                                                           |
+| `backend/app/repositories/implementations/in_memory/audit_repository.py` | 用列表和锁保存审计事实                                          | 本地学习时不依赖数据库                                 | audit append / read 时                                                                                  | 不能 update/delete，只能 append                                                   |
+| `backend/app/repositories/interfaces/`                                   | 定义 Task/Event/Report 存储合同                                 | Service 依赖抽象，存储实现可替换                       | 容器构造和类型检查时                                                                                    | `Protocol` 中最小方法集合                                                       |
+| `backend/app/repositories/implementations/in_memory/`                    | 用字典、锁和深拷贝保存运行数据                                  | 提供无需外部数据库的本地实现                           | 任务和事件每次读写时                                                                                    | 为什么返回`deepcopy`，为什么使用 `RLock`                                      |
+| `backend/app/config/container.py`                                        | 创建并连接 Repository、Agent、Workflow、Service                 | 具体实现只在组合根出现                                 | FastAPI 应用创建时一次                                                                                  | `build_container()` 的依赖连接顺序                                              |
+| `backend/app/schemas/task_api.py`                                        | 定义任务请求和响应的 Pydantic Schema                            | 在 HTTP 边界校验输入并固定合同                         | FastAPI 解析请求/序列化响应时                                                                           | `question` 长度、`mode` 限制和 `from_domain()`                              |
+| `backend/app/schemas/security_api.py`                                    | 定义 current user、role、permission 的 HTTP Schema              | 固定 security read model 的公开字段                    | FastAPI 解析/序列化时                                                                                   | `from_domain()` 如何扁平化主体快照                                              |
+| `backend/app/schemas/audit_api.py`                                       | 定义 audit log 的 HTTP Schema                                   | 固定 append-only 审计读模型                            | FastAPI 解析/序列化时                                                                                   | `timestamp`、`metadata`、`next_cursor`                                      |
+| `backend/app/observability/logging.py`                                   | JSON 日志、request_id 上下文和安全字段                          | 将同一请求/任务的日志关联起来                          | 应用启动、每个请求和业务关键步骤                                                                        | `bind_request_id()`、`log_event()` 允许的字段                                 |
+| `frontend/src/App.tsx`                                                   | 页面状态、提交、SSE 回调、报告加载和渲染                        | 把完整用户流程集中展示                                 | React 首次渲染和每次用户/网络事件发生时                                                                 | `submit()`、`loadReport()`、函数式 `setEvents()`、清理 EventSource          |
+| `frontend/src/api.ts`                                                    | 封装 fetch、响应解包和 EventSource                              | UI 不直接处理 HTTP/SSE 细节                            | `App.tsx` 创建任务、订阅或取报告时                                                                    | `unwrapResponse()`、`subscribeToTask()`、业务 error 与 transport error 的区别 |
+| `frontend/src/types.ts`                                                  | 定义 API 和 SSE 的 TypeScript 类型                              | 编译期发现前后端合同不一致                             | TypeScript 编译和开发时                                                                                 | `TaskEvent` 与 Backend `TaskEventResponse` 的字段对应                         |
+| `frontend/src/App.test.tsx`                                              | 模拟 fetch/EventSource 验证完整 UI 流程                         | 不启动浏览器也能稳定验证成功和错误显示                 | 执行 Frontend tests 时                                                                                  | `FakeEventSource.emit()` 如何驱动真实 React 回调                                |
 
 ## 6. 一次完整任务的源码调用链
 
@@ -324,13 +324,13 @@ log_event(logger, "info", "study_checkpoint", "Reached study checkpoint",
 
 > 增量入口，不替代上文后端主阅读顺序。
 
-| 顺序 | 看什么 | 解决什么 |
-|---|---|---|
-| A | `frontend/src` Login / AuthContext / ProtectedRoute | JWT、401/403、fail-closed |
-| B | 正式导航与业务页 | 文書→RAG→分析→承認 |
-| C | Lifecycle Live Status / Learning Dashboard | 本地学习 trace，不回传后端 |
-| D | `backend/app` LLM Gateway / ai_analysis / executive_reports / approvals | 成本边界与审批状态机 |
-| E | RUNBOOK Appendix L/M/N、VERIFY_CHECKLIST | 启动与验收数字 |
+| 顺序 | 看什么                                                                    | 解决什么                   |
+| ---- | ------------------------------------------------------------------------- | -------------------------- |
+| A    | `frontend/src` Login / AuthContext / ProtectedRoute                     | JWT、401/403、fail-closed  |
+| B    | 正式导航与业务页                                                          | 文書→RAG→分析→承認      |
+| C    | Lifecycle Live Status / Learning Dashboard                                | 本地学习 trace，不回传后端 |
+| D    | `backend/app` LLM Gateway / ai_analysis / executive_reports / approvals | 成本边界与审批状态机       |
+| E    | RUNBOOK Appendix L/M/N、VERIFY_CHECKLIST                                  | 启动与验收数字             |
 
 业务链记忆：
 
