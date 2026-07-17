@@ -299,13 +299,13 @@ export E2E_EXPECT_STUB=1
 
 - [ ] 登录拿到 `access_token`，Swagger Authorize / UI 会话生效
 - [ ] `users/me` 角色正确
-- [ ] 上传 → Import → Chunk
-- [ ] Retrieval + Citation（普通 RAG）
-- [ ] AI 分析：low_cost Provider/Model/Usage/Cost（stub）
-- [ ] 取締役会报告：high_quality Provider/Model/Usage/Cost（stub）
-- [ ] submit-approval
+- [ ] 上传 **201** → Import **201** → Chunk **201**（与源码 `HTTP_201_CREATED` 一致；详见 TEST_CASES Scenario01）
+- [ ] Retrieval + Citation（普通 RAG，HTTP **200**）
+- [ ] AI 分析 **200**：low_cost Provider/Model/Usage/Cost（stub）
+- [ ] 取締役会报告 **200**，报告 `status="generated"`（`ReportStatus.GENERATED`）；high_quality Provider/Model/Usage/Cost（stub）
+- [ ] submit-approval **201**，Approval `pending_approval`
 - [ ] employee approve → **403**（会话保持）
-- [ ] manager detail/history → manager approve
+- [ ] manager detail/history → manager approve **200** / `approved`
 - [ ] ReportVersion + Audit + Ledger 可核对
 - [ ] 普通 RAG 路径无真实 Provider 外呼
 - [ ] 最终报告/审计可读；默认 stub 零真实 LLM 费用
