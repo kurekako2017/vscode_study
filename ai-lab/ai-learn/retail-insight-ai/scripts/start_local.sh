@@ -206,6 +206,16 @@ fi
 
 # ---------- 3) PostgreSQL 可连接 ----------
 log "检查 PostgreSQL 可连接…"
+# 若本机约定的 erip-local-pg 容器存在但未启动，尝试拉起（不打印 Secret）
+if command -v docker >/dev/null 2>&1; then
+  if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx 'erip-local-pg'; then
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -qx 'erip-local-pg'; then
+      log "检测到 erip-local-pg 容器未运行，正在 docker start…"
+      docker start erip-local-pg >/dev/null 2>&1 || true
+      sleep 2
+    fi
+  fi
+fi
 if ! "$VENV_DIR/bin/python" - <<'PY'
 import os, sys
 try:
@@ -226,8 +236,8 @@ sys.exit(0)
 PY
 then
   err "无法连接 PostgreSQL（${SAFE_DB_SUMMARY}）。"
-  err "请确认：1) 宿主 PostgreSQL 已运行 2) .env 中账号库名正确 3) 用户有权限。"
-  err "密码错误时只报连接失败，不会打印密码。"
+  err "请确认：1) 本地开发库服务已运行（本机 erip-local-pg 或等价实例） 2) .env 中库名/用户正确 3) 用户有权限。"
+  err "密码错误时只报连接失败，不会打印密码。勿连接 erip_integration_test 当页面库。"
   exit 5
 fi
 log "PostgreSQL OK"

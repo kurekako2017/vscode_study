@@ -668,19 +668,9 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 **Vite 不是完整 Backend**；只启动 Vite 无法做业务测试。必须宿主 PostgreSQL + Backend + Frontend。
 
-### 20.1 首次配置（只做一次）
+### 20.1 日常启动 / 停止（一条命令）
 
-```bash
-cp .env.example .env
-# 编辑 .env：填写 DATABASE_URL 或 POSTGRES_HOST/PORT/DB/USER/PASSWORD
-# 确认 .env 已被 git 忽略（git check-ignore .env）
-# 宿主 PostgreSQL 已运行
-```
-
-配置由 **项目根 `.env`** 提供（与 `Settings` 的 `env_file=("../.env", ".env")` 一致）。
-**不要**把密码写进脚本或文档；**不要**每次启动 export。
-
-### 20.2 日常启动 / 停止（一条命令）
+本开发机已配置独立库 **`erip_local`**（宿主 **:5433**，volume `erip_local_pg_data`，与 Compose `erip_postgres_data` / `erip_integration_test` 隔离）。
 
 ```bash
 ./scripts/start_local.sh
@@ -689,14 +679,22 @@ cp .env.example .env
 # Swagger  http://127.0.0.1:8000/docs
 
 ./scripts/stop_local.sh
-# 只停 start_local 记录的 PID；不停 PostgreSQL；不影响 Compose
+# 只停 start_local 的 PID；不停数据库；不影响 Compose
 ```
 
-`start_local.sh` 自动完成：加载 `.env` → 强制 postgres+stub → 检查 PG → Alembic upgrade head → Backend 8000 → 校验 health → Vite 5173。
+权威 Schema：[`docs/database/DATABASE.md`](../database/DATABASE.md)。
 
-进阶分终端调试仍可用 `start_backend.sh` / `start_frontend.sh`（非日常默认）。
+### 20.2 新机器管理员首次配置（非日常）
 
-**再次强调：** 5173 ≠ 8080 数据源；本地库 ≠ Docker Volume。
+```bash
+cp .env.example .env
+# 配置独立开发库连接后写入 .env（gitignore）；勿用 integration_test 库
+# 确保 pgvector + alembic upgrade head
+```
+
+`start_local.sh`：加载 `.env` → 强制 postgres+stub → 检查 PG → Alembic → Backend 8000 → health → Vite 5173。
+
+**再次强调：** 5173 ≠ 8080；本地库 ≠ Compose Volume。
 
 ---
 

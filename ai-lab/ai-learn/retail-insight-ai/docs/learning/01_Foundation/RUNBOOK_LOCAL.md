@@ -27,38 +27,33 @@
 
 详细：[`docs/development/DEPLOYMENT_GUIDE.md`](../../development/DEPLOYMENT_GUIDE.md)。
 
-### 首次配置 vs 日常启动（务必分开）
-
-**首次配置（只做一次）：**
-
-```bash
-cp .env.example .env
-# 编辑 .env：设置 DATABASE_URL 或 POSTGRES_HOST/PORT/DB/USER/PASSWORD
-# .env 已被 gitignore，勿提交
-# 确认宿主 PostgreSQL 已安装运行且账号可连
-```
-
-**日常本地启动 / 停止（不要再 export）：**
+### 日常本地启动 / 停止（本机已完成首次配置）
 
 ```bash
 ./scripts/start_local.sh
 # 页面 http://127.0.0.1:5173/login
-# Health http://127.0.0.1:8000/health
+# Health http://127.0.0.1:8000/health  → repository_backend=postgres
 
 ./scripts/stop_local.sh
 ```
 
-`start_local.sh` 会自动：读根目录 `.env`、强制 postgres+stub、检查 PG、Alembic upgrade、起 Backend/Frontend、校验 health。
-**禁止**把下面内容当日常命令：
+`start_local.sh` 自动：读项目根 `.env`、强制 postgres+stub、检查 PG、Alembic upgrade head、Backend :8000、Vite :5173。
+**不要**再手动 `export DATABASE_URL` / `REPOSITORY_BACKEND` / `LLM_PROVIDER_MODE`。
+
+权威库说明：[`docs/database/DATABASE.md`](../../database/DATABASE.md)。
+
+<details>
+<summary>迁移到新机器时的管理员首次配置（非日常）</summary>
 
 ```bash
-# 不要日常这样做：
-# export DATABASE_URL='...'
-# export REPOSITORY_BACKEND=postgres
-# export LLM_PROVIDER_MODE=stub
+cp .env.example .env
+# 配置独立开发库连接（勿与 erip_integration_test / Compose Volume 混用）
+# 详见 DEPLOYMENT_GUIDE；密码只写 .env（gitignore）
 ```
 
-（底层脚本 `start_backend.sh` / `start_frontend.sh` 仍保留给进阶分终端调试。）
+</details>
+
+（底层 `start_backend.sh` / `start_frontend.sh` 仍保留给进阶分终端调试。）
 
 ### Docker Compose 日常（一条命令）
 
