@@ -43,15 +43,22 @@ V1.0 **企业业务交付主链**（与正式 UI 导航一致）：
 
 ### 运行与部署方式入口（三种）
 
-| 方式 | 需要 Docker？ | 页面 | 数据库 | 入口文档 |
+| 方式 | 完整组成 | 日常启动命令 | 页面 | 用途 |
 |---|---|---|---|---|
-| **方式一：本地完整开发** | **否** | **5173**（Vite） | 宿主 PostgreSQL | RUNBOOK「三种方式」+ `start_backend` / `start_frontend` |
-| **方式二：Docker Compose** | **是** | **8080**（Nginx） | Volume `erip_postgres_data` | `./scripts/compose_up.sh`；DEPLOYMENT_GUIDE |
-| **方式三：正式生产** | 视平台 | 正式域名 HTTPS | 独立/托管 PostgreSQL | DEPLOYMENT_GUIDE 生产清单（**非**一条命令上线） |
+| **本地完整开发** | 宿主 PG + Backend + Vite | **`./scripts/start_local.sh`** | **5173** | 页面开发与调试 |
+| **Docker Compose** | 容器 PG + Backend + Nginx | **`./scripts/compose_up.sh`** | **8080** | 部署、验收、演示 |
+| **正式生产** | HTTPS + 内网 Backend + 独立 PG | 生产部署流程 | 正式域名 | 企业运行（非本地一条命令） |
 
-- Docker Compose = 多容器编排（`postgres` + `backend` + `frontend` + 网络/端口/健康检查/Volume/Alembic 顺序），**不是**“只打包项目”。
-- **5173 与 8080 不是同一套数据源**；本地库与 Docker Volume 是两套库。
-- 日常开发用方式一即可，**不必**为改页面启动 Docker。
+| 操作 | 命令 |
+|---|---|
+| 本地停止 | `./scripts/stop_local.sh` |
+| Compose 验证 | `./scripts/compose_verify.sh` |
+| Compose 停止 | `./scripts/compose_down.sh`（**禁止** `-v`） |
+
+- 首次本地：`cp .env.example .env` 填好数据库（只做一次）；日常**不要**再 `export DATABASE_URL=...`。
+- Docker Compose = 多容器编排，**不是**“只打包项目”；日常改页面用 `start_local`，不必开 Docker。
+- **5173 与 8080 不是同一套数据**；本地库与 Docker Volume 是两套库。
+- Vite 只是 Frontend 开发服务器；只起 Vite 无法完成业务测试。
 
 项目目标不是展示一个简单 Demo，而是提供一套可运行、可学习、可面试讲解、可逐步企业级升级的参考项目。
 

@@ -16,8 +16,31 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
+# 默认端口来自环境或 compose 默认（不要求用户每次 export）
+BACKEND_PORT="${BACKEND_PORT:-8000}"
+FRONTEND_PORT="${FRONTEND_PORT:-8080}"
+POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+
+port_busy() {
+  local port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltn 2>/dev/null | grep -qE ":${port}[[:space:]]"
+    return $?
+  fi
+  return 1
+}
+
 echo "[compose_up] validating compose config..."
 docker compose config >/dev/null
+
+for p in "$POSTGRES_PORT" "$BACKEND_PORT" "$FRONTEND_PORT"; do
+  if port_busy "$p"; then
+    echo "[compose_up] WARNING: 宿主端口 ${p} 似乎已被占用。" >&2
+    echo "[compose_up] 若 compose 启动失败，请先释放端口，或一次性覆盖例如：" >&2
+    echo "[compose_up]   export POSTGRES_PORT=5433   # 仅冲突时需要" >&2
+    echo "[compose_up] 不会自动杀死占用进程。" >&2
+  fi
+done
 
 echo "[compose_up] building images..."
 docker compose build

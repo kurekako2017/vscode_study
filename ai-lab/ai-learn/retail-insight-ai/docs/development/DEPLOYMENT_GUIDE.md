@@ -61,11 +61,11 @@
 
 ### 1.1 三种方式总表
 
-| 方式 | 启动内容 | 页面 | 数据库 | 是否需要 Docker | 用途 |
+| 方式 | 完整组成 | 日常启动命令 | 页面 | 是否需要 Docker | 用途 |
 |---|---|---|---|---|---|
-| 方式一：本地完整开发 | 宿主 PostgreSQL + 本地 Backend + Vite | **5173** | 宿主 PostgreSQL | **否** | 日常页面开发、调试 |
-| 方式二：Docker Compose | PostgreSQL + Backend + Nginx Frontend 三容器 | **8080** | Docker Volume PostgreSQL | **是** | 单机部署、企业验收、演示 |
-| 方式三：正式生产部署 | HTTPS/Reverse Proxy + Backend + 独立 PostgreSQL + 企业安全设施 | 正式域名 | 独立或托管 PostgreSQL | 视平台而定 | 正式企业运行 |
+| 方式一：本地完整开发 | 宿主 PostgreSQL + Backend + Vite | **`./scripts/start_local.sh`** | **5173** | **否** | 日常页面开发、调试 |
+| 方式二：Docker Compose | 容器 PG + Backend + Nginx | **`./scripts/compose_up.sh`** | **8080** | **是** | 单机部署、企业验收、演示 |
+| 方式三：正式生产部署 | HTTPS + 内网 Backend + 独立 PG | 生产部署流程（非本地一条命令） | 正式域名 | 视平台 | 企业运行 |
 
 | 对照（端口） | Frontend | Backend | Database |
 |---|---|---|---|
@@ -664,50 +664,39 @@ test -s "$OUT" && echo "backup_ok bytes=$(wc -c < "$OUT")"
 
 ---
 
-## 20. 本地开发（无需 Docker）——方式一完整顺序
+## 20. 本地开发（无需 Docker）——方式一
 
-**Vite 不能单独完成业务运行。** 必须：宿主 PostgreSQL + Backend + Frontend。
-**不要**用 InMemory 充当业务验收。
+**Vite 不是完整 Backend**；只启动 Vite 无法做业务测试。必须宿主 PostgreSQL + Backend + Frontend。
 
-```text
-Terminal 0: 宿主 PostgreSQL 已运行；目标库已 alembic upgrade head
-Terminal 1: Backend  → :8000
-Terminal 2: Frontend → :5173
-```
-
-**Terminal 1（先启动 Backend）：**
+### 20.1 首次配置（只做一次）
 
 ```bash
-# 先确认宿主 PostgreSQL 已运行
-export REPOSITORY_BACKEND=postgres
-export DATABASE_URL='<本地 PostgreSQL连接>'
-# 示例（勿把真实密码写进文档仓库）：
-# export DATABASE_URL='postgresql+psycopg://erip_app:***@127.0.0.1:5432/erip'
-export LLM_PROVIDER_MODE=stub
-# 首次对该库：cd backend && DATABASE_URL=... alembic upgrade head
-
-./scripts/start_backend.sh
-# → http://127.0.0.1:8000
+cp .env.example .env
+# 编辑 .env：填写 DATABASE_URL 或 POSTGRES_HOST/PORT/DB/USER/PASSWORD
+# 确认 .env 已被 git 忽略（git check-ignore .env）
+# 宿主 PostgreSQL 已运行
 ```
 
-**Terminal 2（再启动 Frontend）：**
+配置由 **项目根 `.env`** 提供（与 `Settings` 的 `env_file=("../.env", ".env")` 一致）。
+**不要**把密码写进脚本或文档；**不要**每次启动 export。
+
+### 20.2 日常启动 / 停止（一条命令）
 
 ```bash
-./scripts/start_frontend.sh
-# → http://127.0.0.1:5173  （Vite 代理 /api、/health → 127.0.0.1:8000）
+./scripts/start_local.sh
+# Frontend http://127.0.0.1:5173/login
+# Health   http://127.0.0.1:8000/health  → repository_backend=postgres
+# Swagger  http://127.0.0.1:8000/docs
+
+./scripts/stop_local.sh
+# 只停 start_local 记录的 PID；不停 PostgreSQL；不影响 Compose
 ```
 
-| 地址 | 说明 |
-|---|---|
-| http://127.0.0.1:8000/health | 必须含 `"repository_backend":"postgres"` |
-| http://127.0.0.1:8000/docs | Swagger |
-| http://127.0.0.1:5173/login | Vite 开发登录页 |
+`start_local.sh` 自动完成：加载 `.env` → 强制 postgres+stub → 检查 PG → Alembic upgrade head → Backend 8000 → 校验 health → Vite 5173。
 
-**再次强调：**
+进阶分终端调试仍可用 `start_backend.sh` / `start_frontend.sh`（非日常默认）。
 
-- **5173** = 方式一 Vite；**8080** = 方式二 Compose Frontend；**不是同一套数据**
-- 本地宿主 DB ≠ Docker Volume
-- 要看 Compose 已有数据 → 只开 **8080** 那套（方式二）
+**再次强调：** 5173 ≠ 8080 数据源；本地库 ≠ Docker Volume。
 
 ---
 

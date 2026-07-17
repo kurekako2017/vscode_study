@@ -4,81 +4,71 @@
 
 ## ERIP 的三种运行与部署方式
 
-| 方式 | 启动内容 | 页面 | 数据库 | 是否需要 Docker | 用途 |
-|---|---|---|---|---|---|
-| **方式一：本地完整开发** | 宿主 PostgreSQL + 本地 Backend + Vite | **5173** | 宿主 PostgreSQL | **否** | 日常页面开发、调试 |
-| **方式二：Docker Compose** | PostgreSQL + Backend + Nginx Frontend 三容器 | **8080** | Docker Volume PostgreSQL | **是** | 单机部署、企业验收、演示 |
-| **方式三：正式生产部署** | HTTPS/Reverse Proxy + Backend + 独立 PostgreSQL + 企业安全设施 | 正式域名 | 独立或托管 PostgreSQL | 视平台而定 | 正式企业运行 |
+| 方式 | 完整组成 | 日常启动命令 | 页面 | 用途 |
+|---|---|---|---|---|
+| **本地完整开发** | 宿主 PostgreSQL + Backend + Vite | **`./scripts/start_local.sh`** | **5173** | 页面开发与调试 |
+| **Docker Compose** | 容器 PG + Backend + Nginx | **`./scripts/compose_up.sh`** | **8080** | 部署、验收、演示 |
+| **正式生产** | HTTPS + 内网 Backend + 独立 PG | 由生产部署流程执行 | 正式域名 | 企业运行（非本地一条命令） |
 
-**读表前先理解 Docker Compose（不要误解成“只是打包”）：**
+**Docker / Compose 是什么：**
 
-- **Docker**：镜像与容器的运行技术（把应用装进可重复启动的隔离环境）。
-- **Docker Compose**：对**多个容器**做编排与统一启动/停止的方式（本仓库文件 `docker-compose.yml`）。
-- **ERIP Compose 同时管理**（服务名以 compose 为准）：
-  - `postgres`：PostgreSQL + pgvector
-  - `backend`：FastAPI
-  - `frontend`：Nginx SPA
-  - 容器网络、端口映射、Health Check
-  - PostgreSQL Volume：`erip_postgres_data`
-  - Backend 启动顺序：PostgreSQL ready → `alembic upgrade head` → uvicorn
-- Docker **不只是**“把项目打个包”；Compose 启动的是一整套可运行系统。
-- Windows/WSL 下通常经 **Docker Desktop**，会有额外 CPU/内存开销。
-- **镜像主要占磁盘**；**运行中的容器占 CPU/Memory**。
-- **日常开发不必启动 Docker**（用方式一即可）。
+- **Docker**：镜像与容器运行技术。
+- **Docker Compose**：多容器编排与统一启动（`docker-compose.yml`：`postgres` + `backend` + `frontend` + 网络/端口/Health Check/Volume `erip_postgres_data`/Alembic 启动顺序）。
+- **不是**“只打包项目”；日常改页面**不必**开 Docker。
+- Windows/WSL 下 Docker Desktop 有额外 CPU/内存开销；镜像占磁盘，运行容器占 CPU/Memory。
 
 **必须记住：**
 
-1. **方式一、方式二**是当前仓库**可直接执行**的启动方式。
-2. **方式三**是生产部署架构说明，**不是**“一条命令即可生产上线”。
-3. 当前 Compose 可用于**单机部署与演示**，但**不能直接等同**完整生产环境（TLS、IdP、密钥轮换等见 `DEPLOYMENT_GUIDE`）。
-4. **不要**把 **5173** 与 **8080** 当成同一套页面数据源。
-5. **本地宿主 PostgreSQL** 与 **Docker Volume 库** 是**两套数据库**。
+1. **Vite 不是第三套完整 Backend**，只是本地 Frontend 开发服务器；**只启动 Vite 无法完成业务测试**。
+2. 本地 PostgreSQL 与 Docker Volume **默认是两个数据库**。
+3. 本地 Frontend 若要使用 Docker 里的数据，应连正在运行的 **Docker Backend :8000**（Compose Frontend 则用 **8080**）；**不要**同时再起一个本地 Backend 争用 8000。
+4. `/health` 必须显示 **`repository_backend=postgres`**。InMemory **不是**页面正式运行模式。
+5. 方式三是生产架构，**不能**伪装成当前已完整自动化交付。
 
-详细命令与生产差距：[`docs/development/DEPLOYMENT_GUIDE.md`](../../development/DEPLOYMENT_GUIDE.md)。
+详细：[`docs/development/DEPLOYMENT_GUIDE.md`](../../development/DEPLOYMENT_GUIDE.md)。
 
-### 方式一：本地完整开发（启动顺序）
+### 首次配置 vs 日常启动（务必分开）
 
-**Vite 不能单独完成业务运行。** 必须先有 **宿主 PostgreSQL + Backend**，再开 Frontend。
-
-```text
-Terminal 0（事先）: 宿主 PostgreSQL 已运行，库已 alembic upgrade head
-Terminal 1: start_backend.sh  →  http://127.0.0.1:8000
-Terminal 2: start_frontend.sh →  http://127.0.0.1:5173
-```
-
-**Terminal 1（Backend，必须先起）：**
+**首次配置（只做一次）：**
 
 ```bash
-# 先确认宿主 PostgreSQL 已运行
-export REPOSITORY_BACKEND=postgres
-export DATABASE_URL='<本地 PostgreSQL连接>'
-export LLM_PROVIDER_MODE=stub
-./scripts/start_backend.sh
+cp .env.example .env
+# 编辑 .env：设置 DATABASE_URL 或 POSTGRES_HOST/PORT/DB/USER/PASSWORD
+# .env 已被 gitignore，勿提交
+# 确认宿主 PostgreSQL 已安装运行且账号可连
 ```
 
-**Terminal 2（Frontend）：**
+**日常本地启动 / 停止（不要再 export）：**
 
 ```bash
-./scripts/start_frontend.sh
+./scripts/start_local.sh
+# 页面 http://127.0.0.1:5173/login
+# Health http://127.0.0.1:8000/health
+
+./scripts/stop_local.sh
 ```
 
-验证：
+`start_local.sh` 会自动：读根目录 `.env`、强制 postgres+stub、检查 PG、Alembic upgrade、起 Backend/Frontend、校验 health。
+**禁止**把下面内容当日常命令：
 
 ```bash
-curl -fsS http://127.0.0.1:8000/health
-# 成功：JSON 含 "repository_backend":"postgres"
-# 浏览器：http://127.0.0.1:5173/login
+# 不要日常这样做：
+# export DATABASE_URL='...'
+# export REPOSITORY_BACKEND=postgres
+# export LLM_PROVIDER_MODE=stub
 ```
 
-### 方式二：Docker Compose（一行入口）
+（底层脚本 `start_backend.sh` / `start_frontend.sh` 仍保留给进阶分终端调试。）
+
+### Docker Compose 日常（一条命令）
 
 ```bash
 ./scripts/compose_up.sh
 ./scripts/compose_verify.sh
 # 浏览器：http://127.0.0.1:8080/login
-```
 
-停止（**禁止** `down -v`）：`./scripts/compose_down.sh`
+./scripts/compose_down.sh   # 禁止 down -v
+```
 
 ---
 
