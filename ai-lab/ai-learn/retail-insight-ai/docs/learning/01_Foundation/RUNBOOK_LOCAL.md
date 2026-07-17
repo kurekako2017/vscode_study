@@ -2,8 +2,31 @@
 
 这份文档用于本地启动 Retail Insight AI，并区分 Swagger、ReDoc、OpenAPI JSON、unittest、前后端联调各自的作用。
 
+## ERIP V1.0 当前权威启动入口
+
+操作前先按场景选择章节，避免把历史阶段说明当成当前建议：
+
+| 场景 | 权威章节 |
+|---|---|
+| 本地 InMemory 学习 | [Appendix L](#appendix-l-frontend-启动验证测试与停止) |
+| PostgreSQL/Docker 企业验收 | [Appendix M](#appendix-m-docker-compose-启动与本地验收v10) |
+| 最终测试数字与状态 | [Appendix N](#appendix-n-v10-启动验收基线最终状态) |
+
+V1.0 **正式前端导航**（与 `frontend/src/App.tsx` 一致，登录后可见项受 RBAC 过滤）：
+
+```text
+学习总览
+→ 文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+```
+
+说明：下文若仍出现 `Dashboard / Analysis / Tasks` 等旧英文标签，视为**历史阶段记录**；当前操作与验收以本节导航为准。
+
 ## 目录
 
+- [ERIP V1.0 当前权威启动入口](#erip-v10-当前权威启动入口)
 - [三个文档入口不是同一个用途](#三个文档入口不是同一个用途)
 - [企业项目验证体系](#企业项目验证体系)
 - [推荐启动顺序](#推荐启动顺序)
@@ -33,7 +56,7 @@
 - ReDoc 是 API 阅读文档。
 - OpenAPI JSON 是机器可读接口定义。
 - 三者不是同一个用途。
-- UI 完成后 Swagger 仍然可用于后端验证。
+- 正式 UI 已交付后，Swagger 仍然可用于后端验证。
 - Swagger 和 React 调用的是同一套 FastAPI API。
 
 ## 企业项目验证体系
@@ -54,16 +77,21 @@ Swagger（FastAPI 自动生成的 API 调试与验证工具）
 - Swagger 不是测试环境。
 - Swagger 不是正式 UI。
 - Swagger 是 API 调试与验证工具。
-- 当前阶段主要用 Swagger 验证后端骨架。
-- UI 完成后再做前后端 Integration Test。
-- 发布前再考虑 E2E Test。
+
+> **历史阶段记录**（早期骨架期写法，**不是** V1.0 当前操作建议）：
+>
+> - 当时主要用 Swagger 验证后端骨架。
+> - UI 完成后再做前后端 Integration Test。
+> - 发布前再考虑 E2E Test。
+
+**V1.0 当前建议**：Swagger 仍用于 API 调试；正式 UI 已交付；Integration 用本地/Compose 联调；Stub API E2E 与 unittest/vitest 已是默认验收手段（见 Appendix L / M / N）。
 
 V1.0 最终状态补充（不替换上表，只说明当前仓库已落地能力）：
 
 | 层级 | 当前仓库入口 | 说明 |
 |---|---|---|
-| 本地脚本启动 | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 开发联调主路径（InMemory 默认可选） |
-| Docker Compose | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | PostgreSQL + Backend + Frontend 三容器，默认 `LLM_PROVIDER_MODE=stub` |
+| 本地脚本启动 | `./scripts/start_backend.sh` + `./scripts/start_frontend.sh` | 日常学习主路径（默认 InMemory；见 Appendix L） |
+| Docker Compose | `./scripts/compose_up.sh` / `compose_verify.sh` / `compose_down.sh` | PostgreSQL + Backend + Frontend 三容器，默认 `LLM_PROVIDER_MODE=stub`（见 Appendix M） |
 | Stub API E2E | `./scripts/run_api_e2e.sh` | 企业业务链 API 级验收，零真实 LLM 费用 |
 | 全量自动化 | `./scripts/run_tests.sh` 与 Backend/Frontend 分项命令 | 见 Appendix N 基线数字 |
 
@@ -221,7 +249,7 @@ cp <project_root>/.env.example <project_root>/.env
 为什么这样做：
 
 - 后端启动时会读取环境配置。
-- 即使当前阶段很多功能是本地静态实现，保留 `.env` 习惯也能避免后续扩展时踩坑。
+- 即使本地学习常用 InMemory / Stub，保留 `.env` 习惯也能避免后续切 PostgreSQL 或 Provider 时踩坑。
 
 ## 8. 启动 Backend
 
@@ -255,18 +283,28 @@ http://127.0.0.1:8000/openapi.json
 - ReDoc 用于阅读接口结构。
 - OpenAPI JSON 用于检查接口合同是否正确注册。
 
-## 11. 可选：启动 Frontend
+## 11. 启动 Frontend（V1.0 正式联调步骤）
 
-命令参见 `frontend/` 的本地启动文档或项目脚本；如果只验证后端，先完成 Appendix C 即可。
+> **历史阶段记录**：早期骨架期曾把 Frontend 写成「可选」。
+> **V1.0 当前**：Frontend 已交付（Login/JWT/RBAC/Learning Dashboard 等）；完整学习与 UI 验收应启动 Frontend。
+> 若**仅**调试 Backend API，可先只完成 Appendix C，但不得再把「Frontend 可选」当作当前产品状态。
+
+命令（权威步骤见 [Appendix L](#appendix-l-frontend-启动验证测试与停止)）：
+
+```bash
+# 项目根目录，Backend 已在 8000 运行后
+./scripts/start_frontend.sh
+# 浏览器：http://127.0.0.1:5173
+```
 
 为什么这样做：
 
-- 当前阶段前端是可选的，本地学习可以先把后端跑通。
-- 先验证后端，再联调前端，更容易判断问题出在哪一层。
+- 先验证 Backend Health/Swagger，再联调 Frontend，更容易分层排错。
+- 正式导航与业务链（文書管理 → … → 承認管理）需要在 UI 上走通。
 
-## 12. 可选：运行 `unittest`
+## 12. 运行 `unittest`（推荐，非可选项）
 
-命令参见 Appendix E。
+命令参见 Appendix E；全量基线见 Appendix N。
 
 为什么这样做：
 
@@ -459,6 +497,8 @@ http://127.0.0.1:8000/docs
 
 # Appendix D: Startup Flow
 
+V1.0 本地学习主路径（InMemory；权威步骤见 Appendix L）：
+
 ```text
 Project Root
 ↓
@@ -470,16 +510,24 @@ Install Requirements
 ↓
 Check .env
 ↓
-Start Backend
+Start Backend（./scripts/start_backend.sh）
 ↓
 GET /health
 ↓
 Swagger /docs
 ↓
-Run Tests
+Start Frontend（./scripts/start_frontend.sh）
 ↓
-Frontend (Optional)
+浏览器 http://127.0.0.1:5173
+  学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+↓
+Run Tests（./scripts/run_tests.sh；基线见 Appendix N）
 ```
+
+> **历史阶段记录**：旧流程图末尾曾写 `Frontend (Optional)`。  
+> **V1.0 当前**：Frontend 是正式联调步骤，不是可选项；仅 Backend API 调试时可暂时只跑到 Swagger。
+
+企业容器验收另走 Appendix M（PostgreSQL + Docker Compose），最终数字见 Appendix N。
 
 # Appendix E: Startup Checklist
 
@@ -491,13 +539,15 @@ Frontend (Optional)
 - [ ] `.venv` 已激活
 - [ ] `requirements.txt` 已安装
 - [ ] `.env` 已存在
-- [ ] Backend 已启动
+- [ ] Backend 已启动（`./scripts/start_backend.sh` 或 Appendix C）
 - [ ] `GET /health` 返回 200
 - [ ] Swagger 可打开
 - [ ] ReDoc 可打开
 - [ ] `openapi.json` 可打开
-- [ ] 在 `<project_root>/backend` 执行 `python -m unittest discover -s tests -v` 通过
-- [ ] 前端已按需启动
+- [ ] Frontend 已启动（`./scripts/start_frontend.sh`，`http://127.0.0.1:5173`）
+- [ ] 正式导航可见：学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
+- [ ] 在 `<project_root>/backend` 执行 `python -m unittest discover -s tests -v` 通过（或 `./scripts/run_tests.sh`）
+- [ ] （企业验收）需要时走 Appendix M Compose；基线数字对照 Appendix N
 
 # Appendix F: WSL + VSCode 使用建议
 
@@ -547,6 +597,8 @@ python -m pip -V
 
 面试演示建议按这个顺序。
 
+路径 A：Backend API 闭环（适合先讲后端主链）
+
 ```text
 Backend
 ↓
@@ -565,11 +617,26 @@ Report
 结束
 ```
 
+路径 B：V1.0 正式 UI 闭环（适合讲前后端联调与 RBAC）
+
+```text
+Backend + Frontend
+↓
+登录
+↓
+学习总览
+↓
+文書管理 → RAG検索 → 分析依頼 → 承認管理
+↓
+（需要时）Compose / PostgreSQL 验收见 Appendix M
+```
+
 为什么按这个顺序演示：
 
 - 先证明服务活着，再证明接口可读。
 - 再证明能创建任务、能观察任务状态、能看到实时进度。
-- 最后展示报告，说明这是一个完整闭环，不是单点接口。
+- 最后展示报告或 UI 业务链，说明这是一个完整闭环，不是单点接口。
+- 不要用「Frontend 可选 / 当前阶段只有 Backend」当作 V1.0 交付结论。
 
 # Appendix I: Startup Decision Tree
 
@@ -653,19 +720,22 @@ Backend
 → API 调试
 ```
 
-第二条：
+第二条（**V1.0 正式导航**）：
 
 ```text
 Backend
 → 确认 Health
 → 确认 Swagger
-→ Frontend
-→ Dashboard
-→ Analysis / Tasks
-→ Documents
-→ RAG
-→ Approval
+→ Frontend（登录后）
+→ 学习总览
+→ 文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
 ```
+
+> **历史阶段记录**：旧文曾写 `Dashboard → Analysis / Tasks → Documents → RAG → Approval` 英文标签。
+> 代码与 UI 现已统一为上方中文正式导航；学习时以正式导航为准。
 
 ## K-1. Frontend 页面学习总顺序
 
@@ -680,43 +750,43 @@ Backend 启动
 ↓
 打开浏览器 http://127.0.0.1:5173
 ↓
-Dashboard
+登录（如需）
 ↓
-Analysis / Tasks
+学习总览
 ↓
-Documents
+文書管理
 ↓
-RAG
+RAG検索
 ↓
-Approval
+分析依頼
+↓
+承認管理
 ```
 
-## K-2. Dashboard
+## K-2. 学习总览（Dashboard 路由）
 
 页面操作：
 
-- 打开首页
-- 点击 `Open Tasks`
-- 点击 `Open Documents`
-- 点击 `Open RAG`
-- 点击 `Open Approval`
+- 打开首页 / 学习总览
+- 点击快捷入口进入 `文書管理` / `RAG検索` / `分析依頼` / `承認管理`（文案以页面按钮为准）
 
 对应 API：
 
-- 无
+- 无（总览页本身；子页另有 API）
 
 预期结果：
 
-- 默认先显示 Dashboard
+- 默认先显示 **学习总览**
 - 点击快捷按钮后切换到对应页面
 
 如何确认成功：
 
 - 顶部导航高亮变化
-- Network 中没有新的 API 请求
+- Network 中没有新的 API 请求（仅切换路由时）
 - 页面内容已经切换
+- 导航顺序符合：学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理
 
-## K-3. Analysis / Tasks
+## K-3. 分析依頼（历史标题曾写作 Analysis / Tasks）
 
 页面操作：
 
@@ -743,7 +813,7 @@ Approval
 - 最后看到 `GET /api/tasks/{task_id}/report`
 - 页面出现报告内容
 
-## K-4. Documents
+## K-4. 文書管理（Documents 路由）
 
 页面操作：
 
@@ -781,7 +851,7 @@ Approval
 - `docs/learning/02_Frontend/FRONTEND_SOURCE_LEARNING_GUIDE.md`
 - `docs/learning/02_Frontend/TEST_LEARNING_DOCUMENTS_PAGE.md`
 
-## K-5. RAG
+## K-5. RAG検索
 
 页面操作：
 
@@ -804,7 +874,7 @@ Approval
 - 页面显示 `retrieval_mode`
 - 页面显示 citations 和 warnings
 
-## K-6. Approval
+## K-6. 承認管理（Approval 路由）
 
 页面操作：
 
@@ -863,7 +933,7 @@ Approval
 - 想手动点页面，就走“页面学习启动”
 - 想验证回归结果，就走“自动化测试启动”
 
-当前这一轮 Frontend Phase 3 的权威入口建议是：
+**V1.0 当前**双终端联调权威入口（不再使用「Frontend Phase 3」阶段称呼作为当前状态）：
 
 页面学习：
 
@@ -878,8 +948,10 @@ Approval
 ./scripts/run_tests.sh
 ```
 
+> **历史阶段记录**：旧文曾写「Frontend Phase 3 权威入口」。Phase 3 是开发过程标签；**交付状态以本文顶部「ERIP V1.0 当前权威启动入口」与 Appendix N 为准**。
+
 前面 Appendix A ~ J 保留的是原有学习路径和手动命令说明。
-这一章补的是当前双终端联调和前端阶段收尾时最直接的权威入口。
+这一章补的是当前双终端联调最直接的权威入口（与顶部权威入口表中的 Appendix L 一致）。
 
 ## L-1. 环境准备
 
@@ -1010,8 +1082,18 @@ npm run dev -- --host 127.0.0.1
 
 成功标志：
 
-- 能看到 Dashboard
-- 顶部导航包含 `Dashboard / Analysis / Tasks / Documents / RAG / Approval`
+- 能看到 **学习总览**（路由可为 `/` 或 `/dashboard`）
+- 顶部导航包含正式标签：
+
+```text
+学习总览
+→ 文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+```
+
+- （历史对照）旧文档英文标签 `Dashboard / Analysis / Tasks / Documents / RAG / Approval` 不再作为当前 UI 验收标准
 
 ## L-9. 浏览器地址总表
 
@@ -1190,7 +1272,7 @@ Ctrl+C
 
 ### PostgreSQL 验收说明（V1.0 已落地）
 
-历史笔记中曾出现「PostgreSQL 仅 skipped / 未完成」的表述。  
+历史笔记中曾出现「PostgreSQL 仅 skipped / 未完成」的表述。
 **V1.0 最终状态**：PostgreSQL 已作为正式验收路径之一，默认 InMemory 学习路径仍然保留。
 
 当前 Backend 基线（以本机最近稳定验收为准）：
@@ -1210,7 +1292,7 @@ PostgreSQL 需要：
 
 ### Docker / Compose 验收说明（V1.0 已落地）
 
-历史笔记中曾写「Docker 未验证」。  
+历史笔记中曾写「Docker 未验证」。
 **V1.0 最终状态**：在 Docker Desktop Engine 与 WSL Integration 可用时，下列项已通过：
 
 - image build
@@ -1221,7 +1303,7 @@ PostgreSQL 需要：
 - Stub E2E
 - `compose_down` **不带 `-v`**，Volume 保留后重启数据仍在
 
-如果本地 **没有** Docker CLI 或 daemon 未启动，仍然不要假装通过；应明确记录「本机 Docker 不可用，未执行 Compose 验收」。  
+如果本地 **没有** Docker CLI 或 daemon 未启动，仍然不要假装通过；应明确记录「本机 Docker 不可用，未执行 Compose 验收」。
 完整步骤见 [Appendix M](#appendix-m-docker-compose-启动与本地验收v10)。
 
 ### WSL 关闭导致服务退出
@@ -1377,7 +1459,7 @@ Compose 路径（本附录）
 
 # Appendix N: V1.0 启动验收基线（最终状态）
 
-本附录固定 **文档编写时点** 的最终验收数字与禁止项，供启动手册与测试手册共用。  
+本附录固定 **文档编写时点** 的最终验收数字与禁止项，供启动手册与测试手册共用。
 数字以本仓库已完成回归为准；若你本机结果不同，先查环境，再改文档。
 
 ## N-1. Backend

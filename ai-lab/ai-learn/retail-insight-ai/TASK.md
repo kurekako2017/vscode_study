@@ -1,5 +1,15 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-17 修正 RUNBOOK_LOCAL.md 权威入口与过期状态（已完成）
+
+- [x] 顶部增加「ERIP V1.0 当前权威启动入口」（InMemory → L / Compose → M / 基线 → N）
+- [x] 不新增 Appendix，仅修正正文与既有 L/M/N 交叉引用
+- [x] 处理过期表述：Frontend Phase 3、Frontend 可选、Docker 未验证、PostgreSQL 未完成、未来接入/计划中
+- [x] Appendix D/E/H 与正式导航（学习总览→…→承認管理）对齐
+- [ ] 未改 Backend / Frontend 代码；未执行 Docker daemon 相关验收
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Docker/Compose + Stub E2E（已完成文件与可运行验证）
 
 - [x] 修正 docker-compose / Dockerfiles / dockerignore

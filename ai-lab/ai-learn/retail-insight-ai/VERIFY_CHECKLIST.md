@@ -1,6 +1,24 @@
 # 启动完成检查清单
 
-本清单用于确认文档、接口和测试入口是否按当前学习阶段正常工作。
+本清单用于确认文档、接口和测试入口是否按 **ERIP V1.0 当前交付状态** 正常工作。
+
+权威启动入口（与 `docs/learning/01_Foundation/RUNBOOK_LOCAL.md` 一致）：
+
+| 场景 | 权威章节 |
+|---|---|
+| 本地 InMemory 学习 | RUNBOOK Appendix L |
+| PostgreSQL / Docker 企业验收 | RUNBOOK Appendix M |
+| 最终测试数字与状态 | RUNBOOK Appendix N |
+
+正式前端导航验收标准：
+
+```text
+学习总览
+→ 文書管理
+→ RAG検索
+→ 分析依頼
+→ 承認管理
+```
 
 ## 必查规则
 
@@ -14,6 +32,7 @@
 - 不要在项目根目录直接执行 `python3 -m unittest tests.test_api -v`。
 - 如果报 `ModuleNotFoundError: No module named tests`，说明目录错了。
 - V1.0 默认验收使用 `LLM_PROVIDER_MODE=stub`，不默认产生真实 LLM 费用。
+- 不要用「Frontend 可选 / Docker 未验证 / PostgreSQL 未完成」等历史表述当作当前操作结论。
 
 ## 1. Swagger 可打开
 
@@ -125,7 +144,7 @@ python3 -m unittest tests.test_api -v
 1. `./scripts/start_frontend.sh`（Backend 已在 8000）
 2. 浏览器打开 `http://127.0.0.1:5173`
 
-预想结果：能看到 Dashboard / 登录后的主导航；不是空白连接失败页。
+预想结果：登录后能看到正式主导航（**学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理**）；不是空白连接失败页。历史英文标签 `Dashboard/Tasks/...` 不作验收标准。
 
 ## 12. Frontend 自动化测试与 production build
 
@@ -222,11 +241,11 @@ export E2E_EXPECT_STUB=1
 
 验证方式：
 
-1. 创建可识别的业务数据并记录安全 ID  
-2. `./scripts/compose_down.sh`（确认脚本 **拒绝** `-v`）  
-3. `docker volume ls` 仍有 `erip_postgres_data`  
-4. `./scripts/compose_up.sh` + `./scripts/compose_verify.sh`  
-5. 确认数据仍在  
+1. 创建可识别的业务数据并记录安全 ID
+2. `./scripts/compose_down.sh`（确认脚本 **拒绝** `-v`）
+3. `docker volume ls` 仍有 `erip_postgres_data`
+4. `./scripts/compose_up.sh` + `./scripts/compose_verify.sh`
+5. 确认数据仍在
 6. 再次 `./scripts/compose_down.sh`，**不要**执行 `docker compose down -v`
 
 预想结果：Volume 保留，数据可恢复。

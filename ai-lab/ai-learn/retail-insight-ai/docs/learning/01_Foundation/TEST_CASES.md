@@ -8,9 +8,11 @@
 |---|---|
 | Swagger | FastAPI 自动生成的 API 调试与验证工具，不是测试环境，也不是正式 UI |
 | unittest | 验证单个模块、类、方法、边界和局部逻辑 |
-| 当前阶段 | 先用 Swagger 验证后端骨架，再用 unittest 验证代码边界 |
+| V1.0 当前验收 | Swagger 用于手工 API 调试；unittest / vitest / Stub E2E / Compose 用于回归与交付验收 |
+| 历史阶段记录 | 早期曾写「先用 Swagger 验证后端骨架，再用 unittest」——该句保留为学习史，**不是** V1.0 唯一路径 |
 | 执行目录 | 测试命令默认在 `backend/` 目录执行 |
 | 常见错误 | `ModuleNotFoundError: No module named tests` 通常说明执行目录错了 |
+| 正式前端导航 | `学习总览 → 文書管理 → RAG検索 → 分析依頼 → 承認管理`（与 `App.tsx` 一致） |
 
 ## 企业项目验证体系
 
@@ -61,8 +63,8 @@ V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
 | 16 | `test_document_domain.py` | documents 间接对应 | 领域模型规则 | 防止 Document 状态、metadata、checksum 等领域规则退化 | `python -m unittest tests.test_document_domain -v` | Domain Logic | 领域路径 |
 | 17 | `test_repositories.py` | 无公开 API | Repository 合同 | 防止 Repository interface 与 InMemory 实现不一致 | `python -m unittest tests.test_repositories -v` | 无 | 合同路径 |
 | 18 | `test_settings.py` | 全局间接影响 | 配置解析 | 防止环境变量解析错误、防止默认配置影响本地学习路径 | `python -m unittest tests.test_settings -v` | Settings | 配置路径 |
-| 19 | `test_repository_backend_switch.py` | 全局间接影响 | 仓库后端切换 | 防止 PostgreSQL 可选路径破坏 InMemory 默认路径 | `python -m unittest tests.test_repository_backend_switch -v` | Container / Config | 配置路径 |
-| 20 | `test_postgres_repositories.py` | 全局间接影响 | PostgreSQL 可选路径 | 防止 PostgreSQL repository contract 与默认 repository contract 分叉 | `python -m unittest tests.test_postgres_repositories -v` | Repository Layer | 可选路径 |
+| 19 | `test_repository_backend_switch.py` | 全局间接影响 | 仓库后端切换 | 防止切换错误破坏 InMemory 默认学习路径 | `python -m unittest tests.test_repository_backend_switch -v` | Container / Config | 配置路径 |
+| 20 | `test_postgres_repositories.py` | 全局间接影响 | PostgreSQL 合同路径 | 防止 PostgreSQL repository contract 与 InMemory 合同分叉；**V1.0 正式验收含 PG 全量 suite** | `python -m unittest tests.test_postgres_repositories -v` | Repository Layer | 主验收路径（需 DATABASE_URL） |
 | 21 | `test_logging.py` | 全局间接影响 | 结构化日志 | 防止日志缺少 request_id / task_id / error_code、防止敏感信息输出 | `python -m unittest tests.test_logging -v` | logging helpers | 观测路径 |
 | 22 | `test_authentication.py` | login / users/me / JWT | JWT 签发、解析、时钟偏差 leeway | 防止签名错误被放行、防止时钟回拨导致随机 401、防止 jti 合同漂移 | `python -m unittest tests.test_authentication -v` | `JWTService` / `AuthenticationService` | 安全路径 |
 | 23 | `test_authorization.py` | 受保护 API | RBAC Permission | 防止角色越权、防止未知角色 fail-open | `python -m unittest tests.test_authorization -v` | `AuthorizationService` | 权限路径 |
@@ -660,7 +662,7 @@ Assertion
 
 | 项目 | 内容 |
 |---|---|
-| 测试目的 | 验证 PostgreSQL 仓库实现的可选路径 |
+| 测试目的 | 验证 PostgreSQL 仓库实现合同（V1.0 正式验收路径之一；InMemory 仍为默认学习路径） |
 | 对应API | documents、tasks、approval 等依赖仓库能力间接受影响 |
 | 测试命令 | `cd backend && python -m unittest tests.test_postgres_repositories -v` |
 | 输入（入力） | PostgreSQL 连接配置、数据库环境、`psycopg` 依赖 |
@@ -668,7 +670,7 @@ Assertion
 | Swagger对应操作 | 不建议直接用 Swagger 验证，先确认底层 roundtrip |
 | 后台观察 | 连接、写入、读取、skip 原因 |
 | 对应源码 | `backend/app/repositories/postgres/` |
-| 为什么设计 | 证明 PostgreSQL 是可选演进路径，同时不影响默认本地学习 |
+| 为什么设计 | 证明 PostgreSQL 与 InMemory 合同一致；V1.0 交付以 PG 全量 + InMemory 回归双轨验收，默认本地学习仍可不启 PG |
 
 ### 后端程序流程
 
@@ -886,7 +888,7 @@ Assertion（无真实外呼）
 |---|---|---|
 | 文書管理 | `/documents` | document upload/import/chunk 测试 + E2E |
 | RAG検索 | `/rag` | retrieval / internal-rag / frontend RagPage 测试 |
-| 分析依頼 | `/analysis` 或 RAG 内 AI 分析入口 | `test_ai_analysis_api` + Tasks 主链路 |
+| 分析依頼 | `/analysis`（正式导航「分析依頼」；RAG 页另有 AI 分析入口） | `test_ai_analysis_api` + `test_api` 任务主链路 |
 | 承認管理 | `/approval` | approval / rbac / E2E manager approve |
 | 审计报告 | Approval 详情 + Audit / 报告版本 | audit 测试 + executive report |
 

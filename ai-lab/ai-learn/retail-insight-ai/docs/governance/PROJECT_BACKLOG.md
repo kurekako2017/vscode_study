@@ -1,5 +1,17 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-17 Completed: 修正 RUNBOOK_LOCAL.md 权威入口与过期状态
+
+- [x] 顶部权威入口表：本地 InMemory → Appendix L；PostgreSQL/Docker → Appendix M；最终测试数字 → Appendix N
+- [x] 过期状态改为历史记录 + V1.0 当前结论（Frontend 正式、PG/Docker 已落地验收路径）
+- [x] 修正 Appendix D/E/H 中 Frontend Optional / 按需启动 / 面试演示口径
+- [x] 正式导航与 `App.tsx` 对齐；未新增 Appendix
+- [x] 同步 TASK / CHANGELOG
+
+完成记录：仅文档修改；代码与测试未改。Docker daemon 本机仍可能不可用，Compose 实机验收不在本任务范围。
+
+最后更新：2026-07-17
+
 ## 2026-07-17 Completed: Docker/Compose + Stub E2E 文件与本地验证
 
 - [x] Compose 服务：postgres(pgvector) / backend / frontend
