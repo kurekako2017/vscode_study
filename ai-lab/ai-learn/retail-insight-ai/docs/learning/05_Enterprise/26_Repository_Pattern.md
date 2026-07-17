@@ -4,7 +4,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 26
+# 第26章（Chapter 26）
 
 # Repository Pattern（仓储模式）
 

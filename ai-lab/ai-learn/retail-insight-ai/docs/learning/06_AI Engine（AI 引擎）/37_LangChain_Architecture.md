@@ -2,7 +2,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 37
+# 第37章（Chapter 37）
 
 # LangChain Architecture（LangChain 架构）
 

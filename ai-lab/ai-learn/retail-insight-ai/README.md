@@ -183,7 +183,7 @@ Source Code
 ↓
 docs/architecture/ARCHITECTURE.md
 ↓
-docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md
+docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md
 ```
 
 Mermaid 版本：
@@ -196,7 +196,7 @@ flowchart TD
     D --> E[CODE_STUDY_GUIDE]
     E --> F[Source Code]
     F --> G[docs/architecture/ARCHITECTURE.md]
-    G --> H[docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md]
+    G --> H[docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md]
 ```
 
 ## 六、企业项目验证体系
@@ -290,18 +290,18 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 - [docs/ai-agent-retail-handbook-v3/AGENTS.md](docs/ai-agent-retail-handbook-v3/AGENTS.md)
 - [docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md](docs/ai-agent-retail-handbook-v3/PROJECT_BIBLE.md)
 - [docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md](docs/ai-agent-retail-handbook-v3/01_日本AI项目实战.md)
-- [docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md](docs/ai-agent-retail-handbook-v3/02_日本AI现场面试.md)
+- [docs/ai-agent-retail-handbook-v3/interview/02_日本AI现场面试.md](docs/ai-agent-retail-handbook-v3/interview/02_日本AI现场面试.md)
 - [docs/ai-agent-retail-handbook-v3/03_AI核心知识.md](docs/ai-agent-retail-handbook-v3/03_AI核心知识.md)
 - [docs/ai-agent-retail-handbook-v3/04_日本现场开发.md](docs/ai-agent-retail-handbook-v3/04_日本现场开发.md)
 - [docs/ai-agent-retail-handbook-v3/05_TL代码审查.md](docs/ai-agent-retail-handbook-v3/05_TL代码审查.md)
 - [docs/ai-agent-retail-handbook-v3/06_学习路线.md](docs/ai-agent-retail-handbook-v3/06_学习路线.md)
-- [docs/ai-agent-retail-handbook-v3/07_面试口头训练.md](docs/ai-agent-retail-handbook-v3/07_面试口头训练.md)
+- [docs/ai-agent-retail-handbook-v3/interview/07_面试口头训练.md](docs/ai-agent-retail-handbook-v3/interview/07_面试口头训练.md)
 - [docs/ai-agent-retail-handbook-v3/08_架构图册.md](docs/ai-agent-retail-handbook-v3/08_架构图册.md)
 - [docs/ai-agent-retail-handbook-v3/09_系统设计书.md](docs/ai-agent-retail-handbook-v3/09_系统设计书.md)
 - [docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md](docs/ai-agent-retail-handbook-v3/10_Production_Roadmap.md)
 - [docs/ai-agent-retail-handbook-v3/11_Project_Structure.md](docs/ai-agent-retail-handbook-v3/11_Project_Structure.md)
 - [docs/ai-agent-retail-handbook-v3/12_ADR.md](docs/ai-agent-retail-handbook-v3/12_ADR.md)
-- [docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md)
+- [docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md)
 
 ### Archive
 
@@ -341,7 +341,7 @@ Swagger（FastAPI 自动生成的 Task API / HTTP API 调试与验证工具）
 | [docs/contracts/ERROR_CATALOG.md](docs/contracts/ERROR_CATALOG.md) | 错误码主文档 | 是 | 否 |
 | [docs/database/DATABASE.md](docs/database/DATABASE.md) | 数据库设计主文档 | 是 | 否 |
 | [docs/ai-agent-retail-handbook-v3/README.md](docs/ai-agent-retail-handbook-v3/README.md) | handbook 长期知识库入口 | 是 | 否 |
-| [docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md) | 面试准备主文档 | 是 | 否 |
+| [docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md](docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md) | 面试准备主文档 | 是 | 否 |
 
 禁止新增：
 

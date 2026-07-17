@@ -2,7 +2,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 34
+# 第34章（Chapter 34）
 
 # Cloud Native Architecture（云原生架构）
 

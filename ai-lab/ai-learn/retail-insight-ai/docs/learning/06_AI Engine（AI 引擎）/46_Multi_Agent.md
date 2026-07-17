@@ -2,7 +2,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 46
+# 第46章（Chapter 46）
 
 # Multi-Agent（多 Agent 协作）
 

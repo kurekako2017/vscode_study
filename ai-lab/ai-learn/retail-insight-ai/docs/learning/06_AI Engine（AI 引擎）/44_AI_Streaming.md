@@ -3,7 +3,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 44
+# 第44章（Chapter 44）
 
 # AI Streaming（AI 流式输出）
 

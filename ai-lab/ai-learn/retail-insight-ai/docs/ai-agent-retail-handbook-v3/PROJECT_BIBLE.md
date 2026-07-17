@@ -287,7 +287,7 @@ Approval、Persistent Audit、PostgreSQL、Docker Compose、テスト整備を�
 
 技术介绍必须回答：
 
-- 该技术在 Retail Insight AI 中负责什么
+- 该技术在 ERIP 中负责什么（历史名称 Retail Insight AI 仅早期）
 - 与经营分析业务的关系
 - 为什么采用该设计
 - TL Review 会关注什么
@@ -297,7 +297,7 @@ Approval、Persistent Audit、PostgreSQL、Docker Compose、テスト整備を�
 
 所有面试回答必须引用本章原则：
 
-1. 先说 Retail Insight AI 的业务背景
+1. 先说 ERIP 的业务背景（历史名称 Retail Insight AI 仅早期）
 2. 再说小売業向け AI 経営分析システム的系统目标
 3. 再说自己的担当范围
 4. 再说技术设计
@@ -324,7 +324,7 @@ V3 遵守一本书原则：
 - `PROJECT_BIBLE.md` 是唯一最高规则
 - `README.md` 只做入口和维护说明
 - 正文 Markdown 不超过 6 个
-- 新增内容必须回到 Retail Insight AI
+- 新增内容必须回到 ERIP（历史名称 Retail Insight AI 仅早期）
 - 章节标题统一使用中文
 - 技术名保留英文
 
@@ -352,8 +352,8 @@ V3 遵守一本书原则：
 - peers:
 - `retail-insight-ai/README.md` | sha256=51340b3878b7fccbd5a7bdcdcbc2ed0f4c0bab07fae94fe85b1ddfd54eeca283 | # Retail Insight AI / ## 明天先做什么 / 1. 运行 `check_env` / 2. 启动 Backend
 - `ai-agent-retail-handbook-v3/README.md` | sha256=572e4166668f669ef002b0a0610c3d745b2b1529531a036afd19453db289a826 | # Retail Insight AI Handbook V3 / # 项目介绍 / Retail Insight AI 是《日本 AI Agent 企业开发与面试宝典》V3 的统一项目。 / 日文名称：小売業向け AI 経営分析システム。
-- `ai-agent-retail-handbook-v3/02_日本AI现场面试.md` | sha256=713cdb0ae9c24284a5c62cbad95a808bf2bb530f2db5c514aae34e871dea816d | # 02_日本AI现场面试 / ## 目录 / - [第一章 面试表达总则](#第一章-面试表达总则) / - [第二章 自我介绍](#第二章-自我介绍)
-- `ai-agent-retail-handbook-v3/07_面试口头训练.md` | sha256=af984812e08556e127ee61023203fc8e85957a971fe9c307a287dae27cd30fbe | # 07_面试口头训练 / 本文件只用于开口训练。练习时先遮住回答，听完问题后立即开口；说完再对照关键词，不逐字追求一致。 / ## 第一章 30秒回答训练 / ### 1. 自己紹介をお願いします。
+- `ai-agent-retail-handbook-v3/interview/02_日本AI现场面试.md` | sha256=713cdb0ae9c24284a5c62cbad95a808bf2bb530f2db5c514aae34e871dea816d | # 02_日本AI现场面试 / ## 目录 / - [第一章 面试表达总则](#第一章-面试表达总则) / - [第二章 自我介绍](#第二章-自我介绍)
+- `ai-agent-retail-handbook-v3/interview/07_面试口头训练.md` | sha256=af984812e08556e127ee61023203fc8e85957a971fe9c307a287dae27cd30fbe | # 07_面试口头训练 / 本文件只用于开口训练。练习时先遮住回答，听完问题后立即开口；说完再对照关键词，不逐字追求一致。 / ## 第一章 30秒回答训练 / ### 1. 自己紹介をお願いします。
 
 说明：
 - 这个块由 `scripts/sync_retail_handbook_docs.py` 自动维护。

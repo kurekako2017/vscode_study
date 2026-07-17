@@ -2,7 +2,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 47
+# 第47章（Chapter 47）
 
 # Enterprise AI Best Practice（企业 AI 最佳实践）
 

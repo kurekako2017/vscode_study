@@ -78,7 +78,7 @@ Approval 相关代码主要集中在以上几个模块。
 
 # 三、关键源码文件 ⭐
 
-## approvals.py
+## 源码文件：approvals.py
 
 HTTP API 入口。
 
@@ -93,7 +93,7 @@ HTTP API 入口。
 
 ---
 
-## approval_service.py
+## 源码文件：approval_service.py
 
 负责审批业务。
 
@@ -105,7 +105,7 @@ HTTP API 入口。
 
 ---
 
-## approval_repository.py
+## 源码文件：approval_repository.py
 
 负责：
 
@@ -123,7 +123,7 @@ comment
 
 ---
 
-## graph.py
+## 源码文件：graph.py
 
 Workflow 在需要人工确认时：
 
@@ -141,7 +141,7 @@ Approval。
 
 # 四、关键类与关键函数 ⭐
 
-## ApprovalService
+## 服务实现：ApprovalService
 
 审批业务核心。
 
@@ -159,7 +159,7 @@ get_status()
 
 ---
 
-## ApprovalRepository
+## Repository 仓储：ApprovalRepository
 
 负责数据访问。
 
@@ -177,7 +177,7 @@ list()
 
 ---
 
-## Workflow Resume
+## 工作流恢复（Workflow Resume）
 
 审批完成后：
 

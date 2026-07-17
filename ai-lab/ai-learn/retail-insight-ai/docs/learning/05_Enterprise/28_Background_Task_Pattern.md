@@ -2,7 +2,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 28
+# 第28章（Chapter 28）
 
 # Background Task Pattern（后台任务模式）
 

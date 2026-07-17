@@ -96,7 +96,7 @@ graph.py
 
 # 三、关键源码文件 ⭐
 
-## graph.py
+## 源码文件：graph.py
 
 整个 AI Workflow 入口。
 
@@ -116,7 +116,7 @@ stream()
 
 ---
 
-## workflow.py
+## 源码文件：workflow.py
 
 负责：
 
@@ -126,7 +126,7 @@ KPI Workflow
 
 ---
 
-## static_research.py
+## 源码文件：static_research.py
 
 负责：
 
@@ -144,7 +144,7 @@ Research
 
 ---
 
-## generator.py
+## 源码文件：generator.py
 
 负责：
 
@@ -156,13 +156,13 @@ Research
 
 # 四、关键类与关键函数 ⭐
 
-## AnalysisWorkflow
+## 分析工作流（AnalysisWorkflow）
 
 整个 Workflow 控制器。
 
 ---
 
-### stream()
+### 方法：stream()
 
 整个项目最重要的方法。
 
@@ -192,7 +192,7 @@ Report
 
 ---
 
-## Route
+## 工作流节点：Route
 
 职责：
 
@@ -218,7 +218,7 @@ KPI Result
 
 ---
 
-## Research
+## 工作流节点：Research
 
 职责：
 
@@ -232,7 +232,7 @@ Research Result
 
 ---
 
-## Report
+## 工作流节点：Report
 
 职责：
 

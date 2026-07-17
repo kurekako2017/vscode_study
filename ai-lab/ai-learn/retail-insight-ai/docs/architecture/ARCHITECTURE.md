@@ -146,7 +146,7 @@ flowchart LR
 - 中文（简体）：当前 ERIP V1.0 可运行、可学习、可面试讲解，但 `ERIP` 作为最终企业平台仍然是 Target State
 - 日本語：現在の ERIP V1.0 は実行可能で、学習しやすく、面接説明にも使えますが、最終的な企業プラットフォームとしての `ERIP` はまだ Target State です
 
-## Epic 14 Engineering Standards Freeze
+## 历史主题记录：主题 14 工程标准冻结（Epic 14 Engineering Standards Freeze）
 
 ### 当前状态
 
@@ -190,7 +190,7 @@ flowchart LR
 - 由 `docs/architecture/APPROVAL_WORKFLOW.md` 作为审批状态机单一来源
 - 由 `docs/database/DATABASE.md` 作为 Phase 2 表结构准备来源
 
-## 冲刺 10.1 Approval Workflow Contract Freeze
+## 历史迭代记录：冲刺 10.1 审批工作流合同冻结（Approval Workflow Contract Freeze）
 
 ### 当前状态
 
@@ -228,7 +228,7 @@ flowchart LR
 - 未来 RBAC 只能控制调用资格，不能改变既有状态机含义。
 - 未来实现必须保留 report version 的 immutable snapshot 语义。
 
-## Sprint 11.1 Enterprise Security Foundation Contract Freeze / 企业安全基础合同冻结 / エンタープライズセキュリティ基盤契約凍結
+## 历史迭代记录：Sprint 11.1 Enterprise Security Foundation Contract Freeze / 企业安全基础合同冻结 / エンタープライズセキュリティ基盤契約凍結
 
 ### 当前状态
 
@@ -262,7 +262,7 @@ flowchart LR
 - The current contract only freezes the read surface and the approval-action matrix.
 - Future implementation must preserve the frozen permission names and event names.
 
-## Sprint 11.2 Security Domain + InMemory Audit MVP / 企业安全域 + InMemory 审计最小可行实现 / 企業セキュリティ領域 + InMemory 監査 MVP
+## 历史迭代记录：Sprint 11.2 Security Domain + InMemory Audit MVP / 企业安全域 + InMemory 审计最小可行实现 / 企業セキュリティ領域 + InMemory 監査 MVP
 
 ### 当前状态
 
@@ -322,7 +322,7 @@ flowchart TD
     B --> E[audit.log.created / audit.log.failed]
 ```
 
-## 冲刺 11.3 RBAC Enforcement for Approval APIs
+## 历史迭代记录：冲刺 11.3 审批 API 的 RBAC 强制（RBAC Enforcement for Approval APIs）
 
 ### 当前状态
 
@@ -358,9 +358,9 @@ flowchart TD
 - Future RBAC can replace the placeholder current user seam without changing approval payloads.
 - Keep approval RBAC isolated from document, retrieval, RAG, and task APIs until a later sprint.
 
-## Enterprise Security Overview
+## 企业安全总览（Enterprise Security Overview）
 
-### Security Domain Model
+### 安全域模型（Security Domain Model）
 
 - `user` belongs to one `organization` and one `department`.
 - `role` groups permissions for a job function or operational responsibility.
@@ -370,7 +370,7 @@ flowchart TD
 - `audit log` is append-only and read-only.
 - `operation log` is the operator-facing projection of audit facts.
 
-### RBAC Approval-Action Matrix
+### RBAC 审批动作矩阵（RBAC Approval-Action Matrix）
 
 | Action | Permission | Default Roles |
 |---|---|---|
@@ -385,14 +385,14 @@ flowchart TD
 | `POST /api/v1/approvals/{approval_id}/reject` | `approval.reject` | approver, manager, admin |
 | `POST /api/v1/reports/{task_id}/revise` | `approval.revise` | analyst, manager, approver, admin |
 
-### Audit Log Contract
+### 审计日志合同（Audit Log Contract）
 
 - Audit logs are append-only facts and are safe to read after the originating operation is archived.
 - Audit log records must include actor, resource, result, request_id, trace_id, timestamp, and a secret-safe metadata payload.
 - Operation logs are a projection of the same facts for human review and support workflows.
 - Audit failures must not leak sensitive input, and they must preserve the failure error code.
 
-### Future Authentication流程
+### 后续认证流程（Future Authentication）
 
 ```mermaid
 flowchart LR
@@ -403,7 +403,7 @@ flowchart LR
     E --> F[Audit Log Writer]
 ```
 
-### RBAC流程
+### RBAC 流程
 
 ```mermaid
 flowchart TD
@@ -424,7 +424,7 @@ flowchart TD
     C -->|no| E[forbidden / permission_denied]
 ```
 
-### Audit Log流程
+### 审计日志流程（Audit Log）
 
 ```mermaid
 flowchart TD
@@ -434,7 +434,7 @@ flowchart TD
     C --> E[Operation Log Projection]
 ```
 
-### Future Authentication Flow Notes
+### 后续认证流程说明（Future Authentication Flow Notes）
 
 - Authentication is a future seam, not a current implementation dependency.
 - RBAC consumes the authenticated principal after the identity provider is introduced.
@@ -503,7 +503,7 @@ flowchart TD
     B -->|deny| E[authorization rejected]
 ```
 
-### 计划项 Notes
+### 计划项说明（Notes）
 
 - RBAC is a future authorization seam only.
 - Audit facts must remain usable even before RBAC exists.
@@ -527,7 +527,7 @@ flowchart TD
 - 后续 Upload API、Document Pipeline、Chunk Pipeline、Retrieval Provider、Approval API 和 PostgreSQL Repository 都必须基于本节模型扩展。
 - 当前阶段只允许 `uploaded` 作为新建文档的初始状态，未来状态仅作为生命周期占位与迁移边界。
 
-## Document Domain
+## 文档领域（Document Domain）
 
 ```mermaid
 flowchart LR
@@ -541,7 +541,7 @@ flowchart LR
     D --> A[ApprovalStatus reuse]
 ```
 
-## Document Lifecycle
+## 文档生命周期（Document Lifecycle）
 
 ```mermaid
 flowchart TD
@@ -554,7 +554,7 @@ flowchart TD
     P --> AR[archived]
 ```
 
-## Document Metadata
+## 文档元数据（Document Metadata）
 
 ```mermaid
 flowchart TD
@@ -573,7 +573,7 @@ flowchart TD
     M --> CS[checksum]
 ```
 
-## Future Document Pipeline
+## 后续文档流水线（Future Document Pipeline）
 
 ```mermaid
 flowchart LR
@@ -586,7 +586,7 @@ flowchart LR
     F --> H[PostgreSQL Persistence Future]
 ```
 
-## Current vs Future
+## 当前与后续（Current vs Future）
 
 ```mermaid
 flowchart LR
@@ -611,7 +611,7 @@ flowchart LR
 - 后续实现必须遵守 `docs/contracts/API_CONTRACT.md` 与 `docs/contracts/EVENT_CONTRACT.md`。
 - 当前阶段不实现 Upload API，不修改业务代码，不把审批状态当成 Upload 成功的隐含结果。
 
-## Document Upload API流程
+## 文档上传 API 流程
 
 ```mermaid
 flowchart TD
@@ -626,7 +626,7 @@ flowchart TD
     C -->|checksum duplicate| J[document.upload.failed]
 ```
 
-## Document Upload Event流程
+## 文档上传事件流程
 
 ```mermaid
 flowchart TD
@@ -638,7 +638,7 @@ flowchart TD
     D -->|storage failure| G[document.upload.failed]
 ```
 
-## Document Upload Validation流程
+## 文档上传校验流程
 
 ```mermaid
 flowchart TD
@@ -655,7 +655,7 @@ flowchart TD
     F -->|no| G[accept]
 ```
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -685,7 +685,7 @@ flowchart TD
 - 后续 Upload API 实现必须先遵守 Upload Session、Idempotency、Error Catalog、Upload Policy。
 - 当前阶段不实现 Upload API，不引入文件存储、Chunk、RAG、Approval API、pgvector 或前端上传 UI。
 
-## Document Upload Workflow
+## 文档上传工作流（Document Upload Workflow）
 
 ```mermaid
 flowchart TD
@@ -832,7 +832,7 @@ flowchart TD
     C --> D[Future Internal RAG]
 ```
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -918,7 +918,7 @@ flowchart TD
     C --> D[Future RAG Answering]
 ```
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -964,7 +964,7 @@ flowchart TD
     E[Same checksum without key] --> F[duplicate_checksum]
 ```
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -1131,7 +1131,7 @@ flowchart TD
     C --> D[Grounded summary / extractive rewrite]
 ```
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -1581,7 +1581,7 @@ ERIP 是企业平台化目标架构，不代表当前仓库、当前目录或当
 - Documentation First
 - Backward Compatibility
 
-## Epic 0：Enterprise Platform Architecture Evolution
+## 历史主题记录：Epic 0：Enterprise Platform Architecture Evolution
 
 ### 计划项 Tasks
 
@@ -1593,7 +1593,7 @@ ERIP 是企业平台化目标架构，不代表当前仓库、当前目录或当
 - [ ] Documentation Standard
 - [ ] Testing Standard
 
-## Target Architecture
+## 目标架构（Target Architecture · 后续增强）
 
 ### 当前状态
 
@@ -1658,7 +1658,7 @@ flowchart LR
 - 受保护 JSON API 与 SSE fetch stream 统一使用 Bearer Header；Login / Health 保持匿名。
 - 401 清理会话并跳转 Login；403 保持会话和页面状态；未知角色为空权限集。
 
-### Current Architecture
+### 当前架构（Current Architecture）
 
 Current State
 
@@ -1675,7 +1675,7 @@ Current State
 - 当前主要存储仍是本地静态数据和 InMemory Repository。
 - 当前尚未实现 PostgreSQL、审批流、互联网检索、向量检索、平台级目录冻结。
 
-### Target Architecture
+### 目标架构（Target Architecture · 后续增强）
 
 Target State
 
@@ -2002,7 +2002,7 @@ flowchart TD
 
 - Future LLM providers must be replaceable and must not change the frozen internal RAG API contract.
 
-## Future Approval Integration流程
+## 后续审批集成流程（Future Approval Integration）
 
 ```mermaid
 flowchart TD
@@ -2248,7 +2248,7 @@ erDiagram
 
 未同步以上文档，不得标记完成。
 
-## Epic 0 交付物
+## 历史主题记录：Epic 0 交付物
 
 - [ ] Architecture Freeze
 - [ ] Directory Freeze

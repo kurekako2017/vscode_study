@@ -15,7 +15,7 @@
 - 前端：ProtectedRoute、正式导航（RAG/AI分析 · KPI任务分析 · AI管理）、Document→RAG / Report→Approval 衔接、Lifecycle Live Status
 - 自动化：PG **297/6 skip**，InMemory **286/62 skip**，Frontend **116/116**，head **`20260717_08_ai_runtime`**
 - 默认 stub；真实付费 smoke / Billing UI / 多租户预算 / SIEM·WORM·Streaming / DeepSeek 默认启用 **未**记为完成
-- 面试权威材料：`docs/ai-agent-retail-handbook-v3/` 的 `01`/`02`/`03`/`07`/`ERIP_Volume01` + `INTERVIEW_GUIDE`（`旧 Retail Volume01 已归档至 `_archive_candidate/handbook-interview/`）
+- 面试权威材料：handbook 根 `01`/`03` + `docs/ai-agent-retail-handbook-v3/interview/` 下 `INTERVIEW_GUIDE.md` / `02_日本AI现场面试.md` / `07_面试口头训练.md` / `Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`（旧 Retail Volume 已归档至 `_archive_candidate/ai-agent-retail-handbook-v3/`）
 
 权威细节：`docs/architecture/ARCHITECTURE.md`、`docs/development/DEPLOYMENT_GUIDE.md`、`docs/learning/01_Foundation/RUNBOOK_LOCAL.md` Appendix N、handbook 面试索引。
 
@@ -265,7 +265,7 @@ Documentation Governance V2
 - 继续保持 `POST /api/v1/internal-rag/answer` 对外 response backward compatible。
 - 继续保持 retrieval API contract / scoring / response shape 不变。
 
-## Epic 14：工程标准（最终冻结）
+## 主题（Epic）14：工程标准（最终冻结）
 
 ### 当前状态
 

@@ -3,7 +3,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 39
+# 第39章（Chapter 39）
 
 # AI State Management（AI 状态管理）
 

@@ -1391,8 +1391,8 @@ Ctrl+C
 
 | 模式                  | 结果                                                                                           | 用途                                      |
 | --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| PostgreSQL 全量 suite | **281 tests**，**2** 个 real smoke 默认 **skipped**；发布基线曾连续 3 次稳定 | **正式回归**                        |
-| InMemory 全量 suite   | **270 tests**，**52 skipped**                                                      | **辅助**（加速/隔离；不作业务结论） |
+| PostgreSQL 全量 suite | **297 tests**，**6 skipped**（含 real smoke 默认 skip）；发布基线以当前 suite 为准 | **正式回归**                        |
+| InMemory 全量 suite   | **286 tests**，**62 skipped**                                                      | **辅助**（加速/隔离；不作业务结论） |
 
 PostgreSQL 需要：
 
@@ -1577,9 +1577,9 @@ Compose 路径（本附录，权威）
 
 | 项                                    | 基线                                                                        |
 | ------------------------------------- | --------------------------------------------------------------------------- |
-| PostgreSQL 全量（**正式回归**） | **281 tests**，**2 skipped**（real LLM smoke 默认 skip）        |
+| PostgreSQL 全量（**正式回归**） | **297 tests**，**6 skipped**（含 real LLM smoke 默认 skip）        |
 | PostgreSQL 稳定性                     | 完整 suite**连续 3 次** 通过（修复 JWT 时钟回拨后）                   |
-| InMemory 全量（**仅辅助**）     | **270 tests**，**52 skipped**；不作业务验收结论                 |
+| InMemory 全量（**仅辅助**）     | **286 tests**，**62 skipped**；不作业务验收结论                 |
 | Alembic head                          | `20260717_08_ai_runtime`                                              |
 | Repository 权威                       | **PostgreSQL**（Compose 默认且必须）；InMemory 代码保留但不补企业能力 |
 | `python -m compileall app`          | 通过                                                                        |
@@ -1590,7 +1590,7 @@ Compose 路径（本附录，权威）
 
 | 项                                                | 基线                                                   |
 | ------------------------------------------------- | ------------------------------------------------------ |
-| 测试                                              | **113 / 113**                                    |
+| 测试                                              | **116 / 116**                                    |
 | Production build                                  | 通过                                                   |
 | Login / JWT / ProtectedRoute / RBAC Permission UI | 已完成                                                 |
 | React Lifecycle Live Status                       | 已完成                                                 |

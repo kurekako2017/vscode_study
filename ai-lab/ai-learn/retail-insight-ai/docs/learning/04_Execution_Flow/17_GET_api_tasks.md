@@ -3,7 +3,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 17
+# 第17章（Chapter 17）
 
 # GET /api/tasks 执行全过程
 
@@ -220,7 +220,7 @@ JSON Response
 
 # 六、关键函数
 
-## GET /tasks
+## 接口：GET /tasks
 
 负责：
 
@@ -230,7 +230,7 @@ JSON Response
 
 ---
 
-## GET /tasks/
+## 接口：GET /tasks/
 
 负责：
 
@@ -240,7 +240,7 @@ JSON Response
 
 ---
 
-## Repository.list()
+## 方法：Repository.list()
 
 负责：
 
@@ -250,7 +250,7 @@ JSON Response
 
 ---
 
-## Repository.get()
+## 方法：Repository.get()
 
 负责：
 

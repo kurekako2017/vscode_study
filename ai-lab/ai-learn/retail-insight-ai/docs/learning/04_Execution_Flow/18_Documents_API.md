@@ -3,7 +3,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 18
+# 第18章（Chapter 18）
 
 # Documents API 执行全过程
 
@@ -242,7 +242,7 @@ Repository.delete()
 
 # 六、关键函数
 
-## upload_document()
+## 方法：upload_document()
 
 负责：
 
@@ -250,7 +250,7 @@ Repository.delete()
 
 ---
 
-## get_document()
+## 方法：get_document()
 
 负责：
 
@@ -258,7 +258,7 @@ Repository.delete()
 
 ---
 
-## list_documents()
+## 方法：list_documents()
 
 负责：
 
@@ -268,7 +268,7 @@ Repository.delete()
 
 ---
 
-## delete_document()
+## 方法：delete_document()
 
 负责：
 

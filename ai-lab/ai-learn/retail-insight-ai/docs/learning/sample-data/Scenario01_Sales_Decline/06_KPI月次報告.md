@@ -1,6 +1,6 @@
 # 06_KPI月次報告
 
-# Scenario01_Sales_Decline
+# 场景：Scenario01_Sales_Decline
 
 共通シナリオ: 2026年6月 / 関東地区飲料分類売上下降分析
 

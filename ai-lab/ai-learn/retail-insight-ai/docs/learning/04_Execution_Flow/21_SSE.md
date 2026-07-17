@@ -3,7 +3,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 21
+# 第21章（Chapter 21）
 
 # SSE（Server-Sent Events）事件推送全过程
 
@@ -291,7 +291,7 @@ Browser：
 
 # 七、关键函数
 
-## publish()
+## 方法：publish()
 
 作用：
 
@@ -319,7 +319,7 @@ publish()
 
 ---
 
-## EventSource
+## 事件源（EventSource）
 
 浏览器：
 
@@ -337,7 +337,7 @@ SSE
 
 ---
 
-## Dashboard
+## 看板（Dashboard）
 
 收到：
 

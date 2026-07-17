@@ -2,7 +2,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 30
+# 第30章（Chapter 30）
 
 # Workflow Pattern（工作流模式）
 
@@ -782,7 +782,7 @@ ERIP 当前通过 `AnalysisWorkflow` 实现了这一思想，并为未来接入 
 - Audit Log
 - 企业 AI 系统安全
 
-# Chapter 30
+# 第30章（Chapter 30）
 
 # Workflow 模式
 

@@ -3,7 +3,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 20
+# 第20章（Chapter 20）
 
 # Security API 执行全过程
 
@@ -203,7 +203,7 @@ Authorization Failed
 
 # 六、关键函数
 
-## Authentication
+## 认证（Authentication）
 
 作用：
 
@@ -219,7 +219,7 @@ Authorization Failed
 
 ---
 
-## Authorization
+## 授权（Authorization）
 
 作用：
 

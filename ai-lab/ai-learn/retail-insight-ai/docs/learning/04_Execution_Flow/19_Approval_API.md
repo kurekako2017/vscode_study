@@ -2,7 +2,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 19
+# 第19章（Chapter 19）
 
 # Approval API 执行全过程
 
@@ -278,7 +278,7 @@ Reject
 
 # 六、关键函数
 
-## approve()
+## 方法：approve()
 
 作用：
 
@@ -294,7 +294,7 @@ Workflow。
 
 ---
 
-## reject()
+## 方法：reject()
 
 作用：
 
@@ -310,7 +310,7 @@ Task Status。
 
 ---
 
-## Repository.save()
+## 方法：Repository.save()
 
 作用：
 
@@ -324,7 +324,7 @@ Task。
 
 ---
 
-## publish()
+## 方法：publish()
 
 作用：
 

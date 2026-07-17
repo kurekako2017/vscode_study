@@ -5,7 +5,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 36
+# 第36章（Chapter 36）
 
 # AI Architecture（AI 引擎总体架构）
 

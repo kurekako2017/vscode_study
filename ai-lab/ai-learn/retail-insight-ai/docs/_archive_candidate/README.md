@@ -65,7 +65,7 @@
 |---|---|
 | `README.md` vs `docs/ai-agent-retail-handbook-v3/README.md` | 根 README 是项目唯一入口，handbook README 是长期知识库入口，职责不同 |
 | `docs/LEARNING_API_WALKTHROUGH.md` vs `docs/ai-agent-retail-handbook-v3/06_学习路线.md` | 前者是接口学习细节，后者是长期学习路线 |
-| `docs/TEST_CASES.md` vs `docs/ai-agent-retail-handbook-v3/07_面试口头训练.md` | 前者是测试学习，后者是口头面试训练 |
+| `docs/TEST_CASES.md` vs `docs/ai-agent-retail-handbook-v3/interview/07_面试口头训练.md` | 前者是测试学习，后者是口头面试训练 |
 | `CODE_STUDY_GUIDE.md` vs `docs/ai-agent-retail-handbook-v3/11_Project_Structure.md` | 前者是源码阅读路线，后者是 handbook 项目结构理解 |
 
 ## 人工确认重点
@@ -80,7 +80,7 @@
 |---|---|
 | `handbook-interview/Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | 旧 Volume01；已并入 ERIP 权威 Volume01 后移入此处 |
 
-**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`
 
 ## ai-agent-retail-handbook-v3（待删除区 · 2026-07-17）
 
@@ -88,5 +88,5 @@
 |---|---|
 | `ai-agent-retail-handbook-v3/Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | 旧 Volume01；已合并入 ERIP 权威 Volume01 后移入本目录 |
 
-**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+**唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`
 

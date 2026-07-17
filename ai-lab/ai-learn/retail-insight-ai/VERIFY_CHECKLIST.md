@@ -215,7 +215,7 @@ cd backend
 
 预想结果（V1.0 基线，**辅助**）：
 
-- **270 tests**，**52 skipped**
+- **286 tests**，**62 skipped**
 - 无 unexpected failure
 - 本结果 **不作** 业务/企业能力验收结论
 
@@ -336,8 +336,8 @@ cd .. && git diff --check
 | 项 | 基线 |
 |---|---|
 | Backend PostgreSQL（正式） | 297 tests / 6 skipped |
-| Backend InMemory（辅助） | 270 tests / 52 skipped |
-| Frontend | 113 / 113 |
+| Backend InMemory（辅助） | 286 tests / 62 skipped |
+| Frontend | 116 / 116 |
 | Alembic head | `20260717_08_ai_runtime` |
 | 默认 LLM | stub，零真实费用 |
 | Compose | healthy + Stub E2E + volume 保留 |

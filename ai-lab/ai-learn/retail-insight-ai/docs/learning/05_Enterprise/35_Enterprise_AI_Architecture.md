@@ -4,7 +4,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 35
+# 第35章（Chapter 35）
 
 # Enterprise AI Architecture（企业 AI 架构）
 

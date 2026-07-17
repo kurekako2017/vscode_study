@@ -2,7 +2,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 38
+# 第38章（Chapter 38）
 
 # LangGraph Architecture（LangGraph 架构）
 

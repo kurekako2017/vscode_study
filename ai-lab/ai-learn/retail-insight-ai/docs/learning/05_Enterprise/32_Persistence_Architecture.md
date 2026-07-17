@@ -4,7 +4,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 32
+# 第32章（Chapter 32）
 
 # Persistence Architecture（企业持久化架构）
 

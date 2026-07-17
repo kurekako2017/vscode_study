@@ -2,7 +2,7 @@
 
 > **状态：已合并并移至待删除区（不删除文件本体）**
 > **归档路径：** `docs/_archive_candidate/ai-agent-retail-handbook-v3/`
-> **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+> **唯一权威 Volume01：** `docs/ai-agent-retail-handbook-v3/interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`
 > 独有问答（FastAPI/TaskService/LangGraph/LangChain/RAG/pgvector/Agent/TL）已写入权威 Volume §6–7、§13、**§20** 并按 ERIP V1.0 校正。
 > **禁止**用本文件作面试背诵。
 

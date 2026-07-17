@@ -3,7 +3,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 42
+# 第42章（Chapter 42）
 
 # RAG Architecture（Retrieval-Augmented Generation，检索增强生成）
 

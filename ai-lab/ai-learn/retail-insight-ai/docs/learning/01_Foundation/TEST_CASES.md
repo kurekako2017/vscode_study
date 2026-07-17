@@ -68,9 +68,9 @@ V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
 
 | Suite | 基线 |
 |---|---|
-| Backend PostgreSQL（**正式回归**） | 281 tests，2 skipped（real smoke 默认 skip） |
-| Backend InMemory（**仅辅助**） | 270 tests，52 skipped；不作业务验收结论 |
-| Frontend | 113 / 113 |
+| Backend PostgreSQL（**正式回归**） | 297 tests，6 skipped（含 real smoke 默认 skip） |
+| Backend InMemory（**仅辅助**） | 286 tests，62 skipped；不作业务验收结论 |
+| Frontend | 116 / 116 |
 | Production build / compileall / diff-check | 通过 |
 
 # 测试总览
@@ -108,7 +108,7 @@ V1.0 自动化数量基线（与 `RUNBOOK_LOCAL.md` Appendix N 一致）：
 
 说明：序号 01～21 为历史学习总览，**全部保留**。22～28 为 V1.0 增量登记；仓库中还有 `test_vector_retrieval.py`、`test_embedding_factory.py` 等文件，可按同样表格模板继续追加，不在此删除旧章。
 
-## backend/tests/test_api.py
+## 测试文件：backend/tests/test_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -142,7 +142,7 @@ InMemoryReportRepository.get()
 Response
 ```
 
-## backend/tests/test_document_upload_api.py
+## 测试文件：backend/tests/test_document_upload_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -173,7 +173,7 @@ InMemoryDocumentRepository.create()
 Response
 ```
 
-## backend/tests/test_document_read_api.py
+## 测试文件：backend/tests/test_document_read_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -204,7 +204,7 @@ InMemoryDocumentRepository.list_all() / get()
 Response
 ```
 
-## backend/tests/test_document_archive_api.py
+## 测试文件：backend/tests/test_document_archive_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -235,7 +235,7 @@ InMemoryDocumentRepository.update()
 Response
 ```
 
-## backend/tests/test_document_import_api.py
+## 测试文件：backend/tests/test_document_import_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -266,7 +266,7 @@ InMemoryDocumentRepository.update()
 Response
 ```
 
-## backend/tests/test_document_chunk_api.py
+## 测试文件：backend/tests/test_document_chunk_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -297,7 +297,7 @@ InMemoryDocumentChunkRepository.replace_for_document() / list_for_document()
 Response
 ```
 
-## backend/tests/test_document_retrieval_api.py
+## 测试文件：backend/tests/test_document_retrieval_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -328,7 +328,7 @@ InMemoryKeywordRetrieval.search()
 Response
 ```
 
-## backend/tests/test_internal_rag_api.py
+## 测试文件：backend/tests/test_internal_rag_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -362,7 +362,7 @@ RAGAnswerGenerator.generate()
 Response
 ```
 
-## backend/tests/test_internal_rag_evaluation.py
+## 测试文件：backend/tests/test_internal_rag_evaluation.py
 
 | 项目 | 内容 |
 |---|---|
@@ -393,7 +393,7 @@ InternalRagEvaluationService.evaluate()
 Response
 ```
 
-## backend/tests/test_rag_answer_generator.py
+## 测试文件：backend/tests/test_rag_answer_generator.py
 
 | 项目 | 内容 |
 |---|---|
@@ -421,7 +421,7 @@ RAGAnswerGenerator._fallback()
 Response
 ```
 
-## backend/tests/test_approval_api.py
+## 测试文件：backend/tests/test_approval_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -452,7 +452,7 @@ InMemoryApprovalRepository.save_approval_request() / get_approval_request() / li
 Response
 ```
 
-## backend/tests/test_rbac_guard.py
+## 测试文件：backend/tests/test_rbac_guard.py
 
 | 项目 | 内容 |
 |---|---|
@@ -483,7 +483,7 @@ AuditService.record_audit_log()
 Response
 ```
 
-## backend/tests/test_audit_middleware.py
+## 测试文件：backend/tests/test_audit_middleware.py
 
 | 项目 | 内容 |
 |---|---|
@@ -514,7 +514,7 @@ InMemoryAuditRepository.append()
 Response
 ```
 
-## backend/tests/test_security_audit_api.py
+## 测试文件：backend/tests/test_security_audit_api.py
 
 | 项目 | 内容 |
 |---|---|
@@ -548,7 +548,7 @@ AuditService.list_audit_logs()
 Response
 ```
 
-## backend/tests/test_file_inputs.py
+## 测试文件：backend/tests/test_file_inputs.py
 
 | 项目 | 内容 |
 |---|---|
@@ -575,7 +575,7 @@ file reader / parser
 Assertion
 ```
 
-## backend/tests/test_document_domain.py
+## 测试文件：backend/tests/test_document_domain.py
 
 | 项目 | 内容 |
 |---|---|
@@ -603,7 +603,7 @@ InMemoryDocumentRepository.create() / update() / find_by_checksum()
 Assertion
 ```
 
-## backend/tests/test_repositories.py
+## 测试文件：backend/tests/test_repositories.py
 
 | 项目 | 内容 |
 |---|---|
@@ -631,7 +631,7 @@ Repository Implementation
 Assertion
 ```
 
-## backend/tests/test_settings.py
+## 测试文件：backend/tests/test_settings.py
 
 | 项目 | 内容 |
 |---|---|
@@ -659,7 +659,7 @@ build_container()
 Assertion
 ```
 
-## backend/tests/test_repository_backend_switch.py
+## 测试文件：backend/tests/test_repository_backend_switch.py
 
 | 项目 | 内容 |
 |---|---|
@@ -690,7 +690,7 @@ or backend/app/repositories/postgres/
 Assertion
 ```
 
-## backend/tests/test_postgres_repositories.py
+## 测试文件：backend/tests/test_postgres_repositories.py
 
 | 项目 | 内容 |
 |---|---|
@@ -717,7 +717,7 @@ PostgreSQL roundtrip
 Assertion
 ```
 
-## backend/tests/test_logging.py
+## 测试文件：backend/tests/test_logging.py
 
 | 项目 | 内容 |
 |---|---|
@@ -986,10 +986,10 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 | 验收模式 | 前置条件 | 命令 | 预期结果 | 是否允许真实网络 |
 |---|---|---|---|---|
-| InMemory 全量 unittest（**仅辅助**） | 已创建 `backend/.venv` | `cd backend && ./.venv/bin/python -m unittest discover -s tests -v` | **270** / **52 skipped**；**不作业务验收结论** | 否（默认 stub） |
-| PostgreSQL 全量 unittest（**正式回归**） | 专用库 `erip_integration_test`；`REPOSITORY_BACKEND=postgres`；`LLM_PROVIDER_MODE=stub` | `cd backend && export REPOSITORY_BACKEND=postgres DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql" LLM_PROVIDER_MODE=stub && ./.venv/bin/python -m unittest discover -s tests -v` | **281** / **2 skipped**；**业务与企业能力以本 suite 为准** | 否（默认 stub；仅连本地 PG） |
+| InMemory 全量 unittest（**仅辅助**） | 已创建 `backend/.venv` | `cd backend && ./.venv/bin/python -m unittest discover -s tests -v` | **286** / **62 skipped**；**不作业务验收结论** | 否（默认 stub） |
+| PostgreSQL 全量 unittest（**正式回归**） | 专用库 `erip_integration_test`；`REPOSITORY_BACKEND=postgres`；`LLM_PROVIDER_MODE=stub` | `cd backend && export REPOSITORY_BACKEND=postgres DATABASE_URL="postgresql+psycopg:///erip_integration_test?host=/var/run/postgresql" LLM_PROVIDER_MODE=stub && ./.venv/bin/python -m unittest discover -s tests -v` | **297** / **6 skipped**；**业务与企业能力以本 suite 为准** | 否（默认 stub；仅连本地 PG） |
 | 提交前聚合脚本 | 同本地学习环境 | `./scripts/run_tests.sh` | Backend + Frontend + build + compileall 按脚本约定通过 | 否 |
-| Frontend Vitest + build | 已 `npm install` | `cd frontend && npm test && npm run build` | **113 / 113**；production build 成功 | 否 |
+| Frontend Vitest + build | 已 `npm install` | `cd frontend && npm test && npm run build` | **116 / 116**；production build 成功 | 否 |
 | Compose + Stub E2E | Docker daemon 可用；默认 stub | `./scripts/compose_up.sh` → `./scripts/compose_verify.sh` → `E2E_BASE_URL=http://127.0.0.1:8000 E2E_EXPECT_STUB=1 ./scripts/run_api_e2e.sh` → `./scripts/compose_down.sh` | healthy + E2E `OK`；down **不带** `-v` | 否（容器内 stub） |
 | 真实 OpenRouter smoke（非默认） | 显式 `RUN_REAL_LLM_SMOKE=1` 且已配置 Key | 仅 opt-in 单测入口（见 `test_openrouter_real_smoke.py`）；**默认 suite 不得启用** | 默认 **skip**；启用后才访问外网 | 是（仅该 opt-in） |
 | Backend compileall（独立） | 已创建 `backend/.venv` | `cd backend && ./.venv/bin/python -m compileall app` | 无编译错误输出；exit 0 | 否 |
@@ -1001,14 +1001,14 @@ docs/learning/sample-data/Scenario01_Sales_Decline/
 
 Backend：
 
-- PostgreSQL（**正式**）：**281** tests，**2** skipped。发布基线曾连续三次；日常一次完整 suite 即可。
-- InMemory（**仅辅助**）：**270** tests，**52** skipped；**不作业务验收结论**
+- PostgreSQL（**正式**）：**297** tests，**6** skipped。发布基线曾连续三次；日常一次完整 suite 即可。
+- InMemory（**仅辅助**）：**286** tests，**62** skipped；**不作业务验收结论**
 - Alembic head：`20260717_08_ai_runtime`
 - `compileall app` 与 `git diff --check`：各自独立通过（见上方自动化验收表独立行；亦可由 `./scripts/run_tests.sh` 一并覆盖）
 
 Frontend：
 
-- **113 / 113** tests
+- **116 / 116** tests
 - production build 通过
 
 Docker（daemon 可用时）：

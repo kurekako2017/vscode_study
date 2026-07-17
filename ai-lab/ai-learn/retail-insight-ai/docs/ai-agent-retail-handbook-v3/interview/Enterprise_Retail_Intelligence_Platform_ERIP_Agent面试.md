@@ -1,4 +1,4 @@
-# Enterprise Retail Intelligence Platform（ERIP） 日本 Agent 面试攻略 V1.0
+# Enterprise Retail Intelligence Platform（ERIP）Agent 面试指南 V1.0
 
 ## Volume 01 - 项目介绍与系统架构（中日双语 · 权威合并版）
 
@@ -13,11 +13,11 @@
 
 | 文件 | 用途 |
 |---|---|
-| `01_日本AI项目实战.md` | 业务主链、担当、深掘 |
-| `02_日本AI现场面试.md` | 自介、压迫、速查 |
-| `03_AI核心知识.md` | **技术版本矩阵 + 知识点表** |
-| `07_面试口头训练.md` | 开口训练 |
-| `INTERVIEW_GUIDE.md` | 讲解稿 |
+| [`../01_日本AI项目实战.md`](../01_日本AI项目实战.md) | 业务主链、担当、深掘 |
+| [`02_日本AI现场面试.md`](02_日本AI现场面试.md) | 自介、压迫、速查 |
+| [`../03_AI核心知识.md`](../03_AI核心知识.md) | **技术版本矩阵 + 知识点表** |
+| [`07_面试口头训练.md`](07_面试口头训练.md) | 开口训练 |
+| [`INTERVIEW_GUIDE.md`](INTERVIEW_GUIDE.md) | 讲解稿 |
 
 ---
 
@@ -37,9 +37,10 @@
 | Compose | PostgreSQL + Backend + Nginx Frontend → **8080** |
 | 默认 LLM | **stub**（默认测试不跑真实付费模型） |
 | Runtime 表 | **`ai_runtime_settings`**（mode / kill_switch / version；无 Secret） |
+| 就绪探针 | `/ready`（readiness）与 `/health` 分离；DB/依赖不可用时就绪失败 |
 | Seed | `scripts/seed_scenario01.sh`（PG-only、幂等、零 Provider） |
 
-### 0.2 技术版本快查（详表见 `03_AI核心知识.md`）
+### 0.2 技术版本快查（详表见 [`../03_AI核心知识.md`](../03_AI核心知识.md)）
 
 | 技术 | 版本 | 来源 |
 |---|---|---|
@@ -94,7 +95,7 @@
 
 # 1. 面试开场 / 面接冒頭
 
-## 1.1 60 秒（日文）
+## 1.1 日文自我介绍（60 秒）
 
 ```text
 本日は Enterprise Retail Intelligence Platform、略して ERIP の V1.0 についてご説明します。
@@ -104,13 +105,19 @@
 正式なデータ基盤は PostgreSQL、既定 LLM は stub、ローカル 5173 と Compose 8080 の両方で受入できます。
 ```
 
-## 1.2 60 秒（中文）
+## 1.2 中文自我介绍（60 秒）
 
 ```text
 今天介绍 ERIP V1.0：面向日本零售经营会议的企业 AI 平台。
 登录鉴权 → 文档入湖 → RAG 引用 → 显式 AI → 董事会报告 → 审批 → 审计与 LLM 台账。
 正式 Repository 是 PostgreSQL，默认 stub，5173/8080 双路径验收。
 ```
+
+## 1.25 30 秒项目介绍（中日）
+
+**中文：** ERIP 是零售经营分析企业 AI 平台。React + FastAPI，正式库 PostgreSQL；文档入湖后 RAG 引用，显式 AI 走 low_cost，董事会报告 high_quality，再进审批与审计。默认 stub，InMemory 仅测试。
+
+**日文：** ERIP は小売経営分析の企業 AI 基盤です。React と FastAPI、正式 DB は PostgreSQL。文書取込後に RAG 引用、明示 AI は low_cost、取締役会報告は high_quality、その後承認と監査。既定 stub、InMemory はテストのみ。
 
 ## 1.3 开场注意
 
@@ -382,7 +389,7 @@ RAG はどこで使っていますか。
 文書ページから /rag?document_id= で衔接します。
 ```
 
-## 9.3 Evidence Gate
+## 9.3 证据门禁（Evidence Gate）
 
 ```text
 分析に必要な根拠が足りないとき拒否するゲートです。幻覚と無駄な課金を防ぎます。
@@ -409,7 +416,7 @@ ai_analysis は low_cost、executive_report は high_quality。
 金額は Decimal、使用は llm_usage_ledger、Fallback は OpenRouter→NVIDIA→Gemini→Local Qwen。
 ```
 
-## 10.3 AI Runtime
+## 10.3 AI 运行时配置（AI Runtime）
 
 ```text
 設定は PostgreSQL の ai_runtime_settings に永続化します。
@@ -422,7 +429,7 @@ Admin API は GET/PATCH /api/v1/admin/ai-runtime。InMemory は 503。
 
 ---
 
-# 11. Approval / ReportVersion
+# 11. 审批与报告版本（Approval / ReportVersion）
 
 ## 11.1 问题
 
@@ -454,14 +461,14 @@ History は approval_events、監査は audit_logs で分離します。
 Alembic 1.16.5、head 20260717_08_ai_runtime、psycopg 3.2.9、SQLAlchemy 2.0.51。
 ```
 
-## 12.2 InMemory
+## 12.2 InMemory 测试适配器
 
 ```text
 自動化ユニットテストの高速アダプタと障害隔離用です。
 正式画面・企業受入・本番 Repository ではありません。
 ```
 
-## 12.3 5173 vs 8080
+## 12.3 本地 5173 与 Compose 8080
 
 ```text
 5173：宿主 PostgreSQL + Backend + Vite（start_local.sh）。フル起動後に業務テスト可。Vite 単独は不可。
@@ -612,7 +619,7 @@ React と FastAPI、正式 Repository は PostgreSQL、Alembic head は 08_ai_ru
 2. 隔天练 25 问中的 8 题
 3. 每周一次 5 分钟架构
 4. 辅线（Task/LangGraph）单独练，避免抢主链
-5. 版本数字以 `03_AI核心知识.md` 为准
+5. 版本数字以 [`../03_AI核心知识.md`](../03_AI核心知识.md) 为准
 
 ---
 

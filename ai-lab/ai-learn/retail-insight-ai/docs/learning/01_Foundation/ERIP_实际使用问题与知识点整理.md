@@ -376,10 +376,10 @@ React + Auth/RBAC
 
 1. 修正“只启动 Vite 无法完成业务测试”的歧义：完整本地环境启动后，5173 可以完成业务测试。
 2. `01_日本AI项目实战.md`：项目名称、第五章整体架构、第六章核心模块和全文旧状态需要更新。
-3. `02_日本AI现场面试.md`：全面删除学习项目定位，更新自我介绍、架构、数字与交付边界。
-4. `07_面试口头训练.md`：同步最新业务链、架构、成本治理、审批、审计和 Runtime。
+3. `interview/02_日本AI现场面试.md`：全面删除学习项目定位，更新自我介绍、架构、数字与交付边界。
+4. `interview/07_面试口头训练.md`：同步最新业务链、架构、成本治理、审批、审计和 Runtime。
 5. `03_AI核心知识.md`：增加 ERIP 全技术知识点一览，每项提供一句话解释、项目职责和实现状态。
-6. `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`：保留优秀结构并同步全部最新能力。
+6. `interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`：保留优秀结构并同步全部最新能力。
 7. 所有面试材料必须将 ERIP 表述为真实企业项目，不能写成学习项目或 Current MVP。
 8. 未实现的 Redis、RabbitMQ、OpenTelemetry、Kubernetes、IdP、SIEM、WORM、S3/MinIO 等不得冒充已完成。
 

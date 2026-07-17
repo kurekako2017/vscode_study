@@ -3,7 +3,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 41
+# 第41章（Chapter 41）
 
 # Prompt Engineering（Prompt 工程）
 

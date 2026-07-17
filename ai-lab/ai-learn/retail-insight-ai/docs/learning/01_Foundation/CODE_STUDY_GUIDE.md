@@ -139,7 +139,7 @@ research: route -> research -> report
 - 它接收的是业务请求，输出的是业务结果。
 - 面试时可以说：`Service` 是业务编排层，不让路由直接堆业务规则。
 
-### Repository
+### Repository 仓储层
 
 - 它负责“数据从哪里来、往哪里去”。
 - 它隐藏 InMemory 和 PostgreSQL 的差异。

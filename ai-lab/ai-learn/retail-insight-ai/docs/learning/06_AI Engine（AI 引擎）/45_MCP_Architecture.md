@@ -3,7 +3,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 45
+# 第45章（Chapter 45）
 
 # MCP Architecture（Model Context Protocol）
 

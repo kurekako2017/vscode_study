@@ -629,7 +629,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 | `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` | 分接口学习主文件 | 是 | 是 | 主文件；handbook 仅引用学习路线，不替代此文档 | 否 | 否 |
 | `docs/ai-agent-retail-handbook-v3/06_学习路线.md` | handbook 学习路径文档 | 否 | 是 | 不直接合并；保持入口级路线，引用 `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` | 否 | 是 |
 | `docs/learning/01_Foundation/TEST_CASES.md` | 分测试文件学习主文件 | 是 | 是 | 主文件；handbook 相关章节只引用，不替代 | 否 | 否 |
-| `docs/ai-agent-retail-handbook-v3/07_面试口头训练.md` | 面试口头训练 | 否 | 是 | 不合并；只保留面试训练定位 | 否 | 是 |
+| `docs/ai-agent-retail-handbook-v3/interview/07_面试口头训练.md` | 面试口头训练 | 否 | 是 | 不合并；只保留面试训练定位 | 否 | 是 |
 | `docs/ai-agent-retail-handbook-v3/11_Project_Structure.md` | handbook 项目结构与测试结构说明 | 否 | 是 | 不合并；保留 handbook 结构视角，并引用 `docs/learning/01_Foundation/TEST_CASES.md` | 否 | 是 |
 | `CODE_STUDY_GUIDE.md` | 源码阅读路线主文件 | 是 | 是 | 主文件；handbook 结构/学习路线文档只补充，不替代 | 否 | 否 |
 | `docs/ai-agent-retail-handbook-v3/11_Project_Structure.md` | handbook 项目结构学习文档 | 否 | 是 | `CODE_STUDY_GUIDE.md` 提供源码阅读入口 | 否 | 是 |
@@ -658,7 +658,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
 - [x] `docs/learning/01_Foundation/TEST_CASES.md` 已重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
 - [x] `CODE_STUDY_GUIDE.md` 已重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续作为唯一面试文档入口
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 继续作为唯一面试文档入口
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
 
 ### 文档重构 V3
@@ -667,7 +667,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已重写为中文主导的接口学习走读，并补齐 Swagger / ReDoc / OpenAPI JSON 说明
 - [x] `docs/learning/01_Foundation/TEST_CASES.md` 已重写为程序运行流程学习文档，并补齐程序流转和学习日志
 - [x] `RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md` 已重写为面向新手的启动、验证和源码阅读指南
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 已重写为企业 AI 后端项目面试稿
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 已重写为企业 AI 后端项目面试稿
 - [x] 仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现
 - [x] 删除并收敛旧面试文档引用，统一指向 handbook 唯一入口
 
@@ -676,7 +676,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
 - [x] `docs/learning/01_Foundation/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
 - [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
 - [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
 - [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
@@ -698,7 +698,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] 最短学习路径已收敛到 `README.md` / `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/learning/01_Foundation/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 继续作为收口检查
 

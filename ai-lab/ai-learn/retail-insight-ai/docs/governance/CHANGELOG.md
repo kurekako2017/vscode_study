@@ -27,7 +27,7 @@
 ## 2026-07-17 — ERIP V1.0 Volume 真合并 / 归档 / 03 矩阵 / 静态验证
 
 ### 变更
-- 合并两份面试 Volume 为唯一活动权威 `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+- 合并两份面试 Volume 为唯一活动权威 `Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`
 - 旧 Volume 移动到 `docs/_archive_candidate/handbook-interview/`
 - `03_AI核心知识.md` 定稿技术版本矩阵（B）与技术知识点表（C）
 - 修复 handbook/根 README 等活动文档断链
@@ -429,7 +429,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段、通用时序模板和常见失败速查。
 - `docs/learning/01_Foundation/TEST_CASES.md` 重写为学习导向测试文档，补齐 `Swagger` 和 `unittest` 的区别、每个测试保护的 bug 和能力。
 - `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`。
-- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
+- `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 继续保持企业 AI 后端项目面试稿定位，作为唯一面试文档入口。
 - 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现。
 
 ## 2026-07-05 文档重构 V3
@@ -440,7 +440,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、命令、成功判断、失败现象和修复方法。
 - `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、命令、预想结果、失败现象和参考文档。
 - `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`。
-- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答。
+- `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答。
 - 删除并收敛旧面试文档引用，统一指向 handbook 唯一入口。
 - 本次仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现。
 
@@ -450,7 +450,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 - README 增加初学者只读 5 个文档、面试准备 3 个文档、开发维护再看哪些文档、不要一开始看的文档，以及文档数量控制规则。
 - `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐 Swagger 操作、输入、预期输出、成功后下一步、常见失败和源码位置。
 - `docs/learning/01_Foundation/TEST_CASES.md` 改为测试文件学习表，补齐测试目的、后端流程、Swagger/前端流程和设计理由。
-- `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
+- `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 改为适合日本项目面试的中文主导讲解稿，并加入日语回答要点。
 - `RUNBOOK_LOCAL.md` 明确项目根目录脚本和 backend 目录 uvicorn 的不同执行方式，并补上 Swagger / ReDoc / OpenAPI JSON 的用途。
 - `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档。
 - `CODE_STUDY_GUIDE.md` 增加每章推荐阅读文件和下一步看哪里。
@@ -470,7 +470,7 @@ Freeze LEARNING_API_WALKTHROUGH.md V1.0
 ## 2026-07-05 Sprint R3 Learning Guide + Test Case + Interview Docs Optimization
 
 - 统一最短学习路径到 `README.md`、`docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md`、`CODE_STUDY_GUIDE.md`。
-- 新增 `docs/learning/01_Foundation/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
+- 新增 `docs/learning/01_Foundation/TEST_CASES.md` 和 `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md`，分别用于测试总览和面试讲解。
 - 更新 `README.md`、`RUNBOOK_LOCAL.md`、`VERIFY_CHECKLIST.md`、`CODE_STUDY_GUIDE.md`、`TASK.md`、`ROADMAP.md`、`docs/governance/PROJECT_BACKLOG.md`。
 - 新文档保留 English / 中文（简体） / 日本語 三语摘要，不把未完成能力写成已完成。
 - 本次不新增业务功能，不改 frontend，不接 PostgreSQL，不接真实 LLM，不接 JWT/OAuth，不接 pgvector/MCP。

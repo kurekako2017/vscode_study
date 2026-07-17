@@ -4,7 +4,7 @@
 
 # Volume 05：Enterprise（企业架构）
 
-# Chapter 31
+# 第31章（Chapter 31）
 
 # Security Architecture（企业安全架构）
 

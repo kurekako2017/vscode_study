@@ -2,7 +2,7 @@
 
 # Volume 06：AI Engine（AI 引擎）
 
-# Chapter 43
+# 第43章（Chapter 43）
 
 # Vector Search（向量检索）
 

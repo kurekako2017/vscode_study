@@ -189,7 +189,7 @@ All AI tools working in this repository must follow this document before they wr
 - Keep `README.md` as the navigation center.
 - Keep `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` for runnable learning.
 - Keep `docs/learning/01_Foundation/TEST_CASES.md` for test learning.
-- Keep `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
+- Keep `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` for interview preparation in the handbook mirror.
 - Keep startup and troubleshooting as part of `README.md` and `VERIFY_CHECKLIST.md`; archived runbooks must not remain active maintenance entry points.
 - Keep `VERIFY_CHECKLIST.md` for verification.
 - Keep `CODE_STUDY_GUIDE.md` for source reading order.

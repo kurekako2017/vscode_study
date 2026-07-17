@@ -6,8 +6,8 @@
 > 自动化基线：PostgreSQL **297 tests / 6 skipped**；InMemory **286 / 62 skipped**；Frontend **116/116**；Alembic head **`20260717_08_ai_runtime`**。
 
 > 原文存储：PostgreSQL `documents.content`（S3/MinIO 未接入）。
-> Volume01 权威：`Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`（旧 Retail Volume 已归档）。
-> 技术版本矩阵 / 知识点表：`03_AI核心知识.md` 第一章 B/C。
+> Agent 面试指南权威：[`Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`](Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md)（位于本 `interview/` 目录；旧 Retail Volume 已归档）。
+> 技术版本矩阵 / 知识点表：[`../03_AI核心知识.md`](../03_AI核心知识.md) 第一章 B/C。
 
 ## 项目介绍
 

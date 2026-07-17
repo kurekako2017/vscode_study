@@ -1576,7 +1576,7 @@ mode=fixed      mode=research
 
 ------------------------------------------------------------------------
 
-## AnalysisWorkflow.stream()
+## 方法：AnalysisWorkflow.stream()
 
 真正启动整个 Workflow。
 

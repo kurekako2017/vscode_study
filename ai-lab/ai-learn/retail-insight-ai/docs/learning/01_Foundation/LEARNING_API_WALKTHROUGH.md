@@ -659,46 +659,46 @@ Background 阶段在 HTTP 202 返回后继续执行。
 
 ### 主执行阶段（★★★★★）
 
-### backend/app/api/tasks.py
+### 源码文件：backend/app/api/tasks.py
 
 职责：HTTP 入口，只负责 `create_task()`。
 重点函数：`create_task()`：创建任务，并把后台执行任务加入 BackgroundTasks。
 
-### backend/app/services/task_service.py
+### 源码文件：backend/app/services/task_service.py
 
 职责：创建任务、串联后台任务执行。
 重点函数：`create_task()`：创建任务事实，并返回初始任务状态。
 重点函数：`run_task()`：执行后台任务流程，推动任务状态继续前进。
 
-### backend/app/repositories/implementations/in_memory/task_repository.py
+### 源码文件：backend/app/repositories/implementations/in_memory/task_repository.py
 
 职责：保存任务状态，承接 queued / running / completed。
 重点函数：`create()`：创建新的任务记录并写入仓库。
 重点函数：`save()`：保存任务当前状态快照。
 
-### backend/app/workflow/graph.py
+### 源码文件：backend/app/workflow/graph.py
 
 职责：后台 Workflow，推进 `Route -> KPI -> Research -> Report`。
 重点函数：`stream()`：按流程推进后台工作流并产出执行步骤。
 
-### backend/app/kpi/workflow.py
+### 源码文件：backend/app/kpi/workflow.py
 
 职责：KPI Workflow。
 重点函数：`run()`：执行 KPI 核心计算流程。
 
-### backend/app/agents/providers/static_research.py
+### 源码文件：backend/app/agents/providers/static_research.py
 
 职责：Research。
 重点函数：`research()`：获取研究结果或静态业务资料。
 
-### backend/app/reports/generator.py
+### 源码文件：backend/app/reports/generator.py
 
 职责：生成最终 Report。
 重点函数：`generate()`：把研究与 KPI 结果整理成最终报告。
 
 ### 相关模块（了解即可）
 
-### backend/app/events/publisher.py
+### 源码文件：backend/app/events/publisher.py
 
 说明：负责发布任务生命周期事件。供 SSE/Event Stream 使用。本章节不用深入阅读。
 建议在 `GET /api/tasks/{task_id}/events` 章节再学习。

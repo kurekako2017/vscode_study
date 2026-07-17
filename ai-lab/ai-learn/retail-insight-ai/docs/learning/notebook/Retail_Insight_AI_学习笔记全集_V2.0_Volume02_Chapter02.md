@@ -198,7 +198,7 @@ Executable Workflow
 
 # 8. stream() 与 invoke()
 
-## invoke()
+## 方法：invoke()
 
 ``` text
 Workflow
@@ -212,7 +212,7 @@ Workflow
 
 ------------------------------------------------------------------------
 
-## stream()
+## 方法：stream()
 
 ``` text
 Workflow

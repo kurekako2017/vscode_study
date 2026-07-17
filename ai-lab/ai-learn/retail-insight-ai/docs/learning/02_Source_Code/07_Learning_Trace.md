@@ -135,7 +135,7 @@ finalize_learning_trace()
 
 # 五、各函数职责
 
-## trace_enter()
+## 方法：trace_enter()
 
 作用：
 
@@ -151,7 +151,7 @@ finalize_learning_trace()
 
 ------------------------------------------------------------------------
 
-## trace_step()
+## 方法：trace_step()
 
 作用：
 
@@ -167,7 +167,7 @@ finalize_learning_trace()
 
 ------------------------------------------------------------------------
 
-## trace_source_chain()
+## 方法：trace_source_chain()
 
 作用：
 
@@ -187,7 +187,7 @@ graph.py
 
 ------------------------------------------------------------------------
 
-## format_source_chain()
+## 方法：format_source_chain()
 
 作用：
 
@@ -211,7 +211,7 @@ TaskService.create_task()
 
 ------------------------------------------------------------------------
 
-## trace_exit()
+## 方法：trace_exit()
 
 作用：
 
@@ -225,7 +225,7 @@ TaskService.create_task()
 
 ------------------------------------------------------------------------
 
-## finalize_learning_trace()
+## 方法：finalize_learning_trace()
 
 作用：
 

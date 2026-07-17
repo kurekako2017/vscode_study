@@ -2,7 +2,7 @@
 
 # Volume 04：Execution Flow（源码执行流程）
 
-# Chapter 16
+# 第16章（Chapter 16）
 
 # POST /api/tasks 执行全过程
 
@@ -345,7 +345,7 @@ Completed
 
 # 七、关键函数
 
-## tasks.py
+## 源码文件：tasks.py
 
 ```python
 @router.post("/tasks")
@@ -357,7 +357,7 @@ HTTP 接口入口。
 
 ---
 
-## TaskService.create_task()
+## 方法：TaskService.create_task()
 
 作用：
 
@@ -375,7 +375,7 @@ HTTP 接口入口。
 
 ---
 
-## TaskService.run_task()
+## 方法：TaskService.run_task()
 
 作用：
 
@@ -387,7 +387,7 @@ HTTP 接口入口。
 
 ---
 
-## AnalysisWorkflow.stream()
+## 方法：AnalysisWorkflow.stream()
 
 作用：
 
@@ -404,7 +404,7 @@ HTTP 接口入口。
 
 ---
 
-## EventPublisher.publish()
+## 方法：EventPublisher.publish()
 
 作用：
 

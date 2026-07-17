@@ -26,7 +26,7 @@
 
 ## 2026-07-17 ERIP V1.0 Volume 真合并 + 归档 + 03 矩阵 + 全库静态验证（本轮）
 
-- [x] 两份面试 Volume **真合并**进 `Enterprise_Retail_Intelligence_Platform_ERIP_日本Agent面试_Volume01.md`
+- [x] 两份面试 Volume **真合并**进 `Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`
 - [x] 旧 Volume **实际移动**到 `docs/_archive_candidate/handbook-interview/`
 - [x] `03_AI核心知识.md`：技术版本矩阵（第一章 B）+ 技术知识点表（第一章 C）
 - [x] handbook 活动文档链接修复；根 README / CODE_STUDY 路径修复
@@ -466,7 +466,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 重写为初学者学习文档，补齐 Swagger、当前学习阶段和时序模板
 - [x] `docs/learning/01_Foundation/TEST_CASES.md` 重写为学习导向测试文档，补齐 Swagger / unittest 区别、测试保护的 bug 和能力
 - [x] `CODE_STUDY_GUIDE.md` 重写为固定阅读顺序，明确 `Swagger -> API -> Service -> Repository -> Domain -> Tests`
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 保持企业 AI 后端项目面试稿定位，继续作为唯一面试文档入口
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 保持企业 AI 后端项目面试稿定位，继续作为唯一面试文档入口
 - [x] 本次仅修改文档，不修改 backend、frontend、scripts、业务逻辑或测试实现
 
 ### 文档重构 V1 结果
@@ -477,7 +477,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] `RUNBOOK_LOCAL.md` 重写为启动与排错指南，补齐为什么执行、成功判断、失败原因和解决方法
 - [x] `VERIFY_CHECKLIST.md` 重写为启动完成检查清单，补齐检查项、执行命令、预想结果、失败现象和对应文档
 - [x] `CODE_STUDY_GUIDE.md` 重写为源码阅读指南，补齐为什么要 `Service`、`Repository`、`Provider`、`Workflow`
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 重写为企业 AI 后端项目面试稿，补齐中文回答与日语回答
 - [x] 仅修改文档，不修改 backend、frontend、scripts、API 行为、业务逻辑、数据库或测试实现
 - [x] 删除并收敛旧面试文档引用，统一指向 handbook 唯一入口
 
@@ -486,7 +486,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] README 增加文档导航中心、初学者/面试/开发维护阅读分组和文档数量控制规则
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 改为主链路接口学习表，补齐下一步和常见失败
 - [x] `docs/learning/01_Foundation/TEST_CASES.md` 改为测试文件学习表，补齐后端流程和 Swagger/前端流程
-- [x] `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
+- [x] `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md` 改为中文主导、日语辅助的日本项目面试稿
 - [x] `RUNBOOK_LOCAL.md` 补齐项目根目录脚本与 backend 目录 uvicorn 的区分，以及 Swagger / ReDoc / OpenAPI JSON 用法
 - [x] `VERIFY_CHECKLIST.md` 增加失败时先看哪个文档
 - [x] `CODE_STUDY_GUIDE.md` 补齐推荐阅读文件和下一步看哪里
@@ -508,7 +508,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] 最短学习路径已收敛到 `README.md` / `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/learning/01_Foundation/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
@@ -523,7 +523,7 @@ Documentation Organization + AI Agent Guide 中文化 Sprint
 - [x] 最短学习路径已收敛到 `README.md` / `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` / `CODE_STUDY_GUIDE.md`
 - [x] `README.md` / `RUNBOOK_LOCAL.md` / `VERIFY_CHECKLIST.md` 已补齐启动命令、Swagger 地址、最小验证命令和常见失败原因
 - [x] 新增 `docs/learning/01_Foundation/TEST_CASES.md`，整理 backend tests 现状、核心路径和 PostgreSQL 相关测试
-- [x] 新增 `docs/ai-agent-retail-handbook-v3/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
+- [x] 新增 `docs/ai-agent-retail-handbook-v3/interview/INTERVIEW_GUIDE.md`，整理项目背景、架构、职责和面试回答要点
 - [x] `docs/learning/01_Foundation/LEARNING_API_WALKTHROUGH.md` 已补充最短路径、文档职责与三语言摘要
 - [x] backend tests 与 compileall 验证将继续作为本 sprint 的收口检查
 
@@ -1003,7 +1003,7 @@ Internal Document Retrieval 成为 chunk 与 future RAG 之间的稳定只读边
 
 ### Current State
 
-当前项目名称保持为 `Retail Insight AI`，它是 `Enterprise Retail Intelligence Platform (ERIP)` 的 Current MVP；当前仓库仍是零售分析 Domain 的参考实现，尚未演进成完整企业平台。
+【历史记录·已废止】曾写「Retail Insight AI = Current MVP」。**V1.0 现口径：** 正式名称 Enterprise Retail Intelligence Platform（ERIP）V1.0 为真实企业交付项目；Retail Insight AI 仅为早期历史名称。
 
 ### Target State
 
