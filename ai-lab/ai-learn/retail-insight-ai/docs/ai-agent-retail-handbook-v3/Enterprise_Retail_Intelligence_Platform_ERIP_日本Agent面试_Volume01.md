@@ -22,6 +22,28 @@
 | 默认 LLM | stub |
 | Runtime 表 | `ai_runtime_settings` |
 
+**技术版本基线（声明 / 解析）**
+
+| 技术 | 版本 | 来源 |
+|---|---|---|
+| Python | 3.12-slim | `backend/Dockerfile` |
+| FastAPI | 0.136.3 | `backend/requirements.txt` |
+| Uvicorn | 0.49.0 | requirements |
+| Pydantic | 2.13.4 | requirements |
+| Alembic | 1.16.5 | requirements |
+| psycopg | 3.2.9 | requirements |
+| SQLAlchemy | 2.0.51 | venv |
+| PyJWT | 2.10.1 | requirements |
+| React | lock 19.2.7（`^19.1.0`） | package-lock / package.json |
+| Vite | lock 7.3.6 | package-lock |
+| TypeScript | lock 5.9.3 | package-lock |
+| Vitest | lock 3.2.6 | package-lock |
+| PostgreSQL+pgvector | pg16 | docker-compose |
+| Nginx | 1.29-alpine | frontend Dockerfile |
+| Node | 22-alpine | frontend Dockerfile |
+
+知识点详表：`03_AI核心知识.md` 第一章 B。
+
 **业务主链**
 
 ```text
