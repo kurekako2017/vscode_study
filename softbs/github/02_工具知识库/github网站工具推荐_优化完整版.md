@@ -87,7 +87,7 @@
 | Open-Lovable | https://github.com/firecrawl/open-lovable | AI 应用生成和辅助开发相关项目 | 从需求到界面的 AI 开发流程 |
 | Awesome LLM Apps | https://github.com/theunwindai/awesome-llm-apps | AI 应用落地实战案例与教程合集 | LLM、RAG、AI Agents、Voice Agents 实战 |
 | ai-engineering-from-scratch | https://github.com/rohitg00/ai-engineering-from-scratch | 从零构建 AI 工程项目的实战指南 | 从底层原理到企业级 AI 应用交付 |
-| AI Website Cloner Template | https://github.com/JCodesMore/ai-website-cloner-template | 用 AI 编码 Agent 将网页反向整理为 Next.js 代码库的模板 | 网页结构分析、Design Token 提取、组件化、视觉差异验证 |,是目前最适合快速克隆网站 + 快速开发 + 部署的开源工具|
+| AI Website Cloner Template | https://github.com/JCodesMore/ai-website-cloner-template | 用 AI 编码 Agent 将网页反向整理为 Next.js 代码库的模板 | 网页结构分析、Design Token 提取、组件化、视觉差异验证，是目前最适合快速克隆网站 + 快速开发 + 部署的开源工具 |
 
 ### 代码学习心得
 
