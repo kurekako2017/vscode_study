@@ -74,7 +74,7 @@ company-website/
 ### 前置要求
 
 - Node.js 18+ 
-- pnpm / npm / yarn
+- npm / npm / yarn
 - Git
 - Supabase 账号（免费）
 - Vercel 账号（免费）
@@ -87,14 +87,14 @@ cd web-projects/sample/company-website
 
 # 2. 安装前端依赖
 cd frontend
-pnpm install
+npm install
 
 # 3. 配置环境变量
 cp .env.example .env.local
 # 编辑 .env.local，填入 Supabase 配置
 
 # 4. 运行开发服务器
-pnpm dev
+npm run dev
 # 访问 http://localhost:3000
 ```
 
