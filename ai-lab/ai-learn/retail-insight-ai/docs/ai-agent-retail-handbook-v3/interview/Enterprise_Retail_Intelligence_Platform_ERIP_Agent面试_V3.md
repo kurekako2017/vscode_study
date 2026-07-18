@@ -99,7 +99,7 @@
 
 ```text
 本日は Enterprise Retail Intelligence Platform、略して ERIP の V1.0 についてご説明します。
-日本の小売企業が経営会議前に、社内文書を根拠として分析し、取締役会向け報告を作成し、
+大手流通グループの地域本部・事業会社・経営企画部門が、経営会議前に社内文書を根拠として分析し、取締役会向け報告を作成し、
 上長が承認するまでの業務を、JWT/RBAC、RAG、LLM Gateway、Approval、監査、使用台帳で
 一貫して実装した企業 AI プラットフォームです。
 正式なデータ基盤は PostgreSQL、既定 LLM は stub、ローカル 5173 と Compose 8080 の両方で受入できます。
@@ -108,14 +108,14 @@
 ## 1.2 中文自我介绍（60 秒）
 
 ```text
-今天介绍 ERIP V1.0：面向日本零售经营会议的企业 AI 平台。
+今天介绍 ERIP V1.0：面向大型流通集团区域本部、事业公司和经营分析部门的企业 AI 平台。
 登录鉴权 → 文档入湖 → RAG 引用 → 显式 AI → 董事会报告 → 审批 → 审计与 LLM 台账。
 正式 Repository 是 PostgreSQL，默认 stub，5173/8080 双路径验收。
 ```
 
 ## 1.25 30 秒项目介绍（中日）
 
-**中文：** ERIP 是零售经营分析企业 AI 平台。React + FastAPI，正式库 PostgreSQL；文档入湖后 RAG 引用，显式 AI 走 low_cost，董事会报告 high_quality，再进审批与审计。默认 stub，InMemory 仅测试。
+**中文：** ERIP 是面向大型流通集团、首期服务于区域或事业部经营分析部门的企业 AI 平台。React + FastAPI，正式库 PostgreSQL；文档入湖后 RAG 引用，显式 AI 走 low_cost，董事会报告 high_quality，再进审批与审计。默认 stub，InMemory 仅测试。
 
 **日文：** ERIP は小売経営分析の企業 AI 基盤です。React と FastAPI、正式 DB は PostgreSQL。文書取込後に RAG 引用、明示 AI は low_cost、取締役会報告は high_quality、その後承認と監査。既定 stub、InMemory はテストのみ。
 
@@ -176,6 +176,124 @@ ERIP 解决的是“会前如何稳定产出有依据的分析与可审批报告
 按 2.1 回答，再补一句测试数字与默认 stub。
 
 ---
+
+# 2.4 项目规模定位 / システム規模の位置付け
+
+## 中文统一口径
+
+ERIP 是面向大型流通集团经营分析部门的企业 AI 平台。
+
+主要使用对象包括：
+
+- 经营企划部门
+- 店铺运营部门
+- 管理者
+- 审批负责人
+
+系统覆盖完整业务流程：
+
+```text
+JWT / RBAC
+→ 文档管理
+→ RAG 检索
+→ AI 经营分析
+→ 董事会报告
+→ Approval
+→ Audit
+→ LLM Usage Ledger
+```
+
+技术栈：
+
+```text
+React
+FastAPI
+PostgreSQL
+pgvector
+Docker
+```
+
+生产部署采用：
+
+```text
+CloudFront
+ALB
+ECS Fargate
+Amazon RDS PostgreSQL
+Amazon S3
+CloudWatch
+Secrets Manager
+```
+
+ERIP 是一套企业经营分析平台，而不是聊天 Demo，也不是小企业内部工具。
+
+## 日文面试回答
+
+```text
+ERIP は大手流通グループの経営分析部門向け AI プラットフォームです。
+
+経営企画部門が文書を登録し、
+RAG による根拠検索を行い、
+AI が経営分析を実施し、
+取締役会向けレポートを生成します。
+
+その後、管理者が承認し、
+監査ログと LLM Usage Ledger により、
+操作履歴と AI 利用履歴を管理します。
+
+システムは React、FastAPI、PostgreSQL、Docker を採用しています。
+
+本番構成は CloudFront、ALB、ECS Fargate、
+Amazon RDS PostgreSQL、Amazon S3 を前提に設計しています。
+```
+
+## 30秒回答
+
+```text
+ERIP は大手流通グループ向けの経営分析 AI プラットフォームです。
+
+文書管理、RAG、AI分析、取締役会レポート、
+承認、監査までを一つの業務フローとして実装しました。
+
+React、FastAPI、PostgreSQL を採用し、
+本番構成は ECS Fargate、RDS PostgreSQL、
+Amazon S3 を前提にしています。
+```
+
+## 为什么采用方案B
+
+ERIP 的生产架构采用：
+
+```text
+CloudFront
+ALB
+ECS Fargate
+Amazon RDS PostgreSQL
+Amazon S3
+```
+
+原因：
+
+- FastAPI 易于容器化部署；
+- ECS Fargate 无需自行维护服务器；
+- RDS 提供企业级数据库管理；
+- S3 提供对象存储；
+- CloudWatch 提供统一日志监控；
+- 在可靠性、运维成本、扩展性和开发效率之间取得平衡。
+
+因此采用 ECS Fargate，而不是自行维护 EC2。
+
+## 面试官追问
+
+**Q（日）：大手企業向けなら、なぜ最初から EKS にしないのですか。**
+
+```text
+企業規模だけで EKS を選ぶのではなく、サービス数、運用体制、SRE 能力、
+既存クラウド標準で判断します。
+ERIP V1.0 は API、Worker、PostgreSQL、Object Storage、LLM Provider が中心で、
+ECS Fargate の方が運用複雑度を抑えながら十分に水平拡張できます。
+顧客に統一 Kubernetes 基盤がある場合は EKS を選択肢にします。
+```
 
 # 3. 履历书统一口径
 
