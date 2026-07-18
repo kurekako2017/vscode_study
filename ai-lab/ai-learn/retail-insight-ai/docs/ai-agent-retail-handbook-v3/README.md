@@ -86,12 +86,12 @@ interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md
 
 | 优先级 | 文件 | 用途 | 状态 |
 |---|---|---|---|
-| 1 | [`interview/new/…_Part01.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part01.md) | **V4 面试主文档** 开场 + **全体架构** + **LangChain/LangGraph** | 活动 |
-| 2 | [`interview/new/…_Part02.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part02.md) | **V4 正式版** Backend | 活动 |
-| 3 | [`interview/new/…_Part03.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part03.md) | **V4 正式版** Document / RAG | 活动 |
-| 4 | [`interview/new/…_Part04.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part04.md) | **V4 正式版** Workflow / Approval / SSE | 活动 |
-| 5 | [`interview/new/…_Part05.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part05.md) | **V4 正式版** AWS / 本番 | 活动 |
-| 6 | [`interview/new/…_Part06.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part06.md) | **V4 正式版** 压迫 / 比较 / Appendix | 活动 |
+| 1 | [`interview/new/…_Part01.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part01.md) | **V4 面试主文档** 开场 + **全体架构** + **LangChain/LangGraph** | 活动 |
+| 2 | [`interview/new/…_Part02.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part02.md) | **V4 正式版** Backend | 活动 |
+| 3 | [`interview/new/…_Part03.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part03.md) | **V4 正式版** Document / RAG | 活动 |
+| 4 | [`interview/new/…_Part04.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part04.md) | **V4 正式版** Workflow / Approval / SSE | 活动 |
+| 5 | [`interview/new/…_Part05.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part05.md) | **V4 正式版** AWS / 本番 | 活动 |
+| 6 | [`interview/new/…_Part06.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part06.md) | **V4 正式版** 压迫 / 比较 / Appendix | 活动 |
 | 7 | [`interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`](interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md) | V1.0 合订本（补充对照） | 活动 |
 | 8 | [`interview/INTERVIEW_GUIDE.md`](interview/INTERVIEW_GUIDE.md) | 讲解稿 | 活动 |
 | 9 | [`interview/02_日本AI现场面试.md`](interview/02_日本AI现场面试.md) | 自介、深掘、压迫补充 | 活动 |

@@ -1,5 +1,19 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-18 — interview/new 面试口径统一（LangChain + LangGraph）
+
+### 变更
+- 修改 `interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part01.md`〜`Part06.md`
+- 统一正式面试架构：LangChain = AI Components、LangGraph = Stateful Agent Workflow
+- Part02 边界、Part03 联动、Part04 对比表、Part05 AI 层、Part06 压迫问答与 1/3/5 分
+- README 链接改为新文件名
+
+### 未变更
+- 源码、09 系统设计书、架构图、履历书
+- 未 commit/push
+
+
+
 ## 2026-07-18 — Part01 を ERIP 全体架构 / LangChain·LangGraph 面接主文档へ改訂
 
 ### 变更

@@ -74,6 +74,9 @@
 ## Chapter 12　面接用ストーリー
 - 12.1 失敗から学んだ点
 
+## Chapter 13　LangGraph と LangChain の協働
+- 13.1 Node 内部の LangChain
+
 ---
 
 # Chapter 2　LangGraph / Workflow 基礎
@@ -118,6 +121,9 @@ LangGraph をどう使いましたか。
 状態付きグラフとして業務ステップを Node と Edge で表現するために使いました。
 
 分析ワークフローなど、段階的に状態を更新する処理で有効です。
+Node 内部の Prompt / Retriever / LLM は LangChain の AI Components を使用し、
+Node 間の順序と分岐は LangGraph が制御します。
+
 『エージェントが勝手に何でもする』ためではなく、制御可能な業務流のために使います。
 
 ## 追問
@@ -915,13 +921,62 @@ SSE と状態 API の併用、Approval 分離、Audit 徹底で解決しまし�
 ---
 
 
+
+# Chapter 13　LangGraph と LangChain の協働
+
+## 13.1 Node 内部の LangChain
+
+## 面接官
+
+LangGraph の Node と LangChain の関係は何ですか。
+
+## 回答
+
+LangGraph は Node 間の流れを制御します。
+LangChain は Node 内部の AI 能力を構成します。
+
+例えば、
+Retriever、Prompt、LLM Integration、Citation は
+LangChain の AI Components です。
+
+route / kpi / research / report の順序と分岐は
+LangGraph の Agent Workflow です。
+
+LangGraph は LangChain を代替しません。
+
+## 追問
+
+比較表で説明してください。
+
+## 回答
+
+| 项目 | LangChain | LangGraph |
+|---|---|---|
+| 主要职责 | AI Components | Workflow Orchestration |
+| 状态管理 | 简单 Chain Context | Stateful Graph |
+| 条件分支 | 有限 | 强 |
+| 多步骤流程 | 可实现但复杂 | 主要用途 |
+| ERIP 中作用 | RAG / Prompt / LLM | route / kpi / research / report |
+
+ERIP では、
+LangChain で各 AI 処理を構成し、
+LangGraph で全体 Workflow を制御します。
+
+## Point
+
+- Node 内 = LangChain
+- Node 間 = LangGraph
+- 协作，不替换
+
+---
+
 # Part 04 要点总结
 
 1. Workflow は多段業務の状態と順序を明示する
-2. LangGraph は制御可能な State 機械として使う
-3. レポート生成 ≠ 業務確定。Approval が責任分界
-4. Audit は Who/When/What/Result を残す
-5. SSE は長時間処理の進捗可視化
-6. 主鎖：文書 → RAG → 分析 → レポート → 承認 → 監査
+2. LangGraph = Stateful Agent Workflow（route / kpi / research / report）
+3. LangChain = Node 内部の AI Components（Prompt / Retriever / LLM）
+4. LangGraph は LangChain を置き換えない
+5. レポート生成 ≠ 業務確定。Approval が責任分界
+6. 主鎖：文書 → LangChain RAG → LangGraph 分析 → レポート → 承認 → 監査
 
 『自動で何でもやる』ではなく『責任ある自動化』で語る。

@@ -96,13 +96,21 @@
  → CloudFront
  → ALB
  → Frontend（Nginx / 静的配信）
- → ALB / サービス経路
  → Backend（ECS Fargate 上の FastAPI）
- → RDS PostgreSQL
+ → LangChain
+ → LangGraph
+ → LLM Gateway
+ → RDS PostgreSQL / pgvector
+ → Approval / Audit
  → Secrets Manager / CloudWatch / IAM
 ```
 
 S3 は成果物や静的資源の保管に使います。
+
+AI 層として、
+LangChain は AI Components、
+LangGraph は Stateful Agent Workflow、
+LLM Gateway はモデル呼び出し統制を担当します。
 
 ## 追問
 
@@ -666,7 +674,10 @@ request_id やデプロイ版、DB 状態、外部依存を順に見ます。
 ## 回答
 
 CloudFront と ALB を入口に、Frontend は Nginx 静的配信、
-Backend は ECS Fargate の FastAPI、データは RDS PostgreSQL です。
+Backend は ECS Fargate の FastAPI です。
+その上で LangChain / LangGraph / LLM Gateway の AI 層を実行し、
+データは RDS PostgreSQL / pgvector、
+確定制御は Approval / Audit です。
 Secret は Secrets Manager、監視は CloudWatch、権限は IAM 最小特権。
 Docker と CI/CD で再現可能にデプロイします。
 
@@ -919,9 +930,9 @@ ECS の詳細設定から始めて良いですか。
 
 1. 入口：CloudFront / ALB / Nginx
 2. 計算：ECS Fargate + FastAPI
-3. データ：RDS PostgreSQL（+ 必要に応じ S3）
-4. 運用：IAM 最小特権、Secrets、CloudWatch
-5. 配送：Docker + CI/CD + ロールバック
-6. 可用性：Multi-AZ、ヘルスチェック、単一障害点削減
+3. AI 層：LangChain → LangGraph → LLM Gateway
+4. データ：RDS PostgreSQL / pgvector（+ 必要に応じ S3）
+5. ガバナンス：Approval / Audit
+6. 運用：IAM 最小特権、Secrets、CloudWatch、CI/CD
 
-AWS は聞かれたら話す。案件开场では業務価値を優先する。
+AWS は聞かれたら話す。案件开场では業務価値と AI Agent 中核を優先する。

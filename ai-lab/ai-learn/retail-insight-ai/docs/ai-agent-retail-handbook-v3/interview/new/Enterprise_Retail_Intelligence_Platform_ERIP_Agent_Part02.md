@@ -86,6 +86,10 @@
 ## Chapter 15　クロージング
 - 15.1 30秒 / 2分
 
+## Chapter 16　FastAPI と LangChain / LangGraph の境界
+- 16.1 境界の全体像
+- 16.2 なぜ Backend に AI Framework 境界が必要か
+
 ---
 
 # Chapter 2　Backend 全体像
@@ -994,7 +998,7 @@ Backend を 30 秒と 2 分で説明してください。
 
 ## 回答
 
-30秒：FastAPI で Router/Service/Repository 分離。JWT/RBAC の下で文書・検索・分析・承認・監査を提供し、正式データは PostgreSQL。
+30秒：FastAPI で API 境界、Service で業務、LangChain で AI Components、LangGraph で Agent Workflow。JWT/RBAC の下で文書・検索・分析・承認・監査を提供し、正式データは PostgreSQL。
 
 2分：入口で Validation と認証認可、Service で業務、Repository で永続化。正式は PostgreSQL、テストは InMemory。統一例外と request_id で追跡。AI があっても権限と業務事実は Backend が担保。
 
@@ -1016,12 +1020,124 @@ Backend を 30 秒と 2 分で説明してください。
 
 ---
 
+
+# Chapter 16　FastAPI と LangChain / LangGraph の境界
+
+## 16.1 境界の全体像
+
+## 面接官
+
+FastAPI と LangChain / LangGraph の境界を説明してください。
+
+## 回答
+
+境界は次の通りです。
+
+```text
+FastAPI
+= HTTP / Authentication / Authorization / API Boundary
+
+Service
+= Business Use Case
+
+LangChain
+= AI Components
+
+LangGraph
+= Agent Workflow
+
+Repository
+= Persistence
+
+PostgreSQL
+= Business Data / State / Audit
+```
+
+FastAPI は企業 API の入口、
+Service は業務ユースケース、
+LangChain は Prompt / Retriever / RAG / LLM などの AI 部品、
+LangGraph は多段階の Stateful Agent Workflow、
+Repository / PostgreSQL は永続化を担当します。
+
+## 追問
+
+呼び出しチェーンを教えてください。
+
+## 回答
+
+```text
+React
+ → FastAPI
+ → Service
+ → LangChain
+ → LangGraph
+ → LLM Gateway
+ → Repository
+ → PostgreSQL
+```
+
+権限は FastAPI 境界で確定し、
+AI 処理は Service 配下の LangChain / LangGraph で実行し、
+業務事実は Repository 経由で PostgreSQL に保存します。
+
+## Point
+
+- FastAPI ≠ AI Framework
+- LangChain = AI Components
+- LangGraph = Stateful Agent Workflow
+
+---
+
+## 16.2 なぜ Backend に AI Framework 境界が必要か
+
+## 面接官
+
+なぜ Router から直接 LLM を呼ばないのですか。
+
+## 回答
+
+HTTP 境界と AI 処理境界を混ぜると、
+権限・監査・状態管理・失敗処理が散らばるためです。
+
+ERIP では、
+FastAPI は API Boundary、
+LangChain は AI Components、
+LangGraph は Agent Workflow、
+と責務を分けています。
+
+## 追問
+
+LangChain と LangGraph の違いは。
+
+## 回答
+
+LangChain は、
+Prompt、Retriever、RAG Context、
+Citation、Tool、LLM Integration など
+AI Components を構成する Framework です。
+
+LangGraph は、
+State、Node、Edge、条件分岐を用いて
+複数ステップの Agent Workflow を
+制御する Framework です。
+
+ERIP では、
+LangChain で各 AI 処理を構成し、
+LangGraph で全体 Workflow を制御しています。
+
+## Point
+
+- 入口 / 業務 / AI 部品 / Workflow / 永続化を混同しない
+
+---
+
 # Part 02 要点总结
 
-1. 呼び出しチェーン：React → FastAPI → Router → Service → Repository → PostgreSQL
+1. 呼び出しチェーン：React → FastAPI → Service → LangChain → LangGraph → LLM Gateway → Repository → PostgreSQL
 2. 責務分離：入口 / 業務 / 永続化
 3. JWT = Authentication、RBAC = Authorization
 4. 正式データは PostgreSQL、InMemory はテスト実装
 5. 企業要件：権限、承認、監査、トランザクション、追跡性
+6. LangChain = AI Components、LangGraph = Stateful Agent Workflow
 
 技術名の前に「何を守る Backend か」を先に言う。

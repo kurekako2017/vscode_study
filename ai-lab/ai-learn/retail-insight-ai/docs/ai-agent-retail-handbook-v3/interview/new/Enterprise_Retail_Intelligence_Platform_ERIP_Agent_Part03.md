@@ -15,7 +15,7 @@
 本册は文書管理から RAG までの企業実装を面接形式で整理した正式版である。
 
 - 完成済み企業案件として記述する
-- TODO / Coming Soon / Phase 表現は使わない
+- 未完成・今後対応・開発中の表現は使わない
 - 形式は「面接官 → 回答 → 追問 → 回答 → Point」
 
 ---
@@ -72,6 +72,9 @@
 ## Chapter 11　面接用短答
 - 11.1 30秒で RAG
 - 11.2 なぜ Vector だけではないか
+
+## Chapter 12　LangChain RAG と LangGraph の連携
+- 12.1 LangChain と LangGraph の RAG 分担
 
 ---
 
@@ -465,8 +468,12 @@ Top-K はどのように考えますか。
 
 LLM 単体では社内の最新文書や業務固有情報を正確に使えません。
 
-関連文書を検索して渡し、根拠付き分析を実現するため RAG を採用しました。
+関連文書を検索して渡し、根拠付き分析を実現するため、
+LangChain の AI Components として RAG を採用しました。
 回答品質と説明責任の両立が目的です。
+
+取得した根拠は、必要に応じて LangGraph の State へ渡り、
+後続の Analysis / Report Node で利用されます。
 
 ## 追問
 
@@ -911,13 +918,64 @@ Keyword と組み合わせて取りこぼしを減らします。
 ---
 
 
+
+# Chapter 12　LangChain RAG と LangGraph の連携
+
+## 12.1 LangChain と LangGraph の RAG 分担
+
+## 面接官
+
+RAG における LangChain と LangGraph の役割は何ですか。
+
+## 回答
+
+LangChain は次を担当します。
+
+- Document Loader
+- Text Splitter / Chunk
+- Retriever
+- Prompt
+- Context
+- Citation
+- RAG Chain
+
+LangGraph は次を担当します。
+
+- いつ Retrieval を実行するか
+- 次に KPI / Research / Report のどこへ進むか
+- RAG 結果を後続 Workflow の State として管理すること
+
+つまり、
+LangChain は AI Components、
+LangGraph は Stateful Agent Workflow です。
+
+## 追問
+
+LangChain の RAG は LangGraph とどう連携しますか。
+
+## 回答
+
+LangChain で取得した Retrieval Result と Context を
+LangGraph の State に格納し、
+次の Analysis Node や Report Node が利用します。
+
+検索・文脈組み立ては LangChain、
+その後の多段階分析と分岐は LangGraph です。
+
+## Point
+
+- LangChain RAG → State → LangGraph Node
+- 置き換えではなく連携
+
+---
+
 # Part 03 要点总结
 
 1. Document Lifecycle：登録 → Import → Chunk → 検索可能 → 利用 → アーカイブ
-2. なぜ Chunk：検索精度と Context 制御
-3. なぜ Hybrid：Keyword 正確性 + Vector 意味カバレッジ
-4. なぜ RAG：社内根拠付き分析と説明責任
+2. LangChain：Document Loader / Chunk / Retriever / Prompt / Context / Citation / RAG Chain
+3. LangGraph：Retrieval の実行タイミングと後続 KPI / Research / Report 分岐
+4. 連携：Retrieval Result + Context を State に格納し後続 Node が利用
 5. LLM Gateway：呼び出し統制、経路、コスト、観測
 6. 回答は必ず Citation と権限を伴う
 
-『検索』と『生成』を分けて説明できることが合格ライン。
+LangChain = AI Components、LangGraph = Stateful Agent Workflow。

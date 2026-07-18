@@ -1,5 +1,18 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-18 Completed: interview/new Part01〜06 口径统一（LangChain+LangGraph）
+
+- [x] 新文件名 `Enterprise_Retail_Intelligence_Platform_ERIP_Agent_Part0X.md` を直接修改
+- [x] Part01〜06 の面接口径を LangChain + LangGraph に統一
+- [x] Part02 境界 / Part03 連携 / Part04 比較表 / Part05 AI 層 / Part06 压迫+1/3/5 分
+- [x] handbook README 旧文件名リンク修正
+- [x] 未改 源码・系统设计书・履历书
+- [ ] 用户自行 commit
+
+最后更新：2026-07-18
+
+
+
 ## 2026-07-18 Completed: Part01 架构主文档再定位（LangChain / LangGraph）
 
 - [x] Part01 を AI Agent 面接主ドキュメントへ改訂
