@@ -1,18 +1,18 @@
-# Enterprise Retail Intelligence Platform（ERIP）
+# Enterprise リテールインテリジェンス Platform（ERIP）
 # Agent 面试指南 V4 正式版
-## Part 02：Backend（FastAPI / Repository / JWT / RBAC）
+## Part 02：バックエンド（バックエンド）（FastAPI / リポジトリ層 / JWT（JSON Web Token）（JSON Web トークン） / RBAC（ロールベースアクセス制御）（ロールベースアクセス制御））
 
 ---
 
 - **Version**：V4.0 Official Edition
-- **Document Type**：Interview Handbook
+- **文書（文書） Type**：Interview Handbook
 - **Language**：日本語中心
-- **対象**：AI Engineer / Agent Engineer / Backend Engineer / Solution Architect / Technical Leader
+- **対象**：AI Engineer / Agent Engineer / バックエンド Engineer / Solution Architect / Technical Leader
 - **前提**：Part01 の後に使用する
 
 # 更新说明
 
-本册は ERIP Backend を日本現場面接形式で整理した正式版である。
+本册は ERIP バックエンド を日本現場面接形式で整理した正式版である。
 
 - すでに企業案件として完成した前提で記述する
 - 将来計画・開発中・Phase 表現は使わない
@@ -21,12 +21,12 @@
 ---
 
 
-> **位置付け**：Backend 深掘り备用资料。面试主线は Part01。
+> **位置付け**：バックエンド 深掘り备用资料。面试主线は Part01。
 
 # 目录
 
-## Chapter 2　Backend 全体像
-- 2.1 Backend の役割
+## Chapter 2　バックエンド 全体像
+- 2.1 バックエンド の役割
 - 2.2 レイヤ構造
 - 2.3 呼び出しチェーン
 - 2.4 設計理由
@@ -37,27 +37,27 @@
 - 3.3 Flask / Django 比較
 - 3.4 OpenAPI
 
-## Chapter 4　Router
+## Chapter 4　ルーター（ルーター）
 - 4.1 責務と禁止事項
-- 4.2 主要 Router とバージョン
+- 4.2 主要 ルーター とバージョン
 
-## Chapter 5　Service
-- 5.1 Service の役割
-- 5.2 代表 Service と Workflow 境界
+## Chapter 5　サービス層
+- 5.1 サービス層 の役割
+- 5.2 代表 サービス層 と ワークフロー（ワークフロー（Workflow）） 境界
 
-## Chapter 6　Repository Pattern
+## Chapter 6　リポジトリパターン（リポジトリ層 Pattern）
 - 6.1 定義と採用理由
 - 6.2 Interface・主要実装
 
-## Chapter 7　Dependency Injection
-- 7.1 DI と Depends
+## Chapter 7　依存性注入（依存性注入）
+- 7.1 DI と Depends（依存宣言）
 - 7.2 テストとの関係
 
-## Chapter 8　Pydantic / Exception
-- 8.1 Validation
+## Chapter 8　Pydantic / 例外（例外）
+- 8.1 入力検証（入力検証）
 - 8.2 例外と request_id
 
-## Chapter 9　PostgreSQL / Transaction
+## Chapter 9　PostgreSQL / トランザクション（トランザクション）
 - 9.1 なぜ PostgreSQL
 - 9.2 トランザクション
 - 9.3 Alembic / pgvector
@@ -70,14 +70,14 @@
 - 11.1 JWT の役割
 - 11.2 claims と期限
 
-## Chapter 12　RBAC / Permission / CurrentUser
+## Chapter 12　RBAC / 権限（権限） / CurrentUser（操作ユーザー情報）（操作ユーザー情報）
 - 12.1 認証と認可
-- 12.2 ロールと Permission
+- 12.2 ロールと 権限
 - 12.3 実装位置と CurrentUser
 
 ## Chapter 13　業務別呼び出し
 - 13.1 文書登録
-- 13.2 RAG と承認
+- 13.2 RAG（検索拡張生成）（検索拡張生成） と承認
 
 ## Chapter 14　TL 深掘り
 - 14.1 層を守る理由
@@ -88,24 +88,24 @@
 
 ## Chapter 16　FastAPI と LangChain / LangGraph の境界
 - 16.1 境界の全体像
-- 16.2 なぜ Backend に AI Framework 境界が必要か
+- 16.2 なぜ バックエンド に AI フレームワーク（フレームワーク（Framework）） 境界が必要か
 
 ---
 
-# Chapter 2　Backend 全体像
+# Chapter 2　バックエンド 全体像
 
-## 2.1 Backend の役割
+## 2.1 バックエンド の役割
 
 ## 面接官
 
-ERIP の Backend は何を担当していますか。
+ERIP の バックエンド は何を担当していますか。
 
 ## 回答
 
-ERIP の Backend は、企業向け AI 経営分析プラットフォームの中核です。
+ERIP の バックエンド は、企業向け AI 経営分析プラットフォームの中核です。
 
 認証・認可、文書管理、検索、AI 分析の起動、レポート生成、承認、監査を API として提供します。
-Frontend は画面と操作、Backend は業務ルール・権限・データの正しさを担当します。
+フロントエンド（フロントエンド） は画面と操作、バックエンド は業務ルール・権限・データの正しさを担当します。
 
 ## 追問
 
@@ -113,12 +113,12 @@ Frontend は画面と操作、Backend は業務ルール・権限・データの
 
 ## 回答
 
-Frontend は UX、Backend は業務整合性・権限・永続化です。
+フロントエンド は UX、バックエンド は業務整合性・権限・永続化です。
 画面でボタンを隠しても、API 側で権限とバリデーションを必ず実施します。
 
 ## Point
 
-- Backend = 業務 + 権限 + 永続化
+- バックエンド = 業務 + 権限 + 永続化
 - セキュリティ境界は API
 
 【面试技巧】
@@ -131,13 +131,13 @@ Frontend は UX、Backend は業務整合性・権限・永続化です。
 
 ## 面接官
 
-なぜ Router / Service / Repository に分けましたか。
+なぜ ルーター / サービス層 / リポジトリ層 に分けましたか。
 
 ## 回答
 
 責務分離と変更影響の局所化のためです。
 
-Router は HTTP、Service は業務、Repository は永続化です。
+ルーター は HTTP、サービス層 は業務、リポジトリ層 は永続化です。
 API 変更、業務変更、DB 変更を独立して扱えます。
 
 ## 追問
@@ -146,7 +146,7 @@ API 変更、業務変更、DB 変更を独立して扱えます。
 
 ## 回答
 
-Router に SQL や承認判定が混在し、テスト困難・権限漏れ・重複が増えます。
+ルーター に SQL や承認判定が混在し、テスト困難・権限漏れ・重複が増えます。
 DB 変更時に API 全体改修が必要になります。
 
 ## Point
@@ -160,38 +160,38 @@ DB 変更時に API 全体改修が必要になります。
 
 ## 面接官
 
-Backend 呼び出しチェーンを説明してください。
+バックエンド 呼び出しチェーンを説明してください。
 
 ## 回答
 
 ```text
-React → FastAPI → Router → Service → Repository → PostgreSQL
+React → FastAPI → ルーター → サービス層 → リポジトリ層 → PostgreSQL
 ```
 
-JWT 認証、CurrentUser 確定、Permission 認可の後、Service が業務を実行し、Repository が PostgreSQL へ保存・取得します。
+JWT 認証、CurrentUser 確定、権限 認可の後、サービス層 が業務を実行し、リポジトリ層 が PostgreSQL へ保存・取得します。
 
 ## 追問
 
-RAG や Workflow はどこに入りますか。
+RAG や ワークフロー はどこに入りますか。
 
 ## 回答
 
-Service 配下です。
+サービス層 配下です。
 
 ```text
-Service → Workflow / Retrieval / LLM Gateway → Repository
+サービス層 → ワークフロー / 検索処理（Retrieval） / LLM（大規模言語モデル） ゲートウェイ → リポジトリ層
 ```
 
-AI 処理があっても永続化境界は Repository に統一します。
+AI 処理があっても永続化境界は リポジトリ層 に統一します。
 
 ## Point
 
 - 主鎖を先に暗記
-- AI は Service 配下
+- AI は サービス層 配下
 
 【学习提示】
 
-面试先背主链，再讲 RAG/Workflow 分支。
+面试先背主链，再讲 RAG/ワークフロー 分支。
 
 ---
 
@@ -212,7 +212,7 @@ AI 処理があっても永続化境界は Repository に統一します。
 
 ## 回答
 
-変更耐性です。認証強化や Repository 実装切替でも、Service の公開面を安定維持できます。
+変更耐性です。認証強化や リポジトリ層 実装切替でも、サービス層 の公開面を安定維持できます。
 
 ## Point
 
@@ -231,7 +231,7 @@ AI 処理があっても永続化境界は Repository に統一します。
 
 ## 回答
 
-Python で AI/RAG/Workflow を実装しつつ、企業 API の堅牢性が必要でした。
+Python で AI/RAG/ワークフロー を実装しつつ、企業 API の堅牢性が必要でした。
 非同期、Pydantic 検証、OpenAPI、DI が標準で揃い、契約を明確に保てます。
 
 ## 追問
@@ -240,7 +240,7 @@ Python で AI/RAG/Workflow を実装しつつ、企業 API の堅牢性が必要
 
 ## 回答
 
-いいえ。主目的は開発速度と API 契約の明確化です。Frontend/Backend の齟齬を減らす実務価値があります。
+いいえ。主目的は開発速度と API 契約の明確化です。フロントエンド/バックエンド の齟齬を減らす実務価値があります。
 
 ## Point
 
@@ -262,7 +262,7 @@ FastAPI で何を実装しましたか。
 ## 回答
 
 認証、文書、RAG/分析、レポート、承認、管理（AI Runtime）、ヘルス/レディネスです。
-統一例外、request_id、権限制御を Middleware と Depends で共通化しました。
+統一例外、request_id、権限制御を ミドルウェア（ミドルウェア） と Depends で共通化しました。
 
 ## 追問
 
@@ -286,7 +286,7 @@ FastAPI で何を実装しましたか。
 
 ## 回答
 
-どちらも優秀です。ただし ERIP は React + API 中心で、Schema 駆動と DI、AI 統合を標準化したかったため FastAPI が適合しました。
+どちらも優秀です。ただし ERIP は React + API 中心で、スキーマ（スキーマ） 駆動と DI、AI 統合を標準化したかったため FastAPI が適合しました。
 Flask は小規模/既存資産、Django はフルスタック画面中心案件で強みがあります。
 
 ## 追問
@@ -331,30 +331,30 @@ API 契約の共通言語として、実装参照・結合確認・障害時仕�
 
 ---
 
-# Chapter 4　Router
+# Chapter 4　ルーター
 
 ## 4.1 責務と禁止事項
 
 ## 面接官
 
-Router の責務と、書いてはいけないことは何ですか。
+ルーター の責務と、書いてはいけないことは何ですか。
 
 ## 回答
 
-責務はパス定義、受信、認証認可適用、Service 呼び出し、レスポンス返却です。
-直接 SQL、複雑な業務判定の本体、LLM 詳細実装、監査実装の散在は書きません。
+責務はパス定義、受信、認証認可適用、サービス層 呼び出し、レスポンス返却です。
+直接 SQL、複雑な業務判定の本体、LLM（大規模言語モデル） 詳細実装、監査実装の散在は書きません。
 
 ## 追問
 
-Permission を Router で見るのは正しいですか。
+権限 を ルーター で見るのは正しいですか。
 
 ## 回答
 
-正しいです。入口で不足なら Service を呼びません。状態依存の細かい判定は Service でも実施します。
+正しいです。入口で不足なら サービス層 を呼びません。状態依存の細かい判定は サービス層 でも実施します。
 
 ## Point
 
-- 薄い Router
+- 薄い ルーター
 - 入口で AuthZ
 
 【容易说错】
@@ -363,11 +363,11 @@ Permission を Router で見るのは正しいですか。
 
 ---
 
-## 4.2 主要 Router とバージョン
+## 4.2 主要 ルーター とバージョン
 
 ## 面接官
 
-主要 Router と API バージョン方針は。
+主要 ルーター と API バージョン方針は。
 
 ## 回答
 
@@ -380,7 +380,7 @@ Permission を Router で見るのは正しいですか。
 
 ## 回答
 
-権限境界の明確化です。AI Runtime 等は強い Permission を要求します。
+権限境界の明確化です。AI Runtime 等は強い 権限 を要求します。
 
 ## Point
 
@@ -388,27 +388,27 @@ Permission を Router で見るのは正しいですか。
 
 ---
 
-# Chapter 5　Service
+# Chapter 5　サービス層
 
-## 5.1 Service の役割
+## 5.1 サービス層 の役割
 
 ## 面接官
 
-Service 層の役割は何ですか。
+サービス層 層の役割は何ですか。
 
 ## 回答
 
-業務ユースケースの実行単位です。妥当性確認、追加判定、Workflow 起動、保存、監査調整を行います。
+業務ユースケースの実行単位です。妥当性確認、追加判定、ワークフロー 起動、保存、監査調整を行います。
 HTTP 詳細を知らずに業務を完遂します。
 
 ## 追問
 
-Repository を Router から直接呼ぶ問題は。
+リポジトリ層 を ルーター から直接呼ぶ問題は。
 
 ## 回答
 
 業務ルールが散らばり、承認などの複雑判定が重複・修正漏れします。
-Service で単一実行経路を作ります。
+サービス層 で単一実行経路を作ります。
 
 ## Point
 
@@ -417,16 +417,16 @@ Service で単一実行経路を作ります。
 
 ---
 
-## 5.2 代表 Service と Workflow 境界
+## 5.2 代表 サービス層 と ワークフロー 境界
 
 ## 面接官
 
-代表 Service と Workflow の境界は。
+代表 サービス層 と ワークフロー の境界は。
 
 ## 回答
 
-Document / Retrieval / Task / Approval など業務境界で分割します。
-単純 CRUD は Service+Repository、多段・状態遷移は Workflow です。全部 Workflow にすると過剰です。
+文書 / 検索処理（検索処理） / Task / 承認 など業務境界で分割します。
+単純 CRUD は サービス層+リポジトリ層、多段・状態遷移は ワークフロー です。全部 ワークフロー にすると過剰です。
 
 ## 追問
 
@@ -434,26 +434,26 @@ Document / Retrieval / Task / Approval など業務境界で分割します。
 
 ## 回答
 
-業務境界で分割し、必要なら Workflow へ委譲。循環依存は避けます。
+業務境界で分割し、必要なら ワークフロー へ委譲。循環依存は避けます。
 
 ## Point
 
-- 単純は Service
-- 多段は Workflow
+- 単純は サービス層
+- 多段は ワークフロー
 
 ---
 
-# Chapter 6　Repository Pattern
+# Chapter 6　リポジトリパターン
 
 ## 6.1 定義と採用理由
 
 ## 面接官
 
-Repository Pattern とは何ですか。なぜ必要でしたか。
+リポジトリパターン とは何ですか。なぜ必要でしたか。
 
 ## 回答
 
-業務から保存詳細を隠す永続化境界です。Service は意図だけ呼び、SQL に依存しません。
+業務から保存詳細を隠す永続化境界です。サービス層 は意図だけ呼び、SQL に依存しません。
 テスト容易性、InMemory/PostgreSQL 切替、業務コード安定化が採用理由です。
 
 ## 追問
@@ -475,20 +475,20 @@ DAO と同じですか。
 
 ## 面接官
 
-Interface 分離と主要 Repository は。
+Interface 分離と主要 リポジトリ層 は。
 
 ## 回答
 
-Service は Interface 依存、InMemory/Postgres を DI 注入します。
-Document、Chunk、Task、Report/Version、Approval、Audit、AI Runtime 等が中心です。
+サービス層 は Interface 依存、InMemory/Postgres を DI 注入します。
+文書、チャンク（チャンク）、Task、レポート（レポート）/Version、承認、監査、AI Runtime 等が中心です。
 
 ## 追問
 
-Prompt を DB 代わりにしますか。
+プロンプト（プロンプト（Prompt）） を DB 代わりにしますか。
 
 ## 回答
 
-しません。監査可能な業務事実（誰が何を承認したか、根拠文書）は Repository に永続化します。
+しません。監査可能な業務事実（誰が何を承認したか、根拠文書）は リポジトリ層 に永続化します。
 
 ## Point
 
@@ -497,11 +497,11 @@ Prompt を DB 代わりにしますか。
 
 【学习提示】
 
-状态在哪里 → 永远是 Repository/DB。
+状态在哪里 → 永远是 リポジトリ層/DB。
 
 ---
 
-# Chapter 7　Dependency Injection
+# Chapter 7　依存性注入
 
 ## 7.1 DI と Depends
 
@@ -512,15 +512,15 @@ DI と FastAPI Depends を説明してください。
 ## 回答
 
 依存を利用側が new せず外部注入する設計です。
-Depends で CurrentUser、Permission、Service、Repository を注入し、差し替えと再利用を容易にします。
+Depends で CurrentUser、権限、サービス層、リポジトリ層 を注入し、差し替えと再利用を容易にします。
 
 ## 追問
 
-Middleware との違いは。
+ミドルウェア との違いは。
 
 ## 回答
 
-Middleware は横断処理、Depends はエンドポイント単位の明示依存です。組み合わせて使います。
+ミドルウェア は横断処理、Depends はエンドポイント単位の明示依存です。組み合わせて使います。
 
 ## Point
 
@@ -554,18 +554,18 @@ DB や外部 LLM を差し替え、権限・状態遷移・エラー処理を高
 
 ---
 
-# Chapter 8　Pydantic / Exception
+# Chapter 8　Pydantic / 例外
 
-## 8.1 Validation
+## 8.1 入力検証
 
 ## 面接官
 
-Pydantic と Request/Response 分離の理由は。
+Pydantic と リクエスト（リクエスト）/レスポンス（レスポンス） 分離の理由は。
 
 ## 回答
 
 不正入力を入口で拒否し、契約をコードで強制するためです。
-Request は最小入力、Response は確定情報。Entity 生返却は内部変更が外部破壊になるため避けます。
+リクエスト は最小入力、レスポンス は確定情報。Entity 生返却は内部変更が外部破壊になるため避けます。
 
 ## 追問
 
@@ -590,7 +590,7 @@ Request は最小入力、Response は確定情報。Entity 生返却は内部�
 
 ## 回答
 
-エラー契約を統一し Frontend/運用を安定させます。
+エラー契約を統一し フロントエンド/運用を安定させます。
 ビジネス例外（権限・状態）とシステム例外を分け、業務エラーを安易に 500 にしません。
 request_id は HTTP 追跡、task_id は業務追跡です。
 
@@ -613,7 +613,7 @@ request_id は HTTP 追跡、task_id は業務追跡です。
 
 ---
 
-# Chapter 9　PostgreSQL / Transaction
+# Chapter 9　PostgreSQL / トランザクション
 
 ## 9.1 なぜ PostgreSQL
 
@@ -699,7 +699,7 @@ pgvector はチャンク埋め込みの類似検索用で、当面は運用複�
 
 ## 面接官
 
-InMemory Repository とは何ですか。
+InMemory リポジトリ とは何ですか。
 
 ## 回答
 
@@ -733,11 +733,11 @@ Interface のテスト/開発補助実装です。正式業務データの保存
 
 ## 面接官
 
-Repository 切替はどう実現しますか。
+リポジトリ層 切替はどう実現しますか。
 
 ## 回答
 
-Service は Interface 依存、DI と設定で実装注入します。
+サービス層 は Interface 依存、DI と設定で実装注入します。
 分岐は組成箇所に閉じ込め、業務メソッド内に if を散らしません。
 
 ## 追問
@@ -778,7 +778,7 @@ API/SPA 分離構成に適合し、識別後に RBAC で認可します。
 
 ## Point
 
-- JWT = Authentication
+- JWT = 認証（認証（Authentication））
 
 ---
 
@@ -804,18 +804,18 @@ JWT 认人、RBAC 认权。
 
 ---
 
-# Chapter 12　RBAC / Permission / CurrentUser
+# Chapter 12　RBAC / 権限 / CurrentUser
 
 ## 12.1 認証と認可
 
 ## 面接官
 
-Authentication と Authorization の違いは。
+認証 と 認可（認可（Authorization）） の違いは。
 
 ## 回答
 
 認証は誰か、認可は何をしてよいかです。
-ERIP は JWT で認証、RBAC/Permission で認可します。片方だけでは企業要件を満たしません。
+ERIP は JWT で認証、RBAC/権限 で認可します。片方だけでは企業要件を満たしません。
 
 ## 追問
 
@@ -823,7 +823,7 @@ RBAC とは。
 
 ## 回答
 
-Role Based Access Control。ユーザー→ロール→権限で操作を制御します。企業の役割構造と相性が良いです。
+ロール（ロール） Based アクセス制御（アクセス制御）。ユーザー→ロール→権限で操作を制御します。企業の役割構造と相性が良いです。
 
 ## Point
 
@@ -835,16 +835,16 @@ JWT=权限系统、RBAC=登录 は失分。
 
 ---
 
-## 12.2 ロールと Permission
+## 12.2 ロールと 権限
 
 ## 面接官
 
-ERIP のロールと Permission 粒度は。
+ERIP のロールと 権限 粒度は。
 
 ## 回答
 
 一般利用者（参照・検索・分析依頼）、マネージャー（承認）、管理者（権限/AI Runtime）など。
-Permission は documents.read、retrieval.query、analysis.execute、approval.approve、security.manage 等の機能単位です。
+権限 は documents.read、retrieval.query、analysis.execute、approval.approve、security.manage 等の機能単位です。
 
 ## 追問
 
@@ -857,7 +857,7 @@ Permission は documents.read、retrieval.query、analysis.execute、approval.ap
 ## Point
 
 - 最小特権
-- 機能単位 Permission
+- 機能単位 権限
 
 ---
 
@@ -869,9 +869,9 @@ Permission は documents.read、retrieval.query、analysis.execute、approval.ap
 
 ## 回答
 
-入口（Router/Depends）で必須チェック、状態依存は Service でも実施。
+入口（ルーター/Depends）で必須チェック、状態依存は サービス層 でも実施。
 CurrentUser は操作主体コンテキストで、監査・承認者判定・アクセス制御に必須です。
-UI 非表示は UX であり、最終判定は Backend です。
+UI 非表示は UX であり、最終判定は バックエンド です。
 
 ## 追問
 
@@ -898,8 +898,8 @@ UI 非表示は UX であり、最終判定は Backend です。
 
 ## 回答
 
-Frontend → documents API → JWT/権限 → DocumentService → Repository 保存 →
-Import/Chunk → 監査 → 返却。登録完了と検索可能状態は分離管理します。
+フロントエンド → documents API → JWT/権限 → DocumentService → リポジトリ層 保存 →
+インポート（インポート）/チャンク → 監査 → 返却。登録完了と検索可能状態は分離管理します。
 
 ## 追問
 
@@ -923,8 +923,8 @@ RAG 検索と承認の呼び出し要点は。
 
 ## 回答
 
-RAG：権限確認 → Retrieval（Keyword/Vector/Hybrid）→ 必要時 LLM → Citation 返却 → 監査。
-承認：提出 → 状態遷移検証 → 承認/差戻し → Version/History → Audit。生成は確定ではありません。
+RAG：権限確認 → 検索処理（Keyword/ベクトル（ベクトル）/Hybrid）→ 必要時 LLM → 引用情報（引用情報（Citation）） 返却 → 監査。
+承認：提出 → 状態遷移検証 → 承認/差戻し → Version/History → 監査。生成は確定ではありません。
 
 ## 追問
 
@@ -947,7 +947,7 @@ RAG：権限確認 → Retrieval（Keyword/Vector/Hybrid）→ 必要時 LLM →
 
 ## 面接官
 
-Service に SQL、Router に業務を書かない理由は。
+サービス層 に SQL、ルーター に業務を書かない理由は。
 
 ## 回答
 
@@ -969,13 +969,13 @@ Service に SQL、Router に業務を書かない理由は。
 
 ## 回答
 
-障害は request_id → 認証/業務分類 → Service 状態 → DB → 外部 LLM → 監査突合。
+障害は request_id → 認証/業務分類 → サービス層 状態 → DB → 外部 LLM → 監査突合。
 性能は DB/検索/LLM の内訳を測ってから最適化。
 セキュリティは JWT/RBAC 強制、入力検証、機密ログ禁止、最小特権、監査です。
 
 ## 追問
 
-Prompt 全文をログに出すか。
+プロンプト 全文をログに出すか。
 
 ## 回答
 
@@ -994,13 +994,13 @@ Prompt 全文をログに出すか。
 
 ## 面接官
 
-Backend を 30 秒と 2 分で説明してください。
+バックエンド を 30 秒と 2 分で説明してください。
 
 ## 回答
 
-30秒：FastAPI で API 境界、Service で業務、LangChain で AI Components、LangGraph で Agent Workflow。JWT/RBAC の下で文書・検索・分析・承認・監査を提供し、正式データは PostgreSQL。
+30秒：FastAPI で API 境界、サービス層 で業務、LangChain で AI コンポーネント、LangGraph で エージェントワークフロー（Agent ワークフロー）。JWT/RBAC の下で文書・検索・分析・承認・監査を提供し、正式データは PostgreSQL。
 
-2分：入口で Validation と認証認可、Service で業務、Repository で永続化。正式は PostgreSQL、テストは InMemory。統一例外と request_id で追跡。AI があっても権限と業務事実は Backend が担保。
+2分：入口で 入力検証 と認証認可、サービス層 で業務、リポジトリ層 で永続化。正式は PostgreSQL、テストは InMemory。統一例外と request_id で追跡。AI があっても権限と業務事実は バックエンド が担保。
 
 ## 追問
 
@@ -1035,29 +1035,27 @@ FastAPI と LangChain / LangGraph の境界を説明してください。
 
 ```text
 FastAPI
-= HTTP / Authentication / Authorization / API Boundary
+= HTTP / 認証 / 認可 / API 境界
 
-Service
-= Business Use Case
+サービス層
+= 業務ユースケース
 
-LangChain
-= AI Components
+LangChain ＝ AI コンポーネント
 
-LangGraph
-= Agent Workflow
+LangGraph ＝ エージェントワークフロー（Agent ワークフロー）
 
-Repository
-= Persistence
+リポジトリ層
+= 永続化
 
 PostgreSQL
-= Business Data / State / Audit
+= 業務データ / ステート（State） / 監査
 ```
 
 FastAPI は企業 API の入口、
-Service は業務ユースケース、
-LangChain は Prompt / Retriever / RAG / LLM などの AI 部品、
-LangGraph は多段階の Stateful Agent Workflow、
-Repository / PostgreSQL は永続化を担当します。
+サービス層 は業務ユースケース、
+LangChain は プロンプト / リトリーバー（リトリーバー（Retriever）） / RAG / LLM などの AI コンポーネント、
+LangGraph は多段階の ステートフル・エージェントワークフロー（ステートフル・エージェントワークフロー（Stateful エージェントワークフロー））、
+リポジトリ層 / PostgreSQL は永続化を担当します。
 
 ## 追問
 
@@ -1068,31 +1066,31 @@ Repository / PostgreSQL は永続化を担当します。
 ```text
 React
  → FastAPI
- → Service
+ → サービス層
  → LangChain
  → LangGraph
- → LLM Gateway
- → Repository
+ → LLM ゲートウェイ
+ → リポジトリ層
  → PostgreSQL
 ```
 
 権限は FastAPI 境界で確定し、
-AI 処理は Service 配下の LangChain / LangGraph で実行し、
-業務事実は Repository 経由で PostgreSQL に保存します。
+AI 処理は サービス層 配下の LangChain / LangGraph で実行し、
+業務事実は リポジトリ層 経由で PostgreSQL に保存します。
 
 ## Point
 
-- FastAPI ≠ AI Framework
-- LangChain = AI Components
-- LangGraph = Stateful Agent Workflow
+- FastAPI ≠ AI フレームワーク
+- LangChain ＝ AI コンポーネント
+- LangGraph ＝ ステートフル・エージェントワークフロー
 
 ---
 
-## 16.2 なぜ Backend に AI Framework 境界が必要か
+## 16.2 なぜ バックエンド に AI フレームワーク 境界が必要か
 
 ## 面接官
 
-なぜ Router から直接 LLM を呼ばないのですか。
+なぜ ルーター から直接 LLM を呼ばないのですか。
 
 ## 回答
 
@@ -1100,9 +1098,9 @@ HTTP 境界と AI 処理境界を混ぜると、
 権限・監査・状態管理・失敗処理が散らばるためです。
 
 ERIP では、
-FastAPI は API Boundary、
-LangChain は AI Components、
-LangGraph は Agent Workflow、
+FastAPI は API 境界（API 境界）、
+LangChain は AI コンポーネント、
+LangGraph は エージェントワークフロー、
 と責務を分けています。
 
 ## 追問
@@ -1112,32 +1110,32 @@ LangChain と LangGraph の違いは。
 ## 回答
 
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト（RAG コンテキスト（コンテキスト（Context）））、
+引用情報、ツール（ツール）、LLM 連携（LLM 連携） など
+AI コンポーネント を構成する フレームワークです。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード（ノード（Node））、エッジ（エッジ（Edge））、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワークです。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 
 ## Point
 
-- 入口 / 業務 / AI 部品 / Workflow / 永続化を混同しない
+- 入口 / 業務 / AI コンポーネント / ワークフロー / 永続化を混同しない
 
 ---
 
 # Part 02 要点总结
 
-1. 呼び出しチェーン：React → FastAPI → Service → LangChain → LangGraph → LLM Gateway → Repository → PostgreSQL
+1. 呼び出しチェーン：React → FastAPI → サービス層 → LangChain → LangGraph → LLM ゲートウェイ（LLM ゲートウェイ（ゲートウェイ）） → リポジトリ層 → PostgreSQL
 2. 責務分離：入口 / 業務 / 永続化
-3. JWT = Authentication、RBAC = Authorization
+3. JWT = 認証、RBAC = 認可
 4. 正式データは PostgreSQL、InMemory はテスト実装
 5. 企業要件：権限、承認、監査、トランザクション、追跡性
-6. LangChain = AI Components、LangGraph = Stateful Agent Workflow
+6. LangChain ＝ AI コンポーネント、LangGraph ＝ ステートフル・エージェントワークフロー
 
-技術名の前に「何を守る Backend か」を先に言う。
+技術名の前に「何を守る バックエンド か」を先に言う。

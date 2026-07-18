@@ -1,13 +1,13 @@
-# Enterprise Retail Intelligence Platform（ERIP）
+# Enterprise リテールインテリジェンス Platform（ERIP）
 # Agent 面试指南 V4 正式版
 ## Part 05：AWS / Docker / CI/CD / 本番アーキテクチャ
 
 ---
 
 - **Version**：V4.0 Official Edition
-- **Document Type**：Interview Handbook
+- **文書（文書） Type**：Interview Handbook
 - **Language**：日本語中心
-- **対象**：AI Engineer / Agent Engineer / Backend Engineer / Solution Architect / Technical Leader
+- **対象**：AI Engineer / Agent Engineer / バックエンド（バックエンド） Engineer / Solution Architect / Technical Leader
 - **前提**：Part01〜Part04 の後、インフラ深掘り時に使用する
 
 # 更新说明
@@ -95,22 +95,22 @@
 利用者
  → CloudFront
  → ALB
- → Frontend（Nginx / 静的配信）
- → Backend（ECS Fargate 上の FastAPI）
+ → フロントエンド（Nginx / 静的配信）
+ → バックエンド（ECS Fargate 上の FastAPI）
  → LangChain
  → LangGraph
- → LLM Gateway
+ → LLM（大規模言語モデル） ゲートウェイ
  → RDS PostgreSQL / pgvector
- → Approval / Audit
+ → 承認 / 監査
  → Secrets Manager / CloudWatch / IAM
 ```
 
 S3 は成果物や静的資源の保管に使います。
 
 AI 層として、
-LangChain は AI Components、
-LangGraph は Stateful Agent Workflow、
-LLM Gateway はモデル呼び出し統制を担当します。
+LangChain は AI コンポーネント、
+LangGraph は ステートフル・エージェントワークフロー（ステートフル・エージェントワークフロー（Agent ワークフロー（ワークフロー（Workflow））））、
+LLM（大規模言語モデル） ゲートウェイ（LLM ゲートウェイ（ゲートウェイ）） はモデル呼び出し統制を担当します。
 
 ## 追問
 
@@ -168,8 +168,8 @@ AWS は聞かれたら話す。开场不要主动展开。
 
 ## 回答
 
-最小権限 IAM、Secret の秘匿管理、HTTPS 終端、
-セキュリティグループ、監査ログ、Backend での認証認可です。
+最小権限 IAM、シークレット（シークレット） の秘匿管理、HTTPS 終端、
+セキュリティグループ、監査ログ、バックエンド での認証認可です。
 
 ネットワークだけ、アプリだけ、のどちらか一方では不十分です。
 
@@ -179,13 +179,13 @@ API キーを環境変数ベタ書きしますか。
 
 ## 回答
 
-本番では Secrets Manager 等で管理し、必要最小限の注入にします。
+本番では Secrets Manager（シークレット管理サービス） 等で管理し、必要最小限の注入にします。
 リポジトリへ秘密情報を入れません。
 
 ## Point
 
 - 多層防御
-- Secret を dual 管理しない
+- シークレット を dual 管理しない
 
 ---
 
@@ -223,11 +223,11 @@ Docker があれば十分ですか。
 
 ## 面接官
 
-Backend / Frontend のコンテナ方針は。
+バックエンド / フロントエンド（フロントエンド） のコンテナ方針は。
 
 ## 回答
 
-Backend は FastAPI 実行イメージ、Frontend は build した静的ファイルを Nginx で配信する形が基本です。
+バックエンド は FastAPI 実行イメージ、フロントエンド は build した静的ファイルを Nginx で配信する形が基本です。
 
 アプリ本体と実行環境を分離し、起動時に設定とマイグレーション方針を適用します。
 
@@ -237,12 +237,12 @@ Backend は FastAPI 実行イメージ、Frontend は build した静的ファ�
 
 ## 回答
 
-秘密や環境差分は焼き込みません。実行時設定と Secret 注入で環境差を吸収します。
+秘密や環境差分は焼き込みません。実行時設定と シークレット 注入で環境差を吸収します。
 
 ## Point
 
 - 実行時設定
-- Secret 非焼付
+- シークレット 非焼付
 
 ---
 
@@ -311,7 +311,7 @@ CI/CD の目的は何ですか。
 
 ## 回答
 
-依存インストール、Backend/Frontend テスト、build、
+依存インストール、バックエンド/フロントエンド テスト、build、
 セキュリティ基本チェック、成果物作成、環境へのデプロイです。
 
 本番反映は権限と承認を分けます。
@@ -341,7 +341,7 @@ Nginx の役割は。
 
 ## 回答
 
-Frontend 静的配信、リバースプロキシ、基本的なルーティングやヘッダ制御です。
+フロントエンド 静的配信、リバースプロキシ、基本的なルーティングやヘッダ制御です。
 コンテナ内で Web サーバとして機能します。
 
 ## 追問
@@ -367,7 +367,7 @@ Frontend 静的配信、リバースプロキシ、基本的なルーティン�
 ## 回答
 
 HTTPS 終端、負荷分散、ヘルスチェック、経路制御のためです。
-Backend タスクの増減に対し、安定した入口を提供します。
+バックエンド タスクの増減に対し、安定した入口を提供します。
 
 ## 追問
 
@@ -558,7 +558,7 @@ IAM 設計の原則は。
 
 ## 面接官
 
-Secret 管理はどうしますか。
+シークレット 管理はどうしますか。
 
 ## 回答
 
@@ -576,7 +576,7 @@ API キーや DB パスワードは Secrets Manager 等で管理し、
 
 ## Point
 
-- Secret をリポジトリに置かない
+- シークレット をリポジトリに置かない
 
 ---
 
@@ -620,7 +620,7 @@ API レイテンシ、エラー率、タスク健全性、DB 接続/CPU、
 ## 回答
 
 認証認可、主要業務フロー、マイグレーション、バックアップ、
-ロールバック手順、監視アラート、Secret、負荷の基本確認です。
+ロールバック手順、監視アラート、シークレット、負荷の基本確認です。
 
 『動いた』だけでなく『止められる・戻せる・見える』を確認します。
 
@@ -673,12 +673,12 @@ request_id やデプロイ版、DB 状態、外部依存を順に見ます。
 
 ## 回答
 
-CloudFront と ALB を入口に、Frontend は Nginx 静的配信、
-Backend は ECS Fargate の FastAPI です。
-その上で LangChain / LangGraph / LLM Gateway の AI 層を実行し、
+CloudFront と ALB を入口に、フロントエンド は Nginx 静的配信、
+バックエンド は ECS Fargate の FastAPI です。
+その上で LangChain / LangGraph / LLM ゲートウェイ の AI 層を実行し、
 データは RDS PostgreSQL / pgvector、
-確定制御は Approval / Audit です。
-Secret は Secrets Manager、監視は CloudWatch、権限は IAM 最小特権。
+確定制御は 承認 / 監査 です。
+シークレット は Secrets Manager、監視は CloudWatch、権限は IAM 最小特権。
 Docker と CI/CD で再現可能にデプロイします。
 
 ## Point
@@ -729,7 +729,7 @@ ALB で終端、内部は必要最小限の通信だけを許可します。
 保存データの暗号化（RDS/S3 等の標準機能）、
 アクセス制御、バックアップ、監査です。
 
-加えてアプリ層で RBAC とマスキング方針を持ちます。
+加えてアプリ層で RBAC（ロールベースアクセス制御）（ロールベースアクセス制御） とマスキング方針を持ちます。
 インフラ暗号化だけで業務権限は代替できません。
 
 ## 追問
@@ -877,7 +877,7 @@ AWS 構成を聞かれたら何から話しますか。
 
 ## 回答
 
-まず利用者入口、次に Frontend/Backend、次に DB、最後に運用（IAM/Secret/監視）です。
+まず利用者入口、次に フロントエンド/バックエンド、次に DB、最後に運用（IAM/シークレット/監視）です。
 
 サービス名の羅列から入ると、設計意図が伝わりません。
 
@@ -930,9 +930,9 @@ ECS の詳細設定から始めて良いですか。
 
 1. 入口：CloudFront / ALB / Nginx
 2. 計算：ECS Fargate + FastAPI
-3. AI 層：LangChain → LangGraph → LLM Gateway
+3. AI 層：LangChain → LangGraph → LLM ゲートウェイ
 4. データ：RDS PostgreSQL / pgvector（+ 必要に応じ S3）
-5. ガバナンス：Approval / Audit
+5. ガバナンス：承認 / 監査
 6. 運用：IAM 最小特権、Secrets、CloudWatch、CI/CD
 
 AWS は聞かれたら話す。案件开场では業務価値と AI Agent 中核を優先する。

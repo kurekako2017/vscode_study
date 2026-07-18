@@ -1,13 +1,13 @@
-# Enterprise Retail Intelligence Platform（ERIP）
+# Enterprise リテールインテリジェンス Platform（ERIP）
 # Agent 面试指南 V4 正式版
-## Part 03：Document / Chunk / Retrieval / RAG / LLM Gateway
+## Part 03：文書（文書） / チャンク（チャンク） / 検索処理（検索処理（Retrieval）） / RAG（検索拡張生成）（検索拡張生成） / LLM（大規模言語モデル）（大規模言語モデル） ゲートウェイ（LLM ゲートウェイ（ゲートウェイ））
 
 ---
 
 - **Version**：V4.0 Official Edition
-- **Document Type**：Interview Handbook
+- **文書 Type**：Interview Handbook
 - **Language**：日本語中心
-- **対象**：AI Engineer / Agent Engineer / Backend Engineer / Solution Architect / Technical Leader
+- **対象**：AI Engineer / Agent Engineer / バックエンド（バックエンド） Engineer / Solution Architect / Technical Leader
 - **前提**：Part01・Part02 の後に使用する
 
 # 更新说明
@@ -25,32 +25,32 @@
 
 # 目录
 
-## Chapter 2　Document 管理
-- 2.1 Document とは
-- 2.2 Document Lifecycle
+## Chapter 2　文書 管理
+- 2.1 文書 とは
+- 2.2 文書 ライフサイクル（Lifecycle）
 - 2.3 なぜ文書管理が必要か
 
-## Chapter 3　Import / Chunk
-- 3.1 Import の役割
-- 3.2 なぜ Chunk するのか
-- 3.3 Chunk Strategy
-- 3.4 Chunk と Document の関係
+## Chapter 3　インポート（インポート） / チャンク
+- 3.1 インポート の役割
+- 3.2 なぜ チャンク するのか
+- 3.3 チャンク分割方針（チャンク Strategy）
+- 3.4 チャンク と 文書 の関係
 
-## Chapter 4　Retrieval
-- 4.1 Retrieval とは
-- 4.2 Keyword Retrieval
-- 4.3 Embedding / Vector Search
-- 4.4 Hybrid Retrieval
-- 4.5 Top-K と品質
+## Chapter 4　検索処理
+- 4.1 検索処理 とは
+- 4.2 キーワード検索（Keyword 検索処理）
+- 4.3 エンベディング（エンベディング（Embedding）） / ベクトル検索（ベクトル（ベクトル） Search）
+- 4.4 ハイブリッド検索（Hybrid 検索処理）
+- 4.5 上位 K 件（上位 K 件（Top-K）） と品質
 
-## Chapter 5　RAG / Context / Prompt
+## Chapter 5　RAG / コンテキスト（コンテキスト（Context）） / プロンプト（プロンプト（Prompt））
 - 5.1 なぜ RAG か
-- 5.2 Context 組み立て
-- 5.3 Prompt 設計
-- 5.4 Citation
+- 5.2 コンテキスト 組み立て
+- 5.3 プロンプト 設計
+- 5.4 引用情報（引用情報（Citation））
 
-## Chapter 6　LLM Gateway
-- 6.1 LLM Gateway とは
+## Chapter 6　LLM ゲートウェイ
+- 6.1 LLM ゲートウェイ とは
 - 6.2 ルーティングとコスト
 - 6.3 Stub と本番相当
 
@@ -65,26 +65,26 @@
 ## Chapter 9　クロージング
 - 9.1 1分説明
 
-## Chapter 10　ACL と検索安全
+## Chapter 10　ACL（アクセス制御リスト） と検索安全
 - 10.1 検索時の権限
 - 10.2 文書更新と再インデックス
 
 ## Chapter 11　面接用短答
 - 11.1 30秒で RAG
-- 11.2 なぜ Vector だけではないか
+- 11.2 なぜ ベクトル だけではないか
 
 ## Chapter 12　LangChain RAG と LangGraph の連携
 - 12.1 LangChain と LangGraph の RAG 分担
 
 ---
 
-# Chapter 2　Document 管理
+# Chapter 2　文書 管理
 
-## 2.1 Document とは
+## 2.1 文書 とは
 
 ## 面接官
 
-ERIP における Document とは何ですか。
+ERIP における 文書 とは何ですか。
 
 ## 回答
 
@@ -106,12 +106,12 @@ ERIP における Document とは何ですか。
 
 ## Point
 
-- Document = 根拠の源泉
+- 文書 = 根拠の源泉
 - 権限と監査付き
 
 ---
 
-## 2.2 Document Lifecycle
+## 2.2 文書 ライフサイクル
 
 ## 面接官
 
@@ -123,10 +123,10 @@ ERIP における Document とは何ですか。
 
 ```text
 登録（Upload）
- → Import
- → Chunk
+ → インポート
+ → チャンク
  → 検索可能化
- → 利用（Retrieval / RAG）
+ → 利用（検索処理 / RAG）
  → 更新 / アーカイブ
 ```
 
@@ -183,41 +183,41 @@ ChatGPT に毎回貼れば良いのでは。
 
 ---
 
-# Chapter 3　Import / Chunk
+# Chapter 3　インポート / チャンク
 
-## 3.1 Import の役割
+## 3.1 インポート の役割
 
 ## 面接官
 
-Import とは何ですか。
+インポート とは何ですか。
 
 ## 回答
 
 登録された文書をシステムが利用可能な内部表現へ取り込む工程です。
 
-内容抽出、メタデータ確定、後続 Chunk への受け渡しを担います。
-Import 完了後に分割と検索準備へ進みます。
+内容抽出、メタデータ確定、後続 チャンク への受け渡しを担います。
+インポート 完了後に分割と検索準備へ進みます。
 
 ## 追問
 
-Upload と Import の違いは。
+Upload と インポート の違いは。
 
 ## 回答
 
-Upload は受け取り、Import は業務利用可能な形への取り込みです。
+Upload は受け取り、インポート は業務利用可能な形への取り込みです。
 受け取っただけでは検索根拠になりません。
 
 ## Point
 
-- Upload ≠ Import
+- Upload ≠ インポート
 
 ---
 
-## 3.2 なぜ Chunk するのか
+## 3.2 なぜ チャンク するのか
 
 ## 面接官
 
-なぜ文書を Chunk に分割するのですか。
+なぜ文書を チャンク に分割するのですか。
 
 ## 回答
 
@@ -239,7 +239,7 @@ LLM へ渡す長さも制御困難です。
 
 ## Point
 
-- Chunk = 検索単位
+- チャンク = 検索単位
 - 粒度は精度の要
 
 【容易说错】
@@ -248,11 +248,11 @@ LLM へ渡す長さも制御困難です。
 
 ---
 
-## 3.3 Chunk Strategy
+## 3.3 チャンク分割方針
 
 ## 面接官
 
-Chunk 戦略を説明してください。
+チャンク 戦略を説明してください。
 
 ## 回答
 
@@ -277,26 +277,26 @@ Chunk 戦略を説明してください。
 
 ---
 
-## 3.4 Chunk と Document の関係
+## 3.4 チャンク と 文書 の関係
 
 ## 面接官
 
-Chunk と Document の関係は。
+チャンク と 文書 の関係は。
 
 ## 回答
 
-1 Document が複数 Chunk を持ちます。
+1 文書 が複数 チャンク を持ちます。
 
-検索は主に Chunk 単位、権限やライフサイクルは Document 単位で管理します。
-引用時は Chunk から元 Document へ辿れます。
+検索は主に チャンク 単位、権限やライフサイクルは 文書 単位で管理します。
+引用時は チャンク から元 文書 へ辿れます。
 
 ## 追問
 
-Chunk だけ保存すれば良いですか。
+チャンク だけ保存すれば良いですか。
 
 ## 回答
 
-不十分です。元文書の状態、権限、監査、版管理は Document 側が必要です。
+不十分です。元文書の状態、権限、監査、版管理は 文書 側が必要です。
 
 ## Point
 
@@ -304,17 +304,17 @@ Chunk だけ保存すれば良いですか。
 
 ---
 
-# Chapter 4　Retrieval
+# Chapter 4　検索処理
 
-## 4.1 Retrieval とは
+## 4.1 検索処理 とは
 
 ## 面接官
 
-Retrieval とは何ですか。
+検索処理 とは何ですか。
 
 ## 回答
 
-利用者の質問や分析テーマに関連する Chunk / 文書を取得する処理です。
+利用者の質問や分析テーマに関連する チャンク / 文書を取得する処理です。
 
 RAG の前半であり、『答える』前に『根拠を集める』工程です。
 企業では取得結果にも権限を適用します。
@@ -330,16 +330,16 @@ RAG の前半であり、『答える』前に『根拠を集める』工程で�
 
 ## Point
 
-- Retrieval = 根拠取得
+- 検索処理 = 根拠取得
 - 検索と生成を分離
 
 ---
 
-## 4.2 Keyword Retrieval
+## 4.2 キーワード検索
 
 ## 面接官
 
-Keyword Retrieval を説明してください。
+キーワード検索 を説明してください。
 
 ## 回答
 
@@ -363,16 +363,16 @@ Keyword Retrieval を説明してください。
 
 ---
 
-## 4.3 Embedding / Vector Search
+## 4.3 エンベディング / ベクトル検索
 
 ## 面接官
 
-Embedding と Vector Search を説明してください。
+エンベディング と ベクトル検索 を説明してください。
 
 ## 回答
 
-Embedding はテキストを意味ベクトルへ変換することです。
-Vector Search はその空間で近い Chunk を探す検索です。
+エンベディング はテキストを意味ベクトルへ変換することです。
+ベクトル検索 はその空間で近い チャンク を探す検索です。
 
 言い回しが違っても意味が近ければ拾える利点があります。
 
@@ -392,19 +392,19 @@ Keyword だけで十分では。
 
 【学习提示】
 
-Embedding=向量化，Vector Search=近邻检索。
+エンベディング=向量化，ベクトル検索=近邻检索。
 
 ---
 
-## 4.4 Hybrid Retrieval
+## 4.4 ハイブリッド検索
 
 ## 面接官
 
-なぜ Hybrid Retrieval を採用しましたか。
+なぜ ハイブリッド検索 を採用しましたか。
 
 ## 回答
 
-Keyword の正確性と Vector の意味的カバレッジを両立するためです。
+Keyword の正確性と ベクトル の意味的カバレッジを両立するためです。
 
 どちらか一方だと、取りこぼしやノイズが増えます。
 両方の候補を統合し、上位根拠を選びます。
@@ -415,8 +415,8 @@ Hybrid の実装イメージは。
 
 ## 回答
 
-Keyword 結果と Vector 結果を取得し、スコア統合や再順位付けで最終 Top-K を決めます。
-その後 Context に組み込みます。
+Keyword 結果と ベクトル 結果を取得し、スコア統合や再順位付けで最終 上位 K 件 を決めます。
+その後 コンテキスト に組み込みます。
 
 ## Point
 
@@ -429,11 +429,11 @@ Keyword 結果と Vector 結果を取得し、スコア統合や再順位付け�
 
 ---
 
-## 4.5 Top-K と品質
+## 4.5 上位 K 件 と品質
 
 ## 面接官
 
-Top-K はどのように考えますか。
+上位 K 件 はどのように考えますか。
 
 ## 回答
 
@@ -456,7 +456,7 @@ Top-K はどのように考えますか。
 
 ---
 
-# Chapter 5　RAG / Context / Prompt
+# Chapter 5　RAG / コンテキスト / プロンプト
 
 ## 5.1 なぜ RAG か
 
@@ -469,11 +469,11 @@ Top-K はどのように考えますか。
 LLM 単体では社内の最新文書や業務固有情報を正確に使えません。
 
 関連文書を検索して渡し、根拠付き分析を実現するため、
-LangChain の AI Components として RAG を採用しました。
+LangChain の AI コンポーネント として RAG を採用しました。
 回答品質と説明責任の両立が目的です。
 
-取得した根拠は、必要に応じて LangGraph の State へ渡り、
-後続の Analysis / Report Node で利用されます。
+取得した根拠は、必要に応じて LangGraph の ステート（ステート（State）） へ渡り、
+後続の Analysis / report ノード（ノード（Node）） で利用されます。
 
 ## 追問
 
@@ -495,15 +495,15 @@ RAG は重要部品であり全体ではありません。
 
 ---
 
-## 5.2 Context 組み立て
+## 5.2 コンテキスト 組み立て
 
 ## 面接官
 
-Context はどう組み立てますか。
+コンテキスト はどう組み立てますか。
 
 ## 回答
 
-Retrieval で得た上位 Chunk を、出典情報付きでプロンプト文脈へ配置します。
+検索処理 で得た上位 チャンク を、出典情報付きでプロンプト文脈へ配置します。
 
 長すぎる場合は優先度の高い根拠を残し、無関係部分を落とします。
 『何を根拠に答えたか』が後から分かる形を維持します。
@@ -514,20 +514,20 @@ Retrieval で得た上位 Chunk を、出典情報付きでプロンプト文脈
 
 ## 回答
 
-通常は Top-K と長さ制限で絞ります。全部渡すとノイズとコストが増えます。
+通常は 上位 K 件 と長さ制限で絞ります。全部渡すとノイズとコストが増えます。
 
 ## Point
 
-- 出典付き Context
+- 出典情報付き コンテキスト
 - 長さと関連性の制御
 
 ---
 
-## 5.3 Prompt 設計
+## 5.3 プロンプト 設計
 
 ## 面接官
 
-Prompt で意識したことは何ですか。
+プロンプト で意識したことは何ですか。
 
 ## 回答
 
@@ -539,25 +539,25 @@ Prompt で意識したことは何ですか。
 
 ## 追問
 
-Prompt だけで品質は守れますか。
+プロンプト だけで品質は守れますか。
 
 ## 回答
 
-不十分です。Retrieval 品質、権限、評価、監査が必要です。
-Prompt は重要ですが唯一の品質手段ではありません。
+不十分です。検索処理 品質、権限、評価、監査が必要です。
+プロンプト は重要ですが唯一の品質手段ではありません。
 
 ## Point
 
 - 役割・制約・根拠・形式
-- Prompt 依存しすぎない
+- プロンプト 依存しすぎない
 
 ---
 
-## 5.4 Citation
+## 5.4 引用情報
 
 ## 面接官
 
-Citation はなぜ必要ですか。
+引用情報 はなぜ必要ですか。
 
 ## 回答
 
@@ -570,7 +570,7 @@ ERIP では回答と根拠をセットで提示します。
 
 ## 追問
 
-Citation が無い回答の問題は。
+引用情報 が無い回答の問題は。
 
 ## 回答
 
@@ -583,20 +583,20 @@ Citation が無い回答の問題は。
 
 ---
 
-# Chapter 6　LLM Gateway
+# Chapter 6　LLM ゲートウェイ
 
-## 6.1 LLM Gateway とは
+## 6.1 LLM ゲートウェイ とは
 
 ## 面接官
 
-LLM Gateway とは何ですか。
+LLM ゲートウェイ とは何ですか。
 
 ## 回答
 
 モデル呼び出しの共通入口です。
 
-Provider 差分、タイムアウト、失敗時経路、利用量記録、モード制御を集中管理します。
-業務 Service が各社 SDK を直接散らかして呼ばないようにします。
+プロバイダー（プロバイダー） 差分、タイムアウト、失敗時経路、利用量記録、モード制御を集中管理します。
+業務サービス層 が各社 SDK を直接散らかして呼ばないようにします。
 
 ## 追問
 
@@ -653,7 +653,7 @@ stub についてどう説明しますか。
 
 検証や自動テストで外部課金モデルを呼ばないための実行モードです。
 
-正式業務説明では、Gateway・権限制御・監査・経路設計が実装済みであることを中心に話します。
+正式業務説明では、ゲートウェイ・権限制御・監査・経路設計が実装済みであることを中心に話します。
 面接官が検証方式を聞いた時に stub を補足します。
 
 ## 追問
@@ -686,16 +686,16 @@ CI と再現性が壊れます。用途で使い分けます。
 ## 回答
 
 ```text
-Document 登録
- → Import
- → Chunk
- → Embedding / 索引
+文書 登録
+ → インポート
+ → チャンク
+ → エンベディング / 索引
  → 利用者クエリ
- → Hybrid Retrieval
- → Context 組み立て
- → LLM Gateway（必要時）
- → 回答 + Citation
- → Audit / Usage
+ → ハイブリッド検索
+ → コンテキスト 組み立て
+ → LLM ゲートウェイ（必要時）
+ → 回答 + 引用情報
+ → 監査 / Usage
 ```
 
 権限チェックは入口と検索対象の両方で意識します。
@@ -720,13 +720,13 @@ Document 登録
 
 ## 面接官
 
-なぜこの Document/RAG 構成にしたのですか。
+なぜこの 文書/RAG 構成にしたのですか。
 
 ## 回答
 
 経営分析では『速さ』だけでなく『根拠と責任』が必要だからです。
 
-文書管理、分割、Hybrid 検索、Citation、権限、監査を一連にすることで、
+文書管理、分割、Hybrid 検索、引用情報、権限、監査を一連にすることで、
 企業業務として成立する AI 利用を実現しました。
 
 ## 追問
@@ -754,8 +754,8 @@ RAG に関するよくある誤解は何ですか。
 
 ## 回答
 
-『ベクトル DB を入れれば終わる』『Chunk は適当で良い』
-『権限は生成後で良い』『Citation は任意』などです。
+『ベクトル DB を入れれば終わる』『チャンク は適当で良い』
+『権限は生成後で良い』『引用情報 は任意』などです。
 
 実際はライフサイクル、粒度、Hybrid、ACL、評価が揃って初めて企業利用できます。
 
@@ -784,8 +784,8 @@ RAG に関するよくある誤解は何ですか。
 
 悪い回答を『検索失敗』と『生成失敗』に分けて見ます。
 
-検索なら Chunk 粒度、Hybrid 比率、メタデータ、Top-K を見直します。
-生成なら Prompt とモデル経路を見直します。測らずに全体をいじりません。
+検索なら チャンク 粒度、Hybrid 比率、メタデータ、上位 K 件 を見直します。
+生成なら プロンプト とモデル経路を見直します。測らずに全体をいじりません。
 
 ## 追問
 
@@ -808,13 +808,13 @@ RAG に関するよくある誤解は何ですか。
 
 ## 面接官
 
-Document と RAG を 1 分で説明してください。
+文書 と RAG を 1 分で説明してください。
 
 ## 回答
 
-ERIP では社内文書を登録し、Import と Chunk で検索可能化します。
-質問に対し Keyword と Vector の Hybrid で根拠を取得し、Context として LLM に渡します。
-回答は Citation 付きで返し、権限と監査を伴う企業 RAG として運用します。
+ERIP では社内文書を登録し、インポート と チャンク で検索可能化します。
+質問に対し Keyword と ベクトル の Hybrid で根拠を取得し、コンテキスト として LLM に渡します。
+回答は 引用情報 付きで返し、権限と監査を伴う企業 RAG として運用します。
 
 ## Point
 
@@ -861,7 +861,7 @@ ERIP では社内文書を登録し、Import と Chunk で検索可能化しま�
 
 ## 回答
 
-更新内容を再取り込みし、Chunk と索引を更新します。
+更新内容を再取り込みし、チャンク と索引を更新します。
 古い根拠が残り続けると誤判断の原因になります。
 
 ## 追問
@@ -891,7 +891,7 @@ RAG を 30 秒で説明してください。
 ## 回答
 
 社内文書を分割して検索可能にし、質問に関連する根拠を取得してから回答を生成する方式です。
-ERIP では Hybrid 検索と Citation、権限と監査を付けて企業利用しています。
+ERIP では Hybrid 検索と 引用情報、権限と監査を付けて企業利用しています。
 
 ## Point
 
@@ -900,11 +900,11 @@ ERIP では Hybrid 検索と Citation、権限と監査を付けて企業利用�
 
 ---
 
-## 11.2 なぜ Vector だけではないか
+## 11.2 なぜ ベクトル だけではないか
 
 ## 面接官
 
-Vector Search だけでは駄目な理由は。
+ベクトル検索 だけでは駄目な理由は。
 
 ## 回答
 
@@ -931,23 +931,23 @@ RAG における LangChain と LangGraph の役割は何ですか。
 
 LangChain は次を担当します。
 
-- Document Loader
-- Text Splitter / Chunk
-- Retriever
-- Prompt
-- Context
-- Citation
-- RAG Chain
+- ドキュメントローダー（文書 Loader）
+- テキスト分割処理（テキスト分割処理） / チャンク
+- リトリーバー（リトリーバー（Retriever））
+- プロンプト
+- コンテキスト
+- 引用情報
+- RAG チェーン（RAG チェーン（チェーン））
 
 LangGraph は次を担当します。
 
-- いつ Retrieval を実行するか
-- 次に KPI / Research / Report のどこへ進むか
-- RAG 結果を後続 Workflow の State として管理すること
+- いつ 検索処理 を実行するか
+- 次に KPI / 調査（調査） / レポート のどこへ進むか
+- RAG 結果を後続 ワークフロー（ワークフロー（Workflow）） の ステート として管理すること
 
 つまり、
-LangChain は AI Components、
-LangGraph は Stateful Agent Workflow です。
+LangChain は AI コンポーネント、
+LangGraph は ステートフル・エージェントワークフロー（ステートフル・エージェントワークフロー（Agent ワークフロー）） です。
 
 ## 追問
 
@@ -955,27 +955,27 @@ LangChain の RAG は LangGraph とどう連携しますか。
 
 ## 回答
 
-LangChain で取得した Retrieval Result と Context を
-LangGraph の State に格納し、
-次の Analysis Node や Report Node が利用します。
+LangChain で取得した 検索処理 Result と コンテキスト を
+LangGraph の ステート に格納し、
+次の Analysis ノード や report ノード が利用します。
 
 検索・文脈組み立ては LangChain、
 その後の多段階分析と分岐は LangGraph です。
 
 ## Point
 
-- LangChain RAG → State → LangGraph Node
+- LangChain RAG → ステート → LangGraph ノード
 - 置き換えではなく連携
 
 ---
 
 # Part 03 要点总结
 
-1. Document Lifecycle：登録 → Import → Chunk → 検索可能 → 利用 → アーカイブ
-2. LangChain：Document Loader / Chunk / Retriever / Prompt / Context / Citation / RAG Chain
-3. LangGraph：Retrieval の実行タイミングと後続 KPI / Research / Report 分岐
-4. 連携：Retrieval Result + Context を State に格納し後続 Node が利用
-5. LLM Gateway：呼び出し統制、経路、コスト、観測
-6. 回答は必ず Citation と権限を伴う
+1. 文書 ライフサイクル：登録 → インポート → チャンク → 検索可能 → 利用 → アーカイブ
+2. LangChain：ドキュメントローダー / チャンク / リトリーバー / プロンプト / コンテキスト / 引用情報 / RAG チェーン
+3. LangGraph：検索処理 の実行タイミングと後続 KPI / 調査 / レポート 分岐
+4. 連携：検索処理 Result + コンテキスト を ステート に格納し後続 ノード が利用
+5. LLM ゲートウェイ：呼び出し統制、経路、コスト、観測
+6. 回答は必ず 引用情報 と権限を伴う
 
-LangChain = AI Components、LangGraph = Stateful Agent Workflow。
+LangChain ＝ AI コンポーネント、LangGraph ＝ ステートフル・エージェントワークフロー。

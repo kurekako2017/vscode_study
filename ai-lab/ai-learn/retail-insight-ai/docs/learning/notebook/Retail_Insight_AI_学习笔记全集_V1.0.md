@@ -41,7 +41,7 @@ docs/learning/notebook/
 正式术语统一维护在：
 
 ```
-ai-lab/术语速查表.md
+ai-lab/ai-learn/术语速查表.md
 ```
 
 ---
@@ -204,7 +204,7 @@ Enterprise AI Backend
 >
 > Python、FastAPI、OpenAPI、Swagger、ReDoc 的关系。
 >
-> 正式术语请查看：`ai-lab/术语速查表.md`
+> 正式术语请查看：`ai-lab/ai-learn/术语速查表.md`
 
 ---
 

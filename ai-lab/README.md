@@ -31,7 +31,7 @@
 
 速查：
 
-- [AI / LLM / Agent 术语速查表](./术语速查表.md)
+- [AI / LLM / Agent / ERIP 术语速查表](./ai-learn/术语速查表.md)（入口页：[./术语速查表.md](./术语速查表.md)）
 
 ## 可运行 Demo
 

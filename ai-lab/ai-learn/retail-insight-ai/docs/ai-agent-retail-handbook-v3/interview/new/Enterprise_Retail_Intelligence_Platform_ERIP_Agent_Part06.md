@@ -1,13 +1,13 @@
-# Enterprise Retail Intelligence Platform（ERIP）
+# Enterprise リテールインテリジェンス Platform（ERIP）
 # Agent 面试指南 V4 正式版
 ## Part 06：日本 AI Agent 面接・TL 压迫・技術比較・Appendix
 
 ---
 
 - **Version**：V4.0 Official Edition
-- **Document Type**：Interview Handbook
+- **文書（文書） Type**：Interview Handbook
 - **Language**：日本語中心
-- **対象**：AI Engineer / Agent Engineer / Backend Engineer / Solution Architect / Technical Leader
+- **対象**：AI Engineer / Agent Engineer / バックエンド（バックエンド） Engineer / Solution Architect / Technical Leader
 - **前提**：Part01〜Part05 を踏まえた最終仕上げ
 
 # 更新说明
@@ -41,10 +41,10 @@
 - 4.1 なぜ Spring Boot ではないか
 - 4.2 Java と比較
 - 4.3 なぜ Django ではないか
-- 4.4 なぜ Node ではないか
+- 4.4 なぜ ノード（ノード（Node）） ではないか
 - 4.5 なぜ ChatGPT 単体ではないか
-- 4.6 なぜ RAG が必要か
-- 4.7 なぜ Approval / Audit か
+- 4.6 なぜ RAG（検索拡張生成）（検索拡張生成） が必要か
+- 4.7 なぜ 承認 / 監査 か
 
 ## Chapter 5　連続压迫シミュレーション
 - 5.1 連続1
@@ -63,18 +63,18 @@
 
 ## 回答
 
-Prompt、Retriever、RAG Context、Citation、Tool、
-LLM Integration など AI Components を
+プロンプト（プロンプト（Prompt））、リトリーバー（リトリーバー（Retriever））、RAG コンテキスト（RAG コンテキスト（コンテキスト（Context）））、引用情報（引用情報（Citation））、ツール（ツール）、
+LLM（大規模言語モデル）（大規模言語モデル） 連携（LLM 連携） など AI コンポーネント を
 統一的に構成するためです。
 
 ERIP では、
 単発の LLM 呼び出しではなく、
-根拠取得から構造化出力までの AI 部品を
+根拠取得から構造化出力までの AI コンポーネントを
 LangChain で組み立てています。
 
 ## Point
 
-- LangChain = AI Components
+- LangChain ＝ AI コンポーネント
 
 ---
 
@@ -86,15 +86,15 @@ LangChain で組み立てています。
 
 ## 回答
 
-State、Node、Edge、条件分岐を用いて、
-複数ステップの Agent Workflow を制御するためです。
+ステート（ステート（State））、ノード、エッジ（エッジ（Edge））、条件分岐を用いて、
+複数ステップの エージェントワークフロー（Agent ワークフロー（ワークフロー（Workflow））） を制御するためです。
 
 経営分析は route / KPI / research / report の多段階であり、
 状態付きフロー制御が必要でした。
 
 ## Point
 
-- LangGraph = Stateful Agent Workflow
+- LangGraph ＝ ステートフル・エージェントワークフロー（ステートフル・エージェントワークフロー（Stateful エージェントワークフロー（Agent ワークフロー）））
 
 ---
 
@@ -107,22 +107,22 @@ LangChain と LangGraph の違いは何ですか。
 ## 回答
 
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト、
+引用情報、ツール、LLM 連携 など
+AI コンポーネント を構成する フレームワーク（フレームワーク（Framework）） です。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード、エッジ、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワークです。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 
 ## Point
 
-- Components vs Workflow
+- コンポーネント vs ワークフロー
 
 ---
 
@@ -134,10 +134,10 @@ LangGraph で全体 Workflow を制御しています。
 
 ## 回答
 
-AI 部品だけでは業務フローを安全に制御できず、
-Workflow だけでは各ステップの AI 能力が不足するためです。
+AI コンポーネントだけでは業務フローを安全に制御できず、
+ワークフロー だけでは各ステップの AI 能力が不足するためです。
 
-ERIP は両者協働の Enterprise AI Agent Platform です。
+ERIP は両者協働の エンタープライズ AI エージェント基盤（エンタープライズ AI エージェント基盤（Enterprise AI Agent Platform）） です。
 
 ## 追問
 
@@ -146,12 +146,12 @@ LangChain だけでは駄目ですか。LangGraph だけでは。
 ## 回答
 
 LangChain だけでは、
-単発 RAG や Chain は作れても、
+単発 RAG や チェーン（チェーン） は作れても、
 多段階の状態管理と分岐が弱くなります。
 
 LangGraph だけでは、
-Workflow の器は作れても、
-Prompt / Retriever / RAG / LLM 部品の統合が曖昧になります。
+ワークフロー の器は作れても、
+プロンプト / リトリーバー / RAG / LLM 部品の統合が曖昧になります。
 
 両方必要です。
 
@@ -170,15 +170,15 @@ ERIP のどこで LangChain を使い、どこで LangGraph を使いますか�
 ## 回答
 
 LangChain：
-Document / Chunk / Retriever / Prompt / Context / Citation / LLM Integration。
+文書 / チャンク（チャンク） / リトリーバー / プロンプト / コンテキスト / 引用情報 / LLM 連携。
 
 LangGraph：
 START → route → kpi / research → report → END の
-Agent Workflow Orchestration。
+エージェントワークフロー 制御（制御）。
 
 責任境界は、
-LangChain = AI 部品、
-LangGraph = Stateful Workflow です。
+LangChain ＝ AI コンポーネント、
+LangGraph ＝ ステートフルワークフロー（Stateful ワークフロー） です。
 
 ## Point
 
@@ -190,7 +190,7 @@ LangGraph = Stateful Workflow です。
 
 ## 面接官
 
-Framework を使わず自作しなかった理由は。
+フレームワーク を使わず自作しなかった理由は。
 
 ## 回答
 
@@ -198,7 +198,7 @@ Framework を使わず自作しなかった理由は。
 企業品質で実現するコストが高いためです。
 
 LangChain と LangGraph を使い、
-ERIP 固有の業務ルール・権限・Approval・Audit を
+ERIP 固有の業務ルール・権限・承認・監査 を
 その上に構築する方が適切でした。
 
 ## Point
@@ -317,7 +317,7 @@ AI 案件では。
 
 ## 回答
 
-ERIP を主に置き、Backend / RAG / Workflow / 権限監査を中心に話します。
+ERIP を主に置き、バックエンド / RAG / ワークフロー / 権限監査を中心に話します。
 
 ## Point
 
@@ -340,7 +340,7 @@ Part01 の案件別オープニングとセットで使う。
 ## 回答
 
 完成した企業向けプラットフォームとして、
-文書管理、RAG、分析、レポート、Approval、Audit、JWT/RBAC まで一連で実装しています。
+文書管理、RAG、分析、レポート、承認、監査、JWT（JSON Web Token）（JSON Web トークン）/RBAC（ロールベースアクセス制御）（ロールベースアクセス制御） まで一連で実装しています。
 
 検証用の stub モードやテスト用 InMemory はありますが、
 それは品質確保の手段であり、正式業務経路の代替ではありません。
@@ -379,7 +379,7 @@ Part01 の案件別オープニングとセットで使う。
 ツール（検索・分析・生成）を使い、状態を持って業務を進めるためです。
 
 ただし無制御の自律エージェントではなく、
-権限・Workflow・Approval で制御された Agentic システムです。
+権限・ワークフロー・承認 で制御された Agentic システムです。
 
 ## 追問
 
@@ -392,7 +392,7 @@ Part01 の案件別オープニングとセットで使う。
 
 ## Point
 
-- 制御された Agentic Workflow
+- 制御された エージェント型ワークフロー（Agentic ワークフロー）
 - 誇張しない
 
 ---
@@ -407,7 +407,7 @@ Part01 の案件別オープニングとセットで使う。
 
 業務確定の責任分界は承認者にあります。
 
-システムは、根拠 Citation、版管理、承認履歴、監査ログを提供し、
+システムは、根拠 引用情報、版管理、承認履歴、監査ログを提供し、
 誰が何に基づき承認したかを追跡可能にします。
 無審査確定を防ぐのが設計目的です。
 
@@ -418,7 +418,7 @@ Part01 の案件別オープニングとセットで使う。
 ## 回答
 
 品質と制御を提供する責任はあります。
-だから Retrieval 品質、権限、状態機械、監査を実装しています。
+だから 検索処理（検索処理（Retrieval）） 品質、権限、状態機械、監査を実装しています。
 『AI が書いたから不可避』とは言いません。
 
 ## Point
@@ -464,10 +464,10 @@ LLM コストが爆発したらどうしますか。
 
 ## 回答
 
-JWT/RBAC、検索時 ACL、ログ秘匿、Secret 管理、
+JWT/RBAC、検索時 ACL（アクセス制御リスト）、ログ秘匿、シークレット（シークレット） 管理、
 最小権限、監査で抑えます。
 
-また、不要な全文を外部へ送らない、Prompt/ログに機密を出さない方針です。
+また、不要な全文を外部へ送らない、プロンプト/ログに機密を出さない方針です。
 
 ## 追問
 
@@ -505,7 +505,7 @@ ERIP はその全体を通した実装です。
 
 ## 回答
 
-業務理解と Backend 設計、AI 部品の統制、日本語での設計説明です。
+業務理解と バックエンド 設計、AI コンポーネントの統制、日本語での設計説明です。
 特定ライブラリ暗記だけではありません。
 
 ## Point
@@ -527,7 +527,7 @@ ERIP はその全体を通した実装です。
 Spring Boot は企業 Java で非常に強い選択です。
 
 今回は AI/RAG/Python エコシステムとの統合速度、
-Pydantic 契約、Workflow 実装を優先し FastAPI を選びました。
+Pydantic 契約、ワークフロー 実装を優先し FastAPI を選びました。
 Java 案件では Spring を選びます。否定ではありません。
 
 ## 追問
@@ -589,8 +589,8 @@ ERIP は後者の中心課題が強かったため Python です。
 
 Django は強力なフルスタック枠です。
 
-ERIP は React を Frontend、API を Backend とし、
-RAG/Workflow を明確なサービス境界で置く必要がありました。
+ERIP は React を フロントエンド（フロントエンド）、API を バックエンド とし、
+RAG/ワークフロー を明確なサービス境界で置く必要がありました。
 API 中心 + AI 統合には FastAPI が適合しました。
 
 ## 追問
@@ -608,22 +608,22 @@ API 中心 + AI 統合には FastAPI が適合しました。
 
 ---
 
-## 4.4 なぜ Node ではないか
+## 4.4 なぜ ノード ではないか
 
 ## 面接官
 
-なぜ Node.js ではないのですか。
+なぜ ノード.js ではないのですか。
 
 ## 回答
 
-Node も API に強いです。
+ノード も API に強いです。
 
-ただし今回の中心課題は RAG、Embedding、Python AI 周辺との統合でした。
+ただし今回の中心課題は RAG、エンベディング（エンベディング（Embedding））、Python AI 周辺との統合でした。
 チームとライブラリ資産を含めて Python/FastAPI を選択しました。
 
 ## 追問
 
-Frontend が React なら Backend も Node では。
+フロントエンド が React なら バックエンド も ノード では。
 
 ## 回答
 
@@ -676,7 +676,7 @@ ChatGPT を批判しますか。
 
 ## 回答
 
-社内文書は更新が頻繁で、権限や出典管理が必要だからです。
+社内文書は更新が頻繁で、権限や出典情報管理が必要だからです。
 
 毎回学習し直すより、検索で最新根拠を渡す方が運用適合しやすいです。
 必要に応じて学習手法は併用し得ますが、第一選択を RAG にしました。
@@ -687,27 +687,27 @@ RAG の限界は。
 
 ## 回答
 
-検索が弱いと回答も弱いです。だから Chunk、Hybrid、評価が重要です。
+検索が弱いと回答も弱いです。だから チャンク、Hybrid、評価が重要です。
 
 ## Point
 
-- 更新・権限・出典に強い
+- 更新・権限・出典情報に強い
 - 検索品質が前提
 
 ---
 
-## 4.7 なぜ Approval / Audit か
+## 4.7 なぜ 承認 / 監査 か
 
 ## 面接官
 
-AI が正しいなら Approval は不要では。
+AI が正しいなら 承認 は不要では。
 
 ## 回答
 
 AI は誤り得ます。経営資料は影響が大きいです。
 
-生成と業務確定を分け、人の責任分界を残すために Approval が必要です。
-Audit は後からの説明責任を支えます。
+生成と業務確定を分け、人の責任分界を残すために 承認 が必要です。
+監査 は後からの説明責任を支えます。
 
 ## 追問
 
@@ -737,8 +737,8 @@ Audit は後からの説明責任を支えます。
 
 コア価値は『社内根拠に基づく説明可能な経営分析』です。
 
-技術根拠は、Document Lifecycle、Hybrid RAG、Workflow、
-JWT/RBAC、Approval、Audit が一つの業務鎖で繋がっていることです。
+技術根拠は、文書 ライフサイクル（Lifecycle）、Hybrid RAG、ワークフロー、
+JWT/RBAC、承認、監査 が一つの業務鎖で繋がっていることです。
 
 ## 追問
 
@@ -762,8 +762,8 @@ JWT/RBAC、Approval、Audit が一つの業務鎖で繋がっていることで�
 
 ## 回答
 
-権限拒否、状態遷移、Repository 経路、主要 API 契約、
-Frontend の重要画面、失敗時のエラー契約を保証します。
+権限拒否、状態遷移、リポジトリ層 経路、主要 API 契約、
+フロントエンド の重要画面、失敗時のエラー契約を保証します。
 
 成功して嬉しい経路だけでなく、止めるべき操作が止まることを重視します。
 
@@ -790,7 +790,7 @@ LLM 出力の正しさはテストできますか。
 
 ## 回答
 
-できるように、レイヤ分離、Schema 契約、状態機械、監査、
+できるように、レイヤ分離、スキーマ（スキーマ） 契約、状態機械、監査、
 学習可能なドキュメントとテストを残しています。
 
 属人的な暗黙知だけに依存しない設計を意識しました。
@@ -839,18 +839,18 @@ LLM 出力の正しさはテストできますか。
 
 ## 回答
 
-Prompt、Retriever、RAG Context、Citation、Tool、
-LLM Integration など AI Components を
+プロンプト、リトリーバー、RAG コンテキスト、引用情報、ツール、
+LLM 連携 など AI コンポーネント を
 統一的に構成するためです。
 
 ERIP では、
 単発の LLM 呼び出しではなく、
-根拠取得から構造化出力までの AI 部品を
+根拠取得から構造化出力までの AI コンポーネントを
 LangChain で組み立てています。
 
 ## Point
 
-- LangChain = AI Components
+- LangChain ＝ AI コンポーネント
 
 ---
 
@@ -862,15 +862,15 @@ LangChain で組み立てています。
 
 ## 回答
 
-State、Node、Edge、条件分岐を用いて、
-複数ステップの Agent Workflow を制御するためです。
+ステート、ノード、エッジ、条件分岐を用いて、
+複数ステップの エージェントワークフロー を制御するためです。
 
 経営分析は route / KPI / research / report の多段階であり、
 状態付きフロー制御が必要でした。
 
 ## Point
 
-- LangGraph = Stateful Agent Workflow
+- LangGraph ＝ ステートフル・エージェントワークフロー
 
 ---
 
@@ -883,22 +883,22 @@ LangChain と LangGraph の違いは何ですか。
 ## 回答
 
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト、
+引用情報、ツール、LLM 連携 など
+AI コンポーネント を構成する フレームワークです。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード、エッジ、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワークです。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 
 ## Point
 
-- Components vs Workflow
+- コンポーネント vs ワークフロー
 
 ---
 
@@ -910,10 +910,10 @@ LangGraph で全体 Workflow を制御しています。
 
 ## 回答
 
-AI 部品だけでは業務フローを安全に制御できず、
-Workflow だけでは各ステップの AI 能力が不足するためです。
+AI コンポーネントだけでは業務フローを安全に制御できず、
+ワークフロー だけでは各ステップの AI 能力が不足するためです。
 
-ERIP は両者協働の Enterprise AI Agent Platform です。
+ERIP は両者協働の エンタープライズ AI エージェント基盤 です。
 
 ## 追問
 
@@ -922,12 +922,12 @@ LangChain だけでは駄目ですか。LangGraph だけでは。
 ## 回答
 
 LangChain だけでは、
-単発 RAG や Chain は作れても、
+単発 RAG や チェーン は作れても、
 多段階の状態管理と分岐が弱くなります。
 
 LangGraph だけでは、
-Workflow の器は作れても、
-Prompt / Retriever / RAG / LLM 部品の統合が曖昧になります。
+ワークフロー の器は作れても、
+プロンプト / リトリーバー / RAG / LLM 部品の統合が曖昧になります。
 
 両方必要です。
 
@@ -946,15 +946,15 @@ ERIP のどこで LangChain を使い、どこで LangGraph を使いますか�
 ## 回答
 
 LangChain：
-Document / Chunk / Retriever / Prompt / Context / Citation / LLM Integration。
+文書 / チャンク / リトリーバー / プロンプト / コンテキスト / 引用情報 / LLM 連携。
 
 LangGraph：
 START → route → kpi / research → report → END の
-Agent Workflow Orchestration。
+エージェントワークフロー 制御。
 
 責任境界は、
-LangChain = AI 部品、
-LangGraph = Stateful Workflow です。
+LangChain ＝ AI コンポーネント、
+LangGraph ＝ ステートフルワークフロー です。
 
 ## Point
 
@@ -966,7 +966,7 @@ LangGraph = Stateful Workflow です。
 
 ## 面接官
 
-Framework を使わず自作しなかった理由は。
+フレームワーク を使わず自作しなかった理由は。
 
 ## 回答
 
@@ -974,7 +974,7 @@ Framework を使わず自作しなかった理由は。
 企業品質で実現するコストが高いためです。
 
 LangChain と LangGraph を使い、
-ERIP 固有の業務ルール・権限・Approval・Audit を
+ERIP 固有の業務ルール・権限・承認・監査 を
 その上に構築する方が適切でした。
 
 ## Point
@@ -994,11 +994,11 @@ ERIP を 1 分で紹介してください。
 ## 回答
 
 ERIP は、LangChain と LangGraph を中核とした
-大手流通グループ向け Enterprise AI Agent Platform です。
+大手流通グループ向け エンタープライズ AI エージェント基盤 です。
 
 社内文書を登録し、LangChain の RAG で根拠を取得し、
-LangGraph の Agent Workflow で分析して取締役会向けレポートを生成します。
-Approval と Audit までを一つの業務フローとして提供し、
+LangGraph の エージェントワークフロー で分析して取締役会向けレポートを生成します。
+承認 と 監査 までを一つの業務フローとして提供し、
 私は FastAPI、React、PostgreSQL、LangChain、LangGraph、JWT/RBAC を中心に担当しました。
 
 ## Point
@@ -1017,12 +1017,12 @@ Approval と Audit までを一つの業務フローとして提供し、
 
 従来は資料が分散し、分析とレポート作成に時間が掛かり、根拠説明も困難でした。
 
-ERIP は LangChain と LangGraph を中核とした Enterprise AI Agent Platform です。
+ERIP は LangChain と LangGraph を中核とした エンタープライズ AI エージェント基盤 です。
 文書を一元管理し、LangChain の Hybrid RAG で関連根拠を取得、
-LangGraph の Agent Workflow で分析とレポート生成を実行します。
-生成結果は即確定せず Approval を経て、操作は Audit に残します。
+LangGraph の エージェントワークフロー で分析とレポート生成を実行します。
+生成結果は即確定せず 承認 を経て、操作は 監査 に残します。
 
-Backend は FastAPI、認証は JWT、認可は RBAC、正式データは PostgreSQL です。
+バックエンド は FastAPI、認証は JWT、認可は RBAC、正式データは PostgreSQL です。
 私は API、画面、データ、LangChain、LangGraph、承認監査の設計実装を担当しました。
 
 ## Point
@@ -1039,24 +1039,24 @@ Backend は FastAPI、認証は JWT、認可は RBAC、正式データは Postgr
 
 ## 回答
 
-ERIP、Enterprise Retail Intelligence Platform は、
+ERIP、Enterprise リテールインテリジェンス Platform は、
 LangChain と LangGraph を中核とした
-経営企画向け Enterprise AI Agent Platform です。
+経営企画向け エンタープライズ AI エージェント基盤 です。
 
 課題は三点、資料分散、レポート作成の長期化、根拠の残らなさです。
-解決として、文書登録から Import/Chunk、
-LangChain による Hybrid Retrieval / Prompt / Citation、
-LangGraph による分析 Workflow、
-レポート Version、Approval、Audit を統合しました。
+解決として、文書登録から インポート（インポート）/チャンク、
+LangChain による ハイブリッド検索（Hybrid 検索処理） / プロンプト / 引用情報、
+LangGraph による分析 ワークフロー、
+レポート Version、承認、監査 を統合しました。
 
 技術的には React が操作し、FastAPI が API 境界、
-LangChain が AI Components、LangGraph が Stateful Agent Workflow、
-Repository が PostgreSQL 永続化を担当します。
-JWT/RBAC で権限、LLM Gateway でモデル呼び出しを統制し、
-長時間処理は非同期化と SSE で可視化します。
+LangChain が AI コンポーネント、LangGraph が ステートフル・エージェントワークフロー、
+リポジトリ層 が PostgreSQL 永続化を担当します。
+JWT/RBAC で権限、LLM ゲートウェイ（LLM ゲートウェイ（ゲートウェイ）） でモデル呼び出しを統制し、
+長時間処理は非同期化と SSE（サーバー送信イベント）（サーバー送信イベント） で可視化します。
 
-私の担当は API 設計、Frontend、データ設計、権限、
-LangChain、LangGraph、Approval/Audit の実装です。
+私の担当は API 設計、フロントエンド、データ設計、権限、
+LangChain、LangGraph、承認/監査 の実装です。
 目的は AI を喋らせることではなく、説明可能な経営判断支援を企業運用に耐える形で提供することです。
 
 ## Point
@@ -1075,18 +1075,18 @@ LangChain、LangGraph、Approval/Audit の実装です。
 
 ## 回答
 
-- ERIP：Enterprise Retail Intelligence Platform
-- RAG：Retrieval-Augmented Generation
-- Chunk：検索・引用のための文書分割単位
-- Hybrid Retrieval：Keyword + Vector の統合検索
-- Citation：回答根拠の提示
+- ERIP：Enterprise リテールインテリジェンス Platform
+- RAG：検索処理-Augmented Generation
+- チャンク：検索・引用のための文書分割単位
+- ハイブリッド検索：Keyword + ベクトル（ベクトル） の統合検索
+- 引用情報：回答根拠の提示
 - JWT：認証トークン
 - RBAC：ロールベース認可
-- Approval：生成物の業務確定前承認
-- Audit：操作事実の監査記録
-- Workflow / LangGraph：状態付き業務流
-- LLM Gateway：モデル呼び出し統制層
-- Repository：永続化境界
+- 承認：生成物の業務確定前承認
+- 監査：操作事実の監査記録
+- ワークフロー / LangGraph：状態付き業務流
+- LLM ゲートウェイ：モデル呼び出し統制層
+- リポジトリ層：永続化境界
 - SSE：サーバ推送イベント
 - ECS / RDS / ALB 等：本番インフラ要素
 
@@ -1112,10 +1112,10 @@ LangChain、LangGraph、Approval/Audit の実装です。
 
 ## 回答
 
-- Authentication と Authorization
-- Upload と Import
-- Task 完了 と Approval 完了
-- Event と Audit
+- 認証（認証（Authentication）） と 認可（認可（Authorization））
+- Upload と インポート
+- Task 完了 と 承認 完了
+- イベント（Event） と 監査
 - 生成完了 と 業務確定
 - InMemory と 正式 PostgreSQL
 
@@ -1141,17 +1141,17 @@ LangChain、LangGraph、Approval/Audit の実装です。
 
 | 略語 | 意味 |
 |---|---|
-| ERIP | Enterprise Retail Intelligence Platform |
+| ERIP | Enterprise リテールインテリジェンス Platform |
 | API | Application Programming Interface |
-| JWT | JSON Web Token |
-| RBAC | Role Based Access Control |
-| RAG | Retrieval-Augmented Generation |
-| ACL | Access Control List |
+| JWT | JSON Web トークン（トークン） |
+| RBAC | ロール（ロール） Based アクセス制御（アクセス制御） |
+| RAG | 検索処理-Augmented Generation |
+| ACL | アクセス制御 List |
 | SSE | Server-Sent Events |
-| DI | Dependency Injection |
-| ALB | Application Load Balancer |
-| ECS | Elastic Container Service |
-| RDS | Relational Database Service |
+| DI | 依存性注入（依存性注入） |
+| ALB | Application ロードバランサー（ロードバランサー） |
+| ECS | Elastic コンテナ（コンテナ） サービス層 |
+| RDS | Relational Database サービス層 |
 | IAM | Identity and Access Management |
 | CI/CD | Continuous Integration / Delivery |
 | KPI | Key Performance Indicator |
@@ -1174,9 +1174,9 @@ LangChain、LangGraph、Approval/Audit の実装です。
 
 1. 1/3/5 分紹介（LangChain / LangGraph 必須）
 2. 主鎖（文書→LangChain RAG→LangGraph 分析→レポート→承認→監査）
-3. Backend 主鎖（React→FastAPI→Service→LangChain→LangGraph→Repository→PostgreSQL）
+3. バックエンド 主鎖（React→FastAPI→サービス層→LangChain→LangGraph→リポジトリ層→PostgreSQL）
 4. LangChain と LangGraph の違い
-5. JWT と RBAC の違い / なぜ Approval
+5. JWT と RBAC の違い / なぜ 承認
 6. 弱みを正直に言う一文
 7. 案件別オープニングの切替
 
@@ -1205,9 +1205,9 @@ Part01〜06 をどう使いますか。
 ## 回答
 
 - Part01：開场・案件切替・ERIP とは
-- Part02：Backend
-- Part03：Document / RAG
-- Part04：Workflow / Approval / SSE
+- Part02：バックエンド
+- Part03：文書 / RAG
+- Part04：ワークフロー / 承認 / SSE
 - Part05：AWS / 本番
 - Part06：压迫问答・比較・紹介・用語
 
@@ -1221,11 +1221,11 @@ Part01〜06 をどう使いますか。
 
 # Part 06 要点总结
 
-1. ERIP = LangChain + LangGraph の Enterprise AI Agent Platform
-2. LangChain = AI Components、LangGraph = Stateful Agent Workflow
+1. ERIP = LangChain + LangGraph の エンタープライズ AI エージェント基盤
+2. LangChain ＝ AI コンポーネント、LangGraph ＝ ステートフル・エージェントワークフロー
 3. 两者协作。片方だけでは不十分
 4. 1/3/5 分紹介に必ず LangChain / LangGraph を入れる
 5. 日本面接は業務理解 + 設計意図 + 日本語構造化
-6. 混同禁止：AuthN/AuthZ、生成/確定、Components/Workflow
+6. 混同禁止：AuthN/AuthZ、生成/確定、コンポーネント/ワークフロー
 
 Part01 が主線、Part06 は压迫と最終確認。

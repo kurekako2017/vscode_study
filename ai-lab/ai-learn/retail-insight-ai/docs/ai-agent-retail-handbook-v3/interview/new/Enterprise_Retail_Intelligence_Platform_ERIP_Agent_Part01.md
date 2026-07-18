@@ -1,4 +1,4 @@
-# Enterprise Retail Intelligence Platform（ERIP）
+# Enterprise リテールインテリジェンス Platform（ERIP）
 
 # Agent 面试指南 V4 正式版
 
@@ -7,9 +7,9 @@
 ---
 
 - **Version**：V4.1 Official Edition
-- **Document Type**：Interview Main Handbook
+- **文書（文書） Type**：Interview Main Handbook
 - **Language**：日本語中心
-- **対象**：AI Engineer / Agent Engineer / Backend Engineer / Solution Architect / Technical Leader
+- **対象**：AI Engineer / Agent Engineer / バックエンド（バックエンド） Engineer / Solution Architect / Technical Leader
 - **位置付け**：AI Agent 案件面接で**最初に読む・最初に答える主ドキュメント**
 
 ---
@@ -20,11 +20,11 @@
 
 - 前半 5〜10 分の案件紹介と全体アーキテクチャ
 - LangChain / LangGraph の役割・違い・協働
-- なぜ Agent で、なぜ普通の ChatGPT / RAG ではないか
+- なぜ Agent で、なぜ普通の ChatGPT / RAG（検索拡張生成）（検索拡張生成） ではないか
 
 Part02〜Part06 は深掘り备用。面接主線は Part01。
 
-強化点：LangChain / LangGraph 明示、全体図、Workflow 図、
+強化点：LangChain / LangGraph 明示、全体図、ワークフロー（ワークフロー（Workflow）） 図、
 30秒/1分/3分アーキテクチャ口述、高頻度 TL 问答。
 
 完成済み企業案件として記述する。
@@ -57,12 +57,12 @@ Part02〜Part06 は深掘り备用。面接主線は Part01。
 ## Chapter 2　ERIP 全体アーキテクチャ
 
 - 2.1 ERIP 全体アーキテクチャ
-- 2.2 使用した AI Agent Framework
+- 2.2 使用した AI エージェントフレームワーク（Agent フレームワーク（フレームワーク（Framework）））
 - 2.3 LangChain の役割
 - 2.4 LangGraph の役割
 - 2.5 LangChain と LangGraph の違い
 - 2.6 なぜ両方を使うのか
-- 2.7 ERIP Agent Workflow
+- 2.7 ERIP エージェントワークフロー（Agent ワークフロー）
 - 2.8 なぜ Agent プロジェクトと呼ぶのか
 - 2.9 なぜ普通の RAG ではないのか
 - 2.10 なぜ普通の ChatGPT ではないのか
@@ -74,16 +74,16 @@ Part02〜Part06 は深掘り备用。面接主線は Part01。
 - 3.3 LangChain 使用位置
 - 3.4 LangGraph 使用位置
 - 3.6 为什么不同时只用 LangChain
-- 3.8 State 内容
-- 3.9 Workflow 与 RAG 连接
-- 3.10 Workflow 与 Approval 连接
-- 3.11 不是 Autonomous Agent
-- 3.13 LLM 失败处理
-- 3.14 Retrieval 不足
+- 3.8 ステート（ステート（State）） 内容
+- 3.9 ワークフロー 与 RAG 连接
+- 3.10 ワークフロー 与 承認 连接
+- 3.11 不是 自律型エージェント（自律型エージェント（Autonomous Agent））
+- 3.13 LLM（大規模言語モデル）（大規模言語モデル） 失败处理
+- 3.14 検索処理（検索処理（Retrieval）） 不足
 - 3.15 AI 输出错误控制
 - 3.16 权限贯穿
 - 3.17 PostgreSQL / pgvector
-- 3.18 LLM Gateway
+- 3.18 LLM ゲートウェイ（LLM ゲートウェイ（ゲートウェイ））
 - 3.20 一句话总括
 
 ## Chapter 4　アーキテクチャ口述答案
@@ -198,7 +198,7 @@ SD領域を中心に、
 Dynamics 365とPower Platformを利用した
 業務システム開発を担当しました。
 
-画面開発、Plugin、Workflow、
+画面開発、Plugin、ワークフロー、
 API連携などを担当しております。
 ```
 
@@ -223,22 +223,22 @@ AI経営分析プラットフォームを担当しました。
 
 ERIP は、
 LangChain と LangGraph を中核とした
-Enterprise AI Agent Platform です。
+エンタープライズ AI エージェント基盤（Enterprise AI Agent Platform） です。
 
 経営企画部門が利用するシステムで、
 社内文書を登録し、
 LangChainを用いたRAGにより根拠を取得し、
-LangGraphのAgent Workflowで経営分析を実施します。
+LangGraphのエージェントワークフロー（Agent ワークフロー）で経営分析を実施します。
 
 その結果を取締役会向けレポートとして生成し、
-Approval、Auditまでを
+承認、監査までを
 一つの業務フローとして実装しました。
 
 私は主に、
 FastAPI、React、PostgreSQL、
 LangChain、LangGraph、
-JWT/RBAC、RAG、
-Approval、Auditの
+JWT（JSON Web Token）/RBAC（ロールベースアクセス制御）、RAG、
+承認、監査の
 設計・実装を担当しました。
 ```
 
@@ -253,7 +253,7 @@ Approval、Auditの
 - 测试通过数量
 - 将来版本或未来计划
 - AWS 本番构成设计
-- Router / Repository 等后端细项
+- ルーター（ルーター） / リポジトリ層 等后端细项
 
 这些内容仅在面试官明确追问时回答。
 
@@ -264,9 +264,9 @@ AI Agent 案件开场必须出现：
 1. 业务价值
 2. LangChain
 3. LangGraph
-4. Approval / Audit
+4. 承認 / 監査
 
-不要只说「RAG と AI Workflow」。
+不要只说「RAG と AI ワークフロー」。
 
 ---
 
@@ -304,11 +304,11 @@ Enterprise Retail Intelligence Platformは、
 AI経営分析プラットフォームです。
 
 LangChain と LangGraph を中核とした
-Enterprise AI Agent Platform です。
+エンタープライズ AI エージェント基盤 です。
 
 経営企画部門が保有する社内文書を一元管理し、
 LangChainによるRAGで分析根拠を取得し、
-LangGraphのAgent Workflowで経営分析を実施します。
+LangGraphのエージェントワークフローで経営分析を実施します。
 
 その結果を取締役会向けレポートとして生成し、
 承認、監査までを
@@ -350,8 +350,8 @@ LangGraphのAgent Workflowで経営分析を実施します。
 そこで、
 社内文書を一元管理し、
 RAGで分析根拠を取得し、
-Agent Workflowで分析とレポート作成を進め、
-ApprovalとAuditまで含めて効率化するために、
+エージェントワークフローで分析とレポート作成を進め、
+承認と監査まで含めて効率化するために、
 ERIPを開発しました。
 ```
 
@@ -415,8 +415,8 @@ ERIPを開発しました。
 分析結果の根拠が残りにくいことです。
 
 ERIPでは、
-文書管理、RAG、Agent Workflow、
-Approval、Auditまでを一元管理することで、
+文書管理、RAG、エージェントワークフロー、
+承認、監査までを一元管理することで、
 これらの課題を解決しました。
 ```
 
@@ -452,8 +452,8 @@ ChatGPTは非常に優れた汎用生成AIですが、
 
 ERIPでは、
 LangChainのRAG、
-LangGraphのWorkflow、
-JWT/RBAC、Approval、Auditを組み合わせ、
+LangGraphのワークフロー、
+JWT/RBAC、承認、監査を組み合わせ、
 企業業務向けAI Agentとして構築しました。
 ```
 
@@ -481,11 +481,11 @@ ERIPは企業業務向けAI Agent Platformです。
 | 主要用途 | 汎用対話・生成           | 企業経営分析 Agent             |
 | 数据来源 | 一般知識・入力内容       | 社内文書                       |
 | 根据信息 | 必ずしも提示されない     | LangChain RAG の根拠提示       |
-| 处理形态 | 単発対話中心             | LangGraph の多段階 Workflow    |
-| 权限控制 | 业务系统侧需另行实现     | JWT / RBAC                     |
-| 审批     | 标准对话功能中无业务审批 | Approval Workflow              |
-| 审计     | 需要另行构建             | Audit Log                      |
-| 文档管理 | 不属于核心业务功能       | Enterprise Document Management |
+| 处理形态 | 単発対話中心             | LangGraph の多段階 ワークフロー    |
+| 权限控制 | 业务系统侧需另行实现     | JWT（JSON Web トークン） / RBAC（ロールベースアクセス制御）                     |
+| 审批     | 标准对话功能中无业务审批 | 承認ワークフロー（承認 ワークフロー）              |
+| 审计     | 需要另行构建             | 監査ログ（監査 Log）                      |
+| 文档管理 | 不属于核心业务功能       | Enterprise 文書管理（文書 Management） |
 | 报告生成 | 通用文本生成             | 取締役会向けレポート + Version |
 
 ### 总结回答
@@ -495,7 +495,7 @@ ChatGPTは汎用AIです。
 
 ERIPは、
 社内文書、LangChain RAG、
-LangGraph Workflow、
+LangGraph ワークフロー、
 権限、承認、監査を統合した
 企業向けAI Agentプラットフォームです。
 
@@ -531,8 +531,8 @@ RAGは、
 
 実際の多段階分析、
 レポート生成、
-Approval、
-Auditは、
+承認、
+監査は、
 LangGraphと業務機能として実装しています。
 ```
 
@@ -548,10 +548,10 @@ ERIPは、
 
 文書管理、
 LangChain RAG、
-LangGraph Agent Workflow、
+LangGraph エージェントワークフロー、
 レポート生成、
-Approval、
-Audit、
+承認、
+監査、
 権限管理など、
 複数の企業業務機能を統合しています。
 
@@ -567,15 +567,15 @@ Platformと位置付けています。
 ```text
 ERIPは、
 LangChain と LangGraph を中核とした
-Enterprise AI Agent Platform です。
+エンタープライズ AI エージェント基盤 です。
 
 社内文書を登録し、
 LangChainのRAGで分析根拠を取得し、
-LangGraphのAgent Workflowで経営分析を実施します。
+LangGraphのエージェントワークフローで経営分析を実施します。
 
 その結果を
 取締役会向けレポートとして生成し、
-Approval、Auditまでを
+承認、監査までを
 一つの業務フローとして提供しています。
 ```
 
@@ -599,25 +599,25 @@ LangChainを用いたRAGで
 質問や分析テーマに関連する根拠文書を取得します。
 
 取得した根拠を使い、
-LangGraphのAgent Workflowで
+LangGraphのエージェントワークフローで
 売上、在庫、地域差、商品傾向などを分析し、
 取締役会向けレポートを生成します。
 
 生成したレポートは、
 担当者がそのまま確定するのではなく、
-Approval Workflowを通して承認します。
+承認ワークフローを通して承認します。
 
 また、
 誰が文書を登録し、
 誰が分析を実行し、
 誰が承認したかを
-Audit Logとして保存します。
+監査ログとして保存します。
 
 私は、
 FastAPI、React、PostgreSQL、
 LangChain、LangGraph、
 JWT/RBAC、RAG、
-Approval、Auditを中心に
+承認、監査を中心に
 設計・実装を担当しました。
 ```
 
@@ -636,20 +636,20 @@ ERIP、Enterprise Retail Intelligence Platformは、
 
 ERIPでは社内文書を登録・分割し、
 LangChainのRAGで根拠を取得、
-LangGraphのAgent Workflowで
+LangGraphのエージェントワークフローで
 route / KPI / 調査 / レポート生成を多段階実行します。
 
 結果は取締役会向けレポートとなり、
-Approvalで人が確定し、Auditで履歴を残します。
+承認で人が確定し、監査で履歴を残します。
 
 JWT/RBACで権限制御し、
-BackendはFastAPI、FrontendはReact、
+バックエンドはFastAPI、フロントエンドはReact、
 DBはPostgreSQL/pgvector、
 AI Agent中核はLangChainとLangGraphです。
 
 私はAPI、画面、データ設計、
-LangChain RAG、LangGraph Workflow、
-JWT/RBAC、Approval、Auditを担当しました。
+LangChain RAG、LangGraph ワークフロー、
+JWT/RBAC、承認、監査を担当しました。
 ```
 
 ---
@@ -673,34 +673,34 @@ ERIP の全体像は次の通りです。
 
 利用者
   ↓
-React Frontend
+React フロントエンド
   ↓
 FastAPI API
   ↓
-JWT Authentication / RBAC Authorization
+JWT 認証（Authentication） / RBAC 認可（Authorization）
   ↓
-Business Service
+Business サービス層
   ↓
-Document Management / Retrieval / Analysis
+文書管理 / 検索処理 / Analysis
   ↓
-LangChain（AI 部品統合）
+LangChain（AI コンポーネント統合）
   ↓
-LangGraph Agent Workflow
+LangGraph エージェントワークフロー
   ↓
-LLM Gateway
+LLM ゲートウェイ
   ↓
 PostgreSQL / pgvector
   ↓
-Approval / Audit / Report
+承認 / 監査 / レポート
 
 React は操作と結果表示、
 FastAPI は企業 API と業務入口、
-LangChain は LLM・Prompt・Retriever・RAG など
+LangChain は LLM・プロンプト（Prompt）・リトリーバー（Retriever）・RAG など
 AI 処理部品の統合、
-LangGraph は状態付きの多段階 Agent Workflow、
+LangGraph は状態付きの多段階 エージェントワークフロー、
 PostgreSQL / pgvector は業務データ・文書・ベクトルと状態の永続化、
-Approval は AI 生成結果の人確認、
-Audit は操作と責任の追跡を担当します。
+承認 は AI 生成結果の人確認、
+監査 は操作と責任の追跡を担当します。
 ```
 
 ## 追問
@@ -716,7 +716,7 @@ LangChain で根拠取得と LLM 利用を組み立て、
 LangGraph で分析の順序・分岐・状態を制御します。
 
 その前後に、
-権限、文書管理、Approval、Audit を付けて
+権限、文書管理、承認、監査 を付けて
 企業システムとして成立させています。
 ```
 
@@ -724,18 +724,18 @@ LangGraph で分析の順序・分岐・状態を制御します。
 
 - 先画整图，再解释各层
 - 中核是 LangChain + LangGraph，不是只讲 FastAPI
-- Approval / Audit 要出现在架构末端
+- 承認 / 監査 要出现在架构末端
   【学习提示】
 
 架构口述顺序固定为：入口 → 权限 → 业务 → LangChain → LangGraph → 数据 → 治理。
 
 ---
 
-## 2.2 使用した AI Agent Framework
+## 2.2 使用した AI エージェントフレームワーク
 
 ## 面接官
 
-このプロジェクトでは、どの AI Agent Framework を使用しましたか。
+このプロジェクトでは、どの AI エージェントフレームワーク を使用しましたか。
 
 ## 回答
 
@@ -743,18 +743,18 @@ LangGraph で分析の順序・分岐・状態を制御します。
 LangChain と LangGraph を使用しました。
 
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト、
+引用情報（Citation）、ツール、LLM 連携 など
+AI コンポーネント を構成する フレームワーク です。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード（Node）、エッジ（Edge）、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワーク です。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 ```
 
 ## 追問
@@ -767,12 +767,12 @@ LangGraph で全体 Workflow を制御しています。
 一方だけでは不十分です。
 
 LangChain だけでは、
-単発の RAG や Chain は作れますが、
+単発の RAG や チェーン は作れますが、
 多段階の状態管理と分岐制御が弱くなります。
 
 LangGraph だけでは、
-Workflow の器は作れても、
-RAG・Prompt・LLM 部品の統合責務が曖昧になります。
+ワークフロー の器は作れても、
+RAG・プロンプト・LLM 部品の統合責務が曖昧になります。
 
 ERIP では両者を役割分担して使います。
 ```
@@ -783,8 +783,8 @@ ERIP では両者を役割分担して使います。
 - 先讲分工，再讲必要性
   【容易说错】
 
-不要只说「RAG と AI Workflow を使いました」。
-面试官要听的是 Framework 名：LangChain / LangGraph。
+不要只说「RAG と AI ワークフロー を使いました」。
+面试官要听的是 フレームワーク 名：LangChain / LangGraph。
 
 ---
 
@@ -798,44 +798,44 @@ LangChain は何ですか。ERIP では何を担当しましたか。
 
 ```text
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト、
+引用情報、ツール、LLM 連携 など
+AI コンポーネント を構成する フレームワーク です。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード、エッジ、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワーク です。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 
 具体的には、
-Prompt、Retriever、RAG Context、Citation、
-Tool、LLM Integration、
-AI Component Orchestration を担当します。
+プロンプト、リトリーバー、RAG コンテキスト、引用情報、
+ツール、LLM 連携、
+AI コンポーネントの統合制御（AI コンポーネント 制御） を担当します。
 
-LangGraph の各 Node 内部でも、
-これらの AI Components を呼び出します。
+LangGraph の各 ノード 内部でも、
+これらの AI コンポーネント を呼び出します。
 ```
 
 ## 追問
 
-LangChain は Workflow 全体を制御しますか。
+LangChain は ワークフロー 全体を制御しますか。
 
 ## 回答
 
 ```text
 いいえ。
 
-Workflow 全体の順序・分岐・状態は LangGraph です。
-LangChain は Node 内の AI 部品として使います。
+ワークフロー 全体の順序・分岐・状態は LangGraph です。
+LangChain は ノード 内の AI コンポーネントとして使います。
 ```
 
 ## Point
 
-- LangChain = AI Components
+- LangChain ＝ AI コンポーネント
 - 不负责全流程状态机
 
 ---
@@ -850,26 +850,26 @@ LangGraph は何ですか。ERIP では何を担当しましたか。
 
 ```text
 LangGraph は、
-状態付きグラフで Agent Workflow を制御する Framework です。
+状態付きグラフで エージェントワークフロー を制御する フレームワーク です。
 
 ERIP では主に次を担当します。
 
 - AnalysisState による状態管理
 - route / kpi / research / report の多段階処理
-- Node と Edge の明示
+- ノード と エッジ の明示
 - 条件分岐
 - 失敗時の制御
-- Workflow の可視化と説明容易性
-- Approval 前までの自動処理境界
+- ワークフロー の可視化と説明容易性
+- 承認 前までの自動処理境界
 
 重要なのは、
 無限に自律判断する Agent ではなく、
-制御された Enterprise Agentic Workflow である点です。
+制御された Enterprise エージェント型ワークフロー（Agentic ワークフロー） である点です。
 ```
 
 ## 追問
 
-State には何を持ちますか。
+ステート には何を持ちますか。
 
 ## 回答
 
@@ -878,13 +878,13 @@ task_id、question、mode、route、
 kpi_result、research_result、
 report_markdown などです。
 
-各 Node は必要な項目だけ更新し、
-次の Node がそれを読んで処理を続けます。
+各 ノード は必要な項目だけ更新し、
+次の ノード がそれを読んで処理を続けます。
 ```
 
 ## Point
 
-- LangGraph = Stateful Agent Workflow
+- LangGraph ＝ ステートフル・エージェントワークフロー（ステートフル・エージェントワークフロー（Stateful エージェントワークフロー））
 - 不是无限自主 Agent
 
 ---
@@ -899,23 +899,23 @@ LangChain と LangGraph の違いは何ですか。
 
 ```text
 LangChain は、
-Prompt、Retriever、RAG Context、
-Citation、Tool、LLM Integration など
-AI Components を構成する Framework です。
+プロンプト、リトリーバー、RAG コンテキスト、
+引用情報、ツール、LLM 連携 など
+AI コンポーネント を構成する フレームワーク です。
 
 LangGraph は、
-State、Node、Edge、条件分岐を用いて
-複数ステップの Agent Workflow を
-制御する Framework です。
+ステート、ノード、エッジ、条件分岐を用いて
+複数ステップの エージェントワークフロー を
+制御する フレームワーク です。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御しています。
+LangGraph で全体 ワークフロー を制御しています。
 
 簡単に言うと、
 
-LangChain ＝ AI Components
-LangGraph ＝ Stateful Agent Workflow
+LangChain ＝ AI コンポーネント
+LangGraph ＝ ステートフル・エージェントワークフロー
 
 です。
 
@@ -956,7 +956,7 @@ Enterprise AI Agent Architecture を構成します。
 ## 回答
 
 ```text
-LangChain だけでも単発 RAG や Chain は作れます。
+LangChain だけでも単発 RAG や チェーン は作れます。
 
 しかし ERIP の経営分析は、
 
@@ -966,7 +966,7 @@ LangChain だけでも単発 RAG や Chain は作れます。
 - レポート生成
 - 状態保存
 - 条件分岐
-- Approval 前処理
+- 承認 前処理
 
 という複数段階です。
 
@@ -1001,11 +1001,11 @@ LangGraph の明示的な Graph の方が保守しやすいです。
 
 ---
 
-## 2.7 ERIP Agent Workflow
+## 2.7 ERIP エージェントワークフロー
 
 ## 面接官
 
-ERIP の Agent Workflow を説明してください。
+ERIP の エージェントワークフロー を説明してください。
 
 ## 回答
 
@@ -1033,30 +1033,30 @@ report → END
 mode により、
 hybrid / kpi / research で経路が変わります。
 
-この Workflow を、
+この ワークフロー を、
 全体業務に戻すと次になります。
 
-Document
-  → Import
-  → Chunk
-  → Retrieval
+文書
+  → インポート
+  → チャンク
+  → 検索処理
   → LangChain RAG
-  → LangGraph Analysis Workflow
-  → Report
-  → Approval
-  → Audit
+  → LangGraph Analysis ワークフロー
+  → レポート
+  → 承認
+  → 監査
 ```
 
 ## 追問
 
-route Node は何をしますか。
+route ノード（ノード） は何をしますか。
 
 ## 回答
 
 ```text
 入力の mode を見て、
 最初に KPI へ進むか、
-Research へ進むかを決めます。
+調査 へ進むかを決めます。
 
 ここで処理経路を分けることで、
 不要なステップを避けます。
@@ -1083,32 +1083,32 @@ LLM を呼んだだけでは Agent とは言いません。
 ERIP では、
 
 - タスクに応じて処理経路を選ぶ
-- Retrieval などのツールを使う
-- 複数 Node 間で State を渡す
+- 検索処理 などのツールを使う
+- 複数 ノード 間で ステート を渡す
 - 多段階分析を実行する
 - 結果に応じて次工程を決める
 - レポートを生成する
-- 重要地点で人の Approval に渡す
+- 重要地点で人の 承認 に渡す
 
 という能力を持っています。
 
 これは制御された
-Enterprise Agentic Workflow です。
-制限のない Autonomous Agent ではありません。
+Enterprise エージェント型ワークフロー です。
+制限のない 自律型エージェント ではありません。
 ```
 
 ## 追問
 
-Autonomous Agent との違いは。
+自律型エージェント との違いは。
 
 ## 回答
 
 ```text
-Autonomous Agent は、
+自律型エージェント は、
 目標だけ与えて自由に行動させるイメージが強いです。
 
 ERIP は、
-権限、状態、Node、Approval で
+権限、状態、ノード、承認 で
 行動範囲と責任分界を制限しています。
 
 企業利用では、この制御が必須です。
@@ -1133,7 +1133,7 @@ ERIP は、
 普通の RAG は、
 
 Question
-  → Retrieval
+  → 検索処理
   → LLM
   → Answer
 
@@ -1141,13 +1141,13 @@ Question
 
 ERIP は、
 
-Document Management
-  → Retrieval
+文書管理
+  → 検索処理
   → LangChain RAG
-  → LangGraph Analysis Workflow
-  → Report
-  → Approval
-  → Audit
+  → LangGraph Analysis ワークフロー
+  → レポート
+  → 承認
+  → 監査
 
 です。
 
@@ -1189,12 +1189,12 @@ ERIP は次を持つ企業システムです。
 
 - 社内文書管理
 - LangChain RAG
-- LangGraph Workflow
+- LangGraph ワークフロー
 - JWT / RBAC
 - PostgreSQL / pgvector
-- Approval
-- Audit
-- Report Version
+- 承認
+- 監査
+- レポート版管理
 - 業務状態管理
 
 つまり、
@@ -1236,10 +1236,10 @@ ChatGPT 画面そのものを業務システムの代替にはしません。
 - React 画面
 - PostgreSQL データ設計
 - LangChain RAG 実装
-- LangGraph Workflow 設計
+- LangGraph ワークフロー 設計
 - JWT / RBAC
-- Approval
-- Audit
+- 承認
+- 監査
 
 を担当しました。
 
@@ -1267,7 +1267,7 @@ AI の生成能力と、
 ## Point
 
 - 必须亲口说出 LangChain 与 LangGraph
-- 不要只说 AI Workflow
+- 不要只说 AI ワークフロー
 
 ---
 
@@ -1288,11 +1288,11 @@ AI の生成能力と、
 ```text
 上から、
 
-利用者 → React → FastAPI → JWT/RBAC → Service
-→ Document/Retrieval/Analysis
-→ LangChain → LangGraph → LLM Gateway
+利用者 → React → FastAPI → JWT/RBAC → サービス層
+→ 文書/検索処理/Analysis
+→ LangChain → LangGraph → LLM ゲートウェイ
 → PostgreSQL/pgvector
-→ Report/Approval/Audit
+→ レポート/承認/監査
 
 です。
 
@@ -1328,13 +1328,13 @@ LangChain はアーキテクチャのどこで使いますか。
 ## 回答
 
 ```text
-Business Service 配下の AI 部品層です。
+Business サービス層 配下の AI コンポーネント層です。
 
 具体的には、
-Retrieval、Prompt、RAG Context、
+検索処理、プロンプト、RAG コンテキスト、
 LLM 呼び出し前後の組み立てで使います。
 
-LangGraph の Node が必要に応じて呼び出します。
+LangGraph の ノード が必要に応じて呼び出します。
 ```
 
 ## 追問
@@ -1345,12 +1345,12 @@ API 層で直接 LangChain を呼びますか。
 
 ```text
 基本はしません。
-Router は薄く、Service / Workflow 経由にします。
+ルーター は薄く、サービス層 / ワークフロー 経由にします。
 ```
 
 ## Point
 
-- LangChain 在 Service/Node 内，不在 Router 散落
+- LangChain 在 サービス層/ノード 内，不在 ルーター 散落
 
 ---
 
@@ -1363,32 +1363,32 @@ LangGraph はどこで使いますか。
 ## 回答
 
 ```text
-分析タスクの Agent Workflow です。
+分析タスクの エージェントワークフロー です。
 
 START → route → kpi/research → report → END
 という状態遷移を制御します。
 
-Task の受付や永続化は Service / Repository、
+Task の受付や永続化は サービス層 / リポジトリ層、
 フロー制御は LangGraph、
 と境界を分けています。
 ```
 
 ## 追問
 
-Approval も LangGraph の中ですか。
+承認 も LangGraph の中ですか。
 
 ## 回答
 
 ```text
-Approval は業務確定の人承認なので、
-Workflow 完了後の独立業務機能です。
+承認 は業務確定の人承認なので、
+ワークフロー 完了後の独立業務機能です。
 自動フローと人の責任分界を分けます。
 ```
 
 ## Point
 
 - LangGraph 管自动分析流
-- Approval 是人机边界之后的治理
+- 承認 是人机边界之后的治理
 
 ---
 
@@ -1411,7 +1411,7 @@ Workflow 完了後の独立業務機能です。
 
 ## 追問
 
-Chain の直列接続では。
+チェーン（チェーン） の直列接続では。
 
 ## 回答
 
@@ -1426,11 +1426,11 @@ Chain の直列接続では。
 
 ---
 
-## 3.8 State 内容
+## 3.8 ステート 内容
 
 ## 面接官
 
-LangGraph の State に何を保存しますか。
+LangGraph の ステート に何を保存しますか。
 
 ## 回答
 
@@ -1444,36 +1444,36 @@ KPI 結果、調査結果、レポート本文などです。
 
 ## 追問
 
-DB と State の違いは。
+DB と ステート の違いは。
 
 ## 回答
 
 ```text
-State は Workflow 実行中の共有状態、
+ステート は ワークフロー 実行中の共有状態、
 DB は業務事実の永続化です。
-最終的な Report や Approval は DB に残します。
+最終的な レポート や 承認 は DB に残します。
 ```
 
 ## Point
 
-- State ≠ 业务数据库
+- ステート ≠ 业务数据库
 
 ---
 
-## 3.9 Workflow 与 RAG 连接
+## 3.9 ワークフロー 与 RAG 连接
 
 ## 面接官
 
-Workflow と RAG はどう接続しますか。
+ワークフロー と RAG はどう接続しますか。
 
 ## 回答
 
 ```text
-まず Document を検索可能化し、
+まず 文書 を検索可能化し、
 LangChain RAG で根拠を取得します。
 
 その根拠や分析入力を、
-LangGraph の分析 Node が利用して
+LangGraph の分析 ノード が利用して
 レポート生成まで進めます。
 
 検索と生成と業務フローを分離しつつ接続します。
@@ -1488,26 +1488,26 @@ RAG 失敗時は。
 ```text
 根拠不足を明示し、
 無理に断定回答しません。
-不足 Context として業務側で扱います。
+不足 コンテキスト（Context） として業務側で扱います。
 ```
 
 ## Point
 
-- RAG 输出成为 Workflow 输入
+- RAG 输出成为 ワークフロー 输入
 
 ---
 
-## 3.10 Workflow 与 Approval 连接
+## 3.10 ワークフロー 与 承認 连接
 
 ## 面接官
 
-Workflow と Approval の接続は。
+ワークフロー と 承認 の接続は。
 
 ## 回答
 
 ```text
-LangGraph が Report を生成した後、
-業務上の確定は Approval に渡します。
+LangGraph が レポート を生成した後、
+業務上の確定は 承認 に渡します。
 
 生成完了は自動処理の完了であり、
 公開確定ではありません。
@@ -1515,7 +1515,7 @@ LangGraph が Report を生成した後、
 
 ## 追問
 
-なぜ Workflow 内で自動承認しないのか。
+なぜ ワークフロー 内で自動承認しないのか。
 
 ## 回答
 
@@ -1530,7 +1530,7 @@ LangGraph が Report を生成した後、
 
 ---
 
-## 3.11 不是 Autonomous Agent
+## 3.11 不是 自律型エージェント
 
 ## 面接官
 
@@ -1541,7 +1541,7 @@ LangGraph が Report を生成した後、
 ```text
 はい、完全自律ではありません。
 
-権限、Node 設計、状態、Approval で制御します。
+権限、ノード 設計、状態、承認 で制御します。
 企業では「止められる自動化」が重要です。
 ```
 
@@ -1572,12 +1572,12 @@ LLM 呼び出しが失敗したら、アーキテクチャ上どうしますか�
 ## 回答
 
 ```text
-LLM Gateway で失敗を捕捉し、
+LLM ゲートウェイ で失敗を捕捉し、
 リトライ方針や代替経路、
 明確な失敗状態を返します。
 
 黙って不正確な成功にはしません。
-Workflow 側も failed として追跡します。
+ワークフロー 側も failed として追跡します。
 ```
 
 ## 追問
@@ -1593,15 +1593,15 @@ DB データは。
 
 ## Point
 
-- Gateway + Workflow 状态共同处理失败
+- ゲートウェイ + ワークフロー 状态共同处理失败
 
 ---
 
-## 3.14 Retrieval 不足
+## 3.14 検索処理 不足
 
 ## 面接官
 
-Retrieval 結果が不足したらどうしますか。
+検索処理 結果が不足したらどうしますか。
 
 ## 回答
 
@@ -1616,7 +1616,7 @@ Retrieval 結果が不足したらどうしますか。
 
 ## 追問
 
-Top-K を増やせば解決しますか。
+上位 K 件（上位 K 件（Top-K）） を増やせば解決しますか。
 
 ## 回答
 
@@ -1643,8 +1643,8 @@ AI が誤った内容を出したらどう制御しますか。
 ```text
 多層です。
 
-RAGで根拠拘束、Promptで推測抑止、Citation必須、
-Approvalで人確認、Auditで後追いです。
+RAGで根拠拘束、プロンプトで推測抑止、引用情報必須、
+承認で人確認、監査で後追いです。
 完全ゼロにはできないが、流通前に止め説明できる設計です。
 ```
 
@@ -1655,7 +1655,7 @@ Approvalで人確認、Auditで後追いです。
 ## 回答
 
 ```text
-根拠拘束と Approval です。
+根拠拘束と 承認 です。
 生成後の人確認を外すと危険です。
 ```
 
@@ -1677,13 +1677,13 @@ Approvalで人確認、Auditで後追いです。
 入口で JWT 認証と RBAC 認可を行い、
 文書検索対象にも権限を適用します。
 
-権限外文書を Retrieval に載せないことが基本です。
+権限外文書を 検索処理 に載せないことが基本です。
 Agent が動いても、権限境界は消えません。
 ```
 
 ## 追問
 
-Workflow 内は全権限ですか。
+ワークフロー 内は全権限ですか。
 
 ## 回答
 
@@ -1733,27 +1733,27 @@ pgvector は、
 
 ---
 
-## 3.18 LLM Gateway
+## 3.18 LLM ゲートウェイ
 
 ## 面接官
 
-LLM Gateway はアーキテクチャ上なぜ必要ですか。
+LLM ゲートウェイ はアーキテクチャ上なぜ必要ですか。
 
 ## 回答
 
 ```text
 モデル呼び出しの共通入口です。
 
-Provider 差分、タイムアウト、失敗処理、
+プロバイダー 差分、タイムアウト、失敗処理、
 利用量、経路制御を集中管理します。
 
-LangChain 部品や Workflow が、
+LangChain 部品や ワークフロー が、
 各社 SDK を直接散らかして呼ばないようにします。
 ```
 
 ## 追問
 
-Gateway が無いと。
+ゲートウェイ が無いと。
 
 ## 回答
 
@@ -1764,7 +1764,7 @@ Gateway が無いと。
 
 ## Point
 
-- Gateway = 调用統制
+- ゲートウェイ = 调用統制
 
 ---
 
@@ -1779,7 +1779,7 @@ Gateway が無いと。
 ```text
 社内文書を根拠に、
 LangChain と LangGraph で分析し、
-Approval と Audit まで完遂する
+承認 と 監査 まで完遂する
 企業向け AI 経営分析 Agent プラットフォームです。
 ```
 
@@ -1791,7 +1791,7 @@ Approval と Audit まで完遂する
 
 ```text
 Python、FastAPI、LangChain、LangGraph、
-RAG、LLM Gateway、React、TypeScript、
+RAG、LLM ゲートウェイ、React、TypeScript、
 PostgreSQL、pgvector、JWT、RBAC、
 Docker、AWS、
 ECS Fargate、Amazon RDS、Amazon S3、CloudWatch です。
@@ -1816,8 +1816,8 @@ ERIP は、
 React と FastAPI を入口に、
 JWT/RBAC で権限を制御し、
 LangChain の RAG で根拠を取得、
-LangGraph の Agent Workflow で分析し、
-レポートを Approval / Audit まで通す
+LangGraph の エージェントワークフロー で分析し、
+レポートを 承認 / 監査 まで通す
 企業向け AI Agent 基盤です。
 ```
 
@@ -1830,14 +1830,14 @@ LangGraph の Agent Workflow で分析し、
 FastAPI が認証認可の後に業務を受け付けます。
 
 社内文書は管理・分割された後、
-LangChain の Retriever / RAG で根拠として取得されます。
+LangChain の リトリーバー / RAG で根拠として取得されます。
 
-分析は LangGraph の Workflow で行い、
+分析は LangGraph の ワークフロー で行い、
 route、KPI、調査、レポート生成を
 状態付きで進めます。
 
-生成結果は即確定せず Approval へ渡し、
-操作履歴は Audit に残します。
+生成結果は即確定せず 承認 へ渡し、
+操作履歴は 監査 に残します。
 データは PostgreSQL / pgvector に永続化します。
 ```
 
@@ -1851,17 +1851,17 @@ ERIP の目的は、
 説明可能な経営分析を行うことです。
 
 全体は、
-Frontend、API、権限、業務サービス、
+フロントエンド、API、権限、業務サービス、
 LangChain、LangGraph、
-データ、Approval、Audit で構成されます。
+データ、承認、監査 で構成されます。
 
-LangChain は AI 部品層です。
-Prompt、Retriever、RAG、LLM 接続を統合し、
+LangChain は AI コンポーネント層です。
+プロンプト、リトリーバー、RAG、LLM 接続を統合し、
 一歩の AI 処理を安定して提供します。
 
-LangGraph は Agent Workflow 層です。
+LangGraph は エージェントワークフロー 層です。
 START から route、kpi、research、report、END までを
-State と条件分岐で制御します。
+ステート と条件分岐で制御します。
 
 これにより、
 単なる一問一答 RAG ではなく、
@@ -1870,13 +1870,13 @@ State と条件分岐で制御します。
 さらに、
 JWT/RBAC で権限を貫き、
 PostgreSQL で業務事実を保存し、
-Approval で人の責任分界を残し、
-Audit で追跡可能にします。
+承認 で人の責任分界を残し、
+監査 で追跡可能にします。
 
 私は、
 FastAPI、React、PostgreSQL、
-LangChain RAG、LangGraph Workflow、
-JWT/RBAC、Approval、Audit を担当しました。
+LangChain RAG、LangGraph ワークフロー、
+JWT/RBAC、承認、監査 を担当しました。
 ```
 
 ---
@@ -1888,12 +1888,12 @@ JWT/RBAC、Approval、Audit を担当しました。
 ```text
 1. 最上：利用者 / React
 2. 中上：FastAPI + JWT/RBAC
-3. 中：Business Service
-4. 中核左：LangChain（RAG / Prompt / LLM部品）
+3. 中：Business サービス層
+4. 中核左：LangChain（RAG / プロンプト / LLM部品）
 5. 中核右：LangGraph（route/kpi/research/report）
-6. 下：LLM Gateway
+6. 下：LLM ゲートウェイ
 7. 底：PostgreSQL / pgvector
-8. 右下：Report → Approval → Audit
+8. 右下：レポート → 承認 → 監査
 ```
 
 口述：
@@ -1912,12 +1912,12 @@ AI の賢さだけでなく、
 ## 4.5 LangChain / LangGraph 30秒比较
 
 ```text
-LangChain は AI Components を構成する Framework、
-LangGraph は Stateful Agent Workflow を制御する Framework です。
+LangChain は AI コンポーネント を構成する フレームワーク、
+LangGraph は ステートフル・エージェントワークフロー を制御する フレームワーク です。
 
 ERIP では、
 LangChain で各 AI 処理を構成し、
-LangGraph で全体 Workflow を制御します。
+LangGraph で全体 ワークフロー を制御します。
 
 置き換えではなく、協調関係です。
 ```
@@ -1929,9 +1929,9 @@ LangGraph で全体 Workflow を制御します。
 | Part   | 定位                       | 何时使用                      |
 | ------ | -------------------------- | ----------------------------- |
 | Part01 | **面试主文档**       | 开场到前 10 分钟              |
-| Part02 | Backend 深挖备用           | 被追问 FastAPI/Repository/JWT |
-| Part03 | RAG 深挖备用               | 被追问 Chunk/Hybrid/Embedding |
-| Part04 | Workflow/Approval/SSE 深挖 | 被追问 Node/State/SSE 细节    |
+| Part02 | バックエンド 深挖备用           | 被追问 FastAPI/リポジトリ層/JWT |
+| Part03 | RAG 深挖备用               | 被追问 チャンク（チャンク）/Hybrid/エンベディング（エンベディング（Embedding）） |
+| Part04 | ワークフロー/承認/SSE（サーバー送信イベント）（サーバー送信イベント） 深挖 | 被追问 ノード/ステート/SSE 细节    |
 | Part05 | AWS 深挖备用               | 被追问本番インフラ            |
 | Part06 | 压迫问答与附录             | 终盘压迫、术语、1/3/5 分复习  |
 
@@ -1941,13 +1941,13 @@ LangGraph で全体 Workflow を制御します。
 
 # Part 01 要点总结
 
-0. ERIP は LangChain + LangGraph を中核とした Enterprise AI Agent Platform
+0. ERIP は LangChain + LangGraph を中核とした エンタープライズ AI エージェント基盤（エンタープライズ AI エージェント基盤）
 1. ERIP の業務価値を先に言う
 2. 全体アーキテクチャ図を描く
 3. **LangChain** と **LangGraph** を明示する
-4. 違い：AI Components vs Stateful Agent Workflow
-5. 協働：Node 内 AI 能力 + Graph 编排
-6. Document → RAG → Workflow → Report → Approval → Audit
+4. 違い：AI コンポーネント vs ステートフル・エージェントワークフロー
+5. 協働：ノード 内 AI 能力 + Graph 编排
+6. 文書 → RAG → ワークフロー → レポート（レポート） → 承認 → 監査
 7. 可控 Agent であり、ChatGPT / 普通 RAG ではない
 8. 担当に LangChain / LangGraph を入れる
 
@@ -1955,7 +1955,7 @@ LangGraph で全体 Workflow を制御します。
 
 ```text
 Python、FastAPI、LangChain、LangGraph、
-RAG、LLM Gateway、React、TypeScript、
+RAG、LLM ゲートウェイ、React、TypeScript、
 PostgreSQL、pgvector、JWT、RBAC、
 Docker、AWS、
 ECS Fargate、Amazon RDS、Amazon S3、CloudWatch
