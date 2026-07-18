@@ -1,5 +1,24 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-18 — Part01 を ERIP 全体架构 / LangChain·LangGraph 面接主文档へ改訂
+
+### 变更
+- 改訂 `interview/new/..._Part01.md`：
+  - Chapter2 全体アーキテクチャ（図・Framework・協働・Workflow・担当）
+  - Chapter3 架构 TL 问答
+  - Chapter4 30秒/1分/3分架构口述・白板・比較
+  - 开场与 1/3/5 分に LangChain / LangGraph を明示
+- Part02〜06 に「深掘り备用、主线は Part01」注記
+- handbook README の Part01 用途を主文档へ更新
+- 代码确认：`backend/requirements.txt` に `langgraph==1.1.10`；`workflow/graph.py` で StateGraph 实装
+- `langchain` パッケージの直接 import は無し；RAG/Prompt/LLM Gateway が AI 部品層
+
+### 未变更
+- softbs 内 履历（S级保护，未改）
+- 业务代码；未 commit/push
+
+
+
 ## 2026-07-18 — ERIP Agent 面试指南 V4 正式版 Part02〜Part06
 
 ### 变更

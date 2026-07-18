@@ -1,5 +1,19 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-18 Completed: Part01 を ERIP 架构面接主ドキュメントへ再定位
+
+- [x] Part01 に Chapter2 全体アーキテクチャ / LangChain / LangGraph を追加
+- [x] 架构 TL 问答・30秒/1分/3分架构口述を追加
+- [x] 开场与 1/3/5 分介绍に LangChain / LangGraph を明示
+- [x] 代码确认：langgraph 实装あり；RAG/Prompt/LLM は AI 部品層として実装
+- [x] Part02〜06 を深掘り备用に位置付け注記
+- [x] softbs 履历（S级）は未改修；Part01 の技術スタック口径を更新
+- [ ] 用户审阅后自行 commit
+
+最后更新：2026-07-18
+
+
+
 ## 2026-07-18 Completed: ERIP V4 正式版面试教材 Part02〜Part06
 
 - [x] `docs/ai-agent-retail-handbook-v3/interview/new/` 正式版 Part02〜Part06 全量生成

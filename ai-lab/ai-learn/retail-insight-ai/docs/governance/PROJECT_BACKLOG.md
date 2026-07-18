@@ -1,5 +1,20 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-18 Completed: Part01 架构主文档再定位（LangChain / LangGraph）
+
+- [x] Part01 を AI Agent 面接主ドキュメントへ改訂
+- [x] 全体アーキテクチャ図 / Agent Workflow 図
+- [x] LangChain と LangGraph の役割・違い・協働を明示
+- [x] 架构 TL 问答 + 口述答案
+- [x] 代码检索：`langgraph` 直接使用；`langchain` 包未直接 import（AI 部品層は自研+Gateway）
+- [x] Part02〜06 深掘り备用注記
+- [ ] softbs 职务経歴書の No 番号・技術栈は S 级のため本轮未改（用户确认后）
+- [ ] 用户自行 commit
+
+最后更新：2026-07-18
+
+
+
 ## 2026-07-18 Completed: ERIP Agent 面试 V4 正式版 Part02〜Part06
 
 - [x] 生成正式版 Part02 Backend

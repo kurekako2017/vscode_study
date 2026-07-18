@@ -19,6 +19,9 @@
 
 ---
 
+
+> **位置付け**：Workflow / Approval / SSE 深掘り备用资料。面试主线は Part01。
+
 # 目录
 
 ## Chapter 2　LangGraph / Workflow 基礎

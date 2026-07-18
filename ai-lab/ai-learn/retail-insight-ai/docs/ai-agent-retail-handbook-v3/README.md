@@ -86,7 +86,7 @@ interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md
 
 | 优先级 | 文件 | 用途 | 状态 |
 |---|---|---|---|
-| 1 | [`interview/new/…_Part01.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part01.md) | **V4 正式版** 案件开场 / ERIP 介绍 | 活动 |
+| 1 | [`interview/new/…_Part01.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part01.md) | **V4 面试主文档** 开场 + **全体架构** + **LangChain/LangGraph** | 活动 |
 | 2 | [`interview/new/…_Part02.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part02.md) | **V4 正式版** Backend | 活动 |
 | 3 | [`interview/new/…_Part03.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part03.md) | **V4 正式版** Document / RAG | 活动 |
 | 4 | [`interview/new/…_Part04.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part04.md) | **V4 正式版** Workflow / Approval / SSE | 活动 |
