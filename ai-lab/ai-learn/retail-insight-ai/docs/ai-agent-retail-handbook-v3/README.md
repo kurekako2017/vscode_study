@@ -56,34 +56,53 @@ PROJECT_BIBLE.md
 ## 面试路线（权威 · 仅 `interview/`）
 
 ```text
-interview/INTERVIEW_GUIDE.md
+interview/new/…_Part01.md（案件开场 / ERIP 介绍）
 ↓
-interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md
+interview/new/…_Part02.md（Backend）
 ↓
-interview/02_日本AI现场面试.md
+interview/new/…_Part03.md（Document / RAG）
 ↓
-interview/07_面试口头训练.md
+interview/new/…_Part04.md（Workflow / Approval / SSE）
+↓
+interview/new/…_Part05.md（AWS / 本番）
+↓
+interview/new/…_Part06.md（压迫问答 / 比较 / Appendix）
 ↓
 03_AI核心知识.md（handbook 根 · 技术表）
 ↓
 01_日本AI项目实战.md（handbook 根 · 业务主链）
 ```
 
-## 面试材料权威索引（V1.0 · 当前唯一入口）
+补充（口头训练 / 旧 V1 合订本）：
+
+```text
+interview/INTERVIEW_GUIDE.md
+interview/02_日本AI现场面试.md
+interview/07_面试口头训练.md
+interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md
+```
+
+## 面试材料权威索引（V4 正式版 + V1.0 补充）
 
 | 优先级 | 文件 | 用途 | 状态 |
 |---|---|---|---|
-| 1 | [`interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`](interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md) | **Agent 面试指南 V1.0 唯一权威**（已合并旧 Volume 有价值问答） | 活动 |
-| 2 | [`interview/INTERVIEW_GUIDE.md`](interview/INTERVIEW_GUIDE.md) | 讲解稿 | 活动 |
-| 3 | [`interview/02_日本AI现场面试.md`](interview/02_日本AI现场面试.md) | 自介、深掘、压迫 | 活动 |
-| 4 | [`interview/07_面试口头训练.md`](interview/07_面试口头训练.md) | 开口训练 | 活动 |
-| 5 | [`01_日本AI项目实战.md`](01_日本AI项目实战.md) | 业务主链、架构、担当 | 活动 |
-| 6 | [`03_AI核心知识.md`](03_AI核心知识.md) | **技术版本矩阵 + 技术知识点表** | 活动 |
+| 1 | [`interview/new/…_Part01.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part01.md) | **V4 正式版** 案件开场 / ERIP 介绍 | 活动 |
+| 2 | [`interview/new/…_Part02.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part02.md) | **V4 正式版** Backend | 活动 |
+| 3 | [`interview/new/…_Part03.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part03.md) | **V4 正式版** Document / RAG | 活动 |
+| 4 | [`interview/new/…_Part04.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part04.md) | **V4 正式版** Workflow / Approval / SSE | 活动 |
+| 5 | [`interview/new/…_Part05.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part05.md) | **V4 正式版** AWS / 本番 | 活动 |
+| 6 | [`interview/new/…_Part06.md`](interview/new/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试_V4_正式版_Part06.md) | **V4 正式版** 压迫 / 比较 / Appendix | 活动 |
+| 7 | [`interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`](interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md) | V1.0 合订本（补充对照） | 活动 |
+| 8 | [`interview/INTERVIEW_GUIDE.md`](interview/INTERVIEW_GUIDE.md) | 讲解稿 | 活动 |
+| 9 | [`interview/02_日本AI现场面试.md`](interview/02_日本AI现场面试.md) | 自介、深掘、压迫补充 | 活动 |
+| 10 | [`interview/07_面试口头训练.md`](interview/07_面试口头训练.md) | 开口训练 | 活动 |
+| 11 | [`01_日本AI项目实战.md`](01_日本AI项目实战.md) | 业务主链、架构、担当 | 活动 |
+| 12 | [`03_AI核心知识.md`](03_AI核心知识.md) | **技术版本矩阵 + 技术知识点表** | 活动 |
 
 | 历史文件 | 处理 |
 |---|---|
-| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已合并并移至待删除区** [`../_archive_candidate/ai-agent-retail-handbook-v3/`](../_archive_candidate/ai-agent-retail-handbook-v3/)；有价值内容已并入 `interview/Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md` |
-| 旧文件名 `Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md` | **已废弃**；当前权威文件名为 `Enterprise_Retail_Intelligence_Platform_ERIP_Agent面试.md`（位于 `interview/`） |
+| `interview/new/*Part02-1*` / `*Part02-2*` 等碎片草稿 | **已归档** [`../_archive_candidate/ai-agent-retail-handbook-v3/interview-new-drafts/`](../_archive_candidate/ai-agent-retail-handbook-v3/interview-new-drafts/)；**不作背诵源** |
+| `Retail_Insight_AI_日本Agent面试攻略_Volume01_中日双语版.md` | **已合并并移至待删除区** [`../_archive_candidate/ai-agent-retail-handbook-v3/`](../_archive_candidate/ai-agent-retail-handbook-v3/) |
 | handbook 根目录下的 `02`/`07`/`INTERVIEW_GUIDE`/旧 Volume 路径 | **不再作为入口**；文件已迁至 `interview/` |
 
 **统一业务主链：**

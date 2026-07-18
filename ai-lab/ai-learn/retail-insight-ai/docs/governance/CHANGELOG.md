@@ -1,5 +1,25 @@
 # retail-insight-ai CHANGELOG
 
+## 2026-07-18 — ERIP Agent 面试指南 V4 正式版 Part02〜Part06
+
+### 变更
+- 新增正式面试教材：
+  - `docs/ai-agent-retail-handbook-v3/interview/new/..._Part02.md`（Backend）
+  - `..._Part03.md`（Document/RAG/LLM Gateway）
+  - `..._Part04.md`（LangGraph/Workflow/Approval/SSE）
+  - `..._Part05.md`（AWS/Docker/CI/CD/本番）
+  - `..._Part06.md`（压迫问答/技术比较/Appendix）
+- 废弃草稿 `Part02-2` 移至 `docs/_archive_candidate/ai-agent-retail-handbook-v3/interview-new-drafts/`
+- 统一格式：面接官 → 回答 → 追問 → 回答 → Point；日文中心
+- **未修改** Part01
+- handbook README 面试索引切换为 V4 正式版 Part01〜06 优先
+
+### 未变更
+- 业务代码、测试、Docker、Migration、`.env`
+- 未 git commit / push
+
+
+
 ## 2026-07-17 — 架构图 SQLite(Current) 紧急校正
 
 ### 变更

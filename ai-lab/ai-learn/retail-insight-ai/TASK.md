@@ -1,5 +1,17 @@
 # retail-insight-ai 当前任务
 
+## 2026-07-18 Completed: ERIP V4 正式版面试教材 Part02〜Part06
+
+- [x] `docs/ai-agent-retail-handbook-v3/interview/new/` 正式版 Part02〜Part06 全量生成
+- [x] 风格与格式对齐 Part01（面接官/回答/追問/回答/Point，日文中心）
+- [x] 废弃草稿 Part02-2 归档至 `docs/_archive_candidate/ai-agent-retail-handbook-v3/interview-new-drafts/`
+- [x] new 目录仅保留 Part01〜Part06 六个正式文件
+- [x] 未修改 Part01；未改代码/测试；未 git commit/push
+
+最后更新：2026-07-18
+
+
+
 ## 2026-07-17 紧急：架构图 SQLite(Current)/PostgreSQL(Target) 校正
 
 - [x] 重写 `09_系统设计书_7.0_Technical_Architecture_增补_修改版.md` V1.0 Current 主图

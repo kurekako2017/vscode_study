@@ -1,5 +1,20 @@
 # retail-insight-ai Project Backlog
 
+## 2026-07-18 Completed: ERIP Agent 面试 V4 正式版 Part02〜Part06
+
+- [x] 生成正式版 Part02 Backend
+- [x] 生成正式版 Part03 Document/RAG
+- [x] 生成正式版 Part04 Workflow/Approval/SSE
+- [x] 生成正式版 Part05 AWS/Infra
+- [x] 生成正式版 Part06 压迫问答/比較/Appendix
+- [x] 归档废弃 Part02-2 草稿
+- [x] new 目录仅保留 Part01〜06；禁止碎片文件
+- [ ] 用户审阅后自行 commit（本轮不 commit/push）
+
+最后更新：2026-07-18
+
+
+
 ## 2026-07-17 Completed: 全量文档收尾（深合并 + 03 一览 + 归档路径）
 
 - [x] Volume 深合并与归档路径 `docs/_archive_candidate/ai-agent-retail-handbook-v3/`

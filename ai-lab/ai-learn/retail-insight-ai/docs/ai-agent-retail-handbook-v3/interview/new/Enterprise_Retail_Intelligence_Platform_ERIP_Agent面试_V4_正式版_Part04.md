@@ -56,6 +56,21 @@
 ## Chapter 8　クロージング
 - 8.1 2分説明
 
+## Chapter 9　Node 設計の実践
+- 9.1 良い Node の条件
+- 9.2 条件分岐の置き方
+
+## Chapter 10　Report と人の責任
+- 10.1 取締役会レポートの要件
+- 10.2 差戻し後の流れ
+
+## Chapter 11　SSE 実装の注意
+- 11.1 再接続と重複
+- 11.2 error 後の done 禁止
+
+## Chapter 12　面接用ストーリー
+- 12.1 失敗から学んだ点
+
 ---
 
 # Chapter 2　LangGraph / Workflow 基礎
