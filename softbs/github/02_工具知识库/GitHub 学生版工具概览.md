@@ -45,6 +45,7 @@ GitHub 学生版不是单个工具，而是一组学生认证后可以领取的�
 6. GitHub Actions：给每个项目追加自动构建、测试、部署流程。
 7. Figma / Canva：给项目补充 UI 原型、流程图、作品集截图。
 8. 云主机或容器平台：后期再练习 Docker、Linux、Nginx、数据库、后端服务部署。
+9. Pageclip ：给静态网站（HTML）添加后端表单功能（Form Backend）的服务
 
 ## 4. 和本工作区学习项目的对应关系
 
