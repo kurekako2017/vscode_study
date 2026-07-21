@@ -261,8 +261,10 @@ FastAPI で何を実装しましたか。
 
 ## 回答
 
-認証、文書、RAG/分析、レポート、承認、管理（AI Runtime）、ヘルス/レディネスです。
-統一例外、request_id、権限制御を ミドルウェア（ミドルウェア） と Depends で共通化しました。
+FastAPIでは、
+認証、文書管理、RAG検索、AI分析、レポート生成、承認機能、AI Runtime管理、Health Check APIを実装しました。
+
+また、例外処理、request_id、認証・認可はMiddlewareとDependsを利用して共通化し、保守しやすい構成にしました。
 
 ## 追問
 

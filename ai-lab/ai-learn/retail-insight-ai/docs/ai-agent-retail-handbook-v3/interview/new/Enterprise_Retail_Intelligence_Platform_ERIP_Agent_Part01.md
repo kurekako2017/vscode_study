@@ -221,6 +221,14 @@ Enterprise Retail Intelligence Platform、
 大手流通グループ向け
 AI経営分析プラットフォームを担当しました。
 
+社内文書を一元管理し、LangChainによるRAG検索と、 LangGraphのエージェントワークフローを利用して経営分析を行い、 
+レポート作成から承認・監査までを一連の業務として実現しました。 
+
+私は主に、 バックエンド（Backend）、 フロントエンド（Frontend）、 データベース（Database）、 
+AI基盤（AI Platform）、 認証・認可（Authentication / Authorization）、 RAG検索（Retrieval-Augmented Generation）、 
+承認機能（Approval）、 監査機能（Audit） の設計・実装を担当しました。 
+------
+
 ERIP は、
 LangChain と LangGraph を中核とした
 エンタープライズ AI エージェント基盤（Enterprise AI Agent Platform） です。
