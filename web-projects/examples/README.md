@@ -1,5 +1,28 @@
 # Examples 目录总览
 
+
+
+React Modern Learning  项目
+
+V1.2：增加 Props / State 动画流程图。
+
+V2.0：增加一个“React 生命周期可视化”页面，专门演示 Render、Commit、Effect、Cleanup 等执行过程
+
+建议等你把 React 这套内容学完以后，我们直接做 React Modern Learning V2.0：
+
+统一文档命名（编号化）
+
+建立 docs/ 文档目录
+
+增加架构图和调用图
+
+完整整理 Learning Panel 教程
+
+建立企业开发与 Retail Insight AI 的映射体系
+
+这样 V2.0 会真正成为一个可以长期维护和反复学习的 React 教学项目。
+
+
 本目录包含若干前端示例工程，每个子目录内含可直接运行的示例代码与各自的 `README.md`。可作为学习模板或快速启动样板。
 
 ## 基础入门示例
