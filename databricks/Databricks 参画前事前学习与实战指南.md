@@ -1,7 +1,7 @@
 # Databricks 参画前事前学习与实战指南
 
-> **学习目标**  
-> 本文档以项目组提供的《Databricks 参画前の事前学習内容》为基准进行整理。  
+> **学习目标**
+> 本文档以项目组提供的《Databricks 参画前の事前学習内容》为基准进行整理。
 > 目标不是在参画前深入掌握 Spark 内部架构，而是尽快达到能够参与 Databricks 数据基盘项目开发的基本水平。
 >
 > 最终应达到：
@@ -677,11 +677,11 @@ bank.bronze.customer
 
 数据：
 
-| customer_id | name | status | age |
-|---|---|---|---:|
-| C001 | Tanaka | ACTIVE | 40 |
-| C002 | Sato | NULL | 35 |
-| C003 | Suzuki | ACTIVE | NULL |
+| customer_id | name   | status |  age |
+| ----------- | ------ | ------ | ---: |
+| C001        | Tanaka | ACTIVE |   40 |
+| C002        | Sato   | NULL   |   35 |
+| C003        | Suzuki | ACTIVE | NULL |
 
 Bronze 阶段一般尽量保留原始数据。
 
@@ -784,10 +784,10 @@ GROUP BY
 
 最终：
 
-| customer_id | name | transaction_count | total_amount | avg_amount |
-|---|---|---:|---:|---:|
-| C001 | Tanaka | 25 | 580000 | 23200 |
-| C002 | Sato | 8 | 120000 | 15000 |
+| customer_id | name   | transaction_count | total_amount | avg_amount |
+| ----------- | ------ | ----------------: | -----------: | ---------: |
+| C001        | Tanaka |                25 |       580000 |      23200 |
+| C002        | Sato   |                 8 |       120000 |      15000 |
 
 这张：
 
@@ -881,15 +881,15 @@ df
 
 有 SQL 经验时，推荐使用这种方法学习 PySpark。
 
-| SQL | PySpark |
-|---|---|
-| SELECT | select() |
-| WHERE | filter() |
-| JOIN | join() |
+| SQL      | PySpark   |
+| -------- | --------- |
+| SELECT   | select()  |
+| WHERE    | filter()  |
+| JOIN     | join()    |
 | GROUP BY | groupBy() |
 | ORDER BY | orderBy() |
-| SUM | sum() |
-| COUNT | count() |
+| SUM      | sum()     |
+| COUNT    | count()   |
 
 例如 SQL：
 
@@ -1258,18 +1258,18 @@ Cluster 高级配置
 
 # 32. 建议学习时间
 
-| 内容 | 时间 | 达成目标 |
-|---|---:|---|
-| Databricks 基本概念 | 1h | 理解整体结构 |
-| Free Edition / Workspace | 1h | 熟悉环境 |
-| Notebook | 1h | 可以自己创建和执行 |
-| Catalog / Schema / Table | 1h | 能找到和查询数据 |
-| Databricks SQL | 2h | 常用 SQL 实际执行 |
-| Bronze / Silver / Gold | 3h | **重点掌握** |
-| Delta / MERGE / View | 2h | 理解数据管理方式 |
-| PySpark / DataFrame | 3h | 能看懂并写简单代码 |
-| 完整实战 | 3～4h | CSV → Gold |
-| Job / Pipeline | 1～2h | 理解自动执行 |
+| 内容                     |  时间 | 达成目标           |
+| ------------------------ | ----: | ------------------ |
+| Databricks 基本概念      |    1h | 理解整体结构       |
+| Free Edition / Workspace |    1h | 熟悉环境           |
+| Notebook                 |    1h | 可以自己创建和执行 |
+| Catalog / Schema / Table |    1h | 能找到和查询数据   |
+| Databricks SQL           |    2h | 常用 SQL 实际执行  |
+| Bronze / Silver / Gold   |    3h | **重点掌握** |
+| Delta / MERGE / View     |    2h | 理解数据管理方式   |
+| PySpark / DataFrame      |    3h | 能看懂并写简单代码 |
+| 完整实战                 | 3～4h | CSV → Gold        |
+| Job / Pipeline           | 1～2h | 理解自动执行       |
 
 预计：
 
