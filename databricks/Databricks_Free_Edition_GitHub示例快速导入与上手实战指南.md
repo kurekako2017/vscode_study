@@ -1,18 +1,18 @@
 # Databricks Free Edition：利用 GitHub 示例快速上手实战操作指南
 
-> **适用环境**：Databricks Free Edition（2026）\
+> **适用环境**：Databricks Free Edition（2026）
 > **目标**：不从零手敲一个大项目，而是先把 GitHub 中现成的 Databricks
 > 示例导入 Workspace，运行起来、看到结果，再反过来理解
-> Notebook、SQL、PySpark、Bronze / Silver / Gold。\
+> Notebook、SQL、PySpark、Bronze / Silver / Gold。
 > **当前推荐主项目**：`DataWithBaraa/databricks_bootcamp_2026`
 
-------------------------------------------------------------------------
+---
 
 # 1. 先明确：GitHub 示例和 Databricks 是什么关系
 
 最容易产生的误解是：
 
-``` text
+```text
 GitHub 示例
 ↓
 下载到电脑
@@ -24,7 +24,7 @@ GitHub 示例
 
 更简单的方式是：
 
-``` text
+```text
 GitHub Repository
         ↓
 Databricks Git folder
@@ -40,21 +40,21 @@ Databricks Git folder
 
 也就是说：
 
--   GitHub：保存别人已经写好的学习代码和数据文件
--   Databricks：真正执行这些 Notebook、SQL、PySpark 的环境
--   Git folder：把 GitHub Repository 直接连接/克隆到 Databricks
-    Workspace
+- GitHub：保存别人已经写好的学习代码和数据文件
+- Databricks：真正执行这些 Notebook、SQL、PySpark 的环境
+- Git folder：把 GitHub Repository 直接连接/克隆到 Databricks
+  Workspace
 
 Databricks 现在把旧教程里的 **Repos** 政名为 **Git
 folders**。看到旧视频说 `Repos`，不要困惑，它基本就是现在的 Git folder。
 
-------------------------------------------------------------------------
+---
 
 # 2. 你现在截图所在的位置是正确的
 
 当前已经进入：
 
-``` text
+```text
 Databricks Free Edition
 → 工作区（Workspace）
 → Users
@@ -63,7 +63,7 @@ Databricks Free Edition
 
 截图中已经有：
 
-``` text
+```text
 Drafts
 _assistant
 Bakehouse Sales Starter Space
@@ -74,17 +74,17 @@ notebook_20260822
 
 下一步不需要安装：
 
--   Java
--   Spark
--   Hadoop
--   Python 本地环境
--   Docker
--   Azure VM
+- Java
+- Spark
+- Hadoop
+- Python 本地环境
+- Docker
+- Azure VM
 
 Free Edition 使用 Serverless Compute，可以直接在 Databricks
 中运行学习代码。
 
-------------------------------------------------------------------------
+---
 
 # 3. 最推荐的快速学习方法
 
@@ -96,7 +96,7 @@ Free Edition 使用 Serverless Compute，可以直接在 Databricks
 
 学习循环：
 
-``` text
+```text
 GitHub 找到示例
        ↓
 导入 Databricks
@@ -118,7 +118,7 @@ Run
 
 这是当前最快的学习方法。
 
-------------------------------------------------------------------------
+---
 
 # 4. 第一种导入方式：Git folder【最推荐】
 
@@ -126,7 +126,7 @@ Run
 
 在当前 Databricks 页面：
 
-``` text
+```text
 左侧
 工作区
 ```
@@ -135,7 +135,7 @@ Run
 
 然后：
 
-``` text
+```text
 新建
 ↓
 Git folder
@@ -143,69 +143,69 @@ Git folder
 
 中文界面中可能显示：
 
-``` text
+```text
 Git 文件夹
 ```
 
 如果看不到，可以从 Workspace 内某个目录的：
 
-``` text
+```text
 新建 / Create
 ```
 
 菜单中寻找。
 
-------------------------------------------------------------------------
+---
 
 # 5. 从 GitHub Clone 项目
 
 以推荐项目为例：
 
-``` text
+```text
 https://github.com/DataWithBaraa/databricks_bootcamp_2026
 ```
 
 在 Git folder 创建画面填写：
 
-``` text
+```text
 Git repository URL:
 https://github.com/DataWithBaraa/databricks_bootcamp_2026
 ```
 
 Git Provider：
 
-``` text
+```text
 GitHub
 ```
 
 Repository name 通常会自动成为：
 
-``` text
+```text
 databricks_bootcamp_2026
 ```
 
 点击：
 
-``` text
+```text
 Create Git folder
 ```
 
 或者中文界面的：
 
-``` text
+```text
 创建 Git 文件夹
 ```
 
 完成后 Workspace 中会出现类似：
 
-``` text
+```text
 Workspace
 └── Users
     └── <你的用户>
         └── databricks_bootcamp_2026
 ```
 
-------------------------------------------------------------------------
+---
 
 # 6. Public GitHub 与 GitHub 登录
 
@@ -215,11 +215,11 @@ Workspace
 
 对于：
 
--   Private Repository
--   Push
--   Commit
--   Pull
--   自己的公司 GitHub
+- Private Repository
+- Push
+- Commit
+- Pull
+- 自己的公司 GitHub
 
 则需要正式配置 Git credentials / GitHub App。
 
@@ -229,7 +229,7 @@ Workspace
 
 > 把示例跑起来。
 
-------------------------------------------------------------------------
+---
 
 # 7. Clone 完以后不要马上全部 Run
 
@@ -237,7 +237,7 @@ Workspace
 
 很多 GitHub 教程项目包含：
 
-``` text
+```text
 README
 Setup
 Dataset
@@ -251,23 +251,23 @@ Unity Catalog
 
 不要点击：
 
-``` text
+```text
 Run All
 ```
 
 原因是别人项目可能依赖：
 
--   特定 Catalog
--   特定 Schema
--   特定 Volume
--   特定数据文件路径
--   其他 Notebook
--   非 Free Edition 功能
--   已经创建好的 Table
+- 特定 Catalog
+- 特定 Schema
+- 特定 Volume
+- 特定数据文件路径
+- 其他 Notebook
+- 非 Free Edition 功能
+- 已经创建好的 Table
 
 所以正确方法是：
 
-``` text
+```text
 README
 ↓
 目录结构
@@ -279,7 +279,7 @@ Setup
 逐 Cell Run
 ```
 
-------------------------------------------------------------------------
+---
 
 # 8. Clone 后第一件事：看目录，不是看代码
 
@@ -287,7 +287,7 @@ Setup
 
 例如可能看到：
 
-``` text
+```text
 databricks_bootcamp_2026/
 │
 ├── README.md
@@ -301,7 +301,7 @@ databricks_bootcamp_2026/
 
 看到这些名字时，先建立整体概念：
 
-``` text
+```text
 datasets
    ↓
 原始数据
@@ -321,7 +321,7 @@ gold
 
 这一步比马上研究每一行代码更重要。
 
-------------------------------------------------------------------------
+---
 
 # 9. 第二件事：打开 README
 
@@ -329,7 +329,7 @@ README 不需要逐字翻译。
 
 只寻找以下信息：
 
-``` text
+```text
 Prerequisites
 Setup
 Getting Started
@@ -342,18 +342,18 @@ Schema
 
 重点回答四个问题：
 
-1.  数据在哪里？
-2.  第一个执行文件是什么？
-3.  是否需要先创建 Catalog / Schema？
-4.  Notebook 的执行顺序是什么？
+1. 数据在哪里？
+2. 第一个执行文件是什么？
+3. 是否需要先创建 Catalog / Schema？
+4. Notebook 的执行顺序是什么？
 
-------------------------------------------------------------------------
+---
 
 # 10. 第三个动作：找到 Setup
 
 如果 Repository 有：
 
-``` text
+```text
 setup
 setup.py
 setup.sql
@@ -365,32 +365,32 @@ setup.sql
 
 例如可能存在：
 
-``` sql
+```sql
 CREATE CATALOG ...
 CREATE SCHEMA ...
 ```
 
 或者：
 
-``` python
+```python
 spark.sql(...)
 ```
 
 先理解它准备了什么环境，再执行。
 
-------------------------------------------------------------------------
+---
 
 # 11. 不要因为示例名字不同而困惑
 
 GitHub 示例可能不是：
 
-``` text
+```text
 bank.bronze.customer
 ```
 
 可能是：
 
-``` text
+```text
 workspace.bronze.customers
 sales.bronze.orders
 demo.silver.products
@@ -400,7 +400,7 @@ demo.silver.products
 
 你只要把它映射成：
 
-``` text
+```text
 Catalog
    ↓
 Schema
@@ -410,13 +410,13 @@ Table
 
 例如：
 
-``` text
+```text
 sales.gold.customer_summary
 ```
 
 就是：
 
-``` text
+```text
 sales
 → Catalog
 
@@ -427,7 +427,7 @@ customer_summary
 → Table
 ```
 
-------------------------------------------------------------------------
+---
 
 # 12. Notebook 怎么运行
 
@@ -435,7 +435,7 @@ customer_summary
 
 第一遍采用：
 
-``` text
+```text
 Cell 1
 ↓
 Run
@@ -461,13 +461,13 @@ Run
 
 例如：
 
-``` python
+```python
 df = spark.read.table("bronze.customer")
 ```
 
 理解为：
 
-``` text
+```text
 输入：
 bronze.customer
 
@@ -478,13 +478,13 @@ bronze.customer
 DataFrame df
 ```
 
-------------------------------------------------------------------------
+---
 
 # 13. SQL Cell 怎么看
 
 例如：
 
-``` sql
+```sql
 SELECT *
 FROM bronze.customer
 WHERE status = 'ACTIVE';
@@ -494,7 +494,7 @@ WHERE status = 'ACTIVE';
 
 重点观察：
 
-``` text
+```text
 Databricks Notebook
        ↓
 执行 SQL
@@ -508,13 +508,13 @@ SQL 已经熟悉时，真正需要学习的是：
 
 > Databricks 怎么组织、执行和保存这些数据。
 
-------------------------------------------------------------------------
+---
 
 # 14. PySpark Cell 怎么学最快
 
 例如：
 
-``` python
+```python
 df = spark.read.table("bronze.customer")
 
 result = (
@@ -530,7 +530,7 @@ display(result)
 
 直接与 SQL 对照：
 
-``` sql
+```sql
 SELECT
     customer_id,
     name
@@ -541,7 +541,9 @@ WHERE status = 'ACTIVE';
 对应关系：
 
   SQL            PySpark
-  -------------- --------------------
+
+---
+
   FROM / Table   spark.read.table()
   WHERE          filter()
   SELECT         select()
@@ -551,13 +553,13 @@ WHERE status = 'ACTIVE';
 
 这就是最快的 PySpark 入门方式。
 
-------------------------------------------------------------------------
+---
 
 # 15. 一定要使用 display()
 
 学习时看到：
 
-``` python
+```python
 display(df)
 ```
 
@@ -567,7 +569,7 @@ display(df)
 
 学习过程：
 
-``` python
+```python
 df = spark.read.table("bronze.customer")
 display(df)
 ```
@@ -576,7 +578,7 @@ display(df)
 
 然后：
 
-``` python
+```python
 active_df = df.filter(df["status"] == "ACTIVE")
 display(active_df)
 ```
@@ -585,7 +587,7 @@ display(active_df)
 
 这种：
 
-``` text
+```text
 代码
 ↓
 立即看到数据变化
@@ -593,13 +595,13 @@ display(active_df)
 
 比单纯阅读 PySpark 教程快很多。
 
-------------------------------------------------------------------------
+---
 
 # 16. 学 JOIN 也采用"运行后看结果"
 
 例如：
 
-``` python
+```python
 customer_df = spark.read.table("silver.customer")
 transaction_df = spark.read.table("silver.transaction")
 
@@ -614,13 +616,13 @@ display(result_df)
 
 不要只背：
 
-``` text
+```text
 join()
 ```
 
 而要观察：
 
-``` text
+```text
 Customer
 +
 Transaction
@@ -634,13 +636,13 @@ JOIN
 
 这才是真正理解数据加工。
 
-------------------------------------------------------------------------
+---
 
 # 17. Bronze / Silver / Gold 要这样看 GitHub 示例
 
 看到 Bronze Notebook 时问：
 
-``` text
+```text
 数据从哪里来？
 ↓
 CSV？
@@ -655,7 +657,7 @@ Bronze Table？
 
 看到 Silver Notebook 时问：
 
-``` text
+```text
 从哪个 Bronze Table 读取？
 ↓
 做了哪些：
@@ -671,7 +673,7 @@ Join
 
 看到 Gold Notebook 时问：
 
-``` text
+```text
 读取哪些 Silver Table？
 ↓
 JOIN 什么？
@@ -683,13 +685,13 @@ SUM / COUNT 什么？
 最终建立什么 Gold Table？
 ```
 
-------------------------------------------------------------------------
+---
 
 # 18. 最重要的学习视角
 
 不要：
 
-``` text
+```text
 Notebook 1
 → 记代码
 
@@ -702,7 +704,7 @@ Notebook 3
 
 而应该始终画：
 
-``` text
+```text
 Source
 ↓
 Bronze
@@ -718,7 +720,7 @@ Gold
 
 > 它在这条数据链路的哪一步？
 
-------------------------------------------------------------------------
+---
 
 # 19. 如何快速看出效果
 
@@ -726,7 +728,7 @@ Databricks 学习时主要通过四种方式确认效果。
 
 ## 方法 1：display()
 
-``` python
+```python
 display(df)
 ```
 
@@ -734,7 +736,7 @@ display(df)
 
 ## 方法 2：SELECT
 
-``` sql
+```sql
 SELECT *
 FROM catalog.schema.table
 LIMIT 100;
@@ -746,13 +748,13 @@ LIMIT 100;
 
 左侧：
 
-``` text
+```text
 目录
 ```
 
 或者 Catalog 页面中查看：
 
-``` text
+```text
 Catalog
 ↓
 Schema
@@ -762,22 +764,22 @@ Table
 
 可以查看：
 
--   Table 名称
--   Columns
--   Schema
--   Sample Data
--   Metadata
+- Table 名称
+- Columns
+- Schema
+- Sample Data
+- Metadata
 
 ## 方法 4：COUNT
 
-``` sql
+```sql
 SELECT COUNT(*)
 FROM silver.customer;
 ```
 
 加工前后比较：
 
-``` text
+```text
 Bronze 1000 rows
 ↓
 清洗
@@ -791,7 +793,7 @@ Silver 970 rows
 
 这就是数据工程实际工作中的思维。
 
-------------------------------------------------------------------------
+---
 
 # 20. 第一次运行 GitHub Demo 的正确目标
 
@@ -801,7 +803,7 @@ Silver 970 rows
 
 只追求：
 
-``` text
+```text
 Clone成功
 ↓
 Notebook打开
@@ -817,19 +819,19 @@ PySpark display看到数据
 
 达到这里，第一次学习已经成功。
 
-------------------------------------------------------------------------
+---
 
 # 21. 第二遍才开始修改代码
 
 第一次：
 
-``` python
+```python
 df.filter(df["status"] == "ACTIVE")
 ```
 
 第二遍修改成：
 
-``` python
+```python
 df.filter(df["status"] == "INACTIVE")
 ```
 
@@ -837,13 +839,13 @@ df.filter(df["status"] == "INACTIVE")
 
 然后修改：
 
-``` python
+```python
 .select("customer_id", "name")
 ```
 
 变成：
 
-``` python
+```python
 .select(
     "customer_id",
     "name",
@@ -853,25 +855,25 @@ df.filter(df["status"] == "INACTIVE")
 
 再次观察。
 
-------------------------------------------------------------------------
+---
 
 # 22. 第三遍开始自己写
 
 原示例：
 
-``` python
+```python
 df.filter(df["status"] == "ACTIVE")
 ```
 
 自己尝试：
 
-``` python
+```python
 df.filter(df["age"] >= 30)
 ```
 
 再尝试 SQL：
 
-``` sql
+```sql
 SELECT *
 FROM silver.customer
 WHERE age >= 30;
@@ -879,7 +881,7 @@ WHERE age >= 30;
 
 这样完成：
 
-``` text
+```text
 模仿
 ↓
 修改
@@ -887,13 +889,13 @@ WHERE age >= 30;
 自己写
 ```
 
-------------------------------------------------------------------------
+---
 
 # 23. 第二种方式：直接 Import Notebook
 
 如果 GitHub Repository 很复杂，不想整个 Clone，可以只下载一个：
 
-``` text
+```text
 .py
 .sql
 .ipynb
@@ -902,7 +904,7 @@ WHERE age >= 30;
 
 然后在 Databricks：
 
-``` text
+```text
 Workspace
 ↓
 选择自己的文件夹
@@ -914,25 +916,25 @@ Import
 
 Databricks 支持导入：
 
--   `.py`
--   `.sql`
--   `.scala`
--   `.r`
--   `.ipynb`
--   `.dbc`
--   Databricks 导出的 ZIP
+- `.py`
+- `.sql`
+- `.scala`
+- `.r`
+- `.ipynb`
+- `.dbc`
+- Databricks 导出的 ZIP
 
 适合：
 
 > 我只想快速运行一个 Notebook 看效果。
 
-------------------------------------------------------------------------
+---
 
 # 24. DBC 文件是什么
 
 你之前截图中的旧 Workshop 有：
 
-``` text
+```text
 ADB-bootcamp-20201025-to-be-shared.dbc
 ```
 
@@ -942,7 +944,7 @@ ADB-bootcamp-20201025-to-be-shared.dbc
 
 可以：
 
-``` text
+```text
 下载 .dbc
 ↓
 Databricks Workspace
@@ -958,7 +960,7 @@ Import
 
 所以旧教程经常让你：
 
-``` text
+```text
 Download DBC
 ↓
 Import Databricks
@@ -966,7 +968,7 @@ Import Databricks
 
 这是正常的。
 
-------------------------------------------------------------------------
+---
 
 # 25. 2026 年更推荐 Git folder
 
@@ -974,13 +976,13 @@ Import Databricks
 
 **优先：**
 
-``` text
+```text
 Git folder
 ```
 
 而不是：
 
-``` text
+```text
 下载 ZIP
 ↓
 手工上传
@@ -988,7 +990,7 @@ Git folder
 
 原因：
 
-``` text
+```text
 GitHub
 ↕
 Databricks Git folder
@@ -996,15 +998,15 @@ Databricks Git folder
 
 以后可以继续：
 
--   Pull
--   查看更新
--   Branch
--   Commit
--   Push
+- Pull
+- 查看更新
+- Branch
+- Commit
+- Push
 
 也更接近真实项目开发方式。
 
-------------------------------------------------------------------------
+---
 
 # 26. GitHub 示例无法运行时，先检查这 6 项
 
@@ -1012,51 +1014,51 @@ Databricks Git folder
 
 例如：
 
-``` text
+```text
 CATALOG_NOT_FOUND
 ```
 
 检查代码是否假定存在：
 
-``` text
+```text
 main.demo.xxx
 ```
 
-------------------------------------------------------------------------
+---
 
 ## ② Schema 不存在
 
 例如：
 
-``` text
+```text
 SCHEMA_NOT_FOUND
 ```
 
 先确认是否漏执行 Setup。
 
-------------------------------------------------------------------------
+---
 
 ## ③ Table 不存在
 
 例如：
 
-``` text
+```text
 TABLE_OR_VIEW_NOT_FOUND
 ```
 
 检查：
 
-``` text
+```text
 Bronze Notebook 是否先运行？
 ```
 
-------------------------------------------------------------------------
+---
 
 ## ④ 文件路径不存在
 
 例如代码读取：
 
-``` python
+```python
 "/Volumes/demo/data/customer.csv"
 ```
 
@@ -1064,26 +1066,26 @@ Bronze Notebook 是否先运行？
 
 检查 README / datasets / Setup。
 
-------------------------------------------------------------------------
+---
 
 ## ⑤ Notebook 执行顺序错误
 
 例如直接运行：
 
-``` text
+```text
 03_gold
 ```
 
 但：
 
-``` text
+```text
 01_bronze
 02_silver
 ```
 
 还没执行。
 
-------------------------------------------------------------------------
+---
 
 ## ⑥ Free Edition 不支持某项功能
 
@@ -1096,13 +1098,13 @@ Free Edition 有功能和资源限制。
 先跳过该功能，继续学习 Notebook / SQL / PySpark / Delta /
 Bronze-Silver-Gold。
 
-------------------------------------------------------------------------
+---
 
 # 27. 推荐第一个 GitHub 学习项目
 
 第一阶段：
 
-``` text
+```text
 DataWithBaraa/databricks_bootcamp_2026
 ```
 
@@ -1114,7 +1116,7 @@ GitHub：
 
 第一轮只寻找：
 
-``` text
+```text
 Setup
 ↓
 Data
@@ -1126,11 +1128,11 @@ Silver
 Gold
 ```
 
-------------------------------------------------------------------------
+---
 
 # 28. 第一个项目建议学习顺序
 
-``` text
+```text
 Step 1
 Clone GitHub 到 Git folder
         ↓
@@ -1171,13 +1173,13 @@ Step 13
 重新执行
 ```
 
-------------------------------------------------------------------------
+---
 
 # 29. 第一轮只学习这些代码
 
 PySpark：
 
-``` python
+```python
 spark.read.table()
 display()
 filter()
@@ -1188,7 +1190,7 @@ groupBy()
 
 SQL：
 
-``` sql
+```sql
 SELECT
 WHERE
 JOIN
@@ -1201,7 +1203,7 @@ MERGE
 
 数据结构：
 
-``` text
+```text
 Catalog
 Schema
 Table
@@ -1211,7 +1213,7 @@ DataFrame
 
 数据层：
 
-``` text
+```text
 Bronze
 Silver
 Gold
@@ -1219,13 +1221,13 @@ Gold
 
 先不要扩大范围。
 
-------------------------------------------------------------------------
+---
 
 # 30. 推荐的"1 小时快速上手法"
 
 ## 0～10 分钟
 
-``` text
+```text
 GitHub
 ↓
 Git folder Clone
@@ -1237,7 +1239,7 @@ Git folder Clone
 
 ## 10～20 分钟
 
-``` text
+```text
 README
 ↓
 目录
@@ -1253,7 +1255,7 @@ Setup
 
 运行第一个 Notebook：
 
-``` text
+```text
 Cell 1 Run
 ↓
 Cell 2 Run
@@ -1269,13 +1271,13 @@ Cell 3 Run
 
 找到：
 
-``` python
+```python
 display(df)
 ```
 
 或者：
 
-``` sql
+```sql
 SELECT *
 ```
 
@@ -1287,7 +1289,7 @@ SELECT *
 
 修改：
 
-``` text
+```text
 WHERE条件
 filter条件
 select字段
@@ -1299,13 +1301,13 @@ select字段
 
 > 第一次主动改变执行结果。
 
-------------------------------------------------------------------------
+---
 
 # 31. 推荐的 3 小时实战路线
 
 ## 第 1 小时：运行
 
-``` text
+```text
 Clone
 ↓
 Setup
@@ -1319,7 +1321,7 @@ Run
 
 ## 第 2 小时：理解
 
-``` text
+```text
 Source
 ↓
 Bronze
@@ -1335,7 +1337,7 @@ Gold
 
 修改：
 
-``` text
+```text
 WHERE
 filter
 select
@@ -1345,12 +1347,14 @@ GROUP BY
 
 然后重新运行。
 
-------------------------------------------------------------------------
+---
 
 # 32. 与项目组事前学习要求的对应关系
 
   项目组要求        GitHub 实战怎么学
-  ----------------- ----------------------------------
+
+---
+
   Databricks 概念   Clone 后认识 Workspace / Compute
   Notebook          直接运行 GitHub Notebook
   SQL               修改 Demo SQL
@@ -1364,13 +1368,13 @@ GROUP BY
   MERGE             第二阶段 Delta 示例
   Pipeline          基础完成后再学
 
-------------------------------------------------------------------------
+---
 
 # 33. 和银行数据基盘项目对应起来
 
 以后现场可能是：
 
-``` text
+```text
 银行系统
 ↓
 数据连携
@@ -1396,7 +1400,7 @@ AI Agent
 
 重点看：
 
-``` text
+```text
 Source是什么
 ↓
 Bronze怎么建立
@@ -1408,13 +1412,13 @@ Gold为什么这样聚合
 
 业务数据换了，数据工程思想仍然类似。
 
-------------------------------------------------------------------------
+---
 
 # 34. 当前不要学习 GitHub 的哪些东西
 
 看到这些可以暂时跳过：
 
-``` text
+```text
 CI/CD
 GitHub Actions
 Terraform
@@ -1428,13 +1432,13 @@ Spark内部优化
 
 不是这些没用，而是它们不是当前参画前最高优先级。
 
-------------------------------------------------------------------------
+---
 
 # 35. 最快学习原则
 
 ## 错误方式
 
-``` text
+```text
 先读300页Databricks资料
 ↓
 再学Spark原理
@@ -1448,7 +1452,7 @@ Spark内部优化
 
 ## 推荐方式
 
-``` text
+```text
 今天就打开Databricks
 ↓
 Clone GitHub
@@ -1462,7 +1466,7 @@ Run Notebook
 再查不懂的概念
 ```
 
-------------------------------------------------------------------------
+---
 
 # 36. 每个 Notebook 只回答 5 个问题
 
@@ -1470,7 +1474,7 @@ Run Notebook
 
 ### Q1. 输入是什么？
 
-``` text
+```text
 CSV？
 JSON？
 Table？
@@ -1479,7 +1483,7 @@ DataFrame？
 
 ### Q2. 从哪里读取？
 
-``` text
+```text
 Bronze？
 Silver？
 Volume？
@@ -1487,7 +1491,7 @@ Volume？
 
 ### Q3. 做什么加工？
 
-``` text
+```text
 Filter？
 Select？
 JOIN？
@@ -1497,7 +1501,7 @@ NULL处理？
 
 ### Q4. 输出到哪里？
 
-``` text
+```text
 DataFrame？
 Silver Table？
 Gold Table？
@@ -1505,7 +1509,7 @@ Gold Table？
 
 ### Q5. 业务目的是什么？
 
-``` text
+```text
 数据清洗？
 客户汇总？
 交易汇总？
@@ -1515,7 +1519,7 @@ AI Agent使用？
 
 能回答这五个问题，就说明这个 Notebook 基本看懂了。
 
-------------------------------------------------------------------------
+---
 
 # 37. 第一次学习的完成标准
 
@@ -1523,27 +1527,27 @@ AI Agent使用？
 
 只要完成：
 
--   [ ] GitHub Repository 成功 Clone 到 Databricks
--   [ ] 能打开 Git folder
--   [ ] 能打开 README
--   [ ] 能打开 Notebook
--   [ ] 能执行 Cell
--   [ ] 能看到 SQL 结果
--   [ ] 能 `display(df)`
--   [ ] 能找到 Catalog / Schema / Table
--   [ ] 能理解一个 Bronze → Silver 加工
--   [ ] 能理解一个 Silver → Gold 加工
--   [ ] 能修改一个 WHERE / filter 条件并重新运行
+- [ ] GitHub Repository 成功 Clone 到 Databricks
+- [ ] 能打开 Git folder
+- [ ] 能打开 README
+- [ ] 能打开 Notebook
+- [ ] 能执行 Cell
+- [ ] 能看到 SQL 结果
+- [ ] 能 `display(df)`
+- [ ] 能找到 Catalog / Schema / Table
+- [ ] 能理解一个 Bronze → Silver 加工
+- [ ] 能理解一个 Silver → Gold 加工
+- [ ] 能修改一个 WHERE / filter 条件并重新运行
 
 做到这些，就已经真正开始使用 Databricks，而不再只是看教程。
 
-------------------------------------------------------------------------
+---
 
 # 38. 后续学习顺序
 
 完成第一个 Demo 后再进入：
 
-``` text
+```text
 第一阶段
 databricks_bootcamp_2026
 ↓
@@ -1568,7 +1572,7 @@ CDC
 
 不要三个 Repository 同时学习。
 
-------------------------------------------------------------------------
+---
 
 # 39. 最终目标
 
@@ -1576,7 +1580,7 @@ CDC
 
 而是以后拿到项目代码时，可以迅速判断：
 
-``` text
+```text
 这个 Notebook
 ↓
 读取什么数据
@@ -1594,7 +1598,7 @@ CDC
 
 达到这个水平，就已经具备 Databricks 数据基盘项目最重要的入门阅读能力。
 
-------------------------------------------------------------------------
+---
 
 # 40. 现在立刻执行的操作
 
@@ -1602,7 +1606,7 @@ CDC
 
 直接在当前 Databricks Free Edition：
 
-``` text
+```text
 1. 左侧「工作区」
 2. 进入自己的用户目录
 3. 点击「新建」
@@ -1618,7 +1622,7 @@ CDC
 
 如果第 5～10 步出现错误，先记录：
 
-``` text
+```text
 错误画面
 +
 正在执行的 Notebook 名
