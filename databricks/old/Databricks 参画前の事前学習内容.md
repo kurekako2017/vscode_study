@@ -80,7 +80,7 @@ Sparkについては、事前に深く勉強する必要はありません。
 例えば、以下のような簡単なPySparkコードを見た際に、何をしている処理なのか理解できる程度で十分です。
 
 df = spark.read.table("bronze.customer")
-df.filter(df["status"] == "ACTIVE") \
+df.filter(df["status"] == "ACTIVE")
   .select("customer_id", "name")
 
 Sparkの内部構造、RDD、Shuffle、パーティション、Catalyst Optimizerなどの詳細については、現時点では優先度は低いです。
@@ -96,8 +96,7 @@ Sparkの内部構造、RDD、Shuffle、パーティション、Catalyst Optimize
 5. 簡単なTable / Viewを作成
 6. PythonまたはPySparkで簡単なデータ処理を実行
 7. Bronze → Silver → Goldの流れを簡単に確認
-
-7. 学習の優先順位
+8. 学習の優先順位
 
 時間が限られている場合は、以下の順番で学習してください。
 
@@ -119,3 +118,25 @@ Sparkの内部構造、RDD、Shuffle、パーティション、Catalyst Optimize
 まずは「DatabricksでSQLを使ってデータを確認・加工できる」「Notebookの基本操作ができる」「Bronze / Silver / Goldの意味が分かる」という状態を目標にしてください。
 
 PL/SQLの経験がある場合、SQL部分は既存の知識を活かせるため、Databricks特有の操作やデータ処理の考え方を中心にキャッチアップするのが効率的です。
+
+--------------------------
+
+Databriksの案件参画にあたり参考となる資料を共有します。
+この受講は必須ではないです。
+
+用語や概念を事前に理解しておいたほうが作業には入りやすいですし、
+参画後も使用する機会がある資料となります。
+
+Webトレーニング　
+https://customer-academy.databricks.com/learn/signin
+
+•	Databricks Fundamentals Learning Plan - Japanese
+o	Databricks Fundamentals - Japanese
+o	Databricks Fundamentals Accreditation - Japanese
+•	Get Started with Databricks for Data Engineering - Japanese
+環境
+Databricks Free Edition
+•	Databricks無料版にサインアップ | Databricks on AWS
+https://docs.databricks.com/aws/ja/getting-started/free-edition
+
+以上、よろしくお願いいたします。

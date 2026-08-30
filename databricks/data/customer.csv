@@ -1,0 +1,5 @@
+customer_id,name,status,age
+C001,Tanaka,ACTIVE,40
+C002,Sato,,35
+C003,Suzuki,ACTIVE,28
+C004,Yamada,INACTIVE,50
