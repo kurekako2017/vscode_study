@@ -16,14 +16,14 @@ ERP
 
 当前仓库 CSV 大致规模：
 
-| 文件 | 行数 |
-|---|---:|
-| CRM customer | 18,494 |
-| CRM product | 397 |
-| CRM sales | 60,398 |
-| ERP customer | 18,484 |
-| ERP location | 18,484 |
-| ERP product category | 37 |
+| 文件                 |   行数 |
+| -------------------- | -----: |
+| CRM customer         | 18,494 |
+| CRM product          |    397 |
+| CRM sales            | 60,398 |
+| ERP customer         | 18,484 |
+| ERP location         | 18,484 |
+| ERP product category |     37 |
 
 ---
 
