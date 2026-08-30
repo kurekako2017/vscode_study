@@ -50,3 +50,16 @@ JtProject-NestJS = Next.js + React + TypeScript + Node.js + NestJS
 | **Express**    | Node.js Web 框架                     |
 | **NestJS**     | Node.js 企业级后端框架               |
 | Vite                 | 前端构建工具                         |
+
+TypeScript + React/Next.js + Node/NestJS  更接近
+
+                  TypeScript
+                      │
+          ┌───────────┴────────────┐
+          │                        │
+         前端                     后端
+          │                        │
+        React                    Node.js
+          │                        │
+       Next.js                  NestJS
+     （需要时使用）          （主要后端框架）
