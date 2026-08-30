@@ -43,6 +43,54 @@ flowchart TB
 ```
 
 ---
+```mermaid
+flowchart TB
+
+    SRC["业务系统 / CSV / DB / API<br>数据来源"]
+
+    DBX["Databricks<br>统一的数据处理与分析平台"]
+
+    WS["Workspace<br>管理 Notebook、代码和开发文件"]
+
+    NB["Notebook<br>编写和执行 SQL / Python / PySpark"]
+
+    CMP["Compute / Serverless<br>提供代码运行所需的计算资源"]
+
+    UC["Catalog<br>管理 Schema、Table 等数据资产"]
+
+    B["Bronze Delta Table<br>保存原始或接近原始状态的数据"]
+
+    S["Silver Delta Table<br>保存清洗、去重、标准化后的可信数据"]
+
+    G["Gold Delta Table<br>保存面向业务分析和应用的加工数据"]
+
+    OUT["Data Mart / BI / AI Agent<br>提供报表、分析和 AI 使用的数据"]
+
+    JOB["Jobs / Workflows<br>自动编排和执行数据处理任务"]
+
+    SRC --> B
+
+    DBX --> WS
+    DBX --> UC
+
+    WS --> NB
+
+    CMP --> NB
+
+    UC --> B
+
+    B --> S
+    S --> G
+    G --> OUT
+
+    NB -.->|读取 / 写入| B
+    NB -.->|读取 / 写入| S
+    NB -.->|读取 / 写入| G
+
+    JOB -.->|自动执行| NB
+```
+
+    JOB -. "自动调度执行" .-> NB
 
 ## 3. Workspace：代码在哪里
 
