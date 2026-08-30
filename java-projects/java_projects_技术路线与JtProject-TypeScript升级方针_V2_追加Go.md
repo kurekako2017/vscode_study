@@ -8,17 +8,17 @@
 
 正确理解是：
 
-| 技术 | 定位 |
-| --- | --- |
-| JavaScript | 编程语言 |
-| **TypeScript** | JavaScript 的类型化扩展/语言 |
-| **React** | 前端 UI Library |
-| **Next.js** | 基于 React 的应用框架 |
-| **Node.js** | JavaScript / TypeScript 服务端运行环境 |
-| **Express** | Node.js Web 框架 |
-| **NestJS** | Node.js 企业级后端框架 |
-| Vite | 前端构建工具 |
-| AWS | 部署 / 云基础设施 |
+| 技术                 | 定位                                   |
+| -------------------- | -------------------------------------- |
+| JavaScript           | 编程语言                               |
+| **TypeScript** | JavaScript 的类型化扩展/语言           |
+| **React**      | 前端 UI Library                        |
+| **Next.js**    | 基于 React 的应用框架                  |
+| **Node.js**    | JavaScript / TypeScript 服务端运行环境 |
+| **Express**    | Node.js Web 框架                       |
+| **NestJS**     | Node.js 企业级后端框架                 |
+| Vite                 | 前端构建工具                           |
+| AWS                  | 部署 / 云基础设施                      |
 
 React 可以使用 JavaScript，也可以使用 TypeScript。本项目采用的是 **React + TypeScript**。
 
@@ -53,15 +53,15 @@ Node.js 也不是另一种 JavaScript；它是 JavaScript/TypeScript 的服务�
 
 ## 2. 当前 java-projects 已经覆盖什么
 
-| 项目 | 核心目的 |
-| --- | --- |
-| `JtProject` | Spring Boot + JSP |
-| `JtProject-Thymeleaf` | Spring Boot + Thymeleaf |
-| `JtProject-React` | Spring Boot + React + TypeScript |
-| `JtProject-Vue` | Spring Boot + Vue + TypeScript |
-| `JtProject-Next` | Spring Boot + Next.js + TypeScript |
-| `JtProject-SpringBoot-TypeScript` | Spring Boot + 原生 TypeScript |
-| `JtProject-TypeScript` | Node.js + Express + React + TypeScript |
+| 项目                                | 核心目的                               |
+| ----------------------------------- | -------------------------------------- |
+| `JtProject`                       | Spring Boot + JSP                      |
+| `JtProject-Thymeleaf`             | Spring Boot + Thymeleaf                |
+| `JtProject-React`                 | Spring Boot + React + TypeScript       |
+| `JtProject-Vue`                   | Spring Boot + Vue + TypeScript         |
+| `JtProject-Next`                  | Spring Boot + Next.js + TypeScript     |
+| `JtProject-SpringBoot-TypeScript` | Spring Boot + 原生 TypeScript          |
+| `JtProject-TypeScript`            | Node.js + Express + React + TypeScript |
 
 因此目前已经有：
 
@@ -130,12 +130,12 @@ JtProject-TypeScript/
         └── 前后端共享 TypeScript 类型
 ```
 
-| 目录 | 技术 | 定位 |
-| --- | --- | --- |
-| `apps/web` | React + TypeScript + Vite | 前端 |
-| `apps/api-express` | Node.js + Express + TypeScript | 基础 / 对照 |
-| `apps/api-nestjs` | Node.js + NestJS + TypeScript | **重点 / 最终主后端** |
-| `packages/shared` | TypeScript | DTO / interface / API 类型共享 |
+| 目录                 | 技术                           | 定位                           |
+| -------------------- | ------------------------------ | ------------------------------ |
+| `apps/web`         | React + TypeScript + Vite      | 前端                           |
+| `apps/api-express` | Node.js + Express + TypeScript | 基础 / 对照                    |
+| `apps/api-nestjs`  | Node.js + NestJS + TypeScript  | **重点 / 最终主后端**    |
+| `packages/shared`  | TypeScript                     | DTO / interface / API 类型共享 |
 
 技术关系应画成：
 
@@ -214,18 +214,18 @@ NestJS 的重点：
 
 ## 6. Express / NestJS / Spring Boot 对照
 
-| 功能 | Express | NestJS | Spring Boot |
-| --- | --- | --- | --- |
-| HTTP入口 | Router | Controller | Controller |
-| GET | `router.get()` | `@Get()` | `@GetMapping` |
-| 业务层 | 自己组织 | Service | Service |
-| DI | 自己处理 | 内置 DI | Spring DI |
-| 模块 | 自己组织 | Module | Configuration / Component |
-| DTO | TS interface/type | DTO class | Java DTO |
-| Validation | 中间件等 | Pipe / class-validator | Bean Validation |
-| 权限控制 | Middleware 等 | Guard | Spring Security |
-| 异常处理 | Middleware | Exception Filter | ExceptionHandler |
-| 企业项目结构 | 自己规定 | 框架规定 | 框架规定 |
+| 功能         | Express           | NestJS                 | Spring Boot               |
+| ------------ | ----------------- | ---------------------- | ------------------------- |
+| HTTP入口     | Router            | Controller             | Controller                |
+| GET          | `router.get()`  | `@Get()`             | `@GetMapping`           |
+| 业务层       | 自己组织          | Service                | Service                   |
+| DI           | 自己处理          | 内置 DI                | Spring DI                 |
+| 模块         | 自己组织          | Module                 | Configuration / Component |
+| DTO          | TS interface/type | DTO class              | Java DTO                  |
+| Validation   | 中间件等          | Pipe / class-validator | Bean Validation           |
+| 权限控制     | Middleware 等     | Guard                  | Spring Security           |
+| 异常处理     | Middleware        | Exception Filter       | ExceptionHandler          |
+| 企业项目结构 | 自己规定          | 框架规定               | 框架规定                  |
 
 同一业务：
 
@@ -499,7 +499,6 @@ Node.js + NestJS + TypeScript
 
 > **TypeScript 是语言；React 是前端 UI Library；Next.js 是 React 应用框架；Node.js 是后端运行环境；Express 是基础 Node Web 框架；NestJS 是重点企业级 Node 后端框架；AWS 是部署层。**
 
-
 ---
 
 # 11. Go 语言版本追加方案（SES 案件导向）
@@ -636,22 +635,22 @@ PostgreSQL
 
 建议技术栈：
 
-| 层 | 技术 |
-| --- | --- |
-| 前端语言 | TypeScript |
-| 前端 UI | React |
-| 前端框架 | Next.js |
-| 后端语言 | Go |
-| Web 框架 | Gin |
+| 层           | 技术                        |
+| ------------ | --------------------------- |
+| 前端语言     | TypeScript                  |
+| 前端 UI      | React                       |
+| 前端框架     | Next.js                     |
+| 后端语言     | Go                          |
+| Web 框架     | Gin                         |
 | ORM / DB访问 | GORM（入门）→ sqlc（后续） |
-| DB | PostgreSQL |
-| API | REST API |
-| API 文档 | OpenAPI / Swagger |
-| 配置 | env |
-| 日志 | slog / zap |
-| 测试 | Go testing |
-| 容器 | Docker / Docker Compose |
-| 云部署 | AWS（后续横向部署） |
+| DB           | PostgreSQL                  |
+| API          | REST API                    |
+| API 文档     | OpenAPI / Swagger           |
+| 配置         | env                         |
+| 日志         | slog / zap                  |
+| 测试         | Go testing                  |
+| 容器         | Docker / Docker Compose     |
+| 云部署       | AWS（后续横向部署）         |
 
 ---
 
@@ -800,21 +799,21 @@ model
 
 # 17. Spring Boot / NestJS / Go Gin 横向比较
 
-| 功能 | Spring Boot | NestJS | Go + Gin |
-| --- | --- | --- | --- |
-| 语言 | Java | TypeScript | Go |
-| HTTP入口 | Controller | Controller | Handler |
-| 路由 | `@GetMapping` | `@Get()` | `router.GET()` |
-| Service | `@Service` | `@Injectable()` | struct + method |
-| DI | Spring DI | Nest DI | 手工注入 / Wire 等 |
-| DTO | Java class | TS class | Go struct |
-| JSON | Jackson | 内置序列化 | `encoding/json` / Gin |
-| ORM | JPA | TypeORM/Prisma | GORM |
-| DB | PostgreSQL/MySQL | PostgreSQL/MySQL | PostgreSQL/MySQL |
-| 并发 | Thread / Executor | Event Loop | Goroutine |
-| 构建 | Maven/Gradle | npm/pnpm | `go build` |
-| 部署 | JVM | Node.js | 单一二进制 |
-| 典型方向 | 企业系统 | Web/SaaS | 微服务/高并发/云原生 |
+| 功能     | Spring Boot       | NestJS            | Go + Gin                |
+| -------- | ----------------- | ----------------- | ----------------------- |
+| 语言     | Java              | TypeScript        | Go                      |
+| HTTP入口 | Controller        | Controller        | Handler                 |
+| 路由     | `@GetMapping`   | `@Get()`        | `router.GET()`        |
+| Service  | `@Service`      | `@Injectable()` | struct + method         |
+| DI       | Spring DI         | Nest DI           | 手工注入 / Wire 等      |
+| DTO      | Java class        | TS class          | Go struct               |
+| JSON     | Jackson           | 内置序列化        | `encoding/json` / Gin |
+| ORM      | JPA               | TypeORM/Prisma    | GORM                    |
+| DB       | PostgreSQL/MySQL  | PostgreSQL/MySQL  | PostgreSQL/MySQL        |
+| 并发     | Thread / Executor | Event Loop        | Goroutine               |
+| 构建     | Maven/Gradle      | npm/pnpm          | `go build`            |
+| 部署     | JVM               | Node.js           | 单一二进制              |
+| 典型方向 | 企业系统          | Web/SaaS          | 微服务/高并发/云原生    |
 
 ---
 
