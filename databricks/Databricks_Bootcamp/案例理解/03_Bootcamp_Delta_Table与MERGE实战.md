@@ -245,10 +245,10 @@ ORDER BY customer_id;
 
 ## 11. Table / View / Temporary View
 
-| 类型 | Bootcamp 对应 |
-|---|---|
-| Table | `workspace.silver.crm_customers` |
-| View | 可保存常用 SQL 查询定义 |
+| 类型           | Bootcamp 对应                        |
+| -------------- | ------------------------------------ |
+| Table          | `workspace.silver.crm_customers`   |
+| View           | 可保存常用 SQL 查询定义              |
 | Temporary View | `crm_customer_updates`，会话内使用 |
 
 View 扩展：

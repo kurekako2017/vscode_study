@@ -70,13 +70,13 @@ gold.dim_products
 
 ## 3. Notebook chaining ≠ 正式 Workflow
 
-| Bootcamp orchestration | Jobs / Workflows |
-|---|---|
-| 调用关系写在 Python 中 | 依赖在 Workflow 层表达 |
-| `dbutils.notebook.run()` | 每个 Notebook 是 Task |
-| 简单统一入口 | 更适合生产调度和监控 |
-| 逻辑藏在代码 | DAG 可以直接看到 |
-| 基本执行 | 有 Run History / Retry / Schedule |
+| Bootcamp orchestration     | Jobs / Workflows                  |
+| -------------------------- | --------------------------------- |
+| 调用关系写在 Python 中     | 依赖在 Workflow 层表达            |
+| `dbutils.notebook.run()` | 每个 Notebook 是 Task             |
+| 简单统一入口               | 更适合生产调度和监控              |
+| 逻辑藏在代码               | DAG 可以直接看到                  |
+| 基本执行                   | 有 Run History / Retry / Schedule |
 
 ---
 
